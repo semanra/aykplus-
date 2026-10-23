@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AYK+" />
+  <meta name="theme-color" content="#0b1120" />
+  
+  <link id="appAppleIcon" rel="apple-touch-icon" sizes="180x180" href="icon.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link id="appFavicon" rel="icon" type="image/png" href="icon.png" />
+
+  <title>AYK+ | Makro, GYM & Mobilite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0b1120; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 1rem; }
+    .card-done { background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.45); }
+    .set-done { background-color: rgba(16, 185, 129, 0.16) !important; border-color: rgba(16, 185, 129, 0.55) !important; }
+    input[type="range"] { accent-color: #10b981; }
+    select, input[type="number"], input[type="text"] { background-color: #0f172a; border: 1px solid #475569; color: #f8fafc; }
+    .sticky-bar { position: sticky; top: 0; z-index: 40; backdrop-filter: blur(14px); background-color: rgba(11, 17, 32, 0.94); border-bottom: 1px solid #334155; padding-top: calc(0.625rem + env(safe-area-inset-top, 0px)); }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 45; backdrop-filter: blur(16px); background-color: rgba(15, 23, 42, 0.96); border-top: 1px solid #334155; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+  </style>
+</head>
+<body class="pb-32">
+
+  <!-- ÜST SABİT PANEL -->
+  <div class="sticky-bar px-3 py-2.5 shadow-2xl">
+    <div class="max-w-5xl mx-auto">
+      
+      <!-- Üst Başlık: AYK+ Markası ve Hızlı Araçlar -->
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+        <div class="flex items-center gap-2">
+          <img id="headerLogo" src="" alt="AYK+" class="w-9 h-9 rounded-xl object-cover hidden border border-emerald-500/50 shadow-md" />
+          <div id="defaultLogoBox" class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm tracking-tighter shadow-md">AYK+</div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-white font-extrabold text-lg tracking-tight">AYK<span class="text-emerald-400">+</span></span>
+              <span id="saveBadge" class="text-[10px] bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700/50">✓ Kaydedildi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sağ Üst Kontroller & Kronometre -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <div id="timerBox" class="flex items-center gap-1 bg-slate-900 border border-slate-700 px-2 py-1 rounded-lg text-xs">
+            <span>⏱️</span>
+            <span id="timerDisplay" class="font-mono font-bold text-amber-400">01:30</span>
+            <button onclick="startRestTimer(30)" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-200">30s</button>
+            <button onclick="startRestTimer(45)" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-200">45s</button>
+            <button onclick="startRestTimer(90)" class="text-[10px] bg-slate-800 hover:bg-slate-700 px-1.5 py-0.5 rounded text-slate-200">90s</button>
+            <button onclick="stopRestTimer()" class="text-[10px] text-rose-400 px-1 font-bold">■</button>
+          </div>
+
+          <label class="cursor-pointer text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-1.5 rounded-lg border border-slate-600 transition flex items-center gap-1">
+            🖼️ İkon
+            <input type="file" accept="image/*" class="hidden" onchange="handleIconUpload(event)" />
+          </label>
+          <button onclick="openBackupModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-2 py-1.5 rounded-lg border border-slate-600 transition">
+            💾 Yedek
+          </button>
+        </div>
+      </div>
+
+      <!-- BESLENME SEKMESİ AKTİFKEN GÖRÜNEN 4 MAKRO KARTI -->
+      <div id="nutritionHeaderBar" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="flex justify-between text-[11px] text-slate-400">
+            <span>🔥 KALORİ</span>
+            <span id="calStatus" class="font-semibold text-emerald-400">Kalan: 0</span>
+          </div>
+          <div class="text-base font-bold"><span id="calConsumed">0</span> <span class="text-xs font-normal text-slate-400">/ <span id="calTarget">0</span></span></div>
+          <div class="w-full bg-slate-950 h-1.5 rounded-full mt-1 overflow-hidden">
+            <div id="calBar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="flex justify-between text-[11px] text-slate-400">
+            <span>🥩 PROTEİN</span>
+            <span id="proStatus" class="font-semibold text-sky-400">Kalan: 0g</span>
+          </div>
+          <div class="text-base font-bold"><span id="proConsumed">0</span> <span class="text-xs font-normal text-slate-400">/ <span id="proTarget">0</span>g</span></div>
+          <div class="w-full bg-slate-950 h-1.5 rounded-full mt-1 overflow-hidden">
+            <div id="proBar" class="bg-sky-500 h-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="flex justify-between text-[11px] text-slate-400">
+            <span>🍚 KARB</span>
+            <span id="carbStatus" class="font-semibold text-amber-400">Kalan: 0g</span>
+          </div>
+          <div class="text-base font-bold"><span id="carbConsumed">0</span> <span class="text-xs font-normal text-slate-400">/ <span id="carbTarget">0</span>g</span></div>
+          <div class="w-full bg-slate-950 h-1.5 rounded-full mt-1 overflow-hidden">
+            <div id="carbBar" class="bg-amber-500 h-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="flex justify-between text-[11px] text-slate-400">
+            <span>🥑 YAĞ</span>
+            <span id="fatStatus" class="font-semibold text-rose-400">Kalan: 0g</span>
+          </div>
+          <div class="text-base font-bold"><span id="fatConsumed">0</span> <span class="text-xs font-normal text-slate-400">/ <span id="fatTarget">0</span>g</span></div>
+          <div class="w-full bg-slate-950 h-1.5 rounded-full mt-1 overflow-hidden">
+            <div id="fatBar" class="bg-rose-500 h-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GYM SEKMESİ AKTİFKEN GÖRÜNEN ANTRENMAN ÖZET BARI -->
+      <div id="gymHeaderBar" class="hidden grid-cols-3 gap-2">
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="text-[11px] text-slate-400">🏋️‍♂️ AKTİF GÜN</div>
+          <div id="gymActiveDayTitle" class="text-xs md:text-sm font-bold text-emerald-400 truncate">1. GÜN: Üst Vücut A</div>
+        </div>
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="text-[11px] text-slate-400">✅ BİTEN SET ÇETELESİ</div>
+          <div class="text-sm md:text-base font-bold text-sky-400"><span id="gymDoneSets">0</span> / <span id="gymTotalSets">0</span> Set</div>
+        </div>
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="text-[11px] text-slate-400">⚡ TOPLAM TONAJ</div>
+          <div class="text-sm md:text-base font-bold text-amber-400"><span id="gymTotalVolume">0</span> kg</div>
+        </div>
+      </div>
+
+      <!-- MOBİLİTE SEKMESİ AKTİFKEN GÖRÜNEN ÖZET BAR -->
+      <div id="mobilityHeaderBar" class="hidden grid-cols-3 gap-2">
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="text-[11px] text-slate-400">🧘‍♂️ DİNAMİK MOBİLİTE</div>
+          <div class="text-sm md:text-base font-bold text-emerald-400"><span id="mobDynamicDone">0</span> / <span id="mobDynamicTotal">5</span> Hareket</div>
+        </div>
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="text-[11px] text-slate-400">🤸‍♂️ STATİK STRETCHING</div>
+          <div class="text-sm md:text-base font-bold text-sky-400"><span id="mobStaticDone">0</span> / <span id="mobStaticTotal">5</span> Hareket</div>
+        </div>
+        <div class="bg-slate-800/95 border border-slate-700 rounded-xl p-2">
+          <div class="text-[11px] text-slate-400">⏱️ HIZLI SAYAÇ</div>
+          <div class="flex gap-1 mt-0.5">
+            <button onclick="startRestTimer(30)" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white text-[11px] font-bold py-0.5 rounded">30 sn</button>
+            <button onclick="startRestTimer(45)" class="flex-1 bg-indigo-700 hover:bg-indigo-600 text-white text-[11px] font-bold py-0.5 rounded">45 sn</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- SEKME 1: BESLENME & MAKRO PLANLAYICI                      -->
+  <!-- ========================================================= -->
+  <div id="tabNutrition" class="max-w-5xl mx-auto px-3.5 mt-4 space-y-5">
+
+    <div class="card p-3.5 space-y-3">
+      <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-800 pb-2.5">
+        <span class="text-xs font-semibold text-slate-300">🥗 Beslenme & Günlük Takip Araçları</span>
+        <div class="flex gap-1.5">
+          <button onclick="openCustomFoodModal()" class="text-xs bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-medium transition">➕ Özel Besin Tanımla</button>
+          <button onclick="autoBalanceCarbs()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-lg font-medium transition">⚖️ Kalan Kaloriyi Karb İle Dengele</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
+        <div class="flex items-center justify-between bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+          <div>
+            <div class="text-xs text-slate-400">💧 Günlük Su (Hedef: 3.5 L)</div>
+            <div class="text-base font-bold text-sky-400"><span id="waterVal">0.0</span> / 3.5 L</div>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="addWater(-0.25)" class="px-2.5 py-1.5 text-xs rounded-lg bg-slate-800 text-slate-300 font-bold">-</button>
+            <button onclick="addWater(0.25)" class="px-2.5 py-1.5 text-xs rounded-lg bg-sky-700 hover:bg-sky-600 text-white font-semibold">+250ml</button>
+            <button onclick="addWater(0.5)" class="px-2.5 py-1.5 text-xs rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold">+500ml</button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+          <div class="flex flex-wrap gap-1.5">
+            <button id="supCreatine" onclick="toggleSupp('creatine')" class="text-xs px-2.5 py-1.5 rounded-lg border transition">⚡ Kreatin (5g)</button>
+            <button id="supGreens" onclick="toggleSupp('greens')" class="text-xs px-2.5 py-1.5 rounded-lg border transition">🥬 Greens</button>
+            <button id="supOmega" onclick="toggleSupp('omega')" class="text-xs px-2.5 py-1.5 rounded-lg border transition">🐟 Omega/Vit</button>
+          </div>
+          <button onclick="resetDailyProgress()" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">🌅 Yeni Gün</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+        <div>
+          <div class="flex justify-between items-center text-sm mb-1">
+            <span class="text-slate-300 font-medium">Güncel Kilon:</span>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-bold"><span id="weightVal">105</span> kg</span>
+              <button onclick="logCurrentWeight()" class="text-[11px] bg-emerald-900/70 hover:bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded border border-emerald-700/50">📌 Tartıyı Kaydet</button>
+            </div>
+          </div>
+          <input id="weightSlider" type="range" min="80" max="115" step="0.5" value="105" oninput="updateProfile()" class="w-full" />
+          <div id="weightHistoryText" class="text-[11px] text-slate-400 mt-1 truncate">Hedef: 82 kg (%15 Yağ Oranı)</div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="text-slate-300 font-medium">Kalori Açığı:</span>
+            <span class="text-amber-400 font-bold">-<span id="deficitVal">700</span> kcal</span>
+          </div>
+          <input id="deficitSlider" type="range" min="300" max="1000" step="50" value="700" oninput="updateProfile()" class="w-full" />
+          <div id="timelineInfo" class="text-[11px] text-slate-400 mt-1">Tahmini Süre: ~25 Hafta</div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <span class="text-sm text-slate-300 font-medium">Gün Tipi:</span>
+          <div class="flex gap-2">
+            <button id="btnTrain" onclick="setDayType('train')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white">🏋️ Antrenman Günü</button>
+            <button id="btnRest" onclick="setDayType('rest')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-400 border border-slate-700">🛋️ Dinlenme (-200 kcal)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="mealsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- SEKME 2: GYM ANTRENMAN PROGRAMI & ÇETELE                  -->
+  <!-- ========================================================= -->
+  <div id="tabGym" class="max-w-5xl mx-auto px-3.5 mt-4 space-y-5 hidden">
+
+    <!-- Antrenman Günleri Seçici Bar -->
+    <div class="card p-3.5 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div id="workoutDaysTabs" class="flex flex-wrap gap-1.5"></div>
+        <div class="flex gap-1.5">
+          <button onclick="addWorkoutDay()" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-600 px-2.5 py-1.5 rounded-lg font-medium">+ Yeni Gün</button>
+          <button onclick="renameWorkoutDay()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 px-2.5 py-1.5 rounded-lg">✏️ Adlandır</button>
+        </div>
+      </div>
+
+      <!-- Aktif Antrenman Gününe Hareket Ekleme Barı (Devasa Kütüphane) -->
+      <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
+        <select id="exerciseSelect" class="flex-1 min-w-[210px] text-xs rounded-lg px-3 py-2">
+          <!-- JS ile 130+ Hareket Doldurulur -->
+        </select>
+        <button onclick="addSelectedExercise()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition">
+          + Kütüphaneden Ekle
+        </button>
+        <button onclick="addCustomExercisePrompt()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">
+          ✍️ Özel Hareket Yaz
+        </button>
+      </div>
+    </div>
+
+    <!-- HAREKET KARTLARI VE SET/KİLO/TEKRAR ÇETELESİ -->
+    <div id="gymExercisesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+    <!-- ANTRENMANI BİTİR & GEÇMİŞ ANTRENMAN ÇETELESİ -->
+    <div class="card p-4 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="font-bold text-base text-white">🏁 Antrenman Sonu & Geçmiş Çetele</h3>
+          <p class="text-xs text-slate-400">Antrenmanı tamamladığında kaydet; tikler sonraki hafta için sıfırlanır ama girdiğin kilolar hafızada kalır.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="uncheckAllSets()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700">
+            ↺ Sadece Tikleri Sıfırla
+          </button>
+          <button onclick="finishAndLogWorkout()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
+            ✅ Antrenmanı Bitir ve Kaydet
+          </button>
+        </div>
+      </div>
+
+      <div id="workoutHistoryList" class="space-y-2 pt-2 border-t border-slate-800"></div>
+    </div>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- SEKME 3: DİNAMİK MOBİLİTE AKIŞI & STATİK STRETCHING       -->
+  <!-- ========================================================= -->
+  <div id="tabMobility" class="max-w-5xl mx-auto px-3.5 mt-4 space-y-5 hidden">
+
+    <!-- Üst Bilgi & Kütüphaneden Mobilite/Stretching Ekleme -->
+    <div class="card p-4 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 class="text-base font-bold text-white">🧘‍♂️ Dinamik Mobilite Akışı & Statik Stretching</h2>
+          <p class="text-xs text-slate-400">Dinlenme günlerinde evde veya antrenman çevresinde uyguladığın rutin. Her hareketin set/süre hedefini düzenleyebilir veya kütüphaneden yeni hareket ekleyebilirsin.</p>
+        </div>
+        <button onclick="resetMobilityChecks()" class="text-xs bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 px-3 py-1.5 rounded-lg font-medium">
+          ↺ Tüm Tikleri Sıfırla
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-2 pt-2 border-t border-slate-800">
+        <select id="mobilityTargetType" class="md:col-span-3 text-xs rounded-lg px-2.5 py-2">
+          <option value="dynamic">🔥 Dinamik Mobiliteye Ekle</option>
+          <option value="static">🧘 Statik Stretching'e Ekle</option>
+        </select>
+        <select id="mobilityLibrarySelect" class="md:col-span-5 text-xs rounded-lg px-2.5 py-2">
+          <!-- JS ile zengin mobilite kütüphanesi doldurulur -->
+        </select>
+        <button onclick="addFromMobilityLibrary()" class="md:col-span-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
+          + Listeden Ekle
+        </button>
+        <button onclick="addCustomMobilityPrompt()" class="md:col-span-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 px-3 rounded-lg transition">
+          ✍️ Elle Ekle
+        </button>
+      </div>
+    </div>
+
+    <!-- İKİ ANA BÖLÜM: DİNAMİK MOBİLİTE VE STATİK STRETCHING -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- BÖLÜM 1: DİNAMİK MOBİLİTE AKIŞI -->
+      <div class="card p-4 space-y-3">
+        <div class="flex justify-between items-start border-b border-slate-700/80 pb-2.5">
+          <div>
+            <h3 class="font-bold text-base text-emerald-400">🔥 1. Dinamik Mobilite Akışı</h3>
+            <p class="text-xs text-slate-400">Uygulama: Her hareket 1 Set x 8–10 Tekrar</p>
+          </div>
+          <span class="text-xs bg-emerald-950 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded-lg">Eklem & Akış</span>
+        </div>
+        <div id="dynamicMobilityList" class="space-y-2.5"></div>
+      </div>
+
+      <!-- BÖLÜM 2: STATİK STRETCHING -->
+      <div class="card p-4 space-y-3">
+        <div class="flex justify-between items-start border-b border-slate-700/80 pb-2.5">
+          <div>
+            <h3 class="font-bold text-base text-sky-400">🧘 2. Statik Stretching</h3>
+            <p class="text-xs text-slate-400">2 Set x 30–45 Saniye • Toplam Süre: 8–10 Dakika</p>
+          </div>
+          <span class="text-xs bg-sky-950 text-sky-300 border border-sky-700/50 px-2 py-0.5 rounded-lg">Esneklik & Gevşeme</span>
+        </div>
+        <div id="staticMobilityList" class="space-y-2.5"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- ALT NAVİGASYON BARI (3 SEKME: BESLENME | GYM | MOBİLİTE)  -->
+  <!-- ========================================================= -->
+  <div class="bottom-nav px-3 py-2">
+    <div class="max-w-lg mx-auto grid grid-cols-3 gap-2">
+      <button id="navBtnNutrition" onclick="switchTab('nutrition')" class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition bg-emerald-600 text-white shadow-lg">
+        <span>🥗</span>
+        <span>Beslenme</span>
+      </button>
+      <button id="navBtnGym" onclick="switchTab('gym')" class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition bg-slate-800 text-slate-300 border border-slate-700">
+        <span>🏋️‍♂️</span>
+        <span>GYM Çetele</span>
+      </button>
+      <button id="navBtnMobility" onclick="switchTab('mobility')" class="flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition bg-slate-800 text-slate-300 border border-slate-700">
+        <span>🧘‍♂️</span>
+        <span>Mobilite & Esneme</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ÖZEL BESİN EKLEME MODALI -->
+  <div id="customFoodModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
+    <div class="card p-5 max-w-md w-full space-y-3.5">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-base text-emerald-400">➕ Kendi Özel Besinini Tanımla</h3>
+        <button onclick="closeCustomFoodModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+      </div>
+      <div class="space-y-2.5 text-xs">
+        <div>
+          <label class="block text-slate-300 mb-1">Besin Adı:</label>
+          <input id="cfName" type="text" placeholder="Örn: Proteinli Süt / Ev Yapımı Köfte" class="w-full p-2 rounded-lg" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-300 mb-1">Birim Tipi:</label>
+            <select id="cfUnit" class="w-full p-2 rounded-lg">
+              <option value="100g">Gram (100g değerleri gir)</option>
+              <option value="1adet">Adet / Porsiyon (1 adet değeri)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1">Varsayılan Miktar:</label>
+            <input id="cfDef" type="number" value="100" class="w-full p-2 rounded-lg" />
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-sky-400 mb-1">Protein (g):</label>
+            <input id="cfP" type="number" step="0.1" value="20" class="w-full p-2 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-amber-400 mb-1">Karb (g):</label>
+            <input id="cfC" type="number" step="0.1" value="10" class="w-full p-2 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-rose-400 mb-1">Yağ (g):</label>
+            <input id="cfF" type="number" step="0.1" value="5" class="w-full p-2 rounded-lg" />
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeCustomFoodModal()" class="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-lg">İptal</button>
+        <button onclick="saveCustomFood()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- YEDEKLEME & SIFIRLAMA MODALI -->
+  <div id="backupModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
+    <div class="card p-5 max-w-lg w-full space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-base text-emerald-400">💾 AYK+ Yedekle / Geri Yükle</h3>
+        <button onclick="closeBackupModal()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+      </div>
+      <p class="text-xs text-slate-300">Tüm beslenme planın, özel besinlerin, 4 günlük GYM antrenman programın, kaldırdığın kilolar ve mobilite/stretching listen bu kodda kayıtlıdır.</p>
+      <textarea id="backupText" rows="5" class="w-full p-2.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-mono text-slate-200"></textarea>
+      <div class="flex flex-wrap justify-between gap-2">
+        <button onclick="resetToDefaults()" class="bg-rose-950 hover:bg-rose-900 text-rose-200 border border-rose-800 text-xs px-3 py-2 rounded-lg">↺ Fabrika Ayarlarına Sıfırla</button>
+        <div class="flex gap-2">
+          <button onclick="copyBackup()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg">📋 Kodu Kopyala</button>
+          <button onclick="restoreBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2 rounded-lg font-semibold">📥 Kodu Yükle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ============================================================================
+// 1. ZENGİN BESİN VERİTABANI
+// ============================================================================
+const BASE_FOOD_DB = {
+  tam_yumurta: { name: "Tam Yumurta (L Boy)", cat: "Protein & Kahvaltı", unit: "adet", step: 1, def: 3, p: 6.3, c: 0.4, f: 5.0 },
+  yumurta_beyazi: { name: "Yumurta Beyazı", cat: "Protein & Kahvaltı", unit: "adet", step: 1, def: 4, p: 3.6, c: 0.2, f: 0.0 },
+  whey_shake: { name: "Whey Protein Shake (Su ile)", cat: "Protein & Kahvaltı", unit: "ölçek", step: 0.5, def: 1, p: 24.0, c: 2.0, f: 1.5 },
+  lor_peyniri: { name: "Lor Peyniri / Az Yağlı Beyaz Peynir", cat: "Protein & Kahvaltı", unit: "g", step: 25, def: 100, p: 0.18, c: 0.02, f: 0.02 },
+  hindi_fume: { name: "Hindi Füme", cat: "Protein & Kahvaltı", unit: "g", step: 20, def: 60, p: 0.18, c: 0.02, f: 0.02 },
+  suzme_yogurt: { name: "Süzme Yoğurt (Az Yağlı)", cat: "Protein & Kahvaltı", unit: "g", step: 50, def: 150, p: 0.10, c: 0.04, f: 0.015 },
+  kefir: { name: "Sade Kefir", cat: "Protein & Kahvaltı", unit: "ml", step: 50, def: 250, p: 0.032, c: 0.04, f: 0.02 },
+
+  tavuk_gogsu: { name: "Tavuk Göğsü (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.23, c: 0.0, f: 0.015 },
+  tavuk_incik: { name: "Tavuk Kalça / İncik (Derisiz Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.19, c: 0.0, f: 0.06 },
+  hindi_gogsu: { name: "Hindi Göğsü (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.24, c: 0.0, f: 0.01 },
+  dana_kiyma: { name: "Yağsız Dana Kıyma / Biftek (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.21, c: 0.0, f: 0.06 },
+  somon: { name: "Somon Balığı (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 180, p: 0.20, c: 0.0, f: 0.11 },
+  ton_baligi: { name: "Ton Balığı (Süzülmüş)", cat: "Et / Tavuk / Balık", unit: "g", step: 20, def: 120, p: 0.25, c: 0.0, f: 0.01 },
+
+  yulaf: { name: "Yulaf Ezmesi", cat: "Karbonhidratlar", unit: "g", step: 10, def: 80, p: 0.13, c: 0.60, f: 0.07 },
+  pirinc: { name: "Baldo / Yasemin Pirinç (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 10, def: 90, p: 0.07, c: 0.78, f: 0.005 },
+  basmati: { name: "Basmati Pirinç (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 10, def: 90, p: 0.08, c: 0.77, f: 0.006 },
+  makarna_tam: { name: "Tam Buğday / Durum Makarna (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 10, def: 85, p: 0.12, c: 0.72, f: 0.018 },
+  bulgur: { name: "Pilavlık Bulgur / Karabuğday (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 10, def: 85, p: 0.12, c: 0.70, f: 0.015 },
+  patates: { name: "Fırın / Haşlama Patates (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 50, def: 300, p: 0.02, c: 0.18, f: 0.001 },
+  tatli_patates: { name: "Tatlı Patates (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 50, def: 250, p: 0.016, c: 0.20, f: 0.001 },
+  tam_bugday_ekmek: { name: "Tam Buğday / Ekşi Mayalı Ekmek", cat: "Karbonhidratlar", unit: "dilim", step: 1, def: 2, p: 2.7, c: 14.0, f: 0.6 },
+  lavas: { name: "Tam Buğday Lavaş", cat: "Karbonhidratlar", unit: "adet", step: 1, def: 1, p: 5.0, c: 28.0, f: 1.5 },
+  pirinc_patlagi: { name: "Pirinç Patlağı", cat: "Karbonhidratlar", unit: "adet", step: 1, def: 4, p: 0.8, c: 7.0, f: 0.2 },
+  pirinc_unu: { name: "Pirinç Unu / Cream of Rice", cat: "Karbonhidratlar", unit: "g", step: 10, def: 60, p: 0.06, c: 0.80, f: 0.01 },
+  muz: { name: "Muz (Orta Boy)", cat: "Karbonhidratlar", unit: "adet", step: 0.5, def: 1, p: 1.3, c: 25.0, f: 0.4 },
+  yesil_elma: { name: "Yeşil Elma / Porsiyon Meyve", cat: "Karbonhidratlar", unit: "adet", step: 1, def: 1, p: 0.5, c: 18.0, f: 0.2 },
+
+  yesil_salata: { name: "Dev Kase Yeşil Salata (Roka, Marul, Maydanoz, Salatalık)", cat: "Yeşillik & Sebzeler", unit: "kase", step: 1, def: 1, p: 2.0, c: 5.0, f: 0.3 },
+  brokoli_karnabahar: { name: "Buharda Brokoli & Karnabahar", cat: "Yeşillik & Sebzeler", unit: "g", step: 50, def: 200, p: 0.028, c: 0.05, f: 0.004 },
+  ispanak_kabak: { name: "Sote Ispanak / Kabak / Kuşkonmaz", cat: "Yeşillik & Sebzeler", unit: "g", step: 50, def: 200, p: 0.025, c: 0.035, f: 0.003 },
+  domates_salatalik: { name: "Söğüş Domates & Salatalık & Biber", cat: "Yeşillik & Sebzeler", unit: "g", step: 50, def: 200, p: 0.01, c: 0.035, f: 0.002 },
+  greens_scoop: { name: "Greens & Superfoods Tozu", cat: "Yeşillik & Sebzeler", unit: "ölçek", step: 1, def: 1, p: 1.0, c: 3.0, f: 0.0 },
+
+  badem: { name: "Çiğ Badem", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.21, c: 0.10, f: 0.50 },
+  ceviz: { name: "Ceviz İçi", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.15, c: 0.07, f: 0.65 },
+  findik: { name: "Çiğ Fındık", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.15, c: 0.10, f: 0.61 },
+  kaju: { name: "Çiğ Kaju", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.18, c: 0.27, f: 0.44 },
+  yer_fistigi: { name: "Kavrulmuş Yer Fıstığı", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.25, c: 0.13, f: 0.49 },
+  kabak_cekirdegi: { name: "Çiğ Kabak Çekirdeği İçi", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 20, p: 0.30, c: 0.10, f: 0.49 },
+  fistik_ezmesi: { name: "Şekersiz Fıstık Ezmesi (%100)", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 20, p: 0.25, c: 0.16, f: 0.50 },
+  avokado: { name: "Avokado (Soyulmuş)", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 25, def: 75, p: 0.02, c: 0.04, f: 0.15 },
+  zeytinyagi: { name: "Soğuk Sıkım Zeytinyağı (5g = 1 Tatlı Kaşığı)", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 10, p: 0.0, c: 0.0, f: 1.0 },
+  zeytin: { name: "Siyah / Yeşil Zeytin", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "adet", step: 5, def: 10, p: 0.1, c: 0.2, f: 1.0 },
+
+  peynirsiz_whopper: { name: "Burger (Peynirsiz / Klasik Etli)", cat: "🍔 Esnek Diyet / Dışarıdan", unit: "adet", step: 1, def: 1, p: 28.0, c: 49.0, f: 32.0 },
+  ince_pizza_dilim: { name: "İnce Hamur Pizza (Margarita / Bol Malzemos)", cat: "🍔 Esnek Diyet / Dışarıdan", unit: "dilim", step: 1, def: 2, p: 9.0, c: 22.0, f: 7.5 },
+  citir_tavuk_parca: { name: "Çıtır Tavuk Göğüs / Tenders", cat: "🍔 Esnek Diyet / Dışarıdan", unit: "parça", step: 1, def: 3, p: 11.0, c: 9.0, f: 6.0 },
+  cig_kofte_durum: { name: "Çiğ Köfte Dürüm (Etsiz / Bol Yeşillikli)", cat: "🍔 Esnek Diyet / Dışarıdan", unit: "adet", step: 1, def: 1, p: 9.0, c: 72.0, f: 8.0 }
+};
+
+// ============================================================================
+// 2. KAPSAMLI AĞIRLIK ANTRENMANI KÜTÜPHANESİ (130+ HAREKET, 12 KATEGORİ)
+// ============================================================================
+const EXERCISE_LIBRARY = {
+  "1. Göğüs (Chest - Press & Fly)": [
+    "Barbell Bench Press",
+    "Incline Barbell Bench Press",
+    "Decline Barbell Bench Press",
+    "Flat Dumbbell Bench Press",
+    "Incline Dumbbell Press",
+    "Decline Dumbbell Press",
+    "Machine Chest Press (Flat)",
+    "Incline Machine Chest Press",
+    "Smith Machine Bench Press",
+    "Smith Machine Incline Press",
+    "Weighted Dips (Göğüs Odaklı)",
+    "Assisted Chest Dips",
+    "Pec Deck Fly (Butterfly)",
+    "Pec Deck Fly VEYA Cable Crossover",
+    "Cable Crossover (High-to-Low)",
+    "Cable Fly (Mid-Pulley)",
+    "Low-to-High Cable Fly (Üst Göğüs)",
+    "Seated Cable Chest Fly",
+    "Flat / Incline Dumbbell Fly",
+    "Dumbbell Pullover",
+    "Push-Up (Şınav) / Weighted Push-Up",
+    "Svend Press / Plate Press"
+  ],
+  "2. Sırt - Dikey Çekiş (Lats / Width)": [
+    "Pull-up (Geniş Tutuş Barfiks)",
+    "Weighted Pull-up (Ağırlıklı Barfiks)",
+    "Chin-up (Avuç İçi Bakan Barfiks)",
+    "Neutral Grip Pull-up",
+    "Assisted Pull-up Machine",
+    "Lat Pulldown (Wide Grip / Geniş Tutuş)",
+    "Close-Grip / V-Bar Lat Pulldown",
+    "Reverse-Grip (Underhand) Lat Pulldown",
+    "Single-Arm Kneeling Cable Lat Pulldown",
+    "Machine High Row / Iso-Lateral Pulldown",
+    "Straight-Arm Cable / Rope Pulldown",
+    "Dumbbell / Cable Lat Pullover"
+  ],
+  "3. Sırt - Yatay Çekiş & Alt Sırt (Thickness & Lower Back)": [
+    "Chest-Supported Row (Makine veya Sehpa)",
+    "Seated Cable Row (V-Bar / Close Grip)",
+    "Wide-Grip Seated Cable Row (Üst Sırt)",
+    "Barbell Bent-Over Row (Overhand / Underhand)",
+    "Pendlay Row",
+    "One-Arm Dumbbell Row",
+    "T-Bar Row (Landmine veya Makine)",
+    "Iso-Lateral / Hammer Strength Machine Row",
+    "Meadows Row",
+    "Smith Machine Bent-Over Row",
+    " Helms Row / Incline Bench Dumbbell Row",
+    "Inverted Row (Vücut Ağırlığı Yatay Çekiş)",
+    "Conventional Deadlift",
+    "Sumo Deadlift",
+    "Rack Pull (Kısmi Deadlift)",
+    "Hyperextension (45 Derece Back Extension)",
+    "Reverse Hyperextension",
+    "Good Morning (Barbell)"
+  ],
+  "4. Omuz - Ön, Yan, Arka & Trapez (Delts & Traps)": [
+    "Machine Shoulder Press",
+    "Overhead Dumbbell Shoulder Press (Seated / Standing)",
+    "Overhead Barbell Press (Military Press)",
+    "Smith Machine Shoulder Press",
+    "Arnold Press",
+    "Landmine Shoulder Press",
+    "Dumbbell Lateral Raise",
+    "Cable Lateral Raise (Single-Arm)",
+    "Behind-the-Back Cable Lateral Raise",
+    "Machine Lateral Raise",
+    "Chest-Supported / Incline Lateral Raise",
+    "Egyptian Cable Lateral Raise",
+    "Reverse Pec Deck veya Face Pull",
+    "Reverse Pec Deck (Arka Omuz Makinesi)",
+    "Face Pull (Rope)",
+    "Bent-Over Dumbbell Reverse Fly (Rear Delt)",
+    "Single-Arm Rear Delt Cable Fly",
+    "Dumbbell / Barbell Front Raise",
+    "Cable Rope Front Raise",
+    "Barbell Upright Row / Cable Upright Row",
+    "Dumbbell Shrug (Trapez)",
+    "Barbell / Smith Machine Shrug",
+    "Cable Shrug"
+  ],
+  "5. Bacak - Ön Bacak (Quadriceps)": [
+    "Hack Squat",
+    "Barbell Back Squat (High-Bar / Low-Bar)",
+    "Barbell Front Squat",
+    "Leg Press (45 Derece)",
+    "Horizontal / Seated Leg Press",
+    "Single-Leg Press",
+    "Bulgarian Split Squat (Dumbbell / Barbell)",
+    "Smith Machine Squat",
+    "Pendulum Squat / Belt Squat",
+    "Goblet Squat",
+    "Sissy Squat",
+    "Walking Lunges / Reverse Lunges",
+    "Leg Extension (Çift Bacak)",
+    "Single-Leg Extension (Tek Bacak)",
+    "Step-Up (Dumbbell / Box)"
+  ],
+  "6. Bacak - Arka Bacak & Kalça (Hamstrings & Glutes)": [
+    "Romanian Deadlift (RDL - Barbell)",
+    "Dumbbell Romanian Deadlift",
+    "Single-Leg Romanian Deadlift",
+    "Stiff-Legged Deadlift",
+    "Seated Leg Curl",
+    "Lying Leg Curl",
+    "Standing Single-Leg Curl",
+    "Nordic Hamstring Curl",
+    "Glute-Ham Raise (GHR)",
+    "Barbell Hip Thrust",
+    "Machine Hip Thrust / Glute Drive",
+    "Smith Machine Hip Thrust",
+    "Kas Glute Bridge",
+    "Cable Pull-Through",
+    "Cable Glute Kickback",
+    "Hip Abduction Machine (Dış Bacak / Yan Kalça)",
+    "Hip Adduction Machine (İç Bacak)"
+  ],
+  "7. Bacak - Kalf (Calves & Tibialis)": [
+    "Standing Calf Raise (Makine veya Smith)",
+    "Seated Calf Raise",
+    "Leg Press Calf Raise",
+    "Donkey Calf Raise",
+    "Single-Leg Dumbbell Calf Raise",
+    "Tibialis Raise"
+  ],
+  "8. Kol - Biceps & Ön Kol (Biceps & Forearms)": [
+    "Preacher Curl (EZ-Bar / Makine)",
+    "Single-Arm Dumbbell Preacher Curl",
+    "Incline Dumbbell Curl",
+    "Hammer Curl (Dumbbell)",
+    "Cross-Body Hammer Curl",
+    "Cable Rope Hammer Curl",
+    "Standing Barbell / EZ-Bar Curl",
+    "Standing Alternating Dumbbell Curl",
+    "Bayesian Cable Curl (Arkadan Kablo Curl)",
+    "Standing Cable Bar Curl",
+    "High-Pulley Double Biceps Cable Curl",
+    "Spider Curl",
+    "Concentration Curl",
+    "Reverse Barbell / Cable Curl (Ön Kol)",
+    "Zottman Curl",
+    "Wrist Curl / Reverse Wrist Curl (Bilek)"
+  ],
+  "9. Kol - Triceps (Arka Kol)": [
+    "Overhead Cable Triceps Extension (Rope / Bar)",
+    "Triceps Rope/Bar Pushdown",
+    "Skullcrusher (EZ-Bar / Dumbbell Alna Triceps)",
+    "Single-Arm Overhead Dumbbell Triceps Extension",
+    "Seated Two-Arm Overhead Dumbbell Extension",
+    "Cross-Body Dual Cable Triceps Extension",
+    "Single-Arm Reverse/Underhand Cable Pushdown",
+    "JM Press",
+    "Close-Grip Barbell Bench Press",
+    "Triceps Dip Machine / Bench Dips",
+    "Dumbbell / Cable Triceps Kickback",
+    "Diamond Push-Up"
+  ],
+  "10. Karın & Merkez Bölge (Core & Abs)": [
+    "Crunch Machine",
+    "Hanging Leg Raise",
+    "Captain's Chair Knee / Leg Raise",
+    "Kneeling Cable Crunch (Halatla)",
+    "Decline Bench Crunch / Sit-Up",
+    "Ab Wheel Rollout",
+    "Plank / RKC Plank",
+    "Side Plank",
+    "Russian Twist (Medicine Ball / Plate)",
+    "Pallof Press (Anti-Rotasyon)",
+    "Woodchopper (Cable)",
+    "Deadbug / Bird-Dog",
+    "Stomach Vacuum"
+  ],
+  "11. Kardiyo & Kondisyon (Cardio & Conditioning)": [
+    "Incline Treadmill Walk (Eğimli Yürüyüş)",
+    "Stairmaster (Merdiven Makinesi)",
+    "Assault / Air Bike (HIIT)",
+    "Stationary Bike (Sabit Bisiklet)",
+    "Rowing Machine (Kürek)",
+    "Elliptical Trainer",
+    "Jump Rope (İp Atlama)",
+    "Farmer's Walk (Çiftçi Yürüyüşü)",
+    "Kettlebell Swing"
+  ]
+};
+
+// ============================================================================
+// 3. ZENGİN MOBİLİTE & STRETCHING KÜTÜPHANESİ (45+ HAREKET)
+// ============================================================================
+const MOBILITY_LIBRARY = {
+  "Dinamik Mobilite & Eklem Akışı (Dynamic Mobility)": [
+    { name: "World’s Greatest Stretch", prescription: "1 Set x 8-10 Tekrar (Sağ/Sol)", note: "Kalça, torasik omurga ve hamstring kompleksi" },
+    { name: "90/90 Hip Switch", prescription: "1 Set x 8-10 Tekrar", note: "Kalça iç ve dış rotasyon mobilitesi" },
+    { name: "Kneeling Ankle Dorsiflexion", prescription: "1 Set x 8-10 Tekrar (Her Ayak)", note: "Squat derinliği için ayak bileği mobilitesi" },
+    { name: "Quadruped Cat-Cow", prescription: "1 Set x 8-10 Tekrar", note: "Omurga segmentasyonu ve nefes uyumu" },
+    { name: "Towel/Band Shoulder Dislocates", prescription: "1 Set x 8-10 Tekrar", note: "Omuz kapsülü ve pektoral açılış" },
+    { name: "Quadruped Thoracic Rotation (T-Spine)", prescription: "1 Set x 8-10 Tekrar (Her Yön)", note: "Üst sırt rotasyonel açıklık" },
+    { name: "Deep Squat Hold with Pry & Thoracic Reach", prescription: "1 Set x 60 sn Akış", note: "Kalça ve ayak bileği açma" },
+    { name: "Scapular Push-Up & Wall Slides", prescription: "1 Set x 10-12 Tekrar", note: "Serratus anterior ve skapula kontrolü" },
+    { name: "Cossack Squat (Dinamik Yan Lunge)", prescription: "1 Set x 8 Tekrar (Sağ/Sol)", note: "Adductor (iç bacak) ve kalça mobilitesi" },
+    { name: "Leg Swings (Öne-Arkaya & Yana)", prescription: "1 Set x 12 Tekrar", note: "Dinamik kalça ısınması" },
+    { name: "Inchworm to Cobra Flow", prescription: "1 Set x 6-8 Tekrar", note: "Arka zincir ve omuz stabilitesi" },
+    { name: "Quadruped Hip CARs (Controlled Articular Rotations)", prescription: "1 Set x 6 Tur (Her Yön)", note: "Kalça eklem kapsülü kontrolü" },
+    { name: "Shoulder CARs (Ayakta Tam Daire)", prescription: "1 Set x 5 Tur (Her Kol)", note: "Omuz eklem sağlığı" },
+    { name: "Thread the Needle (Dinamik)", prescription: "1 Set x 8 Tekrar (Sağ/Sol)", note: "Torasik rotasyon ve arka omuz" },
+    { name: "Banded Pull-Apart & External Rotation", prescription: "1 Set x 15 Tekrar", note: "Rotator manşet (Rotator Cuff) aktivasyonu" },
+    { name: "Glute Bridge March", prescription: "1 Set x 10 Tekrar", note: "Kalça aktivasyonu ve pelvik stabilite" }
+  ],
+  "Statik Stretching & Esneme (Static Stretching)": [
+    { name: "Doorway Pec & Biceps Stretch", prescription: "2 Set x 30 sn", note: "Göğüs ve ön omuz gerginliğini açar" },
+    { name: "Child’s Pose with Lat Reach", prescription: "Sağ ve Sol için 1'er Set x 45 sn", note: "Kanat (Latissimus) ve bel esnetme" },
+    { name: "Couch Stretch", prescription: "Sağ ve Sol için 2'şer Set x 30 sn", note: "Rectus femoris ve psoas (kalça fleksörü) esnetme" },
+    { name: "Supine Figure-4 Glute Stretch", prescription: "Sağ ve Sol için 2'şer Set x 30 sn", note: "Piriformis ve derin kalça esnetme" },
+    { name: "Single-Leg Seated Hamstring Stretch", prescription: "Sağ ve Sol için 2'şer Set x 30 sn", note: "Arka bacak uzatma" },
+    { name: "Pigeon Pose (Güvercin Pozu)", prescription: "Sağ ve Sol için 2'şer Set x 45 sn", note: "Derin glute ve dış kalça esnetme" },
+    { name: "Frog Stretch (Kurbağa Esnemesi)", prescription: "2 Set x 45 sn", note: "İç bacak (Adductor) ve kasık esnetme" },
+    { name: "Half-Kneeling Hip Flexor Stretch", prescription: "Sağ ve Sol 2'şer Set x 30 sn", note: "Posterior pelvik tilt ile kalça önü esnetme" },
+    { name: "Butterfly Groin Stretch", prescription: "2 Set x 40 sn", note: "Oturarak ayak tabanları birleşik iç bacak esnetme" },
+    { name: "Standing Wall Calf & Soleus Stretch", prescription: "Sağ ve Sol 2'şer Set x 30 sn", note: "Diz düz (Gastrocnemius) ve diz bükülü (Soleus)" },
+    { name: "Overhead Triceps & Lat Side Lean Stretch", prescription: "Sağ ve Sol 2'şer Set x 30 sn", note: "Triceps uzun başı ve yan gövde" },
+    { name: "Cross-Body Posterior Shoulder Stretch", prescription: "Sağ ve Sol 2'şer Set x 30 sn", note: "Arka omuz kapsülü esnetme" },
+    { name: "Upper Trap & Levator Scapulae Neck Stretch", prescription: "Sağ ve Sol 2'şer Set x 30 sn", note: "Boyun ve üst trapez gevşetme" },
+    { name: "Cobra / Sphinx Abdominal Stretch", prescription: "2 Set x 30 sn", note: "Karın ve ön zincir esnetme" },
+    { name: "Supine Spinal Twist (Yatarak Omurga Rotasyonu)", prescription: "Sağ ve Sol 1'er Set x 45 sn", note: "Bel ve omurga dekompresyonu" },
+    { name: "Dead Hang (Barfikste Pasif Asılma)", prescription: "2 Set x 30–45 sn", note: "Omuz sağlığı ve omurga dekompresyonu" }
+  ],
+  "Foam Roller & Miyofasyal Gevşetme (SMR)": [
+    { name: "Thoracic Spine Foam Roll", prescription: "1 Set x 60 sn", note: "Üst sırt ekstansiyonu" },
+    { name: "Latissimus Dorsi Foam Roll", prescription: "Sağ/Sol 45 sn", note: "Koltuk altı ve yan sırt" },
+    { name: "Quadriceps & Hip Flexor Foam Roll", prescription: "Sağ/Sol 60 sn", note: "Ön bacak miyofasyal gevşetme" },
+    { name: "Glute / Piriformis Lacrosse Ball Release", prescription: "Sağ/Sol 60 sn", note: "Tetik nokta gevşetme" },
+    { name: "Plantar Fascia (Ayak Tabanı) Top Masajı", prescription: "Sağ/Sol 45 sn", note: "Ayak tabanı fasyası" }
+  ]
+};
+
+const STORAGE_KEY = "ayk_plus_v5_state";
+
+// Yardımcı fonksiyon: Belirtilen set sayısı ve hedef tekrar aralığıyla set dizisi üretir
+function makeSets(count, targetRange, defaultKg = 0, defaultReps = 8) {
+  const arr = [];
+  for (let i = 0; i < count; i++) {
+    arr.push({ kg: defaultKg, reps: defaultReps, target: targetRange, done: false });
+  }
+  return arr;
+}
+
+const DEFAULT_STATE = {
+  activeTab: "nutrition",
+  weight: 105,
+  deficit: 700,
+  dayType: "train",
+  waterLiters: 0,
+  supplements: { creatine: false, greens: false, omega: false },
+  weightLogs: [{ date: "Başlangıç", weight: 105 }],
+  customFoods: {},
+  customIconDataUrl: "",
+  meals: [
+    {
+      id: "breakfast",
+      title: "1. Öğün: Kahvaltı (Yulaf + Yumurta + Yeşillik)",
+      targetNote: "Hedef: 50-60g Protein",
+      done: false,
+      items: [
+        { foodId: "tam_yumurta", amount: 3 },
+        { foodId: "yulaf", amount: 80 },
+        { foodId: "whey_shake", amount: 1 },
+        { foodId: "domates_salatalik", amount: 200 }
+      ]
+    },
+    {
+      id: "lunch",
+      title: "2. Öğün: Öğle Yemeği (Antrenman Öncesi)",
+      targetNote: "Yüksek Karbonhidrat & Protein",
+      done: false,
+      items: [
+        { foodId: "tavuk_gogsu", amount: 200 },
+        { foodId: "pirinc", amount: 90 },
+        { foodId: "yesil_salata", amount: 1 },
+        { foodId: "zeytinyagi", amount: 10 }
+      ]
+    },
+    {
+      id: "snack",
+      title: "3. Öğün: Ara Öğün (Antrenman Sonrası / İkindi)",
+      targetNote: "Hızlı Toparlanma & Kuruyemiş",
+      done: false,
+      items: [
+        { foodId: "whey_shake", amount: 1 },
+        { foodId: "suzme_yogurt", amount: 150 },
+        { foodId: "muz", amount: 1 },
+        { foodId: "ceviz", amount: 25 }
+      ]
+    },
+    {
+      id: "dinner",
+      title: "4. Öğün: Akşam Yemeği",
+      targetNote: "Kas Onarımı & Sebze/Lif",
+      done: false,
+      items: [
+        { foodId: "dana_kiyma", amount: 200 },
+        { foodId: "makarna_tam", amount: 85 },
+        { foodId: "brokoli_karnabahar", amount: 200 },
+        { foodId: "zeytinyagi", amount: 5 }
+      ]
+    }
+  ],
+
+  // KULLANICININ AKTİF 4 GÜNLÜK ANTRENMAN PROGRAMI (BİREBİR EŞLEŞTİRİLDİ)
+  activeWorkoutDayIdx: 0,
+  workoutLogs: [],
+  workoutDays: [
+    {
+      id: "upperA",
+      name: "1. GÜN: Üst Vücut A",
+      exercises: [
+        { name: "Barbell Bench Press", targetInfo: "3x5–8", note: "Hedef: 3 Set x 5–8 Tekrar", sets: makeSets(3, "5–8", 0, 6) },
+        { name: "Chest-Supported Row", targetInfo: "4x6–10", note: "Hedef: 4 Set x 6–10 Tekrar", sets: makeSets(4, "6–10", 0, 8) },
+        { name: "Incline Dumbbell Press", targetInfo: "3x8–10", note: "Hedef: 3 Set x 8–10 Tekrar", sets: makeSets(3, "8–10", 0, 10) },
+        { name: "Lat Pulldown", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
+        { name: "Cable Lateral Raise", targetInfo: "4x10–15", note: "Hedef: 4 Set x 10–15 Tekrar", sets: makeSets(4, "10–15", 0, 12) },
+        { name: "Reverse Pec Deck veya Face Pull", targetInfo: "3x12–15", note: "Hedef: 3 Set x 12–15 Tekrar", sets: makeSets(3, "12–15", 0, 15) },
+        { name: "Overhead Cable Triceps Extension", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
+        { name: "Triceps Rope/Bar Pushdown", targetInfo: "2x10–12", note: "Hedef: 2 Set x 10–12 Tekrar", sets: makeSets(2, "10–12", 0, 12) },
+        { name: "Preacher Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) }
+      ]
+    },
+    {
+      id: "lowerA",
+      name: "2. GÜN: Alt Vücut A",
+      exercises: [
+        { name: "Hack Squat", targetInfo: "3x5–8", note: "Hedef: 3 Set x 5–8 Tekrar", sets: makeSets(3, "5–8", 0, 6) },
+        { name: "Romanian Deadlift", targetInfo: "3x6–10", note: "Hedef: 3 Set x 6–10 Tekrar", sets: makeSets(3, "6–10", 0, 8) },
+        { name: "Seated Leg Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
+        { name: "Leg Extension", targetInfo: "3x10–12", note: "Hedef: 3 Set x 10–12 Tekrar", sets: makeSets(3, "10–12", 0, 12) },
+        { name: "Standing Calf Raise", targetInfo: "4x8–12", note: "Hedef: 4 Set x 8–12 Tekrar", sets: makeSets(4, "8–12", 0, 10) },
+        { name: "Crunch Machine", targetInfo: "3x10–15", note: "Hedef: 3 Set x 10–15 Tekrar", sets: makeSets(3, "10–15", 0, 12) }
+      ]
+    },
+    {
+      id: "upperB",
+      name: "3. GÜN: Üst Vücut B",
+      exercises: [
+        { name: "Machine Shoulder Press", targetInfo: "3x6–10 (36kg)", note: "Hedef: 3 Set x 6–10 Tekrar (36K)", sets: makeSets(3, "6–10", 36, 8) },
+        { name: "Pull-up", targetInfo: "4x6–10", note: "Hedef: 4 Set x 6–10 Tekrar", sets: makeSets(4, "6–10", 0, 8) },
+        { name: "Weighted Dips", targetInfo: "3x6–10", note: "Hedef: 3 Set x 6–10 Tekrar", sets: makeSets(3, "6–10", 0, 8) },
+        { name: "Seated Cable Row", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
+        { name: "Pec Deck Fly VEYA Cable Crossover", targetInfo: "3x10–12", note: "Hedef: 3 Set x 10–12 Tekrar", sets: makeSets(3, "10–12", 0, 12) },
+        { name: "Dumbbell Lateral Raise", targetInfo: "4x12–15", note: "Hedef: 4 Set x 12–15 Tekrar", sets: makeSets(4, "12–15", 0, 15) },
+        { name: "Incline Dumbbell Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
+        { name: "Skullcrusher", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
+        { name: "Hammer Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) }
+      ]
+    },
+    {
+      id: "lowerB",
+      name: "4. GÜN: Alt Vücut B",
+      exercises: [
+        { name: "Barbell Hip Thrust", targetInfo: "3x6–10", note: "Hedef: 3 Set x 6–10 Tekrar", sets: makeSets(3, "6–10", 0, 8) },
+        { name: "Leg Press", targetInfo: "3x8–10", note: "Hedef: 3 Set x 8–10 Tekrar", sets: makeSets(3, "8–10", 0, 10) },
+        { name: "Bulgarian Split Squat", targetInfo: "3x8–10", note: "Hedef: 3 Set x 8–10 Tekrar", sets: makeSets(3, "8–10", 0, 10) },
+        { name: "Lying Leg Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
+        { name: "Leg Extension", targetInfo: "3x10–15", note: "Hedef: 3 Set x 10–15 Tekrar", sets: makeSets(3, "10–15", 0, 12) },
+        { name: "Hyperextension", targetInfo: "2x10–15", note: "Hedef: 2 Set x 10–15 Tekrar", sets: makeSets(2, "10–15", 0, 12) },
+        { name: "Seated Calf Raise", targetInfo: "3x12–15", note: "Hedef: 3 Set x 12–15 Tekrar", sets: makeSets(3, "12–15", 0, 15) },
+        { name: "Hanging Leg Raise", targetInfo: "3x8–15", note: "Hedef: 3 Set x 8–15 Tekrar", sets: makeSets(3, "8–15", 0, 12) }
+      ]
+    }
+  ],
+
+  // DİNAMİK MOBİLİTE AKIŞI & STATİK STRETCHING PROGRAMI (BİREBİR EŞLEŞTİRİLDİ)
+  mobilityRoutine: {
+    dynamic: [
+      { name: "World’s Greatest Stretch", prescription: "1 Set x 8–10 Tekrar", note: "Sağ ve sol akıcı geçiş", done: false },
+      { name: "90/90 Hip Switch", prescription: "1 Set x 8–10 Tekrar", note: "Gövde dik, kalça rotasyonu", done: false },
+      { name: "Kneeling Ankle Dorsiflexion", prescription: "1 Set x 8–10 Tekrar", note: "Topuk yerden kalkmadan diz ileri", done: false },
+      { name: "Quadruped Cat-Cow", prescription: "1 Set x 8–10 Tekrar", note: "Nefes alarak ekstansiyon, vererek fleksiyon", done: false },
+      { name: "Towel/Band Shoulder Dislocates", prescription: "1 Set x 8–10 Tekrar", note: "Dirsekler bükülmeden tam tur", done: false }
+    ],
+    static: [
+      { name: "Doorway Pec & Biceps Stretch", prescription: "2 Set x 30 sn", timerSec: 30, note: "Kapı eşiğinde göğüs ve biceps esnetme", done: false },
+      { name: "Child’s Pose with Lat Reach", prescription: "Sağ ve Sol için 1'er Set x 45 sn", timerSec: 45, note: "Ellerle çapraza uzanarak kanat esnetme", done: false },
+      { name: "Couch Stretch", prescription: "Sağ ve Sol için 2'şer Set x 30 sn", timerSec: 30, note: "Kalça fleksörü ve üst bacak", done: false },
+      { name: "Supine Figure-4 Glute Stretch", prescription: "Sağ ve Sol için 2'şer Set x 30 sn", timerSec: 30, note: "Sırtüstü 4 figürü ile kalça esnetme", done: false },
+      { name: "Single-Leg Seated Hamstring Stretch", prescription: "Sağ ve Sol için 2'şer Set x 30 sn", timerSec: 30, note: "Tek bacak oturarak arka bacak esnetme", done: false }
+    ]
+  }
+};
+
+let state = loadState();
+let restTimerInterval = null;
+let restSecondsRemaining = 90;
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...DEFAULT_STATE, ...parsed };
+    }
+    // Önceki v4 sürümünden beslenme/ikon/kilo ayarlarını koru, yeni antrenman ve mobiliteyi yükle
+    const oldV4 = localStorage.getItem("ayk_plus_v4_state");
+    if (oldV4) {
+      const parsedOld = JSON.parse(oldV4);
+      return {
+        ...DEFAULT_STATE,
+        weight: parsedOld.weight ?? DEFAULT_STATE.weight,
+        deficit: parsedOld.deficit ?? DEFAULT_STATE.deficit,
+        dayType: parsedOld.dayType ?? DEFAULT_STATE.dayType,
+        waterLiters: parsedOld.waterLiters ?? 0,
+        supplements: parsedOld.supplements ?? DEFAULT_STATE.supplements,
+        weightLogs: parsedOld.weightLogs ?? DEFAULT_STATE.weightLogs,
+        customFoods: parsedOld.customFoods ?? {},
+        customIconDataUrl: parsedOld.customIconDataUrl ?? "",
+        meals: parsedOld.meals ?? DEFAULT_STATE.meals
+      };
+    }
+  } catch (e) { console.error(e); }
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const badge = document.getElementById("saveBadge");
+    badge.textContent = "✓ Kaydedildi (" + new Date().toLocaleTimeString("tr-TR", {hour: '2-digit', minute:'2-digit'}) + ")";
+  } catch (e) { console.error(e); }
+}
+
+function getFoodDB() {
+  return { ...BASE_FOOD_DB, ...(state.customFoods || {}) };
+}
+
+// KRONOMETRE
+function updateTimerDisplay() {
+  const mins = String(Math.floor(restSecondsRemaining / 60)).padStart(2, "0");
+  const secs = String(restSecondsRemaining % 60).padStart(2, "0");
+  document.getElementById("timerDisplay").textContent = `${mins}:${secs}`;
+}
+
+function startRestTimer(seconds) {
+  if (restTimerInterval) clearInterval(restTimerInterval);
+  restSecondsRemaining = seconds;
+  updateTimerDisplay();
+  const el = document.getElementById("timerDisplay");
+  el.className = "font-mono font-bold text-emerald-400";
+  restTimerInterval = setInterval(() => {
+    restSecondsRemaining--;
+    if (restSecondsRemaining <= 0) {
+      clearInterval(restTimerInterval);
+      restSecondsRemaining = 0;
+      el.textContent = "BİTTİ!";
+      el.className = "font-mono font-bold text-rose-400 animate-pulse";
+    } else {
+      updateTimerDisplay();
+    }
+  }, 1000);
+}
+
+function stopRestTimer() {
+  if (restTimerInterval) clearInterval(restTimerInterval);
+  restSecondsRemaining = 90;
+  updateTimerDisplay();
+  document.getElementById("timerDisplay").className = "font-mono font-bold text-amber-400";
+}
+
+// 3 SEKME GEÇİŞİ (BESLENME | GYM | MOBİLİTE)
+function switchTab(tabName) {
+  state.activeTab = tabName;
+  const tabNut = document.getElementById("tabNutrition");
+  const tabGym = document.getElementById("tabGym");
+  const tabMob = document.getElementById("tabMobility");
+
+  const headNut = document.getElementById("nutritionHeaderBar");
+  const headGym = document.getElementById("gymHeaderBar");
+  const headMob = document.getElementById("mobilityHeaderBar");
+
+  const btnNut = document.getElementById("navBtnNutrition");
+  const btnGym = document.getElementById("navBtnGym");
+  const btnMob = document.getElementById("navBtnMobility");
+
+  const activeClass = "flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition bg-emerald-600 text-white shadow-lg";
+  const idleClass = "flex items-center justify-center gap-1.5 py-2.5 rounded-xl font-bold text-xs transition bg-slate-800 text-slate-300 border border-slate-700";
+
+  tabNut.classList.add("hidden");
+  tabGym.classList.add("hidden");
+  tabMob.classList.add("hidden");
+
+  headNut.classList.add("hidden");
+  headGym.classList.add("hidden"); headGym.classList.remove("grid");
+  headMob.classList.add("hidden"); headMob.classList.remove("grid");
+
+  btnNut.className = idleClass;
+  btnGym.className = idleClass;
+  btnMob.className = idleClass;
+
+  if (tabName === "gym") {
+    tabGym.classList.remove("hidden");
+    headGym.classList.remove("hidden"); headGym.classList.add("grid");
+    btnGym.className = activeClass;
+  } else if (tabName === "mobility") {
+    tabMob.classList.remove("hidden");
+    headMob.classList.remove("hidden"); headMob.classList.add("grid");
+    btnMob.className = activeClass;
+  } else {
+    tabNut.classList.remove("hidden");
+    headNut.classList.remove("hidden");
+    btnNut.className = activeClass;
+  }
+  saveState();
+}
+
+// İKON YÖNETİMİ
+function applyCustomIcon() {
+  if (state.customIconDataUrl) {
+    const logoImg = document.getElementById("headerLogo");
+    const defBox = document.getElementById("defaultLogoBox");
+    logoImg.src = state.customIconDataUrl;
+    logoImg.classList.remove("hidden");
+    defBox.classList.add("hidden");
+    document.getElementById("appAppleIcon").href = state.customIconDataUrl;
+    document.getElementById("appFavicon").href = state.customIconDataUrl;
+  }
+}
+
+function handleIconUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    state.customIconDataUrl = e.target.result;
+    applyCustomIcon();
+    saveState();
+    alert("AYK+ İkonun yüklendi ve kaydedildi!");
+  };
+  reader.readAsDataURL(file);
+}
+
+// BESLENME HESAPLAMALARI
+function getTargets() {
+  const bmr = (10 * state.weight) + (6.25 * 180) - (5 * 26) + 5;
+  const mult = state.dayType === "train" ? 1.55 : 1.43;
+  const tdee = Math.round(bmr * mult);
+  const calTarget = Math.max(1750, tdee - state.deficit);
+  const proTarget = Math.round((82 * 2.0) + (state.weight * 0.35));
+  const fatTarget = Math.max(55, Math.round(state.weight * 0.72));
+  const carbTarget = Math.max(60, Math.round((calTarget - (proTarget * 4) - (fatTarget * 9)) / 4));
+  return { calTarget, proTarget, carbTarget, fatTarget, tdee };
+}
+
+function calcItemMacros(item) {
+  const db = getFoodDB();
+  const f = db[item.foodId];
+  if (!f) return { p: 0, c: 0, f: 0, cal: 0 };
+  const p = f.p * item.amount;
+  const c = f.c * item.amount;
+  const fat = f.f * item.amount;
+  const cal = (p * 4) + (c * 4) + (fat * 9);
+  return { p, c, f: fat, cal };
+}
+
+// ============================================================================
+// GYM EKRANI RENDER VE İŞLEMLERİ
+// ============================================================================
+function renderGym() {
+  if (!state.workoutDays || state.workoutDays.length === 0) {
+    state.workoutDays = JSON.parse(JSON.stringify(DEFAULT_STATE.workoutDays));
+  }
+  if (state.activeWorkoutDayIdx >= state.workoutDays.length) {
+    state.activeWorkoutDayIdx = 0;
+  }
+
+  const exSel = document.getElementById("exerciseSelect");
+  if (exSel.options.length === 0) {
+    let html = `<option value="">+ 130+ Hareket Kütüphanesinden Seç...</option>`;
+    Object.keys(EXERCISE_LIBRARY).forEach(group => {
+      html += `<optgroup label="${group}">`;
+      EXERCISE_LIBRARY[group].forEach(exName => {
+        html += `<option value="${exName}">${exName}</option>`;
+      });
+      html += `</optgroup>`;
+    });
+    exSel.innerHTML = html;
+  }
+
+  const daysTabs = document.getElementById("workoutDaysTabs");
+  daysTabs.innerHTML = "";
+  state.workoutDays.forEach((day, idx) => {
+    const active = idx === state.activeWorkoutDayIdx;
+    const btn = document.createElement("button");
+    btn.onclick = () => { state.activeWorkoutDayIdx = idx; renderAll(); };
+    btn.className = active
+      ? "text-xs font-bold px-3 py-2 rounded-xl bg-emerald-600 text-white shadow"
+      : "text-xs font-medium px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700";
+    btn.textContent = day.name;
+    daysTabs.appendChild(btn);
+  });
+
+  const activeDay = state.workoutDays[state.activeWorkoutDayIdx];
+  document.getElementById("gymActiveDayTitle").textContent = activeDay.name;
+
+  let doneSetsCount = 0;
+  let totalSetsCount = 0;
+  let totalVolumeKg = 0;
+
+  const exContainer = document.getElementById("gymExercisesContainer");
+  exContainer.innerHTML = "";
+
+  activeDay.exercises.forEach((ex, exIdx) => {
+    let exVolume = 0;
+    let best1RM = 0;
+    let setsHtml = "";
+
+    ex.sets.forEach((s, sIdx) => {
+      totalSetsCount++;
+      const vol = (parseFloat(s.kg) || 0) * (parseInt(s.reps) || 0);
+      exVolume += vol;
+      if (s.done) {
+        doneSetsCount++;
+        totalVolumeKg += vol;
+      }
+      if (s.kg > 0 && s.reps > 0) {
+        const est1RM = s.kg * (1 + s.reps / 30);
+        if (est1RM > best1RM) best1RM = est1RM;
+      }
+
+      setsHtml += `
+        <div class="grid grid-cols-12 items-center gap-1.5 bg-slate-900/90 border border-slate-800 px-2.5 py-1.5 rounded-lg transition ${s.done ? 'set-done' : ''}">
+          <div class="col-span-3 text-xs font-bold text-slate-300">
+            ${sIdx + 1}. Set
+            ${s.target ? `<span class="block text-[10px] font-normal text-emerald-400">Hedef: ${s.target}</span>` : ''}
+          </div>
+          <div class="col-span-4 flex items-center gap-1">
+            <input type="number" step="0.5" value="${s.kg}" placeholder="0"
+              onchange="updateSetData(${exIdx}, ${sIdx}, 'kg', this.value)"
+              class="w-full text-center text-sm font-bold py-1 rounded" />
+            <span class="text-[11px] text-slate-400">kg</span>
+          </div>
+          <div class="col-span-3 flex items-center gap-1">
+            <input type="number" step="1" value="${s.reps}"
+              onchange="updateSetData(${exIdx}, ${sIdx}, 'reps', this.value)"
+              class="w-full text-center text-sm font-bold py-1 rounded" />
+            <span class="text-[11px] text-slate-400">tkr</span>
+          </div>
+          <div class="col-span-2 flex justify-end items-center">
+            <button onclick="toggleSetDone(${exIdx}, ${sIdx})"
+              class="w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center transition ${s.done ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+              ✓
+            </button>
+          </div>
+        </div>
+      `;
+    });
+
+    const card = document.createElement("div");
+    card.className = "card p-4 flex flex-col justify-between space-y-3";
+    card.innerHTML = `
+      <div>
+        <div class="flex justify-between items-start border-b border-slate-700/80 pb-2 mb-2.5 gap-2">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h4 class="font-bold text-sm md:text-base text-white">${exIdx + 1}. ${ex.name}</h4>
+              ${ex.targetInfo ? `<span class="text-[11px] bg-emerald-950 text-emerald-300 border border-emerald-700/60 px-2 py-0.5 rounded-md font-semibold">${ex.targetInfo}</span>` : ''}
+            </div>
+            <input type="text" value="${ex.note || ''}" placeholder="Not ekle (Koltuk ayarı, tutuş genişliği vb.)..."
+              onchange="updateExerciseNote(${exIdx}, this.value)"
+              class="mt-1 text-xs bg-transparent border-0 border-b border-slate-700 text-slate-300 focus:outline-none w-full" />
+          </div>
+          <div class="text-right shrink-0">
+            <div class="text-xs font-semibold text-amber-400">1RM: ~${Math.round(best1RM)} kg</div>
+            <div class="text-[11px] text-slate-400">Tonaj: ${Math.round(exVolume)} kg</div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          ${setsHtml}
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
+        <div class="flex gap-1.5">
+          <button onclick="addSetToExercise(${exIdx})" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-slate-700 font-medium">+ Set</button>
+          <button onclick="removeLastSetFromExercise(${exIdx})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">- Set</button>
+        </div>
+        <button onclick="removeExercise(${exIdx})" class="text-rose-400 hover:text-rose-300 font-medium px-2 py-1">🗑️ Sil</button>
+      </div>
+    `;
+    exContainer.appendChild(card);
+  });
+
+  document.getElementById("gymDoneSets").textContent = doneSetsCount;
+  document.getElementById("gymTotalSets").textContent = totalSetsCount;
+  document.getElementById("gymTotalVolume").textContent = Math.round(totalVolumeKg);
+
+  const histEl = document.getElementById("workoutHistoryList");
+  if (!state.workoutLogs || state.workoutLogs.length === 0) {
+    histEl.innerHTML = `<div class="text-xs text-slate-500 italic">Henüz kaydedilmiş antrenman geçmişi yok. Antrenmanı bitirince buraya eklenecek.</div>`;
+  } else {
+    histEl.innerHTML = state.workoutLogs.slice().reverse().slice(0, 8).map(log => `
+      <div class="flex flex-wrap items-center justify-between bg-slate-900/90 border border-slate-800 px-3 py-2 rounded-lg text-xs">
+        <div>
+          <span class="font-bold text-emerald-400">${log.date}</span> •
+          <span class="font-semibold text-white">${log.dayName}</span>
+          <span class="text-slate-400 ml-1">(${log.summary})</span>
+        </div>
+        <div class="font-bold text-amber-400">⚡ ${log.volume} kg Tonaj (${log.sets} Set)</div>
+      </div>
+    `).join("");
+  }
+}
+
+function updateSetData(exIdx, sIdx, field, val) {
+  const activeDay = state.workoutDays[state.activeWorkoutDayIdx];
+  activeDay.exercises[exIdx].sets[sIdx][field] = parseFloat(val) || 0;
+  renderAll();
+}
+
+function toggleSetDone(exIdx, sIdx) {
+  const activeDay = state.workoutDays[state.activeWorkoutDayIdx];
+  const setObj = activeDay.exercises[exIdx].sets[sIdx];
+  setObj.done = !setObj.done;
+  if (setObj.done) startRestTimer(90);
+  renderAll();
+}
+
+function updateExerciseNote(exIdx, val) {
+  state.workoutDays[state.activeWorkoutDayIdx].exercises[exIdx].note = val;
+  saveState();
+}
+
+function addSetToExercise(exIdx) {
+  const ex = state.workoutDays[state.activeWorkoutDayIdx].exercises[exIdx];
+  const lastSet = ex.sets.length > 0 ? ex.sets[ex.sets.length - 1] : { kg: 0, reps: 10, target: "8–12" };
+  ex.sets.push({ kg: lastSet.kg, reps: lastSet.reps, target: lastSet.target || "8–12", done: false });
+  renderAll();
+}
+
+function removeLastSetFromExercise(exIdx) {
+  const ex = state.workoutDays[state.activeWorkoutDayIdx].exercises[exIdx];
+  if (ex.sets.length > 1) {
+    ex.sets.pop();
+    renderAll();
+  }
+}
+
+function removeExercise(exIdx) {
+  if (confirm("Bu hareketi programdan kaldırmak istiyor musun?")) {
+    state.workoutDays[state.activeWorkoutDayIdx].exercises.splice(exIdx, 1);
+    renderAll();
+  }
+}
+
+function addSelectedExercise() {
+  const sel = document.getElementById("exerciseSelect");
+  const name = sel.value;
+  if (!name) return;
+  const targetRange = prompt("Hedef set x tekrar aralığını gir (Örn: 3x8-12):", "3x8–12") || "3x8–12";
+  state.workoutDays[state.activeWorkoutDayIdx].exercises.push({
+    name,
+    targetInfo: targetRange,
+    note: `Hedef: ${targetRange}`,
+    sets: makeSets(3, "8–12", 0, 10)
+  });
+  sel.value = "";
+  renderAll();
+}
+
+function addCustomExercisePrompt() {
+  const name = prompt("Eklemek istediğin hareketin adını yaz:");
+  if (!name || !name.trim()) return;
+  const targetRange = prompt("Hedef set x tekrar aralığını gir (Örn: 3x8-12):", "3x8–12") || "3x8–12";
+  state.workoutDays[state.activeWorkoutDayIdx].exercises.push({
+    name: name.trim(),
+    targetInfo: targetRange,
+    note: `Hedef: ${targetRange}`,
+    sets: makeSets(3, "8–12", 0, 10)
+  });
+  renderAll();
+}
+
+function addWorkoutDay() {
+  const name = prompt("Yeni antrenman gününün adını yaz:");
+  if (!name || !name.trim()) return;
+  state.workoutDays.push({ id: "day_" + Date.now(), name: name.trim(), exercises: [] });
+  state.activeWorkoutDayIdx = state.workoutDays.length - 1;
+  renderAll();
+}
+
+function renameWorkoutDay() {
+  const activeDay = state.workoutDays[state.activeWorkoutDayIdx];
+  const nextName = prompt("Günün yeni adını gir:", activeDay.name);
+  if (nextName && nextName.trim()) {
+    activeDay.name = nextName.trim();
+    renderAll();
+  }
+}
+
+function uncheckAllSets() {
+  const activeDay = state.workoutDays[state.activeWorkoutDayIdx];
+  activeDay.exercises.forEach(ex => ex.sets.forEach(s => s.done = false));
+  renderAll();
+}
+
+function finishAndLogWorkout() {
+  const activeDay = state.workoutDays[state.activeWorkoutDayIdx];
+  let doneSets = 0;
+  let vol = 0;
+  activeDay.exercises.forEach(ex => {
+    ex.sets.forEach(s => {
+      if (s.done) {
+        doneSets++;
+        vol += (parseFloat(s.kg) || 0) * (parseInt(s.reps) || 0);
+      }
+    });
+  });
+
+  if (doneSets === 0) {
+    alert("Kaydetmek için en az 1 setin yanındaki ✓ kutusunu işaretlemelisin.");
+    return;
+  }
+
+  const nowStr = new Date().toLocaleDateString("tr-TR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  if (!state.workoutLogs) state.workoutLogs = [];
+  state.workoutLogs.push({
+    date: nowStr,
+    dayName: activeDay.name,
+    sets: doneSets,
+    volume: Math.round(vol),
+    summary: `${activeDay.exercises.length} Hareket`
+  });
+
+  activeDay.exercises.forEach(ex => ex.sets.forEach(s => s.done = false));
+  stopRestTimer();
+  renderAll();
+  alert(`Tebrikler! ${activeDay.name} antrenmanın (${Math.round(vol)} kg tonaj) çeteleye kaydedildi!`);
+}
+
+// ============================================================================
+// MOBİLİTE & STATİK STRETCHING RENDER VE İŞLEMLERİ
+// ============================================================================
+function renderMobility() {
+  if (!state.mobilityRoutine) {
+    state.mobilityRoutine = JSON.parse(JSON.stringify(DEFAULT_STATE.mobilityRoutine));
+  }
+
+  // Mobilite kütüphanesi açılır menüsünü doldur
+  const mobSel = document.getElementById("mobilityLibrarySelect");
+  if (mobSel.options.length === 0) {
+    let html = `<option value="">+ Mobilite & Stretching Kütüphanesinden Seç...</option>`;
+    Object.keys(MOBILITY_LIBRARY).forEach(cat => {
+      html += `<optgroup label="${cat}">`;
+      MOBILITY_LIBRARY[cat].forEach((item, idx) => {
+        html += `<option value="${cat}__${idx}">${item.name} (${item.prescription})</option>`;
+      });
+      html += `</optgroup>`;
+    });
+    mobSel.innerHTML = html;
+  }
+
+  const dynList = state.mobilityRoutine.dynamic || [];
+  const statList = state.mobilityRoutine.static || [];
+
+  let dynDone = 0;
+  let statDone = 0;
+
+  const dynEl = document.getElementById("dynamicMobilityList");
+  dynEl.innerHTML = dynList.map((item, idx) => {
+    if (item.done) dynDone++;
+    return `
+      <div class="p-3 rounded-xl border transition ${item.done ? 'set-done' : 'bg-slate-900/90 border-slate-800'}">
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-start gap-2.5 flex-1">
+            <button onclick="toggleMobilityDone('dynamic', ${idx})"
+              class="mt-0.5 w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 transition ${item.done ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+              ✓
+            </button>
+            <div class="flex-1">
+              <div class="font-bold text-sm ${item.done ? 'line-through text-emerald-300' : 'text-white'}">${idx + 1}. ${item.name}</div>
+              <div class="flex flex-wrap items-center gap-2 mt-1">
+                <input type="text" value="${item.prescription}" onchange="updateMobilityField('dynamic', ${idx}, 'prescription', this.value)"
+                  class="text-xs font-semibold text-emerald-400 bg-slate-950 border border-slate-700 rounded px-2 py-0.5 w-44" />
+                <input type="text" value="${item.note || ''}" placeholder="Not ekle..." onchange="updateMobilityField('dynamic', ${idx}, 'note', this.value)"
+                  class="text-xs text-slate-400 bg-transparent border-b border-slate-700 focus:outline-none flex-1 min-w-[120px]" />
+              </div>
+            </div>
+          </div>
+          <button onclick="removeMobilityItem('dynamic', ${idx})" class="text-rose-400 hover:text-rose-300 text-sm px-1 font-bold">&times;</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  const statEl = document.getElementById("staticMobilityList");
+  statEl.innerHTML = statList.map((item, idx) => {
+    if (item.done) statDone++;
+    const sec = item.timerSec || 30;
+    return `
+      <div class="p-3 rounded-xl border transition ${item.done ? 'set-done' : 'bg-slate-900/90 border-slate-800'}">
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-start gap-2.5 flex-1">
+            <button onclick="toggleMobilityDone('static', ${idx})"
+              class="mt-0.5 w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 transition ${item.done ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+              ✓
+            </button>
+            <div class="flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-sm ${item.done ? 'line-through text-emerald-300' : 'text-white'}">${idx + 1}. ${item.name}</span>
+                <button onclick="startRestTimer(${sec})" class="text-[11px] bg-sky-900/70 hover:bg-sky-800 text-sky-200 border border-sky-700/50 px-2 py-0.5 rounded-md font-semibold shrink-0">
+                  ⏱️ ${sec} sn Başlat
+                </button>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 mt-1">
+                <input type="text" value="${item.prescription}" onchange="updateMobilityField('static', ${idx}, 'prescription', this.value)"
+                  class="text-xs font-semibold text-sky-400 bg-slate-950 border border-slate-700 rounded px-2 py-0.5 w-56" />
+                <input type="text" value="${item.note || ''}" placeholder="Not ekle..." onchange="updateMobilityField('static', ${idx}, 'note', this.value)"
+                  class="text-xs text-slate-400 bg-transparent border-b border-slate-700 focus:outline-none flex-1 min-w-[120px]" />
+              </div>
+            </div>
+          </div>
+          <button onclick="removeMobilityItem('static', ${idx})" class="text-rose-400 hover:text-rose-300 text-sm px-1 font-bold">&times;</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  document.getElementById("mobDynamicDone").textContent = dynDone;
+  document.getElementById("mobDynamicTotal").textContent = dynList.length;
+  document.getElementById("mobStaticDone").textContent = statDone;
+  document.getElementById("mobStaticTotal").textContent = statList.length;
+}
+
+function toggleMobilityDone(type, idx) {
+  state.mobilityRoutine[type][idx].done = !state.mobilityRoutine[type][idx].done;
+  renderAll();
+}
+
+function updateMobilityField(type, idx, field, val) {
+  state.mobilityRoutine[type][idx][field] = val;
+  saveState();
+}
+
+function removeMobilityItem(type, idx) {
+  state.mobilityRoutine[type].splice(idx, 1);
+  renderAll();
+}
+
+function resetMobilityChecks() {
+  state.mobilityRoutine.dynamic.forEach(i => i.done = false);
+  state.mobilityRoutine.static.forEach(i => i.done = false);
+  renderAll();
+}
+
+function addFromMobilityLibrary() {
+  const targetType = document.getElementById("mobilityTargetType").value;
+  const sel = document.getElementById("mobilityLibrarySelect");
+  if (!sel.value) return;
+  const [cat, idxStr] = sel.value.split("__");
+  const item = MOBILITY_LIBRARY[cat][parseInt(idxStr)];
+  if (!item) return;
+
+  state.mobilityRoutine[targetType].push({
+    name: item.name,
+    prescription: item.prescription,
+    timerSec: item.prescription.includes("45") ? 45 : 30,
+    note: item.note || "",
+    done: false
+  });
+  sel.value = "";
+  renderAll();
+}
+
+function addCustomMobilityPrompt() {
+  const targetType = document.getElementById("mobilityTargetType").value;
+  const name = prompt("Eklemek istediğin mobilite veya esneme hareketinin adını yaz:");
+  if (!name || !name.trim()) return;
+  const defaultPresc = targetType === "dynamic" ? "1 Set x 8–10 Tekrar" : "2 Set x 30 sn";
+  const prescription = prompt("Uygulama set / tekrar / saniye bilgisini gir:", defaultPresc) || defaultPresc;
+
+  state.mobilityRoutine[targetType].push({
+    name: name.trim(),
+    prescription,
+    timerSec: prescription.includes("45") ? 45 : 30,
+    note: "",
+    done: false
+  });
+  renderAll();
+}
+
+// ============================================================================
+// GENEL RENDER FONKSİYONU
+// ============================================================================
+function renderAll() {
+  applyCustomIcon();
+  switchTab(state.activeTab || "nutrition");
+
+  const db = getFoodDB();
+  document.getElementById("weightSlider").value = state.weight;
+  document.getElementById("weightVal").textContent = state.weight;
+  document.getElementById("deficitSlider").value = state.deficit;
+  document.getElementById("deficitVal").textContent = state.deficit;
+  document.getElementById("waterVal").textContent = (state.waterLiters || 0).toFixed(2);
+
+  if (state.weightLogs && state.weightLogs.length > 0) {
+    const recent = state.weightLogs.slice(-3).map(l => `${l.weight}kg (${l.date})`).join(" → ");
+    document.getElementById("weightHistoryText").textContent = `Kayıtlar: ${recent}`;
+  }
+
+  const supps = state.supplements || {};
+  const setSupStyle = (id, active) => {
+    const el = document.getElementById(id);
+    el.className = active
+      ? "text-xs px-2.5 py-1.5 rounded-lg border bg-emerald-600/30 border-emerald-500 text-emerald-200 font-semibold transition"
+      : "text-xs px-2.5 py-1.5 rounded-lg border bg-slate-800 border-slate-700 text-slate-400 transition";
+  };
+  setSupStyle("supCreatine", supps.creatine);
+  setSupStyle("supGreens", supps.greens);
+  setSupStyle("supOmega", supps.omega);
+
+  const btnTrain = document.getElementById("btnTrain");
+  const btnRest = document.getElementById("btnRest");
+  if (state.dayType === "train") {
+    btnTrain.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white";
+    btnRest.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-400 border border-slate-700";
+  } else {
+    btnRest.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white";
+    btnTrain.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-400 border border-slate-700";
+  }
+
+  const kgToLose = Math.max(0, state.weight - 82);
+  const weeklyLoss = (state.deficit * 7) / 7700;
+  const weeks = weeklyLoss > 0 ? Math.ceil(kgToLose / weeklyLoss) : 0;
+  document.getElementById("timelineInfo").textContent =
+    `Haftalık ~${weeklyLoss.toFixed(2)} kg kayıp ile 82 kg hedefine ~${weeks} hafta`;
+
+  const targets = getTargets();
+  let totalP = 0, totalC = 0, totalF = 0, totalCal = 0;
+
+  const container = document.getElementById("mealsContainer");
+  container.innerHTML = "";
+
+  const categories = {};
+  Object.keys(db).forEach(k => {
+    const cat = db[k].cat || "Diğer";
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push({ id: k, ...db[k] });
+  });
+
+  let optionsHtml = `<option value="">+ Besin / Yeşillik / Kuruyemiş / Alternatif Ekle...</option>`;
+  Object.keys(categories).forEach(cat => {
+    optionsHtml += `<optgroup label="${cat}">`;
+    categories[cat].forEach(food => {
+      optionsHtml += `<option value="${food.id}">${food.name} (${food.def} ${food.unit})</option>`;
+    });
+    optionsHtml += `</optgroup>`;
+  });
+
+  state.meals.forEach((meal, mIdx) => {
+    let mP = 0, mC = 0, mF = 0, mCal = 0;
+    let itemsHtml = "";
+
+    meal.items.forEach((item, iIdx) => {
+      const f = db[item.foodId];
+      if (!f) return;
+      const mac = calcItemMacros(item);
+      mP += mac.p; mC += mac.c; mF += mac.f; mCal += mac.cal;
+
+      itemsHtml += `
+        <div class="flex items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 px-3 py-2 rounded-lg">
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-slate-200 truncate">${f.name}</div>
+            <div class="text-xs text-slate-400">
+              <span class="text-emerald-400 font-semibold">${Math.round(mac.cal)} kcal</span> •
+              <span class="text-sky-400">${mac.p.toFixed(1)}P</span> •
+              <span class="text-amber-400">${mac.c.toFixed(1)}K</span> •
+              <span class="text-rose-400">${mac.f.toFixed(1)}Y</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="changeAmount(${mIdx}, ${iIdx}, -${f.step})" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold">-</button>
+            <input type="number" value="${item.amount}" step="${f.step}" min="0"
+              onchange="setAmount(${mIdx}, ${iIdx}, this.value)"
+              class="w-14 text-center text-sm py-1 rounded font-semibold" />
+            <span class="text-[11px] text-slate-400 w-9 truncate">${f.unit}</span>
+            <button onclick="changeAmount(${mIdx}, ${iIdx}, ${f.step})" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold">+</button>
+            <button onclick="removeItem(${mIdx}, ${iIdx})" class="ml-0.5 text-rose-400 hover:text-rose-300 font-bold px-1 text-lg">&times;</button>
+          </div>
+        </div>
+      `;
+    });
+
+    totalP += mP; totalC += mC; totalF += mF; totalCal += mCal;
+
+    const card = document.createElement("div");
+    card.className = `card p-4 flex flex-col justify-between space-y-3 transition ${meal.done ? 'card-done' : ''}`;
+    card.innerHTML = `
+      <div>
+        <div class="flex justify-between items-start border-b border-slate-700/80 pb-2.5 mb-3 gap-2">
+          <div class="flex items-start gap-2">
+            <input type="checkbox" ${meal.done ? 'checked' : ''} onchange="toggleMealDone(${mIdx})"
+              class="mt-1 w-4 h-4 accent-emerald-500 rounded cursor-pointer" />
+            <div>
+              <h3 class="font-bold text-sm md:text-base ${meal.done ? 'line-through text-emerald-300' : 'text-white'}">${meal.title}</h3>
+              <span class="text-xs text-slate-400">${meal.targetNote}</span>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <div class="text-sm font-bold text-emerald-400">${Math.round(mCal)} kcal</div>
+            <div class="text-xs space-x-1 font-medium">
+              <span class="text-sky-400">${Math.round(mP)}P</span>
+              <span class="text-amber-400">${Math.round(mC)}K</span>
+              <span class="text-rose-400">${Math.round(mF)}Y</span>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+          ${itemsHtml || '<div class="text-xs text-slate-500 italic py-2">Bu öğünde henüz besin yok.</div>'}
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-slate-800/80 space-y-2">
+        <div class="flex gap-2">
+          <select id="addSelect_${mIdx}" onchange="addFoodFromSelect(${mIdx})" class="flex-1 text-xs rounded-lg px-2.5 py-2">
+            ${optionsHtml}
+          </select>
+        </div>
+        <div class="flex gap-1.5">
+          <button onclick="quickAdd(${mIdx}, 'whey_shake', 1)" class="flex-1 text-[11px] bg-sky-900/50 hover:bg-sky-800/70 text-sky-200 border border-sky-700/40 py-1.5 rounded-lg font-medium transition">
+            ⚡ +1 Shake
+          </button>
+          <button onclick="quickAdd(${mIdx}, 'yesil_salata', 1)" class="flex-1 text-[11px] bg-emerald-900/50 hover:bg-emerald-800/70 text-emerald-200 border border-emerald-700/40 py-1.5 rounded-lg font-medium transition">
+            🥗 +Salata
+          </button>
+          <button onclick="quickAdd(${mIdx}, 'ceviz', 20)" class="flex-1 text-[11px] bg-amber-900/40 hover:bg-amber-800/60 text-amber-200 border border-amber-700/40 py-1.5 rounded-lg font-medium transition">
+            🌰 +20g Ceviz
+          </button>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  updateMacroCard("cal", totalCal, targets.calTarget, "");
+  updateMacroCard("pro", totalP, targets.proTarget, "g");
+  updateMacroCard("carb", totalC, targets.carbTarget, "g");
+  updateMacroCard("fat", totalF, targets.fatTarget, "g");
+
+  renderGym();
+  renderMobility();
+  saveState();
+}
+
+function updateMacroCard(prefix, consumed, target, unit) {
+  const cRound = Math.round(consumed);
+  const diff = target - cRound;
+  document.getElementById(`${prefix}Consumed`).textContent = cRound;
+  document.getElementById(`${prefix}Target`).textContent = target;
+
+  const statusEl = document.getElementById(`${prefix}Status`);
+  if (diff >= 0) {
+    statusEl.textContent = `Kalan: ${diff}${unit}`;
+    statusEl.className = "font-semibold text-emerald-400";
+  } else {
+    statusEl.textContent = `Aşım: +${Math.abs(diff)}${unit}`;
+    statusEl.className = "font-semibold text-rose-400";
+  }
+
+  const pct = Math.min(100, Math.round((cRound / target) * 100));
+  document.getElementById(`${prefix}Bar`).style.width = `${pct}%`;
+}
+
+function updateProfile() {
+  state.weight = parseFloat(document.getElementById("weightSlider").value);
+  state.deficit = parseInt(document.getElementById("deficitSlider").value);
+  renderAll();
+}
+
+function logCurrentWeight() {
+  const d = new Date().toLocaleDateString("tr-TR", { day: "2-digit", month: "short" });
+  if (!state.weightLogs) state.weightLogs = [];
+  state.weightLogs.push({ date: d, weight: state.weight });
+  renderAll();
+}
+
+function addWater(delta) {
+  state.waterLiters = Math.max(0, Math.round(((state.waterLiters || 0) + delta) * 100) / 100);
+  renderAll();
+}
+
+function toggleSupp(key) {
+  if (!state.supplements) state.supplements = {};
+  state.supplements[key] = !state.supplements[key];
+  renderAll();
+}
+
+function toggleMealDone(mIdx) {
+  state.meals[mIdx].done = !state.meals[mIdx].done;
+  renderAll();
+}
+
+function resetDailyProgress() {
+  state.waterLiters = 0;
+  state.supplements = { creatine: false, greens: false, omega: false };
+  state.meals.forEach(m => m.done = false);
+  renderAll();
+}
+
+function setDayType(type) {
+  state.dayType = type;
+  renderAll();
+}
+
+function changeAmount(mIdx, iIdx, delta) {
+  const item = state.meals[mIdx].items[iIdx];
+  const nextVal = Math.max(0, Math.round((item.amount + delta) * 10) / 10);
+  if (nextVal === 0) state.meals[mIdx].items.splice(iIdx, 1);
+  else item.amount = nextVal;
+  renderAll();
+}
+
+function setAmount(mIdx, iIdx, val) {
+  const num = parseFloat(val);
+  if (isNaN(num) || num <= 0) state.meals[mIdx].items.splice(iIdx, 1);
+  else state.meals[mIdx].items[iIdx].amount = num;
+  renderAll();
+}
+
+function removeItem(mIdx, iIdx) {
+  state.meals[mIdx].items.splice(iIdx, 1);
+  renderAll();
+}
+
+function addFoodFromSelect(mIdx) {
+  const sel = document.getElementById(`addSelect_${mIdx}`);
+  const foodId = sel.value;
+  if (!foodId) return;
+  const f = getFoodDB()[foodId];
+  quickAdd(mIdx, foodId, f.def);
+  sel.value = "";
+}
+
+function quickAdd(mIdx, foodId, amount) {
+  const existing = state.meals[mIdx].items.find(i => i.foodId === foodId);
+  if (existing) existing.amount = Math.round((existing.amount + amount) * 10) / 10;
+  else state.meals[mIdx].items.push({ foodId, amount });
+  renderAll();
+}
+
+function autoBalanceCarbs() {
+  const targets = getTargets();
+  let currentCal = 0;
+  state.meals.forEach(m => m.items.forEach(i => { currentCal += calcItemMacros(i).cal; }));
+  const calDiff = targets.calTarget - currentCal;
+  const carbFoodIds = ["pirinc", "basmati", "makarna_tam", "bulgur", "yulaf", "patates", "tatli_patates"];
+
+  let carbItems = [];
+  state.meals.forEach(m => m.items.forEach(i => {
+    if (carbFoodIds.includes(i.foodId)) carbItems.push(i);
+  }));
+
+  if (carbItems.length === 0) return;
+  const calPerItem = calDiff / carbItems.length;
+  const db = getFoodDB();
+
+  carbItems.forEach(item => {
+    const f = db[item.foodId];
+    const calPerUnit = (f.p * 4) + (f.c * 4) + (f.f * 9);
+    const deltaUnits = calPerItem / calPerUnit;
+    item.amount = Math.max(20, Math.round((item.amount + deltaUnits) / 5) * 5);
+  });
+  renderAll();
+}
+
+// ÖZEL BESİN MODALI
+function openCustomFoodModal() {
+  document.getElementById("customFoodModal").classList.remove("hidden");
+  document.getElementById("customFoodModal").classList.add("flex");
+}
+function closeCustomFoodModal() {
+  document.getElementById("customFoodModal").classList.add("hidden");
+  document.getElementById("customFoodModal").classList.remove("flex");
+}
+function saveCustomFood() {
+  const name = document.getElementById("cfName").value.trim();
+  const unitMode = document.getElementById("cfUnit").value;
+  const def = parseFloat(document.getElementById("cfDef").value) || 100;
+  const p = parseFloat(document.getElementById("cfP").value) || 0;
+  const c = parseFloat(document.getElementById("cfC").value) || 0;
+  const f = parseFloat(document.getElementById("cfF").value) || 0;
+
+  if (!name) { alert("Lütfen besin adını girin."); return; }
+  const id = "custom_" + Date.now();
+  if (!state.customFoods) state.customFoods = {};
+
+  if (unitMode === "100g") {
+    state.customFoods[id] = { name: "⭐ " + name, cat: "⭐ Özel Eklediklerim", unit: "g", step: 10, def, p: p/100, c: c/100, f: f/100 };
+  } else {
+    state.customFoods[id] = { name: "⭐ " + name, cat: "⭐ Özel Eklediklerim", unit: "adet", step: 1, def, p, c, f };
+  }
+  closeCustomFoodModal();
+  renderAll();
+}
+
+// YEDEKLEME MODALI
+function openBackupModal() {
+  document.getElementById("backupText").value = JSON.stringify(state);
+  document.getElementById("backupModal").classList.remove("hidden");
+  document.getElementById("backupModal").classList.add("flex");
+}
+function closeBackupModal() {
+  document.getElementById("backupModal").classList.add("hidden");
+  document.getElementById("backupModal").classList.remove("flex");
+}
+function copyBackup() {
+  const txt = document.getElementById("backupText");
+  txt.select();
+  navigator.clipboard.writeText(txt.value);
+  alert("AYK+ yedek kodu panoya kopyalandı!");
+}
+function restoreBackup() {
+  try {
+    const parsed = JSON.parse(document.getElementById("backupText").value);
+    if (parsed && parsed.meals) {
+      state = { ...DEFAULT_STATE, ...parsed };
+      renderAll();
+      closeBackupModal();
+    }
+  } catch (e) { alert("Geçersiz yedek kodu!"); }
+}
+function resetToDefaults() {
+  if (confirm("AYK+ uygulamasını başlangıç ayarlarına sıfırlamak istediğine emin misin?")) {
+    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    renderAll();
+    closeBackupModal();
+  }
+}
+
+renderAll();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
