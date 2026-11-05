@@ -1,6 +1,6 @@
 // AYK+ çevrimdışı önbellek. Uygulamayı güncellediğinde aşağıdaki sürümü artır (v4, v5...).
-const CACHE = 'aykplus-v7';
-const FILES = ['./', './index.html', './manifest.json', './icon.png', './icon-192.png', './icon-512.png'];
+const CACHE = 'aykplus-v8';
+const FILES = ['./', './index.html', './manifest.json', './icon.png', './icon-192.png', './icon-512.png', './anatomy.jpg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
