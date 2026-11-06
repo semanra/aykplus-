@@ -24,7 +24,7 @@ with sync_playwright() as p:
     # tap-to-skip
     pg.reload(); pg.wait_for_timeout(150); pg.locator("#splash").click(); print("after tap:", pg.locator("#splash").count())
     # disable via settings
-    pg.click("text=⚙️"); pg.locator("#setSplash").uncheck(); pg.click("text=✓ Profili Kaydet"); pg.wait_for_timeout(100)
+    pg.click("#profileBtn"); pg.locator("#setSplash").uncheck(); pg.click("#profileSave"); pg.wait_for_timeout(100)
     pg.reload(); pg.wait_for_timeout(60); print("disabled -> splash on reload:", pg.locator("#splash").count())
     # history
     pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps({"activeTab":"progress","waterLiters":1.5,"dailyLogs":dl,"settings":{"splash":False}}))

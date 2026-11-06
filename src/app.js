@@ -127,7 +127,7 @@ function normalizeState(raw) {
   if (!s.restMeals.length) s.restMeals = clone(s.meals).map(mm => ({ ...mm, id: (mm.id || "meal") + "_rest", done: false }));
   s.settings.separatePlans = true;
   if (!["today", "program", "library", "history"].includes(s.gymView)) s.gymView = "today";
-  if (!["week", "today"].includes(s.libRange)) s.libRange = "week";
+  if (!["week", "today", "program"].includes(s.libRange)) s.libRange = "week";
   if (s.libMuscle && !["Göğüs", "Sırt", "Omuz", "Ön Bacak", "Arka Bacak & Kalça", "Kalf", "Biceps", "Triceps", "Karın"].includes(s.libMuscle)) s.libMuscle = null;
   s.workoutDays.forEach((d, i) => { if (!d.id) d.id = "day_" + i + "_" + Date.now(); });
   if (!TABS.includes(s.activeTab)) s.activeTab = "nutrition";
@@ -181,10 +181,12 @@ function activeDay() { return state.workoutDays[state.activeWorkoutDayIdx]; }
 function toast(msg, type = "ok", action = null) {
   const wrap = $("toastWrap");
   const el = document.createElement("div");
+  const tm = trainCtx();
+  if (tm && type !== "error") { msg = String(msg).replace(EMOJI_LEAD, ""); if (action) action = { ...action, label: String(action.label).replace(EMOJI_LEAD, "") }; }
   const color = type === "error" ? "bg-rose-950 border-rose-700 text-rose-100"
     : type === "pr" ? "bg-amber-950 border-amber-500 text-amber-100"
-    : "bg-slate-900 border-emerald-600/70 text-slate-100";
-  el.className = "toast max-w-sm w-full text-center text-sm font-semibold border rounded-xl px-4 py-2.5 shadow-2xl " + color;
+    : tm ? "bg-[#141416] border-[#1B5E58] text-white" : "bg-slate-900 border-emerald-600/70 text-slate-100";
+  el.className = "toast max-w-sm w-full text-center text-sm font-semibold border px-4 py-2.5 shadow-2xl " + (tm ? "rounded-2xl " : "rounded-xl ") + color;
   el.textContent = msg;
   if (action) {
     el.textContent = "";
@@ -194,7 +196,7 @@ function toast(msg, type = "ok", action = null) {
     sp.textContent = msg;
     const b = document.createElement("button");
     b.textContent = action.label;
-    b.className = "shrink-0 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg";
+    b.className = tm ? "t-btn shrink-0 h-11 px-4 rounded-xl text-[13px]" : "shrink-0 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg";
     b.onclick = () => { el.remove(); action.fn(); };
     el.append(sp, b);
   }
@@ -209,12 +211,58 @@ window.addEventListener("error", e => { toast("⚠️ Hata: " + (e.message || "b
 // ---------------------------------------------------------------------------
 // MODAL YÖNETİMİ
 // ---------------------------------------------------------------------------
-function openModal(id) { const m = $(id); m.classList.remove("hidden"); m.classList.add("flex"); }
+// Antrenman sekmesinden veya Profil ekranından açılan ortak pencereler yeni (siyah) temada görünür.
+function trainCtx() { try { return state.activeTab === "gym" || profileIsOpen(); } catch (e) { return false; } }
+const EMOJI_LEAD = /^(?:[\p{Extended_Pictographic}\u2190-\u21FF\u2700-\u27BF\uFE0F\u200D]+\s*)+/u;
+function openModal(id) {
+  const m = $(id);
+  const tm = trainCtx();
+  m.classList.toggle("tm", tm);
+  if (tm) m.querySelectorAll("h3").forEach(h => { const t = h.textContent; const c = t.replace(EMOJI_LEAD, ""); if (c !== t) h.textContent = c; });
+  m.classList.remove("hidden"); m.classList.add("flex");
+}
 function closeModal(id) { const m = $(id); m.classList.add("hidden"); m.classList.remove("flex"); }
 document.addEventListener("click", e => {
   const t = e.target;
   if (t && t.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "settingsModal", "exSheet", "mealModal"].includes(t.id)) closeModal(t.id);
 });
+
+// Temalı onay / metin penceresi. Sonuç: onay → true (veya yazılan metin), vazgeç → null.
+let uiDlg = null;
+function uiAsk({ title, message = "", input = null, ok = "Tamam", cancel = "Vazgeç", danger = false, dismissable = true }) {
+  if (uiDlg) uiDialogDone(false);
+  return new Promise(resolve => {
+    uiDlg = { resolve, input: !!input, dismissable };
+    $("uiDlgTitle").textContent = title;
+    $("uiDlgMsg").textContent = message;
+    $("uiDlgMsg").classList.toggle("hidden", !message);
+    const inp = $("uiDlgInput");
+    inp.classList.toggle("hidden", !input);
+    inp.value = input ? (input.value || "") : "";
+    inp.placeholder = input ? (input.placeholder || "") : "";
+    $("uiDlgOk").textContent = ok;
+    $("uiDlgOk").className = danger ? "h-[52px] rounded-2xl text-[15px] font-extrabold bg-[#FF5A5F] text-white" : "t-btn h-[52px] rounded-2xl text-[15px]";
+    $("uiDlgCancel").textContent = cancel || "";
+    $("uiDlgCancel").classList.toggle("hidden", !cancel);
+    $("uiDlgBtns").className = cancel ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2";
+    const m = $("uiDialog");
+    m.classList.remove("hidden"); m.classList.add("flex");
+    if (input) { inp.focus(); try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) { /* yoksay */ } }
+  });
+}
+function uiDialogDone(okPressed) {
+  if (!uiDlg) return;
+  const d = uiDlg;
+  uiDlg = null;
+  const m = $("uiDialog");
+  m.classList.add("hidden"); m.classList.remove("flex");
+  const inp = $("uiDlgInput");
+  inp.blur();
+  d.resolve(okPressed ? (d.input ? inp.value : true) : null);
+}
+function uiAlert(title, message) { return uiAsk({ title, message, ok: "Tamam", cancel: null }); }
+// Bağlama göre uyarı: antrenman/profil ekranında temalı pencere, diğer yerlerde sistem kutusu.
+function sayAlert(title, message) { if (trainCtx()) return uiAlert(title, message); alert(message); return Promise.resolve(true); }
 
 // ---------------------------------------------------------------------------
 // SES, EKRAN AÇIK TUTMA
@@ -272,8 +320,6 @@ async function updateWakeLock() {
 // ---------------------------------------------------------------------------
 const timer = { endAt: 0, label: "Dinlenme", running: false, iv: null, finishedAt: 0 };
 
-function toggleTimerPanel() { $("timerPanel").classList.toggle("hidden"); }
-
 function startTimer(sec, label = "Dinlenme") {
   sec = Math.round(num(sec, 0));
   if (sec <= 0) return;
@@ -284,7 +330,6 @@ function startTimer(sec, label = "Dinlenme") {
   timer.finishedAt = 0;
   clearInterval(timer.iv);
   timer.iv = setInterval(tickTimer, 250);
-  $("timerPanel").classList.add("hidden");
   $("restPillInner").classList.remove("timer-flash");
   tickTimer();
 }
@@ -302,8 +347,6 @@ function finishTimer() {
   timer.finishedAt = Date.now();
   beep();
   try { if (navigator.vibrate) navigator.vibrate([300, 150, 300]); } catch (e) { /* yoksay */ }
-  $("timerDisplay").textContent = "BİTTİ";
-  $("timerDisplay").className = "font-mono font-bold text-rose-400";
   $("restPillTime").textContent = "BİTTİ!";
   $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums text-rose-400";
   $("restPillInner").classList.add("timer-flash");
@@ -320,13 +363,10 @@ function adjustTimer(delta) {
 function stopTimer() {
   timer.running = false;
   clearInterval(timer.iv);
-  $("timerPanel").classList.add("hidden");
   resetTimerUI();
 }
 
 function renderTimerUI(rem) {
-  $("timerDisplay").textContent = fmtClock(rem);
-  $("timerDisplay").className = "font-mono font-bold text-emerald-400";
   $("restPill").classList.remove("hidden");
   $("restPillLabel").textContent = timer.label;
   $("restPillTime").textContent = fmtClock(rem);
@@ -334,8 +374,6 @@ function renderTimerUI(rem) {
 }
 
 function resetTimerUI() {
-  $("timerDisplay").textContent = fmtClock(state.settings.restSec);
-  $("timerDisplay").className = "font-mono font-bold text-amber-400";
   $("restPill").classList.add("hidden");
   $("restPillInner").classList.remove("timer-flash");
 }
@@ -495,7 +533,7 @@ function updateBfHint() {
   if (tbf && tbf < bf) {
     const suggest = round1(c.leanKg / (1 - tbf / 100));
     html += `<div class="mt-1.5">Kas kütleni koruyarak %${fmtNum(tbf)} yağ oranına inersen tahmini kilon: <b class="text-amber-400">${fmtNum(suggest)} kg</b></div>
-      <button onclick="$('setTarget').value='${fmtNum(suggest)}'; toast('Hedef kilo ${fmtNum(suggest)} kg olarak dolduruldu, kaydetmeyi unutma');" class="mt-2 w-full bg-amber-700 text-white font-semibold py-1.5 rounded-lg">🎯 Bunu hedef kilom yap</button>`;
+      <button onclick="$('setTarget').value='${fmtNum(suggest)}'; toast('Hedef kilo ${fmtNum(suggest)} kg olarak dolduruldu, kaydetmeyi unutma');" class="t-btn-outline mt-2.5 w-full h-11 rounded-xl text-[14px]">Bunu hedef kilom yap</button>`;
   }
   html += `<div class="mt-1.5 text-slate-500">Yağ oranı girildiği için kalori hesabı yağsız kütleye göre yapılıyor. Ölçüm değiştikçe (ayda bir gibi) güncelle.</div>`;
   el.innerHTML = html;
@@ -793,6 +831,7 @@ function openPicker(title, groups, onPick, extra) {
   picker = { groups, onPick, extra: extra || null, cat: "all", flat: [] };
   $("pickerTitle").textContent = title;
   $("pickerSearch").value = "";
+  $("pickerSearch").placeholder = trainCtx() ? "Ara..." : "🔍 Ara...";
   $("pickerExtraWrap").classList.toggle("hidden", !extra);
   if (extra) $("pickerExtraBtn").textContent = extra.label;
   renderPickerChips();
@@ -884,8 +923,8 @@ function openExercisePicker() {
     short: g.replace(/^\d+\.\s*/, "").replace(/\s*\(.*$/, ""),
     items: EXERCISE_LIBRARY[g].map(n => n.trim()).map(n => ({ id: n, label: n, sub: detectKind(n) !== "weight" ? KIND_LABEL[detectKind(n)] : "" }))
   }));
-  openPicker("🏋️ Hareket Kütüphanesi", groups, it => openExerciseModal({ name: it.id, kind: detectKind(it.id) }),
-    { label: "✍️ Listede yok mu? Özel hareket yaz", onClick: () => openExerciseModal({ name: "", kind: "weight" }) });
+  openPicker("Hareket Kütüphanesi", groups, it => openExerciseModal({ name: it.id, kind: detectKind(it.id) }),
+    { label: "Listede yok mu? Özel hareket yaz", onClick: () => openExerciseModal({ name: "", kind: "weight" }) });
 }
 
 function openMobilityPicker() {
@@ -915,7 +954,8 @@ function setExModalKind(kind) {
   exModal.kind = kind;
   ["weight", "cardio", "time"].forEach(k => {
     const on = k === kind;
-    $("exKind_" + k).className = "py-2 rounded-lg border font-semibold " + (on ? "bg-emerald-600 border-emerald-500 text-white" : "bg-slate-800 border-slate-700 text-slate-300");
+    $("exKind_" + k).classList.toggle("on", on);
+    $("exKind_" + k).setAttribute("aria-pressed", on ? "true" : "false");
     $("exSec_" + k).classList.toggle("hidden", !on);
     $("exSec_" + k).classList.toggle("grid", on);
   });
@@ -953,7 +993,7 @@ function updateExMuscleAuto() {
 
 function openExerciseModal(opts) {
   exModal = { mode: "add", idx: -1, kind: opts.kind || "weight", orig: null };
-  $("exModalTitle").textContent = "➕ Hareket Ekle";
+  $("exModalTitle").textContent = "Hareket Ekle";
   fillExModalFields({ name: opts.name || "" });
   setExModalKind(exModal.kind);
   openModal("exerciseModal");
@@ -971,7 +1011,7 @@ function openEditExercise(exIdx) {
     equip: ex.equip || "", levels: ex.levels ? clone(ex.levels) : null
   };
   exModal = { mode: "edit", idx: exIdx, kind: ex.kind, orig: { ...vals, kind: ex.kind } };
-  $("exModalTitle").textContent = "✎ Hareketi Düzenle";
+  $("exModalTitle").textContent = "Hareketi Düzenle";
   fillExModalFields(vals);
   setExModalKind(ex.kind);
   openModal("exerciseModal");
@@ -1022,7 +1062,7 @@ function resize(arr, n, makeNew) {
 
 function saveExerciseModal() {
   const v = readExModal();
-  if (!v.name) { alert("Lütfen hareket adını yaz."); return; }
+  if (!v.name) { uiAlert("Hareket adı eksik", "Lütfen hareket adını yaz."); return; }
   const kind = exModal.kind;
 
   if (exModal.mode === "add") {
@@ -1223,22 +1263,23 @@ function removeExercise(exIdx) {
   offerUndo(`🗑️ "${ex.name}" kaldırıldı`);
 }
 
-function addWorkoutDay() {
-  const name = prompt("Yeni antrenman gününün adını yaz:", `${state.workoutDays.length + 1}. GÜN: `);
+async function addWorkoutDay() {
+  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: `${state.workoutDays.length + 1}. GÜN: `, placeholder: "Örn: 5. GÜN: Kol" }, ok: "Ekle" });
   if (!name || !name.trim()) return;
   state.workoutDays.push({ id: "day_" + Date.now(), name: name.trim(), exercises: [] });
   state.activeWorkoutDayIdx = state.workoutDays.length - 1;
   renderAll();
 }
-function renameWorkoutDay() {
+async function renameWorkoutDay() {
   const d = activeDay();
-  const n = prompt("Günün yeni adını gir:", d.name);
+  const n = await uiAsk({ title: "Günü adlandır", message: "Günün yeni adını yaz.", input: { value: d.name }, ok: "Kaydet" });
   if (n && n.trim()) { d.name = n.trim(); renderAll(); }
 }
-function deleteWorkoutDay() {
-  if (state.workoutDays.length <= 1) { alert("En az bir antrenman günü kalmalı."); return; }
+async function deleteWorkoutDay() {
+  if (state.workoutDays.length <= 1) { uiAlert("Gün silinemiyor", "En az bir antrenman günü kalmalı."); return; }
   const d = activeDay();
-  if (!confirm(`"${d.name}" ve içindeki tüm hareketler silinsin mi?`)) return;
+  if (!(await uiAsk({ title: "Gün silinsin mi?", message: `"${d.name}" ve içindeki tüm hareketler silinecek. 6 saniye içinde geri alabilirsin.`, ok: "Sil", danger: true }))) return;
+  if (activeDay() !== d) return;
   snapshot();
   state.workoutDays.splice(state.activeWorkoutDayIdx, 1);
   state.activeWorkoutDayIdx = Math.max(0, state.activeWorkoutDayIdx - 1);
@@ -1251,7 +1292,7 @@ function uncheckAllSets() {
   renderAll();
 }
 
-function finishAndLogWorkout() {
+async function finishAndLogWorkout() {
   const day = activeDay();
   let doneSets = 0, vol = 0, cMin = 0, cKm = 0, prs = 0;
   day.exercises.forEach(ex => ex.sets.forEach(s => {
@@ -1260,8 +1301,9 @@ function finishAndLogWorkout() {
     if (ex.kind === "weight") { vol += num(s.kg) * num(s.reps); if (s.pr) prs++; }
     if (ex.kind === "cardio") { cMin += num(s.min); cKm += num(s.km); }
   }));
-  if (doneSets === 0) { alert("Kaydetmek için en az 1 setin yanındaki ✓ kutusunu işaretlemelisin."); return; }
-  if (!confirm(`${day.name} kaydedilsin mi? (${doneSets} set tamamlandı)`)) return;
+  if (doneSets === 0) { uiAlert("Henüz tamamlanan set yok", "Kaydetmek için en az 1 setin yanındaki onay kutusunu işaretlemelisin."); return; }
+  if (!(await uiAsk({ title: "Antrenman kaydedilsin mi?", message: `${day.name} · ${doneSets} set tamamlandı`, ok: "Kaydet" }))) return;
+  if (activeDay() !== day) return;
 
   const ts = Date.now();
   const logId = "w" + ts;
@@ -1437,8 +1479,9 @@ function exerciseSeries(name) {
   return { points: sameKind.map(h => ({ label: fmtDate(h.ts), y: round1(Math.max(...h.sets.map(s => e1rm(s.kg, s.reps)))) })), unit: "kg", color: "#f59e0b", metric: "Tahmini 1RM" };
 }
 
-function exerciseChartHtml(name) {
+function exerciseChartHtml(name, accent) {
   const ser = exerciseSeries(name);
+  if (accent) ser.color = accent;
   const hist = historyFor(name);
   if (!hist.length) return `<div class="text-xs text-slate-500 text-center py-8">Bu hareket için henüz kayıt yok. Antrenmanı bitirip kaydettikçe grafik oluşur.</div>`;
   const rows = hist.slice().reverse().slice(0, 8).map(h => `
@@ -1451,8 +1494,8 @@ function exerciseChartHtml(name) {
 
 function openExerciseChart(exIdx) {
   const ex = activeDay().exercises[exIdx];
-  $("chartTitle").textContent = "📈 " + ex.name;
-  $("chartBody").innerHTML = exerciseChartHtml(ex.name);
+  $("chartTitle").textContent = ex.name;
+  $("chartBody").innerHTML = exerciseChartHtml(ex.name, "#1FD1C1");
   openModal("chartModal");
 }
 function openChartByKey(key) {
@@ -1600,48 +1643,146 @@ function renderProgress() {
 // ---------------------------------------------------------------------------
 // AYARLAR
 // ---------------------------------------------------------------------------
-function openSettings() {
+// Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setSplash"];
+let pfSnap = "";
+function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
+function pfValues() { return JSON.stringify(PF_FIELDS.map(id => { const el = $(id); return el.type === "checkbox" ? el.checked : el.value; })); }
+function fillProfileFields() {
   const st = state.settings;
   $("setSex").value = st.sex;
   $("setAge").value = st.age;
   $("setHeight").value = st.height;
+  $("pfWeight").value = fmtNum(num(state.weight, 0));
   $("setTarget").value = fmtNum(num(st.targetWeight, 82));
   $("setWater").value = fmtNum(num(st.waterTarget, 3.5));
   $("setBf").value = validBf(st.bodyFat) ? fmtNum(validBf(st.bodyFat)) : "";
   $("setTargetBf").value = validBf(st.targetBodyFat) ? fmtNum(validBf(st.targetBodyFat)) : "";
-  updateBfHint();
   $("setRest").value = st.restSec;
   $("setSound").checked = !!st.sound;
   $("setAwake").checked = !!st.keepAwake;
   $("setSplash").checked = st.splash !== false;
+  updateBfHint();
+  pfSnap = pfValues();
+}
+function openProfile() {
+  fillProfileFields();
   $("backupText").value = JSON.stringify(state);
+  renderProfile();
+  const el = $("profilePage");
+  el.classList.remove("hidden"); el.classList.add("flex");
+  document.body.classList.add("pf-open");
+  $("pfScroll").scrollTop = 0;
+}
+const openSettings = openProfile;
+function hideProfile() {
+  const el = $("profilePage");
+  el.classList.add("hidden"); el.classList.remove("flex");
+  document.body.classList.remove("pf-open");
+}
+async function closeProfile() {
+  if (profileIsOpen() && pfValues() !== pfSnap) {
+    const r = await uiAsk({ title: "Değişiklikler kaydedilmedi", message: "Profilde yaptığın değişiklikler kaydedilsin mi?", ok: "Kaydet", cancel: "Kaydetmeden çık", dismissable: false });
+    if (r) { saveSettings(); return; }
+  }
+  hideProfile();
+}
+function closeSettings() { hideProfile(); }
+
+function renderProfile() {
+  // Kilo kayıtları
+  const wl = state.weightLogs.filter(l => num(l.weight) > 0);
+  const lastW = wl[wl.length - 1], firstW = wl[0];
+  const tW = num(state.settings.targetWeight, 0);
+  const left = round1(num(state.weight) - tW);
+  let wh = "";
+  if (wl.length) {
+    const d = round1(num(lastW.weight) - num(firstW.weight));
+    wh += `<div class="grid grid-cols-3 gap-2">
+      <div class="bg-[#1E1E21] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Son tartı</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : lastW.date || "")}</div></div>
+      <div class="bg-[#1E1E21] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Değişim</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${wl.length} kayıt</div></div>
+      <div class="bg-[#1E1E21] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Hedefe</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${!tW ? "hedef yok" : left > 0 ? "verilecek" : left < 0 ? "alınacak" : "hedeftesin"}</div></div>
+    </div>`;
+    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[#2A2A2E] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date || "")}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">· %${fmtNum(validBf(l.bf))} yağ</span>` : ""}</span></div>`).join("");
+    wh += `<div class="mt-2">${rows}</div>`;
+  } else {
+    wh = `<p class="text-[13px] t-dim">Henüz tartı kaydın yok. Kilonu yazıp "Tartıyı kaydet"e dokun; ilerlemen İlerleme sekmesinde grafiğe dönüşür.</p>`;
+  }
+  $("pfWeightBox").innerHTML = wh;
+  // Günlük hedefler (hesaplanan)
+  const t = getTargets();
+  $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
+    ${[["Kalori", Math.round(t.calTarget), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[#1E1E21] rounded-2xl px-1 py-2.5"><div class="text-[11px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[10px] t-dim">${u}</div></div>`).join("")}
+  </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme) ve Beslenme sekmesindeki açık ayarından hesaplanır.</p>`;
+  // Vücut ölçüleri
+  const ms = state.measurements;
+  const lastOf = k => { for (let i = ms.length - 1; i >= 0; i--) if (ms[i][k] != null) return ms[i]; return null; };
+  const firstOf = k => ms.find(m => m[k] != null);
+  const cells = MEASURES.map(([k, n, lowerBetter]) => {
+    const l = lastOf(k);
+    if (!l) return "";
+    const d = round1(l[k] - firstOf(k)[k]);
+    const good = d === 0 ? null : (lowerBetter ? d < 0 : d > 0);
+    return `<div class="bg-[#141416] border border-[#2A2A2E] rounded-2xl px-3 py-2.5 min-w-0">
+      <div class="text-[12px] t-muted truncate">${n}</div>
+      <div class="t-display text-[22px]">${fmtNum(l[k])}<span class="t-dim text-sm"> cm</span></div>
+      <div class="text-[11px] ${good == null ? "t-dim" : good ? "t-accent" : "text-[#FF8A8A]"}">${d === 0 ? "değişim yok" : (d > 0 ? "+" : "") + fmtNum(d) + " cm"}</div>
+    </div>`;
+  }).join("");
+  const lastM = ms[ms.length - 1];
+  $("pfMeasureBox").innerHTML = cells
+    ? `<div class="grid grid-cols-3 gap-2">${cells}</div><p class="text-[12px] t-dim mt-2">Son ölçüm: ${esc(fmtDate(lastM.ts, true))} · Değişim ilk ölçüne göre. Grafik İlerleme sekmesinde.</p>`
+    : `<div class="t-card rounded-[22px] p-4 text-[13px] t-dim">Henüz ölçü eklemedin. Kilo yerinde sayarken belin inceliyorsa yağ yakıp kas kazanıyorsun demektir. İlk ölçünü eklemek için "+ Ölçü ekle"ye dokun.</div>`;
   $("lastBackupText").textContent = state.lastBackupAt
     ? `Son yedek: ${fmtDate(state.lastBackupAt, true)} (${Math.floor((Date.now() - state.lastBackupAt) / DAY_MS)} gün önce)`
     : "Henüz yedek alınmadı. Verilerin sadece bu telefonda duruyor; düzenli yedek almanı öneririm.";
-  openModal("settingsModal");
 }
-function closeSettings() { closeModal("settingsModal"); }
+
+function readProfileWeight() {
+  const raw = $("pfWeight").value.trim();
+  const w = round1(num(raw, 0));
+  return w >= 30 && w <= 300 ? w : 0;
+}
+function profileLogWeight() {
+  const w = readProfileWeight();
+  if (!w) { uiAlert("Kilo geçersiz", "Kilonu 30 ile 300 kg arasında yaz (örn: 98,4)."); return; }
+  state.weight = w;
+  logCurrentWeight();
+  $("pfWeight").value = fmtNum(w);
+  pfSnap = pfValues();
+}
 
 function saveSettings() {
   const st = state.settings;
+  const bfRaw = $("setBf").value.trim(), tbfRaw = $("setTargetBf").value.trim();
+  if ((bfRaw && !validBf(bfRaw)) || (tbfRaw && !validBf(tbfRaw))) { uiAlert("Yağ oranı geçersiz", "Yağ oranı %3 ile %60 arasında olmalı (bilmiyorsan boş bırak)."); return; }
+  const wRaw = $("pfWeight").value.trim();
+  const w = readProfileWeight();
+  if (wRaw && !w) { uiAlert("Kilo geçersiz", "Kilonu 30 ile 300 kg arasında yaz (örn: 98,4)."); return; }
   st.sex = $("setSex").value === "female" ? "female" : "male";
   st.age = Math.max(12, Math.min(99, Math.round(num($("setAge").value, st.age))));
   st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));
   st.targetWeight = Math.max(30, Math.min(250, round1(num($("setTarget").value, st.targetWeight))));
   st.waterTarget = Math.max(0.5, Math.min(10, round1(num($("setWater").value, st.waterTarget))));
   st.restSec = Math.max(10, Math.min(900, Math.round(num($("setRest").value, st.restSec))));
-  const bfRaw = $("setBf").value.trim(), tbfRaw = $("setTargetBf").value.trim();
-  if ((bfRaw && !validBf(bfRaw)) || (tbfRaw && !validBf(tbfRaw))) { alert("Yağ oranı %3 ile %60 arasında olmalı (bilmiyorsan boş bırak)."); return; }
   st.bodyFat = bfRaw ? round1(validBf(bfRaw)) : "";
   st.targetBodyFat = tbfRaw ? round1(validBf(tbfRaw)) : "";
   st.sound = $("setSound").checked;
   st.keepAwake = $("setAwake").checked;
   st.splash = $("setSplash").checked;
+  if (w) state.weight = w;
   if (!timer.running) resetTimerUI();
-  closeSettings();
-  toast("✓ Ayarlar kaydedildi");
+  pfSnap = pfValues();
+  hideProfile();
+  toast("✓ Profil kaydedildi");
   renderAll();
   updateWakeLock();
+}
+
+// Bağlama göre onay: profil/antrenman ekranında temalı pencere, diğer yerlerde sistem kutusu.
+async function askConfirm(title, message, ok = "Devam et", danger = false) {
+  if (trainCtx()) return !!(await uiAsk({ title, message, ok, danger }));
+  return confirm(message);
 }
 
 // ---------------------------------------------------------------------------
@@ -1678,12 +1819,12 @@ async function exportBackupFile() {
   }
 }
 
-function restoreFromText(text) {
+async function restoreFromText(text) {
   let parsed;
-  try { parsed = JSON.parse(String(text || "").trim()); } catch (e) { alert("Geçersiz yedek! Dosya veya kod bozuk görünüyor."); return false; }
+  try { parsed = JSON.parse(String(text || "").trim()); } catch (e) { sayAlert("Geçersiz yedek", "Geçersiz yedek! Dosya veya kod bozuk görünüyor."); return false; }
   if (parsed && parsed.state && (parsed.state.meals || parsed.state.workoutDays)) parsed = parsed.state;
-  if (!parsed || typeof parsed !== "object" || !(parsed.meals || parsed.workoutDays)) { alert("Bu bir AYK+ yedeği değil."); return false; }
-  if (!confirm("Mevcut tüm verilerin bu yedekle DEĞİŞTİRİLECEK. Devam edilsin mi?")) return false;
+  if (!parsed || typeof parsed !== "object" || !(parsed.meals || parsed.workoutDays)) { sayAlert("Yedek tanınmadı", "Bu bir AYK+ yedeği değil."); return false; }
+  if (!(await askConfirm("Yedek geri yüklensin mi?", "Mevcut tüm verilerin bu yedekle DEĞİŞTİRİLECEK. Devam edilsin mi?", "Geri yükle", true))) return false;
   state = normalizeState(parsed);
   state.lastBackupAt = state.lastBackupAt || Date.now();
   checkNewDay();
@@ -1699,7 +1840,7 @@ function importBackupFile(event) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => restoreFromText(e.target.result);
-  reader.onerror = () => alert("Dosya okunamadı.");
+  reader.onerror = () => sayAlert("Dosya okunamadı", "Dosya okunamadı.");
   reader.readAsText(file);
 }
 
@@ -1716,9 +1857,9 @@ async function copyBackup() {
 
 function restoreBackupFromText() { restoreFromText($("backupText").value); }
 
-function resetToDefaults() {
-  if (!confirm("TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?")) return;
-  if (!confirm("Son onay: Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?")) return;
+async function resetToDefaults() {
+  if (!(await askConfirm("Fabrika ayarlarına sıfırla", "TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?", "Devam et", true))) return;
+  if (!(await askConfirm("Son onay", "Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?", "Sıfırla", true))) return;
   state = normalizeState({});
   state.today = todayStr();
   closeSettings();
@@ -1968,7 +2109,7 @@ function openPlateTool(exIdx) {
   const W = num(next && next.kg) || Math.max(...ex.sets.map(s => num(s.kg)), 0);
   const lv = usesLevels(ex);
   plateCtx = { name: ex.name, exIdx, levels: lv ? levelListOf(ex) : null, lv };
-  $("chartTitle").textContent = (lv ? "🎚️ " : "🧮 ") + ex.name;
+  $("chartTitle").textContent = ex.name;
   const bar = num(state.settings.barKg, 20);
   if (lv && !plateCtx.levels) {
     $("chartBody").innerHTML = `<div class="text-sm text-slate-300 space-y-3">
@@ -2020,7 +2161,7 @@ function renderLevelTool() {
       ${exact ? "" : `<div class="text-[11px] text-amber-300 mt-2">${fmtKg(W)} kg bu makinede yok; en yakın alt kademe <b>${fmtKg(near)} kg</b>.</div>`}
     </div>
     <div>
-      <div class="text-[11px] font-bold text-slate-500 tracking-wide mb-1.5">🔥 ISINMA SETLERİ</div>
+      <div class="text-[11px] font-bold text-slate-500 tracking-wide mb-1.5">ISINMA SETLERİ</div>
       ${wu.length ? `<div class="space-y-1">${wu.map(w => `<div class="flex items-center justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5"><span class="text-slate-400 w-14">${w.label}</span><span class="font-bold text-slate-100">${fmtKg(w.kg)} kg × ${w.reps}</span><span></span></div>`).join("")}
         <div class="flex items-center justify-between gap-2 text-xs bg-emerald-950/60 border border-emerald-700/60 rounded-lg px-2.5 py-1.5"><span class="text-emerald-300 w-14">Çalışma</span><span class="font-bold text-emerald-200">${fmtKg(W)} kg</span><span></span></div></div>
         <p class="text-[11px] text-slate-500 mt-1.5">Isınma kiloları makinede var olan kademelere yuvarlandı. Tonaja ve set sayısına dahil edilmez.</p>`
@@ -2049,7 +2190,7 @@ function renderPlateTool() {
   }
   const wu = warmupSets(W, bar);
   html += `<div>
-    <div class="text-[11px] font-bold text-slate-500 tracking-wide mb-1.5">🔥 ISINMA SETLERİ</div>
+    <div class="text-[11px] font-bold text-slate-500 tracking-wide mb-1.5">ISINMA SETLERİ</div>
     ${wu.length ? `<div class="space-y-1">${wu.map(w => {
       const pr = bar > 0 ? platesFor(w.kg, bar) : null;
       return `<div class="flex items-center justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5">
@@ -2419,7 +2560,7 @@ function saveMeasurement() {
     const v = num(raw, 0);
     if (v >= 10 && v <= 250) { entry[k] = round1(v); any = true; }
   });
-  if (!any) { alert("En az bir ölçüyü 10–250 cm arasında gir."); return; }
+  if (!any) { sayAlert("Ölçü girilmedi", "En az bir ölçüyü 10–250 cm arasında gir."); return; }
   const last = state.measurements[state.measurements.length - 1];
   if (last && todayStr(new Date(last.ts)) === todayStr()) state.measurements[state.measurements.length - 1] = entry;
   else state.measurements.push(entry);
@@ -2584,7 +2725,7 @@ async function buildShareCanvas(log) {
 async function openShareCard(logIdx) {
   const log = state.workoutLogs[logIdx];
   if (!log) return;
-  $("chartTitle").textContent = "📤 Antrenman Özeti";
+  $("chartTitle").textContent = "Antrenman Özeti";
   $("chartBody").innerHTML = `<div class="text-xs text-slate-400 text-center py-10">Kart hazırlanıyor...</div>`;
   openModal("chartModal");
   try {
@@ -2596,7 +2737,7 @@ async function openShareCard(logIdx) {
     const url = URL.createObjectURL(blob);
     $("chartBody").innerHTML = `
       <img src="${url}" alt="Antrenman özeti" class="w-full rounded-xl border border-slate-700" />
-      <button onclick="shareWorkoutCard()" class="w-full mt-3 bg-emerald-600 text-white text-sm font-semibold py-2.5 rounded-lg">📤 Paylaş / Fotoğraflara Kaydet</button>
+      <button onclick="shareWorkoutCard()" class="w-full mt-3 bg-emerald-600 text-white text-sm font-semibold py-2.5 rounded-lg">Paylaş / Fotoğraflara Kaydet</button>
       <p class="text-[11px] text-slate-500 mt-2 text-center">Paylaş menüsünden Instagram, WhatsApp veya "Görüntüyü Kaydet"i seçebilirsin.</p>`;
   } catch (e) {
     $("chartBody").innerHTML = `<div class="text-xs text-rose-300 text-center py-8">Kart oluşturulamadı.</div>`;
@@ -2881,10 +3022,8 @@ function dismissLevelsAsk(exIdx) { activeDay().exercises[exIdx].levelsAskDismiss
 let exLevelsMode = "step";
 function setExLevelsMode(m) {
   exLevelsMode = m === "list" ? "list" : "step";
-  const on = "h-10 rounded-lg border font-semibold bg-emerald-600 border-emerald-500 text-white";
-  const off = "h-10 rounded-lg border font-semibold bg-slate-800 border-slate-700 text-slate-300";
-  $("exLvModeStep").className = exLevelsMode === "step" ? on : off;
-  $("exLvModeList").className = exLevelsMode === "list" ? on : off;
+  $("exLvModeStep").classList.toggle("on", exLevelsMode === "step");
+  $("exLvModeList").classList.toggle("on", exLevelsMode === "list");
   $("exLvStepWrap").classList.toggle("hidden", exLevelsMode !== "step");
   $("exLvStepWrap").classList.toggle("grid", exLevelsMode === "step");
   $("exLvListWrap").classList.toggle("hidden", exLevelsMode !== "list");
@@ -2898,6 +3037,9 @@ function updateExEquipUI() {
   $("exEquipWrap").classList.toggle("hidden", kind !== "weight");
   $("exLevelsWrap").classList.toggle("hidden", !lv);
   $("exIncWrap").classList.toggle("hidden", !(kind === "weight" && !lv));
+  const incShown = kind === "weight" && !lv;
+  $("exExtraWrap").classList.toggle("grid-cols-2", incShown);
+  $("exExtraWrap").classList.toggle("grid-cols-1", !incShown);
   $("exLvTitle").textContent = eq === "dumbbell" ? "Salonundaki dambıl kiloları" : "Makinenin kilo kademeleri";
 }
 function fillExLevels(v) {
@@ -2936,7 +3078,9 @@ const ICON = {
   chart: "M4 20V11M10 20V5M16 20v-6M2 20h20", calc: "M5 3h14v18H5zM8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M16 11v4",
   edit: "M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4", up: "M12 19V5M5 12l7-7 7 7", down: "M12 5v14M19 12l-7 7-7-7",
   minus: "M5 12h14", trash: "M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13", play: "M7 4.5v15l12.5-7.5z", share: "M12 3v12M7 8l5-5 5 5M5 14v6h14v-6",
-  search: "M11 4.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM20 20l-4-4"
+  search: "M11 4.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM20 20l-4-4",
+  grip: "M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01", user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5",
+  x: "M6 6l12 12M18 6L6 18"
 };
 function svgI(name, size = 20, sw = 2) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICON[name]}"></path></svg>`;
@@ -3137,7 +3281,8 @@ function gymProgramHtml() {
     const eq = equipOf(ex);
     const meta = [ex.targetInfo, muscleOf(ex), eq ? EQUIP_SHORT[eq] : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
     const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[11px] text-amber-300">Kademe tanımlı değil</span>` : usesLevels(ex) ? `<span class="text-[11px] t-dim">Kademe: ${esc(levelsSummary(ex))}</span>` : "";
-    return `<div class="t-card-flat rounded-2xl min-h-[64px] pl-3.5 pr-1.5 py-2 flex items-center gap-3">
+    return `<div data-ex-row="${i}" class="t-card-flat rounded-2xl min-h-[64px] pl-1 pr-1.5 py-2 flex items-center gap-2">
+      ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${esc(ex.name)} hareketini sürükleyerek taşı" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
       <span class="t-display text-xl t-dim w-6 text-center">${i + 1}</span>
       <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold truncate">${esc(ex.name)}</span><span class="text-xs t-muted truncate">${esc(meta)}</span>${lvWarn}</span>
       <button onclick="openExSheet(${i})" aria-label="${esc(ex.name)} seçenekleri" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-muted">
@@ -3154,7 +3299,8 @@ function gymProgramHtml() {
     </div>
     <div class="space-y-2">
       <div class="flex items-baseline justify-between"><span class="t-label">HAREKETLER</span><span class="text-xs t-dim">${day.exercises.length} hareket · ~${estimateMinutes(day)} dk</span></div>
-      ${rows || `<div class="t-card-flat rounded-2xl p-6 text-center text-sm t-muted">Bu günde henüz hareket yok.</div>`}
+      ${day.exercises.length > 1 ? `<div class="text-xs t-dim">Sırayı değiştirmek için soldaki tutamacı basılı tutup sürükle.</div>` : ""}
+      <div id="progExList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center text-sm t-muted">Bu günde henüz hareket yok.</div>`}</div>
     </div>
     <div class="grid grid-cols-2 gap-2">
       <button onclick="openExercisePicker()" class="t-btn h-12 rounded-xl text-[14px]">+ Kütüphaneden ekle</button>
@@ -3188,8 +3334,19 @@ function todayMuscleSets() {
   });
   return counts;
 }
+// Programın haftalık etkisi: tüm antrenman günlerindeki planlanan setler (her gün haftada bir kez yapılır varsayımıyla).
+function programMuscleSets() {
+  const counts = {};
+  MUSCLES.forEach(m => { counts[m] = 0; });
+  state.workoutDays.forEach(d => d.exercises.forEach(ex => {
+    if (ex.kind === "cardio") return;
+    const g = muscleOf(ex);
+    if (g && counts[g] != null) counts[g] += ex.sets.length;
+  }));
+  return counts;
+}
 function selectMuscle(m) { state.libMuscle = MUSCLES.includes(m) ? m : null; libSearchQ = ""; renderAll(); }
-function setLibRange(r) { state.libRange = r === "today" ? "today" : "week"; renderAll(); }
+function setLibRange(r) { state.libRange = r === "today" || r === "program" ? r : "week"; renderAll(); }
 let libSearchQ = "";
 
 function libExerciseItems(muscle, q) {
@@ -3231,7 +3388,8 @@ function libListHtml() {
 function onLibSearch(v) { libSearchQ = v; $("libList").innerHTML = libListHtml(); }
 
 function gymLibraryHtml() {
-  const counts = state.libRange === "today" ? todayMuscleSets() : weeklyMuscleSets(weekStart());
+  const range = state.libRange === "today" || state.libRange === "program" ? state.libRange : "week";
+  const counts = range === "today" ? todayMuscleSets() : range === "program" ? programMuscleSets() : weeklyMuscleSets(weekStart());
   const sel = state.libMuscle;
   let polys = "", sels = "";
   Object.keys(BODY_POLYS).forEach(m => {
@@ -3243,12 +3401,25 @@ function gymLibraryHtml() {
   });
   const n = sel ? counts[sel] || 0 : 0;
   const tag = n === 0 ? "henüz çalışılmadı" : n < 10 ? "az" : n <= 20 ? "ideal aralıkta" : "yüksek hacim";
-  const rangeBtn = (k, l) => `<button onclick="setLibRange('${k}')" class="h-10 px-3 rounded-xl text-[13px] ${state.libRange === k || (k === "week" && state.libRange !== "today") ? "bg-white text-black font-bold" : "t-muted font-semibold"}">${l}</button>`;
+  const rangeBtn = (k, l) => `<button onclick="setLibRange('${k}')" aria-pressed="${range === k}" class="h-11 rounded-[11px] text-[13px] ${range === k ? "bg-white text-black font-bold" : "t-muted font-semibold"}">${l}</button>`;
+  const rangeTxt = range === "today" ? "Bugünkü set sayısına göre" : range === "program" ? "Programının bir haftada verdiği set sayısı" : "Bu haftaki set sayısına göre";
+  const rangeWord = range === "today" ? "Bugün" : range === "program" ? "Programında haftada" : "Bu hafta";
+  const pTotal = range === "program" ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
+  const pRows = range === "program" ? MUSCLES.map(m => {
+    const c = counts[m] || 0;
+    const tg = c === 0 ? "yok" : c < 10 ? "az" : c <= 20 ? "ideal" : "yüksek";
+    const col = c === 0 ? "#3A3A40" : c < 10 ? "#3E8F88" : c <= 20 ? "#14D9C6" : "#00FFE5";
+    return `<button onclick="selectMuscle(${esc(JSON.stringify(m))})" class="w-full min-h-[44px] flex items-center gap-2.5 text-left">
+      <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-white font-bold" : "text-slate-200"} truncate">${esc(m)}</span>
+      <span class="relative flex-1 h-2.5 rounded-full bg-[#1E1E21] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / 24 * 100)}%;background:${col}"></span></span>
+      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-white">${c}</b> <span class="t-dim text-[11px]">${tg}</span></span>
+    </button>`;
+  }).join("") : "";
   return `
     <div class="flex items-center justify-between">
-      <div class="flex flex-col"><span class="t-label">KAS YÜKÜ</span><span class="text-[13px] text-slate-200">${state.libRange === "today" ? "Bugünkü" : "Haftalık"} set sayısına göre</span></div>
-      <div class="flex bg-[#141416] border border-[#2A2A2E] rounded-[14px] p-0.5">${rangeBtn("week", "Bu hafta")}${rangeBtn("today", "Bugün")}</div>
+      <div class="flex flex-col"><span class="t-label">KAS YÜKÜ</span><span class="text-[13px] text-slate-200">${rangeTxt}</span></div>
     </div>
+    <div class="grid grid-cols-3 gap-0.5 bg-[#141416] border border-[#2A2A2E] rounded-[14px] p-0.5">${rangeBtn("week", "Bu hafta")}${rangeBtn("today", "Bugün")}${rangeBtn("program", "Programım")}</div>
     <div class="flex justify-center">
       <div class="relative" style="width: min(100%, 340px); aspect-ratio: 765 / 1024;">
         <img src="anatomy.jpg" alt="Önden ve arkadan kas anatomisi" class="absolute inset-0 w-full h-full select-none" draggable="false" />
@@ -3266,8 +3437,13 @@ function gymLibraryHtml() {
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#2FC4B6]"></span>10–20</span>
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#4DF2E1]"></span>20+ set</span>
     </div>
+    ${range === "program" ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5">
+      <div class="flex items-baseline justify-between pb-1"><span class="t-label">PROGRAMIN HAFTALIK ETKİSİ</span><span class="text-xs t-dim">${state.workoutDays.length} gün · ${pTotal} set</span></div>
+      ${pRows}
+      <p class="text-[12px] t-dim pt-1.5">Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.</p>
+    </div>` : ""}
     ${sel ? `<div class="t-card rounded-[18px] min-h-[64px] px-4 flex items-center justify-between gap-2">
-      <span class="flex flex-col gap-0.5"><span class="text-base font-bold">${esc(sel)}</span><span class="text-[13px] t-muted">${state.libRange === "today" ? "Bugün" : "Bu hafta"} <b class="text-white">${n} set</b> · ${tag}</span></span>
+      <span class="flex flex-col gap-0.5"><span class="text-base font-bold">${esc(sel)}</span><span class="text-[13px] t-muted">${rangeWord} <b class="text-white">${n} set</b> · ${range === "program" && n === 0 ? "programında yok" : tag}</span></span>
       <button onclick="selectMuscle(null)" class="t-btn-ghost h-11 px-3 rounded-xl text-[13px]">Temizle</button>
     </div>` : ""}
     <label class="flex items-center gap-2.5 h-12 rounded-[14px] bg-[#141416] border border-[#2A2A2E] px-3.5 t-muted">
@@ -3410,16 +3586,19 @@ function saveMealModal() {
 }
 
 let mealDrag = null;
+// Sürükle-bırak: öğün kartları (data-midx) ve Programım'daki hareket satırları (data-exidx) aynı mantığı kullanır.
 document.addEventListener("pointerdown", e => {
   const h = e.target && e.target.closest ? e.target.closest(".drag-handle") : null;
   if (!h) return;
-  e.preventDefault();
-  const cards = [...document.querySelectorAll("#mealsContainer [data-meal-card]")];
-  const from = parseInt(h.dataset.midx, 10);
+  const isEx = h.dataset.exidx != null;
+  const cards = [...document.querySelectorAll(isEx ? "#progExList [data-ex-row]" : "#mealsContainer [data-meal-card]")];
+  const from = parseInt(isEx ? h.dataset.exidx : h.dataset.midx, 10);
   const card = cards[from];
-  if (!card) return;
+  if (!card || cards.length < 2) return;
+  e.preventDefault();
   const sy = window.scrollY;
   mealDrag = {
+    kind: isEx ? "ex" : "meal", dayIdx: state.activeWorkoutDayIdx,
     from, to: from, card, cards, startX: e.clientX, startY: e.clientY + sy,
     centers: cards.map(c => { const r = c.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + sy + r.height / 2 }; })
   };
@@ -3434,7 +3613,8 @@ document.addEventListener("pointermove", e => {
   const sy = window.scrollY;
   if (e.clientY < 140) window.scrollBy(0, -14);
   else if (e.clientY > window.innerHeight - 150) window.scrollBy(0, 14);
-  const dx = e.clientX - mealDrag.startX, dy = e.clientY + sy - mealDrag.startY;
+  const isEx = mealDrag.kind === "ex";
+  const dx = isEx ? 0 : e.clientX - mealDrag.startX, dy = e.clientY + sy - mealDrag.startY;
   mealDrag.card.style.transform = `translate(${dx}px, ${dy}px) scale(1.02)`;
   const c0 = mealDrag.centers[mealDrag.from];
   const cx = c0.x + dx, cy = c0.y + dy;
@@ -3443,22 +3623,30 @@ document.addEventListener("pointermove", e => {
   if (best !== mealDrag.to) {
     if (mealDrag.cards[mealDrag.to] && mealDrag.to !== mealDrag.from) mealDrag.cards[mealDrag.to].style.outline = "";
     mealDrag.to = best;
-    if (best !== mealDrag.from) mealDrag.cards[best].style.outline = "2px dashed #10b981";
+    if (best !== mealDrag.from) mealDrag.cards[best].style.outline = isEx ? "2px dashed #1FD1C1" : "2px dashed #10b981";
   }
 });
 function endMealDrag() {
   if (!mealDrag) return;
-  const { from, to, card, cards } = mealDrag;
+  const { from, to, card, cards, kind, dayIdx } = mealDrag;
   mealDrag = null;
   card.style.transform = ""; card.style.zIndex = ""; card.style.boxShadow = ""; card.style.position = "";
   cards.forEach(c => { c.style.outline = ""; });
-  if (to !== from) {
-    const meals = curMeals();
-    const [m] = meals.splice(from, 1);
-    meals.splice(to, 0, m);
+  if (to === from) return;
+  if (kind === "ex") {
+    const day = state.workoutDays[dayIdx];
+    if (!day || dayIdx !== state.activeWorkoutDayIdx) { renderAll(); return; }
+    const [x] = day.exercises.splice(from, 1);
+    day.exercises.splice(to, 0, x);
     renderAll();
-    toast("↕ Öğün taşındı");
+    toast("↕ Hareket taşındı");
+    return;
   }
+  const meals = curMeals();
+  const [m] = meals.splice(from, 1);
+  meals.splice(to, 0, m);
+  renderAll();
+  toast("↕ Öğün taşındı");
 }
 document.addEventListener("pointerup", endMealDrag);
 document.addEventListener("pointercancel", endMealDrag);
@@ -3528,6 +3716,7 @@ function renderAll() {
   renderGym();
   renderMobility();
   if (state.activeTab === "progress") renderProgress();
+  if (profileIsOpen()) renderProfile();
   renderBanner();
   saveState();
   restorePendingFocus();

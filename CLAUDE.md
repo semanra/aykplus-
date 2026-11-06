@@ -32,7 +32,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 6 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 7 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
@@ -45,7 +45,7 @@ npm test             # 6 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 2. Yeni özellik için `tests/` altına test ekle veya mevcut testi güncelle.
 3. `src/markup.html` içindeki sürüm etiketini artır: `AYK+ vN` (Ayarlar'ın en altında görünür).
 4. `sw.js` içindeki `const CACHE = 'aykplus-vN'` değerini artır (artırılmazsa telefon eski sürümü göstermeye devam edebilir). Yeni statik dosya eklediysen `FILES` listesine ekle.
-5. `npm run build` → `npm test` (6/6 geçmeli).
+5. `npm run build` → `npm test` (7/7 geçmeli).
 6. Açıklayıcı Türkçe mesajla commit et ve `main`'e gönder.
 7. Kullanıcıya kısa Türkçe özet yaz: ne değişti, telefonda ne yapması gerekiyor (genelde: "uygulamayı iki kez tamamen kapatıp aç").
 
@@ -58,11 +58,16 @@ npm test             # 6 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 - **Dokunma alanı en az 44 px.** Buton ve ikonlar küçük olmamalı; kullanıcı bunu açıkça istedi.
 - **Odak koruma:** Tam yeniden çizim (`renderAll()`) yapan girişlere `data-fk="benzersiz-anahtar"` ver; aksi halde iPhone'da klavye kapanır.
 - **Silme işlemleri:** `snapshot()` → sil → `renderAll()` → `offerUndo("mesaj")` (6 sn "Geri al").
+- **Onay / metin girişi:** Antrenman ve Profil tarafında `prompt/confirm/alert` KULLANMA; temalı `uiAsk({title, message, input, ok, cancel, danger})` (Promise döner), `uiAlert()`, bağlama göre `askConfirm()` / `sayAlert()` kullan. Beslenme/Mobilite tarafı (eski tema) şimdilik sistem kutularını kullanıyor.
 - **Dil:** Arayüz metinleri doğru Türkçe yazılır ("antrenman", "antreman" değil). Emojiler beslenme tarafında var; antrenman tarafında çizgi ikonlar (`svgI()`) kullanılır.
 - **iOS sınırları (çözmeye çalışma, kullanıcıya dürüstçe söyle):** titreşim API'si yok; uygulama kapalıyken sayaç sesi çalmaz; sessiz modda ses çıkmaz; bildirim sunucu ister; Apple Sağlık entegrasyonu web uygulamasıyla mümkün değil.
 
 ## 6. Mimari
 
+- **Yeni tema pencereleri:** Ortak pencereler (`pickerModal`, `chartModal`, `customFoodModal`) `openModal()` ile açılırken `trainCtx()` (antrenman sekmesi veya Profil açık) doğruysa `.tm` sınıfı alır; `src/markup.html` içindeki `.tm` CSS kuralları eski renkleri yeni temaya çevirir ve başlıktaki emojiyi kaldırır. Beslenmeden açılınca eski temada kalır. `exerciseModal` yalnızca antrenmanda kullanıldığı için doğrudan yeni temada yazıldı (`t-in`, `t-seg`, `t-field`).
+- **Profil:** Üstteki profil düğmesi (`#profileBtn`) tam ekran `#profilePage`'i açar (eski Ayarlar penceresi kaldırıldı; `openSettings` = `openProfile`). Alan kimlikleri (`setAge`, `setBf`, `setRest`...) aynı. Kaydet: `saveSettings()` (`#profileSave`). Değişiklik varken Geri → uyarı. Kilo/hedef/ölçü kutuları `renderProfile()` ile `renderAll()` içinde güncellenir.
+- **Sayaç:** Üst bardaki kronometre v11'de kaldırıldı; tek sayaç alttaki `#restPill` (set tamamlanınca / `startTimer()`).
+- **Sürükle-bırak:** Tek `pointerdown/move/up` mantığı hem öğün kartlarını (`.drag-handle[data-midx]`, `#mealsContainer`) hem Programım'daki hareketleri (`.drag-handle[data-exidx]`, `#progExList [data-ex-row]`) taşır.
 - **Tek global durum:** `state` (bkz. `normalizeState`). Her değişiklikten sonra `renderAll()` çağrılır; o da tüm sekmeleri çizer ve `saveState()` yapar.
 - **Sekmeler:** `state.activeTab` = `nutrition | gym | mobility | progress`. Antrenman sekmesi seçiliyken `body.theme-train` sınıfı eklenir (siyah tema).
 - **Antrenman alt görünümleri:** `state.gymView` = `today | program | library | history`; `state.gymActive` = aktif antrenman modu. Antrenman arayüzü tamamen `renderGym()` tarafından `#gymRoot` içine çizilir (v10 bölümü).
@@ -90,7 +95,7 @@ npm test             # 6 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 
 ## 9. Yol haritası
 
-Yapıldı (v6–v10): kardiyo/süreli hareketler, kalori koçu, kilo artırma önerisi, plaka/ısınma, kas grubu sayımı, planlanan/yenen, geri al, sıradaki gün, aktif antrenman, öğün menüleri (antrenman/dinlenme), takviyeler, vücut ölçüleri, paylaşım kartı, 42 Türk yemeği, su/beslenme grafikleri, açılış ekranı, yağ oranı, **makine/dambıl kademeleri**, **yeni antrenman teması + vücut haritası**, öğün saat ve sürükle-bırak, özel besin düzenle/sil.
+Yapıldı (v6–v11): kardiyo/süreli hareketler, kalori koçu, kilo artırma önerisi, plaka/ısınma, kas grubu sayımı, planlanan/yenen, geri al, sıradaki gün, aktif antrenman, öğün menüleri (antrenman/dinlenme), takviyeler, vücut ölçüleri, paylaşım kartı, 42 Türk yemeği, su/beslenme grafikleri, açılış ekranı, yağ oranı, **makine/dambıl kademeleri**, **yeni antrenman teması + vücut haritası**, öğün saat ve sürükle-bırak, özel besin düzenle/sil. **v11:** Programım'da hareketleri sürükleyerek sıralama, antrenmandaki tüm pencereler ve onaylar yeni temada, vücut haritasında "Programım" kas yükü, üst kronometre kaldırıldı, Ayarlar → tam ekran Profil (kişisel bilgiler, kilo, hedefler, ölçüler, ayarlar).
 
 Sıradaki adaylar (kullanıcı onayı gerekir):
 - **Beslenme bölümü için yeni tema** (kullanıcı örnek uygulama gönderecek).
