@@ -60,7 +60,7 @@ with sync_playwright() as p:
     print("header:", pg.inner_text("#gymHeaderBar").replace("\n"," | "))
     pg.screenshot(path=""+SHOTS+"/2_gym_ticked.png")
     pg.on("dialog", lambda d: d.accept())
-    pg.locator("button", has_text="Antrenmanı Bitir ve Kaydet").first.click(); pg.wait_for_timeout(300)
+    pg.locator("button", has_text="Antrenmanı Bitir ve Kaydet").first.click(); pg.click("#uiDlgOk"); pg.wait_for_timeout(300)
     pg.evaluate("setGymView('history')"); print("history:", pg.inner_text("#workoutHistoryList").replace("\n"," | ")[:300])
     # PR test
     pg.evaluate("startWorkout()"); pg.wait_for_timeout(150)
@@ -98,8 +98,8 @@ with sync_playwright() as p:
     print("focused after re-render:", pg.evaluate("document.activeElement && document.activeElement.dataset.fk"))
     pg.click("#navBtnMobility"); pg.wait_for_timeout(200); pg.screenshot(path=""+SHOTS+"/8_mobility.png", full_page=True); overflow("mobility")
     pg.click("#navBtnProgress"); pg.wait_for_timeout(300); pg.screenshot(path=""+SHOTS+"/9_progress.png", full_page=True); overflow("progress")
-    pg.click("text=⚙️"); pg.wait_for_timeout(200); pg.screenshot(path=""+SHOTS+"/10_settings.png")
-    pg.fill("#setAge","30"); pg.click("text=✓ Profili Kaydet"); pg.wait_for_timeout(200)
+    pg.click("#profileBtn"); pg.wait_for_timeout(200); pg.screenshot(path=""+SHOTS+"/10_settings.png")
+    pg.fill("#setAge","30"); pg.click("#profileSave"); pg.wait_for_timeout(200)
     st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))"); print("settings:", st["settings"])
     # new day rollover
     pg.evaluate("()=>{const s=JSON.parse(localStorage.getItem('ayk_plus_v5_state')); s.today='2026-10-20'; localStorage.setItem('ayk_plus_v5_state', JSON.stringify(s));}")

@@ -50,6 +50,45 @@
     input.t-note { background: transparent; border: 0; border-bottom: 1px solid #2A2A2E; color: #D4D4D8; padding: 6px 0; border-radius: 0; }
     input.t-search { background: transparent; border: 0; color: #FFFFFF; font-size: 15px; outline: none; }
     .drag-handle:active { cursor: grabbing; }
+    /* YENİ TEMA PENCERELERİ: antrenman veya profil ekranından açılan ortak pencerelere .tm eklenir */
+    .tm { background-color: rgba(0,0,0,.78) !important; }
+    .tm .card, .tm .sheet, .tm .sheet.bg-slate-900 { background: #141416 !important; border: 1px solid #2A2A2E !important; border-radius: 24px !important; color: #fff; }
+    .tm .sheet { border-bottom: 0 !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+    @media (min-width: 768px) { .tm .sheet { border-radius: 24px !important; border-bottom: 1px solid #2A2A2E !important; } }
+    .tm h3, .tm h3.text-emerald-400 { color: #fff !important; font-size: 19px !important; font-weight: 800 !important; }
+    .tm .justify-end > button { flex: 1 1 0; min-height: 52px; font-size: 15px !important; border-radius: 16px !important; }
+    .tm .bg-slate-900, .tm .bg-slate-900\/80, .tm .bg-slate-950 { background-color: #1A1A1D !important; }
+    .tm .bg-slate-800, .tm .bg-slate-800\/80, .tm .bg-slate-800\/95 { background-color: #1E1E21 !important; }
+    .tm .bg-slate-700, .tm .active\:bg-slate-700:active { background-color: #26262A !important; }
+    .tm .border-slate-800, .tm .border-slate-700, .tm .border-slate-600 { border-color: #2A2A2E !important; }
+    .tm .text-slate-100 { color: #F4F4F5 !important; } .tm .text-slate-200 { color: #E4E4E7 !important; }
+    .tm .text-slate-300, .tm .text-slate-400 { color: #A1A1AA !important; } .tm .text-slate-500 { color: #8B8B93 !important; }
+    .tm .text-emerald-400, .tm .text-emerald-300, .tm .text-emerald-200 { color: #1FD1C1 !important; }
+    .tm .bg-emerald-950\/60, .tm .bg-emerald-950\/40 { background-color: #0B2624 !important; }
+    .tm .border-emerald-700\/60, .tm .border-emerald-800, .tm .border-emerald-500 { border-color: #1B5E58 !important; }
+    .tm .bg-emerald-600, .tm .bg-emerald-700, .tm .bg-emerald-500, .tm .bg-indigo-600 { background-color: #1FD1C1 !important; color: #00201D !important; font-weight: 800 !important; border-color: #1FD1C1 !important; }
+    .tm button, .tm label.cursor-pointer { min-height: 44px; }
+    .tm .text-xs { font-size: 13px; } .tm .text-\[11px\] { font-size: 12px; }
+    .tm select, .tm input[type="text"], .tm input[inputmode], .tm input[type="time"], .tm textarea { background-color: #26262A !important; border: 0 !important; color: #fff !important; border-radius: 12px !important; min-height: 44px; }
+    .tm select:focus, .tm input:focus, .tm textarea:focus { outline: 2px solid #1FD1C1; outline-offset: 0; }
+    .tm input::placeholder { color: #71717A; }
+    .tm .modal-x { width: 44px; height: 44px; border-radius: 14px; background: #1E1E21; color: #A1A1AA !important; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
+    .tm svg line[stroke="#334155"] { stroke: #2A2A2E; } .tm svg text[fill="#94a3b8"] { fill: #8B8B93; }
+    #profilePage.tm { background-color: #000 !important; }
+    #profilePage .pf-top { padding-top: calc(0.5rem + env(safe-area-inset-top, 0px)); }
+    #profilePage .pf-save { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
+    body.pf-open { overflow: hidden; }
+    /* Yeni tema: bölümlü seçim düğmeleri */
+    .t-seg { background: #141416; border: 1px solid #2A2A2E; border-radius: 14px; padding: 3px; display: grid; gap: 3px; }
+    .t-seg > button { min-height: 44px; border-radius: 11px; font-size: 14px; font-weight: 600; color: #A1A1AA; }
+    .t-seg > button.on { background: #FFFFFF; color: #000000; font-weight: 800; }
+    .t-field { display: block; font-size: 13px; color: #A1A1AA; margin-bottom: 6px; font-weight: 600; }
+    input.t-in, select.t-in { width: 100%; background: #26262A; border: 0; color: #FFFFFF; border-radius: 12px; height: 48px; padding: 0 12px; font-size: 17px; }
+    input.t-in:focus, select.t-in:focus { outline: 2px solid #1FD1C1; outline-offset: 0; }
+    input.t-in::placeholder { color: #71717A; }
+    .t-sw { appearance: none; -webkit-appearance: none; width: 51px; height: 31px; border-radius: 999px; background: #3A3A40; position: relative; flex-shrink: 0; transition: background .2s; }
+    .t-sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; transition: transform .2s; }
+    .t-sw:checked { background: #1FD1C1; } .t-sw:checked::after { transform: translateX(20px); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { scrollbar-width: none; }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -98,29 +137,10 @@
           </div>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
-          <button id="timerBtn" onclick="toggleTimerPanel()" class="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-2.5 py-1.5 rounded-xl text-xs">
-            <span>⏱️</span>
-            <span id="timerDisplay" class="font-mono font-bold text-amber-400">01:30</span>
-          </button>
-          <button onclick="openSettings()" class="relative w-9 h-9 flex items-center justify-center bg-slate-900 border border-slate-700 rounded-xl text-base" aria-label="Ayarlar">
-            ⚙️
+          <button id="profileBtn" onclick="openProfile()" class="relative w-11 h-11 flex items-center justify-center bg-slate-900 border border-slate-700 rounded-xl text-slate-200" aria-label="Profil">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>
             <span id="backupDot" class="hidden absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-rose-500 rounded-full border border-slate-900"></span>
           </button>
-        </div>
-      </div>
-
-      <!-- SAYAÇ HIZLI SEÇİM PANELİ -->
-      <div id="timerPanel" class="hidden mb-2 bg-slate-900 border border-slate-700 rounded-xl p-2">
-        <div class="text-[11px] text-slate-400 mb-1.5">Dinlenme sayacı başlat:</div>
-        <div class="grid grid-cols-4 gap-1.5">
-          <button onclick="startTimer(30)" class="text-xs font-semibold bg-slate-800 border border-slate-700 rounded-lg py-1.5">30 sn</button>
-          <button onclick="startTimer(45)" class="text-xs font-semibold bg-slate-800 border border-slate-700 rounded-lg py-1.5">45 sn</button>
-          <button onclick="startTimer(60)" class="text-xs font-semibold bg-slate-800 border border-slate-700 rounded-lg py-1.5">60 sn</button>
-          <button onclick="startTimer(90)" class="text-xs font-semibold bg-slate-800 border border-slate-700 rounded-lg py-1.5">90 sn</button>
-          <button onclick="startTimer(120)" class="text-xs font-semibold bg-slate-800 border border-slate-700 rounded-lg py-1.5">2 dk</button>
-          <button onclick="startTimer(180)" class="text-xs font-semibold bg-slate-800 border border-slate-700 rounded-lg py-1.5">3 dk</button>
-          <button onclick="startTimer(300)" class="text-xs font-semibold bg-slate-800 border border-slate-700 rounded-lg py-1.5">5 dk</button>
-          <button onclick="stopTimer()" class="text-xs font-semibold bg-rose-950 border border-rose-800 text-rose-200 rounded-lg py-1.5">■ Durdur</button>
         </div>
       </div>
 
@@ -380,7 +400,7 @@
     <div class="card p-5 max-w-md w-full space-y-3.5">
       <div class="flex justify-between items-center">
         <h3 id="cfTitle" class="font-bold text-base text-emerald-400">➕ Kendi Özel Besinini Tanımla</h3>
-        <button onclick="closeModal('customFoodModal')" class="text-slate-400 text-2xl leading-none px-1">&times;</button>
+        <button onclick="closeModal('customFoodModal')" class="modal-x text-slate-400 text-2xl leading-none px-1">&times;</button>
       </div>
       <div class="space-y-2.5 text-xs">
         <div>
@@ -428,7 +448,7 @@
       <div class="p-4 pb-2 space-y-2.5">
         <div class="flex justify-between items-center">
           <h3 id="pickerTitle" class="font-bold text-base text-emerald-400">Seç</h3>
-          <button onclick="closeModal('pickerModal')" class="text-slate-400 text-2xl leading-none px-1">&times;</button>
+          <button onclick="closeModal('pickerModal')" class="modal-x text-slate-400 text-2xl leading-none px-1">&times;</button>
         </div>
         <input id="pickerSearch" type="text" placeholder="🔍 Ara..." oninput="renderPickerList()" autocomplete="off" class="w-full px-3 py-2.5 rounded-xl text-base" />
         <div id="pickerChips" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
@@ -440,52 +460,52 @@
     </div>
   </div>
 
-  <!-- HAREKET EKLE / DÜZENLE MODALI -->
-  <div id="exerciseModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
-    <div class="card p-5 max-w-md w-full space-y-3.5 overflow-y-auto" style="max-height: 90vh;">
-      <div class="flex justify-between items-center">
-        <h3 id="exModalTitle" class="font-bold text-base text-emerald-400">Hareket Ekle</h3>
-        <button onclick="closeModal('exerciseModal')" class="text-slate-400 text-2xl leading-none px-1">&times;</button>
+  <!-- HAREKET EKLE / DÜZENLE MODALI (yeni tema) -->
+  <div id="exerciseModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
+    <div role="dialog" aria-labelledby="exModalTitle" class="sheet w-full md:max-w-lg bg-[#141416] border-t border-[#2A2A2E] md:border rounded-t-[28px] md:rounded-[28px] text-white flex flex-col" style="max-height: 92vh;">
+      <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-3">
+        <h3 id="exModalTitle" class="text-[20px] font-extrabold">Hareket Ekle</h3>
+        <button onclick="closeModal('exerciseModal')" aria-label="Kapat" class="w-11 h-11 rounded-[14px] bg-[#1E1E21] flex items-center justify-center text-[#A1A1AA]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
-      <div class="space-y-3 text-xs">
+      <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-4">
         <div>
-          <label class="block text-slate-300 mb-1">Hareket Adı:</label>
-          <input id="exName" type="text" placeholder="Örn: Incline Bench Press" oninput="updateExMuscleAuto(); updateExEquipUI();" class="w-full p-2 rounded-lg text-base" />
+          <label for="exName" class="t-field">Hareket adı</label>
+          <input id="exName" type="text" placeholder="Örn: Incline Bench Press" oninput="updateExMuscleAuto(); updateExEquipUI();" class="t-in" />
         </div>
         <div>
-          <label class="block text-slate-300 mb-1">Hareket Tipi:</label>
-          <div class="grid grid-cols-3 gap-1.5">
-            <button id="exKind_weight" onclick="setExModalKind('weight')" class="py-2 rounded-lg border font-semibold">🏋️ Ağırlık</button>
-            <button id="exKind_cardio" onclick="setExModalKind('cardio')" class="py-2 rounded-lg border font-semibold">🏃 Kardiyo</button>
-            <button id="exKind_time" onclick="setExModalKind('time')" class="py-2 rounded-lg border font-semibold">⏱️ Süreli</button>
+          <span class="t-field">Hareket tipi</span>
+          <div class="t-seg grid-cols-3">
+            <button id="exKind_weight" onclick="setExModalKind('weight')">Ağırlık</button>
+            <button id="exKind_cardio" onclick="setExModalKind('cardio')">Kardiyo</button>
+            <button id="exKind_time" onclick="setExModalKind('time')">Süreli</button>
           </div>
         </div>
         <div id="exSec_weight" class="grid grid-cols-3 gap-2">
-          <div><label class="block text-slate-300 mb-1">Set Sayısı</label><input id="exSetCount" type="text" inputmode="numeric" value="3" class="w-full p-2 rounded-lg text-base text-center" /></div>
-          <div><label class="block text-slate-300 mb-1">Hedef Tekrar</label><input id="exRepRange" type="text" value="8–12" class="w-full p-2 rounded-lg text-base text-center" /></div>
-          <div><label class="block text-slate-300 mb-1">Başlangıç kg</label><input id="exStartKg" type="text" inputmode="decimal" value="0" class="w-full p-2 rounded-lg text-base text-center" /></div>
+          <div><label for="exSetCount" class="t-field">Set sayısı</label><input id="exSetCount" type="text" inputmode="numeric" value="3" class="t-in text-center font-bold" /></div>
+          <div><label for="exRepRange" class="t-field">Hedef tekrar</label><input id="exRepRange" type="text" value="8–12" class="t-in text-center font-bold" /></div>
+          <div><label for="exStartKg" class="t-field">Başlangıç kg</label><input id="exStartKg" type="text" inputmode="decimal" value="0" class="t-in text-center font-bold" /></div>
         </div>
         <div id="exSec_time" class="hidden grid-cols-2 gap-2">
-          <div><label class="block text-slate-300 mb-1">Set Sayısı</label><input id="exTimeSetCount" type="text" inputmode="numeric" value="3" class="w-full p-2 rounded-lg text-base text-center" /></div>
-          <div><label class="block text-slate-300 mb-1">Süre (saniye)</label><input id="exTimeSec" type="text" inputmode="numeric" value="45" class="w-full p-2 rounded-lg text-base text-center" /></div>
+          <div><label for="exTimeSetCount" class="t-field">Set sayısı</label><input id="exTimeSetCount" type="text" inputmode="numeric" value="3" class="t-in text-center font-bold" /></div>
+          <div><label for="exTimeSec" class="t-field">Süre (saniye)</label><input id="exTimeSec" type="text" inputmode="numeric" value="45" class="t-in text-center font-bold" /></div>
         </div>
         <div id="exSec_cardio" class="hidden grid-cols-3 gap-2">
-          <div><label class="block text-slate-300 mb-1">Süre (dk)</label><input id="exCardioMin" type="text" inputmode="decimal" value="30" class="w-full p-2 rounded-lg text-base text-center" /></div>
-          <div><label class="block text-slate-300 mb-1">Mesafe (km)</label><input id="exCardioKm" type="text" inputmode="decimal" placeholder="ops." class="w-full p-2 rounded-lg text-base text-center" /></div>
-          <div><label class="block text-slate-300 mb-1">Eğim/Seviye</label><input id="exCardioLvl" type="text" placeholder="ops." class="w-full p-2 rounded-lg text-base text-center" /></div>
+          <div><label for="exCardioMin" class="t-field">Süre (dk)</label><input id="exCardioMin" type="text" inputmode="decimal" value="30" class="t-in text-center font-bold" /></div>
+          <div><label for="exCardioKm" class="t-field">Mesafe (km)</label><input id="exCardioKm" type="text" inputmode="decimal" placeholder="—" class="t-in text-center font-bold" /></div>
+          <div><label for="exCardioLvl" class="t-field">Eğim/Seviye</label><input id="exCardioLvl" type="text" placeholder="—" class="t-in text-center font-bold" /></div>
         </div>
         <div id="exExtraWrap" class="grid grid-cols-2 gap-2">
-          <div><label class="block text-slate-300 mb-1">Kas Grubu</label>
-            <select id="exMuscle" class="w-full p-2 rounded-lg">
+          <div><label for="exMuscle" class="t-field">Kas grubu</label>
+            <select id="exMuscle" class="t-in">
               <option value="auto">Otomatik</option>
               <option>Göğüs</option><option>Sırt</option><option>Omuz</option><option>Ön Bacak</option><option>Arka Bacak & Kalça</option><option>Kalf</option><option>Biceps</option><option>Triceps</option><option>Karın</option>
             </select></div>
-          <div id="exIncWrap"><label class="block text-slate-300 mb-1">Kilo Artış Adımı (kg)</label>
-            <input id="exInc" type="text" inputmode="decimal" placeholder="2,5 (otomatik)" class="w-full p-2 rounded-lg text-base" /></div>
+          <div id="exIncWrap"><label for="exInc" class="t-field">Kilo artış adımı (kg)</label>
+            <input id="exInc" type="text" inputmode="decimal" placeholder="2,5 (otomatik)" class="t-in" /></div>
         </div>
         <div id="exEquipWrap">
-          <label class="block text-slate-300 mb-1">Ekipman</label>
-          <select id="exEquip" onchange="updateExEquipUI()" class="w-full p-2 rounded-lg">
+          <label for="exEquip" class="t-field">Ekipman</label>
+          <select id="exEquip" onchange="updateExEquipUI()" class="t-in">
             <option value="auto">Otomatik</option>
             <option value="plates">Plakalı (bar / plaka)</option>
             <option value="stack">Ağırlık yığını (makine / kablo)</option>
@@ -493,33 +513,33 @@
             <option value="bodyweight">Vücut ağırlığı</option>
           </select>
         </div>
-        <div id="exLevelsWrap" class="hidden space-y-2.5 bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-          <div id="exLvTitle" class="text-slate-200 font-semibold">Makinenin kilo kademeleri</div>
-          <div class="grid grid-cols-2 gap-1.5">
+        <div id="exLevelsWrap" class="hidden space-y-3 bg-[#0E0E10] border border-[#2A2A2E] rounded-[18px] p-3.5">
+          <div id="exLvTitle" class="text-[15px] font-bold">Makinenin kilo kademeleri</div>
+          <div class="t-seg grid-cols-2">
             <button id="exLvModeStep" onclick="setExLevelsMode('step')">Düzenli artış</button>
             <button id="exLvModeList" onclick="setExLevelsMode('list')">Kendi listem</button>
           </div>
           <div id="exLvStepWrap" class="grid grid-cols-2 gap-2">
-            <div><label class="block text-slate-400 mb-1">En düşük kademe (kg)</label><input id="exLvStart" type="text" inputmode="decimal" placeholder="örn: 5" class="w-full p-2 rounded-lg text-base text-center" /></div>
-            <div><label class="block text-slate-400 mb-1">Artış aralığı (kg)</label><input id="exLvStep" type="text" inputmode="decimal" placeholder="örn: 7,5" class="w-full p-2 rounded-lg text-base text-center" /></div>
+            <div><label for="exLvStart" class="t-field">En düşük kademe (kg)</label><input id="exLvStart" type="text" inputmode="decimal" placeholder="örn: 5" class="t-in text-center font-bold" /></div>
+            <div><label for="exLvStep" class="t-field">Artış aralığı (kg)</label><input id="exLvStep" type="text" inputmode="decimal" placeholder="örn: 7,5" class="t-in text-center font-bold" /></div>
           </div>
           <div id="exLvListWrap" class="hidden">
-            <label class="block text-slate-400 mb-1">Kademeler (noktalı virgül veya boşlukla ayır)</label>
-            <input id="exLvList" type="text" inputmode="decimal" placeholder="20; 27,5; 35; 40; 47,5" class="w-full p-2 rounded-lg text-base" />
+            <label for="exLvList" class="t-field">Kademeler (noktalı virgül veya boşlukla ayır)</label>
+            <input id="exLvList" type="text" inputmode="decimal" placeholder="20; 27,5; 35; 40; 47,5" class="t-in" />
           </div>
-          <div><label class="block text-slate-400 mb-1">Ek ara plaka (kg, varsa)</label><input id="exLvAddon" type="text" inputmode="decimal" placeholder="örn: 2,5 — yoksa boş bırak" class="w-full p-2 rounded-lg text-base" /></div>
-          <p class="text-[11px] text-slate-500">Kilo artırma önerisi sadece bu kademelerden birini söyler. Boş bırakırsan geçmişte girdiğin kilolardan tahmin etmeye çalışırım.</p>
+          <div><label for="exLvAddon" class="t-field">Ek ara plaka (kg, varsa)</label><input id="exLvAddon" type="text" inputmode="decimal" placeholder="örn: 2,5 — yoksa boş bırak" class="t-in" /></div>
+          <p class="text-[12px] text-[#8B8B93]">Kilo artırma önerisi sadece bu kademelerden birini söyler. Boş bırakırsan geçmişte girdiğin kilolardan tahmin etmeye çalışırım.</p>
         </div>
         <div id="exRestWrap">
-          <label class="block text-slate-300 mb-1">Setler arası dinlenme (saniye):</label>
-          <input id="exRest" type="text" inputmode="numeric" value="90" class="w-full p-2 rounded-lg text-base" />
-          <p class="text-[11px] text-slate-500 mt-1">Bir seti ✓ ile işaretlediğinde sayaç bu süreyle otomatik başlar.</p>
+          <label for="exRest" class="t-field">Setler arası dinlenme (saniye)</label>
+          <input id="exRest" type="text" inputmode="numeric" value="90" class="t-in" />
+          <p class="text-[12px] text-[#8B8B93] mt-1.5">Bir seti tamamladığında alttaki sayaç bu süreyle otomatik başlar.</p>
         </div>
-        <p id="exEditHint" class="hidden text-[11px] text-amber-300/90">Tipi değiştirirsen bu hareketin setleri yeni değerlerle baştan oluşturulur.</p>
+        <p id="exEditHint" class="hidden text-[12px] text-amber-300">Tipi değiştirirsen bu hareketin setleri yeni değerlerle baştan oluşturulur.</p>
       </div>
-      <div class="flex justify-end gap-2 pt-1">
-        <button onclick="closeModal('exerciseModal')" class="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-lg">İptal</button>
-        <button onclick="saveExerciseModal()" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+      <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 border-t border-[#2A2A2E]">
+        <button onclick="closeModal('exerciseModal')" class="t-btn-ghost h-[52px] rounded-2xl text-[15px]">İptal</button>
+        <button onclick="saveExerciseModal()" class="t-btn h-[52px] rounded-2xl text-[15px]">Kaydet</button>
       </div>
     </div>
   </div>
@@ -537,7 +557,7 @@
     <div class="card p-5 max-w-md w-full space-y-3.5">
       <div class="flex justify-between items-center gap-2">
         <h3 id="mealModalTitle" class="font-bold text-base text-emerald-400">Öğün Ekle</h3>
-        <button onclick="closeModal('mealModal')" class="text-slate-400 text-2xl leading-none px-1" aria-label="Kapat">&times;</button>
+        <button onclick="closeModal('mealModal')" class="modal-x text-slate-400 text-2xl leading-none px-1" aria-label="Kapat">&times;</button>
       </div>
       <div class="space-y-3 text-xs">
         <div><label for="mmName" class="block text-slate-300 mb-1">Öğün adı</label><input id="mmName" type="text" class="w-full p-2 rounded-lg text-base" /></div>
@@ -559,89 +579,145 @@
     <div class="card p-5 max-w-lg w-full space-y-3 overflow-y-auto" style="max-height: 90vh;">
       <div class="flex justify-between items-center gap-2">
         <h3 id="chartTitle" class="font-bold text-base text-emerald-400 truncate">İlerleme</h3>
-        <button onclick="closeModal('chartModal')" class="text-slate-400 text-2xl leading-none px-1">&times;</button>
+        <button onclick="closeModal('chartModal')" class="modal-x text-slate-400 text-2xl leading-none px-1">&times;</button>
       </div>
       <div id="chartBody"></div>
     </div>
   </div>
 
-  <!-- AYARLAR MODALI -->
-  <div id="settingsModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
-    <div class="card p-5 max-w-lg w-full space-y-4 overflow-y-auto" style="max-height: 90vh;">
-      <div class="flex justify-between items-center">
-        <h3 class="font-bold text-base text-emerald-400">⚙️ Ayarlar</h3>
-        <button onclick="closeSettings()" class="text-slate-400 text-2xl leading-none px-1">&times;</button>
+  <!-- PROFİL SAYFASI (tam ekran, yeni tema) — eski Ayarlar penceresinin yerini aldı -->
+  <div id="profilePage" class="tm fixed inset-0 z-[47] hidden flex-col text-white" role="dialog" aria-modal="true" aria-labelledby="pfTitle">
+    <div class="pf-top shrink-0 bg-black border-b border-[#1E1E21] px-4 pb-2">
+      <div class="max-w-lg mx-auto flex items-center gap-3 h-12">
+        <button onclick="closeProfile()" aria-label="Geri" class="w-11 h-11 rounded-full bg-[#141416] flex items-center justify-center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <h2 id="pfTitle" class="t-display text-[28px] leading-none uppercase flex-1">Profil</h2>
       </div>
+    </div>
+    <div id="pfScroll" class="flex-1 overflow-y-auto overscroll-contain bg-black">
+      <div class="max-w-lg mx-auto px-4 pt-4 pb-32 space-y-6">
 
-      <div class="space-y-2.5">
-        <div class="text-xs font-bold text-slate-300 uppercase tracking-wide">👤 Profil (Kalori hesabı için)</div>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div>
-            <label class="block text-slate-400 mb-1">Cinsiyet</label>
-            <select id="setSex" class="w-full p-2 rounded-lg">
-              <option value="male">Erkek</option>
-              <option value="female">Kadın</option>
-            </select>
+        <section class="space-y-2.5" aria-labelledby="pfH1">
+          <div id="pfH1" class="t-label">KİŞİSEL BİLGİLER</div>
+          <div class="t-card rounded-[22px] p-4 grid grid-cols-2 gap-2.5">
+            <div class="col-span-2"><label for="setSex" class="t-field">Cinsiyet</label>
+              <select id="setSex" class="t-in"><option value="male">Erkek</option><option value="female">Kadın</option></select></div>
+            <div><label for="setAge" class="t-field">Yaş</label><input id="setAge" type="text" inputmode="numeric" class="t-in text-center font-bold" /></div>
+            <div><label for="setHeight" class="t-field">Boy (cm)</label><input id="setHeight" type="text" inputmode="numeric" class="t-in text-center font-bold" /></div>
           </div>
-          <div><label class="block text-slate-400 mb-1">Yaş</label><input id="setAge" type="text" inputmode="numeric" class="w-full p-2 rounded-lg text-base" /></div>
-          <div><label class="block text-slate-400 mb-1">Boy (cm)</label><input id="setHeight" type="text" inputmode="numeric" class="w-full p-2 rounded-lg text-base" /></div>
-          <div><label class="block text-slate-400 mb-1">Hedef Kilo (kg)</label><input id="setTarget" type="text" inputmode="decimal" class="w-full p-2 rounded-lg text-base" /></div>
-          <div><label class="block text-slate-400 mb-1">Güncel Yağ Oranı (%)</label><input id="setBf" type="text" inputmode="decimal" placeholder="Bilmiyorsan boş bırak" oninput="updateBfHint()" class="w-full p-2 rounded-lg text-base" /></div>
-          <div><label class="block text-slate-400 mb-1">Hedef Yağ Oranı (%)</label><input id="setTargetBf" type="text" inputmode="decimal" placeholder="Örn: 15" oninput="updateBfHint()" class="w-full p-2 rounded-lg text-base" /></div>
-          <div id="setBfHint" class="hidden col-span-2 bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300"></div>
-          <div><label class="block text-slate-400 mb-1">Su Hedefi (L)</label><input id="setWater" type="text" inputmode="decimal" class="w-full p-2 rounded-lg text-base" /></div>
-          <div><label class="block text-slate-400 mb-1">Varsayılan Dinlenme (sn)</label><input id="setRest" type="text" inputmode="numeric" class="w-full p-2 rounded-lg text-base" /></div>
-        </div>
-        <label class="flex items-center justify-between gap-3 bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2.5 text-xs">
-          <span><span class="text-slate-200 font-semibold">🔔 Sayaç bitince ses</span><span class="block text-slate-500">Telefon sessiz moddaysa ses çıkmaz.</span></span>
-          <input id="setSound" type="checkbox" class="w-5 h-5 accent-emerald-500" />
-        </label>
-        <label class="flex items-center justify-between gap-3 bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2.5 text-xs">
-          <span><span class="text-slate-200 font-semibold">💡 Antrenmanda ekranı açık tut</span><span class="block text-slate-500">Antrenman sekmesindeyken ekran kararmaz.</span></span>
-          <input id="setAwake" type="checkbox" class="w-5 h-5 accent-emerald-500" />
-        </label>
-        <label class="flex items-center justify-between gap-3 bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2.5 text-xs">
-          <span><span class="text-slate-200 font-semibold">✨ Açılış animasyonu</span><span class="block text-slate-500">Uygulama açılırken logo kısa bir geçişle görünür.</span></span>
-          <input id="setSplash" type="checkbox" class="w-5 h-5 accent-emerald-500" />
-        </label>
-        <button onclick="saveSettings()" class="w-full bg-emerald-600 text-white text-xs font-semibold py-2.5 rounded-lg">✓ Profili Kaydet</button>
-      </div>
+        </section>
 
-      <div class="space-y-2.5 pt-3 border-t border-slate-800">
-        <div class="text-xs font-bold text-slate-300 uppercase tracking-wide">💾 Yedekleme</div>
-        <p id="lastBackupText" class="text-xs text-slate-400">Henüz yedek alınmadı.</p>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="exportBackupFile()" class="bg-emerald-600 text-white text-xs font-semibold py-2.5 rounded-lg">📤 Yedek Dosyası Kaydet</button>
-          <label class="bg-slate-700 text-white text-xs font-semibold py-2.5 rounded-lg text-center cursor-pointer">
-            📥 Dosyadan Geri Yükle
-            <input type="file" accept="application/json,.json,text/plain,.txt" class="hidden" onchange="importBackupFile(event)" />
-          </label>
-        </div>
-        <details class="bg-slate-900/80 border border-slate-800 rounded-xl px-3 py-2 text-xs">
-          <summary class="text-slate-300 cursor-pointer">Yedek kodu ile (kopyala / yapıştır)</summary>
-          <textarea id="backupText" rows="4" class="w-full mt-2 p-2.5 rounded-lg text-xs font-mono"></textarea>
-          <div class="flex gap-2 mt-2">
-            <button onclick="copyBackup()" class="flex-1 bg-slate-700 text-white px-3 py-2 rounded-lg">📋 Kodu Kopyala</button>
-            <button onclick="restoreBackupFromText()" class="flex-1 bg-emerald-700 text-white px-3 py-2 rounded-lg">📥 Kodu Yükle</button>
+        <section class="space-y-2.5" aria-labelledby="pfH2">
+          <div id="pfH2" class="t-label">KİLOM</div>
+          <div class="t-card rounded-[22px] p-4 space-y-3">
+            <div class="flex items-end gap-2.5">
+              <div class="flex-1"><label for="pfWeight" class="t-field">Güncel kilo (kg)</label><input id="pfWeight" type="text" inputmode="decimal" class="t-in text-center font-bold text-[20px]" /></div>
+              <button onclick="profileLogWeight()" class="t-btn-outline h-12 px-4 rounded-xl text-[14px] shrink-0">Tartıyı kaydet</button>
+            </div>
+            <div id="pfWeightBox"></div>
           </div>
-        </details>
-      </div>
+        </section>
 
-      <div class="space-y-2.5 pt-3 border-t border-slate-800">
-        <div class="text-xs font-bold text-slate-300 uppercase tracking-wide">🖼️ Uygulama İçi Logo</div>
-        <p class="text-xs text-slate-500">Sadece üst bardaki logoyu değiştirir. Ana ekran icon'u GitHub'daki icon.png dosyasından gelir.</p>
-        <div class="grid grid-cols-2 gap-2">
-          <label class="bg-slate-800 border border-slate-600 text-slate-200 text-xs py-2 rounded-lg text-center cursor-pointer">
-            Logo Yükle
-            <input type="file" accept="image/*" class="hidden" onchange="handleIconUpload(event)" />
-          </label>
-          <button onclick="removeCustomIcon()" class="bg-slate-800 border border-slate-600 text-slate-300 text-xs py-2 rounded-lg">Varsayılana Dön</button>
+        <section class="space-y-2.5" aria-labelledby="pfH3">
+          <div id="pfH3" class="t-label">HEDEFLERİM</div>
+          <div class="t-card rounded-[22px] p-4 space-y-3">
+            <div class="grid grid-cols-2 gap-2.5">
+              <div><label for="setTarget" class="t-field">Hedef kilo (kg)</label><input id="setTarget" type="text" inputmode="decimal" class="t-in text-center font-bold" /></div>
+              <div><label for="setWater" class="t-field">Su hedefi (L)</label><input id="setWater" type="text" inputmode="decimal" class="t-in text-center font-bold" /></div>
+              <div><label for="setBf" class="t-field">Güncel yağ oranı (%)</label><input id="setBf" type="text" inputmode="decimal" placeholder="—" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
+              <div><label for="setTargetBf" class="t-field">Hedef yağ oranı (%)</label><input id="setTargetBf" type="text" inputmode="decimal" placeholder="Örn: 15" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
+            </div>
+            <p class="text-[12px] text-[#8B8B93] -mt-1">Yağ oranını bilmiyorsan boş bırakabilirsin.</p>
+            <div id="setBfHint" class="hidden bg-[#0E0E10] border border-[#2A2A2E] rounded-2xl px-3.5 py-3 text-[13px] text-slate-300"></div>
+            <div id="pfTargetsBox"></div>
+          </div>
+        </section>
+
+        <section class="space-y-2.5" aria-labelledby="pfH4">
+          <div class="flex items-center justify-between"><span id="pfH4" class="t-label">VÜCUT ÖLÇÜLERİM</span>
+            <button onclick="openMeasureModal()" class="t-btn-ghost h-11 px-4 rounded-xl text-[13px]">+ Ölçü ekle</button></div>
+          <div id="pfMeasureBox"></div>
+        </section>
+
+        <section class="space-y-2.5" aria-labelledby="pfH5">
+          <div id="pfH5" class="t-label">AYARLAR</div>
+          <div class="t-card rounded-[22px] overflow-hidden">
+            <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5">
+              <label for="setRest" class="min-w-0"><span class="block text-[15px] font-semibold text-white">Varsayılan dinlenme</span><span class="block text-[13px] text-[#8B8B93]">Saniye. Hareketin kendi süresi yoksa kullanılır.</span></label>
+              <input id="setRest" type="text" inputmode="numeric" class="t-in text-center font-bold" style="width: 84px;" />
+            </div>
+        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[#2A2A2E] first:border-t-0">
+          <span class="min-w-0"><span class="block text-[15px] font-semibold text-white">Sayaç bitince ses</span><span class="block text-[13px] text-[#8B8B93]">Telefon sessiz moddaysa ses çıkmaz.</span></span>
+          <input id="setSound" type="checkbox" class="t-sw" />
+        </label>
+        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[#2A2A2E] first:border-t-0">
+          <span class="min-w-0"><span class="block text-[15px] font-semibold text-white">Antrenmanda ekranı açık tut</span><span class="block text-[13px] text-[#8B8B93]">Antrenman sekmesindeyken ekran kararmaz.</span></span>
+          <input id="setAwake" type="checkbox" class="t-sw" />
+        </label>
+        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[#2A2A2E] first:border-t-0">
+          <span class="min-w-0"><span class="block text-[15px] font-semibold text-white">Açılış animasyonu</span><span class="block text-[13px] text-[#8B8B93]">Uygulama açılırken logo kısa bir geçişle görünür.</span></span>
+          <input id="setSplash" type="checkbox" class="t-sw" />
+        </label>
+          </div>
+        </section>
+
+        <section class="space-y-2.5" aria-labelledby="pfH6">
+          <div id="pfH6" class="t-label">YEDEKLEME</div>
+          <div class="t-card rounded-[22px] p-4 space-y-3">
+            <p id="lastBackupText" class="text-[13px] text-[#A1A1AA]">Henüz yedek alınmadı.</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="exportBackupFile()" class="t-btn h-12 rounded-xl text-[14px]">Yedek dosyası kaydet</button>
+              <label class="t-btn-ghost h-12 rounded-xl text-[14px] flex items-center justify-center text-center cursor-pointer">
+                Dosyadan geri yükle
+                <input type="file" accept="application/json,.json,text/plain,.txt" class="hidden" onchange="importBackupFile(event)" />
+              </label>
+            </div>
+            <details class="bg-[#0E0E10] border border-[#2A2A2E] rounded-2xl px-3.5 py-2 text-[13px]">
+              <summary class="text-[#A1A1AA] cursor-pointer min-h-[40px] flex items-center">Yedek kodu ile (kopyala / yapıştır)</summary>
+              <textarea id="backupText" rows="4" class="w-full mt-2 p-2.5 text-xs font-mono"></textarea>
+              <div class="grid grid-cols-2 gap-2 mt-2 mb-1">
+                <button onclick="copyBackup()" class="t-btn-ghost h-11 rounded-xl">Kodu kopyala</button>
+                <button onclick="restoreBackupFromText()" class="t-btn-outline h-11 rounded-xl">Kodu yükle</button>
+              </div>
+            </details>
+          </div>
+        </section>
+
+        <section class="space-y-2.5" aria-labelledby="pfH7">
+          <div id="pfH7" class="t-label">UYGULAMA İÇİ LOGO</div>
+          <div class="t-card rounded-[22px] p-4 space-y-3">
+            <p class="text-[13px] text-[#8B8B93]">Sadece üst bardaki logoyu değiştirir. Ana ekran simgesi GitHub'daki icon.png dosyasından gelir.</p>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="t-btn-ghost h-11 rounded-xl text-[14px] flex items-center justify-center cursor-pointer">
+                Logo yükle
+                <input type="file" accept="image/*" class="hidden" onchange="handleIconUpload(event)" />
+              </label>
+              <button onclick="removeCustomIcon()" class="t-btn-ghost h-11 rounded-xl text-[14px]">Varsayılana dön</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="flex items-center justify-between gap-2 pt-1">
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v11</span>
+          <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
+    </div>
+    <div class="pf-save shrink-0 bg-[rgba(14,14,16,0.97)] border-t border-[#1E1E21] px-4 pt-3">
+      <div class="max-w-lg mx-auto"><button id="profileSave" onclick="saveSettings()" class="t-btn w-full h-[52px] rounded-2xl text-[16px]">Kaydet</button></div>
+    </div>
+  </div>
 
-      <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
-        <span class="text-[11px] text-slate-500">AYK+ v10</span>
-        <button onclick="resetToDefaults()" class="bg-rose-950 text-rose-200 border border-rose-800 text-xs px-3 py-2 rounded-lg">↺ Fabrika Ayarlarına Sıfırla</button>
+  <!-- TEMALI ONAY / METİN PENCERESİ (antrenman ve profil için; sistem kutusu yerine) -->
+  <div id="uiDialog" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-[70]" onclick="if (event.target === this && uiDlg && uiDlg.dismissable) uiDialogDone(false)">
+    <div role="dialog" aria-modal="true" aria-labelledby="uiDlgTitle" class="sheet w-full md:max-w-md bg-[#141416] border-t border-[#2A2A2E] md:border rounded-t-[28px] md:rounded-[28px] px-5 pt-5 pb-6 text-white space-y-4">
+      <div class="space-y-1.5">
+        <h3 id="uiDlgTitle" class="text-[20px] font-extrabold leading-tight"></h3>
+        <p id="uiDlgMsg" class="text-[15px] text-[#A1A1AA] leading-snug"></p>
+      </div>
+      <input id="uiDlgInput" type="text" class="t-in hidden" autocomplete="off" onkeydown="if (event.key === 'Enter') uiDialogDone(true)" />
+      <div id="uiDlgBtns" class="grid grid-cols-2 gap-2">
+        <button id="uiDlgCancel" onclick="uiDialogDone(false)" class="t-btn-ghost h-[52px] rounded-2xl text-[15px]">Vazgeç</button>
+        <button id="uiDlgOk" onclick="uiDialogDone(true)" class="t-btn h-[52px] rounded-2xl text-[15px]">Tamam</button>
       </div>
     </div>
   </div>

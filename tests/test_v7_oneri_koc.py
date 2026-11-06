@@ -52,7 +52,7 @@ with sync_playwright() as p:
     e=st(pg)["workoutDays"][0]["exercises"][0]; print("reverted:", e.get("muscle"), e.get("inc"))
     # finish workout -> muscle sets
     pg.locator('[onclick="toggleSetDone(0, 0)"]').tap(); pg.locator('[onclick="toggleSetDone(0, 1)"]').tap(); pg.locator('[onclick="toggleSetDone(4, 0)"]').tap()
-    pg.locator("button", has_text="Antrenmanı Bitir ve Kaydet").first.click(); pg.wait_for_timeout(200)
+    pg.locator("button", has_text="Antrenmanı Bitir ve Kaydet").first.click(); pg.click("#uiDlgOk"); pg.wait_for_timeout(200)
     print("weekly muscle:", pg.evaluate("JSON.stringify(weeklyMuscleSets(weekStart()))"))
     # --- eaten view
     pg.click("#navBtnNutrition"); pg.wait_for_timeout(200)
