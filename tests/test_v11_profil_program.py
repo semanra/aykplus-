@@ -174,7 +174,7 @@ try:
     check(pg.is_visible("#profilePage") and not pg.is_visible("#settingsModal") if pg.locator("#settingsModal").count() else pg.is_visible("#profilePage"), "Profil sayfası açılıyor (eski Ayarlar penceresi yok)")
     check(pg.evaluate("getComputedStyle($('profilePage')).backgroundColor") == "rgb(0, 0, 0)", "Profil siyah temada")
     t = pg.inner_text("#profilePage")
-    for sec in ["KİŞİSEL BİLGİLER", "KİLOM", "HEDEFLERİM", "VÜCUT ÖLÇÜLERİM", "AYARLAR", "YEDEKLEME", "AYK+ v11"]:
+    for sec in ["KİŞİSEL BİLGİLER", "KİLOM", "HEDEFLERİM", "VÜCUT ÖLÇÜLERİM", "AYARLAR", "YEDEKLEME", "AYK+ v"]:
         check(sec in t, "Profilde bölüm: " + sec)
     pg.screenshot(path=SHOTS + "/v11_profile.png")
     check(ov(pg), "Profil yatay taşma yok")

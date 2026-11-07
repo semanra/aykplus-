@@ -160,11 +160,9 @@ let saveFailNotified = false;
 function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    $("saveBadge").textContent = "✓ Kaydedildi " + new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
     saveFailNotified = false;
   } catch (e) {
     console.error(e);
-    $("saveBadge").textContent = "⚠️ Kaydedilemedi";
     if (!saveFailNotified) { toast("⚠️ Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
   }
 }
@@ -437,6 +435,7 @@ function manualNewDay() {
 // ---------------------------------------------------------------------------
 // SEKME GEÇİŞİ
 // ---------------------------------------------------------------------------
+const TAB_TITLES = { nutrition: "Beslenme", gym: "Antrenman", mobility: "Mobilite", progress: "İlerleme" };
 function switchTab(tab) {
   if (!TABS.includes(tab)) tab = "nutrition";
   if (tab !== state.activeTab) {
@@ -457,6 +456,9 @@ function applyTabVisibility() {
   const activeCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-bold text-[11px] " + (state.activeTab === "gym" ? "text-[#1FD1C1]" : "text-emerald-400");
   const idleCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-semibold text-[11px] text-[#8B8B93]";
   document.body.classList.toggle("theme-train", state.activeTab === "gym");
+  const tt = $("tabTitle");
+  const title = TAB_TITLES[state.activeTab] || "AYK+";
+  if (tt.textContent !== title) tt.textContent = title;
   Object.keys(map).forEach(k => {
     const [tabId, headId, btnId, disp] = map[k];
     const on = k === state.activeTab;
@@ -468,29 +470,63 @@ function applyTabVisibility() {
 }
 
 // ---------------------------------------------------------------------------
-// LOGO
+// PROFİL FOTOĞRAFI (v12: eski "uygulama içi logo" alanı state.customIconDataUrl profil fotoğrafı oldu)
 // ---------------------------------------------------------------------------
 function applyCustomIcon() {
-  const src = state.customIconDataUrl || "icon.png";
-  const img = $("headerLogo");
-  if (img.getAttribute("src") !== src) img.setAttribute("src", src);
+  const src = state.customIconDataUrl || "";
+  [["profileAvatar", "profileIcon"], ["pfAvatar", "pfAvatarIcon"]].forEach(([imgId, icoId]) => {
+    const img = $(imgId), ico = $(icoId);
+    if (!img) return;
+    if (src) { if (img.getAttribute("src") !== src) img.setAttribute("src", src); }
+    else img.removeAttribute("src");
+    img.classList.toggle("hidden", !src);
+    ico.classList.toggle("hidden", !!src);
+  });
+  if ($("pfPhotoRemove")) {
+    $("pfPhotoRemove").classList.toggle("hidden", !src);
+    $("pfPhotoBtnText").textContent = src ? "Değiştir" : "Fotoğraf seç";
+  }
 }
-function handleIconUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    state.customIconDataUrl = e.target.result;
-    renderAll();
-    toast("🖼️ Logo güncellendi");
-  };
-  reader.readAsDataURL(file);
+// Telefondan seçilen fotoğraf (birkaç MB olabilir) ortadan kare kırpılıp 320×320 JPEG'e küçültülür;
+// böylece telefondaki kayıt alanı dolmaz.
+function shrinkPhoto(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const S = 320, side = Math.min(img.naturalWidth, img.naturalHeight);
+        if (!side) throw new Error("boş görsel");
+        const cv = document.createElement("canvas");
+        cv.width = S; cv.height = S;
+        const ctx = cv.getContext("2d");
+        ctx.fillStyle = "#141416"; ctx.fillRect(0, 0, S, S);
+        ctx.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, S, S);
+        resolve(cv.toDataURL("image/jpeg", 0.85));
+      } catch (e) { reject(e); } finally { URL.revokeObjectURL(url); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("okunamadı")); };
+    img.src = url;
+  });
+}
+async function handleIconUpload(event) {
+  const file = event.target.files && event.target.files[0];
   event.target.value = "";
+  if (!file) return;
+  try {
+    state.customIconDataUrl = await shrinkPhoto(file);
+    renderAll();
+    toast("Profil fotoğrafı güncellendi");
+  } catch (e) {
+    sayAlert("Fotoğraf yüklenemedi", "Bu fotoğraf açılamadı. Başka bir fotoğraf seçmeyi dene.");
+  }
 }
 function removeCustomIcon() {
+  if (!state.customIconDataUrl) return;
+  snapshot();
   state.customIconDataUrl = "";
   renderAll();
-  toast("Varsayılan logo geri yüklendi");
+  offerUndo("Profil fotoğrafı kaldırıldı");
 }
 
 // ---------------------------------------------------------------------------
@@ -2669,7 +2705,7 @@ async function buildShareCanvas(log) {
 
   try {
     const img = new Image();
-    img.src = state.customIconDataUrl || "icon.png";
+    img.src = "icon.png";
     await img.decode();
     ctx.save(); roundRect(ctx, 72, 72, 120, 120, 28); ctx.clip(); ctx.drawImage(img, 72, 72, 120, 120); ctx.restore();
   } catch (e) { /* logo yüklenemezse atla */ }

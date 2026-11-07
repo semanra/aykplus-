@@ -32,7 +32,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 7 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 8 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
@@ -45,7 +45,7 @@ npm test             # 7 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 2. Yeni özellik için `tests/` altına test ekle veya mevcut testi güncelle.
 3. `src/markup.html` içindeki sürüm etiketini artır: `AYK+ vN` (Ayarlar'ın en altında görünür).
 4. `sw.js` içindeki `const CACHE = 'aykplus-vN'` değerini artır (artırılmazsa telefon eski sürümü göstermeye devam edebilir). Yeni statik dosya eklediysen `FILES` listesine ekle.
-5. `npm run build` → `npm test` (7/7 geçmeli).
+5. `npm run build` → `npm test` (8/8 geçmeli).
 6. Açıklayıcı Türkçe mesajla commit et ve `main`'e gönder.
 7. Kullanıcıya kısa Türkçe özet yaz: ne değişti, telefonda ne yapması gerekiyor (genelde: "uygulamayı iki kez tamamen kapatıp aç").
 
@@ -66,6 +66,8 @@ npm test             # 7 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 
 - **Yeni tema pencereleri:** Ortak pencereler (`pickerModal`, `chartModal`, `customFoodModal`) `openModal()` ile açılırken `trainCtx()` (antrenman sekmesi veya Profil açık) doğruysa `.tm` sınıfı alır; `src/markup.html` içindeki `.tm` CSS kuralları eski renkleri yeni temaya çevirir ve başlıktaki emojiyi kaldırır. Beslenmeden açılınca eski temada kalır. `exerciseModal` yalnızca antrenmanda kullanıldığı için doğrudan yeni temada yazıldı (`t-in`, `t-seg`, `t-field`).
 - **Profil:** Üstteki profil düğmesi (`#profileBtn`) tam ekran `#profilePage`'i açar (eski Ayarlar penceresi kaldırıldı; `openSettings` = `openProfile`). Alan kimlikleri (`setAge`, `setBf`, `setRest`...) aynı. Kaydet: `saveSettings()` (`#profileSave`). Değişiklik varken Geri → uyarı. Kilo/hedef/ölçü kutuları `renderProfile()` ile `renderAll()` içinde güncellenir.
+- **Üst başlık (v12):** Sol üstte logo yok; `#tabTitle` açık sekmenin adını yazar (`TAB_TITLES`, `applyTabVisibility()` içinde). Yanındaki `#brandTag` ("AYK+") yalnızca sayfa yüklenirken CSS animasyonuyla (`brandOut`, ~2,3 sn sonra) kayarak kaybolur; açılış animasyonu kapalıysa `html.no-brand` ile hiç gösterilmez. "Kaydedildi" yazısı kaldırıldı (kayıt hatası yine toast ile bildirilir).
+- **Profil fotoğrafı (v12):** Eski "uygulama içi logo" alanı `state.customIconDataUrl` artık profil fotoğrafıdır; sağ üstteki `#profileBtn` içinde (`#profileAvatar`) ve Profil'de (`#pfAvatar`) görünür, yoksa kişi simgesi. Yüklenen fotoğraf `shrinkPhoto()` ile 320×320 JPEG'e küçültülür (localStorage dolmasın diye). Paylaşım kartı her zaman `icon.png` kullanır.
 - **Sayaç:** Üst bardaki kronometre v11'de kaldırıldı; tek sayaç alttaki `#restPill` (set tamamlanınca / `startTimer()`).
 - **Sürükle-bırak:** Tek `pointerdown/move/up` mantığı hem öğün kartlarını (`.drag-handle[data-midx]`, `#mealsContainer`) hem Programım'daki hareketleri (`.drag-handle[data-exidx]`, `#progExList [data-ex-row]`) taşır.
 - **Tek global durum:** `state` (bkz. `normalizeState`). Her değişiklikten sonra `renderAll()` çağrılır; o da tüm sekmeleri çizer ve `saveState()` yapar.
@@ -95,7 +97,7 @@ npm test             # 7 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 
 ## 9. Yol haritası
 
-Yapıldı (v6–v11): kardiyo/süreli hareketler, kalori koçu, kilo artırma önerisi, plaka/ısınma, kas grubu sayımı, planlanan/yenen, geri al, sıradaki gün, aktif antrenman, öğün menüleri (antrenman/dinlenme), takviyeler, vücut ölçüleri, paylaşım kartı, 42 Türk yemeği, su/beslenme grafikleri, açılış ekranı, yağ oranı, **makine/dambıl kademeleri**, **yeni antrenman teması + vücut haritası**, öğün saat ve sürükle-bırak, özel besin düzenle/sil. **v11:** Programım'da hareketleri sürükleyerek sıralama, antrenmandaki tüm pencereler ve onaylar yeni temada, vücut haritasında "Programım" kas yükü, üst kronometre kaldırıldı, Ayarlar → tam ekran Profil (kişisel bilgiler, kilo, hedefler, ölçüler, ayarlar).
+Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma önerisi, plaka/ısınma, kas grubu sayımı, planlanan/yenen, geri al, sıradaki gün, aktif antrenman, öğün menüleri (antrenman/dinlenme), takviyeler, vücut ölçüleri, paylaşım kartı, 42 Türk yemeği, su/beslenme grafikleri, açılış ekranı, yağ oranı, **makine/dambıl kademeleri**, **yeni antrenman teması + vücut haritası**, öğün saat ve sürükle-bırak, özel besin düzenle/sil. **v11:** Programım'da hareketleri sürükleyerek sıralama, antrenmandaki tüm pencereler ve onaylar yeni temada, vücut haritasında "Programım" kas yükü, üst kronometre kaldırıldı, Ayarlar → tam ekran Profil (kişisel bilgiler, kilo, hedefler, ölçüler, ayarlar). **v12:** sol üstte sekme adı + açılışta kayarak kaybolan AYK+, profil fotoğrafı (sağ üstte yuvarlak).
 
 Sıradaki adaylar (kullanıcı onayı gerekir):
 - **Beslenme bölümü için yeni tema** (kullanıcı örnek uygulama gönderecek).
