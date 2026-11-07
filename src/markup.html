@@ -108,9 +108,17 @@
     @keyframes glowIn { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
     @keyframes textIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes splashOut { to { opacity: 0; visibility: hidden; } }
+    /* ÜST BAŞLIK: sekme adı + açılışta kayarak kaybolan AYK+ */
+    #brandTag { display: inline-flex; align-items: center; white-space: nowrap; max-width: 140px; margin-left: 10px; animation: brandOut .6s cubic-bezier(.5,0,.75,0) 2.3s forwards; }
+    #brandTag .brand-sep { width: 1.5px; height: 22px; background: currentColor; opacity: .3; margin-right: 10px; transform: skewX(-12deg); }
+    @keyframes brandOut { 60% { opacity: 0; transform: translateX(-28px); } 100% { opacity: 0; transform: translateX(-28px); max-width: 0; margin-left: 0; } }
+    .no-brand #brandTag { display: none; }
+    body.theme-train #brandPlus { color: #1FD1C1; }
+    body.theme-train #profileBtn { background: #141416; border-color: #2A2A2E; color: #E4E4E7; }
     @media (prefers-reduced-motion: reduce) {
       #splash { animation-duration: .01s; animation-delay: .35s; }
       #splash img, #splash .t, #splash .logo-wrap::before { animation: none; }
+      #brandTag { animation-duration: .01s; animation-delay: 2.5s; }
     }
   </style>
 </head>
@@ -122,24 +130,22 @@
     <div class="t">AYK<span>+</span></div>
   </div>
   <script>
-    try { var _s = JSON.parse(localStorage.getItem("ayk_plus_v5_state") || "null"); if (_s && _s.settings && _s.settings.splash === false) document.getElementById("splash").remove(); } catch (e) {}
+    try { var _s = JSON.parse(localStorage.getItem("ayk_plus_v5_state") || "null"); if (_s && _s.settings && _s.settings.splash === false) { document.getElementById("splash").remove(); document.documentElement.classList.add("no-brand"); } } catch (e) {}
   </script>
 
   <!-- ÜST SABİT PANEL -->
   <div class="sticky-bar px-3 pb-2 shadow-2xl">
     <div class="max-w-5xl mx-auto">
       <div class="flex items-center justify-between gap-2 mb-2">
-        <div class="flex items-center gap-2 min-w-0">
-          <img id="headerLogo" src="icon.png" alt="AYK+" class="w-9 h-9 rounded-xl object-cover border border-slate-700 shrink-0" />
-          <div class="min-w-0">
-            <div class="text-white font-extrabold text-lg tracking-tight leading-none">AYK<span class="text-emerald-400">+</span></div>
-            <div id="saveBadge" class="text-[10px] text-emerald-300/80 leading-tight mt-0.5 truncate">✓ Kaydedildi</div>
-          </div>
+        <div class="flex items-center min-w-0 overflow-hidden h-11">
+          <h1 id="tabTitle" class="t-display text-[28px] leading-none uppercase text-white truncate">Beslenme</h1>
+          <span id="brandTag" class="t-display text-[28px] leading-none text-white shrink-0" aria-hidden="true"><span class="brand-sep"></span>AYK<span id="brandPlus" class="text-emerald-400">+</span></span>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
-          <button id="profileBtn" onclick="openProfile()" class="relative w-11 h-11 flex items-center justify-center bg-slate-900 border border-slate-700 rounded-xl text-slate-200" aria-label="Profil">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>
-            <span id="backupDot" class="hidden absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-rose-500 rounded-full border border-slate-900"></span>
+          <button id="profileBtn" onclick="openProfile()" class="relative w-11 h-11 flex items-center justify-center bg-slate-900 border border-slate-700 rounded-full text-slate-200" aria-label="Profil">
+            <img id="profileAvatar" alt="" class="hidden w-full h-full rounded-full object-cover" />
+            <svg id="profileIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>
+            <span id="backupDot" class="hidden absolute top-0 right-0 w-3 h-3 bg-rose-500 rounded-full border-2 border-black"></span>
           </button>
         </div>
       </div>
@@ -599,6 +605,22 @@
         <section class="space-y-2.5" aria-labelledby="pfH1">
           <div id="pfH1" class="t-label">KİŞİSEL BİLGİLER</div>
           <div class="t-card rounded-[22px] p-4 grid grid-cols-2 gap-2.5">
+            <div class="col-span-2 flex items-center gap-4 pb-1">
+              <div class="w-20 h-20 shrink-0 rounded-full bg-[#1E1E21] border border-[#2A2A2E] overflow-hidden flex items-center justify-center text-[#8B8B93]">
+                <img id="pfAvatar" alt="Profil fotoğrafı" class="hidden w-full h-full object-cover" />
+                <svg id="pfAvatarIcon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>
+              </div>
+              <div class="flex-1 min-w-0 space-y-2">
+                <div class="text-[13px] font-semibold text-[#A1A1AA]">Profil fotoğrafı</div>
+                <div class="flex gap-2">
+                  <label class="t-btn-outline h-11 px-4 rounded-xl text-[14px] flex items-center justify-center cursor-pointer">
+                    <span id="pfPhotoBtnText">Fotoğraf seç</span>
+                    <input id="pfPhotoInput" type="file" accept="image/*" class="hidden" onchange="handleIconUpload(event)" />
+                  </label>
+                  <button id="pfPhotoRemove" onclick="removeCustomIcon()" class="hidden t-btn-ghost h-11 px-4 rounded-xl text-[14px]">Kaldır</button>
+                </div>
+              </div>
+            </div>
             <div class="col-span-2"><label for="setSex" class="t-field">Cinsiyet</label>
               <select id="setSex" class="t-in"><option value="male">Erkek</option><option value="female">Kadın</option></select></div>
             <div><label for="setAge" class="t-field">Yaş</label><input id="setAge" type="text" inputmode="numeric" class="t-in text-center font-bold" /></div>
@@ -682,22 +704,8 @@
           </div>
         </section>
 
-        <section class="space-y-2.5" aria-labelledby="pfH7">
-          <div id="pfH7" class="t-label">UYGULAMA İÇİ LOGO</div>
-          <div class="t-card rounded-[22px] p-4 space-y-3">
-            <p class="text-[13px] text-[#8B8B93]">Sadece üst bardaki logoyu değiştirir. Ana ekran simgesi GitHub'daki icon.png dosyasından gelir.</p>
-            <div class="grid grid-cols-2 gap-2">
-              <label class="t-btn-ghost h-11 rounded-xl text-[14px] flex items-center justify-center cursor-pointer">
-                Logo yükle
-                <input type="file" accept="image/*" class="hidden" onchange="handleIconUpload(event)" />
-              </label>
-              <button onclick="removeCustomIcon()" class="t-btn-ghost h-11 rounded-xl text-[14px]">Varsayılana dön</button>
-            </div>
-          </div>
-        </section>
-
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v11</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v12</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
