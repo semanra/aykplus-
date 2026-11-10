@@ -1,4 +1,7 @@
 ﻿kimlik;gizlenen besin;kategori;neden;listede kalan karşılığı
+u173150;Bagel cipsi;Atıştırmalıklar;Türkiye'de pek bulunmayan ABD ürünü;
+u174098;Balık şeklinde kraker;Atıştırmalıklar;Türkiye'de pek bulunmayan ABD ürünü;
+u167925;Peynir dolgulu sandviç kraker;Atıştırmalıklar;Türkiye'de pek bulunmayan ABD ürünü;
 u172424;Acı bakla (termiye), haşlanmış;Baklagiller;pişmiş hâl (çiğ tartılır);Acı bakla (termiye), kuru (çiğ)
 u173728;Adzuki fasulyesi, haşlanmış;Baklagiller;pişmiş hâl (çiğ tartılır);Adzuki fasulyesi, kuru (çiğ)
 u173736;Barbunya, haşlanmış;Baklagiller;pişmiş hâl (çiğ tartılır);Barbunya, kuru (çiğ)
@@ -48,11 +51,21 @@ u174241;Çipura benzeri balık (scup), ızgara;Balık ve deniz ürünleri;pişmi
 u172005;Çizgili ton balığı (skipjack), ızgara;Balık ve deniz ürünleri;pişmiş hâl (çiğ tartılır);Çizgili ton balığı (skipjack), çiğ
 u171994;İstavrit / Pasifik uskumrusu, ızgara;Balık ve deniz ürünleri;pişmiş hâl (çiğ tartılır);İstavrit / Pasifik uskumrusu, çiğ
 u171980;İstiridye, haşlanmış;Balık ve deniz ürünleri;pişmiş hâl (çiğ tartılır);İstiridye, çiğ
+u174918;Pumpernickel (koyu çavdar ekmeği);Ekmek ve hamur işleri;Türkiye'de pek bulunmayan ABD ürünü;
+u172762;Tam buğday İngiliz muffini;Ekmek ve hamur işleri;Türkiye'de pek bulunmayan ABD ürünü;
+u174994;İngiliz muffini (sade);Ekmek ve hamur işleri;Türkiye'de pek bulunmayan ABD ürünü;
 hindi_gogsu;Hindi Göğsü (Çiğ);Et / Tavuk / Balık;uygulamanın eski listesinde tekrar;Hindi göğsü (derisiz), çiğ
 somon;Somon Balığı (Çiğ);Et / Tavuk / Balık;uygulamanın eski listesinde tekrar;Somon (Atlantik, çiftlik), çiğ
 tavuk_gogsu_pismis;Tavuk Göğsü (Pişmiş / Izgara);Et / Tavuk / Balık;pişmiş hâl (çiğ tartılır);Tavuk göğsü (derisiz), çiğ
 tavuk_gogsu;Tavuk Göğsü (Çiğ);Et / Tavuk / Balık;uygulamanın eski listesinde tekrar;Tavuk göğsü (derisiz), çiğ
 ton_baligi;Ton Balığı (Süzülmüş);Et / Tavuk / Balık;uygulamanın eski listesinde tekrar;Ton balığı konservesi (açık renkli, suda, tuzsuz), süzülmüş
+u172097;Chili con carne, fasulyeli (konserve);Hazır yemekler;Türkiye'de pek bulunmayan ABD ürünü;
+u172100;Domates soslu makarna (konserve);Hazır yemekler;Türkiye'de pek bulunmayan ABD ürünü;
+u169777;Domatesli pilav, İspanyol usulü (paket, pişmiş);Hazır yemekler;Türkiye'de pek bulunmayan ABD ürünü;
+u169770;Peynirli makarna (paket, hazırlanmış);Hazır yemekler;Türkiye'de pek bulunmayan ABD ürünü;
+u173330;Sebzeli et yahnisi (konserve);Hazır yemekler;Türkiye'de pek bulunmayan ABD ürünü;
+u173920;Akçaağaç şuruplu ve esmer şekerli hazır yulaf, kuru;Kahvaltılık gevrekler;Türkiye'de pek bulunmayan ABD ürünü;
+u167717;Maya özü ezmesi;Kahvaltılıklar;Türkiye'de pek bulunmayan ABD ürünü;
 patates;Fırın / Haşlama Patates (Çiğ);Karbonhidratlar;uygulamanın eski listesinde tekrar;Patates, kabuklu, çiğ
 muz;Muz (Orta Boy);Karbonhidratlar;uygulamanın eski listesinde tekrar;Muz
 pirinc_unu;Pirinç Unu / Cream of Rice;Karbonhidratlar;uygulamanın eski listesinde tekrar;Pirinç unu (beyaz)
@@ -131,6 +144,8 @@ u175291;Süt danası kıyma, ızgara;Kırmızı et;pişmiş hâl (çiğ tartıl�
 u172650;Süt danası pirzola, ızgara;Kırmızı et;pişmiş hâl (çiğ tartılır);
 u175274;Süt danası sırt (yağsız kısım), fırında;Kırmızı et;pişmiş hâl (çiğ tartılır);Süt danası sırt (yağsız kısım), çiğ
 u174346;Tavşan eti, haşlanmış;Kırmızı et;pişmiş hâl (çiğ tartılır);Tavşan eti, çiğ
+u172224;Queso blanco (beyaz peynire benzer);Peynirler;Türkiye'de pek bulunmayan ABD ürünü;
+u172223;Queso fresco (taze peynire benzer);Peynirler;Türkiye'de pek bulunmayan ABD ürünü;
 suzme_yogurt;Süzme Yoğurt (Az Yağlı);Protein & Kahvaltı;uygulamanın eski listesinde tekrar;Süzme yoğurt (Greek), az yağlı
 tam_yumurta;Tam Yumurta (L Boy);Protein & Kahvaltı;uygulamanın eski listesinde tekrar;Yumurta, çiğ
 yumurta_beyazi;Yumurta Beyazı;Protein & Kahvaltı;uygulamanın eski listesinde tekrar;Yumurta beyazı, çiğ
@@ -222,6 +237,25 @@ u170024;Yeşil dolmalık biber, sotelenmiş;Sebzeler;pişmiş hâl (çiğ tartı
 u169980;Çin lahanası, haşlanmış;Sebzeler;pişmiş hâl (çiğ tartılır);Çin lahanası, çiğ
 u170058;Şalgam, haşlanmış;Sebzeler;pişmiş hâl (çiğ tartılır);Şalgam, çiğ
 u170011;Şeker bezelye (kabuklu), haşlanmış;Sebzeler;pişmiş hâl (çiğ tartılır);Şeker bezelye (kabuklu), çiğ
+u174561;Bezelye çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u169056;Coleslaw sosu;Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u171176;Domates çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u174073;Etli arpa çorbası (hazır);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u171190;Etli sebze çorbası (hazır);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u172906;Etli şehriye çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u172915;Kremalı mantar çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u172917;Kremalı patates çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u174537;Kremalı tavuk çorbası (konserve, sütle hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u174534;Kuru bezelye çorbası, az tuzlu (hazır);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u172913;Minestrone çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u173562;Rokfor salata sosu;Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u174564;Sebze çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u171559;Sebze çorbası, bol malzemeli (hazır);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u172903;Siyah fasulye çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u171546;Tavuk sebze çorbası (hazır);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u172909;Tavuk şehriye çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u172910;Tavuklu pirinç çorbası (konserve, suyla hazırlanmış);Soslar ve çorbalar;Türkiye'de pek bulunmayan ABD ürünü;
+u171255;Süt-krema karışımı (half and half);Süt ürünleri;Türkiye'de pek bulunmayan ABD ürünü;
 u170683;Amarant, haşlanmış;Tahıllar ve makarna;pişmiş hâl (çiğ tartılır);Amarant, kuru (çiğ)
 u170285;Arpa (inci arpa), haşlanmış;Tahıllar ve makarna;pişmiş hâl (çiğ tartılır);Arpa (inci arpa), kuru (çiğ)
 u168882;Beyaz pirinç (kısa taneli), haşlanmış;Tahıllar ve makarna;pişmiş hâl (çiğ tartılır);Beyaz pirinç (kısa taneli), kuru (çiğ)
@@ -253,6 +287,10 @@ u169711;Yapışkan pirinç, haşlanmış;Tahıllar ve makarna;pişmiş hâl (çi
 u168873;Yulaf kepeği, pişmiş;Tahıllar ve makarna;pişmiş hâl (çiğ tartılır);Yulaf kepeği, kuru (çiğ)
 u173905;Yulaf lapası (suyla pişmiş);Tahıllar ve makarna;pişmiş hâl (çiğ tartılır);
 u169732;Yumurtalı erişte, haşlanmış;Tahıllar ve makarna;pişmiş hâl (çiğ tartılır);Yumurtalı erişte, kuru (çiğ)
+u172788;Balkabaklı turta (ev yapımı);Tatlılar;Türkiye'de pek bulunmayan ABD ürünü;
+u174957;Graham bisküvi (ballı);Tatlılar;Türkiye'de pek bulunmayan ABD ürünü;
+u169578;Pankek şurubu;Tatlılar;Türkiye'de pek bulunmayan ABD ürünü;
+u172786;Pekan cevizli turta (ev yapımı);Tatlılar;Türkiye'de pek bulunmayan ABD ürünü;
 u169902;Bıldırcın, pişmiş;Tavuk ve hindi;pişmiş hâl (çiğ tartılır);
 u171135;Hindi baget (derili), fırında;Tavuk ve hindi;pişmiş hâl (çiğ tartılır);Hindi baget (derili), çiğ
 u172878;Hindi baget (derisiz), fırında;Tavuk ve hindi;pişmiş hâl (çiğ tartılır);Hindi baget (derisiz), çiğ
@@ -312,4 +350,9 @@ u171120;Tavuk üst but (derisiz), çevirme;Tavuk ve hindi;pişmiş hâl (çiğ t
 u172409;Ördek eti (derili), fırında;Tavuk ve hindi;pişmiş hâl (çiğ tartılır);Ördek eti (derili), çiğ
 u172411;Ördek eti (derisiz), fırında;Tavuk ve hindi;pişmiş hâl (çiğ tartılır);Ördek eti (derisiz), çiğ
 u171511;Ördek göğsü (derisiz), ızgara;Tavuk ve hindi;pişmiş hâl (çiğ tartılır);
+u172012;Dana bologna salam;Şarküteri;Türkiye'de pek bulunmayan ABD ürünü;
+u173857;Hindi bologna salam;Şarküteri;Türkiye'de pek bulunmayan ABD ürünü;
+u170602;Konserve dana eti (corned beef);Şarküteri;Türkiye'de pek bulunmayan ABD ürünü;
+u170604;Kurutulmuş tuzlu dana eti (dilim);Şarküteri;Türkiye'de pek bulunmayan ABD ürünü;
+u170200;Salamura dana döş (corned beef), pişmiş;Şarküteri;Türkiye'de pek bulunmayan ABD ürünü;
 tr_bal;Bal;🇹🇷 Türk Mutfağı;uygulamanın eski listesinde tekrar;Bal

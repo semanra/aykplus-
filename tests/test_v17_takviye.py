@@ -44,6 +44,8 @@ try:
     answers.append("Öğle yemeğiyle")
     pg.select_option('#suppEditList [data-supp-row="2"] select', "custom")  # Omega → özel
     pg.wait_for_timeout(80)
+    check(pg.is_visible("#uiDialog") and "nd" in pg.get_attribute("#uiDialog", "class"), "v21: özel etiket beslenme temalı pencerede soruluyor")
+    pg.fill("#uiDlgInput", answers.pop(0)); pg.click("#uiDlgOk"); pg.wait_for_timeout(80)
     sl = st(pg)["supplementList"]
     check(sl[0]["time"] == "post" and sl[1]["time"] == "morning" and sl[2]["time"] == "custom" and sl[2]["timeLabel"] == "Öğle yemeğiyle", "zamanlar kaydedildi (özel etiket dahil)")
     small = pg.evaluate(SMALL_JS, "#suppList button, #suppList select")
@@ -65,6 +67,7 @@ try:
     pg.locator("#suppList button", has_text="Düzenle").click(); pg.wait_for_timeout(60)
     answers.append("💊 D3 Vitamini")
     pg.locator("#suppList button", has_text="+ Ekle").click(); pg.wait_for_timeout(80)
+    pg.fill("#uiDlgInput", answers.pop(0)); pg.click("#uiDlgOk"); pg.wait_for_timeout(80)
     pg.locator("#suppList button", has_text="Bitti").click(); pg.wait_for_timeout(80)
     check(pg.locator("[data-supp-group]").all_inner_texts()[-1] == "Diğer" and "D3" in pg.inner_text("#suppList"), "zaman seçilmeyen takviye 'Diğer' grubunda en sonda")
     # Zamanı kaldırma

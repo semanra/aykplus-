@@ -99,7 +99,8 @@ try:
                  state.combos.push({id:'combo_b', name:'Yoğurtlu', items:[{foodId:'custom_x', amount:200}, {foodId:'u171477', amount:100}]});
                  state.combos.push({id:'combo_c', name:'Sadece yoğurt', items:[{foodId:'custom_x', amount:150}]}); renderAll(); }""")
     check("custom_x" in st(pg)["foodSnap"], "özel besin kombodayken yedeklendi")
-    pg.evaluate("deleteCustomFood('custom_x')"); pg.wait_for_timeout(150)
+    pg.evaluate("void deleteCustomFood('custom_x')"); pg.wait_for_timeout(150)
+    if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(150)   # v21: temalı onay
     s4 = st(pg)
     cb = [c for c in s4["combos"] if c["id"] == "combo_b"]
     check(cb and all(i["foodId"] != "custom_x" for i in cb[0]["items"]), "silinen özel besin kombodan çıkarıldı")

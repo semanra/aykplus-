@@ -81,7 +81,8 @@ with sync_playwright() as p:
     # ---------- 6) takviyeler
     pg.evaluate("setNutriView('today')"); pg.wait_for_timeout(100)
     pg.locator('#suppList button', has_text="Düzenle").click(); pg.wait_for_timeout(100)
-    prompts[:]=["💊 D3 Vitamini"]; pg.locator('#suppList button', has_text="+ Ekle").click(); pg.wait_for_timeout(100)
+    pg.locator('#suppList button', has_text="+ Ekle").click(); pg.wait_for_timeout(100)
+    pg.fill("#uiDlgInput", "💊 D3 Vitamini"); pg.click("#uiDlgOk"); pg.wait_for_timeout(100)   # v21: temalı metin penceresi
     pg.locator('#suppList button[aria-label*="Greens sil"]').click(); pg.wait_for_timeout(100)
     pg.locator('#suppList button', has_text="Bitti").click(); pg.wait_for_timeout(100)
     pg.locator('#suppList button', has_text="D3").click(); pg.wait_for_timeout(100)

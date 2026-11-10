@@ -82,6 +82,28 @@ def portions_for(f):
     out.sort(key=lambda x: x[2])
     return [[n, g] for n, g, _ in out[:4]]
 
+# v21: Seçilince kutuya gelen başlangıç miktarı. Önce doğal birim (adet/dilim/parça; "orta" boy varsa o), yoksa
+# kategoriye göre makul gram. ABD ölçüleri (cup, kaşık, ABD porsiyonu) başlangıç olarak KULLANILMAZ (yulaf 27 g gibi
+# tuhaf değerler çıkıyordu). Yalnızca kutuya gelen öneridir; hesaplamayı etkilemez.
+NOT_NATURAL = ("cup (ABD", "kaşığı", "porsiyon (ABD)", "paket", "kutu/şişe", " kap", "bardak", "yarım adet")
+CAT_DEFAULT = {"Yağlar": 10, "Baharatlar": 5, "Kuruyemiş ve tohumlar": 30, "Takviyeler": 30, "Kahvaltılıklar": 20,
+               "Tatlılar": 50, "Atıştırmalıklar": 30, "İçecekler": 250, "Kahvaltılık gevrekler": 40, "Peynirler": 30,
+               "Şarküteri": 50, "Süt ürünleri": 200, "Tahıllar ve makarna": 80, "Baklagiller": 80, "Ekmek ve hamur işleri": 50,
+               "Yumurta": 50}
+def default_amount(por, cat, name):
+    nat = [(n, g) for n, g in por if not any(t in n for t in NOT_NATURAL) and 0 < g <= 400]
+    meat = cat in ("Kırmızı et", "Tavuk ve hindi", "Balık ve deniz ürünleri", "Sakatat")
+    if meat: nat = [(n, g) for n, g in nat if g <= 250]          # bütün göğüs/but gibi iri parçalar yerine 150 g
+    pref = "(büyük)" if cat == "Yumurta" else "(orta)"           # Türkiye'deki yumurtalar ABD "orta" boyundan iri
+    mid = next((g for n, g in nat if pref in n), None)
+    if mid or nat: return float(mid or nat[0][1])
+    if meat: return 150.0
+    nl = name.lower()
+    if cat == "Soslar ve çorbalar": return 250.0 if ("çorba" in nl or "suyu" in nl) and "toz" not in nl and "tablet" not in nl else 20.0
+    if cat == "Süt ürünleri" and any(t in nl for t in ("tereyağı", "krema", "ghee", "toz", "yoğunlaştırılmış")): return 15.0 if "tereyağı" in nl or "ghee" in nl else 20.0
+    if cat == "Tahıllar ve makarna" and any(t in nl for t in ("un", "nişasta", "kepeği")) and "kuru" not in nl: return 30.0
+    return float(CAT_DEFAULT.get(cat, 100))
+
 # ---------------------------------------------------------------- birleştirme
 def r4(x): return round(x, 4)
 foods, names = {}, {}
@@ -109,11 +131,11 @@ for path in sorted(glob.glob(os.path.join(HERE, "tr", "tr_[A-Z].json"))):
             ke = "alkol" if ("alcoholic" in d or "beer" in d or "wine" in d or "distilled" in d or "vanilla extract" in d) else \
                  "tatlandırıcı" if ("sugar-free" in d or "sugarless" in d or "stevia" in d or "sweetener" in d or "low calorie" in d) else "lif"
         por = portions_for(src)
-        first = next((g for n, g in por if not n.startswith(("1 cup", "1 yemek", "1 tatlı"))), None)
+        first = default_amount(por, x["cat"], name)
         e = {"n": name, "c": x["cat"], "k": r4(kcal / 100), "p": r4(p / 100), "h": r4(c / 100), "f": r4(fat / 100),
              "a": [a for a in dict.fromkeys(x.get("aliases", [])) if a and norm(a) != k][:5], "s": i}
         if por: e["o"] = por
-        if first and first <= 400: e["d"] = first
+        e["d"] = first
         if ke: e["x"] = ke
         foods["u%d" % i] = e
 
@@ -163,6 +185,23 @@ for k, e in foods.items():
         e["z"] = 1
         rk = raw_by_key.get(raw_key(e["n"])) or raw_by_key2.get(raw_key(e["n"], False))
         hidden_rows.append((k, e["n"], e["c"], "pişmiş hâl (çiğ tartılır)", foods[rk]["n"] if rk else ""))
+# v21: Türkiye'de neredeyse hiç bulunmayan ABD ürünleri (Türkiye'de de satılanlar — milkshake, cips, dilim peynir,
+# bacon, ranch sos vb. — KALIR). Gizlenir, silinmez.
+US_HIDE = {174957, 172786, 172788, 169578,                    # Graham bisküvi, pekan/balkabaklı turta, pankek şurubu
+           173150, 167925, 174098,                            # bagel cipsi, sandviç kraker, balık şekilli kraker
+           172097, 169777, 169770, 173330, 172100,            # chili con carne, İspanyol pilav, paket mac&cheese, konserve yahni/makarna
+           173857, 172012, 170200, 170602, 170604,            # bologna salamlar, corned beef, kurutulmuş tuzlu dana
+           172223, 172224, 173920,                            # queso fresco/blanco, akçaağaç şuruplu yulaf
+           169056, 173562,                                    # coleslaw sosu, rokfor salata sosu
+           171176, 172909, 172910, 171546, 174537, 172915, 172917, 171559, 174564, 171190, 172913, 174561, 174534,
+           172903, 174073, 172906,                            # ABD konserve/hazır çorbaları (paket çorbalar kalır)
+           174918, 174994, 172762, 171255, 167717}            # pumpernickel, İngiliz muffini, half and half, maya özü ezmesi
+for i in sorted(US_HIDE):
+    k = "u%d" % i
+    if k not in foods: problems.append(f"US_HIDE: {i} veritabanında yok"); continue
+    if not foods[k].get("z"):
+        foods[k]["z"] = 1
+        hidden_rows.append((k, foods[k]["n"], foods[k]["c"], "Türkiye'de pek bulunmayan ABD ürünü", ""))
 # Uygulamanın kendi listesinde gizlenenler (src/data.js: hidden: true, replace: "<yerine>")
 data_txt = open(os.path.join(REPO, "src", "data.js"), encoding="utf-8").read()
 for m in re.finditer(r'^\s*([a-z0-9_]+): \{ name: "([^"]+)", cat: "([^"]+)".*?hidden: true(?:, replace: "([^"]*)")?', data_txt, re.M):

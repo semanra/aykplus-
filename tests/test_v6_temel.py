@@ -109,10 +109,12 @@ with sync_playwright() as p:
     # backup roundtrip
     backup=pg.evaluate("JSON.stringify(state)")
     pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(300)
-    pg.evaluate("t=>restoreFromText(t)", backup); pg.wait_for_timeout(300)
+    pg.evaluate("t=>{ void restoreFromText(t); }", backup); pg.wait_for_timeout(300)
+    if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(300)   # v21: temalı onay
     st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
     print("restored logs:", len(st["workoutLogs"]), "history keys:", list(st["exerciseHistory"].keys()))
-    pg.evaluate("t=>restoreFromText(t)", json.dumps(legacy)); pg.wait_for_timeout(200)
+    pg.evaluate("t=>{ void restoreFromText(t); }", json.dumps(legacy)); pg.wait_for_timeout(200)
+    if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(300)   # v21: temalı onay
     st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
     print("legacy restore kinds:", [e["kind"] for e in st["workoutDays"][0]["exercises"]])
     # fresh install

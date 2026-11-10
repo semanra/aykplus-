@@ -31,3 +31,8 @@ Yayındaki bir besin kimliği (`u…`, `r_…`) kullanıcının menüsünde olab
 ## Gizli besinler (v20)
 
 Pişmiş hâller listeden **gizlenir** (silinmez): kategori `HIDE_CATS` içinde, adı `COOK_RX` ile eşleşen ve `KEEP_RX` ile eşleşmeyen besinler `z: 1` alır. Görünür kalması istenen bir besin için fdcId'sini `HIDE_KEEP_IDS`'e yaz. Eski listedeki tekrarlar `src/data.js` içinde `hidden: true, replace: "<USDA kimliği>"` ile işaretlenir. Her çalıştırmada `docs/gizlenen-besinler.csv` yeniden yazılır (gizlenen besin → listede kalan karşılığı).
+
+## v21: başlangıç gramları ve ABD ürünleri
+
+- `default_amount()`: besin seçilince kutuya gelen miktar. Önce doğal birim (adet/dilim; yumurtada "büyük", diğerlerinde "orta"), etlerde 250 g'dan büyük parça yerine 150 g, yoksa kategoriye göre (`CAT_DEFAULT`). ABD ölçüleri (cup, kaşık, ABD porsiyonu) başlangıç olmaz. Yalnızca öneridir; hesaplamayı etkilemez.
+- `US_HIDE`: Türkiye'de neredeyse hiç bulunmayan ABD ürünleri (fdcId) gizlenir. Türkiye'de de satılanlar (milkshake, cips, dilim peynir, bacon, ranch sos...) listede kalır.

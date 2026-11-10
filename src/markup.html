@@ -204,6 +204,16 @@
     .n-sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
     .n-sw:checked { background: var(--n-accent); } .n-sw:checked::after { transform: translateX(20px); }
     .n-sheet { background: var(--n-card); border: 1px solid var(--n-line); color: var(--n-text); }
+    /* v21: temalı onay/metin penceresi beslenmeden açılınca (.nd) beslenme temasında (koyu ve gündüz) */
+    #uiDialog.nd { background-color: rgba(0,0,0,.72); }
+    #uiDialog.nd [role="dialog"] { background: var(--n-card); border-color: var(--n-line); color: var(--n-text); }
+    #uiDialog.nd #uiDlgMsg { color: var(--n-muted); }
+    .n-danger-btn { background: var(--n-over); color: #fff; }
+    /* v21: bildirimler beslenme temasında (gündüz temasında açık renk) */
+    .n-toast { background: var(--n-card); border-color: var(--n-accent); color: var(--n-text); }
+    body:not(.theme-nutri) .n-toast { background: #0E1210; border-color: #166534; color: #fff; }
+    /* v21: gündüz temasında takvim kutularındaki rakamlar okunur olsun */
+    body.nutri-light .n-heat.ok, body.nutri-light .n-heat.near, body.nutri-light .n-heat.far { color: #fff; }
     /* Beslenmeden açılan ortak pencereler (.nm): eski lacivert renkleri beslenme temasına çevirir */
     .nm { background-color: rgba(0,0,0,.72) !important; }
     .nm .card, .nm .sheet, .nm .sheet.bg-slate-900 { background: var(--n-card) !important; border: 1px solid var(--n-line) !important; border-radius: 24px !important; color: var(--n-text); }
@@ -959,6 +969,12 @@
           <span class="min-w-0"><span class="block text-[15px] font-semibold text-white">Antrenmanda ekranı açık tut</span><span class="block text-[13px] text-[#8B8B93]">Antrenman sekmesindeyken ekran kararmaz.</span></span>
           <input id="setAwake" type="checkbox" class="t-sw" />
         </label>
+        <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[#2A2A2E]">
+          <label for="setDayStart" class="min-w-0"><span class="block text-[15px] font-semibold text-white">Gün geçişi</span><span class="block text-[13px] text-[#8B8B93]">Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.</span></label>
+          <select id="setDayStart" class="t-in font-bold shrink-0" style="width: 96px;">
+            <option value="0">00:00</option><option value="1">01:00</option><option value="2">02:00</option><option value="3">03:00</option><option value="4">04:00</option><option value="5">05:00</option>
+          </select>
+        </div>
         <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[#2A2A2E] first:border-t-0">
           <span class="min-w-0"><span class="block text-[15px] font-semibold text-white">Açılış animasyonu</span><span class="block text-[13px] text-[#8B8B93]">Uygulama açılırken logo kısa bir geçişle görünür.</span></span>
           <input id="setSplash" type="checkbox" class="t-sw" />
@@ -998,7 +1014,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v20</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v21</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

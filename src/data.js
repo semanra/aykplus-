@@ -5,7 +5,7 @@ const BASE_FOOD_DB = {
   tam_yumurta: { name: "Tam Yumurta (L Boy)", cat: "Protein & Kahvaltı", unit: "adet", step: 1, def: 3, p: 6.3, c: 0.4, f: 5.0, hidden: true, replace: "u171287" },
   yumurta_beyazi: { name: "Yumurta Beyazı", cat: "Protein & Kahvaltı", unit: "adet", step: 1, def: 4, p: 3.6, c: 0.2, f: 0.0, hidden: true, replace: "u172183" },
   whey_shake: { name: "Whey Protein Shake (Su ile)", cat: "Protein & Kahvaltı", unit: "ölçek", step: 0.5, def: 1, p: 24.0, c: 2.0, f: 1.5 },
-  lor_peyniri: { name: "Lor Peyniri / Az Yağlı Beyaz Peynir", cat: "Protein & Kahvaltı", unit: "g", step: 25, def: 100, p: 0.18, c: 0.02, f: 0.02 },
+  lor_peyniri: { name: "Lor Peyniri", cat: "Protein & Kahvaltı", unit: "g", step: 25, def: 100, p: 0.18, c: 0.02, f: 0.02 },
   hindi_fume: { name: "Hindi Füme", cat: "Protein & Kahvaltı", unit: "g", step: 20, def: 60, p: 0.18, c: 0.02, f: 0.02 },
   suzme_yogurt: { name: "Süzme Yoğurt (Az Yağlı)", cat: "Protein & Kahvaltı", unit: "g", step: 50, def: 150, p: 0.10, c: 0.04, f: 0.015, hidden: true, replace: "u170903" },
   kefir: { name: "Sade Kefir", cat: "Protein & Kahvaltı", unit: "ml", step: 50, def: 250, p: 0.032, c: 0.04, f: 0.02 },

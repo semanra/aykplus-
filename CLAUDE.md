@@ -34,7 +34,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 16 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 17 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
@@ -60,7 +60,7 @@ npm test             # 16 test paketi, gerçek Chromium'da iPhone boyutunda; hep
 - **Dokunma alanı en az 44 px.** Buton ve ikonlar küçük olmamalı; kullanıcı bunu açıkça istedi.
 - **Odak koruma:** Tam yeniden çizim (`renderAll()`) yapan girişlere `data-fk="benzersiz-anahtar"` ver; aksi halde iPhone'da klavye kapanır.
 - **Silme işlemleri:** `snapshot()` → sil → `renderAll()` → `offerUndo("mesaj")` (6 sn "Geri al").
-- **Onay / metin girişi:** Antrenman ve Profil tarafında `prompt/confirm/alert` KULLANMA; temalı `uiAsk({title, message, input, ok, cancel, danger})` (Promise döner), `uiAlert()`, bağlama göre `askConfirm()` / `sayAlert()` kullan. Beslenme ve Mobilite tarafı şimdilik sistem kutularını kullanıyor (beslenme için temalı kutulara geçiş Aşama 2 adayı).
+- **Onay / metin girişi:** Antrenman, Profil ve (v21'den beri) Beslenme tarafında `prompt/confirm/alert` KULLANMA; temalı `uiAsk({title, message, input, ok, cancel, danger})` (Promise döner), `uiAlert()`, bağlama göre `askConfirm()` / `sayAlert()` / `askText()` kullan. Beslenmeden açılınca pencere `.nd` sınıfıyla beslenme temasında (koyu/gündüz) çizilir. Yalnızca Mobilite hâlâ sistem kutusu kullanıyor. Testlerde bu fonksiyonları `pg.evaluate` ile çağırırken `void fn()` yaz (Promise beklenirse test kilitlenir) ve `#uiDlgInput` / `#uiDlgOk` ile yanıtla.
 - **Dil:** Arayüz metinleri doğru Türkçe yazılır ("antrenman", "antreman" değil). Antrenman ve (v13'ten beri) beslenme sayfasında çizgi ikonlar (`svgI()`) kullanılır; besin/takviye adlarındaki kullanıcı emojilerine dokunulmaz.
 - **iOS sınırları (çözmeye çalışma, kullanıcıya dürüstçe söyle):** titreşim API'si yok; uygulama kapalıyken sayaç sesi çalmaz; sessiz modda ses çıkmaz; bildirim sunucu ister; Apple Sağlık entegrasyonu web uygulamasıyla mümkün değil.
 
@@ -84,6 +84,7 @@ npm test             # 16 test paketi, gerçek Chromium'da iPhone boyutunda; hep
   - **Besin veritabanı (v18):** `foods.js` → `USDA_FOODS` (sıkıştırılmış anahtarlar) → açılışta `USDA_DB`'ye çevrilir (`unit: "g"`, birim başına `p/c/f/kcal`, `src` = fdcId | "tarif", `aliases`, `portions` [[ad, gram]], `kx` kalori istisnası, `note`). Kimlikler `u<fdcId>` ve `r_<tarif>`; `BASE_FOOD_DB` kimlikleri DEĞİŞMEZ. `getFoodDB()` birleşik tabloyu önbellekte tutar; `renderAll()` ve özel besin değişince `invalidateFoodDB()`. foods.js yüklenemezse uygulama eski listeyle çalışır. Arama: `searchFoods` (Türkçe karakter `normSearch`, kelime sırası serbest, `SEARCH_SYN` eş anlamlılar, `editDist` yazım hatası; sıra: sık kullanılan (adı eşleşirse) > tam > başlayan > içeren). Liste sayfalı (`FOOD_PAGE` = 60, "daha fazla"); seçici ilk 150. Sonuç yoksa `#noResult` (barkod / özel besin / tarif, ad aramadan dolar); bulunamayan aramalar `state.missSearches` (Profil → "Bulunamayan aramalar"). USDA porsiyonları kartta gram karşılığıyla (`foodPresets`); "cup" su bardağı değildir, "cup (ABD, 240 ml)" yazılır.
   - **Bulunamayan besin (v19):** Menülerde, bugünkü planda, kombolarda, tariflerde ve arşivde kullanılan her besinin değerleri `state.foodSnap[id] = {n, u, p, c, f, k, d}` içinde yedeklenir (`refreshFoodSnaps()`, her `renderAll`'da; yalnızca değişince yazılır). `getFoodDB()` = `realFoodDB()` + bulunamayanlar için `lostFood()` kayıtları (ad "⚠ …", `_lost` = 1 yedekli / 2 yedeksiz). `_lost` besinler arama, liste, seçici, malzeme seçici ve önerilerde GÖSTERİLMEZ. Açılışta `checkFoodHealth()` foods.js yüklenemediyse veya menü/komboda bulunamayan besin varsa uyarır. Özel besin silinince kombolardan da çıkarılır. `build_foods.py` yayındaki bir besin kimliği kaybolacaksa durur (`ALLOW_REMOVE`).
   - **Gizli besinler (v20):** Pişmiş hâller (et, tavuk, balık, sakatat, tahıl, baklagil, sebze; kavrulmuş kuruyemiş, konserve, füme, hazır/dondurulmuş ürünler ve tarifler HARİÇ) foods.js'te `z: 1` → `USDA_DB[id].hidden`. Eski listedeki USDA tekrarları `src/data.js` içinde `hidden: true, replace: "<USDA kimliği>"`. `isHiddenFood(f)` (gizli veya bulunamayan) arama, liste, son kullanılanlar, seçiciler ve önerilerden çıkarır; menüde kullanılıyorsa aynı değerle hesaplanır (uyarı yok). ⇄ ikame `swapVisibleId()` ile gizli eski kaydın yerine `replace` karşılığını önerir. Kural `build_foods.py` içinde (`HIDE_CATS`, `COOK_RX`, `KEEP_RX`, `HIDE_KEEP_IDS`); gözden geçirme tablosu `docs/gizlenen-besinler.csv`.
+  - **v21:** `labelCheck(kcal, p, c, f, base)` etiket tutarlılığı (kJ/kcal, ondalık, 100 g aşımı); barkod ürününde `#bcWarn` + "Etikete bakıp düzelt" (`barcodeFixFood`) / "Yine de ekle", elle girişte (`saveCustomFood`) onay. Gün geçişi `settings.dayStartHour` (0–5, Profil `#setDayStart`, varsayılan 0): `logicalToday()` / `logicalNow()` beslenme günü için (`checkNewDay` yalnızca ileri gider). Bildirimler en fazla 2 tane, aynı mesaj tekrarlanmaz, "Geri al"lı olan en son silinir; beslenmede `.n-toast` (gündüz temasında açık). Başlangıç gramları `build_foods.py` `default_amount()`; Türkiye'de bulunmayan ABD ürünleri `US_HIDE`.
   - **Barkod:** `vendor/zxing.min.js` (@zxing/library 0.21.3, Apache-2.0, `sw.js` önbelleğinde) yalnızca barkod açılınca yüklenir. Ürün `fetchOFF()` ile Open Food Facts'ten gelir (internet gerekir; çevrimdışıyken uyarır). Eklenen ürün `customFoods["custom_bc_<barkod>"]` olur ve `barcode` alanı taşır; aynı barkod sonra internetsiz tanınır. Kamera açılamazsa numara elle yazılabilir.
 - **Profil:** Üstteki profil düğmesi (`#profileBtn`) tam ekran `#profilePage`'i açar (eski Ayarlar penceresi kaldırıldı; `openSettings` = `openProfile`). Alan kimlikleri (`setAge`, `setBf`, `setRest`...) aynı. Kaydet: `saveSettings()` (`#profileSave`). Değişiklik varken Geri → uyarı. Kilo/hedef/ölçü kutuları `renderProfile()` ile `renderAll()` içinde güncellenir.
 - **Üst başlık (v12):** Sol üstte logo yok; `#tabTitle` açık sekmenin adını yazar (`TAB_TITLES`, `applyTabVisibility()` içinde). Yanındaki `#brandTag` ("AYK+") yalnızca sayfa yüklenirken CSS animasyonuyla (`brandOut`, ~2,3 sn sonra) kayarak kaybolur; açılış animasyonu kapalıysa `html.no-brand` ile hiç gösterilmez. "Kaydedildi" yazısı kaldırıldı (kayıt hatası yine toast ile bildirilir).
@@ -125,12 +126,13 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 
 **v20:** pişmiş hâller ve eski listedeki tekrarlar listeden gizlendi (silinmedi); kullanıcı tutarlı hesap için çiğ tartıyor.
 
+**v21:** etiket/barkod tutarlılık kontrolü, makul başlangıç gramları, 43 ABD ürünü gizlendi, beslenmede temalı pencereler, Profil → Gün geçişi, bildirim yığılması ve gündüz teması düzeltmeleri.
+
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 
 Sıradaki adaylar (kullanıcı onayı gerekir):
 - Pişmiş / çiğ dönüştürücü (v14–v18 planında madde 6; kullanıcı "şimdilik olmasın" dedi).
 - Antrenman saatine göre öğün kaydırma (planda madde 9; kullanıcı "bu özellik olmasın" dedi).
-- Beslenmede sistem kutuları (`prompt/confirm/alert`) yerine temalı kutular.
 - Kas grubu sayımında ikincil kasların da sayılması (kullanıcı "sonra" dedi).
 - "Akıllı öneri": makinede büyük kademe sıçramasında önce tekrar artırma (kullanıcı bu turda istemedi; tekrar sorulabilir).
 - Mobilite sekmesinin geliştirilmesi, ilk açılış kurulum ekranı.

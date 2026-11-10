@@ -109,6 +109,7 @@ with sync_playwright() as p:
     cf=st(pg)["customFoods"]; print("after edit:", list(cf.keys())==[cid], cf[cid]["p"], cf[cid]["name"])
     pg.evaluate("openFoodPicker(0)"); pg.fill("#pickerSearch","proteinli"); pg.wait_for_timeout(100)
     pg.locator('#pickerList button[aria-label$=" sil"]').first.click(); pg.wait_for_timeout(150)
+    if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(150)   # v21: temalı onay
     s=st(pg); print("deleted:", cid not in s["customFoods"], "still in meal:", any(i["foodId"]==cid for i in s["meals"][0]["items"]))
     pg.locator("#toastWrap button", has_text="Geri al").first.click(); pg.wait_for_timeout(150)
     s=st(pg); assert cid in s["customFoods"], "geri al çalışmadı"; print("undo:", cid in s["customFoods"], any(i["foodId"]==cid for i in s["meals"][0]["items"]))

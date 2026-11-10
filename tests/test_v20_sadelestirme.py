@@ -41,7 +41,7 @@ try:
              && /pişmiş|haşlanmış|ızgara|fırında|kızartılmış|tencerede|çevirme/.test(f.name.toLowerCase())
              && !/çiğ|kuru|konserve|füme|hazır|pane|kroket|dondurulmuş, (fırında|tavada)|tofu|vegan|pişmemiş/.test(f.name.toLowerCase())).map(f => f.name) }; })()""")
     print("  bilgi:", {k: v for k, v in info.items() if k != "cookedVisible"})
-    check(250 <= info["hiddenN"] <= 330, f"veritabanında ~300 pişmiş hâl gizli ({info['hiddenN']} / {info['total']})")
+    check(250 <= info["hiddenN"] <= 400, f"veritabanında ~290 pişmiş hâl (+ v21: ~40 ABD ürünü) gizli ({info['hiddenN']} / {info['total']})")
     check(info["total"] == 1825, "hiçbir besin silinmedi (1825 kayıt duruyor)")
     check(info["izgaraTavuk"] and not info["cigTavuk"], "ızgara tavuk gizli, çiğ tavuk görünür")
     check(info["pirincHas"] and not info["pirincKuru"], "haşlanmış pirinç gizli, kuru pirinç görünür")

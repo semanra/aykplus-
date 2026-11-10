@@ -37,6 +37,10 @@ function fmtKg(n) { return String(round2(n)).replace(".", ","); }
 function todayStr(d = new Date()) {
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 }
+// v21: Beslenme günü (Profil → Gün geçişi, 00:00–05:00). Örn. 03:00 seçiliyse 02:30'da hâlâ önceki gün sayılır.
+function dayStartHour() { const h = parseInt(state && state.settings ? state.settings.dayStartHour : 0, 10); return h >= 0 && h <= 5 ? h : 0; }
+function logicalNow() { return new Date(Date.now() - dayStartHour() * 3600000); }
+function logicalToday() { return todayStr(logicalNow()); }
 function fmtDate(ts, withTime = false) {
   const o = { day: "2-digit", month: "short" };
   if (withTime) { o.hour = "2-digit"; o.minute = "2-digit"; }
@@ -174,6 +178,7 @@ function normalizeState(raw) {
   if (!["today", "program", "library", "history"].includes(s.gymView)) s.gymView = "today";
   if (!["today", "menus", "foods", "history"].includes(s.nutriView)) s.nutriView = "today";
   s.settings.nutriLight = !!s.settings.nutriLight;
+  { const h = parseInt(s.settings.dayStartHour, 10); s.settings.dayStartHour = h >= 0 && h <= 5 ? h : 0; }   // v21
   s.settings.scaleOn = !!s.settings.scaleOn;
   s.settings.scaleBase = num(s.settings.scaleBase, 0);
   if (s.settings.scaleOn && !(s.settings.scaleBase > 0)) s.settings.scaleOn = false;
@@ -324,7 +329,7 @@ function toast(msg, type = "ok", action = null) {
   const color = type === "error" ? "bg-rose-950 border-rose-700 text-rose-100"
     : type === "pr" ? "bg-amber-950 border-amber-500 text-amber-100"
     : tm ? "bg-[#141416] border-[#1B5E58] text-white"
-    : nm ? "bg-[#0E1210] border-[#166534] text-white" : "bg-slate-900 border-emerald-600/70 text-slate-100";
+    : nm ? "n-toast" : "bg-slate-900 border-emerald-600/70 text-slate-100";
   el.className = "toast max-w-sm w-full text-center text-sm font-semibold border px-4 py-2.5 shadow-2xl " + (tm || nm ? "rounded-2xl " : "rounded-xl ") + color;
   el.textContent = msg;
   if (action) {
@@ -341,6 +346,9 @@ function toast(msg, type = "ok", action = null) {
     b.onclick = () => { el.remove(); action.fn(); };
     el.append(sp, b);
   }
+  // v21: bildirimler üst üste yığılıp başlığı kapatmasın: aynı mesaj tekrarlanmaz, en fazla 2 tane görünür
+  [...wrap.children].forEach(c => { if (c.textContent === el.textContent) c.remove(); });
+  while (wrap.children.length >= 2) ([...wrap.children].find(c => !c.querySelector("button")) || wrap.firstElementChild).remove();   // "Geri al" düğmeli olan en son silinir
   wrap.appendChild(el);
   const life = action ? 6000 : type === "pr" ? 3500 : 2400;
   setTimeout(() => { el.style.transition = "opacity .3s"; el.style.opacity = "0"; }, life);
@@ -386,7 +394,14 @@ function uiAsk({ title, message = "", input = null, ok = "Tamam", cancel = "Vazg
     inp.value = input ? (input.value || "") : "";
     inp.placeholder = input ? (input.placeholder || "") : "";
     $("uiDlgOk").textContent = ok;
-    $("uiDlgOk").className = danger ? "h-[52px] rounded-2xl text-[15px] font-extrabold bg-[#FF5A5F] text-white" : "t-btn h-[52px] rounded-2xl text-[15px]";
+    // v21: beslenme ekranında beslenme temasında (koyu/gündüz), diğer yerlerde antrenman temasında
+    const nd = !trainCtx() && nutriCtx();
+    $("uiDialog").classList.toggle("nd", nd);
+    inp.className = (nd ? "n-in" : "t-in") + (input ? "" : " hidden");
+    $("uiDlgCancel").className = nd ? "n-btn-ghost h-[52px] rounded-full text-[15px]" : "t-btn-ghost h-[52px] rounded-2xl text-[15px]";
+    $("uiDlgOk").className = danger
+      ? (nd ? "h-[52px] rounded-full text-[15px] font-extrabold n-danger-btn" : "h-[52px] rounded-2xl text-[15px] font-extrabold bg-[#FF5A5F] text-white")
+      : (nd ? "n-btn h-[52px] rounded-full text-[15px]" : "t-btn h-[52px] rounded-2xl text-[15px]");
     $("uiDlgCancel").textContent = cancel || "";
     $("uiDlgCancel").classList.toggle("hidden", !cancel);
     $("uiDlgBtns").className = cancel ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2";
@@ -407,7 +422,12 @@ function uiDialogDone(okPressed) {
 }
 function uiAlert(title, message) { return uiAsk({ title, message, ok: "Tamam", cancel: null }); }
 // Bağlama göre uyarı: antrenman/profil ekranında temalı pencere, diğer yerlerde sistem kutusu.
-function sayAlert(title, message) { if (trainCtx()) return uiAlert(title, message); alert(message); return Promise.resolve(true); }
+function sayAlert(title, message) { if (trainCtx() || nutriCtx()) return uiAlert(title, message); alert(message); return Promise.resolve(true); }
+// v21: metin sorma (temalı; mobilite gibi eski temalı yerlerde sistem kutusu). Sonuç: yazılan metin veya null.
+async function askText(title, value = "", placeholder = "", message = "", ok = "Kaydet") {
+  if (trainCtx() || nutriCtx()) return uiAsk({ title, message, input: { value, placeholder }, ok });
+  return prompt(message ? title + "\n" + message : title, value);
+}
 
 // ---------------------------------------------------------------------------
 // SES, EKRAN AÇIK TUTMA
@@ -565,9 +585,9 @@ function resetDaily() {
 }
 
 function checkNewDay() {
-  const t = todayStr();
+  const t = logicalToday();
   if (!state.today) { state.today = t; return false; }
-  if (state.today !== t) {
+  if (t > state.today) {   // yalnızca ileri gidince (gün geçişi saati ileri alınınca aynı gün tekrar arşivlenmez)
     archiveDay(state.today);
     resetDaily();
     state.today = t;
@@ -577,11 +597,11 @@ function checkNewDay() {
   return false;
 }
 
-function manualNewDay() {
-  if (!confirm("Su, takviye, öğün ve mobilite tikleri sıfırlansın mı? (Bugünün özeti İlerleme sekmesine kaydedilir.)")) return;
-  archiveDay(state.today || todayStr());
+async function manualNewDay() {
+  if (!(await askConfirm("Yeni güne geçilsin mi?", "Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti İlerleme sekmesine kaydedilir.", "Yeni güne geç"))) return;
+  archiveDay(state.today || logicalToday());
   resetDaily();
-  state.today = todayStr();
+  state.today = logicalToday();
   renderAll();
 }
 
@@ -1133,7 +1153,7 @@ function renderTodayMeals() {
 // ---------------------------------------------------------------------------
 const openEditMeals = new Set();   // Bugün: düzenleme modu açık öğünler (kaydedilmez)
 function dayKind() { return state.dayType === "rest" ? "rest" : "train"; }
-function dayKey() { return state.today || todayStr(); }
+function dayKey() { return state.today || logicalToday(); }
 function dayCopy() {
   const dp = state.dayPlan;
   return dp && dp.date === dayKey() && Array.isArray(dp[dayKind()]) ? dp[dayKind()] : null;
@@ -1292,10 +1312,10 @@ function updateFreeMealHint() {
 function saveFreeMeal() {
   const kcal = num($("fmKcal").value, NaN);
   const p = num($("fmP").value, NaN);
-  if (!(kcal > 0) || kcal > 6000) { alert("Lütfen tahmini kaloriyi yaz (örn: 850)."); return; }
-  if (!isFinite(p) || p < 0 || p * 4 > kcal * 1.2) { alert("Lütfen tahmini proteini gram olarak yaz (bilmiyorsan 0 yazabilirsin). Protein, kaloriden fazla olamaz."); return; }
+  if (!(kcal > 0) || kcal > 6000) { sayAlert("Kalori eksik", "Lütfen tahmini kaloriyi yaz (örn: 850)."); return; }
+  if (!isFinite(p) || p < 0 || p * 4 > kcal * 1.2) { sayAlert("Protein eksik", "Lütfen tahmini proteini gram olarak yaz (bilmiyorsan 0 yazabilirsin). Protein, kaloriden fazla olamaz."); return; }
   const cv = num($("fmC").value, NaN), fv = num($("fmF").value, NaN);
-  if ((isFinite(cv) && cv < 0) || (isFinite(fv) && fv < 0)) { alert("Karb ve yağ negatif olamaz."); return; }
+  if ((isFinite(cv) && cv < 0) || (isFinite(fv) && fv < 0)) { sayAlert("Değer hatalı", "Karb ve yağ negatif olamaz."); return; }
   snapshot();
   const c = ensureDayCopy();
   const m = c[fmIdx];
@@ -1652,7 +1672,7 @@ function renderFoodList() {
           </div>
           <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Artır">${svgI("plus", 20, 2.4)}</button>
         </div>
-        <div class="flex items-center justify-center gap-2 flex-wrap" aria-label="Hazır porsiyonlar">
+        <div class="flex items-center justify-start gap-2 flex-wrap" aria-label="Hazır porsiyonlar">
           ${pr.list.map(x => `<button onclick="foodPreset(${x.v})" class="n-chip ${round1(num(foodUI.amt)) === x.v ? "on" : ""}" data-preset="${x.v}">${esc(x.label)}</button>`).join("")}
           <button onclick="foodPreset(null, ${pr.plus})" class="n-chip">+${fmtNum(pr.plus)} ${esc(f.unit)}</button>
         </div>
@@ -1750,7 +1770,7 @@ function renderNutriHistory() {
   const meals = dayMeals();
   const sup = state.supplements || {};
   const rows = [{
-    key: state.today || todayStr(), live: true, dayType: state.dayType,
+    key: state.today || logicalToday(), live: true, dayType: state.dayType,
     eatenKcal: eaten.cal, eatenP: eaten.p, kcal: plan.cal, calTarget: t.calTarget, proTarget: t.proTarget,
     water: state.waterLiters || 0, mealsDone: meals.filter(m => m.done).length, mealsTotal: meals.length,
     supps: state.supplementList.filter(x => sup[x.id]).length
@@ -1901,13 +1921,18 @@ async function onBarcode(raw) {
   const unit = String(p.product_quantity_unit || "").toLowerCase() === "ml" ? "ml" : "g";
   const serving = num(p.serving_quantity, 0);
   const complete = [pr, cb, ft].every(x => isFinite(x) && x >= 0);
-  bc.found = { code, name, brand, unit, p: pr, c: cb, f: ft, def: serving > 0 && serving <= 1000 ? Math.round(serving) : 100 };
-  bcStatus(complete ? "Ürün bulundu." : "Ürün bulundu ama besin değerleri eksik.");
+  bc.found = { code, name, brand, unit, p: pr, c: cb, f: ft, kcal: isFinite(kcal) ? kcal : null, def: serving > 0 && serving <= 1000 ? Math.round(serving) : 100 };
+  const issues = complete ? labelCheck(isFinite(kcal) ? kcal : null, pr, cb, ft, 100) : [];
+  bcStatus(!complete ? "Ürün bulundu ama besin değerleri eksik." : issues.length ? "Ürün bulundu ama değerleri tutarsız görünüyor." : "Ürün bulundu.");
   $("bcResult").innerHTML = `<div class="n-elev rounded-[20px] p-4 space-y-2.5">
       <div><div class="text-[16px] font-bold leading-snug break-words">${esc(name)}</div><div class="text-[12px] n-muted">${brand ? esc(brand) + " · " : ""}${code}</div></div>
       ${complete
         ? `<div class="text-[13px]"><span class="n-muted">100 ${unit}:</span> <strong>${Math.round(isFinite(kcal) ? kcal : pr * 4 + cb * 4 + ft * 9)} kcal</strong> · <span class="n-p">${fmtNum(pr)} g P</span> · <span class="n-k">${fmtNum(cb)} g K</span> · <span class="n-y">${fmtNum(ft)} g Y</span></div>
-           <button onclick="addBarcodeFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Listeme ekle ve seç</button>`
+           ${issues.length
+             ? `<div id="bcWarn" class="rounded-2xl p-3 text-[13px] leading-snug" style="background: var(--n-over-soft); color: var(--n-text)"><strong style="color: var(--n-over)">⚠ Etiketle karşılaştır.</strong> ${esc(issues.join(" "))} Bu veriler gönüllülerce girilir; hata olabilir.</div>
+                <button onclick="barcodeFixFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Etikete bakıp düzelt</button>
+                <button onclick="addBarcodeFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">Yine de ekle</button>`
+             : `<button onclick="addBarcodeFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Listeme ekle ve seç</button>`}`
         : `<p class="text-[13px] n-muted">Paketin üzerindeki 100 ${unit} değerleriyle elle ekleyebilirsin.</p>
            <button onclick="barcodeManualFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Elle ekle</button>`}
     </div>`;
@@ -1915,6 +1940,24 @@ async function onBarcode(raw) {
 function bcManualButton(code, name) {
   bc.found = { code, name };
   $("bcResult").innerHTML = `<button onclick="barcodeManualFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">Etiketteki değerleri gir</button>`;
+}
+// v21: Etiket değerleri tutarlı mı? (Open Food Facts'te ve elle girişte sık görülen hatalar: kJ/kcal karışıklığı,
+// ondalık hatası, porsiyon ↔ 100 g karışıklığı). base = değerlerin ait olduğu gram (100 ya da porsiyon); 0 = adet (yalnızca kalori sağlaması).
+// Sonuç: sorun cümleleri (boşsa tutarlı).
+function labelCheck(kcal, p, c, f, base) {
+  const out = [];
+  p = num(p, 0); c = num(c, 0); f = num(f, 0);
+  if (base > 0 && p + c + f > base * 1.03) out.push(`Protein + karb + yağ (${fmtNum(p + c + f)} g), ${fmtNum(base)} g'ı aşıyor.`);
+  const k = kcal == null || !isFinite(kcal) ? null : num(kcal, 0);
+  if (base > 0 && k != null && k > base * 9.2) out.push(`${fmtNum(base)} g için ${Math.round(k)} kcal olamaz (en fazla ~${Math.round(base * 9)}).`);
+  if (k != null && (p + c + f) > 0) {
+    const calc = p * 4 + c * 4 + f * 9;
+    if (Math.abs(calc - k) > Math.max(12, 0.2 * Math.max(k, calc))) {
+      const kj = Math.abs(calc * 4.184 - k) <= Math.max(25, 0.15 * k);
+      out.push(`Yazan kalori ${Math.round(k)}, makrolardan hesaplanan ${Math.round(calc)}.${kj ? " Kalori yerine kilojoule (kJ) yazılmış olabilir." : ""}`);
+    }
+  }
+  return out;
 }
 async function fetchOFF(code) {
   const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
@@ -1937,6 +1980,16 @@ function addBarcodeFood() {
   closeBarcode();
   pickFoodInFoods(id);
   toast(`✓ ${nm} listene eklendi; miktarı seçip öğüne ekle`);
+}
+// Tutarsız barkod ürünü: etiket formu bulunan değerlerle dolu açılır, kullanıcı paketteki tabloyla düzeltir
+function barcodeFixFood() {
+  const b = bc.found || {};
+  if (!b.code) return;
+  closeBarcode();
+  openLabelForm(b.code, (b.brand && b.name && !b.name.toLocaleLowerCase("tr").includes(b.brand.toLocaleLowerCase("tr")) ? `${b.name} (${b.brand})` : b.name || "").slice(0, 50));
+  $("cfHint").textContent = `Barkod ${b.code}. Bulunan değerler tutarsızdı; paketin besin tablosuyla karşılaştırıp düzelt (100 g değerleri).`;
+  if (b.kcal != null) $("cfK").value = fmtNum(b.kcal);
+  $("cfP").value = fmtNum(b.p); $("cfC").value = fmtNum(b.c); $("cfF").value = fmtNum(b.f);
 }
 function barcodeManualFood() {
   const b = bc.found || {};
@@ -1993,9 +2046,10 @@ function toggleMealDone(mIdx) {
   renderAll();
 }
 function setDayType(type) { state.dayType = type; renderAll(); }
-function renameMeal(mIdx) {
+async function renameMeal(mIdx) {
   const m = curMeals()[mIdx];
-  const t = prompt("Öğün adı:", m.title);
+  if (!m) return;
+  const t = await askText("Öğün adı", m.title);
   if (t && t.trim()) { m.title = t.trim(); renderAll(); }
 }
 
@@ -2083,16 +2137,19 @@ function cfUnitChanged() {
   $("cfDefLabel").textContent = m === "serv" ? "1 porsiyon kaç gram?" : m === "1adet" ? "Varsayılan miktar (adet):" : "Varsayılan miktar (g):";
 }
 function openFoodModalFromPicker() { closeModal("pickerModal"); openCustomFoodModal(); }
-function saveCustomFood() {
+async function saveCustomFood() {
   const name = $("cfName").value.trim();
-  if (!name) { alert("Lütfen besin adını gir."); return; }
+  if (!name) { sayAlert("Ad eksik", "Lütfen besin adını gir."); return; }
   const unitMode = $("cfUnit").value;
   const def = num($("cfDef").value, 100) || 100;
   const p = num($("cfP").value), c = num($("cfC").value), f = num($("cfF").value);
   const kRaw = $("cfK").value.trim();
   const k = kRaw === "" ? null : num(kRaw, NaN);
-  if ([p, c, f].some(x => x < 0) || (k != null && !(k >= 0))) { alert("Değerler negatif olamaz; kaloriyi rakamla yaz."); return; }
-  if (unitMode === "serv" && !(def > 0 && def <= 2000)) { alert("Lütfen 1 porsiyonun kaç gram olduğunu yaz (etikette yazar, örn: 30)."); return; }
+  if ([p, c, f].some(x => x < 0) || (k != null && !(k >= 0))) { sayAlert("Değer hatalı", "Değerler negatif olamaz; kaloriyi rakamla yaz."); return; }
+  if (unitMode === "serv" && !(def > 0 && def <= 2000)) { sayAlert("Porsiyon eksik", "Lütfen 1 porsiyonun kaç gram olduğunu yaz (etikette yazar, örn: 30)."); return; }
+  // v21: etiket tutarlılık kontrolü (100 g / 1 porsiyon; adet modunda yalnızca kalori sağlaması)
+  const lc = labelCheck(k, p, c, f, unitMode === "1adet" ? 0 : unitMode === "serv" ? def : 100);
+  if (lc.length && !(await askConfirm("Değerler tutarsız görünüyor", lc.join(" ") + " Etiketle karşılaştır; doğruysa yine de kaydedebilirsin.", "Yine de kaydet"))) return;
   const editing = cfEditId && state.customFoods[cfEditId];
   const prev = editing ? state.customFoods[cfEditId] : null;
   const barcode = prev && prev.barcode ? prev.barcode : cfPendingBarcode;
@@ -2944,7 +3001,7 @@ function renderProgress() {
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setSplash"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setSplash", "setDayStart"];
 let pfSnap = "";
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 function pfValues() { return JSON.stringify(PF_FIELDS.map(id => { const el = $(id); return el.type === "checkbox" ? el.checked : el.value; })); }
@@ -2962,6 +3019,7 @@ function fillProfileFields() {
   $("setSound").checked = !!st.sound;
   $("setAwake").checked = !!st.keepAwake;
   $("setSplash").checked = st.splash !== false;
+  $("setDayStart").value = String(dayStartHour());
   updateBfHint();
   pfSnap = pfValues();
 }
@@ -3071,6 +3129,7 @@ function saveSettings() {
   st.sound = $("setSound").checked;
   st.keepAwake = $("setAwake").checked;
   st.splash = $("setSplash").checked;
+  st.dayStartHour = Math.max(0, Math.min(5, parseInt($("setDayStart").value, 10) || 0));
   if (w) state.weight = w;
   if (!timer.running) resetTimerUI();
   pfSnap = pfValues();
@@ -3082,7 +3141,7 @@ function saveSettings() {
 
 // Bağlama göre onay: profil/antrenman ekranında temalı pencere, diğer yerlerde sistem kutusu.
 async function askConfirm(title, message, ok = "Devam et", danger = false) {
-  if (trainCtx()) return !!(await uiAsk({ title, message, ok, danger }));
+  if (trainCtx() || nutriCtx()) return !!(await uiAsk({ title, message, ok, danger }));
   return confirm(message);
 }
 
@@ -3162,7 +3221,7 @@ async function resetToDefaults() {
   if (!(await askConfirm("Fabrika ayarlarına sıfırla", "TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?", "Devam et", true))) return;
   if (!(await askConfirm("Son onay", "Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?", "Sıfırla", true))) return;
   state = normalizeState({});
-  state.today = todayStr();
+  state.today = logicalToday();
   closeSettings();
   stopTimer();
   renderAll();
@@ -3645,8 +3704,8 @@ function applyCoach() {
   toast(`🧠 Hedef kalori ${a.delta > 0 ? "+" : ""}${a.delta} kcal ayarlandı`);
   renderAll();
 }
-function resetCoachAdjust() {
-  if (!confirm("Koç düzeltmesi sıfırlansın mı? Hedef kalorin formülün hesapladığı değere döner.")) return;
+async function resetCoachAdjust() {
+  if (!(await askConfirm("Koç düzeltmesi sıfırlansın mı?", "Hedef kalorin formülün hesapladığı değere döner.", "Sıfırla"))) return;
   state.settings.calAdjust = 0;
   state.settings.coachAppliedAt = 0;
   renderAll();
@@ -3753,20 +3812,21 @@ function toggleSeparatePlans(on) {
   state.settings.separatePlans = !!on;
   renderAll();
 }
-function addMeal() {
+async function addMeal() {
   const meals = curMeals();
-  const t = prompt("Yeni öğünün adı:", `${meals.length + 1}. Öğün: `);
+  const t = await askText("Yeni öğünün adı", `${meals.length + 1}. Öğün: `);
   if (!t || !t.trim()) return;
   meals.push({ id: "meal_" + Date.now(), title: t.trim(), targetNote: "", done: false, items: [] });
   renderAll();
   setTimeout(() => { const c = $("mealsContainer"); if (c.lastElementChild) c.lastElementChild.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
 }
-function editMeal(mIdx) {
+async function editMeal(mIdx) {
   const m = curMeals()[mIdx];
-  const t = prompt("Öğün adı:", m.title);
+  if (!m) return;
+  const t = await askText("Öğün adı", m.title);
   if (t === null) return;
   if (t.trim()) m.title = t.trim();
-  const n = prompt("Kısa not (örn: Hedef 50g protein) — boş bırakabilirsin:", m.targetNote || "");
+  const n = await askText("Kısa not", m.targetNote || "", "örn: Hedef 50 g protein", "Boş bırakabilirsin.");
   if (n !== null) m.targetNote = n.trim();
   renderAll();
 }
@@ -3842,11 +3902,11 @@ function renderSupps() {
   }
   $("suppList").innerHTML = html;
 }
-function setSuppTime(i, v) {
+async function setSuppTime(i, v) {
   const s = state.supplementList[i];
   if (!s) return;
   if (v === "custom") {
-    const l = prompt("Özel zaman etiketi (örn: Öğle yemeğiyle):", s.time === "custom" ? s.timeLabel || "" : "");
+    const l = await askText("Özel zaman etiketi", s.time === "custom" ? s.timeLabel || "" : "", "örn: Öğle yemeğiyle");
     if (l === null) { renderAll(); return; }
     s.time = "custom";
     s.timeLabel = l.trim().slice(0, 24) || "Özel";
@@ -3854,8 +3914,8 @@ function setSuppTime(i, v) {
   else { delete s.time; delete s.timeLabel; }
   renderAll();
 }
-function addSupp() {
-  const n = prompt("Takviye adı (başına emoji ekleyebilirsin, örn: 💊 D3 Vitamini):");
+async function addSupp() {
+  const n = await askText("Takviye adı", "", "örn: D3 Vitamini", "", "Ekle");
   if (!n || !n.trim()) return;
   state.supplementList.push({ id: "sup_" + Date.now(), name: n.trim().slice(0, 40) });
   renderAll();
@@ -4114,7 +4174,7 @@ function dayIntake(d) {
 
 function historySeries(n) {
   const out = [];
-  const today = new Date();
+  const today = logicalNow();
   const tKey = todayStr(today);
   const tg = getTargets();
   for (let i = n - 1; i >= 0; i--) {
@@ -4908,7 +4968,7 @@ function placeByTime(meals, meal) {
 }
 function saveMealModal() {
   const title = $("mmName").value.trim();
-  if (!title) { alert("Öğün adını yaz."); return; }
+  if (!title) { sayAlert("Ad eksik", "Öğün adını yaz."); return; }
   const time = /^\d{2}:\d{2}$/.test($("mmTime").value) ? $("mmTime").value : "";
   const note = $("mmNote").value.trim();
   const meals = curMeals();
@@ -5027,11 +5087,11 @@ function customFoodUses(id) {
   (state.combos || []).forEach(c => c.items.forEach(i => { if (i.foodId === id) n++; }));
   return n;
 }
-function deleteCustomFood(id) {
+async function deleteCustomFood(id) {
   const f = state.customFoods[id];
   if (!f) return;
   const uses = customFoodUses(id);
-  if (uses > 0 && !confirm(`"${f.name}" ${uses} öğün/komboda kullanılıyor. Silersen oralardan da çıkarılacak. Devam edilsin mi?`)) return;
+  if (uses > 0 && !(await askConfirm(`${stripEmoji(f.name).replace(/^⭐\s*/, "")} silinsin mi?`, `${uses} öğün/komboda kullanılıyor. Silersen oralardan da çıkarılacak.`, "Sil", true))) return;
   snapshot();
   delete state.customFoods[id];
   invalidateFoodDB();
@@ -5074,14 +5134,14 @@ function mealTitleBody(m) {
 // ---------------------------------------------------------------------------
 // KOMBO: bir öğünün besinleri "Favori Kase" gibi kaydedilir, tek dokunuşla eklenir
 // ---------------------------------------------------------------------------
-function saveMealAsCombo(mIdx, dest) {
+async function saveMealAsCombo(mIdx, dest) {
   const list = dest === "day" ? dayMeals() : curMeals();
   const m = list[mIdx];
   if (!m) return;
   const db = getFoodDB();
   const items = m.items.filter(i => !i.est && db[i.foodId]).map(i => ({ foodId: i.foodId, amount: num(i.amount) }));
-  if (!items.length) { alert("Bu öğünde kombo olarak kaydedilecek besin yok."); return; }
-  const name = prompt("Kombonun adı (örn: Favori Kase):", mealTitleBody(m).slice(0, 40));
+  if (!items.length) { sayAlert("Kombo kaydedilemedi", "Bu öğünde kombo olarak kaydedilecek besin yok."); return; }
+  const name = await askText("Kombonun adı", mealTitleBody(m).slice(0, 40), "örn: Favori Kase");
   if (name === null) return;
   const nm = name.trim().slice(0, 40) || "Kombo";
   state.combos.push({ id: "combo_" + Date.now().toString(36), name: nm, items });
@@ -5236,10 +5296,10 @@ function rcAddIngredient() {
 }
 function saveRecipe() {
   const name = $("rcName").value.trim().slice(0, 50);
-  if (!name) { alert("Lütfen tarifin adını yaz."); return; }
-  if (!rcp.items.length) { alert("En az bir malzeme ekle."); return; }
+  if (!name) { sayAlert("Ad eksik", "Lütfen tarifin adını yaz."); return; }
+  if (!rcp.items.length) { sayAlert("Malzeme yok", "En az bir malzeme ekle."); return; }
   const cooked = num($("rcCooked").value, 0);
-  if (!(cooked > 0) || cooked > 30000) { alert("Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş)."); return; }
+  if (!(cooked > 0) || cooked > 30000) { sayAlert("Pişmiş ağırlık eksik", "Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş)."); return; }
   const t = recipeTotals();
   const id = rcp.id || "custom_recipe_" + Date.now().toString(36);
   const editing = !!rcp.id;
@@ -5532,7 +5592,7 @@ function logIntake(d) {
   if (!(k > 0)) return null;
   return { k, p: eaten ? num(d.eatenP) : num(d.p, num(d.eatenP)), t: num(d.calTarget, 0), eaten };
 }
-function dateKeyOffset(n) { const d = new Date(); d.setDate(d.getDate() + n); return todayStr(d); }
+function dateKeyOffset(n) { const d = logicalNow(); d.setDate(d.getDate() + n); return todayStr(d); }
 function keyToDate(k) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
 // Hedefe yakınlık: yeşil ±%5 (en az 50 kcal), sarı ±%15, kırmızı daha uzak
 function hitClass(k, t) {
@@ -5549,7 +5609,7 @@ function weekStats() {
   const avgP = days7.length ? days7.reduce((a, b) => a + b.p, 0) / days7.length : 0;
   // Bu hafta (Pazartesi–Pazar)
   const t = getTargets().calTarget;
-  const ws = new Date(weekStart());
+  const ws = new Date(weekStart(logicalNow()));
   let total = 0, taken = 0, daysLeft = 0;
   const today = dayKey();
   for (let i = 0; i < 7; i++) {

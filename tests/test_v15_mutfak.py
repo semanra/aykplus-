@@ -36,6 +36,7 @@ try:
     pg.evaluate("toggleMenuMeal(0)"); pg.wait_for_timeout(50)
     dialog_answers.append("Favori <b>Kase</b>")
     pg.locator('#mealsContainer [onclick="saveMealAsCombo(0, \'menu\')"]').click(); pg.wait_for_timeout(100)
+    pg.fill("#uiDlgInput", dialog_answers.pop(0)); pg.click("#uiDlgOk"); pg.wait_for_timeout(100)   # v21: temalı metin penceresi
     s = st(pg)
     check(len(s["combos"]) == 1 and s["combos"][0]["name"] == "Favori <b>Kase</b>" and len(s["combos"][0]["items"]) == 4, "öğün kombo olarak kaydedildi (4 besin)")
     check(ov(pg), "Menülerim öğün düğme satırı taşmıyor (375 px)")
@@ -127,6 +128,7 @@ try:
     pg.evaluate("openEditMeals.add(dayMeals()[1].id); renderAll()"); pg.wait_for_timeout(50)
     dialog_answers.append("Bugünkü kase")
     pg.locator('[data-edit-panel="1"] button', has_text="Kombo kaydet").click(); pg.wait_for_timeout(80)
+    pg.fill("#uiDlgInput", dialog_answers.pop(0)); pg.click("#uiDlgOk"); pg.wait_for_timeout(80)
     check(len(st(pg)["combos"]) == 2 and st(pg)["combos"][1]["name"] == "Bugünkü kase", "Bugün'den de kombo kaydediliyor")
     small = pg.evaluate(SMALL_JS, "#todayMeals button, #todayMeals input:not([type=checkbox])")
     check(not small, f"Bugün düzenleme paneli: düğmeler en az 44 px {small}")
@@ -175,7 +177,8 @@ try:
     pg.set_viewport_size({"width": 375, "height": 812})
 
     # ---------- 5) Tarifin malzemesi silinse de tarif bozulmuyor; tarif silinince menüden çıkıyor
-    pg.evaluate(f"deleteCustomFood('{rid}')"); pg.wait_for_timeout(80)
+    pg.evaluate(f"void deleteCustomFood('{rid}')"); pg.wait_for_timeout(80)
+    if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(80)   # v21: temalı onay
     s = st(pg)
     check(rid not in s["customFoods"] and not any(i["foodId"] == rid for m in s["meals"] for i in m["items"]), "tarif silinince menüden de çıktı")
 
