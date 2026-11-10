@@ -6,7 +6,8 @@ const DEFAULT_SETTINGS = {
   sex: "male", height: 180, age: 26, targetWeight: 82,
   waterTarget: 3.5, restSec: 90, sound: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
-  macroView: "plan", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true
+  macroView: "plan", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
+  nutriLight: false, scaleOn: false, scaleBase: 0
 };
 const DEFAULT_SUPPS = [
   { id: "creatine", name: "⚡ Kreatin (5g)" },
@@ -126,7 +127,20 @@ function normalizeState(raw) {
   // v10: antrenman ve dinlenme menüleri her zaman ayrı
   if (!s.restMeals.length) s.restMeals = clone(s.meals).map(mm => ({ ...mm, id: (mm.id || "meal") + "_rest", done: false }));
   s.settings.separatePlans = true;
+  // v13: her öğünün kalıcı bir kimliği olsun (açık/kapalı görünüm "Geri al" sonrası da korunur)
+  [s.meals, s.restMeals].forEach((ms, li) => {
+    const seen = new Set();
+    ms.forEach((m, i) => {
+      if (!m.id || seen.has(m.id)) m.id = "meal_" + Date.now().toString(36) + "_" + li + "_" + i;
+      seen.add(m.id);
+    });
+  });
   if (!["today", "program", "library", "history"].includes(s.gymView)) s.gymView = "today";
+  if (!["today", "menus", "foods", "history"].includes(s.nutriView)) s.nutriView = "today";
+  s.settings.nutriLight = !!s.settings.nutriLight;
+  s.settings.scaleOn = !!s.settings.scaleOn;
+  s.settings.scaleBase = num(s.settings.scaleBase, 0);
+  if (s.settings.scaleOn && !(s.settings.scaleBase > 0)) s.settings.scaleOn = false;
   if (!["week", "today", "program"].includes(s.libRange)) s.libRange = "week";
   if (s.libMuscle && !["Göğüs", "Sırt", "Omuz", "Ön Bacak", "Arka Bacak & Kalça", "Kalf", "Biceps", "Triceps", "Karın"].includes(s.libMuscle)) s.libMuscle = null;
   s.workoutDays.forEach((d, i) => { if (!d.id) d.id = "day_" + i + "_" + Date.now(); });
@@ -180,11 +194,13 @@ function toast(msg, type = "ok", action = null) {
   const wrap = $("toastWrap");
   const el = document.createElement("div");
   const tm = trainCtx();
-  if (tm && type !== "error") { msg = String(msg).replace(EMOJI_LEAD, ""); if (action) action = { ...action, label: String(action.label).replace(EMOJI_LEAD, "") }; }
+  const nm = !tm && nutriCtx();
+  if ((tm || nm) && type !== "error") { msg = String(msg).replace(EMOJI_LEAD, ""); if (action) action = { ...action, label: String(action.label).replace(EMOJI_LEAD, "") }; }
   const color = type === "error" ? "bg-rose-950 border-rose-700 text-rose-100"
     : type === "pr" ? "bg-amber-950 border-amber-500 text-amber-100"
-    : tm ? "bg-[#141416] border-[#1B5E58] text-white" : "bg-slate-900 border-emerald-600/70 text-slate-100";
-  el.className = "toast max-w-sm w-full text-center text-sm font-semibold border px-4 py-2.5 shadow-2xl " + (tm ? "rounded-2xl " : "rounded-xl ") + color;
+    : tm ? "bg-[#141416] border-[#1B5E58] text-white"
+    : nm ? "bg-[#0E1210] border-[#166534] text-white" : "bg-slate-900 border-emerald-600/70 text-slate-100";
+  el.className = "toast max-w-sm w-full text-center text-sm font-semibold border px-4 py-2.5 shadow-2xl " + (tm || nm ? "rounded-2xl " : "rounded-xl ") + color;
   el.textContent = msg;
   if (action) {
     el.textContent = "";
@@ -194,7 +210,9 @@ function toast(msg, type = "ok", action = null) {
     sp.textContent = msg;
     const b = document.createElement("button");
     b.textContent = action.label;
-    b.className = tm ? "t-btn shrink-0 h-11 px-4 rounded-xl text-[13px]" : "shrink-0 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg";
+    b.className = tm ? "t-btn shrink-0 h-11 px-4 rounded-xl text-[13px]"
+      : nm ? "n-btn shrink-0 h-11 px-4 rounded-full text-[13px]"
+      : "shrink-0 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg";
     b.onclick = () => { el.remove(); action.fn(); };
     el.append(sp, b);
   }
@@ -211,12 +229,16 @@ window.addEventListener("error", e => { toast("⚠️ Hata: " + (e.message || "b
 // ---------------------------------------------------------------------------
 // Antrenman sekmesinden veya Profil ekranından açılan ortak pencereler yeni (siyah) temada görünür.
 function trainCtx() { try { return state.activeTab === "gym" || profileIsOpen(); } catch (e) { return false; } }
+// Beslenme sekmesinden a\u00E7\u0131lan ortak pencereler beslenme temas\u0131nda (.nm) g\u00F6r\u00FCn\u00FCr.
+function nutriCtx() { try { return !trainCtx() && state.activeTab === "nutrition"; } catch (e) { return false; } }
 const EMOJI_LEAD = /^(?:[\p{Extended_Pictographic}\u2190-\u21FF\u2700-\u27BF\uFE0F\u200D]+\s*)+/u;
 function openModal(id) {
   const m = $(id);
   const tm = trainCtx();
+  const nm = !tm && nutriCtx();
   m.classList.toggle("tm", tm);
-  if (tm) m.querySelectorAll("h3").forEach(h => { const t = h.textContent; const c = t.replace(EMOJI_LEAD, ""); if (c !== t) h.textContent = c; });
+  m.classList.toggle("nm", nm);
+  if (tm || nm) m.querySelectorAll("h3").forEach(h => { const t = h.textContent; const c = t.replace(EMOJI_LEAD, ""); if (c !== t) h.textContent = c; });
   m.classList.remove("hidden"); m.classList.add("flex");
 }
 function closeModal(id) { const m = $(id); m.classList.add("hidden"); m.classList.remove("flex"); }
@@ -453,9 +475,24 @@ function applyTabVisibility() {
     mobility: ["tabMobility", "mobilityHeaderBar", "navBtnMobility", "grid"],
     progress: ["tabProgress", "progressHeaderBar", "navBtnProgress", "block"]
   };
-  const activeCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-bold text-[11px] " + (state.activeTab === "gym" ? "text-[#1FD1C1]" : "text-emerald-400");
+  const activeCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-bold text-[11px] " + (state.activeTab === "gym" ? "text-[#1FD1C1]" : state.activeTab === "nutrition" ? "text-[#22C55E]" : "text-emerald-400");
   const idleCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-semibold text-[11px] text-[#8B8B93]";
   document.body.classList.toggle("theme-train", state.activeTab === "gym");
+  const nutri = state.activeTab === "nutrition";
+  document.body.classList.toggle("theme-nutri", nutri);
+  document.body.classList.toggle("nutri-light", nutri && !!state.settings.nutriLight);
+  const tb = $("nutriThemeBtn");
+  tb.classList.toggle("hidden", !nutri);
+  tb.classList.toggle("flex", nutri);
+  const light = !!state.settings.nutriLight;
+  const want = light ? "moon" : "sun";
+  if (tb.dataset.icon !== want) {
+    tb.dataset.icon = want;
+    tb.innerHTML = light
+      ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>'
+      : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
+    tb.setAttribute("aria-label", light ? "Gece temasına geç" : "Gündüz temasına geç");
+  }
   const tt = $("tabTitle");
   const title = TAB_TITLES[state.activeTab] || "AYK+";
   if (tt.textContent !== title) tt.textContent = title;
@@ -579,17 +616,152 @@ function updateBfHint() {
 function calcItemMacros(item) {
   const f = getFoodDB()[item.foodId];
   if (!f) return { p: 0, c: 0, f: 0, cal: 0 };
-  const p = f.p * item.amount, c = f.c * item.amount, fat = f.f * item.amount;
+  const a = effAmount(item);
+  const p = f.p * a, c = f.c * a, fat = f.f * a;
   return { p, c, f: fat, cal: (p * 4) + (c * 4) + (fat * 9) };
 }
 
 // ---------------------------------------------------------------------------
 // BESLENME RENDER
 // ---------------------------------------------------------------------------
-function renderNutrition() {
-  const db = getFoodDB();
-  const st = state.settings;
+// ============================================================================
+// v13 — BESLENME: Bugün / Menülerim / Besinler / Geçmiş, ikame, hazır porsiyon,
+//        kiloya göre gramaj, gündüz teması, barkod
+// ============================================================================
+const NUTRI_VIEWS = [["today", "Bugün"], ["menus", "Menülerim"], ["foods", "Besinler"], ["history", "Geçmiş"]];
+function setNutriView(v) {
+  state.nutriView = NUTRI_VIEWS.some(x => x[0] === v) ? v : "today";
+  window.scrollTo(0, 0);
+  renderAll();
+}
+function toggleNutriLight() { state.settings.nutriLight = !state.settings.nutriLight; renderAll(); }
 
+// Tam sayıyı Türkçe binlik ayırıcıyla yazar: 2478 → "2.478"
+function fmtInt(n) { return Math.round(num(n, 0)).toLocaleString("tr-TR"); }
+function kcalPerUnit(f) { return f ? (f.p * 4) + (f.c * 4) + (f.f * 9) : 0; }
+// Baştaki emojiyi (bayraklar dahil) kaldırır: "🇹🇷 Türk Mutfağı" → "Türk Mutfağı"
+function stripEmoji(s) { return String(s || "").replace(/^(?:[\u{1F1E6}-\u{1F1FF}]+\s*)+/u, "").replace(EMOJI_LEAD, ""); }
+
+// ---------------------------------------------------------------------------
+// Kiloya göre gramaj: menü, açıldığı andaki kiloya (referans) göre saklanır;
+// kilo değişince yalnızca gram/ml ile ölçülen besinler orantılı gösterilir ve hesaplanır.
+// Saklanan miktar değişmez; ayar kapatılınca menü eski hâline döner.
+// ---------------------------------------------------------------------------
+function scaleK() {
+  const st = state.settings;
+  if (!st.scaleOn || !(num(st.scaleBase, 0) > 0)) return 1;
+  return Math.max(0.7, Math.min(1.3, state.weight / num(st.scaleBase, state.weight)));
+}
+function isScalable(f) { return !!f && (f.unit === "g" || f.unit === "ml"); }
+function effAmount(item) {
+  const f = getFoodDB()[item.foodId];
+  const k = scaleK();
+  if (k === 1 || !isScalable(f)) return item.amount;
+  return Math.max(1, Math.round(item.amount * k));
+}
+// Ekranda görünen (ölçeklenmiş) miktarı saklanacak miktara çevirir
+function rawFromEff(f, eff) {
+  const k = scaleK();
+  // 0,1 hassasiyet: oran en fazla 1,3 olduğundan ekranda yazılan gram aynen geri görünür
+  return k !== 1 && isScalable(f) ? round1(eff / k) : round1(eff);
+}
+function toggleWeightScale(on) {
+  state.settings.scaleOn = !!on;
+  if (on) state.settings.scaleBase = state.weight;
+  renderAll();
+  toast(on ? `Gramajlar artık ${fmtNum(state.weight)} kg'a göre ayarlanacak` : "Kiloya göre gramaj kapatıldı; menü eski gramajlarına döndü");
+}
+function resetScaleBase() {
+  const k = scaleK();
+  // Şu an görünen gramajlar yeni referans olsun: saklanan miktarları sabitle
+  if (k !== 1) [state.meals, state.restMeals].forEach(ms => ms.forEach(m => m.items.forEach(i => {
+    const f = getFoodDB()[i.foodId];
+    if (isScalable(f)) i.amount = Math.max(1, Math.round(i.amount * k));
+  })));
+  state.settings.scaleBase = state.weight;
+  renderAll();
+  toast(`Referans kilo ${fmtNum(state.weight)} kg yapıldı; gramajlar olduğu gibi kaldı`);
+}
+
+// ---------------------------------------------------------------------------
+// İkame: aynı gruptaki besinle, kalori aynı kalacak şekilde değiştir
+// ---------------------------------------------------------------------------
+const SWAP_GROUPS = [
+  ["pirinc", "basmati", "bulgur", "makarna_tam", "yulaf", "pirinc_unu"],
+  ["patates", "tatli_patates"],
+  ["tr_pirinc_pilavi", "tr_bulgur_pilavi"],
+  ["tavuk_gogsu", "hindi_gogsu", "dana_kiyma", "tavuk_incik", "somon"],
+  ["suzme_yogurt", "lor_peyniri"],
+  ["badem", "ceviz", "findik", "kaju", "yer_fistigi", "kabak_cekirdegi", "fistik_ezmesi"],
+  ["brokoli_karnabahar", "ispanak_kabak", "domates_salatalik"]
+];
+function swapGroup(foodId) { return SWAP_GROUPS.find(g => g.includes(foodId)) || null; }
+function swapOptions(item) {
+  const db = getFoodDB();
+  const g = swapGroup(item.foodId);
+  const f0 = db[item.foodId];
+  if (!g || !f0) return [];
+  const kcal0 = kcalPerUnit(f0) * effAmount(item);
+  return g.filter(id => id !== item.foodId && db[id]).map(id => {
+    const f = db[id];
+    const eff = Math.max(5, Math.round(kcal0 / kcalPerUnit(f) / 5) * 5);
+    return { id, f, eff, kcal: Math.round(kcalPerUnit(f) * eff), p: f.p * eff, c: f.c * eff, fat: f.f * eff };
+  });
+}
+function openSwap(mIdx, iIdx) {
+  const item = curMeals()[mIdx] && curMeals()[mIdx].items[iIdx];
+  if (!item) return;
+  const f0 = getFoodDB()[item.foodId];
+  const opts = swapOptions(item);
+  if (!opts.length) return;
+  const items = opts.map(o => ({ id: o.id, eff: o.eff, label: o.f.name, sub: `${fmtNum(o.eff)} ${o.f.unit} · ${o.kcal} kcal · ${Math.round(o.p)}P ${Math.round(o.c)}K ${Math.round(o.fat)}Y` }));
+  openPicker(`${f0.name} yerine`, [{ label: `Şu an: ${fmtNum(effAmount(item))} ${f0.unit} · ${Math.round(kcalPerUnit(f0) * effAmount(item))} kcal`, short: "Alternatifler", items }], it => {
+    const cur = curMeals()[mIdx] && curMeals()[mIdx].items[iIdx];
+    if (!cur) return;
+    const nf = getFoodDB()[it.id];
+    snapshot();
+    cur.foodId = it.id;
+    cur.amount = rawFromEff(nf, it.eff);
+    renderAll();
+    offerUndo(`⇄ ${f0.name} → ${nf.name} (${fmtNum(it.eff)} ${nf.unit})`);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// GENEL BESLENME ÇİZİMİ
+// ---------------------------------------------------------------------------
+const openDoneMeals = new Set();   // Bugün: açılmış "yenmiş" öğünler (kaydedilmez)
+const openMenuMeals = new Set();   // Menülerim: açılmış öğünler (kaydedilmez)
+function toggleMealOpen(mIdx) {
+  const m = curMeals()[mIdx];
+  if (!m) return;
+  if (openDoneMeals.has(m.id)) openDoneMeals.delete(m.id); else openDoneMeals.add(m.id);
+  renderAll();
+}
+function toggleMenuMeal(mIdx) {
+  const m = curMeals()[mIdx];
+  if (!m) return;
+  if (openMenuMeals.has(m.id)) openMenuMeals.delete(m.id); else openMenuMeals.add(m.id);
+  renderAll();
+}
+
+function mealTotals(meal) {
+  let p = 0, c = 0, f = 0, cal = 0, n = 0;
+  meal.items.forEach(i => { if (!getFoodDB()[i.foodId]) return; const x = calcItemMacros(i); p += x.p; c += x.c; f += x.f; cal += x.cal; n++; });
+  return { p, c, f, cal, n };
+}
+function macroLine(p, c, f, dec) {
+  const v = x => dec ? fmtNum(x) : Math.round(x);
+  return `<span class="n-p">${v(p)}P</span> <span class="n-k">${v(c)}K</span> <span class="n-y">${v(f)}Y</span>`;
+}
+
+function renderNutrition() {
+  const st = state.settings;
+  const view = NUTRI_VIEWS.some(x => x[0] === state.nutriView) ? state.nutriView : "today";
+  $("nutriNav").innerHTML = NUTRI_VIEWS.map(([k, l]) => `<button onclick="setNutriView('${k}')" class="n-tab ${view === k ? "on" : ""}" ${view === k ? 'aria-current="page"' : ""}>${l}</button>`).join("");
+  [["today", "nvToday"], ["menus", "nvMenus"], ["foods", "nvFoods"], ["history", "nvHistory"]].forEach(([k, id]) => $(id).classList.toggle("hidden", k !== view));
+
+  // Kilo / açık
   const logged = state.weightLogs.map(l => num(l.weight, 0)).filter(w => w > 0);
   const minW = Math.floor(Math.min(num(st.targetWeight, 82) - 5, ...logged.map(w => w - 5), state.weight));
   const maxW = Math.ceil(Math.max(...logged.map(w => w + 10), state.weight + 10, num(st.targetWeight, 82) + 10));
@@ -598,154 +770,661 @@ function renderNutrition() {
   $("weightVal").textContent = fmtNum(state.weight);
   $("deficitSlider").value = state.deficit;
   $("deficitVal").textContent = state.deficit;
-
-  const wt = num(st.waterTarget, 3.5);
-  $("waterVal").textContent = (state.waterLiters || 0).toFixed(2).replace(".", ",");
-  $("waterTarget").textContent = fmtNum(wt);
-  $("waterBar").style.width = Math.min(100, Math.round(((state.waterLiters || 0) / wt) * 100)) + "%";
-
-  if (state.weightLogs.length > 0) {
-    const recent = state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))}kg (${esc(l.date)})`).join(" → ");
-    $("weightHistoryText").textContent = recent;
-  } else {
-    $("weightHistoryText").textContent = `Hedef: ${fmtNum(num(st.targetWeight, 82))} kg`;
-  }
-
-  renderSupps();
-  const isRest = state.dayType === "rest";
-  const planColor = isRest ? "#8b5cf6" : "#10b981";
-  $("planSub").textContent = `${isRest ? "Dinlenme" : "Antrenman"} günü menüsü · hedef ${getTargets().calTarget} kcal · öğünleri ⠿ tutamacından sürükleyerek sıralayabilirsin`;
-
-  const onCls = "h-12 rounded-xl text-sm font-bold text-white shadow ";
-  const offCls = "h-12 rounded-xl text-sm font-semibold text-slate-400";
-  $("btnTrain").className = state.dayType === "train" ? onCls + "bg-emerald-600" : offCls;
-  $("btnRest").className = state.dayType === "rest" ? onCls + "bg-violet-600" : offCls;
-
+  $("weightHistoryText").textContent = state.weightLogs.length > 0
+    ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.date})`).join(" → ")
+    : `Hedef: ${fmtNum(num(st.targetWeight, 82))} kg`;
   const target = num(st.targetWeight, 82);
   const diffKg = state.weight - target;
   const weeklyLoss = (state.deficit * 7) / 7700;
-  if (diffKg <= 0) {
-    $("timelineInfo").textContent = `🎯 ${fmtNum(target)} kg hedefine ulaştın!`;
-  } else if (weeklyLoss > 0) {
-    $("timelineInfo").textContent = `Haftalık ~${weeklyLoss.toFixed(2).replace(".", ",")} kg kayıp → ${fmtNum(target)} kg hedefine ~${Math.ceil(diffKg / weeklyLoss)} hafta`;
-  } else {
-    $("timelineInfo").textContent = `Kalori açığı yok: kilo koruma modu`;
-  }
-
-  const targets = getTargets();
-  let totalP = 0, totalC = 0, totalF = 0, totalCal = 0;
-  const container = $("mealsContainer");
-  let html = "";
-
-  curMeals().forEach((meal, mIdx) => {
-    let mP = 0, mC = 0, mF = 0, mCal = 0;
-    let itemsHtml = "";
-    meal.items.forEach((item, iIdx) => {
-      const f = db[item.foodId];
-      if (!f) return;
-      const mac = calcItemMacros(item);
-      mP += mac.p; mC += mac.c; mF += mac.f; mCal += mac.cal;
-      itemsHtml += `
-        <div class="flex items-center justify-between gap-2 bg-slate-900/90 border border-slate-800 px-3 py-2 rounded-lg">
-          <div class="flex-1 min-w-0">
-            <div class="text-sm font-medium text-slate-200 truncate">${esc(f.name)}</div>
-            <div class="text-xs text-slate-400 truncate">
-              <span class="text-emerald-400 font-semibold">${Math.round(mac.cal)} kcal</span> •
-              <span class="text-sky-400">${mac.p.toFixed(1)}P</span> •
-              <span class="text-amber-400">${mac.c.toFixed(1)}K</span> •
-              <span class="text-rose-400">${mac.f.toFixed(1)}Y</span>
-            </div>
-          </div>
-          <div class="flex items-center gap-1 shrink-0">
-            <button onclick="changeAmount(${mIdx}, ${iIdx}, -1)" class="w-7 h-7 rounded bg-slate-800 text-slate-200 font-bold">−</button>
-            <input type="text" inputmode="decimal" data-fk="amt-${mIdx}-${iIdx}" value="${esc(fmtNum(item.amount))}" onchange="setAmount(${mIdx}, ${iIdx}, this.value)"
-              class="w-14 text-center text-sm py-1 rounded font-semibold" />
-            <span class="text-[11px] text-slate-400 w-9 truncate">${esc(f.unit)}</span>
-            <button onclick="changeAmount(${mIdx}, ${iIdx}, 1)" class="w-7 h-7 rounded bg-slate-800 text-slate-200 font-bold">+</button>
-            <button onclick="removeItem(${mIdx}, ${iIdx})" class="ml-0.5 text-rose-400 font-bold px-1 text-lg">&times;</button>
-          </div>
-        </div>`;
-    });
-    totalP += mP; totalC += mC; totalF += mF; totalCal += mCal;
-
-    html += `
-      <div data-meal-card="${mIdx}" class="card p-4 flex flex-col justify-between space-y-3 ${meal.done ? "card-done" : ""}" style="border-top: 3px solid ${planColor};">
-        <div>
-          <div class="flex justify-between items-start border-b border-slate-700/80 pb-2.5 mb-3 gap-2">
-            <div class="flex items-start gap-1.5 min-w-0">
-              <button class="drag-handle w-8 h-11 -ml-2 -mt-2 shrink-0 flex items-center justify-center text-slate-500" data-midx="${mIdx}" aria-label="Öğünü sürükleyerek taşı" style="touch-action: none; cursor: grab;">
-                <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="1.6"></circle><circle cx="10" cy="4" r="1.6"></circle><circle cx="4" cy="10" r="1.6"></circle><circle cx="10" cy="10" r="1.6"></circle><circle cx="4" cy="16" r="1.6"></circle><circle cx="10" cy="16" r="1.6"></circle></svg>
-              </button>
-              <input type="checkbox" ${meal.done ? "checked" : ""} onchange="toggleMealDone(${mIdx})" class="mt-1 w-5 h-5 accent-emerald-500 rounded shrink-0" />
-              <div class="min-w-0">
-                <h3 onclick="openMealModal(${mIdx})" class="font-bold text-sm md:text-base ${meal.done ? "line-through text-emerald-300" : "text-white"}">${meal.time ? `<span class="inline-block text-[11px] font-bold px-1.5 py-0.5 rounded-md mr-1 align-middle" style="background:${planColor}26;color:${planColor}">${esc(meal.time)}</span>` : ""}${esc(meal.title)}</h3>
-                <span class="text-xs text-slate-400">${esc(meal.targetNote || "")}</span>
-              </div>
-            </div>
-            <div class="text-right shrink-0">
-              <div class="text-sm font-bold text-emerald-400">${Math.round(mCal)} kcal</div>
-              <div class="text-xs space-x-1 font-medium">
-                <span class="text-sky-400">${Math.round(mP)}P</span><span class="text-amber-400">${Math.round(mC)}K</span><span class="text-rose-400">${Math.round(mF)}Y</span>
-              </div>
-            </div>
-          </div>
-          <div class="space-y-2">
-            ${itemsHtml || '<div class="text-xs text-slate-500 italic py-2">Bu öğünde henüz besin yok.</div>'}
-          </div>
-        </div>
-        <div class="pt-2 border-t border-slate-800/80 space-y-2">
-          <button onclick="openFoodPicker(${mIdx})" class="w-full text-left text-xs rounded-lg px-3 py-2.5 bg-slate-950 border border-slate-600 text-slate-300">🔍 Besin ara ve ekle...</button>
-          <div class="grid grid-cols-3 gap-1.5">
-            <button onclick="quickAdd(${mIdx}, 'whey_shake', 1)" class="text-[11px] bg-sky-900/50 text-sky-200 border border-sky-700/40 py-1.5 rounded-lg font-medium">⚡ +1 Shake</button>
-            <button onclick="quickAdd(${mIdx}, 'yesil_salata', 1)" class="text-[11px] bg-emerald-900/50 text-emerald-200 border border-emerald-700/40 py-1.5 rounded-lg font-medium">🥗 +Salata</button>
-            <button onclick="quickAdd(${mIdx}, 'ceviz', 20)" class="text-[11px] bg-amber-900/40 text-amber-200 border border-amber-700/40 py-1.5 rounded-lg font-medium">🌰 +20g Ceviz</button>
-          </div>
-          <div class="flex items-center justify-between gap-1 pt-1">
-            <div class="flex gap-1">
-              <button onclick="openMealModal(${mIdx})" class="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-3 h-10 rounded-lg">✎ Düzenle</button>
-              <button onclick="copyMeal(${mIdx})" class="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-3 h-10 rounded-lg">⧉ ${state.settings.separatePlans ? (state.dayType === "rest" ? "Antrenmana kopyala" : "Dinlenmeye kopyala") : "Kopyala"}</button>
-            </div>
-            <div class="flex gap-0.5">
-              <button onclick="deleteMeal(${mIdx})" class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 text-sm" aria-label="Öğünü sil">🗑️</button>
-            </div>
-          </div>
-        </div>
-      </div>`;
-  });
-  html += `<button onclick="openMealModal()" class="w-full min-h-[96px] rounded-2xl border-2 border-dashed flex items-center justify-center gap-2 font-semibold text-sm" style="border-color:${planColor}66;color:${planColor}">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
-    Yeni öğün ekle</button>`;
-  container.innerHTML = html;
-
-  const eaten = eatenTotals();
-  const view = state.settings.macroView === "eaten" ? "eaten" : "plan";
-  const shown = view === "eaten" ? eaten : { cal: totalCal, p: totalP, c: totalC, f: totalF };
-  updateMacroCard("cal", shown.cal, targets.calTarget, "");
-  updateMacroCard("pro", shown.p, targets.proTarget, "g");
-  updateMacroCard("carb", shown.c, targets.carbTarget, "g");
-  updateMacroCard("fat", shown.f, targets.fatTarget, "g");
-  const doneMeals = curMeals().filter(m => m.done).length;
-  $("mmPlanVal").textContent = Math.round(totalCal);
-  $("mmEatenVal").textContent = Math.round(eaten.cal);
-  $("mmEatenMeals").textContent = `${doneMeals}/${curMeals().length}`;
-  const onB = "flex items-center justify-center gap-1 text-[11px] py-1 rounded-lg border font-semibold ";
-  $("mmPlan").className = onB + (view === "plan" ? "bg-slate-700 border-slate-500 text-white" : "bg-slate-900 border-slate-800 text-slate-500");
-  $("mmEaten").className = onB + (view === "eaten" ? "bg-emerald-700 border-emerald-500 text-white" : "bg-slate-900 border-slate-800 text-slate-500");
+  $("timelineInfo").textContent = diffKg <= 0 ? `${fmtNum(target)} kg hedefine ulaştın!`
+    : weeklyLoss > 0 ? `Haftalık ~${weeklyLoss.toFixed(2).replace(".", ",")} kg kayıp → ${fmtNum(target)} kg hedefine ~${Math.ceil(diffKg / weeklyLoss)} hafta`
+    : "Kalori açığı yok: kilo koruma modu";
   const hint = coachHintText();
   $("coachHint").classList.toggle("hidden", !hint);
   $("coachHint").textContent = hint;
+
+  const isRest = state.dayType === "rest";
+  ["btnTrain", "mnTrain"].forEach(id => { $(id).className = isRest ? "" : "on"; });
+  ["btnRest", "mnRest"].forEach(id => { $(id).className = isRest ? "on" : ""; });
+  $("planSub").textContent = `${isRest ? "Dinlenme" : "Antrenman"} menüsü · hedef ${fmtInt(getTargets().calTarget)} kcal`;
+
+  renderWater();
+  renderSupps();
+  renderHero();
+  renderTodayMeals();
+  renderMenus();
+  renderFoods();
+  renderNutriHistory();
+}
+
+function renderHero() {
+  const targets = getTargets();
+  const plan = nutritionTotals();
+  const eaten = eatenTotals();
+  const view = state.settings.macroView === "eaten" ? "eaten" : "plan";
+  const shown = view === "eaten" ? eaten : plan;
+  updateMacroCard("cal", shown.cal, targets.calTarget, "kcal");
+  updateMacroCard("pro", shown.p, targets.proTarget, "g");
+  updateMacroCard("carb", shown.c, targets.carbTarget, "g");
+  updateMacroCard("fat", shown.f, targets.fatTarget, "g");
+  const meals = curMeals();
+  $("mmPlanVal").textContent = fmtInt(plan.cal);
+  $("mmEatenVal").textContent = fmtInt(eaten.cal);
+  $("mmEatenMeals").textContent = `${meals.filter(m => m.done).length}/${meals.length}`;
+  $("mmPlan").className = view === "plan" ? "on" : "";
+  $("mmEaten").className = view === "eaten" ? "on" : "";
 }
 
 function updateMacroCard(prefix, consumed, target, unit) {
   const cRound = Math.round(consumed);
   const diff = target - cRound;
-  $(`${prefix}Consumed`).textContent = cRound;
-  $(`${prefix}Target`).textContent = target;
+  const over = diff < 0;
+  const pct = target > 0 ? Math.min(100, Math.round((cRound / target) * 100)) : 0;
+  $(`${prefix}Consumed`).textContent = fmtInt(cRound);
+  $(`${prefix}Target`).textContent = fmtInt(target);
   const st = $(`${prefix}Status`);
-  if (diff >= 0) { st.textContent = `Kalan: ${diff}${unit}`; st.className = "text-[10px] font-semibold mt-0.5 truncate text-emerald-400"; }
-  else { st.textContent = `Aşım: +${Math.abs(diff)}${unit}`; st.className = "text-[10px] font-semibold mt-0.5 truncate text-rose-400"; }
-  $(`${prefix}Bar`).style.width = `${target > 0 ? Math.min(100, Math.round((cRound / target) * 100)) : 0}%`;
+  if (prefix === "cal") {
+    st.innerHTML = `<div class="text-[12px] font-semibold ${over ? "text-[#FB7185]" : "text-white/70"}">${over ? "Aşım" : "Kalan"}</div>
+      <div class="flex items-baseline gap-1 whitespace-nowrap"><span class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-white"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
+    const ring = $("calRing");
+    const C = 301.59;
+    ring.style.strokeDashoffset = String(C - (C * pct) / 100);
+    ring.setAttribute("stroke", over ? "#FB7185" : "#22C55E");
+    return;
+  }
+  st.textContent = over ? `+${Math.abs(diff)} ${unit} aşım` : `${diff} ${unit} kaldı`;
+  st.className = "text-[11px] mt-0.5 font-semibold " + (over ? "text-[#FB7185]" : "text-white/60");
+  $(`${prefix}Bar`).style.width = `${pct}%`;
 }
+
+// Su: her bardak 0,5 L; hedef kadar bardak çizilir, kısmen dolanlar kısmen boyanır
+function renderWater() {
+  const wt = num(state.settings.waterTarget, 3.5);
+  const w = state.waterLiters || 0;
+  $("waterVal").textContent = w.toFixed(2).replace(".", ",");
+  $("waterTarget").textContent = fmtNum(wt);
+  const cups = Math.max(4, Math.min(10, Math.ceil(wt / 0.5)));
+  let h = "";
+  for (let i = 0; i < cups; i++) {
+    const fill = Math.max(0, Math.min(1, (w - i * 0.5) / 0.5));
+    h += `<span class="n-cup ${fill >= 1 ? "full" : ""}"><i style="height:${Math.round(fill * 100)}%"></i></span>`;
+  }
+  $("waterCups").innerHTML = h;
+}
+
+// ---------------------------------------------------------------------------
+// BUGÜN: zaman çizelgesi
+// ---------------------------------------------------------------------------
+function renderTodayMeals() {
+  const db = getFoodDB();
+  const meals = curMeals();
+  const nextIdx = meals.findIndex(m => !m.done);
+  if (!meals.length) {
+    $("todayMeals").innerHTML = `<div class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[14px] n-muted">Bu menüde henüz öğün yok.</p>
+      <button onclick="setNutriView('menus')" class="n-btn h-12 px-6 rounded-full text-[14px]">Menülerim'e git</button></div>`;
+    return;
+  }
+  $("todayMeals").innerHTML = meals.map((meal, mIdx) => {
+    const t = mealTotals(meal);
+    const isNext = mIdx === nextIdx;
+    const last = mIdx === meals.length - 1;
+    const collapsed = meal.done && !openDoneMeals.has(meal.id);
+    const rail = `<div class="flex flex-col items-center w-11 shrink-0">
+        <label class="w-11 h-11 flex items-center justify-center cursor-pointer"><input type="checkbox" ${meal.done ? "checked" : ""} onchange="toggleMealDone(${mIdx})" class="n-check" aria-label="${esc(meal.title)}: yedim" /></label>
+        ${last ? "" : '<div class="w-[1.5px] flex-1 n-rail my-1 rounded-full"></div>'}
+      </div>`;
+    const time = meal.time ? esc(meal.time) : "";
+    if (collapsed) {
+      return `<div class="flex gap-2" data-today-meal="${mIdx}">${rail}
+        <button onclick="toggleMealOpen(${mIdx})" class="flex-1 min-w-0 min-h-[52px] mb-3 flex items-center justify-between gap-3 text-left" aria-expanded="false" aria-label="${esc(meal.title)} öğününü aç">
+          <div class="min-w-0"><div class="text-[12px] font-semibold n-muted">${time ? time + " · " : ""}yendi</div><div class="text-[16px] font-bold n-muted truncate">${esc(meal.title)}</div></div>
+          <div class="text-[14px] font-semibold n-muted whitespace-nowrap shrink-0">${fmtInt(t.cal)} kcal</div>
+        </button></div>`;
+    }
+    const status = meal.done ? "TAMAMLANDI" : isNext ? "SIRADAKİ" : "";
+    const label = [time, status].filter(Boolean).join(" · ");
+    const items = meal.items.map((item, iIdx) => {
+      const f = db[item.foodId];
+      if (!f) return "";
+      const mac = calcItemMacros(item);
+      const canSwap = !!swapGroup(item.foodId);
+      return `<div class="flex items-center justify-between gap-2 min-h-[44px] py-1">
+          <div class="min-w-0 flex-1 text-[14px] leading-snug"><span class="font-semibold">${esc(f.name)}</span> <span class="n-muted whitespace-nowrap">· ${fmtNum(effAmount(item))} ${esc(f.unit)}</span></div>
+          ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx})" class="n-chip swap text-[12px]" aria-label="${esc(f.name)} için ikame seç">⇄ İkame</button>` : ""}
+          <span class="text-[13px] font-semibold n-muted tabular-nums w-10 text-right shrink-0">${Math.round(mac.cal)}</span>
+        </div>`;
+    }).join("");
+    return `<div class="flex gap-2" data-today-meal="${mIdx}">${rail}
+      <div class="flex-1 min-w-0 pb-3">
+        <div class="n-card ${isNext ? "n-next" : ""} rounded-[22px] p-4 space-y-2">
+          ${meal.done
+            ? `<button onclick="toggleMealOpen(${mIdx})" class="w-full flex items-start justify-between gap-3 text-left min-h-[44px]" aria-expanded="true" aria-label="${esc(meal.title)} öğününü kapat">`
+            : `<div class="flex items-start justify-between gap-3">`}
+            <div class="min-w-0">
+              ${label ? `<div class="text-[11px] font-bold tracking-wide n-accent">${label}</div>` : ""}
+              <h3 class="text-[18px] font-extrabold leading-tight mt-0.5 break-words">${esc(meal.title)}</h3>
+              ${meal.targetNote ? `<div class="text-[12px] n-muted mt-0.5">${esc(meal.targetNote)}</div>` : ""}
+            </div>
+            <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[24px] leading-none tabular-nums">${fmtInt(t.cal)}</span><span class="text-[12px] n-muted ml-0.5">kcal</span>
+              <div class="text-[11px] font-semibold tabular-nums mt-0.5">${macroLine(t.p, t.c, t.f)}</div></div>
+          ${meal.done ? "</button>" : "</div>"}
+          <div class="n-div">${items || '<div class="text-[13px] n-dim py-2">Bu öğünde henüz besin yok.</div>'}</div>
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="toggleMealDone(${mIdx})" class="${meal.done ? "n-btn-ghost" : "n-btn"} h-12 rounded-full text-[14px] flex items-center justify-center gap-1.5">${meal.done ? svgI("check", 18, 2.6) + "Yendi" : "Yedim"}</button>
+            <button onclick="goAddFood(${mIdx})" class="n-btn-outline h-12 rounded-full text-[14px] flex items-center justify-center gap-1.5">${svgI("plus", 18, 2.4)}Besin</button>
+          </div>
+        </div>
+      </div></div>`;
+  }).join("");
+}
+
+// ---------------------------------------------------------------------------
+// MENÜLERİM
+// ---------------------------------------------------------------------------
+function renderMenus() {
+  const db = getFoodDB();
+  const targets = getTargets();
+  const plan = nutritionTotals();
+  const diff = Math.round(plan.cal) - targets.calTarget;
+  const tol = Math.max(50, Math.round(targets.calTarget * 0.05));
+  const ok = Math.abs(diff) <= tol;
+  const statusHtml = ok
+    ? `<span class="font-bold n-accent flex items-center gap-1">${svgI("check", 16, 2.6)}Hedefe uygun</span>`
+    : diff > 0 ? `<span class="font-bold n-over">${fmtInt(diff)} kcal fazla</span>` : `<span class="font-bold n-k">${fmtInt(-diff)} kcal eksik</span>`;
+  const pk = plan.p * 4, ck = plan.c * 4, fk = plan.f * 9, sum = pk + ck + fk || 1;
+  const pct = x => Math.round((x / sum) * 100);
+  $("menuTotal").innerHTML = `
+    <div class="flex items-center justify-between gap-2 text-[13px]"><span class="n-muted">Menü toplamı</span>${statusHtml}</div>
+    <div class="flex items-baseline gap-1.5 flex-wrap"><span class="t-display text-[36px] leading-none tabular-nums">${fmtInt(plan.cal)}</span><span class="text-[14px] font-semibold n-muted">/ ${fmtInt(targets.calTarget)} kcal hedef</span></div>
+    <div class="h-2.5 w-full rounded-full overflow-hidden flex gap-1" aria-hidden="true">
+      <div class="h-full rounded-l-full" style="width:${pct(pk)}%;background:var(--n-p)"></div>
+      <div class="h-full" style="width:${pct(ck)}%;background:var(--n-k)"></div>
+      <div class="h-full rounded-r-full" style="width:${pct(fk)}%;background:var(--n-y)"></div>
+    </div>
+    <div class="grid grid-cols-3 gap-2 text-[12px]">
+      <div><strong class="n-p text-[14px]">${Math.round(plan.p)} g</strong> <span class="n-muted">protein</span><div class="n-dim">hedef ${targets.proTarget} g · %${pct(pk)}</div></div>
+      <div><strong class="n-k text-[14px]">${Math.round(plan.c)} g</strong> <span class="n-muted">karb</span><div class="n-dim">hedef ${targets.carbTarget} g · %${pct(ck)}</div></div>
+      <div><strong class="n-y text-[14px]">${Math.round(plan.f)} g</strong> <span class="n-muted">yağ</span><div class="n-dim">hedef ${targets.fatTarget} g · %${pct(fk)}</div></div>
+    </div>`;
+
+  // Kiloya göre gramaj kartı
+  const st = state.settings;
+  const k = scaleK();
+  $("scaleCard").innerHTML = `
+    <label class="flex items-center justify-between gap-3 cursor-pointer min-h-[44px]">
+      <span class="min-w-0"><span class="block text-[15px] font-bold">Kiloya göre gramaj</span>
+        <span class="block text-[12px] n-muted">Kilon değişince menüdeki gramajlar da orantılı değişir.</span></span>
+      <input id="scaleToggle" type="checkbox" class="n-sw" ${st.scaleOn ? "checked" : ""} onchange="toggleWeightScale(this.checked)" />
+    </label>
+    ${st.scaleOn ? `
+      <div class="n-elev rounded-2xl px-3.5 py-3 space-y-1">
+        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">Referans kilo</span><strong>${fmtNum(num(st.scaleBase, state.weight))} kg</strong></div>
+        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">Şimdiki kilo</span><strong>${fmtNum(state.weight)} kg</strong></div>
+        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">Gramaj oranı</span><strong class="n-accent">%${Math.round(k * 100)}</strong></div>
+      </div>
+      <button onclick="resetScaleBase()" class="n-btn-outline w-full h-11 rounded-full text-[13px]">Şimdiki gramajları sabitle (referansı ${fmtNum(state.weight)} kg yap)</button>
+      <p class="text-[12px] n-dim">Yalnızca gram ve ml ile ölçülen besinler değişir (tavuk, pirinç, yulaf...). Adet, kase, ölçek gibi besinler aynı kalır. Oran en fazla %70–%130 arasında uygulanır. Ayarı kapatırsan menü ilk gramajlarına döner.</p>` : ""}`;
+
+  // Öğün listesi
+  const meals = curMeals();
+  const copyLabel = state.dayType === "rest" ? "Antrenmana kopyala" : "Dinlenmeye kopyala";
+  let html = meals.map((meal, mIdx) => {
+    const t = mealTotals(meal);
+    const open = openMenuMeals.has(meal.id);
+    const head = `<div class="flex items-center gap-1">
+        <button class="drag-handle w-11 h-11 -ml-2 shrink-0 flex items-center justify-center n-dim" data-midx="${mIdx}" aria-label="Öğünü sürükleyerek taşı" style="touch-action: none; cursor: grab;">
+          <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="1.6"></circle><circle cx="10" cy="4" r="1.6"></circle><circle cx="4" cy="10" r="1.6"></circle><circle cx="10" cy="10" r="1.6"></circle><circle cx="4" cy="16" r="1.6"></circle><circle cx="10" cy="16" r="1.6"></circle></svg>
+        </button>
+        <button onclick="toggleMenuMeal(${mIdx})" class="flex-1 min-w-0 min-h-[52px] flex items-center gap-3 text-left" aria-expanded="${open}" aria-label="${esc(meal.title)} öğününü ${open ? "kapat" : "aç"}">
+          ${meal.time ? `<span class="t-display text-[18px] n-accent tabular-nums shrink-0">${esc(meal.time)}</span>` : ""}
+          <span class="flex-1 min-w-0"><span class="block text-[15px] font-bold leading-snug break-words">${esc(meal.title)}</span>
+            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${fmtInt(t.cal)} kcal · ${macroLine(t.p, t.c, t.f)} · ${t.n} besin</span></span>
+          <span class="n-dim shrink-0">${svgI(open ? "chevD" : "chevR", 18)}</span>
+        </button>
+      </div>`;
+    if (!open) return `<div data-meal-card="${mIdx}" class="n-card rounded-[20px] px-3 py-1.5">${head}</div>`;
+    const items = meal.items.map((item, iIdx) => {
+      const f = db[item.foodId];
+      if (!f) return "";
+      const mac = calcItemMacros(item);
+      const canSwap = !!swapGroup(item.foodId);
+      return `<div class="py-2.5">
+          <div class="flex items-center gap-1 min-h-[24px]">
+            <div class="flex-1 min-w-0 text-[15px] font-semibold truncate">${esc(f.name)}</div>
+            <div class="shrink-0 text-[14px] font-bold tabular-nums">${Math.round(mac.cal)} <span class="text-[12px] font-semibold n-dim">kcal</span></div>
+            ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 shrink-0 rounded-full flex items-center justify-center n-accent text-[18px] font-bold" aria-label="${esc(f.name)} için ikame seç">⇄</button>` : ""}
+            <button onclick="removeItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(f.name)} çıkar">${svgI("x", 18, 2.2)}</button>
+          </div>
+          <div class="flex items-center justify-between gap-2 mt-2">
+            <div class="text-[12px] font-semibold tabular-nums leading-tight min-w-0">${macroLine(mac.p, mac.c, mac.f, true)}</div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button onclick="changeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(f.name)} azalt">${svgI("minus", 18, 2.4)}</button>
+              <input type="text" inputmode="decimal" data-fk="amt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="setAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt" aria-label="${esc(f.name)} miktarı" />
+              <span class="text-[11px] n-muted w-12 truncate">${esc(f.unit)}</span>
+              <button onclick="changeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(f.name)} artır">${svgI("plus", 18, 2.4)}</button>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+    return `<div data-meal-card="${mIdx}" class="n-card n-sel rounded-[20px] px-3.5 pt-1.5 pb-3.5 space-y-3">
+        ${head}
+        ${meal.targetNote ? `<div class="text-[12px] n-muted -mt-2 pl-10">${esc(meal.targetNote)}</div>` : ""}
+        <div class="n-div n-bt">${items || '<div class="text-[13px] n-dim py-3">Bu öğünde henüz besin yok.</div>'}</div>
+        <button onclick="goAddFood(${mIdx})" class="n-btn w-full h-12 rounded-full text-[14px] flex items-center justify-center gap-1.5">${svgI("plus", 18, 2.4)}Besin ekle</button>
+        <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-0.5 px-0.5">
+          <button onclick="quickAdd(${mIdx}, 'whey_shake', 1)" class="n-chip">+1 Shake</button>
+          <button onclick="quickAdd(${mIdx}, 'yesil_salata', 1)" class="n-chip">+ Salata</button>
+          <button onclick="quickAdd(${mIdx}, 'ceviz', 20)" class="n-chip">+20 g Ceviz</button>
+        </div>
+        <div class="flex items-center justify-end gap-1.5 pt-2 n-bt">
+          <button onclick="openMealModal(${mIdx})" class="n-btn-ghost w-11 h-11 shrink-0 rounded-full flex items-center justify-center" aria-label="${esc(meal.title)} öğününü düzenle">${svgI("edit", 18)}</button>
+          <button onclick="copyMeal(${mIdx})" class="n-btn-ghost h-11 px-4 shrink-0 whitespace-nowrap rounded-full text-[13px] flex items-center gap-1.5">${svgI("copy", 16)}${copyLabel}</button>
+          <button onclick="deleteMeal(${mIdx})" class="n-btn-ghost w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(meal.title)} öğününü sil">${svgI("trash", 18)}</button>
+        </div>
+      </div>`;
+  }).join("");
+  html += `<button onclick="openMealModal()" class="w-full min-h-[60px] rounded-[20px] border-[1.5px] border-dashed n-accent flex items-center justify-center gap-2 font-bold text-[14px]" style="border-color: var(--n-accent)">
+    ${svgI("plus", 20, 2.4)}Yeni öğün ekle</button>`;
+  $("mealsContainer").innerHTML = html;
+}
+
+// ---------------------------------------------------------------------------
+// BESİNLER (arama, kategori, gramaj, hazır porsiyon, canlı kalan)
+// ---------------------------------------------------------------------------
+const foodUI = { meal: null, cat: "all", sel: null, amt: 0 };
+function foodTargetIdx() {
+  const meals = curMeals();
+  if (!meals.length) return -1;
+  if (foodUI.meal != null && foodUI.meal >= 0 && foodUI.meal < meals.length) return foodUI.meal;
+  const nx = meals.findIndex(m => !m.done);
+  return nx >= 0 ? nx : 0;
+}
+function goAddFood(mIdx) {
+  foodUI.meal = mIdx;
+  foodUI.sel = null;
+  state.nutriView = "foods";
+  window.scrollTo(0, 0);
+  renderAll();
+}
+function setFoodMeal(i) { foodUI.meal = i; renderAll(); }
+function setFoodCat(c) { foodUI.cat = c; foodUI.sel = null; renderFoods(); }
+function foodCatKey(cat) { return "c:" + String(cat || "Diğer"); }
+
+function renderFoods() {
+  const meals = curMeals();
+  const tIdx = foodTargetIdx();
+  $("foodMealChips").innerHTML = meals.map((m, i) => `<button onclick="setFoodMeal(${i})" class="n-chip ${i === tIdx ? "solid" : ""} max-w-[220px]" aria-pressed="${i === tIdx}"><span class="truncate">${esc(m.time ? m.time + " · " + m.title : m.title)}</span></button>`).join("");
+  const db = getFoodDB();
+  const cats = [];
+  if (state.recentFoods.some(id => db[id])) cats.push(["recent", "Son kullanılanlar"]);
+  if (Object.keys(state.customFoods).length) cats.push(["custom", "Özel eklediklerim"]);
+  [...new Set(Object.values(BASE_FOOD_DB).map(f => f.cat || "Diğer"))].forEach(c => cats.push([foodCatKey(c), stripEmoji(c)]));
+  if (!cats.some(c => c[0] === foodUI.cat)) foodUI.cat = "all";
+  $("foodCats").innerHTML = [["all", "Tümü"], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
+  renderFoodHead();
+  renderFoodList();
+}
+
+function foodRemainingText(extraCal, extraP) {
+  const targets = getTargets();
+  const plan = nutritionTotals();
+  const rc = targets.calTarget - Math.round(plan.cal + extraCal);
+  const rp = targets.proTarget - Math.round(plan.p + extraP);
+  const c = rc >= 0 ? `<strong class="tabular-nums">${fmtInt(rc)} kcal</strong> kalır` : `<strong class="tabular-nums n-over">${fmtInt(-rc)} kcal</strong> aşar`;
+  const p = rp >= 0 ? `<strong class="n-p tabular-nums">${fmtInt(rp)} g</strong> protein kalır` : `protein hedefi <strong class="n-p">${fmtInt(-rp)} g</strong> aşılır`;
+  return `${c} · ${p}`;
+}
+function renderFoodHead() {
+  const meals = curMeals();
+  const tIdx = foodTargetIdx();
+  if (tIdx < 0) {
+    $("foodHead").innerHTML = `<div class="n-card rounded-[20px] p-4 text-[14px] n-muted">Besin eklemek için önce Menülerim'den bir öğün oluştur.</div>`;
+    return;
+  }
+  const sel = foodSelMacros();
+  $("foodHead").innerHTML = `<div class="flex items-start justify-between gap-2">
+      <div class="min-w-0"><div class="n-label">HANGİ ÖĞÜNE?</div>
+        <h2 class="text-[20px] font-extrabold leading-tight mt-0.5 break-words">${esc(meals[tIdx].title)}</h2></div>
+    </div>
+    <p id="foodRemain" class="text-[13px] n-muted mt-1">${sel ? "Ekledikten sonra menüde " : "Menüde "}${foodRemainingText(sel ? sel.cal : 0, sel ? sel.p : 0)}</p>`;
+}
+
+function foodSelMacros() {
+  const f = foodUI.sel && getFoodDB()[foodUI.sel];
+  if (!f) return null;
+  const a = num(foodUI.amt, 0);
+  return { f, a, p: f.p * a, c: f.c * a, fat: f.f * a, cal: kcalPerUnit(f) * a };
+}
+
+function foodPresets(f) {
+  const def = num(f.def, 1);
+  let vals;
+  if (f.unit === "g") vals = [def, 50, 100, 150, 200];
+  else if (f.unit === "ml") vals = [def, 100, 200, 250, 330];
+  else vals = [def, 0.5, 1, 2, 3].filter(v => v >= num(f.step, 1) || v === def);
+  vals = [...new Set(vals.map(v => round1(v)))].filter(v => v > 0).sort((a, b) => a - b);
+  const plus = f.unit === "g" || f.unit === "ml" ? 50 : num(f.step, 1);
+  return { vals, plus };
+}
+
+function renderFoodList() {
+  const db = getFoodDB();
+  const q = normSearch($("foodSearch").value).trim();
+  const words = q.split(/\s+/).filter(Boolean);
+  let ids;
+  if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id]);
+  else if (foodUI.cat === "custom") ids = Object.keys(state.customFoods).filter(id => db[id]);
+  else if (foodUI.cat.startsWith("c:")) ids = Object.keys(db).filter(id => foodCatKey(db[id].cat) === foodUI.cat);
+  else ids = Object.keys(db);
+  if (words.length) ids = ids.filter(id => { const hay = normSearch(db[id].name + " " + (db[id].cat || "")); return words.every(w => hay.includes(w)); });
+  const tIdx = foodTargetIdx();
+  const html = ids.map(id => {
+    const f = db[id];
+    const def = num(f.def, 1);
+    if (id !== foodUI.sel) {
+      return `<button onclick='selectFood(${esc(JSON.stringify(id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-food="${esc(id)}">
+          <span class="min-w-0"><span class="block text-[15px] font-bold leading-snug">${esc(f.name)}</span>
+            <span class="block text-[12px] n-muted mt-0.5 tabular-nums">${fmtNum(def)} ${esc(f.unit)} · ${Math.round(kcalPerUnit(f) * def)} kcal · ${Math.round(f.p * def)} g protein</span></span>
+          <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
+        </button>`;
+    }
+    const pr = foodPresets(f);
+    const custom = id.startsWith("custom_");
+    return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3.5 my-2" data-food="${esc(id)}" id="foodSelCard">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(f.name)}</h3>
+            <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? " · barkod " + esc(f.barcode) : ""}</div></div>
+          <div class="text-right shrink-0 whitespace-nowrap"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
+        </div>
+        <div class="flex items-center justify-between px-1">
+          <button onclick="foodStep(-1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Azalt">${svgI("minus", 20, 2.4)}</button>
+          <div class="flex items-baseline justify-center gap-1 min-w-0">
+            <input id="foodAmt" type="text" inputmode="decimal" data-fk="food-amt" value="${esc(fmtNum(foodUI.amt))}" oninput="foodAmtInput(this.value)" class="n-amt big t-display" aria-label="${esc(f.name)} miktarı" />
+            <span class="text-[14px] font-semibold n-muted">${esc(f.unit)}</span>
+          </div>
+          <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Artır">${svgI("plus", 20, 2.4)}</button>
+        </div>
+        <div class="flex items-center justify-center gap-2 flex-wrap" aria-label="Hazır porsiyonlar">
+          ${pr.vals.map(v => `<button onclick="foodPreset(${v})" class="n-chip ${round1(num(foodUI.amt)) === v ? "on" : ""}" data-preset="${v}">${fmtNum(v)} ${esc(f.unit)}${v === round1(num(f.def, 1)) ? " · porsiyon" : ""}</button>`).join("")}
+          <button onclick="foodPreset(null, ${pr.plus})" class="n-chip">+${fmtNum(pr.plus)} ${esc(f.unit)}</button>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center text-[13px] font-extrabold">
+          <div id="foodSelP" class="py-2 rounded-full n-p" style="background: color-mix(in srgb, var(--n-p) 14%, transparent)"></div>
+          <div id="foodSelC" class="py-2 rounded-full n-k" style="background: color-mix(in srgb, var(--n-k) 14%, transparent)"></div>
+          <div id="foodSelF" class="py-2 rounded-full n-y" style="background: color-mix(in srgb, var(--n-y) 14%, transparent)"></div>
+        </div>
+        <button id="foodAddBtn" onclick="addSelectedFood()" class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}></button>
+        ${custom ? `<div class="flex justify-end gap-2 pt-1 n-bt">
+            <button onclick='editCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5">${svgI("edit", 16)}Düzenle</button>
+            <button onclick='deleteCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}Sil</button>
+          </div>` : ""}
+      </div>`;
+  }).join("");
+  $("foodList").innerHTML = html || `<div class="text-[14px] n-muted text-center py-8">Sonuç bulunamadı. Barkod okutabilir ya da özel besin tanımlayabilirsin.</div>`;
+  updateFoodSelUI();
+}
+
+// Seçili besinin canlı değerleri (tam yeniden çizim yapmadan; iPhone'da klavye kapanmasın)
+function updateFoodSelUI() {
+  const s = foodSelMacros();
+  if (s && $("foodSelKcal")) {
+    const tIdx = foodTargetIdx();
+    $("foodSelKcal").textContent = fmtInt(s.cal);
+    $("foodSelP").textContent = `${fmtNum(s.p)} g P`;
+    $("foodSelC").textContent = `${fmtNum(s.c)} g K`;
+    $("foodSelF").textContent = `${fmtNum(s.fat)} g Y`;
+    $("foodAddBtn").textContent = tIdx >= 0 ? `Öğüne ekle · ${fmtInt(s.cal)} kcal` : "Önce bir öğün oluştur";
+    $("foodAddBtn").disabled = tIdx < 0 || !(s.a > 0);
+    document.querySelectorAll("#foodSelCard [data-preset]").forEach(b => b.classList.toggle("on", num(b.dataset.preset) === round1(s.a)));
+  }
+  const r = $("foodRemain");
+  if (r) r.innerHTML = (s ? "Ekledikten sonra menüde " : "Menüde ") + foodRemainingText(s ? s.cal : 0, s ? s.p : 0);
+}
+function selectFood(id) {
+  const f = getFoodDB()[id];
+  if (!f) return;
+  foodUI.sel = id;
+  foodUI.amt = round1(num(f.def, 1));
+  renderFoodHead();
+  renderFoodList();
+  const el = $("foodSelCard");
+  if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+function foodAmtInput(v) { foodUI.amt = Math.max(0, num(v, 0)); updateFoodSelUI(); }
+function foodStep(dir) {
+  const f = foodUI.sel && getFoodDB()[foodUI.sel];
+  if (!f) return;
+  foodUI.amt = Math.max(0, round1(num(foodUI.amt) + dir * num(f.step, 1)));
+  $("foodAmt").value = fmtNum(foodUI.amt);
+  updateFoodSelUI();
+}
+function foodPreset(v, plus) {
+  foodUI.amt = plus ? round1(num(foodUI.amt) + plus) : round1(v);
+  $("foodAmt").value = fmtNum(foodUI.amt);
+  updateFoodSelUI();
+}
+function addSelectedFood() {
+  const s = foodSelMacros();
+  const tIdx = foodTargetIdx();
+  if (!s || tIdx < 0 || !(s.a > 0)) return;
+  const mealTitle = curMeals()[tIdx].title;
+  quickAdd(tIdx, foodUI.sel, s.a);
+  toast(`✓ ${fmtNum(s.a)} ${s.f.unit} ${s.f.name} → ${mealTitle}`);
+  foodUI.sel = null;
+  renderFoods();
+}
+
+// ---------------------------------------------------------------------------
+// GEÇMİŞ
+// ---------------------------------------------------------------------------
+function renderNutriHistory() {
+  const t = getTargets();
+  const plan = nutritionTotals();
+  const eaten = eatenTotals();
+  const meals = curMeals();
+  const sup = state.supplements || {};
+  const rows = [{
+    key: state.today || todayStr(), live: true, dayType: state.dayType,
+    eatenKcal: eaten.cal, eatenP: eaten.p, kcal: plan.cal, calTarget: t.calTarget, proTarget: t.proTarget,
+    water: state.waterLiters || 0, mealsDone: meals.filter(m => m.done).length, mealsTotal: meals.length,
+    supps: state.supplementList.filter(x => sup[x.id]).length
+  }];
+  Object.keys(state.dailyLogs).sort().reverse().filter(k => k !== rows[0].key).slice(0, 60).forEach(k => rows.push({ key: k, ...state.dailyLogs[k] }));
+  const dayLabel = k => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString("tr-TR", { weekday: "short", day: "numeric", month: "short" }) : k;
+  };
+  const card = r => {
+    const hasEaten = r.eatenKcal != null;
+    const kc = Math.round(num(hasEaten ? r.eatenKcal : r.kcal, 0));
+    const tg = Math.round(num(r.calTarget, 0));
+    const pct = tg > 0 ? Math.min(100, Math.round(kc / tg * 100)) : 0;
+    const over = tg > 0 && kc > tg;
+    const bits = [];
+    if (r.eatenP != null) bits.push(`Protein <strong>${fmtInt(r.eatenP)}</strong>${r.proTarget ? " / " + fmtInt(r.proTarget) : ""} g`);
+    if (r.water != null) bits.push(`Su <strong>${fmtNum(num(r.water))}</strong> L`);
+    if (r.mealsTotal) bits.push(`Öğün <strong>${num(r.mealsDone)}/${num(r.mealsTotal)}</strong>`);
+    if (r.supps != null) bits.push(`Takviye <strong>${num(r.supps)}</strong>`);
+    return `<div class="n-card rounded-[20px] p-4 space-y-2.5" data-history-day="${esc(r.key)}">
+        <div class="flex items-center justify-between gap-2">
+          <div class="text-[15px] font-bold">${r.live ? "Bugün" : esc(dayLabel(r.key))}${r.live ? ' <span class="text-[12px] font-semibold n-accent">· devam ediyor</span>' : ""}</div>
+          ${r.dayType ? `<span class="text-[12px] font-semibold n-muted">${r.dayType === "rest" ? "Dinlenme" : "Antrenman"}</span>` : ""}
+        </div>
+        <div class="flex items-baseline gap-1.5"><span class="t-display text-[26px] leading-none tabular-nums ${over ? "n-over" : ""}">${fmtInt(kc)}</span>
+          <span class="text-[13px] n-muted">${tg ? "/ " + fmtInt(tg) + " " : ""}kcal ${hasEaten ? "yenen" : "planlanan"}</span></div>
+        ${tg ? `<div class="h-1.5 rounded-full n-bar-bg overflow-hidden"><div class="h-full rounded-full" style="width:${pct}%;background:${over ? "var(--n-over)" : "var(--n-accent)"}"></div></div>` : ""}
+        ${bits.length ? `<div class="text-[12px] n-muted flex flex-wrap gap-x-3 gap-y-1">${bits.map(b => `<span>${b}</span>`).join("")}</div>` : ""}
+      </div>`;
+  };
+  $("nutriHistory").innerHTML = rows.map(card).join("")
+    + (rows.length === 1 ? `<p class="text-[13px] n-muted text-center py-2">Her gün gece yarısı (ya da "Yeni gün" ile) günün özeti buraya eklenir.</p>` : "")
+    + `<button onclick="switchTab('progress')" class="n-btn-outline w-full h-12 rounded-full text-[14px]">Grafikler için İlerleme sekmesine git</button>`;
+}
+
+// ---------------------------------------------------------------------------
+// BARKOD (kamera → ZXing; ürün bilgisi Open Food Facts'ten, internet gerekir)
+// ---------------------------------------------------------------------------
+const bc = { reader: null, token: 0, found: null };
+let cfPendingBarcode = null;
+function bcStatus(msg) { $("bcStatus").textContent = msg || ""; }
+function openBarcode() {
+  $("bcResult").innerHTML = "";
+  $("bcManual").value = "";
+  bc.found = null;
+  const m = $("barcodeModal");
+  m.classList.remove("hidden"); m.classList.add("flex");
+  startScan();
+}
+function closeBarcode() { stopScan(); closeModal("barcodeModal"); }
+function loadZXing() {
+  return new Promise((res, rej) => {
+    if (window.ZXing) { res(window.ZXing); return; }
+    const s = document.createElement("script");
+    s.src = "vendor/zxing.min.js";
+    s.onload = () => window.ZXing ? res(window.ZXing) : rej(new Error("ZXing yüklenemedi"));
+    s.onerror = () => rej(new Error("ZXing yüklenemedi"));
+    document.head.appendChild(s);
+  });
+}
+async function startScan() {
+  stopScan();
+  const token = bc.token;
+  const wrap = $("bcCamWrap");
+  wrap.classList.remove("hidden");
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    wrap.classList.add("hidden");
+    bcStatus("Bu cihazda kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin.");
+    return;
+  }
+  bcStatus("Kamera açılıyor…");
+  try {
+    const Z = await loadZXing();
+    if (token !== bc.token) return;
+    const hints = new Map();
+    hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13, Z.BarcodeFormat.EAN_8, Z.BarcodeFormat.UPC_A, Z.BarcodeFormat.UPC_E, Z.BarcodeFormat.CODE_128]);
+    const reader = new Z.BrowserMultiFormatReader(hints, 250);
+    bc.reader = reader;
+    await reader.decodeFromConstraints({ audio: false, video: { facingMode: { ideal: "environment" } } }, $("bcVideo"), (result) => {
+      if (!result || token !== bc.token) return;
+      const code = result.getText();
+      stopScan();
+      wrap.classList.add("hidden");
+      onBarcode(code);
+    });
+    if (token === bc.token) bcStatus("Barkodu çerçevenin içine getir.");
+  } catch (e) {
+    if (token !== bc.token) return;
+    stopScan();
+    wrap.classList.add("hidden");
+    const name = e && e.name;
+    bcStatus(name === "NotAllowedError" || name === "SecurityError"
+      ? "Kamera izni verilmedi. iPhone'da Ayarlar → Safari → Kamera'dan izin verebilirsin. Numarayı aşağıya elle de yazabilirsin."
+      : name === "NotFoundError" || name === "OverconstrainedError"
+        ? "Kamera bulunamadı. Barkod numarasını aşağıya elle yazabilirsin."
+        : "Kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin.");
+  }
+}
+function stopScan() {
+  bc.token++;
+  try { if (bc.reader) bc.reader.reset(); } catch (e) { /* yoksay */ }
+  bc.reader = null;
+  const v = $("bcVideo");
+  if (v && v.srcObject) { try { v.srcObject.getTracks().forEach(t => t.stop()); } catch (e) { /* yoksay */ } v.srcObject = null; }
+}
+function barcodeManual() { stopScan(); $("bcCamWrap").classList.add("hidden"); onBarcode($("bcManual").value); }
+
+async function onBarcode(raw) {
+  const code = String(raw || "").replace(/\D/g, "");
+  $("bcResult").innerHTML = "";
+  if (code.length < 8 || code.length > 14) { bcStatus("Geçerli bir barkod numarası değil (8–14 rakam olmalı)."); return; }
+  $("bcManual").value = code;
+  const local = Object.keys(state.customFoods).find(id => state.customFoods[id] && state.customFoods[id].barcode === code);
+  if (local) {
+    closeBarcode();
+    pickFoodInFoods(local);
+    toast(`✓ ${state.customFoods[local].name} listende vardı; miktarı seçip öğüne ekle`);
+    return;
+  }
+  if (navigator.onLine === false) {
+    bcStatus(`${code} okundu. Ürünü bulmak için internet gerekli. Bağlanınca tekrar dene ya da besini elle ekle.`);
+    bcManualButton(code, "");
+    return;
+  }
+  bcStatus(`${code} aranıyor…`);
+  let p;
+  try { p = await fetchOFF(code); }
+  catch (e) {
+    bcStatus("Ürün bilgisine ulaşılamadı. İnternet bağlantını kontrol edip tekrar dene ya da besini elle ekle.");
+    bcManualButton(code, "");
+    return;
+  }
+  if ($("bcManual").value !== code) return;   // bu arada başka barkod arandı
+  if (!p) {
+    bcStatus(`${code} veritabanında bulunamadı.`);
+    bcManualButton(code, "");
+    return;
+  }
+  const n = p.nutriments || {};
+  const v = k => { const x = n[k]; return x === "" || x == null ? NaN : num(x, NaN); };
+  const pr = v("proteins_100g"), cb = v("carbohydrates_100g"), ft = v("fat_100g");
+  let kcal = v("energy-kcal_100g");
+  if (!isFinite(kcal) && isFinite(v("energy_100g"))) kcal = v("energy_100g") / 4.184;
+  const name = String(p.product_name_tr || p.product_name || "").trim() || `Ürün ${code}`;
+  const brand = String(p.brands || "").split(",")[0].trim();
+  const unit = String(p.product_quantity_unit || "").toLowerCase() === "ml" ? "ml" : "g";
+  const serving = num(p.serving_quantity, 0);
+  const complete = [pr, cb, ft].every(x => isFinite(x) && x >= 0);
+  bc.found = { code, name, brand, unit, p: pr, c: cb, f: ft, def: serving > 0 && serving <= 1000 ? Math.round(serving) : 100 };
+  bcStatus(complete ? "Ürün bulundu." : "Ürün bulundu ama besin değerleri eksik.");
+  $("bcResult").innerHTML = `<div class="n-elev rounded-[20px] p-4 space-y-2.5">
+      <div><div class="text-[16px] font-bold leading-snug break-words">${esc(name)}</div><div class="text-[12px] n-muted">${brand ? esc(brand) + " · " : ""}${code}</div></div>
+      ${complete
+        ? `<div class="text-[13px]"><span class="n-muted">100 ${unit}:</span> <strong>${Math.round(isFinite(kcal) ? kcal : pr * 4 + cb * 4 + ft * 9)} kcal</strong> · <span class="n-p">${fmtNum(pr)} g P</span> · <span class="n-k">${fmtNum(cb)} g K</span> · <span class="n-y">${fmtNum(ft)} g Y</span></div>
+           <button onclick="addBarcodeFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Listeme ekle ve seç</button>`
+        : `<p class="text-[13px] n-muted">Paketin üzerindeki 100 ${unit} değerleriyle elle ekleyebilirsin.</p>
+           <button onclick="barcodeManualFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Elle ekle</button>`}
+    </div>`;
+}
+function bcManualButton(code, name) {
+  bc.found = { code, name };
+  $("bcResult").innerHTML = `<button onclick="barcodeManualFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">Besini elle ekle</button>`;
+}
+async function fetchOFF(code) {
+  const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
+  const timer = setTimeout(() => { if (ctrl) ctrl.abort(); }, 10000);
+  try {
+    const r = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,product_name_tr,brands,nutriments,serving_quantity,product_quantity_unit`, ctrl ? { signal: ctrl.signal } : {});
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    return j && j.status === 1 && j.product ? j.product : null;
+  } finally { clearTimeout(timer); }
+}
+function addBarcodeFood() {
+  const b = bc.found;
+  if (!b || !isFinite(b.p)) return;
+  const id = "custom_bc_" + b.code;
+  const nm = (b.brand && !b.name.toLocaleLowerCase("tr").includes(b.brand.toLocaleLowerCase("tr")) ? `${b.name} (${b.brand})` : b.name).slice(0, 70);
+  state.customFoods[id] = { name: "⭐ " + nm, cat: "⭐ Özel Eklediklerim", unit: b.unit, step: 10, def: b.def, p: b.p / 100, c: b.c / 100, f: b.f / 100, barcode: b.code };
+  closeBarcode();
+  pickFoodInFoods(id);
+  toast(`✓ ${nm} listene eklendi; miktarı seçip öğüne ekle`);
+}
+function barcodeManualFood() {
+  const b = bc.found || {};
+  closeBarcode();
+  openCustomFoodModal();
+  if (b.name) $("cfName").value = b.name;
+  cfPendingBarcode = b.code || null;
+}
+function pickFoodInFoods(id) {
+  state.nutriView = "foods";
+  foodUI.cat = "all";
+  $("foodSearch").value = "";
+  renderAll();
+  selectFood(id);
+}
+document.addEventListener("click", e => { if (e.target && e.target.id === "barcodeModal") closeBarcode(); });
 
 function updateProfile() {
   state.weight = round1(num($("weightSlider").value, state.weight));
@@ -774,7 +1453,13 @@ function deleteWeightLog(idx) {
 
 function addWater(delta) { state.waterLiters = Math.max(0, Math.round(((state.waterLiters || 0) + delta) * 100) / 100); renderAll(); }
 function toggleSupp(key) { state.supplements[key] = !state.supplements[key]; renderAll(); }
-function toggleMealDone(mIdx) { curMeals()[mIdx].done = !curMeals()[mIdx].done; renderAll(); }
+function toggleMealDone(mIdx) {
+  const m = curMeals()[mIdx];
+  if (!m) return;
+  m.done = !m.done;
+  openDoneMeals.delete(m.id);
+  renderAll();
+}
 function setDayType(type) { state.dayType = type; renderAll(); }
 function renameMeal(mIdx) {
   const m = curMeals()[mIdx];
@@ -782,19 +1467,21 @@ function renameMeal(mIdx) {
   if (t && t.trim()) { m.title = t.trim(); renderAll(); }
 }
 
+// Ekranda görünen miktar (kiloya göre gramaj açıksa ölçeklenmiş hâli) üzerinden çalışır
 function changeAmount(mIdx, iIdx, dir) {
   const item = curMeals()[mIdx].items[iIdx];
   const f = getFoodDB()[item.foodId];
   const step = f ? num(f.step, 1) : 1;
-  const next = Math.max(0, round1(item.amount + dir * step));
+  const next = Math.max(0, round1(effAmount(item) + dir * step));
   if (next === 0) curMeals()[mIdx].items.splice(iIdx, 1);
-  else item.amount = next;
+  else item.amount = rawFromEff(f, next);
   renderAll();
 }
 function setAmount(mIdx, iIdx, val) {
   const n = num(val, NaN);
+  const item = curMeals()[mIdx].items[iIdx];
   if (!isFinite(n) || n <= 0) curMeals()[mIdx].items.splice(iIdx, 1);
-  else curMeals()[mIdx].items[iIdx].amount = round1(n);
+  else item.amount = rawFromEff(getFoodDB()[item.foodId], round1(n));
   renderAll();
 }
 function removeItem(mIdx, iIdx) {
@@ -805,12 +1492,14 @@ function removeItem(mIdx, iIdx) {
   offerUndo(`🗑️ ${f ? f.name : "Besin"} çıkarıldı`);
 }
 
+// amount: ekranda görünen miktar (ölçek açıksa saklanacak miktara çevrilir)
 function quickAdd(mIdx, foodId, amount) {
   const f = getFoodDB()[foodId];
-  if (!f) return;
+  if (!f || !curMeals()[mIdx]) return;
+  const raw = rawFromEff(f, amount);
   const existing = curMeals()[mIdx].items.find(i => i.foodId === foodId);
-  if (existing) existing.amount = round1(existing.amount + amount);
-  else curMeals()[mIdx].items.push({ foodId, amount });
+  if (existing) existing.amount = isScalable(f) && scaleK() !== 1 ? existing.amount + raw : round1(existing.amount + raw);
+  else curMeals()[mIdx].items.push({ foodId, amount: raw });
   state.recentFoods = [foodId, ...state.recentFoods.filter(id => id !== foodId)].slice(0, 8);
   renderAll();
 }
@@ -827,7 +1516,8 @@ function autoBalanceCarbs() {
   carbItems.forEach(item => {
     const f = db[item.foodId];
     const calPerUnit = (f.p * 4) + (f.c * 4) + (f.f * 9);
-    item.amount = Math.max(20, Math.round((item.amount + per / calPerUnit) / 5) * 5);
+    const eff = Math.max(20, Math.round((effAmount(item) + per / calPerUnit) / 5) * 5);
+    item.amount = rawFromEff(f, eff);
   });
   toast("⚖️ Karbonhidratlar kalan kaloriye göre dengelendi");
   renderAll();
@@ -835,6 +1525,7 @@ function autoBalanceCarbs() {
 
 function openCustomFoodModal() {
   cfEditId = null;
+  cfPendingBarcode = null;
   $("cfTitle").textContent = "➕ Kendi Özel Besinini Tanımla";
   $("cfName").value = ""; $("cfUnit").value = "100g"; $("cfDef").value = "100";
   $("cfP").value = "20"; $("cfC").value = "10"; $("cfF").value = "5";
@@ -848,14 +1539,20 @@ function saveCustomFood() {
   const def = num($("cfDef").value, 100) || 100;
   const p = num($("cfP").value), c = num($("cfC").value), f = num($("cfF").value);
   const editing = cfEditId && state.customFoods[cfEditId];
-  const id = editing ? cfEditId : "custom_" + Date.now();
+  const prev = editing ? state.customFoods[cfEditId] : null;
+  const barcode = prev && prev.barcode ? prev.barcode : cfPendingBarcode;
+  const id = editing ? cfEditId : barcode ? "custom_bc_" + barcode : "custom_" + Date.now();
   cfEditId = null;
-  state.customFoods[id] = unitMode === "100g"
-    ? { name: "⭐ " + name, cat: "⭐ Özel Eklediklerim", unit: "g", step: 10, def, p: p / 100, c: c / 100, f: f / 100 }
+  cfPendingBarcode = null;
+  const food = unitMode === "100g"
+    ? { name: "⭐ " + name, cat: "⭐ Özel Eklediklerim", unit: prev && prev.unit === "ml" ? "ml" : "g", step: 10, def, p: p / 100, c: c / 100, f: f / 100 }
     : { name: "⭐ " + name, cat: "⭐ Özel Eklediklerim", unit: "adet", step: 1, def, p, c, f };
+  if (barcode) food.barcode = barcode;
+  state.customFoods[id] = food;
   closeModal("customFoodModal");
   toast(editing ? "✓ " + name + " güncellendi" : "⭐ " + name + " besin listene eklendi");
   renderAll();
+  if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") selectFood(id);
 }
 
 // ---------------------------------------------------------------------------
@@ -867,9 +1564,9 @@ function openPicker(title, groups, onPick, extra) {
   picker = { groups, onPick, extra: extra || null, cat: "all", flat: [] };
   $("pickerTitle").textContent = title;
   $("pickerSearch").value = "";
-  $("pickerSearch").placeholder = trainCtx() ? "Ara..." : "🔍 Ara...";
+  $("pickerSearch").placeholder = trainCtx() || nutriCtx() ? "Ara..." : "🔍 Ara...";
   $("pickerExtraWrap").classList.toggle("hidden", !extra);
-  if (extra) $("pickerExtraBtn").textContent = extra.label;
+  if (extra) $("pickerExtraBtn").textContent = trainCtx() || nutriCtx() ? String(extra.label).replace(EMOJI_LEAD, "") : extra.label;
   renderPickerChips();
   renderPickerList();
   openModal("pickerModal");
@@ -2539,15 +3236,14 @@ function copyMeal(mIdx) {
 // ---------------------------------------------------------------------------
 let suppEdit = false;
 function renderSupps() {
-  const on = "text-xs px-2.5 py-1.5 rounded-lg border bg-emerald-600/30 border-emerald-500 text-emerald-200 font-semibold";
-  const off = "text-xs px-2.5 py-1.5 rounded-lg border bg-slate-800 border-slate-700 text-slate-400";
-  const del = "text-xs px-2.5 py-1.5 rounded-lg border bg-rose-950/60 border-rose-800 text-rose-200";
   let html = state.supplementList.map((s, i) => suppEdit
-    ? `<button onclick="removeSupp(${i})" class="${del}">${esc(s.name)} ✕</button>`
-    : `<button onclick="toggleSupp(${esc(JSON.stringify(s.id))})" class="${state.supplements[s.id] ? on : off}">${state.supplements[s.id] ? "✓ " : ""}${esc(s.name)}</button>`).join("");
-  if (suppEdit) html += `<button onclick="addSupp()" class="text-xs px-2.5 py-1.5 rounded-lg border border-dashed border-emerald-600 text-emerald-300">+ Ekle</button>`;
-  html += `<button onclick="suppEdit = !suppEdit; renderAll();" class="text-xs px-2 py-1.5 rounded-lg ${suppEdit ? "bg-emerald-600 text-white font-semibold" : "bg-slate-900 text-slate-500 border border-slate-800"}">${suppEdit ? "✓ Bitti" : "✎"}</button>`;
-  if (!state.supplementList.length && !suppEdit) html = `<span class="text-xs text-slate-500 self-center">Takviye listen boş.</span>` + html;
+    ? `<button onclick="removeSupp(${i})" class="n-chip del" aria-label="${esc(s.name)} sil">${esc(s.name)} ${svgI("x", 14, 2.4)}</button>`
+    : `<button onclick="toggleSupp(${esc(JSON.stringify(s.id))})" class="n-chip ${state.supplements[s.id] ? "on" : ""}" aria-pressed="${state.supplements[s.id] ? "true" : "false"}">${state.supplements[s.id] ? svgI("check", 14, 3) : ""}${esc(s.name)}</button>`).join("");
+  if (suppEdit) html += `<button onclick="addSupp()" class="n-chip add">+ Ekle</button>`;
+  html += suppEdit
+    ? `<button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}Bitti</button>`
+    : `<button onclick="suppEdit = true; renderAll();" class="n-chip" aria-label="Takviyeleri düzenle">${svgI("edit", 14)}Düzenle</button>`;
+  if (!state.supplementList.length && !suppEdit) html = `<span class="text-[13px] n-dim self-center">Takviye listen boş.</span>` + html;
   $("suppList").innerHTML = html;
 }
 function addSupp() {
@@ -3116,7 +3812,7 @@ const ICON = {
   minus: "M5 12h14", trash: "M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13", play: "M7 4.5v15l12.5-7.5z", share: "M12 3v12M7 8l5-5 5 5M5 14v6h14v-6",
   search: "M11 4.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM20 20l-4-4",
   grip: "M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01", user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5",
-  x: "M6 6l12 12M18 6L6 18"
+  x: "M6 6l12 12M18 6L6 18", copy: "M9 9h11v11H9zM15 9V4H4v11h5", chevD: "M6 9l6 6 6-6"
 };
 function svgI(name, size = 20, sw = 2) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICON[name]}"></path></svg>`;
@@ -3659,7 +4355,7 @@ document.addEventListener("pointermove", e => {
   if (best !== mealDrag.to) {
     if (mealDrag.cards[mealDrag.to] && mealDrag.to !== mealDrag.from) mealDrag.cards[mealDrag.to].style.outline = "";
     mealDrag.to = best;
-    if (best !== mealDrag.from) mealDrag.cards[best].style.outline = isEx ? "2px dashed #1FD1C1" : "2px dashed #10b981";
+    if (best !== mealDrag.from) mealDrag.cards[best].style.outline = isEx ? "2px dashed #1FD1C1" : "2px dashed #22C55E";
   }
 });
 function endMealDrag() {

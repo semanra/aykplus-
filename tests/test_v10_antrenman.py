@@ -83,6 +83,7 @@ with sync_playwright() as p:
     # --- öğün: saat yerleştirme
     pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(300)
     pg.evaluate("()=>{curMeals()[0].time='08:00'; curMeals()[1].time='13:00'; renderAll();}")
+    pg.evaluate("setNutriView('menus')"); pg.wait_for_timeout(100)
     pg.locator("text=Yeni öğün ekle").click(); pg.fill("#mmName","Ara Öğün"); pg.fill("#mmTime","10:30"); pg.click("#mealModal >> text=Kaydet"); pg.wait_for_timeout(200)
     _o=[m.get("time") for m in st(pg)["meals"]][:3]; assert _o==["08:00","10:30","13:00"], _o
     print("order:", [ (m.get("time") or "--")+" "+m["title"][:10] for m in st(pg)["meals"]])
@@ -100,13 +101,13 @@ with sync_playwright() as p:
     pg.evaluate("openCustomFoodModal()"); pg.fill("#cfName","Proteinli Süt"); pg.fill("#cfP","10"); pg.click("#customFoodModal >> text=Kaydet"); pg.wait_for_timeout(100)
     cid=[k for k in st(pg)["customFoods"]][0]
     pg.evaluate(f"quickAdd(0, '{cid}', 200)"); pg.wait_for_timeout(100)
-    pg.locator("text=🔍 Besin ara ve ekle...").first.tap(); pg.fill("#pickerSearch","proteinli"); pg.wait_for_timeout(100)
+    pg.evaluate("openFoodPicker(0)"); pg.fill("#pickerSearch","proteinli"); pg.wait_for_timeout(100)
     pg.screenshot(path=""+SHOTS+"/v10_customfood.png")
     pg.locator('#pickerList button[aria-label$="düzenle"]').first.click(); pg.wait_for_timeout(100)
     print("edit prefill:", pg.input_value("#cfName"), pg.input_value("#cfP"), pg.inner_text("#cfTitle"))
     pg.fill("#cfP","12"); pg.click("#customFoodModal >> text=Kaydet"); pg.wait_for_timeout(100)
     cf=st(pg)["customFoods"]; print("after edit:", list(cf.keys())==[cid], cf[cid]["p"], cf[cid]["name"])
-    pg.locator("text=🔍 Besin ara ve ekle...").first.tap(); pg.fill("#pickerSearch","proteinli"); pg.wait_for_timeout(100)
+    pg.evaluate("openFoodPicker(0)"); pg.fill("#pickerSearch","proteinli"); pg.wait_for_timeout(100)
     pg.locator('#pickerList button[aria-label$=" sil"]').first.click(); pg.wait_for_timeout(150)
     s=st(pg); print("deleted:", cid not in s["customFoods"], "still in meal:", any(i["foodId"]==cid for i in s["meals"][0]["items"]))
     pg.locator("#toastWrap button", has_text="Geri al").first.click(); pg.wait_for_timeout(150)

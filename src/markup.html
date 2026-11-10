@@ -115,6 +115,107 @@
     .no-brand #brandTag { display: none; }
     body.theme-train #brandPlus { color: #1FD1C1; }
     body.theme-train #profileBtn { background: #141416; border-color: #2A2A2E; color: #E4E4E7; }
+    /* BESLENME TEMASI (v13 · Emerald Obsidian + gündüz teması "Warm Alabaster").
+       Renkler değişkenlerle tanımlı; gündüz teması yalnızca değişkenleri değiştirir. */
+    body.theme-nutri {
+      --n-bg: #050706; --n-card: #0E1210; --n-elev: #151B18; --n-elev2: #1A211D; --n-line: #1A211D; --n-line2: #2A332E;
+      --n-text: #F8FAFC; --n-text2: #E2E8F0; --n-muted: #94A3B8; --n-dim: #7C8A9E;
+      --n-accent: #22C55E; --n-accent-text: #22C55E; --n-accent-soft: rgba(34, 197, 94, 0.16);
+      --n-btn: #16A34A; --n-btn-text: #FFFFFF; --n-on-bg: #FFFFFF; --n-on-text: #050706; --n-tick: #04130A;
+      --n-p: #58B9F7; --n-k: #E5B85B; --n-y: #E27C66; --n-over: #FB7185; --n-over-soft: rgba(251, 113, 133, 0.12);
+      --n-water: #4EA8DE; --n-water-soft: rgba(78, 168, 222, 0.16); --n-water-text: #8CCBF0; --n-cup-line: #3B4A5C;
+      --n-nav: rgba(10, 14, 12, 0.95);
+      background-color: var(--n-bg);
+    }
+    body.theme-nutri.nutri-light {
+      --n-bg: #F3F5F2; --n-card: #FFFFFF; --n-elev: #EAEDE8; --n-elev2: #DFE4DD; --n-line: #E2E6E0; --n-line2: #C5CEC8;
+      --n-text: #0F172A; --n-text2: #1E293B; --n-muted: #475569; --n-dim: #5B6B80;
+      --n-accent: #059669; --n-accent-text: #047857; --n-accent-soft: rgba(16, 185, 129, 0.14);
+      --n-btn: #047857; --n-btn-text: #FFFFFF; --n-on-bg: #0F172A; --n-on-text: #FFFFFF; --n-tick: #FFFFFF;
+      --n-p: #0369A1; --n-k: #A16207; --n-y: #C2410C; --n-over: #E11D48; --n-over-soft: rgba(225, 29, 72, 0.10);
+      --n-water: #0284C7; --n-water-soft: rgba(2, 132, 199, 0.12); --n-water-text: #075985; --n-cup-line: #94A3B8;
+      --n-nav: rgba(255, 255, 255, 0.95);
+    }
+    /* Özet kartı her iki temada da koyu yeşil kalır */
+    .n-hero {
+      --n-text: #FFFFFF; --n-muted: rgba(255, 255, 255, 0.72); --n-p: #58B9F7; --n-k: #E5B85B; --n-y: #E27C66; --n-over: #FB7185;
+      --n-on-bg: #FFFFFF; --n-on-text: #050706;
+      background: linear-gradient(145deg, #0D2E22 0%, #071A12 100%); border: 1px solid rgba(34, 197, 94, 0.28); color: #FFFFFF;
+    }
+    body.theme-nutri .sticky-bar { background-color: var(--n-bg); border-bottom-color: var(--n-line); }
+    body.theme-nutri .bottom-nav { background-color: var(--n-nav); border-top-color: var(--n-line); }
+    body.theme-nutri #tabTitle, body.theme-nutri #brandTag { color: var(--n-text); }
+    body.theme-nutri #brandPlus { color: var(--n-accent); }
+    body.theme-nutri #profileBtn, #nutriThemeBtn { background: var(--n-card); border: 1px solid var(--n-line2); color: var(--n-text2); }
+    body.theme-nutri input[type="range"] { accent-color: var(--n-accent); }
+    .n-text { color: var(--n-text); } .n-muted { color: var(--n-muted); } .n-dim { color: var(--n-dim); } .n-accent { color: var(--n-accent-text); }
+    .n-p { color: var(--n-p); } .n-k { color: var(--n-k); } .n-y { color: var(--n-y); } .n-over { color: var(--n-over); }
+    .n-card { background: var(--n-card); border: 1px solid var(--n-line); }
+    .n-elev { background: var(--n-elev); }
+    .n-bar-bg { background: var(--n-elev2); }
+    .n-bt { border-top: 1px solid var(--n-line); } .n-bb { border-bottom: 1px solid var(--n-line); }
+    .n-div > * + * { border-top: 1px solid var(--n-line); }
+    .n-rail { background: var(--n-line2); }
+    .n-label { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--n-muted); }
+    .n-btn { background: var(--n-btn); color: var(--n-btn-text); font-weight: 800; }
+    .n-btn:disabled { opacity: .45; }
+    .n-btn-outline { border: 1.5px solid var(--n-line2); color: var(--n-text); background: transparent; font-weight: 700; }
+    .n-btn-ghost { background: var(--n-elev); color: var(--n-text2); font-weight: 600; }
+    .n-water-btn { background: var(--n-water-soft); color: var(--n-water-text); font-weight: 700; }
+    .n-seg { background: var(--n-card); border: 1px solid var(--n-line); border-radius: 999px; padding: 4px; display: grid; gap: 4px; }
+    .n-seg > button { min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--n-muted); }
+    .n-seg > button.on { background: var(--n-on-bg); color: var(--n-on-text); font-weight: 800; }
+    .n-hero .n-seg { background: rgba(0, 0, 0, 0.28); border-color: rgba(255, 255, 255, 0.08); }
+    .n-tab { flex-shrink: 0; height: 44px; font-size: 15px; font-weight: 500; color: var(--n-muted); border-bottom: 2.5px solid transparent; margin-bottom: -1px; }
+    .n-tab.on { color: var(--n-text); font-weight: 800; border-bottom-color: var(--n-accent); }
+    .n-chip { min-height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--n-elev); color: var(--n-muted); border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; white-space: nowrap; }
+    .n-chip.on { background: var(--n-accent-soft); color: var(--n-accent-text); border-color: var(--n-accent); font-weight: 700; }
+    .n-chip.solid { background: var(--n-on-bg); color: var(--n-on-text); border-color: var(--n-on-bg); font-weight: 800; }
+    .n-chip.del { background: var(--n-over-soft); color: var(--n-over); border-color: var(--n-over); }
+    .n-chip.add { background: transparent; color: var(--n-accent-text); border: 1.5px dashed var(--n-accent); }
+    #foodSelCard .n-chip:not(.on) { background: var(--n-card); border-color: var(--n-line); }
+    body.nutri-light #navBtnNutrition { color: var(--n-accent-text); }
+    .n-chip.swap { color: var(--n-accent-text); background: var(--n-accent-soft); font-weight: 700; padding: 0 12px; }
+    input.n-amt { background: var(--n-elev); border: 0; color: var(--n-text); border-radius: 12px; height: 44px; width: 56px; text-align: center; font-weight: 700; font-size: 16px; padding: 0 2px; }
+    input.n-amt.big { width: 110px; height: 56px; font-size: 30px; font-weight: 800; background: transparent; }
+    input.n-in { width: 100%; background: var(--n-elev); border: 0; color: var(--n-text); border-radius: 14px; height: 48px; padding: 0 14px; font-size: 17px; }
+    input.n-search { background: transparent; border: 0; color: var(--n-text); font-size: 16px; outline: none; }
+    input.n-amt:focus, input.n-in:focus { outline: 2px solid var(--n-accent); outline-offset: 0; }
+    input.n-search::placeholder, input.n-in::placeholder { color: var(--n-dim); }
+    .n-check { appearance: none; -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--n-accent); background: var(--n-card); position: relative; flex-shrink: 0; cursor: pointer; margin: 0; }
+    .n-check:checked { background: var(--n-accent); }
+    .n-check:checked::after { content: ""; position: absolute; left: 8.5px; top: 4px; width: 7px; height: 13px; border: solid var(--n-tick); border-width: 0 3px 3px 0; transform: rotate(45deg); }
+    .n-next { border-color: var(--n-accent); box-shadow: 0 8px 28px -6px var(--n-accent-soft); }
+    .n-sel { border: 1.5px solid var(--n-accent); box-shadow: 0 10px 30px -10px var(--n-accent-soft); }
+    .n-cup { position: relative; flex: 1 1 0; height: 26px; max-width: 30px; border: 1.5px solid var(--n-cup-line); border-radius: 3px 3px 8px 8px; overflow: hidden; }
+    .n-cup > i { position: absolute; left: 0; right: 0; bottom: 0; background: var(--n-water); }
+    .n-cup.full { border-color: var(--n-water); }
+    .n-sw { appearance: none; -webkit-appearance: none; width: 51px; height: 31px; border-radius: 999px; background: var(--n-line2); position: relative; flex-shrink: 0; transition: background .2s; margin: 0; }
+    .n-sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+    .n-sw:checked { background: var(--n-accent); } .n-sw:checked::after { transform: translateX(20px); }
+    .n-sheet { background: var(--n-card); border: 1px solid var(--n-line); color: var(--n-text); }
+    /* Beslenmeden açılan ortak pencereler (.nm): eski lacivert renkleri beslenme temasına çevirir */
+    .nm { background-color: rgba(0,0,0,.72) !important; }
+    .nm .card, .nm .sheet, .nm .sheet.bg-slate-900 { background: var(--n-card) !important; border: 1px solid var(--n-line) !important; border-radius: 24px !important; color: var(--n-text); }
+    .nm .sheet { border-bottom: 0 !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+    @media (min-width: 768px) { .nm .sheet { border-radius: 24px !important; border-bottom: 1px solid var(--n-line) !important; } }
+    .nm h3, .nm h3.text-emerald-400 { color: var(--n-text) !important; font-size: 19px !important; font-weight: 800 !important; }
+    .nm .justify-end > button { flex: 1 1 0; min-height: 52px; font-size: 15px !important; border-radius: 999px !important; }
+    .nm .bg-slate-900, .nm .bg-slate-900\/80, .nm .bg-slate-950, .nm .bg-slate-800, .nm .bg-slate-800\/80, .nm .bg-slate-800\/95 { background-color: var(--n-elev) !important; }
+    .nm .bg-slate-700, .nm .active\:bg-slate-700:active { background-color: var(--n-elev2) !important; }
+    .nm .border-slate-800, .nm .border-slate-700, .nm .border-slate-600 { border-color: var(--n-line) !important; }
+    .nm .text-slate-100, .nm .text-slate-200 { color: var(--n-text) !important; }
+    .nm .text-slate-300, .nm .text-slate-400 { color: var(--n-muted) !important; } .nm .text-slate-500 { color: var(--n-dim) !important; }
+    .nm .text-emerald-400, .nm .text-emerald-300, .nm .text-emerald-200 { color: var(--n-accent-text) !important; }
+    .nm .text-sky-400 { color: var(--n-p) !important; } .nm .text-amber-400 { color: var(--n-k) !important; } .nm .text-rose-400, .nm .text-rose-300 { color: var(--n-over) !important; }
+    .nm .bg-emerald-600, .nm .bg-emerald-700, .nm .bg-emerald-500, .nm .bg-indigo-600 { background-color: var(--n-btn) !important; color: var(--n-btn-text) !important; font-weight: 800 !important; border-color: var(--n-btn) !important; }
+    .nm button, .nm label.cursor-pointer { min-height: 44px; }
+    .nm #pickerChips button { padding-left: 14px; padding-right: 14px; font-size: 13px; }
+    .nm .text-xs { font-size: 13px; } .nm .text-\[11px\] { font-size: 12px; }
+    .nm select, .nm input[type="text"], .nm input[inputmode], .nm input[type="time"], .nm textarea { background-color: var(--n-elev2) !important; border: 0 !important; color: var(--n-text) !important; border-radius: 12px !important; min-height: 44px; }
+    .nm select:focus, .nm input:focus, .nm textarea:focus { outline: 2px solid var(--n-accent); outline-offset: 0; }
+    .nm input::placeholder { color: var(--n-dim); }
+    .nm .modal-x { width: 44px; height: 44px; border-radius: 999px; background: var(--n-elev); color: var(--n-muted) !important; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
     @media (prefers-reduced-motion: reduce) {
       #splash { animation-duration: .01s; animation-delay: .35s; }
       #splash img, #splash .t, #splash .logo-wrap::before { animation: none; }
@@ -142,6 +243,7 @@
           <span id="brandTag" class="t-display text-[28px] leading-none text-white shrink-0" aria-hidden="true"><span class="brand-sep"></span>AYK<span id="brandPlus" class="text-emerald-400">+</span></span>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
+          <button id="nutriThemeBtn" onclick="toggleNutriLight()" class="hidden w-11 h-11 items-center justify-center rounded-full" aria-label="Gündüz temasına geç"></button>
           <button id="profileBtn" onclick="openProfile()" class="relative w-11 h-11 flex items-center justify-center bg-slate-900 border border-slate-700 rounded-full text-slate-200" aria-label="Profil">
             <img id="profileAvatar" alt="" class="hidden w-full h-full rounded-full object-cover" />
             <svg id="profileIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>
@@ -150,39 +252,8 @@
         </div>
       </div>
 
-      <!-- BESLENME ÖZET BARI -->
-      <div id="nutritionHeaderBar">
-      <div class="grid grid-cols-4 gap-1.5">
-        <div class="bg-slate-800/95 border border-slate-700 rounded-xl px-2 py-1.5 min-w-0">
-          <div class="text-[10px] text-slate-400 truncate">🔥 Kalori</div>
-          <div class="font-bold leading-tight"><span id="calConsumed" class="text-sm">0</span><span class="text-[10px] font-normal text-slate-400">/<span id="calTarget">0</span></span></div>
-          <div class="w-full bg-slate-950 h-1 rounded-full mt-1 overflow-hidden"><div id="calBar" class="bg-emerald-500 h-full transition-all duration-300" style="width:0%"></div></div>
-          <div id="calStatus" class="text-[10px] font-semibold mt-0.5 truncate text-emerald-400">Kalan: 0</div>
-        </div>
-        <div class="bg-slate-800/95 border border-slate-700 rounded-xl px-2 py-1.5 min-w-0">
-          <div class="text-[10px] text-slate-400 truncate">🥩 Protein</div>
-          <div class="font-bold leading-tight"><span id="proConsumed" class="text-sm">0</span><span class="text-[10px] font-normal text-slate-400">/<span id="proTarget">0</span>g</span></div>
-          <div class="w-full bg-slate-950 h-1 rounded-full mt-1 overflow-hidden"><div id="proBar" class="bg-sky-500 h-full transition-all duration-300" style="width:0%"></div></div>
-          <div id="proStatus" class="text-[10px] font-semibold mt-0.5 truncate text-emerald-400">Kalan: 0g</div>
-        </div>
-        <div class="bg-slate-800/95 border border-slate-700 rounded-xl px-2 py-1.5 min-w-0">
-          <div class="text-[10px] text-slate-400 truncate">🍚 Karb</div>
-          <div class="font-bold leading-tight"><span id="carbConsumed" class="text-sm">0</span><span class="text-[10px] font-normal text-slate-400">/<span id="carbTarget">0</span>g</span></div>
-          <div class="w-full bg-slate-950 h-1 rounded-full mt-1 overflow-hidden"><div id="carbBar" class="bg-amber-500 h-full transition-all duration-300" style="width:0%"></div></div>
-          <div id="carbStatus" class="text-[10px] font-semibold mt-0.5 truncate text-emerald-400">Kalan: 0g</div>
-        </div>
-        <div class="bg-slate-800/95 border border-slate-700 rounded-xl px-2 py-1.5 min-w-0">
-          <div class="text-[10px] text-slate-400 truncate">🥑 Yağ</div>
-          <div class="font-bold leading-tight"><span id="fatConsumed" class="text-sm">0</span><span class="text-[10px] font-normal text-slate-400">/<span id="fatTarget">0</span>g</span></div>
-          <div class="w-full bg-slate-950 h-1 rounded-full mt-1 overflow-hidden"><div id="fatBar" class="bg-rose-500 h-full transition-all duration-300" style="width:0%"></div></div>
-          <div id="fatStatus" class="text-[10px] font-semibold mt-0.5 truncate text-emerald-400">Kalan: 0g</div>
-        </div>
-      </div>
-      <div class="grid grid-cols-2 gap-1.5 mt-1.5">
-        <button id="mmPlan" onclick="setMacroView('plan')">📋 Plan: <span id="mmPlanVal">0</span> kcal</button>
-        <button id="mmEaten" onclick="setMacroView('eaten')">🍽️ Yenen: <span id="mmEatenVal">0</span> kcal • <span id="mmEatenMeals">0/0</span></button>
-      </div>
-      </div>
+      <!-- BESLENME: v13'te özet, sayfanın içindeki kalori halkası kartına taşındı -->
+      <div id="nutritionHeaderBar"></div>
 
       <!-- GYM ÖZET BARI -->
       <div id="gymHeaderBar" class="hidden grid-cols-3 gap-1.5">
@@ -235,78 +306,156 @@
   <!-- ========================================================= -->
   <!-- SEKME 1: BESLENME                                          -->
   <!-- ========================================================= -->
-  <div id="tabNutrition" class="max-w-5xl mx-auto px-3.5 mt-4 space-y-5">
+  <div id="tabNutrition" class="max-w-xl mx-auto px-4 mt-1 n-text">
 
-    <div class="card p-3.5 space-y-3">
-      <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-800 pb-2.5">
-        <span class="text-xs font-semibold text-slate-300">🥗 Günlük Takip</span>
-        <div class="flex flex-wrap gap-1.5">
-          <button onclick="openCustomFoodModal()" class="text-xs bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-lg font-medium">➕ Özel Besin</button>
-          <button onclick="autoBalanceCarbs()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-lg font-medium">⚖️ Karb ile Dengele</button>
-        </div>
+    <!-- Alt sekmeler: Bugün / Menülerim / Besinler / Geçmiş -->
+    <nav id="nutriNav" class="flex gap-6 n-bb overflow-x-auto no-scrollbar mb-4" aria-label="Beslenme bölümleri"></nav>
+
+    <!-- ===================== BUGÜN ===================== -->
+    <div id="nvToday" class="space-y-4">
+      <div class="n-seg grid-cols-2" role="tablist" aria-label="Gün tipi">
+        <button id="btnTrain" onclick="setDayType('train')">Antrenman günü</button>
+        <button id="btnRest" onclick="setDayType('rest')">Dinlenme günü</button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
-        <div class="flex items-center justify-between gap-2 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-          <div class="min-w-0">
-            <div class="text-xs text-slate-400">💧 Günlük Su</div>
-            <div class="text-base font-bold text-sky-400"><span id="waterVal">0.00</span> / <span id="waterTarget">3.5</span> L</div>
-            <div class="w-full bg-slate-950 h-1 rounded-full mt-1 overflow-hidden"><div id="waterBar" class="bg-sky-500 h-full transition-all duration-300" style="width:0%"></div></div>
-          </div>
-          <div class="flex gap-1.5 shrink-0">
-            <button onclick="addWater(-0.25)" class="px-2.5 py-1.5 text-xs rounded-lg bg-slate-800 text-slate-300 font-bold">−</button>
-            <button onclick="addWater(0.25)" class="px-2.5 py-1.5 text-xs rounded-lg bg-sky-700 text-white font-semibold">+250ml</button>
-            <button onclick="addWater(0.5)" class="px-2.5 py-1.5 text-xs rounded-lg bg-sky-600 text-white font-semibold">+500ml</button>
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-          <div id="suppList" class="flex flex-wrap gap-1.5"></div>
-          <button onclick="manualNewDay()" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300">🌅 Yeni Gün</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card p-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-        <div>
-          <div class="flex justify-between items-center text-sm mb-1 gap-2">
-            <span class="text-slate-300 font-medium">Güncel Kilon:</span>
-            <div class="flex items-center gap-1.5">
-              <button onclick="adjustWeight(-0.1)" class="w-7 h-7 rounded-lg bg-slate-800 text-slate-200 font-bold">−</button>
-              <span class="text-emerald-400 font-bold whitespace-nowrap"><span id="weightVal">105</span> kg</span>
-              <button onclick="adjustWeight(0.1)" class="w-7 h-7 rounded-lg bg-slate-800 text-slate-200 font-bold">+</button>
+      <!-- Kalori halkası + makrolar -->
+      <section class="n-hero rounded-[26px] p-4 space-y-4" aria-label="Günlük kalori ve makrolar">
+        <div class="flex items-center gap-4">
+          <div class="relative w-[124px] h-[124px] shrink-0">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 112 112" aria-hidden="true">
+              <circle cx="56" cy="56" r="48" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="10"></circle>
+              <circle id="calRing" cx="56" cy="56" r="48" fill="none" stroke="#22C55E" stroke-width="10" stroke-linecap="round" stroke-dasharray="301.59" stroke-dashoffset="301.59" style="transition: stroke-dashoffset .5s ease, stroke .3s;"></circle>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span id="calConsumed" class="t-display text-[30px] leading-none text-white tabular-nums">0</span>
+              <span class="text-[11px] text-white/70 font-medium mt-1">/ <span id="calTarget">0</span> kcal</span>
             </div>
           </div>
-          <input id="weightSlider" type="range" min="80" max="115" step="0.5" value="105" oninput="updateProfile()" class="w-full" />
-          <div class="flex items-center justify-between gap-2 mt-1">
-            <div id="weightHistoryText" class="text-[11px] text-slate-400 truncate">Hedef: 82 kg</div>
-            <button onclick="logCurrentWeight()" class="text-[11px] bg-emerald-900/70 text-emerald-200 px-2 py-0.5 rounded border border-emerald-700/50 shrink-0">📌 Tartıyı Kaydet</button>
+          <div class="flex-1 min-w-0 space-y-2.5">
+            <div id="calStatus"></div>
+            <div>
+              <div class="flex items-baseline justify-between gap-2 text-[12px]"><span class="font-bold">Protein</span><span class="text-white/80 tabular-nums"><span id="proConsumed" class="font-bold text-white">0</span> / <span id="proTarget">0</span> g</span></div>
+              <div class="h-1.5 rounded-full bg-white/15 overflow-hidden mt-1"><div id="proBar" class="h-full rounded-full transition-all duration-500" style="width:0%;background:#58B9F7"></div></div>
+              <div id="proStatus" class="text-[11px] mt-0.5"></div>
+            </div>
+            <div>
+              <div class="flex items-baseline justify-between gap-2 text-[12px]"><span class="font-bold">Karb</span><span class="text-white/80 tabular-nums"><span id="carbConsumed" class="font-bold text-white">0</span> / <span id="carbTarget">0</span> g</span></div>
+              <div class="h-1.5 rounded-full bg-white/15 overflow-hidden mt-1"><div id="carbBar" class="h-full rounded-full transition-all duration-500" style="width:0%;background:#E5B85B"></div></div>
+              <div id="carbStatus" class="text-[11px] mt-0.5"></div>
+            </div>
+            <div>
+              <div class="flex items-baseline justify-between gap-2 text-[12px]"><span class="font-bold">Yağ</span><span class="text-white/80 tabular-nums"><span id="fatConsumed" class="font-bold text-white">0</span> / <span id="fatTarget">0</span> g</span></div>
+              <div class="h-1.5 rounded-full bg-white/15 overflow-hidden mt-1"><div id="fatBar" class="h-full rounded-full transition-all duration-500" style="width:0%;background:#E27C66"></div></div>
+              <div id="fatStatus" class="text-[11px] mt-0.5"></div>
+            </div>
           </div>
         </div>
+        <div class="n-seg grid-cols-2" aria-label="Gösterilen değerler">
+          <button id="mmPlan" onclick="setMacroView('plan')">Plan · <span id="mmPlanVal">0</span> kcal</button>
+          <button id="mmEaten" onclick="setMacroView('eaten')">Yenen · <span id="mmEatenVal">0</span> · <span id="mmEatenMeals">0/0</span></button>
+        </div>
+      </section>
 
+      <!-- Su + takviyeler -->
+      <section class="n-card rounded-[22px] p-4 space-y-3" aria-label="Su ve takviyeler">
+        <div class="flex items-baseline justify-between gap-2">
+          <span class="n-label">SU</span>
+          <span class="text-[13px] n-muted"><strong id="waterVal" class="t-display text-[24px] n-text tabular-nums">0,00</strong> / <span id="waterTarget">3,5</span> L</span>
+        </div>
+        <div id="waterCups" class="flex items-end gap-1.5" aria-hidden="true"></div>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="addWater(-0.25)" class="n-btn-ghost h-11 rounded-full text-[14px]" aria-label="250 mililitre çıkar">− 250 ml</button>
+          <button onclick="addWater(0.25)" class="n-water-btn h-11 rounded-full text-[14px]">+250 ml</button>
+          <button onclick="addWater(0.5)" class="n-water-btn h-11 rounded-full text-[14px]">+500 ml</button>
+        </div>
+        <div class="pt-3 n-bt space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="n-label">TAKVİYELER</span>
+            <button onclick="manualNewDay()" class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M5.6 7.6L7 9M18.4 7.6L17 9M3 17h18M7 17a5 5 0 0 1 10 0M8 21h8"></path></svg>Yeni gün</button>
+          </div>
+          <div id="suppList" class="flex flex-wrap gap-2"></div>
+        </div>
+      </section>
+
+      <div class="flex items-baseline justify-between gap-2 pt-1">
+        <span class="n-label">BUGÜNÜN ÖĞÜNLERİ</span>
+        <span class="text-[12px] n-dim">Değiştirmek için ⇄ İkame</span>
+      </div>
+      <div id="todayMeals"></div>
+    </div>
+
+    <!-- ===================== MENÜLERİM ===================== -->
+    <div id="nvMenus" class="hidden space-y-4">
+      <div class="n-seg grid-cols-2" role="tablist" aria-label="Menü">
+        <button id="mnTrain" onclick="setDayType('train')">Antrenman menüsü</button>
+        <button id="mnRest" onclick="setDayType('rest')">Dinlenme menüsü</button>
+      </div>
+
+      <section id="menuTotal" class="n-card rounded-[24px] p-4 space-y-3" aria-label="Menü toplamı"></section>
+
+      <!-- Kilo ve kalori açığı -->
+      <section class="n-card rounded-[22px] p-4 space-y-4" aria-label="Kilo ve kalori açığı">
         <div>
-          <div class="flex justify-between text-sm mb-1">
-            <span class="text-slate-300 font-medium">Kalori Açığı:</span>
-            <span class="text-amber-400 font-bold">−<span id="deficitVal">700</span> kcal</span>
+          <div class="flex items-center justify-between gap-2">
+            <span class="n-label">GÜNCEL KİLO</span>
+            <div class="flex items-center gap-1">
+              <button onclick="adjustWeight(-0.1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="0,1 kg azalt"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+              <span class="min-w-[84px] text-center whitespace-nowrap"><span id="weightVal" class="t-display text-[26px] leading-none tabular-nums">105</span> <span class="text-[13px] n-muted font-semibold">kg</span></span>
+              <button onclick="adjustWeight(0.1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="0,1 kg artır"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+            </div>
           </div>
-          <input id="deficitSlider" type="range" min="0" max="1000" step="50" value="700" oninput="updateProfile()" class="w-full" />
-          <div id="timelineInfo" class="text-[11px] text-slate-400 mt-1">-</div>
-          <button id="coachHint" onclick="switchTab('progress')" class="hidden mt-1.5 w-full text-left text-[11px] font-semibold text-amber-200 bg-amber-950/60 border border-amber-700/60 rounded-lg px-2 py-1"></button>
+          <input id="weightSlider" type="range" min="80" max="115" step="0.5" value="105" oninput="updateProfile()" class="w-full h-11" aria-label="Güncel kilo" />
+          <div class="flex items-center justify-between gap-2">
+            <div id="weightHistoryText" class="text-[12px] n-muted truncate min-w-0">Hedef: 82 kg</div>
+            <button onclick="logCurrentWeight()" class="n-btn-outline h-11 px-4 rounded-full text-[13px] shrink-0">Tartıyı kaydet</button>
+          </div>
         </div>
+        <div class="pt-4 n-bt">
+          <div class="flex items-center justify-between gap-2 min-h-[44px]">
+            <span class="n-label">KALORİ AÇIĞI</span>
+            <span class="whitespace-nowrap n-k"><span class="t-display text-[26px] leading-none tabular-nums">−<span id="deficitVal">700</span></span> <span class="text-[13px] font-semibold">kcal</span></span>
+          </div>
+          <input id="deficitSlider" type="range" min="0" max="1000" step="50" value="700" oninput="updateProfile()" class="w-full h-11" aria-label="Kalori açığı" />
+          <div id="timelineInfo" class="text-[12px] n-muted">-</div>
+          <button id="coachHint" onclick="switchTab('progress')" class="hidden mt-2 w-full min-h-[44px] text-left text-[13px] font-semibold n-k border border-current rounded-2xl px-3.5 py-2"></button>
+        </div>
+      </section>
 
+      <!-- Kiloya göre gramaj -->
+      <section id="scaleCard" class="n-card rounded-[22px] p-4 space-y-3" aria-label="Kiloya göre gramaj"></section>
+
+      <div class="space-y-2.5 pt-1">
+        <div class="flex items-baseline justify-between gap-2">
+          <span class="n-label">ÖĞÜNLER</span>
+          <span id="planSub" class="text-[12px] n-dim text-right min-w-0"></span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="openCustomFoodModal()" class="n-btn-ghost h-11 rounded-full text-[13px] flex items-center justify-center gap-1.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Özel besin</button>
+          <button onclick="autoBalanceCarbs()" class="n-btn-ghost h-11 rounded-full text-[13px] flex items-center justify-center gap-1.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"></path></svg>Karbı dengele</button>
+        </div>
+        <p class="text-[12px] n-dim">Sırayı değiştirmek için öğünü ⋮⋮ tutamacından sürükle. Öğüne dokununca besinleri ve gramajları açılır.</p>
       </div>
+      <div id="mealsContainer" class="space-y-3"></div>
     </div>
 
-    <div class="space-y-1.5">
-      <div class="grid grid-cols-2 gap-1.5 p-1.5 rounded-2xl bg-slate-900 border border-slate-800" role="tablist" aria-label="Gün tipi ve menü">
-        <button id="btnTrain" onclick="setDayType('train')">🏋️ Antrenman Günü</button>
-        <button id="btnRest" onclick="setDayType('rest')">🛋️ Dinlenme Günü</button>
+    <!-- ===================== BESİNLER ===================== -->
+    <div id="nvFoods" class="hidden space-y-3">
+      <div id="foodHead"></div>
+      <div id="foodMealChips" class="flex gap-2 overflow-x-auto no-scrollbar -mx-0.5 px-0.5"></div>
+      <div class="flex items-center gap-1 n-elev rounded-full pl-4 pr-1 h-[52px]">
+        <svg class="n-muted shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M11 4.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM20 20l-4-4"></path></svg>
+        <input id="foodSearch" type="text" placeholder="Besin ara (tavuk, mercimek, yulaf...)" oninput="renderFoodList()" autocomplete="off" aria-label="Besin ara" class="n-search flex-1 min-w-0 h-11 pl-1" />
+        <button onclick="openBarcode()" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-accent" aria-label="Barkod okut"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13.5 8v8M17 8v8"></path></svg></button>
       </div>
-      <div id="planSub" class="text-[11px] text-slate-400 px-1"></div>
+      <div id="foodCats" class="flex gap-2 overflow-x-auto no-scrollbar -mx-0.5 px-0.5"></div>
+      <div id="foodList"></div>
+      <button onclick="openCustomFoodModal()" class="w-full h-12 rounded-full n-btn-outline text-[14px]">Listede yok mu? Özel besin tanımla</button>
     </div>
 
-    <div id="mealsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    <!-- ===================== GEÇMİŞ ===================== -->
+    <div id="nvHistory" class="hidden space-y-3">
+      <div id="nutriHistory" class="space-y-3"></div>
+    </div>
   </div>
 
   <!-- ========================================================= -->
@@ -558,6 +707,32 @@
     </div>
   </div>
 
+  <!-- BARKOD OKUMA (beslenme temasında) -->
+  <div id="barcodeModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
+    <div role="dialog" aria-labelledby="bcTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
+      <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-3">
+        <h3 id="bcTitle" class="text-[20px] font-extrabold">Barkod okut</h3>
+        <button onclick="closeBarcode()" aria-label="Kapat" class="w-11 h-11 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <div class="flex-1 overflow-y-auto px-5 pb-6 space-y-3.5">
+        <div id="bcCamWrap" class="relative rounded-[20px] overflow-hidden bg-black aspect-[4/3]">
+          <video id="bcVideo" playsinline muted autoplay class="w-full h-full object-cover"></video>
+          <div class="absolute inset-x-8 top-1/2 -translate-y-1/2 h-24 border-2 border-[#22C55E] rounded-xl pointer-events-none"></div>
+        </div>
+        <p id="bcStatus" class="text-[14px] n-muted" role="status" aria-live="polite"></p>
+        <div id="bcResult"></div>
+        <div>
+          <label for="bcManual" class="block text-[13px] font-semibold n-muted mb-1.5">Barkod numarasını elle yaz</label>
+          <div class="flex gap-2">
+            <input id="bcManual" type="text" inputmode="numeric" autocomplete="off" placeholder="örn: 8690504012345" class="n-in flex-1 min-w-0" onkeydown="if (event.key === 'Enter') barcodeManual()" />
+            <button id="bcSearchBtn" onclick="barcodeManual()" class="n-btn h-12 px-5 rounded-full text-[15px] shrink-0">Ara</button>
+          </div>
+        </div>
+        <p class="text-[12px] n-dim">Ürün bilgileri internetten (Open Food Facts) gelir. Bir kez eklediğin ürün listende kalır; aynı barkodu sonra internetsiz de tanırım.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ÖĞÜN EKLE / DÜZENLE -->
   <div id="mealModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
     <div class="card p-5 max-w-md w-full space-y-3.5">
@@ -705,7 +880,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v12</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v13</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

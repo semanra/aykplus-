@@ -1,0 +1,33 @@
+AYK+ v12 — Bilgisayarda kurulum ve komutlar
+===========================================
+
+Bu klasör uygulamanın tüm kaynak kodu ve geçmişi (git) ile birlikte gelir.
+
+1) Gerekenler (bir kez kurulur)
+   - Node.js (LTS sürüm): https://nodejs.org
+   - Python 3: https://www.python.org/downloads
+   - Git (isteğe bağlı, geçmişi görmek için): https://git-scm.com
+
+2) Klasörde bir terminal açın (Windows: klasörde boş yere sağ tık → "Terminalde aç") ve sırayla:
+
+   npm install
+   npm run build
+   pip install playwright
+   python -m playwright install chromium
+   npm test
+
+   - "npm run build" src/ klasöründeki dosyalardan index.html'i üretir. index.html'i elle düzenlemeyin.
+   - "npm test" 8 test paketini çalıştırır; hepsi geçmeli.
+
+3) Uygulamayı bilgisayarda açıp denemek için:
+
+   python -m http.server 8000
+
+   Sonra tarayıcıda http://localhost:8000 adresini açın.
+
+4) Yayınlamak için gereken dosyalar (sadece bunlar):
+   index.html, sw.js, manifest.json, icon.png, icon-192.png, icon-512.png, anatomy.jpg
+   Bunlar ayrıca "AYK-Plus-v12-site.zip" içinde hazır olarak var.
+
+Not: Site adresi değişirse telefondaki veriler yeni adreste otomatik görünmez.
+Profil → Yedekleme → "Dosyadan geri yükle" ile aldığınız yedeği yükleyin.

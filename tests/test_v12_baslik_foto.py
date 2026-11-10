@@ -57,7 +57,7 @@ try:
     check(pg.is_visible("#profileIcon") and not pg.is_visible("#profileAvatar"), "fotoğraf yokken sağ üstte kişi simgesi")
     pg.click("#profileBtn"); pg.wait_for_timeout(150)
     t = pg.inner_text("#profilePage")
-    check("Profil fotoğrafı" in t and "UYGULAMA İÇİ LOGO" not in t and "AYK+ v12" in t, "Profilde 'Profil fotoğrafı' var, eski logo bölümü yok, sürüm v12")
+    check("Profil fotoğrafı" in t and "UYGULAMA İÇİ LOGO" not in t and "AYK+ v" in t, "Profilde 'Profil fotoğrafı' var, eski logo bölümü yok, sürüm etiketi görünüyor")
     check(not pg.is_visible("#pfPhotoRemove"), "fotoğraf yokken Kaldır düğmesi gizli")
     big = os.path.join(REPO, "anatomy.jpg")
     pg.set_input_files("#pfPhotoInput", big); pg.wait_for_timeout(700)

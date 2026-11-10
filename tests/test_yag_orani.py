@@ -18,7 +18,7 @@ with sync_playwright() as p:
     pg.click("text=Bunu hedef kilom yap"); print("target field:", pg.input_value("#setTarget"))
     pg.click("#profileSave"); pg.wait_for_timeout(200)
     print("after:", pg.evaluate("JSON.stringify(getTargets())"), pg.evaluate("JSON.stringify(state.settings)"))
-    pg.click("text=📌 Tartıyı Kaydet"); pg.wait_for_timeout(100)
+    pg.evaluate("switchTab('nutrition'); setNutriView('menus')"); pg.click('#tabNutrition [onclick="logCurrentWeight()"]'); pg.wait_for_timeout(100)
     print("log:", pg.evaluate("JSON.stringify(state.weightLogs.slice(-1))"))
     pg.click("#navBtnProgress"); pg.wait_for_timeout(300)
     pg.screenshot(path=""+SHOTS+"/bf_progress.png")

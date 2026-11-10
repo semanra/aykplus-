@@ -7,6 +7,7 @@
     "test": "python3 tests/run_all.py"
   },
   "devDependencies": {
+    "@zxing/library": "^0.21.3",
     "tailwindcss": "3.4.17"
   }
 }

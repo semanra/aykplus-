@@ -235,7 +235,7 @@ try:
     check(st(pg)["settings"]["splash"] is False, "Profil içindeki ayar (açılış animasyonu) kaydediliyor")
     # Eski yerler duruyor: Beslenme'de kilo, İlerleme'de ölçüler
     pg.click("#navBtnNutrition"); pg.wait_for_timeout(150)
-    check(pg.locator("text=📌 Tartıyı Kaydet").count() == 1, "Beslenme'deki kilo bölümü yerinde")
+    check(pg.locator('#tabNutrition [onclick="logCurrentWeight()"]').count() == 1, "Beslenme'deki kilo bölümü yerinde")
     pg.click("#navBtnProgress"); pg.wait_for_timeout(250)
     check("96,5" in pg.inner_text("#progressContent"), "İlerleme'deki ölçü bölümü aynı veriyi gösteriyor")
     # Profil, beslenmeden açılsa da yeni temada; içinden açılan onay da temalı

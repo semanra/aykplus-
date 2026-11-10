@@ -87,12 +87,13 @@ with sync_playwright() as p:
     # nutrition
     pg.click("#navBtnNutrition"); pg.wait_for_timeout(300)
     pg.screenshot(path=""+SHOTS+"/6_nutrition.png", full_page=True); overflow("nutrition")
-    pg.locator("text=🔍 Besin ara ve ekle...").first.tap(); pg.fill("#pickerSearch","tavuk gogsu"); pg.wait_for_timeout(100)
+    pg.evaluate("openFoodPicker(0)"); pg.fill("#pickerSearch","tavuk gogsu"); pg.wait_for_timeout(100)
     pg.screenshot(path=""+SHOTS+"/7_foodpicker.png")
     pg.locator("#pickerList button").first.tap(); pg.wait_for_timeout(200)
     st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
     print("meal0 items:", [i["foodId"] for i in st["meals"][0]["items"]])
-    # amount focus test
+    # amount focus test (gramaj kutuları Menülerim'de, öğün açıkken)
+    pg.evaluate("setNutriView('menus'); toggleMenuMeal(0)"); pg.wait_for_timeout(100)
     a0=pg.locator('[data-fk="amt-0-0"]'); a1=pg.locator('[data-fk="amt-0-1"]')
     a0.tap(); a0.fill("4"); a1.tap(); pg.wait_for_timeout(100)
     print("focused after re-render:", pg.evaluate("document.activeElement && document.activeElement.dataset.fk"))

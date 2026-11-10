@@ -32,7 +32,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 8 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 9 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
@@ -45,7 +45,7 @@ npm test             # 8 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 2. Yeni özellik için `tests/` altına test ekle veya mevcut testi güncelle.
 3. `src/markup.html` içindeki sürüm etiketini artır: `AYK+ vN` (Ayarlar'ın en altında görünür).
 4. `sw.js` içindeki `const CACHE = 'aykplus-vN'` değerini artır (artırılmazsa telefon eski sürümü göstermeye devam edebilir). Yeni statik dosya eklediysen `FILES` listesine ekle.
-5. `npm run build` → `npm test` (8/8 geçmeli).
+5. `npm run build` → `npm test` (9/9 geçmeli).
 6. Açıklayıcı Türkçe mesajla commit et ve `main`'e gönder.
 7. Kullanıcıya kısa Türkçe özet yaz: ne değişti, telefonda ne yapması gerekiyor (genelde: "uygulamayı iki kez tamamen kapatıp aç").
 
@@ -58,13 +58,22 @@ npm test             # 8 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 - **Dokunma alanı en az 44 px.** Buton ve ikonlar küçük olmamalı; kullanıcı bunu açıkça istedi.
 - **Odak koruma:** Tam yeniden çizim (`renderAll()`) yapan girişlere `data-fk="benzersiz-anahtar"` ver; aksi halde iPhone'da klavye kapanır.
 - **Silme işlemleri:** `snapshot()` → sil → `renderAll()` → `offerUndo("mesaj")` (6 sn "Geri al").
-- **Onay / metin girişi:** Antrenman ve Profil tarafında `prompt/confirm/alert` KULLANMA; temalı `uiAsk({title, message, input, ok, cancel, danger})` (Promise döner), `uiAlert()`, bağlama göre `askConfirm()` / `sayAlert()` kullan. Beslenme/Mobilite tarafı (eski tema) şimdilik sistem kutularını kullanıyor.
-- **Dil:** Arayüz metinleri doğru Türkçe yazılır ("antrenman", "antreman" değil). Emojiler beslenme tarafında var; antrenman tarafında çizgi ikonlar (`svgI()`) kullanılır.
+- **Onay / metin girişi:** Antrenman ve Profil tarafında `prompt/confirm/alert` KULLANMA; temalı `uiAsk({title, message, input, ok, cancel, danger})` (Promise döner), `uiAlert()`, bağlama göre `askConfirm()` / `sayAlert()` kullan. Beslenme ve Mobilite tarafı şimdilik sistem kutularını kullanıyor (beslenme için temalı kutulara geçiş Aşama 2 adayı).
+- **Dil:** Arayüz metinleri doğru Türkçe yazılır ("antrenman", "antreman" değil). Antrenman ve (v13'ten beri) beslenme sayfasında çizgi ikonlar (`svgI()`) kullanılır; besin/takviye adlarındaki kullanıcı emojilerine dokunulmaz.
 - **iOS sınırları (çözmeye çalışma, kullanıcıya dürüstçe söyle):** titreşim API'si yok; uygulama kapalıyken sayaç sesi çalmaz; sessiz modda ses çıkmaz; bildirim sunucu ister; Apple Sağlık entegrasyonu web uygulamasıyla mümkün değil.
 
 ## 6. Mimari
 
 - **Yeni tema pencereleri:** Ortak pencereler (`pickerModal`, `chartModal`, `customFoodModal`) `openModal()` ile açılırken `trainCtx()` (antrenman sekmesi veya Profil açık) doğruysa `.tm` sınıfı alır; `src/markup.html` içindeki `.tm` CSS kuralları eski renkleri yeni temaya çevirir ve başlıktaki emojiyi kaldırır. Beslenmeden açılınca eski temada kalır. `exerciseModal` yalnızca antrenmanda kullanıldığı için doğrudan yeni temada yazıldı (`t-in`, `t-seg`, `t-field`).
+- **Beslenme (v13):** Beslenme sekmesindeyken `body.theme-nutri` (+ gündüz teması açıksa `nutri-light`; `state.settings.nutriLight`, üstteki `#nutriThemeBtn`). Renkler CSS değişkenleri (`--n-*`); `.n-hero` her iki temada koyu kalır. Ortak pencereler beslenmeden açılınca (`nutriCtx()`) `.nm` alır. Alt sekmeler `state.nutriView` = `today | menus | foods | history` (`setNutriView`), her biri `#nvToday/#nvMenus/#nvFoods/#nvHistory`:
+  - **Bugün:** gün tipi (`#btnTrain/#btnRest`), kalori halkası (`#calRing`, `updateMacroCard`), su bardakları (`renderWater`), takviyeler (`#suppList`), zaman çizelgesi (`#todayMeals`, `[data-today-meal]`, daire = `toggleMealDone` onay kutusu). Yenmiş öğün tek satıra kapanır.
+  - **Menülerim:** menü seçimi (`#mnTrain/#mnRest`), menü toplamı (`#menuTotal`), kilo/açık kartı, kiloya göre gramaj (`#scaleCard`), öğün listesi `#mealsContainer [data-meal-card]` (sürükle-bırak burada; öğün açılınca gramaj düzenleme, ⇄, kopyala/sil).
+  - **Besinler:** hedef öğün (`foodUI.meal`, `goAddFood(mIdx)`), arama `#foodSearch` (statik; yeniden çizilmez), kategoriler, seçili besin kartı `#foodSelCard` (gramaj yazarken tam çizim YAPILMAZ: `foodAmtInput` → `updateFoodSelUI`), hazır porsiyonlar (`foodPresets`), barkod.
+  - **Geçmiş:** `state.dailyLogs` + bugünün canlı özeti (`renderNutriHistory`).
+  - Açık/kapalı öğün bilgisi kaydedilmez; öğün **kimliğiyle** tutulur (`openDoneMeals`, `openMenuMeals` Set). `normalizeState` kimliği olmayan öğünlere kimlik verir.
+  - **İkame:** `SWAP_GROUPS` (aynı birimli, gram besin grupları); `openSwap` seçici penceresinde kaloriyi koruyan gramajlarla alternatifleri listeler, Geri al destekli.
+  - **Kiloya göre gramaj:** `settings.scaleOn/scaleBase`; oran `scaleK()` = kilo/referans (0,7–1,3). Saklanan `item.amount` DEĞİŞMEZ; görünen/hesaplanan miktar `effAmount(item)` (yalnızca `g`/`ml` birimli besinler). Ekrandan girilen miktar `rawFromEff()` ile saklanır. `calcItemMacros` `effAmount` kullanır. "Sabitle" (`resetScaleBase`) görünen gramajları kayda yazar.
+  - **Barkod:** `vendor/zxing.min.js` (@zxing/library 0.21.3, Apache-2.0, `sw.js` önbelleğinde) yalnızca barkod açılınca yüklenir. Ürün `fetchOFF()` ile Open Food Facts'ten gelir (internet gerekir; çevrimdışıyken uyarır). Eklenen ürün `customFoods["custom_bc_<barkod>"]` olur ve `barcode` alanı taşır; aynı barkod sonra internetsiz tanınır. Kamera açılamazsa numara elle yazılabilir.
 - **Profil:** Üstteki profil düğmesi (`#profileBtn`) tam ekran `#profilePage`'i açar (eski Ayarlar penceresi kaldırıldı; `openSettings` = `openProfile`). Alan kimlikleri (`setAge`, `setBf`, `setRest`...) aynı. Kaydet: `saveSettings()` (`#profileSave`). Değişiklik varken Geri → uyarı. Kilo/hedef/ölçü kutuları `renderProfile()` ile `renderAll()` içinde güncellenir.
 - **Üst başlık (v12):** Sol üstte logo yok; `#tabTitle` açık sekmenin adını yazar (`TAB_TITLES`, `applyTabVisibility()` içinde). Yanındaki `#brandTag` ("AYK+") yalnızca sayfa yüklenirken CSS animasyonuyla (`brandOut`, ~2,3 sn sonra) kayarak kaybolur; açılış animasyonu kapalıysa `html.no-brand` ile hiç gösterilmez. "Kaydedildi" yazısı kaldırıldı (kayıt hatası yine toast ile bildirilir).
 - **Profil fotoğrafı (v12):** Eski "uygulama içi logo" alanı `state.customIconDataUrl` artık profil fotoğrafıdır; sağ üstteki `#profileBtn` içinde (`#profileAvatar`) ve Profil'de (`#pfAvatar`) görünür, yoksa kişi simgesi. Yüklenen fotoğraf `shrinkPhoto()` ile 320×320 JPEG'e küçültülür (localStorage dolmasın diye). Paylaşım kartı her zaman `icon.png` kullanır.
@@ -85,7 +94,7 @@ npm test             # 8 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 
 **Vücut haritası:** `anatomy.jpg` kullanıcının kendi ürettiği görseldir (yapay zekâ ile üretip düzenledi); kullanım hakkı onda. Kas bölgeleri `BODY_POLYS` içinde 765×1024 koordinatlarında; renk katmanı `mix-blend-mode: color` ile çizimin gölgesini korur.
 
-**Beslenme bölümü:** Henüz eski (lacivert) tema. Kullanıcı ileride **ayrı bir tema** isteyecek; antrenmanla aynı olmayacak ama çok da farklı olmamalı, sade olmalı.
+**Beslenme bölümü teması (v13, "Emerald Obsidian", uygulandı):** zemin `#050706`; kart `#0E1210` (çizgi `#1A211D`); yükseltilmiş `#151B18`; metin beyaz / `#94A3B8` / `#7C8A9E`; **vurgu zümrüt yeşili `#22C55E`**, dolu düğme `#16A34A` + beyaz yazı; özet kartı yeşil degrade (`.n-hero`). Makro renkleri: protein `#58B9F7`, karb `#E5B85B`, yağ `#E27C66`, su `#4EA8DE`, aşım `#FB7185`. Sınıflar `n-*` (bkz. `src/markup.html`). Kaynak: kullanıcının gönderdiği tasarım dosyası (`ayk_beslenme_tema_ux_st_dyosu.tsx`, 4 tema içeriyordu; Emerald Obsidian seçildi). Mobilite ve İlerleme hâlâ eski lacivert temada.
 
 ## 8. Kullanıcıyla çalışma şekli
 
@@ -97,10 +106,13 @@ npm test             # 8 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 
 ## 9. Yol haritası
 
-Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma önerisi, plaka/ısınma, kas grubu sayımı, planlanan/yenen, geri al, sıradaki gün, aktif antrenman, öğün menüleri (antrenman/dinlenme), takviyeler, vücut ölçüleri, paylaşım kartı, 42 Türk yemeği, su/beslenme grafikleri, açılış ekranı, yağ oranı, **makine/dambıl kademeleri**, **yeni antrenman teması + vücut haritası**, öğün saat ve sürükle-bırak, özel besin düzenle/sil. **v11:** Programım'da hareketleri sürükleyerek sıralama, antrenmandaki tüm pencereler ve onaylar yeni temada, vücut haritasında "Programım" kas yükü, üst kronometre kaldırıldı, Ayarlar → tam ekran Profil (kişisel bilgiler, kilo, hedefler, ölçüler, ayarlar). **v12:** sol üstte sekme adı + açılışta kayarak kaybolan AYK+, profil fotoğrafı (sağ üstte yuvarlak).
+Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma önerisi, plaka/ısınma, kas grubu sayımı, planlanan/yenen, geri al, sıradaki gün, aktif antrenman, öğün menüleri (antrenman/dinlenme), takviyeler, vücut ölçüleri, paylaşım kartı, 42 Türk yemeği, su/beslenme grafikleri, açılış ekranı, yağ oranı, **makine/dambıl kademeleri**, **yeni antrenman teması + vücut haritası**, öğün saat ve sürükle-bırak, özel besin düzenle/sil. **v11:** Programım'da hareketleri sürükleyerek sıralama, antrenmandaki tüm pencereler ve onaylar yeni temada, vücut haritasında "Programım" kas yükü, üst kronometre kaldırıldı, Ayarlar → tam ekran Profil (kişisel bilgiler, kilo, hedefler, ölçüler, ayarlar). **v12:** sol üstte sekme adı + açılışta kayarak kaybolan AYK+, profil fotoğrafı (sağ üstte yuvarlak). **v13:** beslenme, kullanıcının gönderdiği tasarım dosyasına göre baştan: yeni tema, Bugün / Menülerim / Besinler / Geçmiş, ikame ⇄, hazır porsiyonlar, kiloya göre gramaj (aç/kapa), gündüz teması, barkod okuma (Open Food Facts).
+
+**Onay bekleyen büyük plan (v14–v18):** `docs/PLAN-beslenme-v14-v18.md`. Kullanıcı "devam et" derse önce bu dosyayı oku ve içindeki bekleyen soruları sor.
 
 Sıradaki adaylar (kullanıcı onayı gerekir):
-- **Beslenme bölümü için yeni tema** (kullanıcı örnek uygulama gönderecek).
+- Pişmiş / çiğ tartım (kullanıcı "şimdilik olmasın" dedi; doğru pişme oranları gerekir).
+- Beslenmede sistem kutuları (`prompt/confirm/alert`) yerine temalı kutular.
 - Kas grubu sayımında ikincil kasların da sayılması (kullanıcı "sonra" dedi).
 - "Akıllı öneri": makinede büyük kademe sıçramasında önce tekrar artırma (kullanıcı bu turda istemedi; tekrar sorulabilir).
 - Mobilite sekmesinin geliştirilmesi, ilk açılış kurulum ekranı.
