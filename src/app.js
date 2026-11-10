@@ -120,6 +120,12 @@ function normalizeState(raw) {
   if (!s.customFoods || typeof s.customFoods !== "object") s.customFoods = {};
   if (!s.supplements || typeof s.supplements !== "object") s.supplements = {};
   if (!Array.isArray(s.supplementList)) s.supplementList = clone(DEFAULT_SUPPS);
+  // v17: zamanlama etiketi doğrulaması
+  s.supplementList = s.supplementList.filter(x => x && typeof x === "object" && x.id && x.name);
+  s.supplementList.forEach(x => {
+    if (!["morning", "pre", "post", "bed", "custom"].includes(x.time)) delete x.time;
+    if (x.time === "custom") x.timeLabel = String(x.timeLabel || "Özel").slice(0, 24); else delete x.timeLabel;
+  });
   if (!Array.isArray(s.restMeals)) s.restMeals = [];
   s.restMeals.forEach(m => { if (!Array.isArray(m.items)) m.items = []; });
   if (!Array.isArray(s.measurements)) s.measurements = [];
@@ -3660,16 +3666,56 @@ function copyMeal(mIdx) {
 // TAKVİYELER (düzenlenebilir liste)
 // ---------------------------------------------------------------------------
 let suppEdit = false;
+// v17: takviye zamanlama etiketleri (Bugün'de bu sırayla gruplanır)
+const SUPP_TIMES = [["morning", "Sabah tok"], ["pre", "Antrenman öncesi"], ["post", "Antrenman sonrası"], ["bed", "Yatmadan önce"], ["custom", "Özel"]];
+function suppTimeLabel(s) {
+  if (s.time === "custom") return s.timeLabel || "Özel";
+  const t = SUPP_TIMES.find(x => x[0] === s.time);
+  return t ? t[1] : "";
+}
 function renderSupps() {
-  let html = state.supplementList.map((s, i) => suppEdit
-    ? `<button onclick="removeSupp(${i})" class="n-chip del" aria-label="${esc(s.name)} sil">${esc(s.name)} ${svgI("x", 14, 2.4)}</button>`
-    : `<button onclick="toggleSupp(${esc(JSON.stringify(s.id))})" class="n-chip ${state.supplements[s.id] ? "on" : ""}" aria-pressed="${state.supplements[s.id] ? "true" : "false"}">${state.supplements[s.id] ? svgI("check", 14, 3) : ""}${esc(s.name)}</button>`).join("");
-  if (suppEdit) html += `<button onclick="addSupp()" class="n-chip add">+ Ekle</button>`;
-  html += suppEdit
-    ? `<button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}Bitti</button>`
-    : `<button onclick="suppEdit = true; renderAll();" class="n-chip" aria-label="Takviyeleri düzenle">${svgI("edit", 14)}Düzenle</button>`;
-  if (!state.supplementList.length && !suppEdit) html = `<span class="text-[13px] n-dim self-center">Takviye listen boş.</span>` + html;
+  const list = state.supplementList;
+  let html;
+  if (suppEdit) {
+    html = `<div class="w-full space-y-2" id="suppEditList">${list.map((s, i) => `<div class="flex items-center gap-2 min-h-[44px]" data-supp-row="${i}">
+        <span class="flex-1 min-w-0 text-[14px] font-semibold truncate">${esc(s.name)}</span>
+        <select onchange="setSuppTime(${i}, this.value)" class="n-in h-11 w-[150px] shrink-0" aria-label="${esc(s.name)} ne zaman alınır?">
+          <option value="" ${!s.time ? "selected" : ""}>Zaman seç</option>
+          ${SUPP_TIMES.map(([k, l]) => `<option value="${k}" ${s.time === k ? "selected" : ""}>${k === "custom" && s.time === "custom" ? esc(suppTimeLabel(s)) : l}</option>`).join("")}
+        </select>
+        <button onclick="removeSupp(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(s.name)} sil">${svgI("trash", 18)}</button>
+      </div>`).join("")}</div>`;
+    html += `<button onclick="addSupp()" class="n-chip add">+ Ekle</button>`;
+    html += `<button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}Bitti</button>`;
+  } else {
+    const chip = s => `<button onclick="toggleSupp(${esc(JSON.stringify(s.id))})" class="n-chip ${state.supplements[s.id] ? "on" : ""}" aria-pressed="${state.supplements[s.id] ? "true" : "false"}">${state.supplements[s.id] ? svgI("check", 14, 3) : ""}${esc(s.name)}</button>`;
+    const groups = [];
+    SUPP_TIMES.forEach(([k]) => {
+      if (k === "custom") {
+        const labels = [...new Set(list.filter(s => s.time === "custom").map(suppTimeLabel))];
+        labels.forEach(l => groups.push([l, list.filter(s => s.time === "custom" && suppTimeLabel(s) === l)]));
+      } else groups.push([SUPP_TIMES.find(x => x[0] === k)[1], list.filter(s => s.time === k)]);
+    });
+    const untimed = list.filter(s => !suppTimeLabel(s));
+    const timed = groups.filter(g => g[1].length);
+    if (untimed.length) groups.push([timed.length ? "Diğer" : "", untimed]);
+    html = groups.filter(g => g[1].length).map(([l, ss]) => (l ? `<div class="w-full text-[12px] font-bold n-muted pt-1" data-supp-group="${esc(l)}">${esc(l)}</div>` : "") + ss.map(chip).join("")).join("");
+    html += `<button onclick="suppEdit = true; renderAll();" class="n-chip" aria-label="Takviyeleri düzenle">${svgI("edit", 14)}Düzenle</button>`;
+    if (!list.length) html = `<span class="text-[13px] n-dim self-center">Takviye listen boş.</span>` + html;
+  }
   $("suppList").innerHTML = html;
+}
+function setSuppTime(i, v) {
+  const s = state.supplementList[i];
+  if (!s) return;
+  if (v === "custom") {
+    const l = prompt("Özel zaman etiketi (örn: Öğle yemeğiyle):", s.time === "custom" ? s.timeLabel || "" : "");
+    if (l === null) { renderAll(); return; }
+    s.time = "custom";
+    s.timeLabel = l.trim().slice(0, 24) || "Özel";
+  } else if (SUPP_TIMES.some(x => x[0] === v)) { s.time = v; delete s.timeLabel; }
+  else { delete s.time; delete s.timeLabel; }
+  renderAll();
 }
 function addSupp() {
   const n = prompt("Takviye adı (başına emoji ekleyebilirsin, örn: 💊 D3 Vitamini):");

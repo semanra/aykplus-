@@ -82,7 +82,7 @@ with sync_playwright() as p:
     pg.evaluate("setNutriView('today')"); pg.wait_for_timeout(100)
     pg.locator('#suppList button', has_text="Düzenle").click(); pg.wait_for_timeout(100)
     prompts[:]=["💊 D3 Vitamini"]; pg.locator('#suppList button', has_text="+ Ekle").click(); pg.wait_for_timeout(100)
-    pg.locator('#suppList button', has_text="Greens").click(); pg.wait_for_timeout(100)
+    pg.locator('#suppList button[aria-label*="Greens sil"]').click(); pg.wait_for_timeout(100)
     pg.locator('#suppList button', has_text="Bitti").click(); pg.wait_for_timeout(100)
     pg.locator('#suppList button', has_text="D3").click(); pg.wait_for_timeout(100)
     s=st(pg); print("supps:", [x["name"] for x in s["supplementList"]], s["supplements"])

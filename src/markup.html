@@ -187,6 +187,8 @@
     input.n-amt { background: var(--n-elev); border: 0; color: var(--n-text); border-radius: 12px; height: 44px; width: 56px; text-align: center; font-weight: 700; font-size: 16px; padding: 0 2px; }
     input.n-amt.big { width: 110px; height: 56px; font-size: 30px; font-weight: 800; background: transparent; }
     input.n-in { width: 100%; background: var(--n-elev); border: 0; color: var(--n-text); border-radius: 14px; height: 48px; padding: 0 14px; font-size: 17px; }
+    select.n-in { background: var(--n-elev); border: 0; color: var(--n-text); border-radius: 14px; padding: 0 10px; font-size: 16px; }
+    select.n-in:focus { outline: 2px solid var(--n-accent); outline-offset: 0; }
     input.n-search { background: transparent; border: 0; color: var(--n-text); font-size: 16px; outline: none; }
     input.n-amt:focus, input.n-in:focus { outline: 2px solid var(--n-accent); outline-offset: 0; }
     input.n-search::placeholder, input.n-in::placeholder { color: var(--n-dim); }
@@ -987,7 +989,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v16</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v17</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
