@@ -33,7 +33,7 @@ with sync_playwright() as p:
     print("card stats:", card.inner_text().replace("\n"," | ")[:220])
     print("bars 14:", card.locator("svg").first.locator("rect").count())
     card.screenshot(path=""+SHOTS+"/v9_hist14.png")
-    pg.click("text=30 gün"); pg.wait_for_timeout(200)
+    pg.click("#tabProgress >> text=30 gün"); pg.wait_for_timeout(200)
     card=pg.locator(".card", has_text="Su & Beslenme Geçmişi")
     print("bars 30:", card.locator("svg").first.locator("rect").count())
     card.screenshot(path=""+SHOTS+"/v9_hist30.png")

@@ -5,7 +5,7 @@ Kayıt tarihi: 9 Kasım 2026. Durum: **10 Kasım 2026'da ONAYLANDI. 5 paket tek 
 ## İlerleme
 - [x] 1. paket (v14) — commit "AYK+ v14: ..."
 - [x] 2. paket (v15) — commit "AYK+ v15: ..." (madde 6 çiğ↔pişmiş yapılmadı, kullanıcı kararı)
-- [ ] 3. paket (v16) — madde 8 ve 10 (madde 9 yapılmayacak)
+- [x] 3. paket (v16) — madde 8 ve 10 (madde 9 yapılmadı, kullanıcı kararı)
 - [ ] 4. paket (v17)
 - [ ] 5. paket (v18)
 - [ ] Hepsi bitince tek push (main)

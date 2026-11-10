@@ -150,6 +150,7 @@ function normalizeState(raw) {
   }));
   if (!s.shopChecked || typeof s.shopChecked !== "object" || Array.isArray(s.shopChecked)) s.shopChecked = {};
   if (!(Number.isInteger(s.shopTrainDays) && s.shopTrainDays >= 0 && s.shopTrainDays <= 7)) s.shopTrainDays = null;
+  if (s.nutriHistRange !== "30") s.nutriHistRange = "7";   // v16: Geçmiş takvim aralığı
   if (!["today", "program", "library", "history"].includes(s.gymView)) s.gymView = "today";
   if (!["today", "menus", "foods", "history"].includes(s.nutriView)) s.nutriView = "today";
   s.settings.nutriLight = !!s.settings.nutriLight;
@@ -807,6 +808,9 @@ function renderNutrition() {
   $("weightHistoryText").textContent = state.weightLogs.length > 0
     ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.date})`).join(" → ")
     : `Hedef: ${fmtNum(num(st.targetWeight, 82))} kg`;
+  const wa7 = weightAvg7();
+  $("weightAvgText").textContent = wa7 ? `7 günlük ortalama: ${fmtNum(wa7.avg)} kg (${wa7.n} tartı)` : "";
+  $("weightAvgText").classList.toggle("hidden", !wa7);
   const target = num(st.targetWeight, 82);
   const diffKg = state.weight - target;
   const weeklyLoss = (state.deficit * 7) / 7700;
@@ -1406,6 +1410,7 @@ function renderFoods() {
   if (!cats.some(c => c[0] === foodUI.cat)) foodUI.cat = "all";
   $("foodCats").innerHTML = [["all", "Tümü"], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
   renderFoodHead();
+  renderFoodSuggest();
   renderFoodList();
 }
 
@@ -1470,6 +1475,8 @@ function renderFoodList() {
   const db = getFoodDB();
   const q = normSearch($("foodSearch").value).trim();
   const words = q.split(/\s+/).filter(Boolean);
+  // v16: öneri kartı yalnızca arama boşken ve besin seçili değilken görünür
+  if ($("foodSuggest")) $("foodSuggest").classList.toggle("hidden", !!q || !!foodUI.sel || !foodSuggestCache.length);
   let ids;
   // v15: komboalar ("Komboların" kategorisinde ve aramada adıyla eşleşenler)
   let comboHtml = "";
@@ -1642,7 +1649,7 @@ function renderNutriHistory() {
         ${bits.length ? `<div class="text-[12px] n-muted flex flex-wrap gap-x-3 gap-y-1">${bits.map(b => `<span>${b}</span>`).join("")}</div>` : ""}
       </div>`;
   };
-  $("nutriHistory").innerHTML = rows.map(card).join("")
+  $("nutriHistory").innerHTML = weekCardHtml() + rows.map(card).join("")
     + (rows.length === 1 ? `<p class="text-[13px] n-muted text-center py-2">Her gün gece yarısı (ya da "Yeni gün" ile) günün özeti buraya eklenir.</p>` : "")
     + `<button onclick="switchTab('progress')" class="n-btn-outline w-full h-12 rounded-full text-[14px]">Grafikler için İlerleme sekmesine git</button>`;
 }
@@ -5192,6 +5199,250 @@ async function copyShopList() {
 async function shareShopList() {
   try { await navigator.share({ title: "Alışveriş listesi", text: shopText() }); }
   catch (e) { if (e && e.name !== "AbortError") copyShopList(); }
+}
+
+// ============================================================================
+// v16 — AKILLI: kalan makroya göre tamamla, haftalık görünüm (Geçmiş)
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// KALAN HEDEFİ KAPATAN SEÇENEKLER: yalnızca kullanıcının sık yediği/kayıtlı besinlerden,
+// önce kalan protein, sonra kalan kalori hedeflenir.
+// ---------------------------------------------------------------------------
+function frequentFoods(limit = 30) {
+  const db = getFoodDB();
+  const cnt = {};
+  const bump = (id, w) => { if (id && id !== "_est" && db[id]) cnt[id] = (cnt[id] || 0) + w; };
+  allMealLists().forEach(ms => ms.forEach(m => m.items.forEach(i => bump(i.foodId, 1))));
+  (state.combos || []).forEach(c => c.items.forEach(i => bump(i.foodId, 1)));
+  state.recentFoods.forEach((id, i) => bump(id, 2 - i * 0.1));
+  Object.keys(state.dailyLogs).forEach(k => {
+    const ms = state.dailyLogs[k].meals;
+    if (Array.isArray(ms)) ms.forEach(m => (m.items || []).forEach(i => bump(i.foodId, 0.5)));
+  });
+  return Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]).slice(0, limit);
+}
+// Ekranda gösterilecek "makul" miktar: gram/ml 10'ar, diğerleri adım (en az 0,5)
+// Gerçekçi olsun diye bir besinden en fazla porsiyonunun 2,5 katı önerilir (40 g zeytinyağı gibi miktarlar çıkmaz)
+function maxSuggestAmt(f) {
+  const def = num(f.def, isScalable(f) ? 100 : 1);
+  return isScalable(f) ? Math.min(500, Math.max(30, def * 2.5)) : Math.min(6, Math.max(1, def * 2.5));
+}
+function niceAmt(f, a) {
+  const cap = maxSuggestAmt(f);
+  if (isScalable(f)) return Math.max(10, Math.min(Math.floor(cap / 10) * 10 || 10, Math.round(a / 10) * 10));
+  const st = Math.max(0.5, num(f.step, 1));
+  return Math.max(st, Math.min(Math.floor(cap / st) * st || st, Math.round(a / st) * st));
+}
+function fillSuggestions(remP, remK) {
+  const db = getFoodDB();
+  const ids = frequentFoods(30);
+  const macro = (id, a) => { const f = db[id]; return { p: f.p * a, k: kcalPerUnit(f) * a }; };
+  const score = (P, K) => Math.abs(P - remP) * 8 + (K > remK ? (K - remK) * 2 : remK - K);
+  const out = [];
+  // Tek besin: proteini kapatacak kadar
+  ids.forEach(id => {
+    const f = db[id];
+    if (!(f.p > 0)) return;
+    const a = niceAmt(f, remP / f.p);
+    const m = macro(id, a);
+    if (m.k > remK + 80) return;
+    out.push({ parts: [{ id, a }], P: m.p, K: m.k, s: score(m.p, m.k) });
+  });
+  // İki besin: A proteini, B kalan kaloriyi kapatır
+  ids.forEach(A => {
+    const fa = db[A];
+    if (!(fa.p > 0) || (fa.p * 4) / Math.max(1e-9, kcalPerUnit(fa)) < 0.25) return;   // A protein kaynağı olmalı
+    ids.forEach(B => {
+      if (A === B) return;
+      const fb = db[B];
+      const kb = kcalPerUnit(fb);
+      if (!(kb > 0)) return;
+      const a = niceAmt(fa, remP / fa.p);
+      const ma = macro(A, a);
+      const leftK = remK - ma.k;
+      if (leftK < 60) return;
+      const b = niceAmt(fb, leftK / kb);
+      const mb = macro(B, b);
+      const P = ma.p + mb.p, K = ma.k + mb.k;
+      if (K > remK + 80) return;
+      out.push({ parts: [{ id: A, a }, { id: B, a: b }], P, K, s: score(P, K) });
+    });
+  });
+  out.sort((x, y) => x.s - y.s);
+  // Çeşitlilik: aynı besin kümesi bir kez; aynı ana protein kaynağı en fazla iki seçenekte
+  const seen = new Set(), used = {}, pick = [];
+  for (const o of out) {
+    const key = o.parts.map(p => p.id).sort().join("+");
+    const a0 = o.parts[0].id;
+    if (seen.has(key) || (used[a0] || 0) >= 2) continue;
+    seen.add(key);
+    used[a0] = (used[a0] || 0) + 1;
+    pick.push(o);
+    if (pick.length >= 3) break;
+  }
+  return pick;
+}
+let foodSuggestCache = [];
+function renderFoodSuggest() {
+  const el = $("foodSuggest");
+  if (!el) return;
+  const tIdx = foodTargetIdx();
+  const t = getTargets();
+  const tot = nutritionTotals(foodMeals());
+  const remP = t.proTarget - tot.p, remK = t.calTarget - tot.cal;
+  foodSuggestCache = tIdx >= 0 && remK >= 80 && remP >= 8 ? fillSuggestions(remP, remK) : [];
+  if (!foodSuggestCache.length) { el.innerHTML = ""; el.classList.add("hidden"); return; }
+  const db = getFoodDB();
+  el.classList.remove("hidden");
+  el.innerHTML = `<div class="n-label mb-2">KALAN HEDEFİNİ KAPATAN SEÇENEKLER</div>
+    <p class="text-[12px] n-muted mb-2">Kalan: <strong class="n-text tabular-nums">${fmtInt(remK)} kcal</strong> · <strong class="n-p tabular-nums">${fmtInt(remP)} g protein</strong>. Sık yediğin besinlerden:</p>
+    <div class="space-y-2">${foodSuggestCache.map((o, i) => {
+      const label = o.parts.map(p => `${fmtNum(p.a)} ${db[p.id].unit} ${stripEmoji(db[p.id].name).replace(/^⭐\s*/, "")}`).join(" + ");
+      const lk = Math.round(remK - o.K), lp = Math.round(remP - o.P);
+      const kTxt = lk >= 0 ? `${fmtInt(lk)} kcal kalır` : `${fmtInt(-lk)} kcal aşar`;
+      const pTxt = lp > 0 ? `${fmtInt(lp)} g P kalır` : "protein tamam";
+      return `<button onclick="addSuggestion(${i})" class="w-full min-h-[56px] n-card rounded-2xl px-3.5 py-2.5 text-left flex items-center justify-between gap-3" data-suggest="${i}">
+          <span class="min-w-0"><span class="block text-[14px] font-bold leading-snug">${esc(label)}</span>
+            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${fmtInt(o.K)} kcal · ${fmtInt(o.P)} g protein → ${kTxt}, ${pTxt}</span></span>
+          <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
+        </button>`;
+    }).join("")}</div>`;
+}
+function addSuggestion(i) {
+  const o = foodSuggestCache[i];
+  const tIdx = foodTargetIdx();
+  if (!o || tIdx < 0) return;
+  const day = foodUI.dest !== "menu";
+  const list = day ? ensureDayCopy() : curMeals();
+  const meal = list[tIdx];
+  const db = getFoodDB();
+  const items = o.parts.map(p => ({ foodId: p.id, amount: rawFromEff(db[p.id], p.a) }));
+  mergeItems(meal, items);
+  o.parts.forEach(p => { state.recentFoods = [p.id, ...state.recentFoods.filter(x => x !== p.id)].slice(0, 8); });
+  renderAll();
+  const mid = meal.id;
+  toast(`✓ ${o.parts.length} besin → ${meal.title}${day ? " (yalnızca bugün)" : " (menü)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+    const mm = curMeals().find(x => x.id === mid);
+    if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
+    mergeItems(mm, items);
+    renderAll();
+    toast(`✓ Menüdeki "${mm.title}" öğününe de eklendi`);
+  } } : null);
+}
+
+// ---------------------------------------------------------------------------
+// HAFTALIK GÖRÜNÜM (Geçmiş): 7 günlük ortalama, hedef tutturma takvimi (7/30 gün),
+// haftalık kalori bütçesi, 7 günlük hareketli kilo ortalaması
+// ---------------------------------------------------------------------------
+// Bir günün alınan kalorisi/proteini: öğün tiki varsa yenen, yoksa plan (kalori koçuyla aynı kural)
+function logIntake(d) {
+  if (!d) return null;
+  const eaten = num(d.mealsDone) > 0 && num(d.eatenKcal) > 0;
+  const k = eaten ? num(d.eatenKcal) : num(d.kcal);
+  if (!(k > 0)) return null;
+  return { k, p: eaten ? num(d.eatenP) : num(d.p, num(d.eatenP)), t: num(d.calTarget, 0), eaten };
+}
+function dateKeyOffset(n) { const d = new Date(); d.setDate(d.getDate() + n); return todayStr(d); }
+function keyToDate(k) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+// Hedefe yakınlık: yeşil ±%5 (en az 50 kcal), sarı ±%15, kırmızı daha uzak
+function hitClass(k, t) {
+  if (!(t > 0)) return "none";
+  const d = Math.abs(k - t);
+  if (d <= Math.max(50, t * 0.05)) return "ok";
+  if (d <= t * 0.15) return "near";
+  return "far";
+}
+function weekStats() {
+  const days7 = [];
+  for (let i = 7; i >= 1; i--) { const k = dateKeyOffset(-i); const x = logIntake(state.dailyLogs[k]); if (x) days7.push(x); }
+  const avgK = days7.length ? days7.reduce((a, b) => a + b.k, 0) / days7.length : 0;
+  const avgP = days7.length ? days7.reduce((a, b) => a + b.p, 0) / days7.length : 0;
+  // Bu hafta (Pazartesi–Pazar)
+  const t = getTargets().calTarget;
+  const ws = new Date(weekStart());
+  let total = 0, taken = 0, daysLeft = 0;
+  const today = dayKey();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(ws); d.setDate(ws.getDate() + i);
+    const k = todayStr(d);
+    if (k < today) {
+      const x = logIntake(state.dailyLogs[k]);
+      total += x && x.t > 0 ? x.t : t;
+      if (x) taken += x.k;
+    } else {
+      total += t;
+      if (k === today) taken += eatenTotals().cal;
+      daysLeft++;
+    }
+  }
+  return { n7: days7.length, avgK, avgP, total, taken, left: total - taken, daysLeft };
+}
+function weightAvg7() {
+  const from = Date.now() - 7 * DAY_MS;
+  const ws = state.weightLogs.filter(l => l.ts && l.ts >= from && num(l.weight) > 0).map(l => num(l.weight));
+  return ws.length ? { avg: ws.reduce((a, b) => a + b, 0) / ws.length, n: ws.length } : null;
+}
+function setNutriHistRange(r) { state.nutriHistRange = r === "30" ? "30" : "7"; renderAll(); }
+function heatHtml(n) {
+  const cells = [];
+  const start = keyToDate(dateKeyOffset(-n + 1));
+  const lead = (start.getDay() + 6) % 7;   // Pazartesi başlangıçlı ızgara
+  for (let i = 0; i < lead; i++) cells.push(`<span aria-hidden="true"></span>`);
+  for (let i = n - 1; i >= 0; i--) {
+    const k = dateKeyOffset(-i);
+    const isToday = k === dayKey();
+    const x = isToday ? null : logIntake(state.dailyLogs[k]);
+    const cls = isToday ? "today" : x ? hitClass(x.k, x.t) : "none";
+    const d = keyToDate(k);
+    const lbl = d.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+    const tip = isToday ? `${lbl}: bugün (devam ediyor)` : x ? `${lbl}: ${fmtInt(x.k)} / ${fmtInt(x.t)} kcal` : `${lbl}: kayıt yok`;
+    cells.push(`<span class="n-heat ${cls}" data-heat="${k}" data-cls="${cls}" role="img" aria-label="${esc(tip)}" title="${esc(tip)}">${d.getDate()}</span>`);
+  }
+  const wd = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"].map(x => `<span class="text-[11px] n-dim text-center">${x}</span>`).join("");
+  return `<div class="grid grid-cols-7 gap-1.5">${wd}${cells.join("")}</div>`;
+}
+function weekCardHtml() {
+  const w = weekStats();
+  const wa = weightAvg7();
+  const lastLog = state.weightLogs.reduce((m, l) => (!m || num(l.ts, 0) >= num(m.ts, 0) ? l : m), null);
+  const last = lastLog ? num(lastLog.weight) : 0;
+  const range = state.nutriHistRange === "30" ? "30" : "7";
+  const perDay = w.daysLeft > 0 ? Math.round(w.left / w.daysLeft) : 0;
+  return `<section id="weekCard" class="n-card rounded-[22px] p-4 space-y-4" aria-label="Haftalık görünüm">
+      <div class="flex items-baseline justify-between gap-2"><span class="n-label">SON 7 GÜN</span><span class="text-[12px] n-dim">${w.n7} gün kayıt</span></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><div class="text-[12px] n-muted">Ortalama kalori</div><div class="t-display text-[26px] leading-none tabular-nums mt-1" id="avgKcal">${w.n7 ? fmtInt(w.avgK) : "—"}</div><div class="text-[11px] n-dim">kcal / gün</div></div>
+        <div><div class="text-[12px] n-muted">Ortalama protein</div><div class="t-display text-[26px] leading-none tabular-nums mt-1 n-p" id="avgPro">${w.n7 ? fmtInt(w.avgP) : "—"}</div><div class="text-[11px] n-dim">g / gün</div></div>
+      </div>
+      <div class="pt-3 n-bt space-y-2.5">
+        <div class="flex items-center justify-between gap-2">
+          <span class="n-label">HEDEF TUTTURMA</span>
+          <div class="n-seg grid-cols-2 w-[150px]" aria-label="Takvim aralığı">
+            <button onclick="setNutriHistRange('7')" class="${range === "7" ? "on" : ""}" aria-pressed="${range === "7"}">7 gün</button>
+            <button onclick="setNutriHistRange('30')" class="${range === "30" ? "on" : ""}" aria-pressed="${range === "30"}">30 gün</button>
+          </div>
+        </div>
+        <div id="heatGrid">${heatHtml(range === "30" ? 30 : 7)}</div>
+        <div class="flex flex-wrap gap-x-3 gap-y-1 text-[11px] n-muted">
+          <span class="flex items-center gap-1"><i class="n-heat-dot ok"></i>Hedefte (±%5)</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot near"></i>Yakın (±%15)</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot far"></i>Uzak</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot none"></i>Kayıt yok</span>
+        </div>
+      </div>
+      <div class="pt-3 n-bt space-y-1.5" id="weekBudget">
+        <span class="n-label">BU HAFTANIN KALORİ BÜTÇESİ</span>
+        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">Haftalık hedef</span><strong class="tabular-nums">${fmtInt(w.total)} kcal</strong></div>
+        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">Şu ana kadar alınan</span><strong class="tabular-nums">${fmtInt(w.taken)} kcal</strong></div>
+        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">Kalan</span><strong class="tabular-nums ${w.left < 0 ? "n-over" : "n-accent"}">${fmtInt(w.left)} kcal</strong></div>
+        ${w.daysLeft > 0 ? `<p class="text-[12px] n-dim">Kalan ${w.daysLeft} günde (bugün dahil) günde ortalama ~${fmtInt(perDay)} kcal. Geçmiş günlerde öğün tiki yoksa planlanan kalori sayılır.</p>` : ""}
+      </div>
+      <div class="pt-3 n-bt flex items-center justify-between gap-2 text-[14px]" id="weightAvgRow">
+        <span class="n-muted">Kilo${last ? ` · son tartı <strong class="n-text">${fmtNum(last)} kg</strong>` : ""}</span>
+        <span>${wa ? `7 günlük ort. <strong class="tabular-nums">${fmtNum(wa.avg)} kg</strong> <span class="text-[11px] n-dim">(${wa.n} tartı)</span>` : `<span class="n-dim text-[12px]">Son 7 günde tartı yok</span>`}</span>
+      </div>
+    </section>`;
 }
 
 // ---------------------------------------------------------------------------
