@@ -11,6 +11,9 @@ const p = (...x) => path.join(root, ...x);
 
 execSync(`node --check "${p("src", "app.js")}"`, { stdio: "inherit" });
 execSync(`node --check "${p("src", "data.js")}"`, { stdio: "inherit" });
+// v18: besin veritabanı ayrı dosyada (scripts/usda/build_foods.py üretir)
+if (!fs.existsSync(p("foods.js"))) throw new Error("foods.js yok; scripts/usda/build_foods.py ile üret.");
+execSync(`node --check "${p("foods.js")}"`, { stdio: "inherit" });
 
 const markup = fs.readFileSync(p("src", "markup.html"), "utf8");
 const data = fs.readFileSync(p("src", "data.js"), "utf8");

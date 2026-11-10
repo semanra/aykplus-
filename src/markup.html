@@ -458,7 +458,7 @@
       <section id="foodSuggest" class="hidden" aria-label="Kalan hedefini kapatan seçenekler"></section>
       <div class="flex items-center gap-1 n-elev rounded-full pl-4 pr-1 h-[52px]">
         <svg class="n-muted shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M11 4.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM20 20l-4-4"></path></svg>
-        <input id="foodSearch" type="text" placeholder="Besin ara (tavuk, mercimek, yulaf...)" oninput="renderFoodList()" autocomplete="off" aria-label="Besin ara" class="n-search flex-1 min-w-0 h-11 pl-1" />
+        <input id="foodSearch" type="text" placeholder="Besin ara (tavuk, mercimek, yulaf...)" oninput="foodUI.limit = 0; renderFoodList()" autocomplete="off" aria-label="Besin ara" class="n-search flex-1 min-w-0 h-11 pl-1" />
         <button onclick="openBarcode()" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-accent" aria-label="Barkod okut"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13.5 8v8M17 8v8"></path></svg></button>
       </div>
       <div id="foodCats" class="flex gap-2 overflow-x-auto no-scrollbar -mx-0.5 px-0.5"></div>
@@ -988,8 +988,17 @@
           </div>
         </section>
 
+        <section class="space-y-2.5" aria-labelledby="pfH7">
+          <div id="pfH7" class="t-label">BULUNAMAYAN ARAMALAR</div>
+          <div class="t-card rounded-[22px] p-4 space-y-3">
+            <p class="text-[13px] text-[#A1A1AA]">Besinler'de aradığın ama bulamadığın kelimeler burada (yalnızca bu telefonda tutulur). Eksikleri özel besin olarak ekleyebilirsin.</p>
+            <div id="missList" class="flex flex-wrap gap-2"></div>
+            <button id="missClear" onclick="clearMissSearches()" class="t-btn-ghost w-full h-11 rounded-xl text-[14px]">Listeyi temizle</button>
+          </div>
+        </section>
+
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v17</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v18</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -1014,6 +1023,8 @@
     </div>
   </div>
 
+<!-- v18: besin veritabanı (USDA, ayrı dosya; service worker ile önbellekte, internetsiz çalışır) -->
+<script src="foods.js"></script>
 <script>
 /*__DATA__*/
 </script>

@@ -1,0 +1,1972 @@
+[
+ {
+  "id": 168652,
+  "tr": "Dana kıyma (%70 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "dana kıyma",
+   "köftelik",
+   "çekilmiş et"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174037,
+  "tr": "Dana kıyma (%75 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "dana kıyma",
+   "köftelik",
+   "çekilmiş et"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174036,
+  "tr": "Dana kıyma (%80 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "dana kıyma",
+   "köftelik",
+   "çekilmiş et"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171799,
+  "tr": "Dana kıyma (%80 yağsız), tavada kavrulmuş",
+  "aliases": [
+   "kıyma",
+   "kavrulmuş kıyma",
+   "dana kıyma"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171797,
+  "tr": "Dana köfte (%80 yağsız kıyma), ızgara",
+  "aliases": [
+   "köfte",
+   "ızgara köfte",
+   "hamburger köftesi",
+   "burger"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173068,
+  "tr": "Dana kıyma (%85 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "dana kıyma",
+   "köftelik",
+   "çekilmiş et"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174034,
+  "tr": "Dana kıyma (%85 yağsız), tavada kavrulmuş",
+  "aliases": [
+   "kıyma",
+   "kavrulmuş kıyma",
+   "dana kıyma"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174032,
+  "tr": "Dana köfte (%85 yağsız kıyma), ızgara",
+  "aliases": [
+   "köfte",
+   "ızgara köfte",
+   "hamburger köftesi",
+   "burger"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174030,
+  "tr": "Dana kıyma (%90 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "dana kıyma",
+   "köftelik",
+   "çekilmiş et"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171794,
+  "tr": "Dana kıyma (%90 yağsız), tavada kavrulmuş",
+  "aliases": [
+   "kıyma",
+   "kavrulmuş kıyma",
+   "dana kıyma"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174031,
+  "tr": "Dana köfte (%90 yağsız kıyma), ızgara",
+  "aliases": [
+   "köfte",
+   "ızgara köfte",
+   "hamburger köftesi",
+   "burger"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173110,
+  "tr": "Dana kıyma (%93 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "dana kıyma",
+   "köftelik",
+   "çekilmiş et"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174752,
+  "tr": "Dana köfte (%93 yağsız kıyma), ızgara",
+  "aliases": [
+   "köfte",
+   "ızgara köfte",
+   "hamburger köftesi",
+   "burger"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171790,
+  "tr": "Dana kıyma (%95 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "dana kıyma",
+   "köftelik",
+   "çekilmiş et"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174028,
+  "tr": "Dana kıyma (%95 yağsız), tavada kavrulmuş",
+  "aliases": [
+   "kıyma",
+   "kavrulmuş kıyma",
+   "dana kıyma"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171791,
+  "tr": "Dana köfte (%95 yağsız kıyma), ızgara",
+  "aliases": [
+   "köfte",
+   "ızgara köfte",
+   "hamburger köftesi",
+   "burger"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173111,
+  "tr": "Dana kıyma (%97 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "dana kıyma",
+   "köftelik",
+   "çekilmiş et"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172161,
+  "tr": "Dana kıyma (yağ oranı belirsiz), pişmiş",
+  "aliases": [
+   "kıyma",
+   "pişmiş kıyma",
+   "dana kıyma"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173988,
+  "tr": "Dana bonfile, çiğ",
+  "aliases": [
+   "bonfile",
+   "fileto",
+   "dana bonfile",
+   "tenderloin"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170237,
+  "tr": "Dana bonfile, ızgara",
+  "aliases": [
+   "bonfile",
+   "fileto",
+   "dana bonfile",
+   "tenderloin"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171767,
+  "tr": "Dana bonfile (yağsız kısım), çiğ",
+  "aliases": [
+   "bonfile",
+   "fileto",
+   "dana bonfile",
+   "tenderloin"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170641,
+  "tr": "Dana bonfile (yağsız kısım), ızgara",
+  "aliases": [
+   "bonfile",
+   "fileto",
+   "dana bonfile",
+   "tenderloin"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171750,
+  "tr": "Dana kontrfile, çiğ",
+  "aliases": [
+   "kontrfile",
+   "striploin",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170239,
+  "tr": "Dana kontrfile, ızgara",
+  "aliases": [
+   "kontrfile",
+   "striploin",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174002,
+  "tr": "Dana kontrfile (yağsız kısım), çiğ",
+  "aliases": [
+   "kontrfile",
+   "striploin",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 168632,
+  "tr": "Dana kontrfile (yağsız kısım), ızgara",
+  "aliases": [
+   "kontrfile",
+   "striploin",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173402,
+  "tr": "Dana antrikot, çiğ",
+  "aliases": [
+   "antrikot",
+   "ribeye",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172164,
+  "tr": "Dana antrikot, ızgara",
+  "aliases": [
+   "antrikot",
+   "ribeye",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172143,
+  "tr": "Dana antrikot (yağsız kısım), çiğ",
+  "aliases": [
+   "antrikot",
+   "ribeye",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172142,
+  "tr": "Dana antrikot (yağsız kısım), ızgara",
+  "aliases": [
+   "antrikot",
+   "ribeye",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 168726,
+  "tr": "Dana sirloin (top sirloin), çiğ",
+  "aliases": [
+   "sirloin",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 168727,
+  "tr": "Dana sirloin (top sirloin), ızgara",
+  "aliases": [
+   "sirloin",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174055,
+  "tr": "Dana sirloin (top sirloin, yağsız kısım), çiğ",
+  "aliases": [
+   "sirloin",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174054,
+  "tr": "Dana sirloin (top sirloin, yağsız kısım), ızgara",
+  "aliases": [
+   "sirloin",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172118,
+  "tr": "Dana T-bone, çiğ",
+  "aliases": [
+   "t-bone",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173351,
+  "tr": "Dana T-bone, ızgara",
+  "aliases": [
+   "t-bone",
+   "steak",
+   "biftek"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 169563,
+  "tr": "Dana bavet (flank), çiğ",
+  "aliases": [
+   "bavet",
+   "flank",
+   "flank steak"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 168733,
+  "tr": "Dana bavet (flank), ızgara",
+  "aliases": [
+   "bavet",
+   "flank",
+   "flank steak"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173400,
+  "tr": "Dana etek (skirt), çiğ",
+  "aliases": [
+   "etek",
+   "skirt",
+   "skirt steak"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173397,
+  "tr": "Dana etek (skirt), ızgara",
+  "aliases": [
+   "etek",
+   "skirt",
+   "skirt steak"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 168664,
+  "tr": "Dana döş, çiğ",
+  "aliases": [
+   "döş",
+   "dana döş",
+   "brisket"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 168665,
+  "tr": "Dana döş, kısık ateşte pişmiş",
+  "aliases": [
+   "döş",
+   "dana döş",
+   "brisket"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 168656,
+  "tr": "Dana döş (flat, yağsız kısım), çiğ",
+  "aliases": [
+   "döş",
+   "dana döş",
+   "brisket"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170210,
+  "tr": "Dana döş (flat, yağsız kısım), kısık ateşte pişmiş",
+  "aliases": [
+   "döş",
+   "dana döş",
+   "brisket"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171206,
+  "tr": "Dana kuşbaşı, çiğ",
+  "aliases": [
+   "kuşbaşı",
+   "dana kuşbaşı",
+   "sote",
+   "gulaşlık",
+   "haşlamalık"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171203,
+  "tr": "Dana kuşbaşı, kısık ateşte pişmiş",
+  "aliases": [
+   "kuşbaşı",
+   "dana kuşbaşı",
+   "sote",
+   "gulaşlık",
+   "haşlamalık"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 169491,
+  "tr": "Dana kol, çiğ",
+  "aliases": [
+   "dana kol",
+   "kol eti",
+   "chuck"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 168667,
+  "tr": "Dana kol, kısık ateşte pişmiş",
+  "aliases": [
+   "dana kol",
+   "kol eti",
+   "chuck"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174051,
+  "tr": "Dana kol (yağsız kısım), çiğ",
+  "aliases": [
+   "dana kol",
+   "kol eti",
+   "chuck"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174050,
+  "tr": "Dana kol (yağsız kısım), kısık ateşte pişmiş",
+  "aliases": [
+   "dana kol",
+   "kol eti",
+   "chuck"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 169493,
+  "tr": "Dana kürek, çiğ",
+  "aliases": [
+   "kürek",
+   "dana kürek",
+   "kürek eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 169494,
+  "tr": "Dana kürek, kısık ateşte pişmiş",
+  "aliases": [
+   "kürek",
+   "dana kürek",
+   "kürek eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170826,
+  "tr": "Dana kaburga arası (short rib, kemiksiz), çiğ",
+  "aliases": [
+   "kaburga",
+   "dana kaburga",
+   "short rib"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171222,
+  "tr": "Dana kaburga arası (short rib, kemiksiz), kısık ateşte pişmiş",
+  "aliases": [
+   "kaburga",
+   "dana kaburga",
+   "short rib"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172169,
+  "tr": "Dana kaburga (back ribs, kemikli), çiğ",
+  "aliases": [
+   "kaburga",
+   "dana kaburga",
+   "kemikli kaburga"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172166,
+  "tr": "Dana kaburga (back ribs, kemikli), kısık ateşte pişmiş",
+  "aliases": [
+   "kaburga",
+   "dana kaburga",
+   "kemikli kaburga"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171757,
+  "tr": "Dana nuar (top round, yağsız kısım), çiğ",
+  "aliases": [
+   "nuar",
+   "but",
+   "dana but",
+   "top round"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 168649,
+  "tr": "Dana nuar (top round, yağsız kısım), ızgara",
+  "aliases": [
+   "nuar",
+   "but",
+   "dana but",
+   "top round"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173125,
+  "tr": "Dana tranç (tip round, yağsız kısım), çiğ",
+  "aliases": [
+   "tranç",
+   "but",
+   "dana but"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170233,
+  "tr": "Dana tranç (tip round, yağsız kısım), fırında",
+  "aliases": [
+   "tranç",
+   "but",
+   "dana but"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171762,
+  "tr": "Dana but (eye of round, yağsız kısım), çiğ",
+  "aliases": [
+   "but",
+   "dana but",
+   "eye of round"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 171772,
+  "tr": "Dana but (eye of round, yağsız kısım), ızgara",
+  "aliases": [
+   "but",
+   "dana but",
+   "eye of round"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174046,
+  "tr": "Dana but (bottom round, yağsız kısım), çiğ",
+  "aliases": [
+   "but",
+   "dana but",
+   "bottom round"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170629,
+  "tr": "Dana but (bottom round, yağsız kısım), fırında",
+  "aliases": [
+   "but",
+   "dana but",
+   "bottom round"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 169441,
+  "tr": "Dana incik (yağsız kısım), çiğ",
+  "aliases": [
+   "incik",
+   "dana incik",
+   "kemikli incik"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 169442,
+  "tr": "Dana incik (yağsız kısım), haşlanmış",
+  "aliases": [
+   "incik",
+   "dana incik",
+   "haşlama"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174757,
+  "tr": "Dana eti (karışık parçalar), çiğ",
+  "aliases": [
+   "dana eti",
+   "kırmızı et",
+   "sığır eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170609,
+  "tr": "Dana eti (karışık parçalar), pişmiş",
+  "aliases": [
+   "dana eti",
+   "kırmızı et",
+   "sığır eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174760,
+  "tr": "Dana eti (karışık parçalar, yağsız kısım), çiğ",
+  "aliases": [
+   "dana eti",
+   "yağsız et",
+   "sığır eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170208,
+  "tr": "Dana eti (karışık parçalar, yağsız kısım), pişmiş",
+  "aliases": [
+   "dana eti",
+   "yağsız et",
+   "sığır eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 170193,
+  "tr": "Dana iç yağı, çiğ",
+  "aliases": [
+   "iç yağı",
+   "don yağı",
+   "sığır yağı"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 169451,
+  "tr": "Dana ciğer, çiğ",
+  "aliases": [
+   "ciğer",
+   "karaciğer",
+   "dana ciğeri"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 168627,
+  "tr": "Dana ciğer, tavada",
+  "aliases": [
+   "ciğer",
+   "ciğer tava",
+   "karaciğer"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 168625,
+  "tr": "Dana yürek, çiğ",
+  "aliases": [
+   "yürek",
+   "kalp",
+   "dana yüreği"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 169448,
+  "tr": "Dana yürek, haşlanmış",
+  "aliases": [
+   "yürek",
+   "kalp",
+   "dana yüreği"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 169449,
+  "tr": "Dana böbrek, çiğ",
+  "aliases": [
+   "böbrek",
+   "dana böbreği"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 169450,
+  "tr": "Dana böbrek, haşlanmış",
+  "aliases": [
+   "böbrek",
+   "dana böbreği"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 170196,
+  "tr": "Dana dil, çiğ",
+  "aliases": [
+   "dil",
+   "dana dili"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 170598,
+  "tr": "Dana dil, haşlanmış",
+  "aliases": [
+   "dil",
+   "dana dili",
+   "dil haşlama"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 170599,
+  "tr": "Dana işkembe, çiğ",
+  "aliases": [
+   "işkembe",
+   "dana işkembe"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174769,
+  "tr": "Dana işkembe, haşlanmış",
+  "aliases": [
+   "işkembe",
+   "işkembe haşlama"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 168622,
+  "tr": "Dana beyin, çiğ",
+  "aliases": [
+   "beyin",
+   "dana beyni"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 168624,
+  "tr": "Dana beyin, haşlanmış",
+  "aliases": [
+   "beyin",
+   "beyin haşlama"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 168628,
+  "tr": "Dana akciğer, çiğ",
+  "aliases": [
+   "akciğer",
+   "ak ciğer",
+   "dana akciğeri"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 170194,
+  "tr": "Dana uykuluk (timus), çiğ",
+  "aliases": [
+   "uykuluk",
+   "timus",
+   "sweetbread"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174370,
+  "tr": "Kuzu kıyma, çiğ",
+  "aliases": [
+   "kuzu kıyma",
+   "kıyma",
+   "kuzu eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172544,
+  "tr": "Kuzu kıyma, ızgara",
+  "aliases": [
+   "kuzu kıyma",
+   "kıyma",
+   "kuzu eti",
+   "kuzu köfte"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172608,
+  "tr": "Kuzu kıyma (%85 yağsız), çiğ",
+  "aliases": [
+   "kuzu kıyma",
+   "kıyma",
+   "kuzu eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174307,
+  "tr": "Kuzu eti (karışık parçalar, yağsız kısım), çiğ",
+  "aliases": [
+   "kuzu eti",
+   "kuzu",
+   "yağsız kuzu"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174308,
+  "tr": "Kuzu eti (karışık parçalar, yağsız kısım), pişmiş",
+  "aliases": [
+   "kuzu eti",
+   "kuzu",
+   "yağsız kuzu"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174414,
+  "tr": "Kuzu pirzola, çiğ",
+  "aliases": [
+   "pirzola",
+   "kuzu pirzola",
+   "kuzu kotlet"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174415,
+  "tr": "Kuzu pirzola, ızgara",
+  "aliases": [
+   "pirzola",
+   "kuzu pirzola",
+   "kuzu kotlet"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174416,
+  "tr": "Kuzu pirzola (yağsız kısım), çiğ",
+  "aliases": [
+   "pirzola",
+   "kuzu pirzola",
+   "kuzu kotlet"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172589,
+  "tr": "Kuzu pirzola (yağsız kısım), ızgara",
+  "aliases": [
+   "pirzola",
+   "kuzu pirzola",
+   "kuzu kotlet"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174377,
+  "tr": "Kuzu kafes (rib), çiğ",
+  "aliases": [
+   "kafes",
+   "kuzu kafes",
+   "pirzola"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172552,
+  "tr": "Kuzu kafes (rib), fırında",
+  "aliases": [
+   "kafes",
+   "kuzu kafes",
+   "pirzola"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172551,
+  "tr": "Kuzu sırt (loin), çiğ",
+  "aliases": [
+   "kuzu sırt",
+   "kuzu kontrfile",
+   "kuzu loin"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174375,
+  "tr": "Kuzu sırt (loin), ızgara",
+  "aliases": [
+   "kuzu sırt",
+   "kuzu kontrfile",
+   "kuzu loin"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172491,
+  "tr": "Kuzu sırt (loin, yağsız kısım), çiğ",
+  "aliases": [
+   "kuzu sırt",
+   "kuzu kontrfile",
+   "kuzu loin"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172492,
+  "tr": "Kuzu sırt (loin, yağsız kısım), ızgara",
+  "aliases": [
+   "kuzu sırt",
+   "kuzu kontrfile",
+   "kuzu loin"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174372,
+  "tr": "Kuzu but, çiğ",
+  "aliases": [
+   "kuzu but",
+   "but",
+   "kuzu eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174373,
+  "tr": "Kuzu but, fırında",
+  "aliases": [
+   "kuzu but",
+   "but",
+   "kuzu eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174313,
+  "tr": "Kuzu but (yağsız kısım), çiğ",
+  "aliases": [
+   "kuzu but",
+   "but",
+   "kuzu eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174314,
+  "tr": "Kuzu but (yağsız kısım), fırında",
+  "aliases": [
+   "kuzu but",
+   "but",
+   "kuzu eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172553,
+  "tr": "Kuzu kol, çiğ",
+  "aliases": [
+   "kuzu kol",
+   "kol",
+   "kuzu omuz"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172554,
+  "tr": "Kuzu kol, kısık ateşte pişmiş",
+  "aliases": [
+   "kuzu kol",
+   "kol",
+   "kuzu omuz"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174326,
+  "tr": "Kuzu kol (yağsız kısım), çiğ",
+  "aliases": [
+   "kuzu kol",
+   "kol",
+   "kuzu omuz"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174327,
+  "tr": "Kuzu kol (yağsız kısım), kısık ateşte pişmiş",
+  "aliases": [
+   "kuzu kol",
+   "kol",
+   "kuzu omuz"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172481,
+  "tr": "Kuzu incik, çiğ",
+  "aliases": [
+   "kuzu incik",
+   "incik"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172482,
+  "tr": "Kuzu incik, kısık ateşte pişmiş",
+  "aliases": [
+   "kuzu incik",
+   "incik"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172508,
+  "tr": "Kuzu kuşbaşı / şişlik (yağsız kısım), çiğ",
+  "aliases": [
+   "kuzu kuşbaşı",
+   "şişlik",
+   "kuşbaşı",
+   "kuzu şiş"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172510,
+  "tr": "Kuzu şiş (yağsız kısım), ızgara",
+  "aliases": [
+   "kuzu şiş",
+   "şiş kebap",
+   "şişlik"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172637,
+  "tr": "Kuzu gerdan, çiğ",
+  "aliases": [
+   "gerdan",
+   "kuzu gerdan",
+   "boyun"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172636,
+  "tr": "Kuzu gerdan, kısık ateşte pişmiş",
+  "aliases": [
+   "gerdan",
+   "kuzu gerdan",
+   "boyun"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172623,
+  "tr": "Kuzu bonfile (yağsız kısım), çiğ",
+  "aliases": [
+   "kuzu bonfile",
+   "kuzu fileto",
+   "bonfile"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172622,
+  "tr": "Kuzu bonfile (yağsız kısım), tavada",
+  "aliases": [
+   "kuzu bonfile",
+   "kuzu fileto",
+   "bonfile"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172531,
+  "tr": "Kuzu ciğer, çiğ",
+  "aliases": [
+   "kuzu ciğeri",
+   "ciğer",
+   "karaciğer"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 172533,
+  "tr": "Kuzu ciğer, tavada",
+  "aliases": [
+   "kuzu ciğeri",
+   "ciğer tava",
+   "arnavut ciğeri"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 172527,
+  "tr": "Kuzu yürek, çiğ",
+  "aliases": [
+   "kuzu yüreği",
+   "yürek"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 172528,
+  "tr": "Kuzu yürek, kısık ateşte pişmiş",
+  "aliases": [
+   "kuzu yüreği",
+   "yürek"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174354,
+  "tr": "Kuzu böbrek, çiğ",
+  "aliases": [
+   "kuzu böbreği",
+   "böbrek"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174355,
+  "tr": "Kuzu böbrek, kısık ateşte pişmiş",
+  "aliases": [
+   "kuzu böbreği",
+   "böbrek"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 172525,
+  "tr": "Kuzu beyin, çiğ",
+  "aliases": [
+   "kuzu beyni",
+   "beyin"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174350,
+  "tr": "Kuzu beyin, tavada",
+  "aliases": [
+   "kuzu beyni",
+   "beyin tava"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174366,
+  "tr": "Kuzu dil, çiğ",
+  "aliases": [
+   "kuzu dili",
+   "dil"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174367,
+  "tr": "Kuzu dil, kısık ateşte pişmiş",
+  "aliases": [
+   "kuzu dili",
+   "dil"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 172619,
+  "tr": "Koç yumurtası, çiğ",
+  "aliases": [
+   "koç yumurtası",
+   "billur"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 172618,
+  "tr": "Koç yumurtası, tavada",
+  "aliases": [
+   "koç yumurtası",
+   "billur",
+   "billur tava"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 173817,
+  "tr": "Süt danası eti (karışık parçalar, yağsız kısım), çiğ",
+  "aliases": [
+   "süt danası",
+   "dana eti",
+   "veal"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175265,
+  "tr": "Süt danası eti (karışık parçalar, yağsız kısım), pişmiş",
+  "aliases": [
+   "süt danası",
+   "dana eti",
+   "veal"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175290,
+  "tr": "Süt danası kıyma, çiğ",
+  "aliases": [
+   "süt danası kıyma",
+   "kıyma",
+   "veal"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175291,
+  "tr": "Süt danası kıyma, ızgara",
+  "aliases": [
+   "süt danası kıyma",
+   "kıyma",
+   "köfte"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173843,
+  "tr": "Süt danası kuşbaşı (yağsız kısım), çiğ",
+  "aliases": [
+   "kuşbaşı",
+   "süt danası",
+   "sote"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175289,
+  "tr": "Süt danası kuşbaşı (yağsız kısım), kısık ateşte pişmiş",
+  "aliases": [
+   "kuşbaşı",
+   "süt danası",
+   "sote"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175269,
+  "tr": "Süt danası but (yağsız kısım), çiğ",
+  "aliases": [
+   "süt danası but",
+   "but",
+   "veal"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173822,
+  "tr": "Süt danası but (yağsız kısım), fırında",
+  "aliases": [
+   "süt danası but",
+   "but",
+   "veal"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173819,
+  "tr": "Süt danası şnitzel (pane), tavada",
+  "aliases": [
+   "şnitzel",
+   "schnitzel",
+   "pane et",
+   "dana şnitzel"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172643,
+  "tr": "Süt danası eskalop, çiğ",
+  "aliases": [
+   "eskalop",
+   "escalope",
+   "dana eskalop"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174880,
+  "tr": "Süt danası eskalop, ızgara",
+  "aliases": [
+   "eskalop",
+   "escalope",
+   "dana eskalop"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172650,
+  "tr": "Süt danası pirzola, ızgara",
+  "aliases": [
+   "dana pirzola",
+   "pirzola",
+   "veal chop"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173826,
+  "tr": "Süt danası sırt (yağsız kısım), çiğ",
+  "aliases": [
+   "süt danası sırt",
+   "sırt"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175274,
+  "tr": "Süt danası sırt (yağsız kısım), fırında",
+  "aliases": [
+   "süt danası sırt",
+   "sırt"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175280,
+  "tr": "Süt danası kol (yağsız kısım), çiğ",
+  "aliases": [
+   "süt danası kol",
+   "kol"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173831,
+  "tr": "Süt danası kol (yağsız kısım), kısık ateşte pişmiş",
+  "aliases": [
+   "süt danası kol",
+   "kol"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172570,
+  "tr": "Süt danası incik (yağsız kısım), çiğ",
+  "aliases": [
+   "süt danası incik",
+   "incik",
+   "osso buco"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172571,
+  "tr": "Süt danası incik (yağsız kısım), kısık ateşte pişmiş",
+  "aliases": [
+   "süt danası incik",
+   "incik",
+   "osso buco"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172534,
+  "tr": "Süt danası ciğer, çiğ",
+  "aliases": [
+   "ciğer",
+   "dana ciğeri",
+   "karaciğer"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174358,
+  "tr": "Süt danası ciğer, tavada",
+  "aliases": [
+   "ciğer",
+   "ciğer tava",
+   "dana ciğeri"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174356,
+  "tr": "Süt danası böbrek, çiğ",
+  "aliases": [
+   "böbrek",
+   "dana böbreği"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174368,
+  "tr": "Süt danası dil, çiğ",
+  "aliases": [
+   "dil",
+   "dana dili"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 175303,
+  "tr": "Keçi eti, çiğ",
+  "aliases": [
+   "keçi eti",
+   "keçi",
+   "oğlak eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175304,
+  "tr": "Keçi eti, fırında",
+  "aliases": [
+   "keçi eti",
+   "keçi",
+   "oğlak eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 173855,
+  "tr": "Geyik eti, çiğ",
+  "aliases": [
+   "geyik eti",
+   "geyik",
+   "av eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175085,
+  "tr": "Geyik eti, fırında",
+  "aliases": [
+   "geyik eti",
+   "geyik",
+   "av eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175299,
+  "tr": "Manda eti, çiğ",
+  "aliases": [
+   "manda eti",
+   "manda",
+   "camış eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 175300,
+  "tr": "Manda eti, fırında",
+  "aliases": [
+   "manda eti",
+   "manda",
+   "camış eti"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172521,
+  "tr": "Tavşan eti, çiğ",
+  "aliases": [
+   "tavşan eti",
+   "tavşan"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 174346,
+  "tr": "Tavşan eti, haşlanmış",
+  "aliases": [
+   "tavşan eti",
+   "tavşan",
+   "tavşan yahni"
+  ],
+  "cat": "Kırmızı et"
+ },
+ {
+  "id": 172941,
+  "tr": "Hindi göğüs dilim (paketli)",
+  "aliases": [
+   "hindi füme",
+   "hindi göğüs",
+   "hindi dilim"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174572,
+  "tr": "Hindi göğüs dilim (az tuzlu)",
+  "aliases": [
+   "hindi füme",
+   "hindi göğüs",
+   "hindi dilim"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174612,
+  "tr": "Hindi füme (limon biberli, %97 yağsız)",
+  "aliases": [
+   "hindi füme",
+   "hindi göğüs",
+   "hindi dilim"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174613,
+  "tr": "Hindi göğüs dilim (çevirme)",
+  "aliases": [
+   "hindi göğüs",
+   "hindi dilim",
+   "hindi füme"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 168092,
+  "tr": "Hindi jambon (ekstra yağsız)",
+  "aliases": [
+   "hindi jambon",
+   "jambon",
+   "hindi dilim"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 172927,
+  "tr": "Hindi pastrami",
+  "aliases": [
+   "hindi pastrami",
+   "pastrami",
+   "hindi füme"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 172937,
+  "tr": "Hindi salam",
+  "aliases": [
+   "hindi salam",
+   "salam"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 173857,
+  "tr": "Hindi bologna salam",
+  "aliases": [
+   "hindi salam",
+   "bologna",
+   "salam"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 171625,
+  "tr": "Hindi sosis",
+  "aliases": [
+   "hindi sosis",
+   "sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174617,
+  "tr": "Taze hindi sosis, çiğ",
+  "aliases": [
+   "hindi sosis",
+   "sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 173871,
+  "tr": "Taze hindi sosis, pişmiş",
+  "aliases": [
+   "hindi sosis",
+   "sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174604,
+  "tr": "Hindi füme sosis (İtalyan usulü)",
+  "aliases": [
+   "hindi sosis",
+   "füme sosis",
+   "sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174606,
+  "tr": "Acılı hindi füme sosis",
+  "aliases": [
+   "hindi sosis",
+   "acılı sosis",
+   "sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174592,
+  "tr": "Hindi bacon, çiğ",
+  "aliases": [
+   "hindi bacon",
+   "bacon"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 171639,
+  "tr": "Hindi bacon, pişmiş",
+  "aliases": [
+   "hindi bacon",
+   "bacon"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174593,
+  "tr": "Hindi pepperoni",
+  "aliases": [
+   "pepperoni",
+   "hindi pepperoni",
+   "pizza salamı"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 171624,
+  "tr": "Tavuk sosis",
+  "aliases": [
+   "tavuk sosis",
+   "sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 172957,
+  "tr": "Tavuk bratwurst, pişmiş",
+  "aliases": [
+   "bratwurst",
+   "tavuk sosis",
+   "sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 172963,
+  "tr": "Tavuk göğüs dilim (fırında, yağsız)",
+  "aliases": [
+   "tavuk göğüs dilim",
+   "tavuk füme",
+   "tavuk jambon"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 172962,
+  "tr": "Tavuk göğüs dilim (füme aromalı, yağsız)",
+  "aliases": [
+   "tavuk göğüs dilim",
+   "tavuk füme"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 173874,
+  "tr": "Tavuk göğüs dilim (çevirme baharatlı)",
+  "aliases": [
+   "tavuk göğüs dilim",
+   "tavuk füme"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174608,
+  "tr": "Tavuk göğüs rulo (fırında)",
+  "aliases": [
+   "tavuk rulo",
+   "tavuk göğüs dilim",
+   "tavuk jambon"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 172928,
+  "tr": "Tavuk ciğer ezmesi (konserve)",
+  "aliases": [
+   "ciğer ezmesi",
+   "pate",
+   "tavuk ciğeri"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 173862,
+  "tr": "Dana sosis",
+  "aliases": [
+   "dana sosis",
+   "sosis",
+   "frankfurter"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174614,
+  "tr": "Dana sosis, ısıtılmış",
+  "aliases": [
+   "dana sosis",
+   "sosis",
+   "haşlanmış sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 167696,
+  "tr": "Dana sosis (az yağlı)",
+  "aliases": [
+   "dana sosis",
+   "sosis",
+   "light sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 170606,
+  "tr": "Dana füme sosis",
+  "aliases": [
+   "füme sosis",
+   "dana sosis",
+   "sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174616,
+  "tr": "Dana kahvaltılık sosis (hazır pişmiş)",
+  "aliases": [
+   "kahvaltılık sosis",
+   "dana sosis",
+   "sosis"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 172935,
+  "tr": "Dana salam",
+  "aliases": [
+   "dana salam",
+   "salam"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 172012,
+  "tr": "Dana bologna salam",
+  "aliases": [
+   "dana salam",
+   "bologna",
+   "salam"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 170204,
+  "tr": "Dana pastrami",
+  "aliases": [
+   "pastrami",
+   "dana pastrami",
+   "dana füme"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 172959,
+  "tr": "Dana pastrami (%98 yağsız)",
+  "aliases": [
+   "pastrami",
+   "dana pastrami",
+   "light pastrami"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 174570,
+  "tr": "Rosto dana (dilim)",
+  "aliases": [
+   "roast beef",
+   "rosto",
+   "dana füme",
+   "dana dilim"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 170607,
+  "tr": "Dana füme (ince dilim, preslenmiş)",
+  "aliases": [
+   "dana füme",
+   "füme et",
+   "dana dilim"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 170604,
+  "tr": "Kurutulmuş tuzlu dana eti (dilim)",
+  "aliases": [
+   "kuru et",
+   "kurutulmuş et",
+   "dana füme"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 170197,
+  "tr": "Dana bacon, çiğ",
+  "aliases": [
+   "dana bacon",
+   "bacon",
+   "beef bacon"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 170198,
+  "tr": "Dana bacon, pişmiş",
+  "aliases": [
+   "dana bacon",
+   "bacon",
+   "beef bacon"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 170200,
+  "tr": "Salamura dana döş (corned beef), pişmiş",
+  "aliases": [
+   "corned beef",
+   "salamura et",
+   "dana döş"
+  ],
+  "cat": "Şarküteri"
+ },
+ {
+  "id": 170602,
+  "tr": "Konserve dana eti (corned beef)",
+  "aliases": [
+   "corned beef",
+   "konserve et",
+   "et konservesi"
+  ],
+  "cat": "Şarküteri"
+ }
+]

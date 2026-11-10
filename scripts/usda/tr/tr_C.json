@@ -1,0 +1,3080 @@
+[
+ {
+  "id": 169205,
+  "tr": "Enginar, çiğ",
+  "aliases": [
+   "enginar",
+   "enginar kalbi"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168386,
+  "tr": "Enginar, haşlanmış",
+  "aliases": [
+   "enginar",
+   "zeytinyağlı enginar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168387,
+  "tr": "Enginar, dondurulmuş",
+  "aliases": [
+   "enginar",
+   "dondurulmuş enginar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168388,
+  "tr": "Enginar, dondurulmuş, haşlanmış",
+  "aliases": [
+   "enginar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168389,
+  "tr": "Kuşkonmaz, çiğ",
+  "aliases": [
+   "kuşkonmaz",
+   "asparagus"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168390,
+  "tr": "Kuşkonmaz, haşlanmış",
+  "aliases": [
+   "kuşkonmaz",
+   "asparagus"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169207,
+  "tr": "Kuşkonmaz, konserve, süzülmüş",
+  "aliases": [
+   "kuşkonmaz",
+   "konserve kuşkonmaz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169208,
+  "tr": "Kuşkonmaz, dondurulmuş",
+  "aliases": [
+   "kuşkonmaz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169209,
+  "tr": "Kuşkonmaz, dondurulmuş, haşlanmış",
+  "aliases": [
+   "kuşkonmaz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169998,
+  "tr": "Taze mısır, çiğ",
+  "aliases": [
+   "mısır",
+   "koçan mısır",
+   "tatlı mısır"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169999,
+  "tr": "Taze mısır, haşlanmış",
+  "aliases": [
+   "mısır",
+   "haşlanmış mısır",
+   "koçan mısır"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169214,
+  "tr": "Mısır, konserve, süzülmüş",
+  "aliases": [
+   "mısır konservesi",
+   "konserve mısır",
+   "tane mısır"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168397,
+  "tr": "Mısır, konserve, süzülmüş ve durulanmış",
+  "aliases": [
+   "mısır konservesi",
+   "konserve mısır"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170409,
+  "tr": "Mısır, konserve (suyuyla)",
+  "aliases": [
+   "mısır konservesi",
+   "konserve mısır"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169215,
+  "tr": "Kremalı mısır, konserve",
+  "aliases": [
+   "krem mısır",
+   "mısır püresi"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168399,
+  "tr": "Mısır taneleri, dondurulmuş, haşlanmış",
+  "aliases": [
+   "dondurulmuş mısır",
+   "tane mısır"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168400,
+  "tr": "Koçanda mısır, dondurulmuş",
+  "aliases": [
+   "koçan mısır",
+   "dondurulmuş mısır"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168401,
+  "tr": "Koçanda mısır, dondurulmuş, haşlanmış",
+  "aliases": [
+   "koçan mısır",
+   "haşlanmış mısır"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168405,
+  "tr": "Taze börülce, çiğ",
+  "aliases": [
+   "börülce",
+   "kabuklu börülce"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169221,
+  "tr": "Taze börülce, haşlanmış",
+  "aliases": [
+   "börülce",
+   "zeytinyağlı börülce"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169220,
+  "tr": "Börülce tanesi (taze), çiğ",
+  "aliases": [
+   "börülce",
+   "taze börülce"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168402,
+  "tr": "Börülce tanesi (taze), haşlanmış",
+  "aliases": [
+   "börülce"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168407,
+  "tr": "Tere, çiğ",
+  "aliases": [
+   "tere otu",
+   "bahçe teresi"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168409,
+  "tr": "Salatalık, kabuklu, çiğ",
+  "aliases": [
+   "salatalık",
+   "hıyar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169225,
+  "tr": "Salatalık, soyulmuş, çiğ",
+  "aliases": [
+   "salatalık",
+   "hıyar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168412,
+  "tr": "Endivyen, çiğ",
+  "aliases": [
+   "kıvırcık hindiba",
+   "hindiba"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170404,
+  "tr": "Hindiba (Belçika hindibası), çiğ",
+  "aliases": [
+   "hindiba",
+   "witloof"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168564,
+  "tr": "Kırmızı hindiba (radicchio), çiğ",
+  "aliases": [
+   "radicchio",
+   "radikyo"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169992,
+  "tr": "Radika, çiğ",
+  "aliases": [
+   "radika",
+   "yabani hindiba"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168421,
+  "tr": "Kale, çiğ",
+  "aliases": [
+   "kale lahanası",
+   "yeşil yapraklı lahana"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169238,
+  "tr": "Kale, haşlanmış",
+  "aliases": [
+   "kale lahanası"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170406,
+  "tr": "Kara lahana, çiğ",
+  "aliases": [
+   "karalahana",
+   "kara lahana yaprağı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170407,
+  "tr": "Kara lahana, haşlanmış",
+  "aliases": [
+   "karalahana",
+   "kara lahana sarması"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169251,
+  "tr": "Kültür mantarı, çiğ",
+  "aliases": [
+   "mantar",
+   "beyaz mantar",
+   "şampinyon"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169252,
+  "tr": "Kültür mantarı, haşlanmış",
+  "aliases": [
+   "mantar",
+   "şampinyon"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169253,
+  "tr": "Kültür mantarı, sotelenmiş",
+  "aliases": [
+   "mantar sote",
+   "şampinyon"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169254,
+  "tr": "Mantar, konserve, süzülmüş",
+  "aliases": [
+   "konserve mantar",
+   "mantar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168434,
+  "tr": "Kestane mantarı, çiğ",
+  "aliases": [
+   "kahverengi mantar",
+   "crimini"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169255,
+  "tr": "Portobello mantarı, çiğ",
+  "aliases": [
+   "portobello",
+   "mantar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169243,
+  "tr": "Portobello mantarı, ızgara",
+  "aliases": [
+   "portobello",
+   "ızgara mantar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168580,
+  "tr": "İstiridye mantarı, çiğ",
+  "aliases": [
+   "istiridye mantarı",
+   "kayın mantarı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169242,
+  "tr": "Shiitake mantarı, çiğ",
+  "aliases": [
+   "shiitake",
+   "mantar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168436,
+  "tr": "Shiitake mantarı, kurutulmuş",
+  "aliases": [
+   "shiitake",
+   "kuru mantar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168423,
+  "tr": "Kuzugöbeği mantarı, çiğ",
+  "aliases": [
+   "kuzugöbeği",
+   "morel"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168424,
+  "tr": "Alabaş, çiğ",
+  "aliases": [
+   "alabaş",
+   "yer lahanası"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169246,
+  "tr": "Pırasa, çiğ",
+  "aliases": [
+   "pırasa"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168426,
+  "tr": "Pırasa, haşlanmış",
+  "aliases": [
+   "pırasa",
+   "zeytinyağlı pırasa"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168427,
+  "tr": "Mercimek filizi, çiğ",
+  "aliases": [
+   "filiz",
+   "mercimek"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169247,
+  "tr": "Marul, çiğ",
+  "aliases": [
+   "marul",
+   "romaine"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169248,
+  "tr": "Aysberg marul, çiğ",
+  "aliases": [
+   "aysberg",
+   "iceberg",
+   "göbek marul"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169249,
+  "tr": "Kıvırcık marul, çiğ",
+  "aliases": [
+   "kıvırcık",
+   "yeşil yapraklı marul"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168431,
+  "tr": "Kırmızı kıvırcık, çiğ",
+  "aliases": [
+   "lollo rosso",
+   "kırmızı marul"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168429,
+  "tr": "Tereyağı marulu, çiğ",
+  "aliases": [
+   "butterhead",
+   "yumuşak marul"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168462,
+  "tr": "Ispanak, çiğ",
+  "aliases": [
+   "ıspanak",
+   "bebek ıspanak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168463,
+  "tr": "Ispanak, haşlanmış",
+  "aliases": [
+   "ıspanak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169288,
+  "tr": "Ispanak, dondurulmuş, haşlanmış",
+  "aliases": [
+   "ıspanak",
+   "dondurulmuş ıspanak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169286,
+  "tr": "Ispanak, konserve, süzülmüş",
+  "aliases": [
+   "ıspanak",
+   "konserve ıspanak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170026,
+  "tr": "Patates, kabuklu, çiğ",
+  "aliases": [
+   "patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170029,
+  "tr": "Kırmızı patates, kabuklu, çiğ",
+  "aliases": [
+   "patates",
+   "kırmızı patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170093,
+  "tr": "Patates, kabuğuyla fırında",
+  "aliases": [
+   "fırın patates",
+   "patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170033,
+  "tr": "Patates, fırında (kabuksuz iç)",
+  "aliases": [
+   "fırın patates",
+   "patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170438,
+  "tr": "Patates, kabuğuyla haşlanmış (soyulmuş)",
+  "aliases": [
+   "haşlanmış patates",
+   "patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170440,
+  "tr": "Patates, soyulup haşlanmış",
+  "aliases": [
+   "haşlanmış patates",
+   "patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170441,
+  "tr": "Patates, mikrodalgada (kabuksuz iç)",
+  "aliases": [
+   "patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170444,
+  "tr": "Patates, konserve, süzülmüş",
+  "aliases": [
+   "konserve patates",
+   "patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168442,
+  "tr": "Parmak patates, dondurulmuş (pişmemiş)",
+  "aliases": [
+   "patates kızartması",
+   "dondurulmuş patates",
+   "cips patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169264,
+  "tr": "Parmak patates, dondurulmuş, fırında",
+  "aliases": [
+   "patates kızartması",
+   "fırın patates",
+   "cips patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170451,
+  "tr": "İnce kesim patates, dondurulmuş (pişmemiş)",
+  "aliases": [
+   "patates kızartması",
+   "ince patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170452,
+  "tr": "İnce kesim patates, dondurulmuş, fırında",
+  "aliases": [
+   "patates kızartması",
+   "ince patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168444,
+  "tr": "Kalın kesim patates, dondurulmuş (pişmemiş)",
+  "aliases": [
+   "patates kızartması",
+   "steak patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168445,
+  "tr": "Kalın kesim patates, dondurulmuş, fırında",
+  "aliases": [
+   "patates kızartması",
+   "steak patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168946,
+  "tr": "Elma dilim patates, dondurulmuş (pişmemiş)",
+  "aliases": [
+   "elma dilim",
+   "patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170047,
+  "tr": "Patates topları, dondurulmuş (pişmemiş)",
+  "aliases": [
+   "patates topu",
+   "kroket patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170048,
+  "tr": "Patates topları, dondurulmuş, fırında",
+  "aliases": [
+   "patates topu",
+   "kroket patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170036,
+  "tr": "Rösti patates (ev yapımı)",
+  "aliases": [
+   "rösti",
+   "patates rösti"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170044,
+  "tr": "Rösti patates, dondurulmuş, tavada kızartılmış",
+  "aliases": [
+   "rösti",
+   "hash brown"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170092,
+  "tr": "Patates mücveri",
+  "aliases": [
+   "patates köftesi",
+   "latke"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170493,
+  "tr": "Patates püresi, sütlü (ev yapımı)",
+  "aliases": [
+   "patates püresi",
+   "püre"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168555,
+  "tr": "Patates püresi, süt ve tereyağlı (ev yapımı)",
+  "aliases": [
+   "patates püresi",
+   "püre"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169768,
+  "tr": "Patates püresi, hazır",
+  "aliases": [
+   "patates püresi",
+   "hazır püre"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170445,
+  "tr": "Patates püresi tozu (kuru)",
+  "aliases": [
+   "hazır püre",
+   "püre tozu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170442,
+  "tr": "Patates graten (tereyağlı, ev yapımı)",
+  "aliases": [
+   "graten",
+   "fırında patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169269,
+  "tr": "Patates salatası, mayonezli (ev yapımı)",
+  "aliases": [
+   "patates salatası",
+   "mayonezli salata"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168446,
+  "tr": "Patates unu",
+  "aliases": [
+   "patates nişastası",
+   "un"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168448,
+  "tr": "Bal kabağı, çiğ",
+  "aliases": [
+   "balkabağı",
+   "kabak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168449,
+  "tr": "Bal kabağı, haşlanmış",
+  "aliases": [
+   "balkabağı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168450,
+  "tr": "Bal kabağı püresi, konserve",
+  "aliases": [
+   "balkabağı püresi",
+   "balkabağı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169295,
+  "tr": "Butternut kabak, çiğ",
+  "aliases": [
+   "bal kabağı",
+   "butternut"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169296,
+  "tr": "Butternut kabak, fırında",
+  "aliases": [
+   "bal kabağı",
+   "butternut"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169298,
+  "tr": "Spagetti kabak, çiğ",
+  "aliases": [
+   "spagetti kabağı",
+   "kabak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169299,
+  "tr": "Spagetti kabak, pişmiş",
+  "aliases": [
+   "spagetti kabağı",
+   "kabak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169291,
+  "tr": "Kabak, kabuklu, çiğ",
+  "aliases": [
+   "sakız kabağı",
+   "yeşil kabak",
+   "kabak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169292,
+  "tr": "Kabak, kabuklu, haşlanmış",
+  "aliases": [
+   "sakız kabağı",
+   "kabak",
+   "zeytinyağlı kabak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168469,
+  "tr": "Kabak, dondurulmuş",
+  "aliases": [
+   "sakız kabağı",
+   "kabak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168565,
+  "tr": "Bebek kabak, çiğ",
+  "aliases": [
+   "mini kabak",
+   "kabak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168464,
+  "tr": "Sarı kabak, çiğ",
+  "aliases": [
+   "yaz kabağı",
+   "kabak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168465,
+  "tr": "Sarı kabak, haşlanmış",
+  "aliases": [
+   "yaz kabağı",
+   "kabak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169270,
+  "tr": "Kabak çiçeği, çiğ",
+  "aliases": [
+   "kabak çiçeği dolması"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168483,
+  "tr": "Tatlı patates, kabuğunda fırında",
+  "aliases": [
+   "tatlı patates",
+   "fırın tatlı patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168484,
+  "tr": "Tatlı patates, soyulup haşlanmış",
+  "aliases": [
+   "tatlı patates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168015,
+  "tr": "Tatlı patates kızartmalık, dondurulmuş",
+  "aliases": [
+   "tatlı patates kızartması"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169387,
+  "tr": "Roka, çiğ",
+  "aliases": [
+   "roka"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169226,
+  "tr": "Karahindiba, çiğ",
+  "aliases": [
+   "karahindiba yaprağı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169228,
+  "tr": "Patlıcan, çiğ",
+  "aliases": [
+   "patlıcan"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169229,
+  "tr": "Patlıcan, haşlanmış",
+  "aliases": [
+   "patlıcan"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169892,
+  "tr": "Patlıcan turşusu",
+  "aliases": [
+   "turşu",
+   "patlıcan"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169230,
+  "tr": "Sarımsak, çiğ",
+  "aliases": [
+   "sarımsak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169231,
+  "tr": "Zencefil, taze",
+  "aliases": [
+   "zencefil kökü"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169236,
+  "tr": "Yer elması, çiğ",
+  "aliases": [
+   "yerelması"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169244,
+  "tr": "Sirken, çiğ",
+  "aliases": [
+   "kazayağı",
+   "sirken otu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169260,
+  "tr": "Bamya, çiğ",
+  "aliases": [
+   "bamya"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169261,
+  "tr": "Bamya, haşlanmış",
+  "aliases": [
+   "bamya"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169262,
+  "tr": "Bamya, dondurulmuş",
+  "aliases": [
+   "bamya",
+   "dondurulmuş bamya"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169263,
+  "tr": "Bamya, dondurulmuş, haşlanmış",
+  "aliases": [
+   "bamya"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169274,
+  "tr": "Semizotu, çiğ",
+  "aliases": [
+   "semizotu",
+   "pirpirim"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169275,
+  "tr": "Semizotu, haşlanmış",
+  "aliases": [
+   "semizotu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169279,
+  "tr": "Lahana turşusu (sauerkraut), konserve",
+  "aliases": [
+   "lahana turşusu",
+   "sauerkraut",
+   "turşu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168567,
+  "tr": "Kurutulmuş domates",
+  "aliases": [
+   "kuru domates",
+   "güneşte kurutulmuş domates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169384,
+  "tr": "Kurutulmuş domates, yağda (süzülmüş)",
+  "aliases": [
+   "kuru domates",
+   "yağlı kuru domates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168568,
+  "tr": "Bebek havuç, çiğ",
+  "aliases": [
+   "havuç",
+   "mini havuç"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168570,
+  "tr": "Kurutulmuş acı biber",
+  "aliases": [
+   "kuru biber",
+   "acı biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168575,
+  "tr": "Asma yaprağı, taze (çiğ)",
+  "aliases": [
+   "asma yaprağı",
+   "sarma yaprağı",
+   "yaprak"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169393,
+  "tr": "Asma yaprağı, salamura (konserve)",
+  "aliases": [
+   "salamura yaprak",
+   "sarma yaprağı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168576,
+  "tr": "Jalapeño biber, çiğ",
+  "aliases": [
+   "jalapeno",
+   "acı biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170080,
+  "tr": "Jalapeño biber, konserve",
+  "aliases": [
+   "jalapeno",
+   "acı biber turşusu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169394,
+  "tr": "Banana biber, çiğ",
+  "aliases": [
+   "sarı biber",
+   "uzun biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168574,
+  "tr": "Taze bakla (kabuklu), çiğ",
+  "aliases": [
+   "bakla",
+   "taze bakla"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170377,
+  "tr": "Taze bakla tanesi, çiğ",
+  "aliases": [
+   "bakla",
+   "iç bakla"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170378,
+  "tr": "Taze bakla tanesi, haşlanmış",
+  "aliases": [
+   "bakla",
+   "iç bakla"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169961,
+  "tr": "Taze fasulye, çiğ",
+  "aliases": [
+   "fasulye",
+   "çalı fasulye",
+   "yeşil fasulye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169141,
+  "tr": "Taze fasulye, haşlanmış",
+  "aliases": [
+   "fasulye",
+   "yeşil fasulye",
+   "zeytinyağlı fasulye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169143,
+  "tr": "Taze fasulye, konserve, süzülmüş",
+  "aliases": [
+   "fasulye",
+   "konserve fasulye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169963,
+  "tr": "Taze fasulye, dondurulmuş, haşlanmış",
+  "aliases": [
+   "fasulye",
+   "dondurulmuş fasulye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169320,
+  "tr": "Sarı taze fasulye, çiğ",
+  "aliases": [
+   "sarı fasulye",
+   "taze fasulye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169322,
+  "tr": "Sarı taze fasulye, haşlanmış",
+  "aliases": [
+   "sarı fasulye",
+   "taze fasulye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169145,
+  "tr": "Pancar, çiğ",
+  "aliases": [
+   "kırmızı pancar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169146,
+  "tr": "Pancar, haşlanmış",
+  "aliases": [
+   "kırmızı pancar",
+   "haşlanmış pancar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169966,
+  "tr": "Pancar, konserve, süzülmüş",
+  "aliases": [
+   "kırmızı pancar",
+   "konserve pancar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170480,
+  "tr": "Pancar turşusu, konserve",
+  "aliases": [
+   "turşu",
+   "kırmızı pancar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170375,
+  "tr": "Pancar yaprağı, çiğ",
+  "aliases": [
+   "pancar otu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170379,
+  "tr": "Brokoli, çiğ",
+  "aliases": [
+   "brokoli"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169967,
+  "tr": "Brokoli, haşlanmış",
+  "aliases": [
+   "brokoli",
+   "buharda brokoli"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169968,
+  "tr": "Brokoli, dondurulmuş",
+  "aliases": [
+   "brokoli",
+   "dondurulmuş brokoli"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169969,
+  "tr": "Brokoli, dondurulmuş, haşlanmış",
+  "aliases": [
+   "brokoli"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169330,
+  "tr": "Brokoli çiçeği, çiğ",
+  "aliases": [
+   "brokoli"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169331,
+  "tr": "Brokoli sapı, çiğ",
+  "aliases": [
+   "brokoli"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170383,
+  "tr": "Brüksel lahanası, çiğ",
+  "aliases": [
+   "brüksel lahanası",
+   "minik lahana"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169971,
+  "tr": "Brüksel lahanası, haşlanmış",
+  "aliases": [
+   "brüksel lahanası"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169972,
+  "tr": "Brüksel lahanası, dondurulmuş",
+  "aliases": [
+   "brüksel lahanası"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169973,
+  "tr": "Brüksel lahanası, dondurulmuş, haşlanmış",
+  "aliases": [
+   "brüksel lahanası"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169975,
+  "tr": "Beyaz lahana, çiğ",
+  "aliases": [
+   "lahana",
+   "beyaz lahana"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169976,
+  "tr": "Beyaz lahana, haşlanmış",
+  "aliases": [
+   "lahana",
+   "lahana sarması"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169977,
+  "tr": "Kırmızı lahana, çiğ",
+  "aliases": [
+   "mor lahana",
+   "kırmızı lahana"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169978,
+  "tr": "Kırmızı lahana, haşlanmış",
+  "aliases": [
+   "mor lahana"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170388,
+  "tr": "Kıvırcık lahana (savoy), çiğ",
+  "aliases": [
+   "savoy lahana",
+   "lahana"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170389,
+  "tr": "Kıvırcık lahana (savoy), haşlanmış",
+  "aliases": [
+   "savoy lahana",
+   "lahana"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169979,
+  "tr": "Çin lahanası, çiğ",
+  "aliases": [
+   "çin lahanası",
+   "napa lahana"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169980,
+  "tr": "Çin lahanası, haşlanmış",
+  "aliases": [
+   "çin lahanası"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170390,
+  "tr": "Pak choi, çiğ",
+  "aliases": [
+   "bok choy",
+   "pak choi"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170391,
+  "tr": "Pak choi, haşlanmış",
+  "aliases": [
+   "bok choy",
+   "pak choi"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170393,
+  "tr": "Havuç, çiğ",
+  "aliases": [
+   "havuç"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170394,
+  "tr": "Havuç, haşlanmış",
+  "aliases": [
+   "havuç"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169984,
+  "tr": "Havuç, dondurulmuş, haşlanmış",
+  "aliases": [
+   "havuç"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170396,
+  "tr": "Havuç, konserve, süzülmüş",
+  "aliases": [
+   "havuç",
+   "konserve havuç"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170491,
+  "tr": "Havuç suyu, konserve",
+  "aliases": [
+   "havuç suyu",
+   "sebze suyu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169986,
+  "tr": "Karnabahar, çiğ",
+  "aliases": [
+   "karnabahar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170397,
+  "tr": "Karnabahar, haşlanmış",
+  "aliases": [
+   "karnabahar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170398,
+  "tr": "Karnabahar, dondurulmuş",
+  "aliases": [
+   "karnabahar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170399,
+  "tr": "Karnabahar, dondurulmuş, haşlanmış",
+  "aliases": [
+   "karnabahar"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169389,
+  "tr": "Yeşil karnabahar, çiğ",
+  "aliases": [
+   "karnabahar",
+   "romanesko"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170400,
+  "tr": "Kereviz (kök), çiğ",
+  "aliases": [
+   "kereviz",
+   "kök kereviz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169987,
+  "tr": "Kereviz (kök), haşlanmış",
+  "aliases": [
+   "kereviz",
+   "zeytinyağlı kereviz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169988,
+  "tr": "Sap kereviz, çiğ",
+  "aliases": [
+   "kereviz sapı",
+   "sap kereviz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169989,
+  "tr": "Sap kereviz, haşlanmış",
+  "aliases": [
+   "kereviz sapı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169991,
+  "tr": "Pazı, çiğ",
+  "aliases": [
+   "pazı",
+   "pazı yaprağı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170401,
+  "tr": "Pazı, haşlanmış",
+  "aliases": [
+   "pazı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169994,
+  "tr": "Frenk soğanı, çiğ",
+  "aliases": [
+   "frenk soğanı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170075,
+  "tr": "Frenk soğanı, kurutulmuş",
+  "aliases": [
+   "frenk soğanı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169997,
+  "tr": "Kişniş, taze yaprak",
+  "aliases": [
+   "kişniş",
+   "taze kişniş"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170000,
+  "tr": "Kuru soğan, çiğ",
+  "aliases": [
+   "soğan",
+   "kuru soğan"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170001,
+  "tr": "Kuru soğan, haşlanmış",
+  "aliases": [
+   "soğan"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170004,
+  "tr": "Kuru soğan, kavrulmuş",
+  "aliases": [
+   "soğan",
+   "kavrulmuş soğan",
+   "sote soğan"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170008,
+  "tr": "Tatlı soğan, çiğ",
+  "aliases": [
+   "soğan",
+   "beyaz soğan"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170002,
+  "tr": "Kurutulmuş soğan (pul)",
+  "aliases": [
+   "soğan",
+   "kuru soğan pul"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170005,
+  "tr": "Yeşil soğan, çiğ",
+  "aliases": [
+   "taze soğan",
+   "yeşil soğan"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170499,
+  "tr": "Arpacık soğanı (şalot), çiğ",
+  "aliases": [
+   "arpacık soğan",
+   "şalot"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170415,
+  "tr": "Soğan halkası, pane, fırında",
+  "aliases": [
+   "soğan halkası"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170416,
+  "tr": "Maydanoz, taze",
+  "aliases": [
+   "maydanoz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170486,
+  "tr": "Maydanoz, kurutulmuş",
+  "aliases": [
+   "kuru maydanoz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170417,
+  "tr": "Yaban havucu, çiğ",
+  "aliases": [
+   "parsnip"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170009,
+  "tr": "Yaban havucu, haşlanmış",
+  "aliases": [
+   "parsnip"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170419,
+  "tr": "Bezelye, çiğ",
+  "aliases": [
+   "bezelye",
+   "taze bezelye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170420,
+  "tr": "Bezelye, haşlanmış",
+  "aliases": [
+   "bezelye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170013,
+  "tr": "Bezelye, konserve, süzülmüş",
+  "aliases": [
+   "bezelye",
+   "konserve bezelye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170017,
+  "tr": "Bezelye, dondurulmuş, haşlanmış",
+  "aliases": [
+   "bezelye",
+   "dondurulmuş bezelye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170010,
+  "tr": "Şeker bezelye (kabuklu), çiğ",
+  "aliases": [
+   "şeker bezelye",
+   "kar bezelyesi"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170011,
+  "tr": "Şeker bezelye (kabuklu), haşlanmış",
+  "aliases": [
+   "şeker bezelye"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170425,
+  "tr": "Bezelye ve havuç, dondurulmuş",
+  "aliases": [
+   "garnitür",
+   "bezelye",
+   "havuç"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170018,
+  "tr": "Bezelye ve havuç, dondurulmuş, haşlanmış",
+  "aliases": [
+   "garnitür",
+   "bezelye",
+   "havuç"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170427,
+  "tr": "Yeşil dolmalık biber, çiğ",
+  "aliases": [
+   "dolmalık biber",
+   "yeşil biber",
+   "biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170428,
+  "tr": "Yeşil dolmalık biber, haşlanmış",
+  "aliases": [
+   "dolmalık biber",
+   "yeşil biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170024,
+  "tr": "Yeşil dolmalık biber, sotelenmiş",
+  "aliases": [
+   "dolmalık biber",
+   "biber sote"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170108,
+  "tr": "Kırmızı dolmalık biber, çiğ",
+  "aliases": [
+   "kırmızı biber",
+   "kapya biber",
+   "çan biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170110,
+  "tr": "Kırmızı dolmalık biber, haşlanmış",
+  "aliases": [
+   "kırmızı biber",
+   "kapya biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168550,
+  "tr": "Kırmızı dolmalık biber, sotelenmiş",
+  "aliases": [
+   "kırmızı biber",
+   "biber sote"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168546,
+  "tr": "Kırmızı biber, konserve (suyuyla)",
+  "aliases": [
+   "kavanoz biber",
+   "kırmızı biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169383,
+  "tr": "Sarı dolmalık biber, çiğ",
+  "aliases": [
+   "sarı biber",
+   "çan biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170106,
+  "tr": "Kırmızı acı biber, çiğ",
+  "aliases": [
+   "acı biber",
+   "kırmızı biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170497,
+  "tr": "Yeşil acı biber, çiğ",
+  "aliases": [
+   "acı biber",
+   "sivri biber",
+   "acı sivri"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169766,
+  "tr": "Acı biber turşusu, konserve",
+  "aliases": [
+   "biber turşusu",
+   "turşu",
+   "acı biber"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170457,
+  "tr": "Domates, çiğ",
+  "aliases": [
+   "domates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170456,
+  "tr": "Yeşil domates, çiğ",
+  "aliases": [
+   "yeşil domates",
+   "ham domates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170096,
+  "tr": "Sarı domates, çiğ",
+  "aliases": [
+   "domates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170050,
+  "tr": "Domates, pişmiş",
+  "aliases": [
+   "domates",
+   "pişmiş domates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170051,
+  "tr": "Domates, konserve (domates suyunda)",
+  "aliases": [
+   "konserve domates",
+   "soyulmuş domates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170138,
+  "tr": "Domates, konserve (domates suyunda), tuzsuz",
+  "aliases": [
+   "konserve domates",
+   "soyulmuş domates"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170501,
+  "tr": "Rendelenmiş domates, konserve",
+  "aliases": [
+   "ezilmiş domates",
+   "domates rendesi"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170465,
+  "tr": "Şalgam, çiğ",
+  "aliases": [
+   "şalgam",
+   "şalgam kökü"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170058,
+  "tr": "Şalgam, haşlanmış",
+  "aliases": [
+   "şalgam"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170061,
+  "tr": "Şalgam yaprağı, çiğ",
+  "aliases": [
+   "şalgam otu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170471,
+  "tr": "Karışık sebze (garnitür), dondurulmuş",
+  "aliases": [
+   "garnitür",
+   "karışık sebze",
+   "dondurulmuş sebze"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170472,
+  "tr": "Karışık sebze (garnitür), dondurulmuş, haşlanmış",
+  "aliases": [
+   "garnitür",
+   "karışık sebze"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170065,
+  "tr": "Karışık sebze, konserve, süzülmüş",
+  "aliases": [
+   "garnitür",
+   "karışık sebze"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170068,
+  "tr": "Su teresi, çiğ",
+  "aliases": [
+   "su teresi",
+   "tere"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168558,
+  "tr": "Salatalık turşusu (dereotlu)",
+  "aliases": [
+   "turşu",
+   "kornişon",
+   "salatalık turşusu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169379,
+  "tr": "Salatalık turşusu (ekşi)",
+  "aliases": [
+   "turşu",
+   "salatalık turşusu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169378,
+  "tr": "Salatalık turşusu, tatlı",
+  "aliases": [
+   "tatlı turşu",
+   "turşu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169385,
+  "tr": "Rezene (yumru), çiğ",
+  "aliases": [
+   "rezene",
+   "arapsaçı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169957,
+  "tr": "Maş fasulyesi filizi, çiğ",
+  "aliases": [
+   "fasulye filizi",
+   "soya filizi",
+   "filiz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169137,
+  "tr": "Maş fasulyesi filizi, haşlanmış",
+  "aliases": [
+   "fasulye filizi",
+   "filiz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168384,
+  "tr": "Yonca filizi, çiğ",
+  "aliases": [
+   "alfalfa",
+   "filiz"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 169256,
+  "tr": "Hardal otu, çiğ",
+  "aliases": [
+   "hardal yaprağı"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170076,
+  "tr": "Labada, çiğ",
+  "aliases": [
+   "labada otu",
+   "efelek"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170481,
+  "tr": "Hodan, çiğ",
+  "aliases": [
+   "hodan otu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 168458,
+  "tr": "Nori yosunu, çiğ",
+  "aliases": [
+   "nori",
+   "deniz yosunu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170495,
+  "tr": "Spirulina, kurutulmuş",
+  "aliases": [
+   "spirulina",
+   "spirulina tozu"
+  ],
+  "cat": "Sebzeler"
+ },
+ {
+  "id": 170063,
+  "tr": "Sebze suyu kokteyli, konserve",
+  "aliases": [
+   "sebze suyu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 170458,
+  "tr": "Domates suyu, konserve",
+  "aliases": [
+   "domates suyu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 170545,
+  "tr": "Domates suyu, konserve, tuzsuz",
+  "aliases": [
+   "domates suyu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 170054,
+  "tr": "Domates sosu, konserve",
+  "aliases": [
+   "domates sosu",
+   "sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 169074,
+  "tr": "Domates sosu, konserve, tuzsuz",
+  "aliases": [
+   "domates sosu",
+   "sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 170055,
+  "tr": "Domates sosu, mantarlı (konserve)",
+  "aliases": [
+   "domates sosu",
+   "mantarlı sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 170057,
+  "tr": "Domates sosu, otlu ve peynirli (konserve)",
+  "aliases": [
+   "domates sosu",
+   "makarna sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 170546,
+  "tr": "Domates püresi, konserve",
+  "aliases": [
+   "domates püresi",
+   "passata"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 170460,
+  "tr": "Domates püresi, konserve, tuzsuz",
+  "aliases": [
+   "domates püresi",
+   "passata"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 170461,
+  "tr": "Domates tozu",
+  "aliases": [
+   "domates tozu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 168556,
+  "tr": "Ketçap",
+  "aliases": [
+   "ketçap",
+   "ketchup"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 169381,
+  "tr": "Ketçap, az sodyumlu",
+  "aliases": [
+   "ketçap",
+   "ketchup"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172442,
+  "tr": "Miso",
+  "aliases": [
+   "miso ezmesi"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174277,
+  "tr": "Soya sosu",
+  "aliases": [
+   "soya sosu",
+   "soy sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172473,
+  "tr": "Soya sosu, az sodyumlu",
+  "aliases": [
+   "soya sosu",
+   "soy sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174278,
+  "tr": "Tamari soya sosu",
+  "aliases": [
+   "tamari",
+   "soya sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 167717,
+  "tr": "Maya özü ezmesi",
+  "aliases": [
+   "maya ezmesi",
+   "marmite"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 172420,
+  "tr": "Yeşil mercimek, kuru (çiğ)",
+  "aliases": [
+   "mercimek",
+   "kahverengi mercimek",
+   "iri mercimek"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172421,
+  "tr": "Yeşil mercimek, haşlanmış",
+  "aliases": [
+   "mercimek",
+   "haşlanmış mercimek"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174284,
+  "tr": "Kırmızı mercimek, kuru (çiğ)",
+  "aliases": [
+   "kırmızı mercimek",
+   "mercimek"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172423,
+  "tr": "Acı bakla (termiye), kuru (çiğ)",
+  "aliases": [
+   "acı bakla",
+   "termiye",
+   "lupin"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172424,
+  "tr": "Acı bakla (termiye), haşlanmış",
+  "aliases": [
+   "acı bakla",
+   "termiye",
+   "lupin"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172428,
+  "tr": "Kuru bezelye, kırık (çiğ)",
+  "aliases": [
+   "kırık bezelye",
+   "kuru bezelye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172429,
+  "tr": "Kuru bezelye, kırık, haşlanmış",
+  "aliases": [
+   "kırık bezelye",
+   "kuru bezelye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173734,
+  "tr": "Siyah fasulye, kuru (çiğ)",
+  "aliases": [
+   "siyah fasulye",
+   "black beans"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173735,
+  "tr": "Siyah fasulye, haşlanmış",
+  "aliases": [
+   "siyah fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175188,
+  "tr": "Siyah fasulye, konserve",
+  "aliases": [
+   "siyah fasulye",
+   "konserve fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175189,
+  "tr": "Barbunya, kuru (çiğ)",
+  "aliases": [
+   "barbunya",
+   "kuru barbunya"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173736,
+  "tr": "Barbunya, haşlanmış",
+  "aliases": [
+   "barbunya",
+   "barbunya pilaki"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173737,
+  "tr": "Barbunya, konserve",
+  "aliases": [
+   "barbunya",
+   "konserve barbunya"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175200,
+  "tr": "Pinto fasulye, haşlanmış",
+  "aliases": [
+   "benekli fasulye",
+   "barbunya"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174286,
+  "tr": "Pinto fasulye, konserve, süzülmüş",
+  "aliases": [
+   "benekli fasulye",
+   "barbunya"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173744,
+  "tr": "Kırmızı fasulye, kuru (çiğ)",
+  "aliases": [
+   "kidney fasulye",
+   "kırmızı kuru fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175194,
+  "tr": "Kırmızı fasulye, haşlanmış",
+  "aliases": [
+   "kidney fasulye",
+   "kırmızı kuru fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174285,
+  "tr": "Kırmızı fasulye, konserve, süzülmüş",
+  "aliases": [
+   "kidney fasulye",
+   "konserve fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175202,
+  "tr": "Kuru fasulye (beyaz), çiğ",
+  "aliases": [
+   "kuru fasulye",
+   "beyaz fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175203,
+  "tr": "Kuru fasulye (beyaz), haşlanmış",
+  "aliases": [
+   "kuru fasulye",
+   "beyaz fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175204,
+  "tr": "Beyaz fasulye, konserve",
+  "aliases": [
+   "kuru fasulye",
+   "konserve fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173745,
+  "tr": "Küçük beyaz fasulye, kuru (çiğ)",
+  "aliases": [
+   "kuru fasulye",
+   "navy fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173746,
+  "tr": "Küçük beyaz fasulye, haşlanmış",
+  "aliases": [
+   "kuru fasulye",
+   "navy fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173747,
+  "tr": "Küçük beyaz fasulye, konserve",
+  "aliases": [
+   "kuru fasulye",
+   "konserve fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175191,
+  "tr": "İri beyaz fasulye, haşlanmış",
+  "aliases": [
+   "kuru fasulye",
+   "dermason"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175192,
+  "tr": "İri beyaz fasulye, konserve",
+  "aliases": [
+   "kuru fasulye",
+   "konserve fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175182,
+  "tr": "Fırın fasulye, konserve (sade)",
+  "aliases": [
+   "baked beans",
+   "fasulye konservesi"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174252,
+  "tr": "Lima fasulyesi, kuru (çiğ)",
+  "aliases": [
+   "lima",
+   "iri fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174253,
+  "tr": "Lima fasulyesi, haşlanmış",
+  "aliases": [
+   "lima",
+   "iri fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175205,
+  "tr": "Kuru bakla, çiğ",
+  "aliases": [
+   "bakla",
+   "fava"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173753,
+  "tr": "Kuru bakla, haşlanmış",
+  "aliases": [
+   "bakla",
+   "fava"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173754,
+  "tr": "Bakla, konserve",
+  "aliases": [
+   "bakla",
+   "fava",
+   "ful"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173756,
+  "tr": "Nohut, kuru (çiğ)",
+  "aliases": [
+   "nohut",
+   "kuru nohut"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173757,
+  "tr": "Nohut, haşlanmış",
+  "aliases": [
+   "nohut",
+   "haşlanmış nohut"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173800,
+  "tr": "Nohut, konserve, süzülmüş",
+  "aliases": [
+   "nohut",
+   "konserve nohut"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173801,
+  "tr": "Nohut, konserve, süzülmüş ve durulanmış",
+  "aliases": [
+   "nohut",
+   "konserve nohut"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174288,
+  "tr": "Nohut unu",
+  "aliases": [
+   "nohut unu",
+   "besan"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173758,
+  "tr": "Kuru börülce, çiğ",
+  "aliases": [
+   "börülce",
+   "kuru börülce",
+   "siyah gözlü fasulye"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173759,
+  "tr": "Kuru börülce, haşlanmış",
+  "aliases": [
+   "börülce",
+   "börülce salatası"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173760,
+  "tr": "Börülce, konserve",
+  "aliases": [
+   "börülce",
+   "konserve börülce"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174256,
+  "tr": "Maş fasulyesi, kuru (çiğ)",
+  "aliases": [
+   "maş",
+   "mung fasulyesi"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174257,
+  "tr": "Maş fasulyesi, haşlanmış",
+  "aliases": [
+   "maş",
+   "mung fasulyesi"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174258,
+  "tr": "Cam şehriye (maş fasulyesi), kuru",
+  "aliases": [
+   "cam erişte",
+   "glass noodle"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173727,
+  "tr": "Adzuki fasulyesi, kuru (çiğ)",
+  "aliases": [
+   "adzuki"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173728,
+  "tr": "Adzuki fasulyesi, haşlanmış",
+  "aliases": [
+   "adzuki"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174270,
+  "tr": "Soya fasulyesi, kuru (çiğ)",
+  "aliases": [
+   "soya",
+   "soya fasulyesi"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174271,
+  "tr": "Soya fasulyesi, haşlanmış",
+  "aliases": [
+   "soya",
+   "soya fasulyesi"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 169282,
+  "tr": "Taze soya fasulyesi, çiğ",
+  "aliases": [
+   "edamame",
+   "yeşil soya"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 169283,
+  "tr": "Taze soya fasulyesi, haşlanmış",
+  "aliases": [
+   "edamame",
+   "yeşil soya"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 168410,
+  "tr": "Edamame, dondurulmuş",
+  "aliases": [
+   "edamame",
+   "yeşil soya"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 168411,
+  "tr": "Edamame, haşlanmış",
+  "aliases": [
+   "edamame",
+   "yeşil soya"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174273,
+  "tr": "Soya unu, tam yağlı",
+  "aliases": [
+   "soya unu"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174275,
+  "tr": "Soya unu, yağsız",
+  "aliases": [
+   "soya unu"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172444,
+  "tr": "Soya unu, az yağlı",
+  "aliases": [
+   "soya unu"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172447,
+  "tr": "Soya protein konsantresi",
+  "aliases": [
+   "soya proteini",
+   "protein tozu"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174276,
+  "tr": "Soya protein izolatı",
+  "aliases": [
+   "soya proteini",
+   "protein tozu",
+   "izolat"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174268,
+  "tr": "Soya kıyması (kuru)",
+  "aliases": [
+   "soya kıyması",
+   "soya proteini",
+   "tvp"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172446,
+  "tr": "Soya sütü, sade",
+  "aliases": [
+   "soya sütü",
+   "bitkisel süt"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172456,
+  "tr": "Soya sütü, kalsiyum ve vitamin katkılı",
+  "aliases": [
+   "soya sütü",
+   "bitkisel süt"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 175215,
+  "tr": "Soya sütü, şekersiz (katkılı)",
+  "aliases": [
+   "soya sütü",
+   "şekersiz soya sütü"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 173766,
+  "tr": "Soya sütü, light (katkılı)",
+  "aliases": [
+   "soya sütü",
+   "light"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174293,
+  "tr": "Soya sütü, çikolatalı",
+  "aliases": [
+   "çikolatalı soya sütü"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172475,
+  "tr": "Tofu, sert",
+  "aliases": [
+   "tofu",
+   "soya peyniri"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172476,
+  "tr": "Tofu, normal",
+  "aliases": [
+   "tofu",
+   "soya peyniri"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172448,
+  "tr": "Tofu, sert (nigari ile)",
+  "aliases": [
+   "tofu",
+   "soya peyniri"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174290,
+  "tr": "Tofu, ekstra sert",
+  "aliases": [
+   "tofu",
+   "soya peyniri"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172449,
+  "tr": "Tofu, yumuşak",
+  "aliases": [
+   "tofu",
+   "ipeksi tofu"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172451,
+  "tr": "Tofu, kızartılmış",
+  "aliases": [
+   "tofu",
+   "kızarmış tofu"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174272,
+  "tr": "Tempeh",
+  "aliases": [
+   "tempeh",
+   "fermente soya"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172467,
+  "tr": "Tempeh, pişmiş",
+  "aliases": [
+   "tempeh"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172454,
+  "tr": "Humus (ev yapımı)",
+  "aliases": [
+   "humus",
+   "nohut ezmesi"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174289,
+  "tr": "Humus (hazır)",
+  "aliases": [
+   "humus",
+   "nohut ezmesi"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172455,
+  "tr": "Falafel (ev yapımı)",
+  "aliases": [
+   "falafel",
+   "nohut köftesi"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 174287,
+  "tr": "Soya burger köftesi (vegan), pişmemiş",
+  "aliases": [
+   "vegan burger",
+   "sebze burger"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 169888,
+  "tr": "Vejetaryen köfte / burger",
+  "aliases": [
+   "vegan köfte",
+   "sebze burger"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 169067,
+  "tr": "Vegan köfte (etsiz)",
+  "aliases": [
+   "etsiz köfte",
+   "vegan köfte"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 169887,
+  "tr": "Vegan sosis (etsiz)",
+  "aliases": [
+   "etsiz sosis",
+   "vegan sosis"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 167719,
+  "tr": "Vegan tavuk, pane, kızartılmış",
+  "aliases": [
+   "etsiz tavuk",
+   "vegan nugget"
+  ],
+  "cat": "Baklagiller"
+ },
+ {
+  "id": 172430,
+  "tr": "Yer fıstığı, çiğ",
+  "aliases": [
+   "fıstık",
+   "yerfıstığı"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 173806,
+  "tr": "Yer fıstığı, kavrulmuş, tuzsuz",
+  "aliases": [
+   "fıstık",
+   "kavrulmuş fıstık"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 174262,
+  "tr": "Yer fıstığı, kavrulmuş, tuzlu",
+  "aliases": [
+   "fıstık",
+   "tuzlu fıstık"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 175258,
+  "tr": "Yer fıstığı, yağda kavrulmuş, tuzsuz",
+  "aliases": [
+   "fıstık",
+   "kavrulmuş fıstık"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 174261,
+  "tr": "Yer fıstığı, yağda kavrulmuş, tuzlu",
+  "aliases": [
+   "fıstık",
+   "tuzlu fıstık"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 174260,
+  "tr": "Yer fıstığı, haşlanmış (tuzlu)",
+  "aliases": [
+   "fıstık",
+   "haşlanmış fıstık"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 172470,
+  "tr": "Fıstık ezmesi, pürüzsüz, tuzsuz",
+  "aliases": [
+   "fıstık ezmesi",
+   "yer fıstığı ezmesi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 172459,
+  "tr": "Fıstık ezmesi, pürüzsüz (vitamin katkılı)",
+  "aliases": [
+   "fıstık ezmesi",
+   "yer fıstığı ezmesi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 172469,
+  "tr": "Fıstık ezmesi, parçacıklı, tuzsuz",
+  "aliases": [
+   "fıstık ezmesi",
+   "crunchy"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 174265,
+  "tr": "Fıstık ezmesi, parçacıklı, tuzlu",
+  "aliases": [
+   "fıstık ezmesi",
+   "crunchy"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 172458,
+  "tr": "Fıstık ezmesi, az yağlı",
+  "aliases": [
+   "fıstık ezmesi",
+   "light fıstık ezmesi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 172457,
+  "tr": "Fıstık ezmesi, az şekerli",
+  "aliases": [
+   "fıstık ezmesi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169869,
+  "tr": "Fıstık ezmesi, az sodyumlu",
+  "aliases": [
+   "fıstık ezmesi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 172435,
+  "tr": "Yer fıstığı unu, az yağlı",
+  "aliases": [
+   "fıstık unu",
+   "fıstık tozu"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 172440,
+  "tr": "Kavrulmuş soya, tuzlu",
+  "aliases": [
+   "soya çerezi",
+   "kavrulmuş soya"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 174300,
+  "tr": "Kavrulmuş soya, tuzsuz",
+  "aliases": [
+   "soya çerezi",
+   "kavrulmuş soya"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ }
+]

@@ -1,0 +1,478 @@
+[
+{
+"id": 167776,
+"tr": "Armut (Williams), çiğ",
+"aliases": [
+"armut",
+"williams armut"
+],
+"cat": "Meyveler"
+},
+{
+"id": 167778,
+"tr": "Armut (Bosc), çiğ",
+"aliases": [
+"armut"
+],
+"cat": "Meyveler"
+},
+{
+"id": 167779,
+"tr": "Armut (yeşil Anjou), çiğ",
+"aliases": [
+"armut",
+"yeşil armut"
+],
+"cat": "Meyveler"
+},
+{
+"id": 167793,
+"tr": "Elma, Fuji (kabuklu), çiğ",
+"aliases": [
+"elma",
+"fuji elma"
+],
+"cat": "Meyveler"
+},
+{
+"id": 168165,
+"tr": "Kuru üzüm, siyah, çekirdeksiz",
+"aliases": [
+"kuru üzüm",
+"siyah üzüm"
+],
+"cat": "Meyveler"
+},
+{
+"id": 168173,
+"tr": "Çilek, dondurulmuş, şekersiz",
+"aliases": [
+"çilek",
+"donuk çilek"
+],
+"cat": "Meyveler"
+},
+{
+"id": 168201,
+"tr": "Elma, Starking/Red Delicious (kabuklu), çiğ",
+"aliases": [
+"elma",
+"kırmızı elma",
+"starking"
+],
+"cat": "Meyveler"
+},
+{
+"id": 168203,
+"tr": "Elma, Granny Smith (kabuklu), çiğ",
+"aliases": [
+"elma",
+"yeşil elma",
+"granny smith"
+],
+"cat": "Meyveler"
+},
+{
+"id": 168204,
+"tr": "Elma, Gala (kabuklu), çiğ",
+"aliases": [
+"elma",
+"gala elma"
+],
+"cat": "Meyveler"
+},
+{
+"id": 168398,
+"tr": "Mısır taneleri, dondurulmuş, pişmemiş",
+"aliases": [
+"mısır",
+"tane mısır"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 168443,
+"tr": "Elma dilim patates, dondurulmuş (pişmemiş)",
+"aliases": [
+"patates",
+"elma dilim",
+"dondurulmuş patates"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 168482,
+"tr": "Tatlı patates, çiğ",
+"aliases": [
+"tatlı patates",
+"batat"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 168595,
+"tr": "Ay çekirdeği ezmesi, tuzlu",
+"aliases": [
+"ay çekirdeği ezmesi",
+"ayçekirdeği ezmesi"
+],
+"cat": "Kuruyemiş ve tohumlar"
+},
+{
+"id": 168875,
+"tr": "Esmer pirinç (orta taneli), haşlanmış",
+"aliases": [
+"esmer pirinç",
+"kepekli pirinç",
+"esmer pilav"
+],
+"cat": "Tahıllar ve makarna"
+},
+{
+"id": 168893,
+"tr": "Tam buğday unu",
+"aliases": [
+"tam buğday unu",
+"kepekli un",
+"tam un"
+],
+"cat": "Tahıllar ve makarna"
+},
+{
+"id": 168910,
+"tr": "Tam buğday makarna (%100), haşlanmış",
+"aliases": [
+"tam buğday makarna",
+"kepekli makarna",
+"tam tahıllı makarna"
+],
+"cat": "Tahıllar ve makarna"
+},
+{
+"id": 169098,
+"tr": "Portakal suyu, taze sıkılmış",
+"aliases": [
+"portakal suyu",
+"taze sıkma portakal"
+],
+"cat": "İçecekler"
+},
+{
+"id": 169287,
+"tr": "Ispanak, dondurulmuş, pişmemiş",
+"aliases": [
+"ıspanak",
+"donuk ıspanak"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 169306,
+"tr": "Tatlı patates, dondurulmuş, pişmemiş",
+"aliases": [
+"tatlı patates",
+"batat"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 169345,
+"tr": "Mısır, konserve, tuzsuz (suyuyla)",
+"aliases": [
+"mısır konservesi",
+"konserve mısır"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 169703,
+"tr": "Esmer pirinç (uzun taneli), kuru (çiğ)",
+"aliases": [
+"esmer pirinç",
+"kepekli pirinç"
+],
+"cat": "Tahıllar ve makarna"
+},
+{
+"id": 169704,
+"tr": "Esmer pirinç (uzun taneli), haşlanmış",
+"aliases": [
+"esmer pirinç",
+"esmer pilav",
+"kepekli pirinç"
+],
+"cat": "Tahıllar ve makarna"
+},
+{
+"id": 169705,
+"tr": "Yulaf (tam tahıl), kuru",
+"aliases": [
+"yulaf",
+"tam yulaf"
+],
+"cat": "Tahıllar ve makarna"
+},
+{
+"id": 169706,
+"tr": "Esmer pirinç (orta taneli), kuru (çiğ)",
+"aliases": [
+"esmer pirinç",
+"kepekli pirinç"
+],
+"cat": "Tahıllar ve makarna"
+},
+{
+"id": 169738,
+"tr": "Tam buğday makarna (%100), kuru (çiğ)",
+"aliases": [
+"tam buğday makarna",
+"kepekli makarna"
+],
+"cat": "Tahıllar ve makarna"
+},
+{
+"id": 169917,
+"tr": "Portakal (Washington), çiğ",
+"aliases": [
+"portakal",
+"washington portakal"
+],
+"cat": "Meyveler"
+},
+{
+"id": 169931,
+"tr": "Şeftali, konserve (çok hafif şuruplu)",
+"aliases": [
+"şeftali konservesi"
+],
+"cat": "Meyveler"
+},
+{
+"id": 169937,
+"tr": "Armut, konserve (çok hafif şuruplu)",
+"aliases": [
+"armut konservesi"
+],
+"cat": "Meyveler"
+},
+{
+"id": 169962,
+"tr": "Taze fasulye, dondurulmuş, pişmemiş",
+"aliases": [
+"taze fasulye",
+"yeşil fasulye",
+"donuk fasulye"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 169970,
+"tr": "Brokoli, dondurulmuş, pişmemiş",
+"aliases": [
+"brokoli",
+"donuk brokoli"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 169983,
+"tr": "Havuç, dondurulmuş, pişmemiş",
+"aliases": [
+"havuç",
+"donuk havuç"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 170016,
+"tr": "Bezelye, dondurulmuş, pişmemiş",
+"aliases": [
+"bezelye",
+"donuk bezelye"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 170027,
+"tr": "Patates (kabuklu), çiğ",
+"aliases": [
+"patates",
+"kabuklu patates"
+],
+"cat": "Sebzeler"
+},
+{
+"id": 170459,
+"tr": "Domates salçası, tuzsuz",
+"aliases": [
+"salça",
+"domates salçası"
+],
+"cat": "Soslar ve çorbalar"
+},
+{
+"id": 170894,
+"tr": "Süzme yoğurt (Greek), sade, yağsız",
+"aliases": [
+"süzme yoğurt",
+"greek yoğurt",
+"yağsız yoğurt"
+],
+"cat": "Süt ürünleri"
+},
+{
+"id": 171292,
+"tr": "Cheddar peyniri, az yağlı",
+"aliases": [
+"cheddar",
+"çedar"
+],
+"cat": "Peynirler"
+},
+{
+"id": 171688,
+"tr": "Elma (kabuklu), çiğ",
+"aliases": [
+"elma"
+],
+"cat": "Meyveler"
+},
+{
+"id": 171695,
+"tr": "Elma püresi, konserve, şekersiz",
+"aliases": [
+"elma püresi"
+],
+"cat": "Meyveler"
+},
+{
+"id": 171708,
+"tr": "Vişne, kurutulmuş, şekerli",
+"aliases": [
+"kuru vişne",
+"vişne kurusu"
+],
+"cat": "Meyveler"
+},
+{
+"id": 171718,
+"tr": "Vişne, dondurulmuş, şekersiz",
+"aliases": [
+"vişne",
+"donuk vişne"
+],
+"cat": "Meyveler"
+},
+{
+"id": 171723,
+"tr": "Turna yemişi (cranberry), kurutulmuş, şekerli",
+"aliases": [
+"cranberry",
+"kuru turna yemişi"
+],
+"cat": "Meyveler"
+},
+{
+"id": 171796,
+"tr": "Dana kıyma (%85 yağsız), çiğ (ABD)",
+"aliases": [
+"kıyma",
+"dana kıyma",
+"köftelik kıyma"
+],
+"cat": "Kırmızı et"
+},
+{
+"id": 172024,
+"tr": "Tam buğday makarna (%51 tam buğday, zenginleştirilmiş), haşlanmış",
+"aliases": [
+"tam buğday makarna",
+"kepekli makarna"
+],
+"cat": "Tahıllar ve makarna"
+},
+{
+"id": 172202,
+"tr": "Yumurta (bütün), çiğ, dondurulmuş-pastörize",
+"aliases": [
+"sıvı yumurta",
+"pastörize yumurta"
+],
+"cat": "Yumurta"
+},
+{
+"id": 173414,
+"tr": "Cheddar peyniri",
+"aliases": [
+"cheddar",
+"çedar"
+],
+"cat": "Peynirler"
+},
+{
+"id": 173709,
+"tr": "Ton balığı, konserve (suda), süzülmüş",
+"aliases": [
+"ton balığı",
+"ton konservesi",
+"light ton"
+],
+"cat": "Balık ve deniz ürünleri"
+},
+{
+"id": 173949,
+"tr": "Yaban mersini (yabani), dondurulmuş",
+"aliases": [
+"yaban mersini",
+"blueberry"
+],
+"cat": "Meyveler"
+},
+{
+"id": 173950,
+"tr": "Yaban mersini, dondurulmuş, şekersiz",
+"aliases": [
+"yaban mersini",
+"blueberry"
+],
+"cat": "Meyveler"
+},
+{
+"id": 174266,
+"tr": "Fıstık ezmesi, kremamsı, tuzlu",
+"aliases": [
+"fıstık ezmesi",
+"yer fıstığı ezmesi",
+"peanut butter"
+],
+"cat": "Kuruyemiş ve tohumlar"
+},
+{
+"id": 174294,
+"tr": "Fıstık ezmesi, kremamsı",
+"aliases": [
+"fıstık ezmesi",
+"yer fıstığı ezmesi",
+"peanut butter"
+],
+"cat": "Kuruyemiş ve tohumlar"
+},
+{
+"id": 175190,
+"tr": "İri beyaz fasulye (great northern), kuru (çiğ)",
+"aliases": [
+"kuru fasulye",
+"beyaz fasulye"
+],
+"cat": "Baklagiller"
+},
+{
+"id": 175199,
+"tr": "Pinto fasulye, kuru (çiğ)",
+"aliases": [
+"barbunya",
+"pinto fasulye"
+],
+"cat": "Baklagiller"
+}
+]

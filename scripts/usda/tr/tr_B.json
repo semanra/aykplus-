@@ -1,0 +1,2880 @@
+[
+ {
+  "id": 171447,
+  "tr": "Tavuk eti, karışık (derili), çiğ",
+  "aliases": [
+   "bütün tavuk",
+   "piliç"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171052,
+  "tr": "Tavuk eti, karışık (derisiz), çiğ",
+  "aliases": [
+   "bütün tavuk",
+   "piliç",
+   "tavuk eti"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171450,
+  "tr": "Tavuk eti, karışık (derili), fırında",
+  "aliases": [
+   "fırın tavuk",
+   "piliç"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171054,
+  "tr": "Tavuk eti, karışık (derisiz), fırında",
+  "aliases": [
+   "fırın tavuk",
+   "piliç"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171448,
+  "tr": "Tavuk eti, karışık (derili), kızartılmış (hamurlu)",
+  "aliases": [
+   "tavuk kızartma",
+   "çıtır tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171053,
+  "tr": "Tavuk eti, karışık (derisiz), kızartılmış",
+  "aliases": [
+   "tavuk kızartma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171451,
+  "tr": "Tavuk eti, karışık (derisiz), haşlanmış",
+  "aliases": [
+   "haşlama tavuk",
+   "didiklenmiş tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171077,
+  "tr": "Tavuk göğsü (derisiz), çiğ",
+  "aliases": [
+   "göğüs eti",
+   "fileto",
+   "tavuk fileto"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171534,
+  "tr": "Tavuk göğsü (derisiz), ızgara",
+  "aliases": [
+   "göğüs eti",
+   "fileto",
+   "tavuk fileto",
+   "ızgara tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171140,
+  "tr": "Tavuk göğsü (derisiz), tencerede pişmiş",
+  "aliases": [
+   "göğüs eti",
+   "fileto",
+   "tavuk fileto",
+   "sote"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171477,
+  "tr": "Tavuk göğsü (derisiz), fırında",
+  "aliases": [
+   "göğüs eti",
+   "fileto",
+   "tavuk fileto",
+   "fırın tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171478,
+  "tr": "Tavuk göğsü (derisiz), haşlanmış",
+  "aliases": [
+   "göğüs eti",
+   "fileto",
+   "tavuk fileto",
+   "haşlama tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171078,
+  "tr": "Tavuk göğsü (derisiz), kızartılmış",
+  "aliases": [
+   "göğüs eti",
+   "fileto",
+   "tavuk fileto",
+   "tavuk kızartma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171518,
+  "tr": "Tavuk göğsü (derisiz), çevirme",
+  "aliases": [
+   "göğüs eti",
+   "fileto",
+   "tavuk fileto",
+   "piliç çevirme"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171474,
+  "tr": "Tavuk göğsü (derili), çiğ",
+  "aliases": [
+   "göğüs eti",
+   "derili göğüs"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171075,
+  "tr": "Tavuk göğsü (derili), fırında",
+  "aliases": [
+   "göğüs eti",
+   "fırın tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171076,
+  "tr": "Tavuk göğsü (derili), haşlanmış",
+  "aliases": [
+   "göğüs eti",
+   "haşlama tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171475,
+  "tr": "Tavuk göğsü (derili), kızartılmış (hamurlu)",
+  "aliases": [
+   "göğüs eti",
+   "çıtır tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171476,
+  "tr": "Tavuk göğsü (derili), kızartılmış (unlu)",
+  "aliases": [
+   "göğüs eti",
+   "tavuk kızartma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171067,
+  "tr": "Tavuk koyu eti (derisiz), çiğ",
+  "aliases": [
+   "but eti",
+   "koyu et",
+   "tavuk but eti"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171069,
+  "tr": "Tavuk koyu eti (derisiz), fırında",
+  "aliases": [
+   "but eti",
+   "koyu et"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173627,
+  "tr": "Tavuk üst but (derisiz), çiğ",
+  "aliases": [
+   "pirzola",
+   "but",
+   "kemiksiz but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172388,
+  "tr": "Tavuk üst but (derisiz), fırında",
+  "aliases": [
+   "pirzola",
+   "but",
+   "kemiksiz but",
+   "fırın tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172389,
+  "tr": "Tavuk üst but (derisiz), haşlanmış",
+  "aliases": [
+   "pirzola",
+   "but",
+   "kemiksiz but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172387,
+  "tr": "Tavuk üst but (derisiz), kızartılmış",
+  "aliases": [
+   "pirzola",
+   "but",
+   "kemiksiz but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172853,
+  "tr": "Tavuk üst but (derisiz), tencerede pişmiş",
+  "aliases": [
+   "pirzola",
+   "but",
+   "kemiksiz but",
+   "sote"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171120,
+  "tr": "Tavuk üst but (derisiz), çevirme",
+  "aliases": [
+   "pirzola",
+   "but",
+   "kemiksiz but",
+   "piliç çevirme"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172385,
+  "tr": "Tavuk üst but (derili), çiğ",
+  "aliases": [
+   "but",
+   "derili but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173625,
+  "tr": "Tavuk üst but (derili), fırında",
+  "aliases": [
+   "but",
+   "fırın tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172386,
+  "tr": "Tavuk üst but (derili), kızartılmış (hamurlu)",
+  "aliases": [
+   "but",
+   "çıtır tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173614,
+  "tr": "Tavuk baget (derisiz), çiğ",
+  "aliases": [
+   "baget",
+   "alt but",
+   "but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172376,
+  "tr": "Tavuk baget (derisiz), fırında",
+  "aliases": [
+   "baget",
+   "alt but",
+   "but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172377,
+  "tr": "Tavuk baget (derisiz), haşlanmış",
+  "aliases": [
+   "baget",
+   "alt but",
+   "but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172375,
+  "tr": "Tavuk baget (derisiz), kızartılmış",
+  "aliases": [
+   "baget",
+   "alt but",
+   "but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172852,
+  "tr": "Tavuk baget (derisiz), tencerede pişmiş",
+  "aliases": [
+   "baget",
+   "alt but",
+   "but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172373,
+  "tr": "Tavuk baget (derili), çiğ",
+  "aliases": [
+   "baget",
+   "alt but",
+   "but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173612,
+  "tr": "Tavuk baget (derili), fırında",
+  "aliases": [
+   "baget",
+   "alt but",
+   "but",
+   "fırın baget"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172374,
+  "tr": "Tavuk baget (derili), kızartılmış (hamurlu)",
+  "aliases": [
+   "baget",
+   "alt but",
+   "but",
+   "çıtır tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173619,
+  "tr": "Tavuk but (bütün, derisiz), çiğ",
+  "aliases": [
+   "but",
+   "tavuk but",
+   "kalçalı but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172380,
+  "tr": "Tavuk but (bütün, derisiz), fırında",
+  "aliases": [
+   "but",
+   "tavuk but",
+   "kalçalı but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172378,
+  "tr": "Tavuk but (bütün, derili), çiğ",
+  "aliases": [
+   "but",
+   "tavuk but",
+   "kalçalı but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173617,
+  "tr": "Tavuk but (bütün, derili), fırında",
+  "aliases": [
+   "but",
+   "tavuk but",
+   "kalçalı but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173615,
+  "tr": "Tavuk but (bütün, derili), kızartılmış (hamurlu)",
+  "aliases": [
+   "but",
+   "tavuk but",
+   "kalçalı but",
+   "çıtır tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173632,
+  "tr": "Tavuk kanadı (derisiz), çiğ",
+  "aliases": [
+   "kanat",
+   "tavuk kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172392,
+  "tr": "Tavuk kanadı (derisiz), fırında",
+  "aliases": [
+   "kanat",
+   "tavuk kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172393,
+  "tr": "Tavuk kanadı (derisiz), haşlanmış",
+  "aliases": [
+   "kanat",
+   "tavuk kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172391,
+  "tr": "Tavuk kanadı (derisiz), kızartılmış",
+  "aliases": [
+   "kanat",
+   "tavuk kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172390,
+  "tr": "Tavuk kanadı (derili), çiğ",
+  "aliases": [
+   "kanat",
+   "tavuk kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173630,
+  "tr": "Tavuk kanadı (derili), fırında",
+  "aliases": [
+   "kanat",
+   "tavuk kanat",
+   "fırın kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 173628,
+  "tr": "Tavuk kanadı (derili), kızartılmış (hamurlu)",
+  "aliases": [
+   "kanat",
+   "tavuk kanat",
+   "çıtır kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171115,
+  "tr": "Tavuk kanadı, barbekü soslu, fırında",
+  "aliases": [
+   "kanat",
+   "tavuk kanat",
+   "barbekü kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171452,
+  "tr": "Tavuk derisi, çiğ",
+  "aliases": [
+   "deri"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171055,
+  "tr": "Tavuk derisi, fırında",
+  "aliases": [
+   "deri",
+   "çıtır deri"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171453,
+  "tr": "Tavuk derisi, kızartılmış (hamurlu)",
+  "aliases": [
+   "deri",
+   "çıtır deri"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171116,
+  "tr": "Tavuk kıyması, çiğ",
+  "aliases": [
+   "kıyma",
+   "tavuk kıyma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171117,
+  "tr": "Tavuk kıyması, tavada pişmiş",
+  "aliases": [
+   "kıyma",
+   "tavuk kıyma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171119,
+  "tr": "Tavuk ayağı, haşlanmış",
+  "aliases": [
+   "tavuk paça",
+   "ayak"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171099,
+  "tr": "Tavuk konservesi (suyuyla)",
+  "aliases": [
+   "konserve tavuk"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171514,
+  "tr": "Panelenmiş tavuk fileto (hazır), pişmiş",
+  "aliases": [
+   "çıtır tavuk",
+   "pane tavuk",
+   "tenders"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171513,
+  "tr": "Tavuk burger köftesi (hazır, dondurulmuş), pişmiş",
+  "aliases": [
+   "tavuk burger",
+   "tavuk köfte"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171060,
+  "tr": "Tavuk ciğeri, çiğ",
+  "aliases": [
+   "ciğer",
+   "tavuk ciğer"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171061,
+  "tr": "Tavuk ciğeri, haşlanmış",
+  "aliases": [
+   "ciğer",
+   "tavuk ciğer"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174491,
+  "tr": "Tavuk ciğeri, tavada pişmiş",
+  "aliases": [
+   "ciğer",
+   "ciğer sote"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171456,
+  "tr": "Tavuk taşlığı, çiğ",
+  "aliases": [
+   "taşlık",
+   "katı"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171457,
+  "tr": "Tavuk taşlığı, haşlanmış",
+  "aliases": [
+   "taşlık",
+   "katı"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171458,
+  "tr": "Tavuk yüreği, çiğ",
+  "aliases": [
+   "yürek",
+   "tavuk yürek"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171059,
+  "tr": "Tavuk yüreği, haşlanmış",
+  "aliases": [
+   "yürek",
+   "tavuk yürek"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171057,
+  "tr": "Tavuk sakatatı (karışık), çiğ",
+  "aliases": [
+   "sakatat",
+   "ciğer",
+   "taşlık"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171455,
+  "tr": "Tavuk sakatatı (karışık), haşlanmış",
+  "aliases": [
+   "sakatat",
+   "ciğer",
+   "taşlık"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171486,
+  "tr": "Hindi ciğeri, çiğ",
+  "aliases": [
+   "ciğer",
+   "hindi ciğer"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171487,
+  "tr": "Hindi ciğeri, haşlanmış",
+  "aliases": [
+   "ciğer",
+   "hindi ciğer"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171085,
+  "tr": "Hindi taşlığı, çiğ",
+  "aliases": [
+   "taşlık"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171483,
+  "tr": "Hindi taşlığı, haşlanmış",
+  "aliases": [
+   "taşlık"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171484,
+  "tr": "Hindi yüreği, çiğ",
+  "aliases": [
+   "yürek"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171485,
+  "tr": "Hindi yüreği, haşlanmış",
+  "aliases": [
+   "yürek"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174467,
+  "tr": "Ördek ciğeri, çiğ",
+  "aliases": [
+   "ciğer"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 172415,
+  "tr": "Kaz ciğeri, çiğ",
+  "aliases": [
+   "ciğer"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 171100,
+  "tr": "Kaz ciğeri ezmesi (foie gras), konserve",
+  "aliases": [
+   "foie gras",
+   "ciğer ezmesi",
+   "pate"
+  ],
+  "cat": "Sakatat"
+ },
+ {
+  "id": 174515,
+  "tr": "Hindi göğsü (derisiz), çiğ",
+  "aliases": [
+   "hindi fileto",
+   "göğüs eti"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 174516,
+  "tr": "Hindi göğsü (derisiz), fırında",
+  "aliases": [
+   "hindi fileto",
+   "göğüs eti"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171528,
+  "tr": "Hindi göğsü (derili), çiğ",
+  "aliases": [
+   "hindi göğüs",
+   "göğüs eti"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171529,
+  "tr": "Hindi göğsü (derili), fırında",
+  "aliases": [
+   "hindi göğüs",
+   "göğüs eti"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 174518,
+  "tr": "Hindi üst but (derisiz), çiğ",
+  "aliases": [
+   "hindi but",
+   "hindi pirzola"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172877,
+  "tr": "Hindi üst but (derisiz), fırında",
+  "aliases": [
+   "hindi but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171533,
+  "tr": "Hindi üst but (derili), çiğ",
+  "aliases": [
+   "hindi but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171137,
+  "tr": "Hindi üst but (derili), fırında",
+  "aliases": [
+   "hindi but"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172875,
+  "tr": "Hindi baget (derisiz), çiğ",
+  "aliases": [
+   "hindi but",
+   "hindi incik"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172878,
+  "tr": "Hindi baget (derisiz), fırında",
+  "aliases": [
+   "hindi but",
+   "hindi incik"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171134,
+  "tr": "Hindi baget (derili), çiğ",
+  "aliases": [
+   "hindi but",
+   "hindi incik"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171135,
+  "tr": "Hindi baget (derili), fırında",
+  "aliases": [
+   "hindi but",
+   "hindi incik"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 174517,
+  "tr": "Hindi kanadı (derisiz), çiğ",
+  "aliases": [
+   "hindi kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172872,
+  "tr": "Hindi kanadı (derisiz), fırında",
+  "aliases": [
+   "hindi kanat"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171480,
+  "tr": "Hindi eti, karışık (derisiz), çiğ",
+  "aliases": [
+   "hindi",
+   "bütün hindi"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171481,
+  "tr": "Hindi eti, karışık (derisiz), fırında",
+  "aliases": [
+   "hindi",
+   "fırın hindi"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171081,
+  "tr": "Hindi eti, karışık (derili), çiğ",
+  "aliases": [
+   "hindi",
+   "bütün hindi"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171479,
+  "tr": "Hindi eti, karışık (derili), fırında",
+  "aliases": [
+   "hindi",
+   "fırın hindi"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171505,
+  "tr": "Hindi kıyması, çiğ",
+  "aliases": [
+   "kıyma",
+   "hindi kıyma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171506,
+  "tr": "Hindi kıyması, pişmiş",
+  "aliases": [
+   "kıyma",
+   "hindi kıyma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172850,
+  "tr": "Hindi kıyması (%93 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "hindi kıyma",
+   "yağsız kıyma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172851,
+  "tr": "Hindi kıyması (%93 yağsız), tavada pişmiş",
+  "aliases": [
+   "kıyma",
+   "hindi kıyma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 174493,
+  "tr": "Hindi kıyması (%85 yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "hindi kıyma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 174494,
+  "tr": "Hindi kıyması (%85 yağsız), tavada pişmiş",
+  "aliases": [
+   "kıyma",
+   "hindi kıyma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172847,
+  "tr": "Hindi kıyması (yağsız), çiğ",
+  "aliases": [
+   "kıyma",
+   "hindi kıyma",
+   "light kıyma"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 167713,
+  "tr": "Füme hindi eti (derisiz), pişmiş",
+  "aliases": [
+   "füme hindi",
+   "hindi füme"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 168120,
+  "tr": "Füme hindi eti (derili), pişmiş",
+  "aliases": [
+   "füme hindi",
+   "hindi füme"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172410,
+  "tr": "Ördek eti (derisiz), çiğ",
+  "aliases": [
+   "ördek"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172411,
+  "tr": "Ördek eti (derisiz), fırında",
+  "aliases": [
+   "ördek",
+   "fırın ördek"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172408,
+  "tr": "Ördek eti (derili), çiğ",
+  "aliases": [
+   "ördek"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172409,
+  "tr": "Ördek eti (derili), fırında",
+  "aliases": [
+   "ördek",
+   "fırın ördek"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171511,
+  "tr": "Ördek göğsü (derisiz), ızgara",
+  "aliases": [
+   "ördek göğüs",
+   "ördek fileto"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172413,
+  "tr": "Kaz eti (derisiz), çiğ",
+  "aliases": [
+   "kaz"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172414,
+  "tr": "Kaz eti (derisiz), fırında",
+  "aliases": [
+   "kaz",
+   "fırın kaz"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172419,
+  "tr": "Bıldırcın eti (derisiz), çiğ",
+  "aliases": [
+   "bıldırcın"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 172418,
+  "tr": "Bıldırcın eti (derili), çiğ",
+  "aliases": [
+   "bıldırcın"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 169902,
+  "tr": "Bıldırcın, pişmiş",
+  "aliases": [
+   "bıldırcın",
+   "bıldırcın ızgara"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 174473,
+  "tr": "Sülün eti (derisiz), çiğ",
+  "aliases": [
+   "sülün"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 171079,
+  "tr": "Güvercin eti, çiğ",
+  "aliases": [
+   "güvercin"
+  ],
+  "cat": "Tavuk ve hindi"
+ },
+ {
+  "id": 174182,
+  "tr": "Hamsi, çiğ",
+  "aliases": [
+   "hamsi",
+   "karadeniz hamsisi"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174183,
+  "tr": "Ançüez (hamsi konservesi, yağda), süzülmüş",
+  "aliases": [
+   "ançüez",
+   "hamsi konserve"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175139,
+  "tr": "Sardalya konservesi (yağda), süzülmüş",
+  "aliases": [
+   "sardalya",
+   "sardalya konserve"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175140,
+  "tr": "Sardalya konservesi (domates soslu), süzülmüş",
+  "aliases": [
+   "sardalya",
+   "sardalya konserve"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175119,
+  "tr": "Uskumru, çiğ",
+  "aliases": [
+   "uskumru",
+   "atlantik uskumrusu"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175120,
+  "tr": "Uskumru, ızgara",
+  "aliases": [
+   "uskumru",
+   "uskumru ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 168149,
+  "tr": "Uskumru, tuzlu",
+  "aliases": [
+   "tuzlu uskumru",
+   "çiroz"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173672,
+  "tr": "İstavrit / Pasifik uskumrusu, çiğ",
+  "aliases": [
+   "istavrit",
+   "kraça"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171994,
+  "tr": "İstavrit / Pasifik uskumrusu, ızgara",
+  "aliases": [
+   "istavrit",
+   "istavrit ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175121,
+  "tr": "İstavrit konservesi, süzülmüş",
+  "aliases": [
+   "istavrit",
+   "konserve balık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173706,
+  "tr": "Orkinos (mavi yüzgeçli ton), çiğ",
+  "aliases": [
+   "orkinos",
+   "ton balığı",
+   "taze ton"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173707,
+  "tr": "Orkinos (mavi yüzgeçli ton), ızgara",
+  "aliases": [
+   "orkinos",
+   "ton balığı",
+   "ton steak"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175159,
+  "tr": "Sarı yüzgeçli ton balığı, çiğ",
+  "aliases": [
+   "ton balığı",
+   "taze ton",
+   "yellowfin"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 172006,
+  "tr": "Sarı yüzgeçli ton balığı, ızgara",
+  "aliases": [
+   "ton balığı",
+   "ton steak"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175156,
+  "tr": "Çizgili ton balığı (skipjack), çiğ",
+  "aliases": [
+   "ton balığı",
+   "palamut benzeri"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 172005,
+  "tr": "Çizgili ton balığı (skipjack), ızgara",
+  "aliases": [
+   "ton balığı"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171986,
+  "tr": "Ton balığı konservesi (açık renkli, suda, tuzsuz), süzülmüş",
+  "aliases": [
+   "ton balığı",
+   "ton konserve",
+   "light ton"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173708,
+  "tr": "Ton balığı konservesi (açık renkli, yağda), süzülmüş",
+  "aliases": [
+   "ton balığı",
+   "ton konserve",
+   "light ton"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175158,
+  "tr": "Ton balığı konservesi (beyaz ton, suda), süzülmüş",
+  "aliases": [
+   "ton balığı",
+   "ton konserve",
+   "albacore"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175157,
+  "tr": "Ton balığı konservesi (beyaz ton, yağda), süzülmüş",
+  "aliases": [
+   "ton balığı",
+   "ton konserve",
+   "albacore"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175160,
+  "tr": "Ton balığı salatası",
+  "aliases": [
+   "ton salata",
+   "ton balığı"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175142,
+  "tr": "Levrek, çiğ",
+  "aliases": [
+   "levrek"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173694,
+  "tr": "Levrek, ızgara",
+  "aliases": [
+   "levrek",
+   "levrek ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175141,
+  "tr": "Çipura benzeri balık (scup), çiğ",
+  "aliases": [
+   "çipura",
+   "sparoz"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174241,
+  "tr": "Çipura benzeri balık (scup), ızgara",
+  "aliases": [
+   "çipura",
+   "çipura ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173717,
+  "tr": "Gökkuşağı alabalığı (çiftlik), çiğ",
+  "aliases": [
+   "alabalık",
+   "somon alabalık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173718,
+  "tr": "Gökkuşağı alabalığı (çiftlik), ızgara",
+  "aliases": [
+   "alabalık",
+   "alabalık ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175154,
+  "tr": "Gökkuşağı alabalığı (doğal), çiğ",
+  "aliases": [
+   "alabalık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175155,
+  "tr": "Gökkuşağı alabalığı (doğal), ızgara",
+  "aliases": [
+   "alabalık",
+   "alabalık ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175153,
+  "tr": "Alabalık (karışık türler), çiğ",
+  "aliases": [
+   "alabalık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 172004,
+  "tr": "Alabalık (karışık türler), ızgara",
+  "aliases": [
+   "alabalık",
+   "alabalık ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175167,
+  "tr": "Somon (Atlantik, çiftlik), çiğ",
+  "aliases": [
+   "somon",
+   "somon fileto"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175168,
+  "tr": "Somon (Atlantik, çiftlik), ızgara",
+  "aliases": [
+   "somon",
+   "somon ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173686,
+  "tr": "Somon (Atlantik, doğal), çiğ",
+  "aliases": [
+   "somon",
+   "somon fileto"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171998,
+  "tr": "Somon (Atlantik, doğal), ızgara",
+  "aliases": [
+   "somon",
+   "somon ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173691,
+  "tr": "Kırmızı somon (sockeye), çiğ",
+  "aliases": [
+   "somon",
+   "sockeye"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173692,
+  "tr": "Kırmızı somon (sockeye), ızgara",
+  "aliases": [
+   "somon",
+   "sockeye"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173687,
+  "tr": "Füme somon",
+  "aliases": [
+   "somon füme",
+   "füme balık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171985,
+  "tr": "Füme somon (lox)",
+  "aliases": [
+   "somon füme",
+   "lox"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173693,
+  "tr": "Somon konservesi (sockeye), süzülmüş",
+  "aliases": [
+   "somon konserve",
+   "konserve balık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175175,
+  "tr": "Somon konservesi (pembe somon), süzülmüş",
+  "aliases": [
+   "somon konserve",
+   "konserve balık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171949,
+  "tr": "Lüfer, çiğ",
+  "aliases": [
+   "lüfer",
+   "çinekop",
+   "sarıkanat"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174229,
+  "tr": "Lüfer, ızgara",
+  "aliases": [
+   "lüfer",
+   "lüfer ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173710,
+  "tr": "Kalkan, çiğ",
+  "aliases": [
+   "kalkan",
+   "kalkan balığı"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174245,
+  "tr": "Kalkan, ızgara",
+  "aliases": [
+   "kalkan",
+   "kalkan balığı"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173713,
+  "tr": "Mezgit, çiğ",
+  "aliases": [
+   "mezgit"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175161,
+  "tr": "Mezgit, ızgara",
+  "aliases": [
+   "mezgit",
+   "mezgit ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175123,
+  "tr": "Kefal, çiğ",
+  "aliases": [
+   "kefal",
+   "has kefal"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175124,
+  "tr": "Kefal, ızgara",
+  "aliases": [
+   "kefal",
+   "kefal ızgara"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174196,
+  "tr": "Dil balığı / pisi (yassı balık), çiğ",
+  "aliases": [
+   "dil balığı",
+   "pisi",
+   "yassı balık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174197,
+  "tr": "Dil balığı / pisi (yassı balık), ızgara",
+  "aliases": [
+   "dil balığı",
+   "pisi",
+   "yassı balık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171955,
+  "tr": "Morina, çiğ",
+  "aliases": [
+   "morina",
+   "cod"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171956,
+  "tr": "Morina, ızgara",
+  "aliases": [
+   "morina",
+   "cod"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174190,
+  "tr": "Morina, kurutulmuş ve tuzlanmış",
+  "aliases": [
+   "kuru morina",
+   "bakalyaro",
+   "tuzlu morina"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173725,
+  "tr": "Alaska mezgiti (pollock), çiğ",
+  "aliases": [
+   "pollock",
+   "beyaz balık fileto"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173726,
+  "tr": "Alaska mezgiti (pollock), pişmiş",
+  "aliases": [
+   "pollock",
+   "beyaz balık fileto"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175176,
+  "tr": "Tilapya, çiğ",
+  "aliases": [
+   "tilapya",
+   "tilapia"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175177,
+  "tr": "Tilapya, ızgara",
+  "aliases": [
+   "tilapya",
+   "tilapia"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171952,
+  "tr": "Sazan, çiğ",
+  "aliases": [
+   "sazan"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174185,
+  "tr": "Sazan, ızgara",
+  "aliases": [
+   "sazan"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173703,
+  "tr": "Kılıç balığı, çiğ",
+  "aliases": [
+   "kılıç",
+   "kılıç şiş"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173704,
+  "tr": "Kılıç balığı, ızgara",
+  "aliases": [
+   "kılıç",
+   "kılıç şiş"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171962,
+  "tr": "Orfoz / lahos (grouper), çiğ",
+  "aliases": [
+   "orfoz",
+   "lahos",
+   "grouper"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171963,
+  "tr": "Orfoz / lahos (grouper), ızgara",
+  "aliases": [
+   "orfoz",
+   "lahos",
+   "grouper"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175116,
+  "tr": "Ringa balığı, çiğ",
+  "aliases": [
+   "ringa"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175118,
+  "tr": "Ringa balığı, turşu (marine)",
+  "aliases": [
+   "ringa",
+   "marine balık"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174188,
+  "tr": "Havyar (siyah ve kırmızı)",
+  "aliases": [
+   "havyar",
+   "kırmızı havyar",
+   "siyah havyar"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175132,
+  "tr": "Balık yumurtası, çiğ",
+  "aliases": [
+   "balık yumurtası",
+   "tarama"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174195,
+  "tr": "Balık kroket (fish stick), pişmiş",
+  "aliases": [
+   "balık kroket",
+   "fish stick",
+   "balık parmak"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 173702,
+  "tr": "Surimi",
+  "aliases": [
+   "surimi"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175179,
+  "tr": "Karides, çiğ",
+  "aliases": [
+   "karides"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 175180,
+  "tr": "Karides, haşlanmış",
+  "aliases": [
+   "karides",
+   "haşlanmış karides"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171970,
+  "tr": "Karides, pane kızartılmış",
+  "aliases": [
+   "karides tava",
+   "çıtır karides"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171972,
+  "tr": "Karides konservesi",
+  "aliases": [
+   "karides",
+   "konserve karides"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174223,
+  "tr": "Kalamar, çiğ",
+  "aliases": [
+   "kalamar"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171982,
+  "tr": "Kalamar, kızartılmış",
+  "aliases": [
+   "kalamar tava",
+   "kalamar"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174215,
+  "tr": "Mürekkep balığı (sübye), çiğ",
+  "aliases": [
+   "mürekkep balığı",
+   "sübye"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 172010,
+  "tr": "Mürekkep balığı (sübye), haşlanmış",
+  "aliases": [
+   "mürekkep balığı",
+   "sübye"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174216,
+  "tr": "Midye, çiğ",
+  "aliases": [
+   "midye"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174217,
+  "tr": "Midye, haşlanmış",
+  "aliases": [
+   "midye",
+   "midye buğulama"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174218,
+  "tr": "Ahtapot, çiğ",
+  "aliases": [
+   "ahtapot"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174249,
+  "tr": "Ahtapot, haşlanmış",
+  "aliases": [
+   "ahtapot",
+   "ahtapot salatası"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174204,
+  "tr": "Yengeç (mavi yengeç), çiğ",
+  "aliases": [
+   "yengeç",
+   "mavi yengeç"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174205,
+  "tr": "Yengeç (mavi yengeç), haşlanmış",
+  "aliases": [
+   "yengeç",
+   "mavi yengeç"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171966,
+  "tr": "Yengeç eti konservesi",
+  "aliases": [
+   "yengeç",
+   "konserve yengeç"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174203,
+  "tr": "Yengeç çubuğu (surimi)",
+  "aliases": [
+   "yengeç çubuğu",
+   "surimi",
+   "kanikama"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171978,
+  "tr": "İstiridye, çiğ",
+  "aliases": [
+   "istiridye"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171980,
+  "tr": "İstiridye, haşlanmış",
+  "aliases": [
+   "istiridye"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174208,
+  "tr": "Istakoz, çiğ",
+  "aliases": [
+   "ıstakoz"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174209,
+  "tr": "Istakoz, haşlanmış",
+  "aliases": [
+   "ıstakoz"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 174220,
+  "tr": "Deniz tarağı, çiğ",
+  "aliases": [
+   "tarak",
+   "deniz tarağı",
+   "scallop"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 167742,
+  "tr": "Deniz tarağı, buharda pişmiş",
+  "aliases": [
+   "tarak",
+   "deniz tarağı",
+   "scallop"
+  ],
+  "cat": "Balık ve deniz ürünleri"
+ },
+ {
+  "id": 171287,
+  "tr": "Yumurta, çiğ",
+  "aliases": [
+   "yumurta",
+   "tavuk yumurtası"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 173424,
+  "tr": "Yumurta, haşlanmış",
+  "aliases": [
+   "haşlanmış yumurta",
+   "katı yumurta"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 173423,
+  "tr": "Yumurta, sahanda (yağda kızartılmış)",
+  "aliases": [
+   "sahanda yumurta",
+   "kızarmış yumurta"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172187,
+  "tr": "Yumurta, tavada çırpılmış (scrambled)",
+  "aliases": [
+   "çırpılmış yumurta",
+   "scrambled",
+   "yumurta kavurma"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172185,
+  "tr": "Omlet (sade)",
+  "aliases": [
+   "omlet",
+   "yumurta"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172186,
+  "tr": "Yumurta, poşe",
+  "aliases": [
+   "poşe yumurta",
+   "çılbır"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172183,
+  "tr": "Yumurta beyazı, çiğ",
+  "aliases": [
+   "yumurta akı",
+   "yumurta beyazı",
+   "ak"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172184,
+  "tr": "Yumurta sarısı, çiğ",
+  "aliases": [
+   "yumurta sarısı",
+   "sarı"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172203,
+  "tr": "Yumurta beyazı, pastörize (sıvı)",
+  "aliases": [
+   "sıvı yumurta akı",
+   "yumurta akı"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172204,
+  "tr": "Yumurta beyazı tozu",
+  "aliases": [
+   "yumurta akı tozu",
+   "albümin"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172188,
+  "tr": "Yumurta tozu (bütün)",
+  "aliases": [
+   "yumurta tozu"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172191,
+  "tr": "Bıldırcın yumurtası, çiğ",
+  "aliases": [
+   "bıldırcın yumurtası"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172189,
+  "tr": "Ördek yumurtası, çiğ",
+  "aliases": [
+   "ördek yumurtası"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 172190,
+  "tr": "Kaz yumurtası, çiğ",
+  "aliases": [
+   "kaz yumurtası"
+  ],
+  "cat": "Yumurta"
+ },
+ {
+  "id": 171265,
+  "tr": "Süt, tam yağlı (%3,25)",
+  "aliases": [
+   "süt",
+   "tam yağlı süt",
+   "inek sütü"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171267,
+  "tr": "Süt, yarım yağlı (%2)",
+  "aliases": [
+   "süt",
+   "yarım yağlı süt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170872,
+  "tr": "Süt, az yağlı (%1)",
+  "aliases": [
+   "süt",
+   "az yağlı süt",
+   "light süt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171269,
+  "tr": "Süt, yağsız",
+  "aliases": [
+   "süt",
+   "yağsız süt",
+   "skim süt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170871,
+  "tr": "Süt, yarım yağlı (%2), protein takviyeli",
+  "aliases": [
+   "proteinli süt",
+   "süt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171271,
+  "tr": "Süt, yağsız, protein takviyeli",
+  "aliases": [
+   "proteinli süt",
+   "yağsız süt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171278,
+  "tr": "Keçi sütü",
+  "aliases": [
+   "keçi sütü"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170882,
+  "tr": "Koyun sütü",
+  "aliases": [
+   "koyun sütü"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171280,
+  "tr": "Manda sütü",
+  "aliases": [
+   "manda sütü"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170879,
+  "tr": "Kakaolu süt, tam yağlı",
+  "aliases": [
+   "kakaolu süt",
+   "çikolatalı süt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170880,
+  "tr": "Kakaolu süt, yarım yağlı",
+  "aliases": [
+   "kakaolu süt",
+   "çikolatalı süt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171277,
+  "tr": "Sıcak çikolata (sütlü, ev yapımı)",
+  "aliases": [
+   "sıcak çikolata",
+   "kakao"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170876,
+  "tr": "Süt tozu, tam yağlı",
+  "aliases": [
+   "süt tozu"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 172195,
+  "tr": "Süt tozu, yağsız",
+  "aliases": [
+   "süt tozu",
+   "yağsız süt tozu"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171275,
+  "tr": "Şekerli yoğunlaştırılmış süt (konserve)",
+  "aliases": [
+   "yoğunlaştırılmış süt",
+   "kondanse süt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171276,
+  "tr": "Buharlaştırılmış süt (konserve, şekersiz)",
+  "aliases": [
+   "evaporated süt",
+   "konserve süt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 172225,
+  "tr": "Yayık altı (buttermilk), tam yağlı",
+  "aliases": [
+   "yayık altı",
+   "buttermilk"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170874,
+  "tr": "Yayık altı (buttermilk), az yağlı",
+  "aliases": [
+   "yayık altı",
+   "buttermilk"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171282,
+  "tr": "Peynir altı suyu (sıvı)",
+  "aliases": [
+   "peynir suyu",
+   "whey"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171284,
+  "tr": "Yoğurt, sade, tam yağlı",
+  "aliases": [
+   "yoğurt",
+   "tam yağlı yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170886,
+  "tr": "Yoğurt, sade, az yağlı",
+  "aliases": [
+   "yoğurt",
+   "az yağlı yoğurt",
+   "light yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170887,
+  "tr": "Yoğurt, sade, yağsız",
+  "aliases": [
+   "yoğurt",
+   "yağsız yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171304,
+  "tr": "Süzme yoğurt (Greek), tam yağlı",
+  "aliases": [
+   "süzme",
+   "greek yoğurt",
+   "süzme yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170903,
+  "tr": "Süzme yoğurt (Greek), az yağlı",
+  "aliases": [
+   "süzme",
+   "greek yoğurt",
+   "light süzme"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170905,
+  "tr": "Süzme yoğurt (Greek), meyveli, tam yağlı",
+  "aliases": [
+   "süzme",
+   "greek yoğurt",
+   "meyveli yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170901,
+  "tr": "Süzme yoğurt (Greek), çilekli, yağsız",
+  "aliases": [
+   "süzme",
+   "greek yoğurt",
+   "çilekli yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170902,
+  "tr": "Süzme yoğurt (Greek), vanilyalı, yağsız",
+  "aliases": [
+   "süzme",
+   "greek yoğurt",
+   "vanilyalı yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170888,
+  "tr": "Yoğurt, vanilyalı, az yağlı",
+  "aliases": [
+   "vanilyalı yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170906,
+  "tr": "Yoğurt, vanilyalı, yağsız",
+  "aliases": [
+   "vanilyalı yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171285,
+  "tr": "Meyveli yoğurt, az yağlı",
+  "aliases": [
+   "meyveli yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 172208,
+  "tr": "Kakaolu yoğurt, yağsız",
+  "aliases": [
+   "çikolatalı yoğurt",
+   "kakaolu yoğurt"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170859,
+  "tr": "Krema, yüksek yağlı (çırpma kreması)",
+  "aliases": [
+   "krema",
+   "krem şanti",
+   "sıvı krema"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170858,
+  "tr": "Krema, hafif (çırpma kreması)",
+  "aliases": [
+   "krema",
+   "sıvı krema"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170857,
+  "tr": "Krema, hafif (kahve kreması)",
+  "aliases": [
+   "krema",
+   "kahve kreması"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171255,
+  "tr": "Süt-krema karışımı (half and half)",
+  "aliases": [
+   "krema",
+   "half and half"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 170860,
+  "tr": "Krem şanti, sprey (hazır)",
+  "aliases": [
+   "krem şanti",
+   "sprey krema"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171257,
+  "tr": "Ekşi krema",
+  "aliases": [
+   "ekşi krema",
+   "sour cream"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171256,
+  "tr": "Ekşi krema, yağı azaltılmış",
+  "aliases": [
+   "ekşi krema",
+   "light ekşi krema"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 173444,
+  "tr": "Ekşi krema, yağsız",
+  "aliases": [
+   "ekşi krema"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 173410,
+  "tr": "Tereyağı, tuzlu",
+  "aliases": [
+   "tereyağı",
+   "tuzlu tereyağı"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 173430,
+  "tr": "Tereyağı, tuzsuz",
+  "aliases": [
+   "tereyağı",
+   "tuzsuz tereyağı"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171314,
+  "tr": "Sade yağ (ghee)",
+  "aliases": [
+   "sade yağ",
+   "ghee",
+   "erimiş tereyağı"
+  ],
+  "cat": "Süt ürünleri"
+ },
+ {
+  "id": 171283,
+  "tr": "Peynir altı suyu tozu (tatlı whey)",
+  "aliases": [
+   "whey",
+   "whey tozu",
+   "peynir altı tozu"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 171281,
+  "tr": "Peynir altı suyu tozu (asit whey)",
+  "aliases": [
+   "whey",
+   "whey tozu"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 173459,
+  "tr": "Süt bazlı protein tozu (Muscle Milk)",
+  "aliases": [
+   "protein tozu",
+   "protein",
+   "muscle milk"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 173460,
+  "tr": "Süt bazlı protein tozu, light (Muscle Milk Light)",
+  "aliases": [
+   "protein tozu",
+   "protein",
+   "muscle milk"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 173420,
+  "tr": "Feta peyniri (beyaz peynire benzer)",
+  "aliases": [
+   "feta",
+   "beyaz peynir"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 170845,
+  "tr": "Mozzarella, tam yağlı",
+  "aliases": [
+   "mozzarella",
+   "mozarella"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 170847,
+  "tr": "Mozzarella, yarım yağlı",
+  "aliases": [
+   "mozzarella",
+   "mozarella"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171244,
+  "tr": "Mozzarella, az nemli, yarım yağlı (pizza peyniri)",
+  "aliases": [
+   "mozzarella",
+   "pizza peyniri"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 170900,
+  "tr": "Mozzarella, az nemli, yarım yağlı, rendelenmiş",
+  "aliases": [
+   "rendelenmiş mozzarella",
+   "pizza peyniri"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 169051,
+  "tr": "Mozzarella, yağsız",
+  "aliases": [
+   "mozzarella",
+   "light mozzarella"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 170899,
+  "tr": "Çedar peyniri (keskin, dilim)",
+  "aliases": [
+   "çedar",
+   "cheddar"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171295,
+  "tr": "Çedar peyniri, yağsız",
+  "aliases": [
+   "çedar",
+   "cheddar",
+   "light çedar"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 170848,
+  "tr": "Parmesan, sert",
+  "aliases": [
+   "parmesan",
+   "parmigiano"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171247,
+  "tr": "Parmesan, rendelenmiş (toz)",
+  "aliases": [
+   "parmesan",
+   "rende parmesan"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 173431,
+  "tr": "Parmesan, rendelenmiş (iri)",
+  "aliases": [
+   "parmesan",
+   "rende parmesan"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171249,
+  "tr": "Romano peyniri (pecorino benzeri)",
+  "aliases": [
+   "romano",
+   "pecorino"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172179,
+  "tr": "Lor benzeri cottage peyniri (kremalı)",
+  "aliases": [
+   "cottage",
+   "lor"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172182,
+  "tr": "Lor benzeri cottage peyniri, az yağlı (%2)",
+  "aliases": [
+   "cottage",
+   "lor"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 173417,
+  "tr": "Lor benzeri cottage peyniri, az yağlı (%1)",
+  "aliases": [
+   "cottage",
+   "lor",
+   "light lor"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172181,
+  "tr": "Cottage peyniri, yağsız, kuru (lora benzer)",
+  "aliases": [
+   "cottage",
+   "lor",
+   "yağsız lor"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 170851,
+  "tr": "Ricotta, tam yağlı",
+  "aliases": [
+   "ricotta",
+   "lor"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171248,
+  "tr": "Ricotta, yarım yağlı",
+  "aliases": [
+   "ricotta",
+   "lor"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 173418,
+  "tr": "Krem peynir",
+  "aliases": [
+   "krem peynir",
+   "labne",
+   "philadelphia"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172207,
+  "tr": "Krem peynir, yağsız",
+  "aliases": [
+   "krem peynir",
+   "light labne"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 169081,
+  "tr": "Krem peynir bazlı sürülebilir peynir",
+  "aliases": [
+   "sürülebilir peynir",
+   "krem peynir"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 173435,
+  "tr": "Keçi peyniri, yumuşak",
+  "aliases": [
+   "keçi peyniri"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 173433,
+  "tr": "Keçi peyniri, yarı sert",
+  "aliases": [
+   "keçi peyniri"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172197,
+  "tr": "Keçi peyniri, sert",
+  "aliases": [
+   "keçi peyniri"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171251,
+  "tr": "İsviçre peyniri (Emmental)",
+  "aliases": [
+   "emmental",
+   "isviçre peyniri"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171241,
+  "tr": "Gouda peyniri",
+  "aliases": [
+   "gouda"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 173419,
+  "tr": "Edam peyniri",
+  "aliases": [
+   "edam"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171242,
+  "tr": "Gruyère peyniri",
+  "aliases": [
+   "gruyere",
+   "gravyer"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 170850,
+  "tr": "Provolone peyniri",
+  "aliases": [
+   "provolone"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172177,
+  "tr": "Brie peyniri",
+  "aliases": [
+   "brie"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172178,
+  "tr": "Camembert peyniri",
+  "aliases": [
+   "camembert",
+   "kamember"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172175,
+  "tr": "Mavi küflü peynir",
+  "aliases": [
+   "küflü peynir",
+   "blue cheese"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171250,
+  "tr": "Rokfor peyniri",
+  "aliases": [
+   "rokfor",
+   "küflü peynir"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172223,
+  "tr": "Queso fresco (taze peynire benzer)",
+  "aliases": [
+   "taze peynir",
+   "queso fresco"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172224,
+  "tr": "Queso blanco (beyaz peynire benzer)",
+  "aliases": [
+   "beyaz peynir",
+   "queso blanco"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171290,
+  "tr": "İşlenmiş dilim peynir (American)",
+  "aliases": [
+   "dilim peynir",
+   "tost peyniri",
+   "eritme peynir"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 171254,
+  "tr": "Sürülebilir işlenmiş peynir (American)",
+  "aliases": [
+   "sürülebilir peynir",
+   "eritme peynir"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 172200,
+  "tr": "Peynir sosu (ev yapımı)",
+  "aliases": [
+   "peynir sosu",
+   "cheddar sos"
+  ],
+  "cat": "Peynirler"
+ },
+ {
+  "id": 173461,
+  "tr": "Süt reçeli (dulce de leche)",
+  "aliases": [
+   "süt reçeli",
+   "dulce de leche",
+   "karamel"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 173465,
+  "tr": "Yumuşak dondurma (soft serve), çikolatalı",
+  "aliases": [
+   "dondurma",
+   "çikolatalı dondurma",
+   "külah"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 171293,
+  "tr": "Light yumuşak dondurma, çikolatalı",
+  "aliases": [
+   "dondurma",
+   "light dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 173466,
+  "tr": "Çikolata kaplı çubuk dondurma",
+  "aliases": [
+   "dondurma",
+   "çubuk dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172226,
+  "tr": "Dondurmalı sandviç (bisküvili)",
+  "aliases": [
+   "dondurma",
+   "sandviç dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 173467,
+  "tr": "Dondurma, yağsız, şeker ilavesiz",
+  "aliases": [
+   "dondurma",
+   "şekersiz dondurma",
+   "light dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170908,
+  "tr": "Dondurulmuş yoğurt, az yağlı",
+  "aliases": [
+   "frozen yoğurt",
+   "dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170883,
+  "tr": "Milkshake, çikolatalı",
+  "aliases": [
+   "milkshake",
+   "shake"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170884,
+  "tr": "Milkshake, vanilyalı",
+  "aliases": [
+   "milkshake",
+   "shake"
+  ],
+  "cat": "Tatlılar"
+ }
+]

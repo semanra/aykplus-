@@ -1,0 +1,1739 @@
+[
+ {
+  "id": 174158,
+  "tr": "Su (içme suyu)",
+  "aliases": [
+   "su",
+   "içme suyu",
+   "şişe su",
+   "musluk suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173227,
+  "tr": "Çay, siyah, demlenmiş",
+  "aliases": [
+   "çay",
+   "siyah çay",
+   "demli çay"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171917,
+  "tr": "Yeşil çay, demlenmiş",
+  "aliases": [
+   "yeşil çay",
+   "çay"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174156,
+  "tr": "Papatya çayı, demlenmiş",
+  "aliases": [
+   "papatya çayı",
+   "bitki çayı"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173232,
+  "tr": "Bitki çayı, demlenmiş (papatya dışı)",
+  "aliases": [
+   "bitki çayı",
+   "ıhlamur",
+   "adaçayı",
+   "nane limon",
+   "kuşburnu çayı"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171946,
+  "tr": "Hibiskus çayı, demlenmiş",
+  "aliases": [
+   "hibiskus",
+   "hibiskus çayı",
+   "bitki çayı"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 175090,
+  "tr": "Hazır limonlu çay, şekerli, suyla hazırlanmış",
+  "aliases": [
+   "limonlu çay",
+   "hazır çay"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174144,
+  "tr": "Soğuk çay, siyah, şekersiz (hazır)",
+  "aliases": [
+   "soğuk çay",
+   "ice tea"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171888,
+  "tr": "Soğuk çay, limonlu, şekerli (hazır)",
+  "aliases": [
+   "soğuk çay",
+   "limonlu soğuk çay",
+   "ice tea"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171892,
+  "tr": "Soğuk çay, limonlu, diyet (hazır)",
+  "aliases": [
+   "diyet soğuk çay",
+   "şekersiz soğuk çay",
+   "ice tea"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174128,
+  "tr": "Soğuk yeşil çay, şekerli (hazır)",
+  "aliases": [
+   "soğuk yeşil çay",
+   "yeşil çay"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171890,
+  "tr": "Kahve, filtre (demlenmiş)",
+  "aliases": [
+   "kahve",
+   "filtre kahve",
+   "americano",
+   "sade kahve"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171889,
+  "tr": "Kahve, filtre (demlenmiş), kafeinsiz",
+  "aliases": [
+   "kafeinsiz kahve",
+   "filtre kahve",
+   "decaf"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171891,
+  "tr": "Espresso",
+  "aliases": [
+   "espresso",
+   "kahve"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171893,
+  "tr": "Hazır kahve, toz (sade)",
+  "aliases": [
+   "hazır kahve",
+   "granül kahve"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174130,
+  "tr": "Hazır kahve, sade, suyla hazırlanmış",
+  "aliases": [
+   "hazır kahve",
+   "granül kahve"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174135,
+  "tr": "Hazır mocha kahve, şekerli, toz",
+  "aliases": [
+   "mocha",
+   "hazır kahve",
+   "kahve karışımı"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171880,
+  "tr": "Soğuk kahve, sütlü, şekerli (hazır)",
+  "aliases": [
+   "soğuk kahve",
+   "ice latte",
+   "sütlü kahve"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174119,
+  "tr": "Soğuk mocha, sütlü (hazır)",
+  "aliases": [
+   "soğuk kahve",
+   "iced mocha",
+   "mocha"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174852,
+  "tr": "Kola",
+  "aliases": [
+   "kola",
+   "gazlı içecek"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 175099,
+  "tr": "Kola, şekersiz (diyet)",
+  "aliases": [
+   "diyet kola",
+   "şekersiz kola",
+   "zero kola",
+   "light kola"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173205,
+  "tr": "Gazoz (limonlu, renksiz)",
+  "aliases": [
+   "gazoz",
+   "limonlu gazoz",
+   "gazlı içecek"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173204,
+  "tr": "Gazlı içecek, şekersiz (kola dışı)",
+  "aliases": [
+   "diyet gazoz",
+   "şekersiz gazoz",
+   "zero gazoz"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174854,
+  "tr": "Portakallı gazoz",
+  "aliases": [
+   "portakallı gazoz",
+   "gazlı içecek"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174846,
+  "tr": "Zencefilli gazoz (ginger ale)",
+  "aliases": [
+   "ginger ale",
+   "zencefilli gazoz"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171869,
+  "tr": "Tonik",
+  "aliases": [
+   "tonik",
+   "tonik su"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174842,
+  "tr": "Soda (sade, gazlı su)",
+  "aliases": [
+   "soda",
+   "maden suyu",
+   "sade soda",
+   "gazlı su"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174821,
+  "tr": "Enerji içeceği",
+  "aliases": [
+   "enerji içeceği",
+   "enerji"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174822,
+  "tr": "Enerji içeceği, şekersiz",
+  "aliases": [
+   "şekersiz enerji içeceği",
+   "zero enerji içeceği"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171923,
+  "tr": "Sporcu içeceği, şekersiz (kalorisiz)",
+  "aliases": [
+   "sporcu içeceği",
+   "izotonik",
+   "elektrolit"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173217,
+  "tr": "Limonata (konsantreden hazırlanmış)",
+  "aliases": [
+   "limonata"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 169044,
+  "tr": "Portakallı meyve içeceği",
+  "aliases": [
+   "portakallı içecek",
+   "meyve suyu",
+   "portakal suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173178,
+  "tr": "Portakal suyu, light, posasız",
+  "aliases": [
+   "portakal suyu",
+   "light meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171914,
+  "tr": "Karışık meyve içeceği",
+  "aliases": [
+   "karışık meyve suyu",
+   "meyve içeceği",
+   "punch"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173214,
+  "tr": "Kızılcık suyu (şekerli içecek)",
+  "aliases": [
+   "kızılcık suyu",
+   "meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174175,
+  "tr": "Sebze-meyve suyu karışımı (%100)",
+  "aliases": [
+   "sebze meyve suyu",
+   "karışık meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174831,
+  "tr": "Hindistan cevizi suyu (şekersiz)",
+  "aliases": [
+   "hindistan cevizi suyu",
+   "coconut water"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174832,
+  "tr": "Badem sütü, şekersiz",
+  "aliases": [
+   "badem sütü",
+   "bitkisel süt"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168751,
+  "tr": "Badem sütü, vanilyalı, şekerli",
+  "aliases": [
+   "vanilyalı badem sütü",
+   "badem sütü"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174820,
+  "tr": "Badem sütü, kakaolu",
+  "aliases": [
+   "kakaolu badem sütü",
+   "badem sütü"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171942,
+  "tr": "Pirinç sütü, şekersiz",
+  "aliases": [
+   "pirinç sütü",
+   "bitkisel süt"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174174,
+  "tr": "Aromalı süt, az yağlı, şekerli (hazır)",
+  "aliases": [
+   "aromalı süt",
+   "kakaolu süt",
+   "çilekli süt"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173226,
+  "tr": "Milkshake, vanilyalı",
+  "aliases": [
+   "milkshake",
+   "vanilyalı milkshake",
+   "shake"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174122,
+  "tr": "Sıcak çikolata tozu",
+  "aliases": [
+   "sıcak çikolata",
+   "kakaolu içecek"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174123,
+  "tr": "Sıcak çikolata, suyla hazırlanmış",
+  "aliases": [
+   "sıcak çikolata",
+   "kakao"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171879,
+  "tr": "Sıcak çikolata, tam yağlı sütle hazırlanmış",
+  "aliases": [
+   "sıcak çikolata",
+   "sütlü kakao"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174159,
+  "tr": "Süte katılan kakaolu toz (vitaminli)",
+  "aliases": [
+   "kakaolu süt tozu",
+   "kakaolu toz"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174117,
+  "tr": "Çikolata şurubu",
+  "aliases": [
+   "çikolata şurubu",
+   "çikolata sosu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174863,
+  "tr": "Alkolsüz bira (malt içeceği)",
+  "aliases": [
+   "alkolsüz bira",
+   "malt içeceği"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168746,
+  "tr": "Bira",
+  "aliases": [
+   "bira"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168749,
+  "tr": "Bira, light",
+  "aliases": [
+   "light bira",
+   "bira"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173190,
+  "tr": "Kırmızı şarap",
+  "aliases": [
+   "şarap",
+   "kırmızı şarap"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174837,
+  "tr": "Beyaz şarap",
+  "aliases": [
+   "şarap",
+   "beyaz şarap"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174815,
+  "tr": "Distile alkollü içki (40 derece)",
+  "aliases": [
+   "votka",
+   "viski",
+   "cin",
+   "rom",
+   "alkollü içki"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173180,
+  "tr": "Whey protein tozu",
+  "aliases": [
+   "whey",
+   "protein tozu",
+   "protein"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 173177,
+  "tr": "Whey protein izolat tozu",
+  "aliases": [
+   "whey izolat",
+   "izolat",
+   "protein tozu"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 173181,
+  "tr": "Soya protein tozu",
+  "aliases": [
+   "soya proteini",
+   "bitkisel protein",
+   "protein tozu"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 174181,
+  "tr": "Yüksek proteinli shake tozu",
+  "aliases": [
+   "protein shake",
+   "protein tozu",
+   "shake"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 169655,
+  "tr": "Toz şeker",
+  "aliases": [
+   "şeker",
+   "toz şeker",
+   "küp şeker",
+   "beyaz şeker"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169656,
+  "tr": "Pudra şekeri",
+  "aliases": [
+   "pudra şekeri",
+   "şeker"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168833,
+  "tr": "Esmer şeker",
+  "aliases": [
+   "esmer şeker",
+   "şeker"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169640,
+  "tr": "Bal",
+  "aliases": [
+   "bal",
+   "süzme bal",
+   "çiçek balı"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 168820,
+  "tr": "Melas (şeker kamışı)",
+  "aliases": [
+   "melas",
+   "şeker kamışı melası"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 169641,
+  "tr": "Reçel",
+  "aliases": [
+   "reçel",
+   "çilek reçeli",
+   "vişne reçeli"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 170645,
+  "tr": "Kayısı reçeli",
+  "aliases": [
+   "kayısı reçeli",
+   "reçel"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 168819,
+  "tr": "Portakal marmelatı",
+  "aliases": [
+   "marmelat",
+   "portakal marmelatı",
+   "reçel"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 167706,
+  "tr": "Reçel, az şekerli",
+  "aliases": [
+   "az şekerli reçel",
+   "diyet reçel",
+   "reçel"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 169058,
+  "tr": "Reçel, şekersiz (tatlandırıcılı)",
+  "aliases": [
+   "şekersiz reçel",
+   "diyet reçel",
+   "reçel"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 169642,
+  "tr": "Meyve jölesi (sürülebilir)",
+  "aliases": [
+   "meyve jölesi",
+   "jöle",
+   "reçel"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 168816,
+  "tr": "Elma ezmesi (sürülebilir)",
+  "aliases": [
+   "elma ezmesi",
+   "elma kreması"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 168000,
+  "tr": "Kakaolu fındık kreması",
+  "aliases": [
+   "fındık kreması",
+   "kakaolu krema",
+   "çikolata kreması"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 169661,
+  "tr": "Akçaağaç şurubu",
+  "aliases": [
+   "akçaağaç şurubu",
+   "maple şurup"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169578,
+  "tr": "Pankek şurubu",
+  "aliases": [
+   "pankek şurubu",
+   "şurup"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170277,
+  "tr": "Agave şurubu",
+  "aliases": [
+   "agave",
+   "agave şurubu"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168837,
+  "tr": "Mısır şurubu, açık (glikoz şurubu)",
+  "aliases": [
+   "glikoz şurubu",
+   "mısır şurubu"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168835,
+  "tr": "Çikolata sosu (fudge)",
+  "aliases": [
+   "çikolata sosu",
+   "fudge sos"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168841,
+  "tr": "Karamel sos",
+  "aliases": [
+   "karamel sos",
+   "karamel"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170273,
+  "tr": "Bitter çikolata (%70–85 kakao)",
+  "aliases": [
+   "bitter çikolata",
+   "bitter",
+   "%70 çikolata",
+   "%85 çikolata"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170272,
+  "tr": "Bitter çikolata (%60–69 kakao)",
+  "aliases": [
+   "bitter çikolata",
+   "bitter",
+   "%60 çikolata"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170271,
+  "tr": "Bitter çikolata (%45–59 kakao)",
+  "aliases": [
+   "bitter çikolata",
+   "yarı bitter",
+   "%50 çikolata"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167587,
+  "tr": "Sütlü çikolata",
+  "aliases": [
+   "çikolata",
+   "sütlü çikolata"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168754,
+  "tr": "Bademli sütlü çikolata",
+  "aliases": [
+   "bademli çikolata",
+   "çikolata"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167571,
+  "tr": "Beyaz çikolata",
+  "aliases": [
+   "beyaz çikolata",
+   "çikolata"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167976,
+  "tr": "Yarı bitter çikolata (damla çikolata)",
+  "aliases": [
+   "damla çikolata",
+   "yarı bitter",
+   "kuvertür"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168001,
+  "tr": "Çikolata kaplı yer fıstığı",
+  "aliases": [
+   "çikolatalı fıstık",
+   "draje"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170275,
+  "tr": "Fıstık ezmesi dolgulu çikolatalı bar",
+  "aliases": [
+   "çikolatalı bar",
+   "fıstık ezmeli bar"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167996,
+  "tr": "Tahin helvası, sade",
+  "aliases": [
+   "helva",
+   "tahin helvası",
+   "sade helva"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167991,
+  "tr": "Jelibon",
+  "aliases": [
+   "jelibon",
+   "şekerleme",
+   "yumuşak şeker"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167989,
+  "tr": "Nişastalı jöle şekeri (lokum benzeri)",
+  "aliases": [
+   "jöle şekeri",
+   "jelibon",
+   "lokum"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167990,
+  "tr": "Sert şeker (akide benzeri)",
+  "aliases": [
+   "akide",
+   "bonbon",
+   "şekerleme",
+   "sert şeker"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167995,
+  "tr": "Marshmallow",
+  "aliases": [
+   "marshmallow",
+   "marşmelov"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167974,
+  "tr": "Karamela (sütlü şekerleme)",
+  "aliases": [
+   "karamela",
+   "şekerleme"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168771,
+  "tr": "Sakız",
+  "aliases": [
+   "sakız",
+   "ciklet"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169882,
+  "tr": "Sakız, şekersiz",
+  "aliases": [
+   "şekersiz sakız",
+   "sakız",
+   "ciklet"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170656,
+  "tr": "Badem şekeri (şeker kaplı badem)",
+  "aliases": [
+   "badem şekeri",
+   "draje badem"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169588,
+  "tr": "Susamlı bar (susam krokanı)",
+  "aliases": [
+   "susamlı bar",
+   "susam krokanı",
+   "susamlı şekerleme"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169585,
+  "tr": "Yer fıstıklı bar",
+  "aliases": [
+   "fıstıklı bar",
+   "yer fıstığı bar"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167540,
+  "tr": "Meyve pestili",
+  "aliases": [
+   "pestil",
+   "meyve pestili"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167575,
+  "tr": "Dondurma, vanilyalı",
+  "aliases": [
+   "dondurma",
+   "vanilyalı dondurma",
+   "sade dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168809,
+  "tr": "Dondurma, çikolatalı",
+  "aliases": [
+   "dondurma",
+   "çikolatalı dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168810,
+  "tr": "Dondurma, çilekli",
+  "aliases": [
+   "dondurma",
+   "çilekli dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167572,
+  "tr": "Dondurma, vanilyalı, light",
+  "aliases": [
+   "light dondurma",
+   "dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167981,
+  "tr": "Yumuşak dondurma, vanilyalı (makine)",
+  "aliases": [
+   "yumuşak dondurma",
+   "külah dondurma",
+   "soft dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168813,
+  "tr": "Su buzu (meyve aromalı, çubuklu)",
+  "aliases": [
+   "su buzu",
+   "buzlu",
+   "meyveli buz"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168130,
+  "tr": "Çubuklu dondurma, çikolata kaplı, kuruyemişli",
+  "aliases": [
+   "çubuklu dondurma",
+   "dondurma"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168105,
+  "tr": "Dondurulmuş yoğurt (çikolatasız)",
+  "aliases": [
+   "frozen yoğurt",
+   "dondurulmuş yoğurt"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168778,
+  "tr": "Çikolatalı puding (hazır, kapta)",
+  "aliases": [
+   "puding",
+   "çikolatalı puding",
+   "sütlü tatlı"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169608,
+  "tr": "Vanilyalı puding (hazır, kapta)",
+  "aliases": [
+   "puding",
+   "vanilyalı puding",
+   "muhallebi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168782,
+  "tr": "Pirinç pudingi (sütlaç benzeri, hazır)",
+  "aliases": [
+   "sütlaç",
+   "pirinç pudingi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169600,
+  "tr": "Çikolatalı puding, tozdan, tam yağlı sütle",
+  "aliases": [
+   "puding",
+   "çikolatalı puding"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167998,
+  "tr": "Çikolatalı puding, tozdan, yarım yağlı sütle",
+  "aliases": [
+   "puding",
+   "çikolatalı puding"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168785,
+  "tr": "Vanilyalı puding, tozdan, tam yağlı sütle",
+  "aliases": [
+   "puding",
+   "vanilyalı puding",
+   "muhallebi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167574,
+  "tr": "Krem karamel (ev yapımı)",
+  "aliases": [
+   "krem karamel",
+   "flan"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168777,
+  "tr": "Çikolatalı mus (ev yapımı)",
+  "aliases": [
+   "mus",
+   "çikolatalı mus"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168775,
+  "tr": "Jöle tozu (şekerli)",
+  "aliases": [
+   "jöle tozu",
+   "jöle"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169596,
+  "tr": "Jöle tatlısı, suyla hazırlanmış",
+  "aliases": [
+   "jöle",
+   "jöle tatlısı"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169599,
+  "tr": "Jelatin tozu (şekersiz)",
+  "aliases": [
+   "jelatin",
+   "toz jelatin"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168795,
+  "tr": "Çikolatalı pasta kreması (hazır)",
+  "aliases": [
+   "pasta kreması",
+   "çikolatalı krema"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169593,
+  "tr": "Kakao tozu (şekersiz)",
+  "aliases": [
+   "kakao",
+   "kakao tozu"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 170679,
+  "tr": "Stevya (toz tatlandırıcı)",
+  "aliases": [
+   "stevya",
+   "tatlandırıcı"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 169072,
+  "tr": "Sakarin (toz tatlandırıcı)",
+  "aliases": [
+   "sakarin",
+   "tatlandırıcı"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 171595,
+  "tr": "Acı domates sosu (şişe, ketçap benzeri)",
+  "aliases": [
+   "acı ketçap",
+   "domates sosu",
+   "chili sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171192,
+  "tr": "Makarna sosu, domatesli (marinara, hazır)",
+  "aliases": [
+   "makarna sosu",
+   "domates sosu",
+   "marinara"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172880,
+  "tr": "Pizza sosu (hazır)",
+  "aliases": [
+   "pizza sosu",
+   "domates sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174523,
+  "tr": "Barbekü sosu",
+  "aliases": [
+   "barbekü sos",
+   "bbq sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171186,
+  "tr": "Sriracha acı sos",
+  "aliases": [
+   "sriracha",
+   "acı sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174527,
+  "tr": "Acı sos (biber sosu, hazır)",
+  "aliases": [
+   "acı sos",
+   "biber sosu",
+   "hot sauce"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171579,
+  "tr": "Pesto sos (soğuk zincir)",
+  "aliases": [
+   "pesto",
+   "fesleğen sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171167,
+  "tr": "Teriyaki sos",
+  "aliases": [
+   "teriyaki"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171610,
+  "tr": "Worcestershire sos",
+  "aliases": [
+   "worcestershire",
+   "İngiliz sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174066,
+  "tr": "Tatlı ekşi sos (hazır)",
+  "aliases": [
+   "tatlı ekşi sos",
+   "sweet sour"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172886,
+  "tr": "Hoisin sos",
+  "aliases": [
+   "hoisin",
+   "Çin sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174529,
+  "tr": "İstiridye sosu",
+  "aliases": [
+   "istiridye sosu",
+   "oyster sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171826,
+  "tr": "Tartar sos",
+  "aliases": [
+   "tartar sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174524,
+  "tr": "Salsa sos (hazır)",
+  "aliases": [
+   "salsa",
+   "meksika sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171191,
+  "tr": "Peynir sosu (hazır)",
+  "aliases": [
+   "peynir sosu",
+   "cheddar sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174525,
+  "tr": "Beşamel sos (ev yapımı, orta kıvam)",
+  "aliases": [
+   "beşamel",
+   "beyaz sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174070,
+  "tr": "Fıstık sosu (fıstık ezmeli)",
+  "aliases": [
+   "fıstık sosu",
+   "satay sos"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171831,
+  "tr": "Wasabi",
+  "aliases": [
+   "wasabi"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172884,
+  "tr": "Tavuk suyu (ev yapımı)",
+  "aliases": [
+   "tavuk suyu",
+   "kemik suyu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172883,
+  "tr": "Et suyu (ev yapımı)",
+  "aliases": [
+   "et suyu",
+   "kemik suyu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174536,
+  "tr": "Tavuk suyu (hazır)",
+  "aliases": [
+   "tavuk suyu",
+   "hazır tavuk suyu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171538,
+  "tr": "Et suyu (hazır)",
+  "aliases": [
+   "et suyu",
+   "hazır et suyu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171583,
+  "tr": "Sebze suyu (hazır)",
+  "aliases": [
+   "sebze suyu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171563,
+  "tr": "Tavuk bulyon (tablet, kuru)",
+  "aliases": [
+   "bulyon",
+   "tavuk bulyon",
+   "tablet bulyon"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171561,
+  "tr": "Et bulyon (tablet, kuru)",
+  "aliases": [
+   "bulyon",
+   "et bulyon",
+   "tablet bulyon"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171176,
+  "tr": "Domates çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "domates çorbası",
+   "çorba"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174569,
+  "tr": "Domates çorbası (paket, suyla hazırlanmış)",
+  "aliases": [
+   "paket çorba",
+   "domates çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172909,
+  "tr": "Tavuk şehriye çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "tavuk çorbası",
+   "şehriye çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172925,
+  "tr": "Tavuk şehriye çorbası (paket, suyla hazırlanmış)",
+  "aliases": [
+   "paket çorba",
+   "tavuk çorbası",
+   "şehriye çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172910,
+  "tr": "Tavuklu pirinç çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "tavuklu pirinç çorbası",
+   "tavuk çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171546,
+  "tr": "Tavuk sebze çorbası (hazır)",
+  "aliases": [
+   "tavuk sebze çorbası",
+   "sebze çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174567,
+  "tr": "Kremalı tavuk çorbası (paket, suyla hazırlanmış)",
+  "aliases": [
+   "paket çorba",
+   "kremalı tavuk çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174537,
+  "tr": "Kremalı tavuk çorbası (konserve, sütle hazırlanmış)",
+  "aliases": [
+   "kremalı tavuk çorbası",
+   "tavuk çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172915,
+  "tr": "Kremalı mantar çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "mantar çorbası",
+   "kremalı mantar çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172917,
+  "tr": "Kremalı patates çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "patates çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171608,
+  "tr": "Patates çorbası, paket (toz)",
+  "aliases": [
+   "paket çorba",
+   "patates çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174568,
+  "tr": "Soğan çorbası (paket, suyla hazırlanmış)",
+  "aliases": [
+   "soğan çorbası",
+   "paket çorba"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171166,
+  "tr": "Kremalı sebze çorbası, paket (toz)",
+  "aliases": [
+   "sebze çorbası",
+   "paket çorba",
+   "çorba tozu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171559,
+  "tr": "Sebze çorbası, bol malzemeli (hazır)",
+  "aliases": [
+   "sebze çorbası",
+   "hazır çorba"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174564,
+  "tr": "Sebze çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "sebze çorbası",
+   "çorba"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171190,
+  "tr": "Etli sebze çorbası (hazır)",
+  "aliases": [
+   "etli sebze çorbası",
+   "hazır çorba"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172913,
+  "tr": "Minestrone çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "minestrone",
+   "sebze çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171549,
+  "tr": "Mercimek çorbası, jambonlu (hazır, konserve)",
+  "aliases": [
+   "mercimek çorbası",
+   "hazır çorba"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174561,
+  "tr": "Bezelye çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "bezelye çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174534,
+  "tr": "Kuru bezelye çorbası, az tuzlu (hazır)",
+  "aliases": [
+   "kuru bezelye çorbası",
+   "bezelye çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172903,
+  "tr": "Siyah fasulye çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "fasulye çorbası",
+   "siyah fasulye çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 174073,
+  "tr": "Etli arpa çorbası (hazır)",
+  "aliases": [
+   "arpa çorbası",
+   "etli çorba"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172906,
+  "tr": "Etli şehriye çorbası (konserve, suyla hazırlanmış)",
+  "aliases": [
+   "etli şehriye çorbası",
+   "şehriye çorbası"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171177,
+  "tr": "Hazır noodle (ramen), kuru",
+  "aliases": [
+   "noodle",
+   "ramen",
+   "hazır erişte"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 168952,
+  "tr": "Şehriyeli pirinç pilavı (paket karışım, pişmiş)",
+  "aliases": [
+   "şehriyeli pilav",
+   "pilav",
+   "pirinç pilavı"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 173348,
+  "tr": "Tavuk aromalı şehriyeli pilav (paket, pişmiş)",
+  "aliases": [
+   "tavuklu pilav",
+   "şehriyeli pilav"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 169777,
+  "tr": "Domatesli pilav, İspanyol usulü (paket, pişmiş)",
+  "aliases": [
+   "domatesli pilav",
+   "pilav"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 173333,
+  "tr": "Lazanya, peynirli (dondurulmuş, pişmiş)",
+  "aliases": [
+   "lazanya",
+   "peynirli lazanya"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 172114,
+  "tr": "Lazanya, kıymalı (dondurulmuş, pişmiş)",
+  "aliases": [
+   "lazanya",
+   "kıymalı lazanya"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 172094,
+  "tr": "Tortellini, peynirli (taze)",
+  "aliases": [
+   "tortellini",
+   "peynirli makarna"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 172113,
+  "tr": "Ravioli, peynirli, domates soslu (dondurulmuş)",
+  "aliases": [
+   "ravioli",
+   "mantı benzeri"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 172089,
+  "tr": "Kıymalı spagetti (dondurulmuş hazır yemek)",
+  "aliases": [
+   "kıymalı makarna",
+   "bolonez",
+   "spagetti"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 172100,
+  "tr": "Domates soslu makarna (konserve)",
+  "aliases": [
+   "domatesli makarna",
+   "makarna"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 169770,
+  "tr": "Peynirli makarna (paket, hazırlanmış)",
+  "aliases": [
+   "peynirli makarna",
+   "mac and cheese"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 172112,
+  "tr": "Tavuk nugget, beyaz et (dondurulmuş)",
+  "aliases": [
+   "nugget",
+   "tavuk nugget"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 173346,
+  "tr": "Pane tavuk fileto (dondurulmuş, pişmiş)",
+  "aliases": [
+   "çıtır tavuk",
+   "tavuk tender",
+   "pane tavuk"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 173343,
+  "tr": "Yumurtalı patates salatası",
+  "aliases": [
+   "patates salatası"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 172097,
+  "tr": "Chili con carne, fasulyeli (konserve)",
+  "aliases": [
+   "chili",
+   "kıymalı fasulye"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 173330,
+  "tr": "Sebzeli et yahnisi (konserve)",
+  "aliases": [
+   "et yahnisi",
+   "güveç"
+  ],
+  "cat": "Hazır yemekler"
+ },
+ {
+  "id": 172105,
+  "tr": "Sebzeli bahar rulosu (dondurulmuş, pişmiş)",
+  "aliases": [
+   "bahar rulosu",
+   "spring roll",
+   "Çin böreği"
+  ],
+  "cat": "Hazır yemekler"
+ }
+]

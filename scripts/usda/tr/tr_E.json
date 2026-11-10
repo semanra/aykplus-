@@ -1,0 +1,2421 @@
+[
+ {
+  "id": 168877,
+  "tr": "Beyaz pirinç (uzun taneli), kuru (çiğ)",
+  "aliases": [
+   "pirinç",
+   "uzun taneli pirinç",
+   "pilavlık pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168878,
+  "tr": "Beyaz pirinç (uzun taneli), haşlanmış",
+  "aliases": [
+   "haşlanmış pirinç",
+   "pişmiş pirinç",
+   "pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168879,
+  "tr": "Beyaz pirinç (orta taneli), kuru (çiğ)",
+  "aliases": [
+   "baldo",
+   "baldo pirinç",
+   "osmancık",
+   "pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168880,
+  "tr": "Beyaz pirinç (orta taneli), haşlanmış",
+  "aliases": [
+   "haşlanmış baldo",
+   "pişmiş pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168881,
+  "tr": "Beyaz pirinç (kısa taneli), kuru (çiğ)",
+  "aliases": [
+   "kısa taneli pirinç",
+   "sütlaçlık pirinç",
+   "suşi pirinci"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168882,
+  "tr": "Beyaz pirinç (kısa taneli), haşlanmış",
+  "aliases": [
+   "pişmiş suşi pirinci",
+   "haşlanmış pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168883,
+  "tr": "Yapışkan pirinç, kuru (çiğ)",
+  "aliases": [
+   "mochi pirinci",
+   "glutinous pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169711,
+  "tr": "Yapışkan pirinç, haşlanmış",
+  "aliases": [
+   "pişmiş yapışkan pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169707,
+  "tr": "Parboiled pirinç (uzun taneli), kuru (çiğ)",
+  "aliases": [
+   "parboiled",
+   "ön pişirilmiş pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169708,
+  "tr": "Parboiled pirinç (uzun taneli), pişmiş",
+  "aliases": [
+   "pişmiş parboiled pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169709,
+  "tr": "Hazır pirinç (instant), kuru (çiğ)",
+  "aliases": [
+   "instant pirinç",
+   "minute pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169710,
+  "tr": "Hazır pirinç (instant), pişmiş",
+  "aliases": [
+   "pişmiş instant pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169726,
+  "tr": "Yabani pirinç, kuru (çiğ)",
+  "aliases": [
+   "yabani pirinç",
+   "wild rice"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168897,
+  "tr": "Yabani pirinç, haşlanmış",
+  "aliases": [
+   "pişmiş yabani pirinç"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169714,
+  "tr": "Pirinç unu (beyaz)",
+  "aliases": [
+   "pirinç unu"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170688,
+  "tr": "Bulgur, kuru (çiğ)",
+  "aliases": [
+   "pilavlık bulgur",
+   "köftelik bulgur",
+   "bulgur"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170287,
+  "tr": "Bulgur, haşlanmış",
+  "aliases": [
+   "pişmiş bulgur",
+   "haşlanmış bulgur"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169736,
+  "tr": "Makarna, kuru (çiğ)",
+  "aliases": [
+   "makarna",
+   "spagetti",
+   "penne",
+   "burgu makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169737,
+  "tr": "Makarna, haşlanmış",
+  "aliases": [
+   "pişmiş makarna",
+   "haşlanmış spagetti"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168915,
+  "tr": "Tam buğday makarna (%51 tam buğday), kuru (çiğ)",
+  "aliases": [
+   "kepekli makarna",
+   "tam buğday spagetti"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168916,
+  "tr": "Tam buğday makarna (%51 tam buğday), haşlanmış",
+  "aliases": [
+   "pişmiş kepekli makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168937,
+  "tr": "Proteinli spagetti, kuru (çiğ)",
+  "aliases": [
+   "protein makarna",
+   "yüksek proteinli makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168934,
+  "tr": "Proteinli spagetti, haşlanmış",
+  "aliases": [
+   "pişmiş protein makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168911,
+  "tr": "Ispanaklı spagetti, kuru (çiğ)",
+  "aliases": [
+   "ıspanaklı makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168912,
+  "tr": "Ispanaklı spagetti, haşlanmış",
+  "aliases": [
+   "pişmiş ıspanaklı makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169727,
+  "tr": "Taze makarna (paketli), çiğ",
+  "aliases": [
+   "taze makarna",
+   "fresh pasta"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169728,
+  "tr": "Taze makarna, haşlanmış",
+  "aliases": [
+   "pişmiş taze makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168901,
+  "tr": "Ev yapımı yumurtalı makarna, haşlanmış",
+  "aliases": [
+   "ev makarnası",
+   "kesme makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168899,
+  "tr": "Glutensiz mısır makarnası, kuru (çiğ)",
+  "aliases": [
+   "glutensiz makarna",
+   "mısır makarnası"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168900,
+  "tr": "Glutensiz mısır makarnası, haşlanmış",
+  "aliases": [
+   "pişmiş glutensiz makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169731,
+  "tr": "Yumurtalı erişte, kuru (çiğ)",
+  "aliases": [
+   "erişte",
+   "yumurtalı makarna"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169732,
+  "tr": "Yumurtalı erişte, haşlanmış",
+  "aliases": [
+   "pişmiş erişte",
+   "haşlanmış erişte"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168906,
+  "tr": "Soba eriştesi (karabuğday), kuru (çiğ)",
+  "aliases": [
+   "soba",
+   "soba noodle"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168907,
+  "tr": "Soba eriştesi (karabuğday), haşlanmış",
+  "aliases": [
+   "pişmiş soba"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169742,
+  "tr": "Pirinç eriştesi, kuru (çiğ)",
+  "aliases": [
+   "pirinç noodle",
+   "pirinç şehriyesi"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168914,
+  "tr": "Pirinç eriştesi, haşlanmış",
+  "aliases": [
+   "pişmiş pirinç noodle"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169699,
+  "tr": "Kuskus, kuru (çiğ)",
+  "aliases": [
+   "kuskus"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169700,
+  "tr": "Kuskus, haşlanmış",
+  "aliases": [
+   "pişmiş kuskus"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168874,
+  "tr": "Kinoa, kuru (çiğ)",
+  "aliases": [
+   "kinoa",
+   "quinoa"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168917,
+  "tr": "Kinoa, haşlanmış",
+  "aliases": [
+   "pişmiş kinoa"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169702,
+  "tr": "Darı, kuru (çiğ)",
+  "aliases": [
+   "darı",
+   "akdarı"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168871,
+  "tr": "Darı, haşlanmış",
+  "aliases": [
+   "pişmiş darı"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170284,
+  "tr": "Arpa (inci arpa), kuru (çiğ)",
+  "aliases": [
+   "inci arpa",
+   "pilavlık arpa",
+   "arpa"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170285,
+  "tr": "Arpa (inci arpa), haşlanmış",
+  "aliases": [
+   "pişmiş arpa",
+   "haşlanmış arpa"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169739,
+  "tr": "Arpa unu",
+  "aliases": [
+   "öğütülmüş arpa"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170286,
+  "tr": "Karabuğday, kuru (çiğ)",
+  "aliases": [
+   "karabuğday",
+   "greçka"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170685,
+  "tr": "Kavrulmuş karabuğday, kuru (çiğ)",
+  "aliases": [
+   "kaşa",
+   "kavrulmuş karabuğday"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170686,
+  "tr": "Kavrulmuş karabuğday, haşlanmış",
+  "aliases": [
+   "pişmiş karabuğday",
+   "kaşa"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170687,
+  "tr": "Karabuğday unu",
+  "aliases": [
+   "greçka unu"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170682,
+  "tr": "Amarant, kuru (çiğ)",
+  "aliases": [
+   "amarant",
+   "horoz ibiği tohumu"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170683,
+  "tr": "Amarant, haşlanmış",
+  "aliases": [
+   "pişmiş amarant"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169747,
+  "tr": "Teff, kuru (çiğ)",
+  "aliases": [
+   "teff"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168918,
+  "tr": "Teff, haşlanmış",
+  "aliases": [
+   "pişmiş teff"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169745,
+  "tr": "Spelt buğdayı, kuru (çiğ)",
+  "aliases": [
+   "spelt"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169746,
+  "tr": "Spelt buğdayı, haşlanmış",
+  "aliases": [
+   "pişmiş spelt"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168889,
+  "tr": "Buğday tanesi (sert kırmızı)",
+  "aliases": [
+   "buğday",
+   "aşurelik buğday"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169721,
+  "tr": "Durum buğdayı tanesi",
+  "aliases": [
+   "makarnalık buğday",
+   "durum buğdayı"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168892,
+  "tr": "Buğday ruşeymi",
+  "aliases": [
+   "buğday embriyosu",
+   "ruşeym"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169722,
+  "tr": "Buğday kepeği",
+  "aliases": [
+   "kepek"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168872,
+  "tr": "Yulaf kepeği, kuru (çiğ)",
+  "aliases": [
+   "yulaf kepeği"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168873,
+  "tr": "Yulaf kepeği, pişmiş",
+  "aliases": [
+   "yulaf kepeği lapası"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168147,
+  "tr": "Buğday gluteni (vital gluten)",
+  "aliases": [
+   "gluten",
+   "seitan unu"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168894,
+  "tr": "Buğday unu (beyaz, çok amaçlı)",
+  "aliases": [
+   "un",
+   "beyaz un",
+   "buğday unu"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168896,
+  "tr": "Buğday unu (ekmeklik)",
+  "aliases": [
+   "ekmeklik un",
+   "yüksek proteinli un"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168895,
+  "tr": "Kendiliğinden kabaran buğday unu",
+  "aliases": [
+   "kabartmalı un"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169723,
+  "tr": "Kek unu",
+  "aliases": [
+   "pastacılık unu",
+   "böreklik un"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168944,
+  "tr": "Tam buğday unu",
+  "aliases": [
+   "kepekli un",
+   "tam un"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168885,
+  "tr": "Çavdar unu (koyu)",
+  "aliases": [
+   "tam çavdar unu",
+   "çavdar unu"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168886,
+  "tr": "Çavdar unu (orta)",
+  "aliases": [
+   "çavdar unu"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169741,
+  "tr": "Yulaf unu",
+  "aliases": [
+   "öğütülmüş yulaf"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 170290,
+  "tr": "Mısır unu (tam tahıl, sarı)",
+  "aliases": [
+   "mısır unu"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169748,
+  "tr": "Mısır unu (tam tahıl, beyaz)",
+  "aliases": [
+   "beyaz mısır unu"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169697,
+  "tr": "Mısır unu, iri öğütülmüş (tam tahıl, sarı)",
+  "aliases": [
+   "polenta",
+   "mısır irmiği"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 168867,
+  "tr": "Mısır unu, iri öğütülmüş (kepeği alınmış, sarı)",
+  "aliases": [
+   "polenta",
+   "mısır irmiği"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169698,
+  "tr": "Mısır nişastası",
+  "aliases": [
+   "nişasta"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 169715,
+  "tr": "İrmik",
+  "aliases": [
+   "irmik",
+   "semolina"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 173916,
+  "tr": "İnce buğday irmiği (farina), kuru",
+  "aliases": [
+   "farina",
+   "ince irmik"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 173904,
+  "tr": "Yulaf ezmesi, kuru (çiğ)",
+  "aliases": [
+   "yulaf",
+   "yulaf ezmesi",
+   "yulaf gevreği"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 173905,
+  "tr": "Yulaf lapası (suyla pişmiş)",
+  "aliases": [
+   "yulaf lapası",
+   "porridge"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 171661,
+  "tr": "Hazır yulaf (instant), kuru",
+  "aliases": [
+   "instant yulaf",
+   "hazır yulaf ezmesi"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 171662,
+  "tr": "Hazır yulaf (instant), sıcak suyla hazırlanmış",
+  "aliases": [
+   "hazır yulaf lapası"
+  ],
+  "cat": "Tahıllar ve makarna"
+ },
+ {
+  "id": 171664,
+  "tr": "Tarçınlı hazır yulaf, kuru",
+  "aliases": [
+   "tarçınlı yulaf"
+  ],
+  "cat": "Kahvaltılık gevrekler"
+ },
+ {
+  "id": 173920,
+  "tr": "Akçaağaç şuruplu ve esmer şekerli hazır yulaf, kuru",
+  "aliases": [
+   "şuruplu yulaf"
+  ],
+  "cat": "Kahvaltılık gevrekler"
+ },
+ {
+  "id": 167724,
+  "tr": "Darı patlağı",
+  "aliases": [
+   "patlatılmış darı"
+  ],
+  "cat": "Kahvaltılık gevrekler"
+ },
+ {
+  "id": 173912,
+  "tr": "Pirinç patlağı gevreği",
+  "aliases": [
+   "patlatılmış pirinç",
+   "pirinç gevreği"
+  ],
+  "cat": "Kahvaltılık gevrekler"
+ },
+ {
+  "id": 173913,
+  "tr": "Buğday patlağı gevreği",
+  "aliases": [
+   "patlatılmış buğday"
+  ],
+  "cat": "Kahvaltılık gevrekler"
+ },
+ {
+  "id": 171646,
+  "tr": "Granola (ev yapımı)",
+  "aliases": [
+   "granola"
+  ],
+  "cat": "Kahvaltılık gevrekler"
+ },
+ {
+  "id": 169077,
+  "tr": "Kepekli buğday gevreği, meyveli ve kuruyemişli (şekerli)",
+  "aliases": [
+   "müsli tipi gevrek",
+   "meyveli gevrek"
+  ],
+  "cat": "Kahvaltılık gevrekler"
+ },
+ {
+  "id": 172973,
+  "tr": "Çikolatalı mısır patlağı gevreği",
+  "aliases": [
+   "çikolatalı gevrek"
+  ],
+  "cat": "Kahvaltılık gevrekler"
+ },
+ {
+  "id": 169677,
+  "tr": "Patates cipsi (sade, tuzlu)",
+  "aliases": [
+   "cips",
+   "patates cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169683,
+  "tr": "Patates cipsi (az yağlı)",
+  "aliases": [
+   "light cips"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167962,
+  "tr": "Barbekü aromalı patates cipsi",
+  "aliases": [
+   "barbekü cips"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167963,
+  "tr": "Ekşi krema ve soğan aromalı patates cipsi",
+  "aliases": [
+   "soğanlı cips"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169682,
+  "tr": "Peynir aromalı patates cipsi",
+  "aliases": [
+   "peynirli cips"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169686,
+  "tr": "Yağsız patates cipsi (tuzlu)",
+  "aliases": [
+   "yağsız cips"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169046,
+  "tr": "Fırınlanmış patates cipsi",
+  "aliases": [
+   "fırın cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 168853,
+  "tr": "Patates cipsi (kurutulmuş patatesten, tüp tipi)",
+  "aliases": [
+   "tüp cips"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 168854,
+  "tr": "Çubuk patates cipsi",
+  "aliases": [
+   "patates çubuğu"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167558,
+  "tr": "Tortilla cipsi (beyaz mısır, tuzlu)",
+  "aliases": [
+   "mısır cipsi",
+   "nacho cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 173143,
+  "tr": "Tortilla cipsi (sarı mısır, tuzlu)",
+  "aliases": [
+   "mısır cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167559,
+  "tr": "Nacho peynirli tortilla cipsi",
+  "aliases": [
+   "peynirli mısır cipsi",
+   "nacho peynirli cips"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 168137,
+  "tr": "Tortilla cipsi (light, az yağla fırınlanmış)",
+  "aliases": [
+   "light mısır cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167537,
+  "tr": "Mısır cipsi (ekstrüde, sade)",
+  "aliases": [
+   "mısır cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167538,
+  "tr": "Barbekü aromalı mısır cipsi",
+  "aliases": [
+   "barbekü mısır cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167949,
+  "tr": "Peynirli mısır çerezi (puf/çubuk)",
+  "aliases": [
+   "peynirli çubuk",
+   "mısır çerezi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167959,
+  "tr": "Patlamış mısır (yağsız, sıcak havayla)",
+  "aliases": [
+   "patlamış mısır",
+   "popcorn"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 170247,
+  "tr": "Patlamış mısır (yağda, tuzlu)",
+  "aliases": [
+   "yağlı patlamış mısır"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 173141,
+  "tr": "Mikrodalga patlamış mısır (tereyağı aromalı)",
+  "aliases": [
+   "mikrodalga mısır"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167549,
+  "tr": "Mikrodalga patlamış mısır (sade)",
+  "aliases": [
+   "mikrodalga popcorn"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 174778,
+  "tr": "Mikrodalga patlamış mısır (az yağlı)",
+  "aliases": [
+   "light mikrodalga mısır"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167960,
+  "tr": "Peynirli patlamış mısır",
+  "aliases": [
+   "peynir aromalı popcorn"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167552,
+  "tr": "Karamelli patlamış mısır",
+  "aliases": [
+   "karamelli popcorn"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167550,
+  "tr": "Patlamış mısır galeti",
+  "aliases": [
+   "mısır patlağı keki"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 168857,
+  "tr": "Mısır galeti (mısır patlağı)",
+  "aliases": [
+   "mısır patlağı",
+   "mısırlı galeta"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167966,
+  "tr": "Pirinç patlağı (esmer pirinç, sade)",
+  "aliases": [
+   "pirinç patlağı",
+   "pirinç keki",
+   "pirinç galeti"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167557,
+  "tr": "Susamlı pirinç patlağı",
+  "aliases": [
+   "susamlı pirinç keki"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169679,
+  "tr": "Mısırlı pirinç patlağı",
+  "aliases": [
+   "mısırlı pirinç keki"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 173161,
+  "tr": "Pirinç krakeri",
+  "aliases": [
+   "Japon krakeri"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167555,
+  "tr": "Pretzel (sert, tuzlu)",
+  "aliases": [
+   "pretzel",
+   "tuzlu çubuk kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167965,
+  "tr": "Tam buğday pretzel",
+  "aliases": [
+   "kepekli pretzel"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169064,
+  "tr": "Yumuşak pretzel",
+  "aliases": [
+   "brezel",
+   "simit tipi pretzel"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167542,
+  "tr": "Granola bar (sert, sade)",
+  "aliases": [
+   "granola bar",
+   "müsli bar",
+   "tahıl bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167543,
+  "tr": "Bademli granola bar (sert)",
+  "aliases": [
+   "bademli müsli bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167952,
+  "tr": "Damla çikolatalı granola bar (sert)",
+  "aliases": [
+   "çikolatalı müsli bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169681,
+  "tr": "Fıstık ezmeli granola bar (sert)",
+  "aliases": [
+   "fıstık ezmeli bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167954,
+  "tr": "Granola bar (yumuşak, sade)",
+  "aliases": [
+   "yumuşak müsli bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167544,
+  "tr": "Kuru üzümlü granola bar (yumuşak)",
+  "aliases": [
+   "üzümlü müsli bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169674,
+  "tr": "Damla çikolatalı granola bar (yumuşak)",
+  "aliases": [
+   "yumuşak çikolatalı bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167955,
+  "tr": "Fıstık ezmeli granola bar (yumuşak)",
+  "aliases": [
+   "yumuşak fıstık ezmeli bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167545,
+  "tr": "Sütlü çikolata kaplı granola bar",
+  "aliases": [
+   "çikolata kaplı müsli bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169863,
+  "tr": "Hindistan cevizli, çikolata kaplı granola bar",
+  "aliases": [
+   "hindistan cevizli bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 173145,
+  "tr": "Şekeri azaltılmış granola bar",
+  "aliases": [
+   "az şekerli müsli bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 173146,
+  "tr": "Granola lokmaları",
+  "aliases": [
+   "granola topları"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169063,
+  "tr": "Yulaflı kahvaltı barı (üzüm ve hindistan cevizli)",
+  "aliases": [
+   "yulaf bar",
+   "kahvaltı barı"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167951,
+  "tr": "Damla çikolatalı pirinç patlağı barı",
+  "aliases": [
+   "pirinç patlaklı bar"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167561,
+  "tr": "Kuruyemiş karışımı (trail mix)",
+  "aliases": [
+   "karışık kuruyemiş",
+   "çerez karışımı",
+   "trail mix"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167969,
+  "tr": "Çikolatalı kuruyemiş karışımı",
+  "aliases": [
+   "çikolatalı çerez"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 168856,
+  "tr": "Susamlı çubuk çerez (tuzlu)",
+  "aliases": [
+   "susamlı çubuk"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 173147,
+  "tr": "Pita cipsi",
+  "aliases": [
+   "pide cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 173150,
+  "tr": "Bagel cipsi",
+  "aliases": [
+   "ekmek cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 168849,
+  "tr": "Muz cipsi",
+  "aliases": [
+   "kuru muz cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 174783,
+  "tr": "Tatlı patates cipsi (tuzsuz)",
+  "aliases": [
+   "tatlı patates cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 174796,
+  "tr": "Sebze cipsi",
+  "aliases": [
+   "sebzeli cips"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 173160,
+  "tr": "Karides krakeri",
+  "aliases": [
+   "karides cipsi"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167536,
+  "tr": "Sığır eti kurusu (jerky)",
+  "aliases": [
+   "jerky",
+   "et kurusu"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 169636,
+  "tr": "Meyve pestili",
+  "aliases": [
+   "pestil",
+   "meyve köseleği"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 172746,
+  "tr": "Tuzlu kraker",
+  "aliases": [
+   "kraker",
+   "soda krakeri"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167942,
+  "tr": "Tam buğday tuzlu kraker",
+  "aliases": [
+   "kepekli tuzlu kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 174985,
+  "tr": "Buğday krakeri",
+  "aliases": [
+   "kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 172749,
+  "tr": "Tam buğday krakeri",
+  "aliases": [
+   "kepekli kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 174982,
+  "tr": "Kraker (standart, yağlı)",
+  "aliases": [
+   "çıtır kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 171838,
+  "tr": "Çok tahıllı kraker",
+  "aliases": [
+   "tahıllı kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 174975,
+  "tr": "Peynirli kraker",
+  "aliases": [
+   "peynir aromalı kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167941,
+  "tr": "Peynirli kraker (az yağlı)",
+  "aliases": [
+   "light peynirli kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 174098,
+  "tr": "Balık şeklinde kraker",
+  "aliases": [
+   "balık kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 171856,
+  "tr": "Su krakeri",
+  "aliases": [
+   "sade ince kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 167925,
+  "tr": "Peynir dolgulu sandviç kraker",
+  "aliases": [
+   "peynirli sandviç kraker"
+  ],
+  "cat": "Atıştırmalıklar"
+ },
+ {
+  "id": 174924,
+  "tr": "Beyaz ekmek (paketli)",
+  "aliases": [
+   "beyaz ekmek",
+   "tost ekmeği",
+   "francala"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174925,
+  "tr": "Beyaz ekmek, kızarmış",
+  "aliases": [
+   "kızarmış ekmek",
+   "tost"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172675,
+  "tr": "Fransız ekmeği (baget, ekşi maya dahil)",
+  "aliases": [
+   "baget",
+   "ekşi mayalı ekmek",
+   "somun"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172688,
+  "tr": "Tam buğday ekmeği",
+  "aliases": [
+   "kepekli ekmek",
+   "tam buğday",
+   "tam tahıllı ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172689,
+  "tr": "Tam buğday ekmeği, kızarmış",
+  "aliases": [
+   "kızarmış kepekli ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172690,
+  "tr": "Ev yapımı tam buğday ekmeği",
+  "aliases": [
+   "ev yapımı kepekli ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172686,
+  "tr": "Buğday ekmeği (kısmen kepekli)",
+  "aliases": [
+   "buğday ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 168013,
+  "tr": "Çok tahıllı ekmek",
+  "aliases": [
+   "tahıllı ekmek",
+   "çok tahıllı"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172684,
+  "tr": "Çavdar ekmeği",
+  "aliases": [
+   "çavdar"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172685,
+  "tr": "Çavdar ekmeği, kızarmış",
+  "aliases": [
+   "kızarmış çavdar ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174918,
+  "tr": "Pumpernickel (koyu çavdar ekmeği)",
+  "aliases": [
+   "siyah çavdar ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172678,
+  "tr": "Yulaf ekmeği",
+  "aliases": [
+   "yulaflı ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172680,
+  "tr": "Kuru üzümlü ekmek",
+  "aliases": [
+   "üzümlü ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 171850,
+  "tr": "Filizlenmiş buğday ekmeği",
+  "aliases": [
+   "çimlenmiş buğday ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174917,
+  "tr": "Protein ekmeği (glutenli)",
+  "aliases": [
+   "proteinli ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174921,
+  "tr": "Diyet buğday ekmeği (düşük kalorili)",
+  "aliases": [
+   "light ekmek",
+   "diyet ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174922,
+  "tr": "Diyet beyaz ekmek (düşük kalorili)",
+  "aliases": [
+   "light beyaz ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 167943,
+  "tr": "Patatesli ekmek",
+  "aliases": [
+   "patates ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 167945,
+  "tr": "Focaccia",
+  "aliases": [
+   "İtalyan yassı ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 167939,
+  "tr": "Sarımsaklı ekmek (dondurulmuş)",
+  "aliases": [
+   "sarımsaklı ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174915,
+  "tr": "Pita ekmeği (beyaz)",
+  "aliases": [
+   "pita",
+   "Arap ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174916,
+  "tr": "Tam buğday pita ekmeği",
+  "aliases": [
+   "kepekli pita"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175037,
+  "tr": "Tortilla (buğday unu)",
+  "aliases": [
+   "lavaş",
+   "dürüm lavaşı",
+   "wrap"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174081,
+  "tr": "Tam buğday tortilla",
+  "aliases": [
+   "tam buğday lavaş",
+   "kepekli wrap"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175036,
+  "tr": "Mısır tortillası",
+  "aliases": [
+   "mısır lavaşı"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 171845,
+  "tr": "Naan ekmeği",
+  "aliases": [
+   "naan"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 171844,
+  "tr": "Çapati (roti)",
+  "aliases": [
+   "roti",
+   "çapati"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172793,
+  "tr": "Küçük yuvarlak ekmek (dinner roll)",
+  "aliases": [
+   "mini ekmek",
+   "sofra ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172794,
+  "tr": "Tam buğday küçük ekmek",
+  "aliases": [
+   "kepekli mini ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172796,
+  "tr": "Hamburger / sosisli ekmeği",
+  "aliases": [
+   "hamburger ekmeği",
+   "sosisli ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174090,
+  "tr": "Tam buğday hamburger ekmeği",
+  "aliases": [
+   "kepekli hamburger ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175031,
+  "tr": "Kaiser ekmeği (sert kabuklu)",
+  "aliases": [
+   "kaiser"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174899,
+  "tr": "Bagel (sade, susamlı/haşhaşlı dahil)",
+  "aliases": [
+   "bagel"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174900,
+  "tr": "Bagel, kızarmış",
+  "aliases": [
+   "kızarmış bagel"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 171852,
+  "tr": "Çok tahıllı bagel",
+  "aliases": [
+   "tahıllı bagel"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174994,
+  "tr": "İngiliz muffini (sade)",
+  "aliases": [
+   "english muffin"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172762,
+  "tr": "Tam buğday İngiliz muffini",
+  "aliases": [
+   "kepekli english muffin"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174929,
+  "tr": "Grissini (ekmek çubuğu)",
+  "aliases": [
+   "grissini",
+   "ekmek çubuğu"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174928,
+  "tr": "Galeta unu (sade)",
+  "aliases": [
+   "ekmek kırıntısı",
+   "galeta unu"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172751,
+  "tr": "Kruton (sade)",
+  "aliases": [
+   "kızarmış ekmek küpü",
+   "kruton"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174981,
+  "tr": "Galeta",
+  "aliases": [
+   "peksimet"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172739,
+  "tr": "Çavdar gevrek ekmeği",
+  "aliases": [
+   "çavdar krakeri",
+   "gevrek ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172791,
+  "tr": "Yufka (phyllo hamuru)",
+  "aliases": [
+   "yufka",
+   "baklava yufkası",
+   "börek yufkası"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172790,
+  "tr": "Milföy hamuru, çiğ",
+  "aliases": [
+   "milföy",
+   "puf böreği hamuru"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172802,
+  "tr": "Wonton / spring roll yaprağı",
+  "aliases": [
+   "spring roll yaprağı",
+   "mantı yaprağı"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175024,
+  "tr": "Tart hamuru (hazır), çiğ",
+  "aliases": [
+   "tart hamuru",
+   "turta hamuru"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175025,
+  "tr": "Tart hamuru (hazır), pişmiş",
+  "aliases": [
+   "pişmiş tart hamuru"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172814,
+  "tr": "Ev yapımı tart hamuru, çiğ",
+  "aliases": [
+   "ev yapımı turta hamuru"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175026,
+  "tr": "Ev yapımı tart hamuru, pişmiş",
+  "aliases": [
+   "pişmiş ev tart hamuru"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175043,
+  "tr": "Kuru maya",
+  "aliases": [
+   "instant maya",
+   "ekmek mayası"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175042,
+  "tr": "Yaş maya",
+  "aliases": [
+   "taze maya"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172804,
+  "tr": "Kabartma tozu",
+  "aliases": [
+   "kabartıcı"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175040,
+  "tr": "Karbonat",
+  "aliases": [
+   "sodyum bikarbonat",
+   "yemek sodası"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175009,
+  "tr": "Pankek (ev yapımı)",
+  "aliases": [
+   "pankek",
+   "pancake"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175047,
+  "tr": "Ayranlı pankek (buttermilk, ev yapımı)",
+  "aliases": [
+   "buttermilk pankek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172773,
+  "tr": "Yaban mersinli pankek (ev yapımı)",
+  "aliases": [
+   "yaban mersinli pancake"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172771,
+  "tr": "Hazır pankek (dondurulmuş, ısıtmalık)",
+  "aliases": [
+   "dondurulmuş pankek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 172772,
+  "tr": "Pankek karışımı (toz)",
+  "aliases": [
+   "pankek unu"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175006,
+  "tr": "Pankek, hazır karışımdan",
+  "aliases": [
+   "karışımdan pankek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174998,
+  "tr": "Yumurtalı ekmek (french toast, ev yapımı)",
+  "aliases": [
+   "french toast",
+   "yumurtaya bulanmış ekmek"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174987,
+  "tr": "Tereyağlı kruvasan",
+  "aliases": [
+   "kruvasan",
+   "croissant"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174989,
+  "tr": "Peynirli kruvasan",
+  "aliases": [
+   "peynirli croissant"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174988,
+  "tr": "Elmalı kruvasan",
+  "aliases": [
+   "elmalı croissant"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 174910,
+  "tr": "Mısır ekmeği (ev yapımı)",
+  "aliases": [
+   "mısır ekmeği"
+  ],
+  "cat": "Ekmek ve hamur işleri"
+ },
+ {
+  "id": 175039,
+  "tr": "Waffle (ev yapımı)",
+  "aliases": [
+   "waffle",
+   "gofre"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 175038,
+  "tr": "Hazır waffle (dondurulmuş)",
+  "aliases": [
+   "dondurulmuş waffle"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172706,
+  "tr": "Pandispanya (hazır)",
+  "aliases": [
+   "pandispanya",
+   "sünger kek"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172709,
+  "tr": "Sade kek (ev yapımı, kremasız)",
+  "aliases": [
+   "kek",
+   "sade kek"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172710,
+  "tr": "Sarı kek (ev yapımı, kremasız)",
+  "aliases": [
+   "yumurtalı kek",
+   "vanilyalı kek"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172697,
+  "tr": "Kakaolu kek (ev yapımı, kremasız)",
+  "aliases": [
+   "kakaolu kek",
+   "çikolatalı kek"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174934,
+  "tr": "Çikolata kremalı yaş pasta (pastane)",
+  "aliases": [
+   "çikolatalı pasta",
+   "yaş pasta"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174945,
+  "tr": "Vanilya kremalı yaş pasta",
+  "aliases": [
+   "vanilyalı pasta",
+   "doğum günü pastası"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172704,
+  "tr": "Tereyağlı baton kek",
+  "aliases": [
+   "baton kek",
+   "paund kek"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172711,
+  "tr": "Cheesecake (hazır)",
+  "aliases": [
+   "cheesecake"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174939,
+  "tr": "Kuru meyveli kek",
+  "aliases": [
+   "meyveli kek"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172703,
+  "tr": "Ananaslı ters kek",
+  "aliases": [
+   "ananaslı kek"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174943,
+  "tr": "Kremalı paket kek (pandispanya)",
+  "aliases": [
+   "paket kek",
+   "kremalı kek"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174906,
+  "tr": "Muzlu kek (banana bread)",
+  "aliases": [
+   "muzlu ekmek",
+   "banana bread"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174950,
+  "tr": "Tereyağlı kurabiye",
+  "aliases": [
+   "kurabiye",
+   "tereyağlı bisküvi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174967,
+  "tr": "Un kurabiyesi (shortbread)",
+  "aliases": [
+   "shortbread",
+   "kıyır kurabiye"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172716,
+  "tr": "Damla çikolatalı kurabiye (hazır)",
+  "aliases": [
+   "cookie",
+   "çikolatalı kurabiye"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172808,
+  "tr": "Damla çikolatalı kurabiye (ev yapımı)",
+  "aliases": [
+   "ev yapımı cookie"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172725,
+  "tr": "Yulaflı kurabiye (hazır)",
+  "aliases": [
+   "yulaflı cookie"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174963,
+  "tr": "Üzümlü yulaflı kurabiye",
+  "aliases": [
+   "üzümlü cookie"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172727,
+  "tr": "Fıstık ezmeli kurabiye (hazır)",
+  "aliases": [
+   "fıstık ezmeli cookie"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174971,
+  "tr": "Şekerli kurabiye (vanilyalı)",
+  "aliases": [
+   "vanilyalı kurabiye"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172718,
+  "tr": "Kremalı kakaolu bisküvi (sandviç)",
+  "aliases": [
+   "kakaolu kremalı bisküvi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172737,
+  "tr": "Vanilya kremalı bisküvi (sandviç)",
+  "aliases": [
+   "kremalı bisküvi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172736,
+  "tr": "Kremalı gofret",
+  "aliases": [
+   "gofret"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174088,
+  "tr": "Çikolata kaplı gofret",
+  "aliases": [
+   "çikolatalı gofret"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172714,
+  "tr": "Kakaolu bisküvi (ince)",
+  "aliases": [
+   "kakaolu bisküvi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174957,
+  "tr": "Graham bisküvi (ballı)",
+  "aliases": [
+   "graham kraker"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 168014,
+  "tr": "Hayvan şekilli bisküvi (çay bisküvisi dahil)",
+  "aliases": [
+   "çay bisküvisi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 171867,
+  "tr": "Marie bisküvi",
+  "aliases": [
+   "petibör",
+   "sade bisküvi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174956,
+  "tr": "Zencefilli bisküvi",
+  "aliases": [
+   "zencefilli kurabiye"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172821,
+  "tr": "Kedi dili bisküvi",
+  "aliases": [
+   "kedi dili",
+   "savoyardi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172721,
+  "tr": "İncirli bisküvi (bar)",
+  "aliases": [
+   "incirli bar"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 171847,
+  "tr": "Hindistan cevizli makaron",
+  "aliases": [
+   "hindistan cevizli kurabiye"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 171866,
+  "tr": "Çikolata kaplı çubuk bisküvi",
+  "aliases": [
+   "çikolatalı çubuk"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172723,
+  "tr": "Çikolata kaplı marshmallowlu bisküvi",
+  "aliases": [
+   "marshmallowlu bisküvi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174079,
+  "tr": "Çikolata dolgulu veya kaplı tereyağlı bisküvi",
+  "aliases": [
+   "çikolatalı bisküvi"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 175000,
+  "tr": "Dondurma külahı (gofret)",
+  "aliases": [
+   "külah"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172713,
+  "tr": "Brownie (hazır)",
+  "aliases": [
+   "brownie"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174949,
+  "tr": "Brownie (ev yapımı)",
+  "aliases": [
+   "ev yapımı brownie"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172753,
+  "tr": "Tarçınlı Danimarka çöreği",
+  "aliases": [
+   "danish",
+   "tarçınlı çörek"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172754,
+  "tr": "Peynirli Danimarka çöreği",
+  "aliases": [
+   "peynirli danish"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172755,
+  "tr": "Meyveli Danimarka çöreği",
+  "aliases": [
+   "meyveli danish"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167940,
+  "tr": "Tarçınlı rulo çörek (kremalı)",
+  "aliases": [
+   "cinnamon roll",
+   "tarçınlı rulo"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 175032,
+  "tr": "Elmalı strudel",
+  "aliases": [
+   "strudel"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174986,
+  "tr": "Ekler hamuru (ev yapımı, pişmiş)",
+  "aliases": [
+   "choux hamuru",
+   "profiterol hamuru"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 167534,
+  "tr": "Kremalı ekler (kaplamalı)",
+  "aliases": [
+   "ekler",
+   "profiterol"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172758,
+  "tr": "Glazürlü donut",
+  "aliases": [
+   "donut",
+   "şekerli donut"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174990,
+  "tr": "Sade donut (kek tipi)",
+  "aliases": [
+   "sade donut"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 174991,
+  "tr": "Çikolata kaplı donut",
+  "aliases": [
+   "çikolatalı donut"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172759,
+  "tr": "Reçelli donut",
+  "aliases": [
+   "berliner"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172757,
+  "tr": "Kremalı donut",
+  "aliases": [
+   "krema dolgulu donut"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 175012,
+  "tr": "Elmalı turta (ev yapımı)",
+  "aliases": [
+   "elmalı tart",
+   "elmalı pay"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 175011,
+  "tr": "Elmalı turta (hazır)",
+  "aliases": [
+   "hazır elmalı pay"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172781,
+  "tr": "Vişneli turta (ev yapımı)",
+  "aliases": [
+   "vişneli tart",
+   "vişneli pay"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172780,
+  "tr": "Vişneli turta (hazır)",
+  "aliases": [
+   "hazır vişneli pay"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 175018,
+  "tr": "Limonlu beze turta (ev yapımı)",
+  "aliases": [
+   "limonlu tart",
+   "limonlu pay"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172788,
+  "tr": "Balkabaklı turta (ev yapımı)",
+  "aliases": [
+   "balkabaklı pay"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172786,
+  "tr": "Pekan cevizli turta (ev yapımı)",
+  "aliases": [
+   "pekan turtası"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 175020,
+  "tr": "Şeftalili turta",
+  "aliases": [
+   "şeftalili pay"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 175014,
+  "tr": "Çikolata kremalı turta (hazır)",
+  "aliases": [
+   "çikolatalı pay"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172765,
+  "tr": "Yaban mersinli muffin (hazır)",
+  "aliases": [
+   "muffin"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172764,
+  "tr": "Sade muffin (ev yapımı)",
+  "aliases": [
+   "sade muffin"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172768,
+  "tr": "Yaban mersinli muffin (ev yapımı)",
+  "aliases": [
+   "ev yapımı muffin"
+  ],
+  "cat": "Tatlılar"
+ },
+ {
+  "id": 172769,
+  "tr": "Yulaf kepekli muffin",
+  "aliases": [
+   "yulaflı muffin"
+  ],
+  "cat": "Tatlılar"
+ }
+]

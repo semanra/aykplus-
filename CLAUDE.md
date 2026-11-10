@@ -20,7 +20,9 @@ sw.js               ← Service worker (önbellek sürümü burada)
 manifest.json, icon*.png, anatomy.jpg   ← Statik dosyalar
 src/markup.html     ← HTML iskeleti + özel CSS + gömülü yazı tipi (AYKDisplay = Barlow Condensed 800 italik, OFL)
 src/app.js          ← Tüm uygulama mantığı (~3.600 satır)
-src/data.js         ← Besin veritabanı, hareket ve mobilite kütüphaneleri, varsayılan durum
+src/data.js         ← Uygulamanın kendi besin listesi (BASE_FOOD_DB), hareket ve mobilite kütüphaneleri, varsayılan durum
+foods.js            ← v18 USDA besin veritabanı (~1.800 besin + 124 Türk yemeği tarifi). ÜRETİLİR, elle düzenleme (scripts/usda/)
+scripts/usda/       ← foods.js üreticisi: extract.py, build_foods.py, tr/*.json (Türkçe adlar, tarifler), README.md
 src/tailwind.css    ← Tailwind girişi
 scripts/build.mjs   ← Derleme betiği
 tests/              ← Playwright (Python) test paketleri
@@ -32,7 +34,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 9 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 14 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
@@ -45,7 +47,7 @@ npm test             # 9 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 2. Yeni özellik için `tests/` altına test ekle veya mevcut testi güncelle.
 3. `src/markup.html` içindeki sürüm etiketini artır: `AYK+ vN` (Ayarlar'ın en altında görünür).
 4. `sw.js` içindeki `const CACHE = 'aykplus-vN'` değerini artır (artırılmazsa telefon eski sürümü göstermeye devam edebilir). Yeni statik dosya eklediysen `FILES` listesine ekle.
-5. `npm run build` → `npm test` (9/9 geçmeli).
+5. `npm run build` → `npm test` (hepsi geçmeli). Derleme çıktısında "✓ index.html oluşturuldu" yazdığını kontrol et (sözdizimi hatasında derleme durur ve eski index.html kalır).
 6. Açıklayıcı Türkçe mesajla commit et ve `main`'e gönder.
 7. Kullanıcıya kısa Türkçe özet yaz: ne değişti, telefonda ne yapması gerekiyor (genelde: "uygulamayı iki kez tamamen kapatıp aç").
 
@@ -79,6 +81,7 @@ npm test             # 9 test paketi, gerçek Chromium'da iPhone boyutunda; heps
   - **Mutfak (v15):** Kombo `state.combos = [{ id, name, items }]` (ham miktarlar; `saveMealAsCombo(mIdx, dest)`, Besinler'de "Komboların" kategorisi, seçim `foodUI.sel = "combo:<id>"`, `addComboToMeal`). Tarif = özel besin `customFoods["custom_recipe_<id>"]` (`unit: "g"`, birim başına `kcal`, `recipe: { items, cooked }`; `#recipeModal`, `openRecipeModal`, `editCustomFood` tarifse tarif penceresini açar; malzeme seçici tarif penceresinin üstünde açılır, bu yüzden tarif/alışveriş pencereleri `z-[45]`). "Dünkü gibi" (`repeatLastMeal`): `archiveDay` öğün içeriklerini `dailyLogs[gün].meals` içine yazar (yalnızca son 7 gün). Alışveriş listesi (`#shopModal`, `shopList()`): antrenman menüsü × `shopTrainDays()` (varsayılan program gün sayısı) + dinlenme × kalan gün; tarifler malzemelerine açılır; işaretler `state.shopChecked`.
   - **Akıllı (v16):** Besinler'de `#foodSuggest` (`renderFoodSuggest`, `fillSuggestions`): kalan protein/kaloriyi kapatan 2–3 seçenek, yalnızca `frequentFoods()` (menüler, kombolar, son kullanılanlar, son 7 günün arşivi) içinden; miktar en fazla porsiyonun 2,5 katı (`maxSuggestAmt`). Arama yazılınca/besin seçilince gizlenir. Geçmiş'in başında `#weekCard` (`weekCardHtml`): 7 günlük ortalama (`logIntake`: tik varsa yenen, yoksa plan), hedef tutturma takvimi 7/30 gün (`state.nutriHistRange`, `hitClass`: ±%5 yeşil, ±%15 sarı), haftalık bütçe (`weekStats`, Pazartesi–Pazar), 7 günlük kilo ortalaması (`weightAvg7`, Menülerim'de `#weightAvgText`). Not: İlerleme sekmesinde ayrı bir `setHistRange` var; karıştırma.
   - **Takviye zamanı (v17):** `supplementList[i].time` = `morning | pre | post | bed | custom` (+ `timeLabel` özelde), `SUPP_TIMES` sırasıyla Bugün'de gruplanır; zamansızlar "Diğer"de. Düzenle modunda her satırda `select.n-in` (`setSuppTime`) ve çöp kutusu (`removeSupp`).
+  - **Besin veritabanı (v18):** `foods.js` → `USDA_FOODS` (sıkıştırılmış anahtarlar) → açılışta `USDA_DB`'ye çevrilir (`unit: "g"`, birim başına `p/c/f/kcal`, `src` = fdcId | "tarif", `aliases`, `portions` [[ad, gram]], `kx` kalori istisnası, `note`). Kimlikler `u<fdcId>` ve `r_<tarif>`; `BASE_FOOD_DB` kimlikleri DEĞİŞMEZ. `getFoodDB()` birleşik tabloyu önbellekte tutar; `renderAll()` ve özel besin değişince `invalidateFoodDB()`. foods.js yüklenemezse uygulama eski listeyle çalışır. Arama: `searchFoods` (Türkçe karakter `normSearch`, kelime sırası serbest, `SEARCH_SYN` eş anlamlılar, `editDist` yazım hatası; sıra: sık kullanılan (adı eşleşirse) > tam > başlayan > içeren). Liste sayfalı (`FOOD_PAGE` = 60, "daha fazla"); seçici ilk 150. Sonuç yoksa `#noResult` (barkod / özel besin / tarif, ad aramadan dolar); bulunamayan aramalar `state.missSearches` (Profil → "Bulunamayan aramalar"). USDA porsiyonları kartta gram karşılığıyla (`foodPresets`); "cup" su bardağı değildir, "cup (ABD, 240 ml)" yazılır.
   - **Barkod:** `vendor/zxing.min.js` (@zxing/library 0.21.3, Apache-2.0, `sw.js` önbelleğinde) yalnızca barkod açılınca yüklenir. Ürün `fetchOFF()` ile Open Food Facts'ten gelir (internet gerekir; çevrimdışıyken uyarır). Eklenen ürün `customFoods["custom_bc_<barkod>"]` olur ve `barcode` alanı taşır; aynı barkod sonra internetsiz tanınır. Kamera açılamazsa numara elle yazılabilir.
 - **Profil:** Üstteki profil düğmesi (`#profileBtn`) tam ekran `#profilePage`'i açar (eski Ayarlar penceresi kaldırıldı; `openSettings` = `openProfile`). Alan kimlikleri (`setAge`, `setBf`, `setRest`...) aynı. Kaydet: `saveSettings()` (`#profileSave`). Değişiklik varken Geri → uyarı. Kilo/hedef/ölçü kutuları `renderProfile()` ile `renderAll()` içinde güncellenir.
 - **Üst başlık (v12):** Sol üstte logo yok; `#tabTitle` açık sekmenin adını yazar (`TAB_TITLES`, `applyTabVisibility()` içinde). Yanındaki `#brandTag` ("AYK+") yalnızca sayfa yüklenirken CSS animasyonuyla (`brandOut`, ~2,3 sn sonra) kayarak kaybolur; açılış animasyonu kapalıysa `html.no-brand` ile hiç gösterilmez. "Kaydedildi" yazısı kaldırıldı (kayıt hatası yine toast ile bildirilir).
@@ -114,12 +117,13 @@ npm test             # 9 test paketi, gerçek Chromium'da iPhone boyutunda; heps
 
 Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma önerisi, plaka/ısınma, kas grubu sayımı, planlanan/yenen, geri al, sıradaki gün, aktif antrenman, öğün menüleri (antrenman/dinlenme), takviyeler, vücut ölçüleri, paylaşım kartı, 42 Türk yemeği, su/beslenme grafikleri, açılış ekranı, yağ oranı, **makine/dambıl kademeleri**, **yeni antrenman teması + vücut haritası**, öğün saat ve sürükle-bırak, özel besin düzenle/sil. **v11:** Programım'da hareketleri sürükleyerek sıralama, antrenmandaki tüm pencereler ve onaylar yeni temada, vücut haritasında "Programım" kas yükü, üst kronometre kaldırıldı, Ayarlar → tam ekran Profil (kişisel bilgiler, kilo, hedefler, ölçüler, ayarlar). **v12:** sol üstte sekme adı + açılışta kayarak kaybolan AYK+, profil fotoğrafı (sağ üstte yuvarlak). **v13:** beslenme, kullanıcının gönderdiği tasarım dosyasına göre baştan: yeni tema, Bugün / Menülerim / Besinler / Geçmiş, ikame ⇄, hazır porsiyonlar, kiloya göre gramaj (aç/kapa), gündüz teması, barkod okuma (Open Food Facts).
 
-**Onay bekleyen büyük plan (v14–v18):** `docs/PLAN-beslenme-v14-v18.md`. Kullanıcı "devam et" derse önce bu dosyayı oku ve içindeki bekleyen soruları sor.
+**v14–v18 (10 Kasım 2026, tamamlandı):** "sadece bugün" + Dışarıda yedim/Günü dengele + barkod etiket formu (v14), kombo/tarif/dünkü öğün/alışveriş listesi (v15), kalan hedefi kapatan öneriler + haftalık görünüm (v16), takviye zamanları (v17), USDA veritabanı + akıllı arama (v18). Ayrıntı ve kararlar: `docs/PLAN-beslenme-v14-v18.md`. Kullanıcı çeviri listesini `docs/besin-veritabani-listesi.csv` üzerinden gözden geçirecek; düzeltme isterse `scripts/usda/tr/*.json` düzenlenip `build_foods.py` yeniden çalıştırılır.
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 
 Sıradaki adaylar (kullanıcı onayı gerekir):
-- Pişmiş / çiğ tartım (kullanıcı "şimdilik olmasın" dedi; doğru pişme oranları gerekir).
+- Pişmiş / çiğ dönüştürücü (v14–v18 planında madde 6; kullanıcı "şimdilik olmasın" dedi).
+- Antrenman saatine göre öğün kaydırma (planda madde 9; kullanıcı "bu özellik olmasın" dedi).
 - Beslenmede sistem kutuları (`prompt/confirm/alert`) yerine temalı kutular.
 - Kas grubu sayımında ikincil kasların da sayılması (kullanıcı "sonra" dedi).
 - "Akıllı öneri": makinede büyük kademe sıçramasında önce tekrar artırma (kullanıcı bu turda istemedi; tekrar sorulabilir).

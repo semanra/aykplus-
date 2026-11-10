@@ -156,7 +156,10 @@ function normalizeState(raw) {
   }));
   if (!s.shopChecked || typeof s.shopChecked !== "object" || Array.isArray(s.shopChecked)) s.shopChecked = {};
   if (!(Number.isInteger(s.shopTrainDays) && s.shopTrainDays >= 0 && s.shopTrainDays <= 7)) s.shopTrainDays = null;
-  if (s.nutriHistRange !== "30") s.nutriHistRange = "7";   // v16: Geçmiş takvim aralığı
+  if (s.nutriHistRange !== "30") s.nutriHistRange = "7";
+  // v18: bulunamayan aramalar
+  if (!Array.isArray(s.missSearches)) s.missSearches = [];
+  s.missSearches = s.missSearches.filter(x => x && typeof x.q === "string" && x.q.trim()).slice(0, 50);   // v16: Geçmiş takvim aralığı
   if (!["today", "program", "library", "history"].includes(s.gymView)) s.gymView = "today";
   if (!["today", "menus", "foods", "history"].includes(s.nutriView)) s.nutriView = "today";
   s.settings.nutriLight = !!s.settings.nutriLight;
@@ -206,7 +209,33 @@ function saveState() {
 let state = loadState();
 let progressSel = "";
 
-function getFoodDB() { return { ...BASE_FOOD_DB, ...(state.customFoods || {}) }; }
+// v18: USDA veritabanı (foods.js) uygulama biçimine bir kez çevrilir; birleşik tablo önbellekte tutulur
+// (her renderAll'da ve özel besin nesnesi değişince yenilenir). foods.js yüklenemezse uygulama eski listeyle çalışır.
+const USDA_DB = (() => {
+  const out = {};
+  try {
+    if (typeof USDA_FOODS === "undefined") return out;
+    Object.keys(USDA_FOODS).forEach(id => {
+      const x = USDA_FOODS[id];
+      const def = num(x.d, 100) || 100;
+      const f = { name: x.n, cat: x.c, unit: "g", step: def < 60 ? 5 : 10, def, p: x.p, c: x.h, f: x.f, kcal: x.k, src: x.s, aliases: x.a || [] };
+      if (x.o) f.portions = x.o;
+      if (x.x) f.kx = x.x;
+      if (x.t) f.note = x.t;
+      out[id] = f;
+    });
+  } catch (e) { console.error(e); }
+  return out;
+})();
+let foodDbVer = 0, _fdb = null, _fdbRef = null, _fdbVer = -1;
+function getFoodDB() {
+  const c = state.customFoods || {};
+  if (_fdb && _fdbRef === c && _fdbVer === foodDbVer) return _fdb;
+  _fdb = Object.assign({}, USDA_DB, BASE_FOOD_DB, c);
+  _fdbRef = c; _fdbVer = foodDbVer;
+  return _fdb;
+}
+function invalidateFoodDB() { foodDbVer++; }
 function activeDay() { return state.workoutDays[state.activeWorkoutDayIdx]; }
 
 // ---------------------------------------------------------------------------
@@ -1399,7 +1428,7 @@ function goAddFood(mIdx, dest) {
 }
 function setFoodDest(d) { foodUI.dest = d === "menu" ? "menu" : "day"; renderAll(); }
 function setFoodMeal(i) { foodUI.meal = i; renderAll(); }
-function setFoodCat(c) { foodUI.cat = c; foodUI.sel = null; renderFoods(); }
+function setFoodCat(c) { foodUI.cat = c; foodUI.sel = null; foodUI.limit = 0; renderFoods(); }
 function foodCatKey(cat) { return "c:" + String(cat || "Diğer"); }
 
 function renderFoods() {
@@ -1413,6 +1442,7 @@ function renderFoods() {
   if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", "Tariflerim"]);
   if (Object.keys(state.customFoods).length) cats.push(["custom", "Özel eklediklerim"]);
   [...new Set(Object.values(BASE_FOOD_DB).map(f => f.cat || "Diğer"))].forEach(c => cats.push([foodCatKey(c), stripEmoji(c)]));
+  [...new Set(Object.values(USDA_DB).map(f => f.cat))].forEach(c => { if (!cats.some(x => x[0] === foodCatKey(c))) cats.push([foodCatKey(c), c]); });
   if (!cats.some(c => c[0] === foodUI.cat)) foodUI.cat = "all";
   $("foodCats").innerHTML = [["all", "Tümü"], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
   renderFoodHead();
@@ -1466,15 +1496,21 @@ function foodSelMacros() {
   return { f, a, p: f.p * a, c: f.c * a, fat: f.f * a, cal: kcalPerUnit(f) * a };
 }
 
+// Hazır porsiyonlar: [{ v: miktar, label }]. USDA besinlerinde USDA porsiyonları (gram karşılığıyla) gösterilir.
 function foodPresets(f) {
   const def = num(f.def, 1);
+  if (Array.isArray(f.portions) && f.portions.length) {
+    const list = f.portions.map(([n, g]) => ({ v: round1(g), label: `${n} · ${fmtNum(g)} g` }));
+    if (!list.some(x => x.v === 100)) list.push({ v: 100, label: "100 g" });
+    return { list, plus: 50 };
+  }
   let vals;
   if (f.unit === "g") vals = [def, 50, 100, 150, 200];
   else if (f.unit === "ml") vals = [def, 100, 200, 250, 330];
   else vals = [def, 0.5, 1, 2, 3].filter(v => v >= num(f.step, 1) || v === def);
   vals = [...new Set(vals.map(v => round1(v)))].filter(v => v > 0).sort((a, b) => a - b);
   const plus = f.unit === "g" || f.unit === "ml" ? 50 : num(f.step, 1);
-  return { vals, plus };
+  return { list: vals.map(v => ({ v, label: `${fmtNum(v)} ${f.unit}${v === round1(def) ? " · porsiyon" : ""}` })), plus };
 }
 
 function renderFoodList() {
@@ -1499,9 +1535,15 @@ function renderFoodList() {
   else if (foodUI.cat === "custom") ids = Object.keys(state.customFoods).filter(id => db[id]);
   else if (foodUI.cat.startsWith("c:")) ids = Object.keys(db).filter(id => foodCatKey(db[id].cat) === foodUI.cat);
   else ids = Object.keys(db);
-  if (words.length) ids = ids.filter(id => { const hay = normSearch(db[id].name + " " + (db[id].cat || "")); return words.every(w => hay.includes(w)); });
+  // v18: akıllı arama (Türkçe karakter, kelime sırası, eş anlamlı, küçük yazım hatası) + sıralama
+  if (words.length) ids = searchFoods(ids, q);
+  else if (foodUI.cat === "all") ids = rankBrowse(ids);
+  const total = ids.length;
+  const shownIds = ids.slice(0, foodUI.limit || FOOD_PAGE);
+  if (foodUI.sel && !shownIds.includes(foodUI.sel) && ids.includes(foodUI.sel)) shownIds.unshift(foodUI.sel);   // seçili besin her zaman görünür
+  if (words.length) { if (!total && !comboHtml) noteMissSearch($("foodSearch").value); else cancelMissSearch(); }
   const tIdx = foodTargetIdx();
-  const html = ids.map(id => {
+  const html = shownIds.map(id => {
     const f = db[id];
     const def = num(f.def, 1);
     if (id !== foodUI.sel) {
@@ -1516,7 +1558,10 @@ function renderFoodList() {
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3.5 my-2" data-food="${esc(id)}" id="foodSelCard">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(f.name)}</h3>
-            <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? " · barkod " + esc(f.barcode) : ""}</div></div>
+            <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? " · barkod " + esc(f.barcode) : ""}</div>
+            ${foodSourceText(f) ? `<div class="text-[11px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
+            ${f.note ? `<div class="text-[11px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
+            ${f.kx ? `<div class="text-[11px] n-dim mt-0.5">Kalori USDA ölçümüdür (${esc(f.kx)} nedeniyle makrolardan hesaplanandan farklı).</div>` : ""}</div>
           <div class="text-right shrink-0 whitespace-nowrap"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
         </div>
         <div class="flex items-center justify-between px-1">
@@ -1528,7 +1573,7 @@ function renderFoodList() {
           <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Artır">${svgI("plus", 20, 2.4)}</button>
         </div>
         <div class="flex items-center justify-center gap-2 flex-wrap" aria-label="Hazır porsiyonlar">
-          ${pr.vals.map(v => `<button onclick="foodPreset(${v})" class="n-chip ${round1(num(foodUI.amt)) === v ? "on" : ""}" data-preset="${v}">${fmtNum(v)} ${esc(f.unit)}${v === round1(num(f.def, 1)) ? " · porsiyon" : ""}</button>`).join("")}
+          ${pr.list.map(x => `<button onclick="foodPreset(${x.v})" class="n-chip ${round1(num(foodUI.amt)) === x.v ? "on" : ""}" data-preset="${x.v}">${esc(x.label)}</button>`).join("")}
           <button onclick="foodPreset(null, ${pr.plus})" class="n-chip">+${fmtNum(pr.plus)} ${esc(f.unit)}</button>
         </div>
         <div class="grid grid-cols-3 gap-2 text-center text-[13px] font-extrabold">
@@ -1543,7 +1588,9 @@ function renderFoodList() {
           </div>` : ""}
       </div>`;
   }).join("");
-  $("foodList").innerHTML = (comboHtml + html) || `<div class="text-[14px] n-muted text-center py-8">Sonuç bulunamadı. Barkod okutabilir ya da özel besin tanımlayabilirsin.</div>`;
+  const more = total > shownIds.length
+    ? `<button onclick="foodUI.limit = (foodUI.limit || FOOD_PAGE) + 100; renderFoodList()" class="n-btn-ghost w-full h-12 rounded-full text-[14px] mt-2" id="foodMore">${fmtInt(total - shownIds.length)} sonuç daha · göster</button>` : "";
+  $("foodList").innerHTML = (comboHtml + html) ? comboHtml + html + more : noResultHtml($("foodSearch").value.trim());
   updateFoodSelUI();
 }
 
@@ -1806,6 +1853,7 @@ function addBarcodeFood() {
   const id = "custom_bc_" + b.code;
   const nm = (b.brand && !b.name.toLocaleLowerCase("tr").includes(b.brand.toLocaleLowerCase("tr")) ? `${b.name} (${b.brand})` : b.name).slice(0, 70);
   state.customFoods[id] = { name: "⭐ " + nm, cat: "⭐ Özel Eklediklerim", unit: b.unit, step: 10, def: b.def, p: b.p / 100, c: b.c / 100, f: b.f / 100, barcode: b.code };
+  invalidateFoodDB();
   closeBarcode();
   pickFoodInFoods(id);
   toast(`✓ ${nm} listene eklendi; miktarı seçip öğüne ekle`);
@@ -1980,6 +2028,7 @@ function saveCustomFood() {
   if (k != null) food.kcal = k / base;
   if (barcode) food.barcode = barcode;
   state.customFoods[id] = food;
+  invalidateFoodDB();
   closeModal("customFoodModal");
   toast(editing ? "✓ " + name + " güncellendi" : "⭐ " + name + " besin listene eklendi");
   renderAll();
@@ -2020,6 +2069,7 @@ function renderPickerList() {
   const words = q.split(/\s+/).filter(Boolean);
   picker.flat = [];
   let html = "";
+  let shown = 0, hidden = 0;
   picker.groups.forEach((g, gi) => {
     if (picker.cat !== "all" && picker.cat !== String(gi)) return;
     const items = g.items.filter(it => {
@@ -2028,8 +2078,12 @@ function renderPickerList() {
       return words.every(w => hay.includes(w));
     });
     if (!items.length) return;
+    // v18: çok uzun listede (binlerce besin) ilk 150 sonuç; gerisi için arama daraltılır
+    if (shown >= 150) { hidden += items.length; return; }
     html += `<div class="text-[11px] font-bold text-slate-500 tracking-wide pt-2">${esc(g.label)}</div>`;
     items.forEach(it => {
+      if (shown >= 150) { hidden++; return; }
+      shown++;
       const idx = picker.flat.push(it) - 1;
       const main = `<button onclick="pickerChoose(${idx})" class="flex-1 min-w-0 text-left px-3 py-2.5">
         <div class="text-sm font-medium text-slate-100">${esc(it.label)}</div>
@@ -2042,6 +2096,7 @@ function renderPickerList() {
         : `<div class="bg-slate-800/80 border border-slate-700 rounded-xl active:bg-slate-700 flex">${main}</div>`;
     });
   });
+  if (hidden) html += `<div class="text-[12px] text-slate-500 text-center py-3">${hidden} sonuç daha var; aramayı daralt.</div>`;
   $("pickerList").innerHTML = html || `<div class="text-sm text-slate-500 text-center py-8">Sonuç bulunamadı.</div>`;
 }
 
@@ -2854,6 +2909,7 @@ async function closeProfile() {
 function closeSettings() { hideProfile(); }
 
 function renderProfile() {
+  renderMissList();
   // Kilo kayıtları
   const wl = state.weightLogs.filter(l => num(l.weight) > 0);
   const lastW = wl[wl.length - 1], firstW = wl[0];
@@ -4896,6 +4952,7 @@ function deleteCustomFood(id) {
   if (uses > 0 && !confirm(`"${f.name}" ${uses} öğünde kullanılıyor. Silersen o öğünlerden de çıkarılacak. Devam edilsin mi?`)) return;
   snapshot();
   delete state.customFoods[id];
+  invalidateFoodDB();
   allMealLists().forEach(ms => ms.forEach(m => { m.items = m.items.filter(i => i.foodId !== id); }));
   state.recentFoods = state.recentFoods.filter(x => x !== id);
   closeModal("pickerModal");
@@ -5106,6 +5163,7 @@ function saveRecipe() {
     p: t.p / cooked, c: t.c / cooked, f: t.f / cooked, kcal: t.cal / cooked,
     recipe: { items: rcp.items.filter(i => num(i.amount) > 0).map(i => ({ foodId: i.foodId, amount: num(i.amount) })), cooked }
   };
+  invalidateFoodDB();
   closeModal("recipeModal");
   toast(editing ? `✓ ${name} tarifi güncellendi` : `🍲 ${name} tarifi besin listene eklendi`);
   renderAll();
@@ -5491,6 +5549,145 @@ function weekCardHtml() {
     </section>`;
 }
 
+// ============================================================================
+// v18 — BESİN VERİTABANI: USDA (foods.js), akıllı arama, porsiyonlar, bulunamayan aramalar
+// ============================================================================
+const FOOD_PAGE = 60;   // listede bir seferde gösterilen sonuç
+// Aramada eş anlamlı / pişirme kelimeleri (normalleştirilmiş yazımla)
+const SEARCH_SYN = {
+  pismis: ["pismis", "izgara", "haslanmis", "firinda", "kizartilmis", "tavada", "kavrulmus", "pisirilmis"],
+  haslama: ["haslanmis", "haslama"], haslanmis: ["haslanmis", "haslama"],
+  kizartma: ["kizartilmis", "kizartma"], kizarmis: ["kizartilmis", "kizarmis"],
+  firin: ["firinda", "firin"], izgara: ["izgara"], cig: ["cig"],
+  pilic: ["tavuk", "pilic"], tavuk: ["tavuk", "pilic"], dana: ["dana", "sigir"], sigir: ["dana", "sigir"],
+  kuzu: ["kuzu"], koyun: ["kuzu", "koyun"], yagsiz: ["yagsiz", "az yagli", "light"], light: ["light", "yagsiz", "az yagli"],
+  ekmek: ["ekmek", "ekmegi"], peynir: ["peynir", "peyniri"], yogurt: ["yogurt", "yogurdu"], sut: ["sut", "sutu"],
+  corba: ["corba", "corbasi"], pilav: ["pilav", "pilavi"], salata: ["salata", "salatasi"], tatli: ["tatli", "tatlisi"]
+};
+// Kısa Damerau–Levenshtein (yazım hatası toleransı için)
+function editDist(a, b) {
+  const m = a.length, n = b.length;
+  if (Math.abs(m - n) > 2) return 3;
+  const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+  for (let j = 1; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+    const c = a[i - 1] === b[j - 1] ? 0 : 1;
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+  }
+  return d[m][n];
+}
+let _sIdx = null, _sIdxDb = null;
+function searchIndex() {
+  const db = getFoodDB();
+  if (_sIdx && _sIdxDb === db) return _sIdx;
+  _sIdx = {};
+  Object.keys(db).forEach(id => {
+    const f = db[id];
+    const name = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
+    const extra = normSearch((f.aliases || []).join(" ") + " " + stripEmoji(f.cat || ""));
+    const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(t => t.length > 1);
+    _sIdx[id] = { name, nameTok: name.split(/[^a-z0-9%]+/).filter(Boolean), extra, tokens };
+  });
+  _sIdxDb = db;
+  return _sIdx;
+}
+// Tek kelimenin bir besine uyum puanı (0 = uymuyor)
+function wordScore(w, e) {
+  const alts = SEARCH_SYN[w] || [w];
+  let best = 0;
+  for (const a of alts) {
+    if (e.nameTok.some(t => t.startsWith(a))) best = Math.max(best, 150);
+    else if (e.name.includes(a)) best = Math.max(best, 100);
+    else if (e.extra.includes(a)) best = Math.max(best, 60);
+  }
+  if (best || w.length < 4) return best;
+  const k = w.length >= 7 ? 2 : 1;
+  for (const t of e.tokens) {
+    for (const L of [w.length - 1, w.length, w.length + 1]) {
+      if (L < 3 || L > t.length) continue;
+      if (editDist(w, t.slice(0, L)) <= k) return 25;
+    }
+  }
+  return 0;
+}
+// Sıralama: sık kullanılanlar > tam eşleşme > kelimeyle başlayan > içinde geçen (> eş anlamlı > yazım hatası)
+function searchFoods(ids, q) {
+  const idx = searchIndex();
+  const words = q.split(/\s+/).filter(Boolean);
+  const freq = new Set(frequentFoods(40));
+  const out = [];
+  ids.forEach(id => {
+    const e = idx[id];
+    if (!e) return;
+    let sc = 0, inName = true;
+    for (const w of words) { const s = wordScore(w, e); if (!s) return; sc += s; if (s < 100) inName = false; }
+    if (e.name === q) sc += 600;
+    else if (e.name.startsWith(q)) sc += 300;
+    if (freq.has(id) && inName) sc += 1000;   // sık kullanılan önceliği yalnızca adı eşleşince (kategori/eş anlamlıyla değil)
+    if (!USDA_DB[id]) sc += 40;            // uygulamanın kendi listesi ve özel besinler önce
+    sc -= e.name.length * 0.3;
+    out.push([id, sc]);
+  });
+  return out.sort((a, b) => b[1] - a[1]).map(x => x[0]);
+}
+// Arama yokken "Tümü": sık kullanılanlar, sonra uygulamanın kendi listesi, sonra veritabanı
+function rankBrowse(ids) {
+  const freq = frequentFoods(40);
+  const fs = new Set(freq);
+  const custom = ids.filter(id => !fs.has(id) && state.customFoods[id]);
+  const own = ids.filter(id => !fs.has(id) && !USDA_DB[id] && !state.customFoods[id]);
+  const usda = ids.filter(id => !fs.has(id) && USDA_DB[id]);
+  return [...freq.filter(id => ids.includes(id)), ...custom, ...own, ...usda];
+}
+function noResultHtml(q) {
+  if (!q) return `<div class="text-[14px] n-muted text-center py-8">Bu kategoride besin yok.</div>`;
+  return `<div id="noResult" class="text-center py-5 space-y-3">
+      <p class="text-[14px] n-muted">"${esc(q)}" bulunamadı. Şunlardan birini dene:</p>
+      <div class="grid gap-2">
+        <button onclick="openBarcode()" class="n-btn-outline h-12 rounded-full text-[14px]">Barkod okut</button>
+        <button onclick="newFoodFromSearch()" class="n-btn-outline h-12 rounded-full text-[14px]">Özel besin oluştur</button>
+        <button onclick="newRecipeFromSearch()" class="n-btn-outline h-12 rounded-full text-[14px]">Tarif oluştur</button>
+      </div>
+    </div>`;
+}
+function newFoodFromSearch() { const q = $("foodSearch").value.trim(); openCustomFoodModal(); $("cfName").value = q.slice(0, 50); }
+function newRecipeFromSearch() { const q = $("foodSearch").value.trim(); openRecipeModal(); $("rcName").value = q.slice(0, 50); }
+
+// Bulunamayan aramalar: yazmayı bıraktıktan 1,5 sn sonra hâlâ sonuç yoksa kaydedilir (yalnızca bu telefonda)
+let missTimer = null;
+function noteMissSearch(raw) {
+  clearTimeout(missTimer);
+  const q = String(raw || "").trim();
+  if (q.length < 3) return;
+  missTimer = setTimeout(() => {
+    if ($("foodSearch").value.trim() !== q) return;
+    const k = normSearch(q);
+    const ex = state.missSearches.find(x => normSearch(x.q) === k);
+    if (ex) { ex.n = num(ex.n, 1) + 1; ex.ts = Date.now(); }
+    else state.missSearches.unshift({ q: q.slice(0, 40), n: 1, ts: Date.now() });
+    state.missSearches = state.missSearches.slice(0, 50);
+    saveState();
+  }, 1500);
+}
+function cancelMissSearch() { clearTimeout(missTimer); }
+function clearMissSearches() { state.missSearches = []; saveState(); renderMissList(); }
+function renderMissList() {
+  const el = $("missList");
+  if (!el) return;
+  const l = state.missSearches || [];
+  el.innerHTML = l.length
+    ? l.map(x => `<span class="px-3 py-2 rounded-full bg-[#1E1E21] text-[13px]" data-miss="${esc(x.q)}">${esc(x.q)}${num(x.n, 1) > 1 ? ` <span class="text-[#8B8B93]">×${num(x.n, 1)}</span>` : ""}</span>`).join("")
+    : `<span class="text-[13px] text-[#8B8B93]">Henüz yok.</span>`;
+  $("missClear").classList.toggle("hidden", !l.length);
+}
+// Besin kartındaki kaynak satırı
+function foodSourceText(f) {
+  if (f.src === "tarif") return "Tarif hesaplaması (yaklaşık), USDA malzemeleriyle";
+  if (typeof f.src === "number") return `USDA FoodData Central · ${f.src}`;
+  return "";
+}
+
 // ---------------------------------------------------------------------------
 // GENEL RENDER
 // ---------------------------------------------------------------------------
@@ -5512,6 +5709,7 @@ function restorePendingFocus() {
 }
 
 function renderAll() {
+  invalidateFoodDB();
   applyCustomIcon();
   applyTabVisibility();
   renderNutrition();

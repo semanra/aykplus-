@@ -1,0 +1,2828 @@
+[
+ {
+  "id": 167746,
+  "tr": "Limon, kabuksuz",
+  "aliases": [
+   "limon"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167747,
+  "tr": "Limon suyu, taze sıkılmış",
+  "aliases": [
+   "limon suyu",
+   "limon"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 167748,
+  "tr": "Limon suyu, şişe (konsantreden)",
+  "aliases": [
+   "limon suyu",
+   "hazır limon suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 167749,
+  "tr": "Limon kabuğu, çiğ",
+  "aliases": [
+   "limon kabuğu rendesi",
+   "limon kabuğu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167750,
+  "tr": "Frenk inciri, çiğ",
+  "aliases": [
+   "kaktüs inciri",
+   "frenk inciri"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167751,
+  "tr": "Kuru erik, şekersiz haşlanmış",
+  "aliases": [
+   "kuru erik",
+   "erik kurusu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167752,
+  "tr": "Kuru erik hoşafı (şekerli)",
+  "aliases": [
+   "hoşaf",
+   "kuru erik"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167753,
+  "tr": "Kuru erik suyu, şişe",
+  "aliases": [
+   "erik suyu",
+   "kuru erik"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 167754,
+  "tr": "Pomelo, çiğ",
+  "aliases": [
+   "pomelo",
+   "şadok"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167755,
+  "tr": "Ahududu, taze",
+  "aliases": [
+   "ahududu",
+   "frambuaz"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167756,
+  "tr": "Ahududu, konserve (şuruplu)",
+  "aliases": [
+   "ahududu konservesi",
+   "ahududu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167762,
+  "tr": "Çilek, taze",
+  "aliases": [
+   "çilek"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167763,
+  "tr": "Demirhindi, çiğ",
+  "aliases": [
+   "demirhindi",
+   "tamarind"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167765,
+  "tr": "Karpuz",
+  "aliases": [
+   "karpuz dilimi",
+   "yaz meyvesi"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167766,
+  "tr": "Kokteyl kirazı (maraşino, süzülmüş)",
+  "aliases": [
+   "maraşino kirazı",
+   "kokteyl kirazı"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167767,
+  "tr": "Ananas, konserve (meyve sulu), süzülmüş",
+  "aliases": [
+   "ananas konservesi",
+   "ananas"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167768,
+  "tr": "Kayısı, konserve (şuruplu), süzülmüş",
+  "aliases": [
+   "kayısı konservesi",
+   "kayısı"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167769,
+  "tr": "Vişne, konserve (sulu), süzülmüş",
+  "aliases": [
+   "vişne konservesi",
+   "vişne"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167770,
+  "tr": "Kiraz, konserve (şuruplu), süzülmüş",
+  "aliases": [
+   "kiraz konservesi",
+   "kiraz"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167771,
+  "tr": "Elma suyu (%100, şekersiz)",
+  "aliases": [
+   "elma suyu",
+   "meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 167772,
+  "tr": "Elma püresi, şekersiz",
+  "aliases": [
+   "elma püresi",
+   "bebek maması"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171696,
+  "tr": "Elma püresi, şekerli",
+  "aliases": [
+   "elma püresi"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167774,
+  "tr": "Greyfurt suyu (pembe), taze",
+  "aliases": [
+   "greyfurt suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 167777,
+  "tr": "Armut, kırmızı (Anjou), çiğ",
+  "aliases": [
+   "armut",
+   "kırmızı armut"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167781,
+  "tr": "Şekerlenmiş meyve",
+  "aliases": [
+   "meyve şekerlemesi",
+   "kandi meyve"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 167785,
+  "tr": "Mango nektarı",
+  "aliases": [
+   "mango suyu",
+   "meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 167787,
+  "tr": "Nar suyu, şişe",
+  "aliases": [
+   "nar suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 167792,
+  "tr": "Portakal-ananas suyu",
+  "aliases": [
+   "portakal suyu",
+   "ananas suyu",
+   "karışık meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 167807,
+  "tr": "Vişne suyu (%100)",
+  "aliases": [
+   "vişne suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168117,
+  "tr": "Turna yemişi suyu (cranberry), şekersiz",
+  "aliases": [
+   "cranberry suyu",
+   "turna yemişi"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168151,
+  "tr": "Hünnap, taze",
+  "aliases": [
+   "hünnap"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168152,
+  "tr": "Hünnap, kuru",
+  "aliases": [
+   "kuru hünnap",
+   "hünnap"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168153,
+  "tr": "Kivi",
+  "aliases": [
+   "yeşil kivi",
+   "kiwi"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168154,
+  "tr": "Kamkat",
+  "aliases": [
+   "kumkat"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168155,
+  "tr": "Misket limonu",
+  "aliases": [
+   "lime"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168156,
+  "tr": "Misket limonu suyu, taze",
+  "aliases": [
+   "lime suyu",
+   "misket limonu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168158,
+  "tr": "Kuru yaban mersini, şekerli",
+  "aliases": [
+   "kuru yaban mersini",
+   "blueberry"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168160,
+  "tr": "Kuru erik (az nemli, sert)",
+  "aliases": [
+   "kuru erik"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168162,
+  "tr": "Kuru erik",
+  "aliases": [
+   "erik kurusu",
+   "mürdüm eriği kurusu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168163,
+  "tr": "Ayva, çiğ",
+  "aliases": [
+   "ayva"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168164,
+  "tr": "Kuru üzüm, sarı (çekirdeksiz)",
+  "aliases": [
+   "kuru üzüm",
+   "sultani"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168166,
+  "tr": "Kuru üzüm, çekirdekli",
+  "aliases": [
+   "kuru üzüm",
+   "siyah kuru üzüm"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168174,
+  "tr": "Çilek, dondurulmuş, şekerli",
+  "aliases": [
+   "dondurulmuş çilek",
+   "çilek"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168176,
+  "tr": "Feijoa, çiğ",
+  "aliases": [
+   "feijoa"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168177,
+  "tr": "Nashi armudu (Asya armudu), çiğ",
+  "aliases": [
+   "nashi",
+   "armut"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168178,
+  "tr": "Meyve kokteyli, konserve (şuruplu), süzülmüş",
+  "aliases": [
+   "meyve kokteyli",
+   "meyve konservesi"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 174668,
+  "tr": "Meyve kokteyli, konserve (meyve sulu)",
+  "aliases": [
+   "meyve kokteyli",
+   "meyve konservesi"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168181,
+  "tr": "Şeftali, konserve (şuruplu), süzülmüş",
+  "aliases": [
+   "şeftali konservesi",
+   "şeftali"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169930,
+  "tr": "Şeftali, konserve (meyve sulu)",
+  "aliases": [
+   "şeftali konservesi",
+   "şeftali"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168182,
+  "tr": "Armut, konserve (şuruplu), süzülmüş",
+  "aliases": [
+   "armut konservesi",
+   "armut"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168184,
+  "tr": "Mandalina, konserve (meyve sulu), süzülmüş",
+  "aliases": [
+   "mandalina konservesi",
+   "mandalina"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168185,
+  "tr": "Şeftali nektarı",
+  "aliases": [
+   "şeftali suyu",
+   "meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168186,
+  "tr": "Armut nektarı",
+  "aliases": [
+   "armut suyu",
+   "meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168187,
+  "tr": "Ananas suyu, şekersiz",
+  "aliases": [
+   "ananas suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168191,
+  "tr": "Hurma, Medjool",
+  "aliases": [
+   "hurma",
+   "medjool"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171726,
+  "tr": "Hurma, Deglet Nour",
+  "aliases": [
+   "hurma",
+   "deglet nour"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168195,
+  "tr": "Klementin",
+  "aliases": [
+   "mandalina"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168202,
+  "tr": "Elma, Golden (kabuklu), çiğ",
+  "aliases": [
+   "elma",
+   "golden elma",
+   "sarı elma"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171689,
+  "tr": "Elma (kabuksuz), çiğ",
+  "aliases": [
+   "elma",
+   "soyulmuş elma"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173928,
+  "tr": "Elma (kabuksuz), haşlanmış",
+  "aliases": [
+   "haşlanmış elma",
+   "elma"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171691,
+  "tr": "Kuru elma",
+  "aliases": [
+   "elma kurusu",
+   "elma cipsi"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173931,
+  "tr": "Kuru elma (az nemli, çıtır)",
+  "aliases": [
+   "elma cipsi",
+   "elma kurusu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 168209,
+  "tr": "Ahududu, dondurulmuş, şekersiz",
+  "aliases": [
+   "dondurulmuş ahududu",
+   "frambuaz"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169086,
+  "tr": "Liçi, çiğ",
+  "aliases": [
+   "liçi"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169091,
+  "tr": "Kuru mango, şekerli",
+  "aliases": [
+   "kuru mango",
+   "mango"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169092,
+  "tr": "Kavun (kantalup)",
+  "aliases": [
+   "kantalup",
+   "kavun"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169093,
+  "tr": "Kavun (kış kavunu)",
+  "aliases": [
+   "kavun",
+   "kış kavunu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169911,
+  "tr": "Kavun (honeydew)",
+  "aliases": [
+   "kavun",
+   "bal kavunu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169094,
+  "tr": "Siyah zeytin, konserve",
+  "aliases": [
+   "siyah zeytin",
+   "zeytin"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 169095,
+  "tr": "Siyah zeytin, konserve (iri boy)",
+  "aliases": [
+   "siyah zeytin",
+   "zeytin"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 169096,
+  "tr": "Yeşil zeytin, salamura",
+  "aliases": [
+   "yeşil zeytin",
+   "zeytin"
+  ],
+  "cat": "Kahvaltılıklar"
+ },
+ {
+  "id": 169097,
+  "tr": "Portakal",
+  "aliases": [
+   "portakal, çiğ",
+   "narenciye"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169919,
+  "tr": "Portakal (kabuğuyla)",
+  "aliases": [
+   "portakal"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169099,
+  "tr": "Portakal suyu, konserve (şekersiz)",
+  "aliases": [
+   "portakal suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 169100,
+  "tr": "Portakal suyu (hazır, %100)",
+  "aliases": [
+   "portakal suyu",
+   "meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 169103,
+  "tr": "Portakal kabuğu, çiğ",
+  "aliases": [
+   "portakal kabuğu",
+   "portakal kabuğu rendesi"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169105,
+  "tr": "Mandalina",
+  "aliases": [
+   "mandalina, çiğ",
+   "narenciye"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169925,
+  "tr": "Mandalina suyu, taze",
+  "aliases": [
+   "mandalina suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 169108,
+  "tr": "Çarkıfelek meyvesi",
+  "aliases": [
+   "passion fruit",
+   "çarkıfelek"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169109,
+  "tr": "Çarkıfelek meyvesi suyu",
+  "aliases": [
+   "passion fruit suyu",
+   "çarkıfelek"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 169118,
+  "tr": "Armut, çiğ",
+  "aliases": [
+   "armut"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169121,
+  "tr": "Kuru armut",
+  "aliases": [
+   "armut kurusu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169124,
+  "tr": "Ananas, çiğ",
+  "aliases": [
+   "ananas"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169125,
+  "tr": "Ananas, konserve (sulu)",
+  "aliases": [
+   "ananas konservesi",
+   "ananas"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169134,
+  "tr": "Nar, çiğ",
+  "aliases": [
+   "nar",
+   "nar taneleri"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169908,
+  "tr": "Yenidünya, çiğ",
+  "aliases": [
+   "yenidünya",
+   "malta eriği"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169910,
+  "tr": "Mango, çiğ",
+  "aliases": [
+   "mango"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169913,
+  "tr": "Dut, taze",
+  "aliases": [
+   "dut",
+   "karadut",
+   "beyaz dut"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169914,
+  "tr": "Nektarin",
+  "aliases": [
+   "nektarin şeftali"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169926,
+  "tr": "Papaya, çiğ",
+  "aliases": [
+   "papaya"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169928,
+  "tr": "Şeftali, çiğ",
+  "aliases": [
+   "şeftali"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169934,
+  "tr": "Kuru şeftali",
+  "aliases": [
+   "şeftali kurusu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169941,
+  "tr": "Trabzon hurması, çiğ",
+  "aliases": [
+   "trabzon hurması",
+   "cennet hurması",
+   "hurma"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169942,
+  "tr": "Trabzon hurması, kuru",
+  "aliases": [
+   "kuru trabzon hurması",
+   "cennet hurması"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169949,
+  "tr": "Erik, çiğ",
+  "aliases": [
+   "erik",
+   "can eriği",
+   "mürdüm eriği"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 169951,
+  "tr": "Erik, konserve (meyve sulu)",
+  "aliases": [
+   "erik konservesi",
+   "erik"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171697,
+  "tr": "Kayısı, taze",
+  "aliases": [
+   "kayısı",
+   "zerdali"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173941,
+  "tr": "Kuru kayısı",
+  "aliases": [
+   "kayısı kurusu",
+   "sarı kayısı"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171702,
+  "tr": "Kuru kayısı (az nemli, sert)",
+  "aliases": [
+   "kuru kayısı"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173942,
+  "tr": "Kuru kayısı, şekersiz haşlanmış",
+  "aliases": [
+   "kuru kayısı",
+   "kayısı kurusu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173943,
+  "tr": "Kuru kayısı hoşafı (şekerli)",
+  "aliases": [
+   "hoşaf",
+   "kuru kayısı"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171704,
+  "tr": "Kayısı nektarı",
+  "aliases": [
+   "kayısı suyu",
+   "meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 171705,
+  "tr": "Avokado",
+  "aliases": [
+   "avokado, çiğ",
+   "avocado"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171706,
+  "tr": "Avokado (Hass)",
+  "aliases": [
+   "avokado",
+   "hass avokado"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171707,
+  "tr": "Avokado (iri, yeşil kabuklu)",
+  "aliases": [
+   "avokado"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173946,
+  "tr": "Böğürtlen, taze",
+  "aliases": [
+   "böğürtlen",
+   "taze böğürtlen"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171710,
+  "tr": "Böğürtlen, dondurulmuş, şekersiz",
+  "aliases": [
+   "dondurulmuş böğürtlen",
+   "böğürtlen"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171711,
+  "tr": "Yaban mersini, taze",
+  "aliases": [
+   "yaban mersini",
+   "blueberry",
+   "likapa"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171715,
+  "tr": "Yıldız meyvesi, çiğ",
+  "aliases": [
+   "yıldız meyvesi",
+   "karambola"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171719,
+  "tr": "Kiraz, çiğ",
+  "aliases": [
+   "kiraz"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173954,
+  "tr": "Vişne, çiğ",
+  "aliases": [
+   "vişne"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173955,
+  "tr": "Vişne, konserve (sulu)",
+  "aliases": [
+   "vişne konservesi",
+   "vişne"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173957,
+  "tr": "Kiraz, konserve (sulu)",
+  "aliases": [
+   "kiraz konservesi",
+   "kiraz"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171722,
+  "tr": "Turna yemişi (cranberry), çiğ",
+  "aliases": [
+   "cranberry",
+   "turna yemişi"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 171724,
+  "tr": "Kuş üzümü, kuru",
+  "aliases": [
+   "kuş üzümü",
+   "kuru üzüm"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173021,
+  "tr": "İncir, taze",
+  "aliases": [
+   "incir",
+   "taze incir"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 174665,
+  "tr": "Kuru incir",
+  "aliases": [
+   "incir kurusu",
+   "incir"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 174666,
+  "tr": "Kuru incir, haşlanmış",
+  "aliases": [
+   "kuru incir",
+   "incir hoşafı"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173024,
+  "tr": "İncir, konserve (şuruplu)",
+  "aliases": [
+   "incir konservesi",
+   "incir"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173030,
+  "tr": "Bektaşi üzümü, çiğ",
+  "aliases": [
+   "bektaşi üzümü"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173032,
+  "tr": "Goji berry, kuru",
+  "aliases": [
+   "goji",
+   "kurt üzümü"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173033,
+  "tr": "Greyfurt, çiğ",
+  "aliases": [
+   "greyfurt",
+   "altıntop"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 174673,
+  "tr": "Greyfurt (pembe-kırmızı), çiğ",
+  "aliases": [
+   "greyfurt",
+   "kırmızı greyfurt"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 174676,
+  "tr": "Greyfurt (beyaz), çiğ",
+  "aliases": [
+   "greyfurt",
+   "altıntop"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173039,
+  "tr": "Greyfurt suyu (beyaz), taze",
+  "aliases": [
+   "greyfurt suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 174678,
+  "tr": "Greyfurt suyu, şişe (şekersiz)",
+  "aliases": [
+   "greyfurt suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173042,
+  "tr": "Üzüm suyu (%100, şekersiz)",
+  "aliases": [
+   "üzüm suyu",
+   "meyve suyu"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 173043,
+  "tr": "Altın çilek (physalis), çiğ",
+  "aliases": [
+   "altın çilek",
+   "physalis"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173044,
+  "tr": "Guava, çiğ",
+  "aliases": [
+   "guava"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 174683,
+  "tr": "Üzüm, çiğ",
+  "aliases": [
+   "üzüm",
+   "sultani üzüm",
+   "çekirdeksiz üzüm"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 174684,
+  "tr": "Üzüm, konserve (sulu)",
+  "aliases": [
+   "üzüm konservesi",
+   "üzüm"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173944,
+  "tr": "Muz",
+  "aliases": [
+   "muz, çiğ",
+   "banana"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173945,
+  "tr": "Kuru muz (muz tozu)",
+  "aliases": [
+   "muz kurusu",
+   "muz tozu"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173963,
+  "tr": "Frenk üzümü (siyah), çiğ",
+  "aliases": [
+   "siyah frenk üzümü",
+   "frenk üzümü"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 173964,
+  "tr": "Frenk üzümü (kırmızı-beyaz), çiğ",
+  "aliases": [
+   "kırmızı frenk üzümü",
+   "frenk üzümü"
+  ],
+  "cat": "Meyveler"
+ },
+ {
+  "id": 170174,
+  "tr": "Hindistan cevizi suyu",
+  "aliases": [
+   "coconut water"
+  ],
+  "cat": "İçecekler"
+ },
+ {
+  "id": 168585,
+  "tr": "Hindistan cevizi ezmesi (kurutulmuş, kremalı)",
+  "aliases": [
+   "hindistan cevizi ezmesi",
+   "hindistan cevizi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168586,
+  "tr": "Hindistan cevizi rendesi, şekerli",
+  "aliases": [
+   "hindistan cevizi",
+   "rende hindistan cevizi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170170,
+  "tr": "Hindistan cevizi rendesi (şekersiz)",
+  "aliases": [
+   "hindistan cevizi",
+   "rende hindistan cevizi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170169,
+  "tr": "Hindistan cevizi, taze",
+  "aliases": [
+   "hindistan cevizi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170579,
+  "tr": "Hindistan cevizi rendesi, kavrulmuş",
+  "aliases": [
+   "hindistan cevizi",
+   "kavrulmuş hindistan cevizi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170577,
+  "tr": "Hindistan cevizi yaprakları, şekerli",
+  "aliases": [
+   "hindistan cevizi cipsi",
+   "hindistan cevizi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170172,
+  "tr": "Hindistan cevizi sütü (taze)",
+  "aliases": [
+   "hindistan cevizi sütü",
+   "coconut milk"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170173,
+  "tr": "Hindistan cevizi sütü (konserve)",
+  "aliases": [
+   "hindistan cevizi sütü",
+   "coconut milk"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170580,
+  "tr": "Hindistan cevizi kreması",
+  "aliases": [
+   "coconut cream"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170171,
+  "tr": "Hindistan cevizi kreması, konserve (şekerli)",
+  "aliases": [
+   "hindistan cevizi kreması"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168588,
+  "tr": "Badem ezmesi (sade, tuzsuz)",
+  "aliases": [
+   "badem ezmesi",
+   "badem kreması"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168603,
+  "tr": "Badem ezmesi (sade, tuzlu)",
+  "aliases": [
+   "badem ezmesi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170160,
+  "tr": "Marzipan (şekerli badem hamuru)",
+  "aliases": [
+   "marzipan",
+   "badem hamuru"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168592,
+  "tr": "Badem, ballı kavrulmuş",
+  "aliases": [
+   "ballı badem",
+   "badem"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168596,
+  "tr": "Badem, kavrulmuş, tuzlu",
+  "aliases": [
+   "tuzlu badem",
+   "badem"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170158,
+  "tr": "Badem, kavrulmuş, tuzsuz",
+  "aliases": [
+   "kavrulmuş badem",
+   "badem"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169419,
+  "tr": "Badem, yağda kavrulmuş, tuzlu",
+  "aliases": [
+   "tuzlu badem",
+   "badem"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170567,
+  "tr": "Badem, çiğ",
+  "aliases": [
+   "badem",
+   "badem içi",
+   "çiğ badem"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170568,
+  "tr": "Badem, soyulmuş (beyaz)",
+  "aliases": [
+   "beyaz badem",
+   "soyulmuş badem",
+   "badem"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168593,
+  "tr": "Ay çekirdeği içi, yağda kavrulmuş, tuzlu",
+  "aliases": [
+   "ay çekirdeği",
+   "çekirdek"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170562,
+  "tr": "Ay çekirdeği içi, çiğ",
+  "aliases": [
+   "ay çekirdeği",
+   "çiğ çekirdek"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170563,
+  "tr": "Ay çekirdeği içi, kavrulmuş, tuzsuz",
+  "aliases": [
+   "ay çekirdeği",
+   "çekirdek"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169418,
+  "tr": "Ay çekirdeği içi, kavrulmuş, tuzlu",
+  "aliases": [
+   "ay çekirdeği",
+   "çekirdek"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169417,
+  "tr": "Ay çekirdeği, kabuklu kavrulmuş tuzlu (iç kısmı)",
+  "aliases": [
+   "ay çekirdeği",
+   "çekirdek",
+   "siyah çekirdek"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170155,
+  "tr": "Ay çekirdeği ezmesi, tuzsuz",
+  "aliases": [
+   "ay çekirdeği ezmesi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168597,
+  "tr": "Kaju ezmesi (tuzlu)",
+  "aliases": [
+   "kaju ezmesi",
+   "kaju"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170163,
+  "tr": "Kaju ezmesi (tuzsuz)",
+  "aliases": [
+   "kaju ezmesi",
+   "kaju"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170162,
+  "tr": "Kaju, çiğ",
+  "aliases": [
+   "kaju",
+   "çiğ kaju"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169421,
+  "tr": "Kaju, kavrulmuş, tuzlu",
+  "aliases": [
+   "kaju",
+   "tuzlu kaju"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170571,
+  "tr": "Kaju, kavrulmuş, tuzsuz",
+  "aliases": [
+   "kaju",
+   "kavrulmuş kaju"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169422,
+  "tr": "Kaju, yağda kavrulmuş, tuzlu",
+  "aliases": [
+   "kaju",
+   "tuzlu kaju"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170178,
+  "tr": "Makadamya, çiğ",
+  "aliases": [
+   "makadamya"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170179,
+  "tr": "Makadamya, kavrulmuş, tuzsuz",
+  "aliases": [
+   "makadamya"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168598,
+  "tr": "Makadamya, kavrulmuş, tuzlu",
+  "aliases": [
+   "makadamya"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168599,
+  "tr": "Karışık kuruyemiş (yer fıstıklı), kavrulmuş, tuzlu",
+  "aliases": [
+   "karışık kuruyemiş",
+   "çerez",
+   "karışık çerez"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170585,
+  "tr": "Karışık kuruyemiş (yer fıstıklı), kavrulmuş, tuzsuz",
+  "aliases": [
+   "karışık kuruyemiş",
+   "çerez"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169423,
+  "tr": "Karışık kuruyemiş (yer fıstıksız), yağda kavrulmuş, tuzlu",
+  "aliases": [
+   "karışık kuruyemiş",
+   "çerez"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170588,
+  "tr": "Karışık kuruyemiş (yer fıstıksız), yağda kavrulmuş, tuzsuz",
+  "aliases": [
+   "karışık kuruyemiş",
+   "çerez"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168601,
+  "tr": "Kabak çekirdeği (kabuklu), kavrulmuş, tuzlu",
+  "aliases": [
+   "kabak çekirdeği",
+   "çekirdek",
+   "beyaz çekirdek"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170188,
+  "tr": "Kabak çekirdeği (kabuklu), kavrulmuş, tuzsuz",
+  "aliases": [
+   "kabak çekirdeği",
+   "çekirdek"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170556,
+  "tr": "Kabak çekirdeği içi, çiğ",
+  "aliases": [
+   "kabak çekirdeği",
+   "çiğ kabak çekirdeği"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170557,
+  "tr": "Kabak çekirdeği içi, kavrulmuş, tuzsuz",
+  "aliases": [
+   "kabak çekirdeği",
+   "çekirdek içi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169415,
+  "tr": "Kabak çekirdeği içi, kavrulmuş, tuzlu",
+  "aliases": [
+   "kabak çekirdeği",
+   "çekirdek içi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 168604,
+  "tr": "Tahin",
+  "aliases": [
+   "susam ezmesi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170189,
+  "tr": "Tahin (kavrulmuş susamdan)",
+  "aliases": [
+   "tahin",
+   "susam ezmesi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169406,
+  "tr": "Tahin (çiğ susamdan)",
+  "aliases": [
+   "çiğ tahin",
+   "tahin"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169410,
+  "tr": "Tahin, taş değirmen (çiğ susam)",
+  "aliases": [
+   "tahin",
+   "taş değirmen tahin"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169407,
+  "tr": "Karpuz çekirdeği içi, kuru",
+  "aliases": [
+   "karpuz çekirdeği",
+   "çekirdek"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169412,
+  "tr": "Susam, kabuğu soyulmuş",
+  "aliases": [
+   "susam",
+   "beyaz susam"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170150,
+  "tr": "Susam, çiğ (bütün)",
+  "aliases": [
+   "susam",
+   "kepekli susam"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170151,
+  "tr": "Susam, kavrulmuş",
+  "aliases": [
+   "kavrulmuş susam",
+   "susam"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169416,
+  "tr": "Susam, soyulmuş, kavrulmuş, tuzlu",
+  "aliases": [
+   "susam",
+   "tuzlu susam"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169414,
+  "tr": "Keten tohumu",
+  "aliases": [
+   "keten"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170554,
+  "tr": "Chia tohumu",
+  "aliases": [
+   "chia"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170148,
+  "tr": "Kenevir tohumu, kabuksuz",
+  "aliases": [
+   "kenevir tohumu",
+   "hemp"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 171330,
+  "tr": "Haşhaş tohumu",
+  "aliases": [
+   "haşhaş"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169424,
+  "tr": "Pekan cevizi, kavrulmuş, tuzlu",
+  "aliases": [
+   "pekan cevizi",
+   "pekan"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170182,
+  "tr": "Pekan cevizi",
+  "aliases": [
+   "pekan"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170183,
+  "tr": "Pekan cevizi, kavrulmuş, tuzsuz",
+  "aliases": [
+   "pekan cevizi",
+   "pekan"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 169426,
+  "tr": "Antep fıstığı, kavrulmuş, tuzlu",
+  "aliases": [
+   "antep fıstığı",
+   "fıstık",
+   "şam fıstığı"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170185,
+  "tr": "Antep fıstığı, kavrulmuş, tuzsuz",
+  "aliases": [
+   "antep fıstığı",
+   "fıstık"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170184,
+  "tr": "Antep fıstığı, çiğ",
+  "aliases": [
+   "antep fıstığı",
+   "fıstık",
+   "çiğ antep fıstığı"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170575,
+  "tr": "Kestane, çiğ (soyulmuş)",
+  "aliases": [
+   "kestane"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170574,
+  "tr": "Kestane, çiğ (kabuklu)",
+  "aliases": [
+   "kestane"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170190,
+  "tr": "Kestane, kavrulmuş",
+  "aliases": [
+   "kestane kebap",
+   "közde kestane",
+   "kestane"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170168,
+  "tr": "Kestane, haşlanmış",
+  "aliases": [
+   "haşlanmış kestane",
+   "kestane"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170167,
+  "tr": "Kuru kestane (soyulmuş)",
+  "aliases": [
+   "kestane",
+   "kestane kurusu"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170187,
+  "tr": "Ceviz içi",
+  "aliases": [
+   "ceviz"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170594,
+  "tr": "Ceviz, kavrulmuş, tuzlu",
+  "aliases": [
+   "ceviz",
+   "kavrulmuş ceviz"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170593,
+  "tr": "Ceviz, şekerle kaplanmış",
+  "aliases": [
+   "şekerli ceviz",
+   "ceviz"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170186,
+  "tr": "Kara ceviz, kuru",
+  "aliases": [
+   "kara ceviz",
+   "ceviz"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170569,
+  "tr": "Brezilya fıstığı",
+  "aliases": [
+   "brezilya cevizi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170581,
+  "tr": "Fındık, çiğ",
+  "aliases": [
+   "fındık",
+   "iç fındık",
+   "çiğ fındık"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170582,
+  "tr": "Fındık, zarı soyulmuş (beyaz)",
+  "aliases": [
+   "beyaz fındık",
+   "fındık"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170583,
+  "tr": "Fındık, kavrulmuş, tuzsuz",
+  "aliases": [
+   "kavrulmuş fındık",
+   "fındık",
+   "fındık içi"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170591,
+  "tr": "Çam fıstığı",
+  "aliases": [
+   "dolmalık fıstık"
+  ],
+  "cat": "Kuruyemiş ve tohumlar"
+ },
+ {
+  "id": 170917,
+  "tr": "Defne yaprağı",
+  "aliases": [
+   "defne"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170918,
+  "tr": "Karaman kimyonu",
+  "aliases": [
+   "frenk kimyonu"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170919,
+  "tr": "Kakule",
+  "aliases": [
+   "kakule tohumu",
+   "kardamom"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170921,
+  "tr": "Kişniş yaprağı, kuru",
+  "aliases": [
+   "kişniş",
+   "kişniş yaprağı"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170922,
+  "tr": "Kişniş tohumu",
+  "aliases": [
+   "kişniş"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170923,
+  "tr": "Kimyon",
+  "aliases": [
+   "kimyon tohumu",
+   "toz kimyon"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170924,
+  "tr": "Köri",
+  "aliases": [
+   "curry"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170926,
+  "tr": "Zencefil, toz",
+  "aliases": [
+   "zencefil",
+   "toz zencefil"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170927,
+  "tr": "Muskat çiçeği (mace), toz",
+  "aliases": [
+   "muskat çiçeği",
+   "mace"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170928,
+  "tr": "Mercanköşk, kuru",
+  "aliases": [
+   "mercanköşk"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170929,
+  "tr": "Hardal tohumu, öğütülmüş",
+  "aliases": [
+   "hardal tozu",
+   "hardal tohumu"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170930,
+  "tr": "Maydanoz, kuru",
+  "aliases": [
+   "maydanoz",
+   "kuru maydanoz"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170931,
+  "tr": "Karabiber",
+  "aliases": [
+   "biber"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170932,
+  "tr": "Acı kırmızı toz biber (kayen)",
+  "aliases": [
+   "kayen biberi",
+   "acı toz biber",
+   "pul biber"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170933,
+  "tr": "Beyaz biber",
+  "aliases": [
+   "biber"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170934,
+  "tr": "Safran",
+  "aliases": [
+   "safran baharatı"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170935,
+  "tr": "Adaçayı, öğütülmüş",
+  "aliases": [
+   "adaçayı"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170936,
+  "tr": "Sater (zahter), öğütülmüş",
+  "aliases": [
+   "zahter",
+   "sater",
+   "kekik"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170937,
+  "tr": "Tarhun, kuru",
+  "aliases": [
+   "tarhun"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 170938,
+  "tr": "Kekik, kuru (thyme)",
+  "aliases": [
+   "kekik",
+   "dağ kekiği",
+   "thyme"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 173470,
+  "tr": "Kekik, taze (thyme)",
+  "aliases": [
+   "taze kekik",
+   "kekik"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171328,
+  "tr": "Kekik, kuru (oregano)",
+  "aliases": [
+   "kekik",
+   "oregano",
+   "keklik otu"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171315,
+  "tr": "Yenibahar, öğütülmüş",
+  "aliases": [
+   "yenibahar"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171316,
+  "tr": "Anason tohumu",
+  "aliases": [
+   "anason"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171317,
+  "tr": "Fesleğen, kuru",
+  "aliases": [
+   "fesleğen",
+   "reyhan"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 172232,
+  "tr": "Fesleğen, taze",
+  "aliases": [
+   "fesleğen",
+   "reyhan"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171319,
+  "tr": "Chili baharatı (karışım)",
+  "aliases": [
+   "chili",
+   "acı baharat"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171320,
+  "tr": "Tarçın, toz",
+  "aliases": [
+   "tarçın"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171321,
+  "tr": "Karanfil, öğütülmüş",
+  "aliases": [
+   "karanfil"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171322,
+  "tr": "Dereotu, kuru",
+  "aliases": [
+   "dereotu",
+   "kuru dereotu"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 172233,
+  "tr": "Dereotu, taze",
+  "aliases": [
+   "dereotu"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171323,
+  "tr": "Rezene tohumu",
+  "aliases": [
+   "rezene"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171324,
+  "tr": "Çemen otu tohumu",
+  "aliases": [
+   "çemen",
+   "çemen otu"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171325,
+  "tr": "Sarımsak tozu",
+  "aliases": [
+   "sarımsak"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171326,
+  "tr": "Muskat (küçük hindistan cevizi), toz",
+  "aliases": [
+   "muskat",
+   "küçük hindistan cevizi"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171327,
+  "tr": "Soğan tozu",
+  "aliases": [
+   "toz soğan",
+   "kuru soğan"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171329,
+  "tr": "Toz kırmızı biber (tatlı)",
+  "aliases": [
+   "tatlı toz biber",
+   "paprika",
+   "kırmızı biber"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 171333,
+  "tr": "Biberiye, kuru",
+  "aliases": [
+   "biberiye"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 173473,
+  "tr": "Biberiye, taze",
+  "aliases": [
+   "biberiye"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 172231,
+  "tr": "Zerdeçal, toz",
+  "aliases": [
+   "zerdeçal",
+   "kurkuma"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 172239,
+  "tr": "Nane, kuru",
+  "aliases": [
+   "nane",
+   "kuru nane"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 173475,
+  "tr": "Nane, taze",
+  "aliases": [
+   "nane",
+   "taze nane"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 173474,
+  "tr": "Nane, taze (peppermint)",
+  "aliases": [
+   "tıbbi nane",
+   "nane"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 173471,
+  "tr": "Vanilya özütü",
+  "aliases": [
+   "vanilya",
+   "vanilya ekstresi"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 173468,
+  "tr": "Tuz (sofra tuzu)",
+  "aliases": [
+   "tuz",
+   "sofra tuzu"
+  ],
+  "cat": "Baharatlar"
+ },
+ {
+  "id": 172234,
+  "tr": "Hardal (hazır, sarı)",
+  "aliases": [
+   "hardal"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172237,
+  "tr": "Sirke (beyaz, damıtılmış)",
+  "aliases": [
+   "sirke",
+   "beyaz sirke"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172240,
+  "tr": "Kırmızı şarap sirkesi",
+  "aliases": [
+   "sirke",
+   "üzüm sirkesi"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172241,
+  "tr": "Balzamik sirke",
+  "aliases": [
+   "balzamik",
+   "sirke"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 173469,
+  "tr": "Elma sirkesi",
+  "aliases": [
+   "sirke"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 172238,
+  "tr": "Kapari (konserve)",
+  "aliases": [
+   "kapari",
+   "kebere"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171413,
+  "tr": "Zeytinyağı",
+  "aliases": [
+   "zeytin yağı",
+   "sızma zeytinyağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171025,
+  "tr": "Ayçiçek yağı",
+  "aliases": [
+   "ayçiçeği yağı",
+   "sıvı yağ",
+   "ayçiçek"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 172338,
+  "tr": "Ayçiçek yağı (yüksek oleik)",
+  "aliases": [
+   "ayçiçeği yağı",
+   "sıvı yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171029,
+  "tr": "Mısırözü yağı",
+  "aliases": [
+   "mısır yağı",
+   "sıvı yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 172336,
+  "tr": "Kanola yağı",
+  "aliases": [
+   "kanola",
+   "kolza yağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171427,
+  "tr": "Fındık yağı",
+  "aliases": [
+   "fındık",
+   "sıvı yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171412,
+  "tr": "Hindistan cevizi yağı",
+  "aliases": [
+   "coconut oil"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171016,
+  "tr": "Susam yağı",
+  "aliases": [
+   "susam",
+   "sıvı yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171410,
+  "tr": "Yer fıstığı yağı",
+  "aliases": [
+   "fıstık yağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171411,
+  "tr": "Soya yağı",
+  "aliases": [
+   "sıvı yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171028,
+  "tr": "Üzüm çekirdeği yağı",
+  "aliases": [
+   "çekirdek yağı",
+   "sıvı yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171030,
+  "tr": "Ceviz yağı",
+  "aliases": [
+   "ceviz",
+   "sıvı yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171031,
+  "tr": "Badem yağı",
+  "aliases": [
+   "tatlı badem yağı",
+   "badem"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 173573,
+  "tr": "Avokado yağı",
+  "aliases": [
+   "avokado",
+   "sıvı yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 167702,
+  "tr": "Keten tohumu yağı (soğuk sıkım)",
+  "aliases": [
+   "keten yağı",
+   "keten tohumu yağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171015,
+  "tr": "Palm yağı",
+  "aliases": [
+   "hurma yağı",
+   "palmiye yağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171014,
+  "tr": "Buğday rüşeymi yağı",
+  "aliases": [
+   "buğday yağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171024,
+  "tr": "Pamuk yağı",
+  "aliases": [
+   "pamuk çekirdeği yağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171027,
+  "tr": "Aspir yağı",
+  "aliases": [
+   "aspir",
+   "sıvı yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171400,
+  "tr": "İç yağı (sığır)",
+  "aliases": [
+   "iç yağı",
+   "sığır yağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 173564,
+  "tr": "Tavuk yağı",
+  "aliases": [
+   "hayvansal yağ",
+   "tavuk"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 173572,
+  "tr": "Kaz yağı",
+  "aliases": [
+   "hayvansal yağ",
+   "kaz"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 173584,
+  "tr": "Bitkisel katı yağ (shortening)",
+  "aliases": [
+   "katı yağ",
+   "shortening",
+   "bitkisel yağ"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 172346,
+  "tr": "Margarin, paket (%80 yağ)",
+  "aliases": [
+   "margarin",
+   "paket margarin"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 172347,
+  "tr": "Margarin, kase (%80 yağ)",
+  "aliases": [
+   "margarin",
+   "kase margarin"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 173583,
+  "tr": "Margarin, light (%60 yağ)",
+  "aliases": [
+   "light margarin",
+   "margarin"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 173589,
+  "tr": "Margarin, light (%40–49 yağ)",
+  "aliases": [
+   "light margarin",
+   "margarin"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 171415,
+  "tr": "Margarin, light (%35–39 yağ)",
+  "aliases": [
+   "light margarin",
+   "margarin"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 172339,
+  "tr": "Tereyağlı margarin (karışım)",
+  "aliases": [
+   "tereyağlı margarin",
+   "margarin"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 173581,
+  "tr": "Tereyağı, light (tuzlu)",
+  "aliases": [
+   "light tereyağı",
+   "tereyağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 172344,
+  "tr": "Tereyağı, light (tuzsuz)",
+  "aliases": [
+   "light tereyağı",
+   "tereyağı"
+  ],
+  "cat": "Yağlar"
+ },
+ {
+  "id": 173577,
+  "tr": "Balık yağı (morina karaciğeri)",
+  "aliases": [
+   "balık yağı",
+   "omega 3",
+   "morina yağı"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 172343,
+  "tr": "Balık yağı (somon)",
+  "aliases": [
+   "balık yağı",
+   "omega 3",
+   "somon yağı"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 173578,
+  "tr": "Balık yağı (sardalya)",
+  "aliases": [
+   "balık yağı",
+   "omega 3"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 172340,
+  "tr": "Balık yağı (ringa)",
+  "aliases": [
+   "balık yağı",
+   "omega 3"
+  ],
+  "cat": "Takviyeler"
+ },
+ {
+  "id": 171009,
+  "tr": "Mayonez",
+  "aliases": [
+   "mayonez sos",
+   "mayonnaise"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 173594,
+  "tr": "Mayonez, light",
+  "aliases": [
+   "light mayonez",
+   "mayonez"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171443,
+  "tr": "Mayonez, light (zeytinyağlı)",
+  "aliases": [
+   "zeytinyağlı mayonez",
+   "light mayonez"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171403,
+  "tr": "Salata sosu (mayonez tipi)",
+  "aliases": [
+   "mayonezli sos",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 167695,
+  "tr": "Tofu mayonezi",
+  "aliases": [
+   "vegan mayonez"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 173592,
+  "tr": "Ranch sos",
+  "aliases": [
+   "ranch",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 173593,
+  "tr": "Ranch sos, light",
+  "aliases": [
+   "ranch",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 169055,
+  "tr": "Sezar sos",
+  "aliases": [
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 169877,
+  "tr": "Sezar sos, light",
+  "aliases": [
+   "sezar sos",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171019,
+  "tr": "İtalyan salata sosu",
+  "aliases": [
+   "italyan sos",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171405,
+  "tr": "İtalyan salata sosu, light",
+  "aliases": [
+   "italyan sos",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 173590,
+  "tr": "İtalyan salata sosu, yağsız",
+  "aliases": [
+   "italyan sos",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171414,
+  "tr": "Fransız salata sosu",
+  "aliases": [
+   "fransız sos",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171404,
+  "tr": "Fransız salata sosu, light",
+  "aliases": [
+   "fransız sos",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171402,
+  "tr": "Thousand Island sos",
+  "aliases": [
+   "bin ada sosu",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171008,
+  "tr": "Thousand Island sos, light",
+  "aliases": [
+   "bin ada sosu",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171043,
+  "tr": "Ballı hardal sos",
+  "aliases": [
+   "ballı hardal",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171034,
+  "tr": "Ballı hardal sos, light",
+  "aliases": [
+   "ballı hardal",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 173562,
+  "tr": "Rokfor salata sosu",
+  "aliases": [
+   "rokfor sos",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 169056,
+  "tr": "Coleslaw sosu",
+  "aliases": [
+   "lahana salatası sosu",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171417,
+  "tr": "Sirke ve yağlı salata sosu (ev yapımı)",
+  "aliases": [
+   "sirkeli sos",
+   "vinegret",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ },
+ {
+  "id": 171006,
+  "tr": "Susamlı salata sosu",
+  "aliases": [
+   "susamlı sos",
+   "salata sosu"
+  ],
+  "cat": "Soslar ve çorbalar"
+ }
+]

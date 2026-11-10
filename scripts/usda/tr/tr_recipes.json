@@ -1,0 +1,5843 @@
+[
+ {
+  "key": "domates_corbasi",
+  "tr": "Domates çorbası",
+  "aliases": [
+   "domates çorba",
+   "domatesli çorba"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 170457,
+    "g": 1000,
+    "what": "domates (rendelenmiş)"
+   },
+   {
+    "id": 173430,
+    "g": 30,
+    "what": "tereyağı"
+   },
+   {
+    "id": 168894,
+    "g": 40,
+    "what": "un"
+   },
+   {
+    "id": 170461,
+    "g": 9,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 21,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171265,
+    "g": 200,
+    "what": "süt"
+   },
+   {
+    "id": 174158,
+    "g": 800,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "sehriye_corbasi",
+  "tr": "Şehriye çorbası",
+  "aliases": [
+   "tel şehriye çorbası",
+   "şehriyeli çorba"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169736,
+    "g": 100,
+    "what": "tel şehriye (kuru)"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171025,
+    "g": 15,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 170457,
+    "g": 150,
+    "what": "domates"
+   },
+   {
+    "id": 174158,
+    "g": 1500,
+    "what": "su"
+   },
+   {
+    "id": 167747,
+    "g": 15,
+    "what": "limon suyu"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "dugun_corbasi",
+  "tr": "Düğün çorbası",
+  "aliases": [
+   "düğün çorba",
+   "terbiyeli et çorbası"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 172482,
+    "g": 250,
+    "what": "kuzu eti (haşlanmış, didilmiş)"
+   },
+   {
+    "id": 172883,
+    "g": 1500,
+    "what": "et suyu"
+   },
+   {
+    "id": 168894,
+    "g": 40,
+    "what": "un"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 172184,
+    "g": 17,
+    "what": "yumurta sarısı"
+   },
+   {
+    "id": 171284,
+    "g": 200,
+    "what": "yoğurt"
+   },
+   {
+    "id": 167747,
+    "g": 20,
+    "what": "limon suyu"
+   },
+   {
+    "id": 170932,
+    "g": 2,
+    "what": "pul biber"
+   }
+  ]
+ },
+ {
+  "key": "iskembe_corbasi",
+  "tr": "İşkembe çorbası",
+  "aliases": [
+   "işkembe çorba",
+   "terbiyeli işkembe"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 174769,
+    "g": 400,
+    "what": "işkembe (haşlanmış)"
+   },
+   {
+    "id": 172883,
+    "g": 1400,
+    "what": "haşlama suyu"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 168894,
+    "g": 40,
+    "what": "un"
+   },
+   {
+    "id": 172184,
+    "g": 17,
+    "what": "yumurta sarısı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   },
+   {
+    "id": 169230,
+    "g": 15,
+    "what": "sarımsak"
+   },
+   {
+    "id": 172237,
+    "g": 20,
+    "what": "sirke"
+   }
+  ]
+ },
+ {
+  "key": "yesil_mercimek_corbasi",
+  "tr": "Yeşil mercimek çorbası",
+  "aliases": [
+   "yeşil mercimek çorba",
+   "kara mercimek çorbası"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 172421,
+    "g": 500,
+    "what": "yeşil mercimek (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 170393,
+    "g": 80,
+    "what": "havuç"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 30,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 168894,
+    "g": 20,
+    "what": "un"
+   },
+   {
+    "id": 174158,
+    "g": 1100,
+    "what": "su"
+   },
+   {
+    "id": 172239,
+    "g": 2,
+    "what": "kuru nane"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "sebze_corbasi",
+  "tr": "Sebze çorbası",
+  "aliases": [
+   "sebzeli çorba",
+   "karışık sebze çorbası"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 170028,
+    "g": 200,
+    "what": "patates"
+   },
+   {
+    "id": 170393,
+    "g": 150,
+    "what": "havuç"
+   },
+   {
+    "id": 169291,
+    "g": 150,
+    "what": "kabak"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 169988,
+    "g": 50,
+    "what": "sap kereviz"
+   },
+   {
+    "id": 170419,
+    "g": 80,
+    "what": "bezelye"
+   },
+   {
+    "id": 171025,
+    "g": 30,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 168894,
+    "g": 20,
+    "what": "un"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 1300,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "kremali_mantar_corbasi",
+  "tr": "Kremalı mantar çorbası",
+  "aliases": [
+   "mantar çorbası",
+   "mantarlı çorba"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169251,
+    "g": 400,
+    "what": "kültür mantarı"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 173430,
+    "g": 30,
+    "what": "tereyağı"
+   },
+   {
+    "id": 168894,
+    "g": 40,
+    "what": "un"
+   },
+   {
+    "id": 171265,
+    "g": 500,
+    "what": "süt"
+   },
+   {
+    "id": 170859,
+    "g": 100,
+    "what": "krema"
+   },
+   {
+    "id": 174158,
+    "g": 700,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "balkabagi_corbasi",
+  "tr": "Balkabağı çorbası",
+  "aliases": [
+   "bal kabağı çorbası",
+   "kabak çorbası"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 168448,
+    "g": 800,
+    "what": "balkabağı"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 170393,
+    "g": 100,
+    "what": "havuç"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171413,
+    "g": 15,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 171265,
+    "g": 200,
+    "what": "süt"
+   },
+   {
+    "id": 174158,
+    "g": 600,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "brokoli_corbasi",
+  "tr": "Brokoli çorbası",
+  "aliases": [
+   "brokolili çorba",
+   "kremalı brokoli çorbası"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 170379,
+    "g": 500,
+    "what": "brokoli"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 170028,
+    "g": 150,
+    "what": "patates"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 168894,
+    "g": 20,
+    "what": "un"
+   },
+   {
+    "id": 171265,
+    "g": 300,
+    "what": "süt"
+   },
+   {
+    "id": 174158,
+    "g": 800,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "pirasa_corbasi",
+  "tr": "Pırasa çorbası",
+  "aliases": [
+   "pırasalı çorba"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169246,
+    "g": 400,
+    "what": "pırasa"
+   },
+   {
+    "id": 170028,
+    "g": 150,
+    "what": "patates"
+   },
+   {
+    "id": 170393,
+    "g": 80,
+    "what": "havuç"
+   },
+   {
+    "id": 168880,
+    "g": 100,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 171413,
+    "g": 30,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 174158,
+    "g": 1200,
+    "what": "su"
+   },
+   {
+    "id": 167747,
+    "g": 15,
+    "what": "limon suyu"
+   }
+  ]
+ },
+ {
+  "key": "patates_corbasi",
+  "tr": "Patates çorbası",
+  "aliases": [
+   "patatesli çorba",
+   "kremalı patates çorbası"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 170028,
+    "g": 600,
+    "what": "patates"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 170393,
+    "g": 80,
+    "what": "havuç"
+   },
+   {
+    "id": 173430,
+    "g": 30,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171265,
+    "g": 300,
+    "what": "süt"
+   },
+   {
+    "id": 174158,
+    "g": 800,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "bezelye_corbasi",
+  "tr": "Bezelye çorbası",
+  "aliases": [
+   "bezelyeli çorba"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 170017,
+    "g": 500,
+    "what": "bezelye (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 170028,
+    "g": 150,
+    "what": "patates"
+   },
+   {
+    "id": 173430,
+    "g": 25,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171265,
+    "g": 200,
+    "what": "süt"
+   },
+   {
+    "id": 174158,
+    "g": 800,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "lebeniye_corbasi",
+  "tr": "Lebeniye çorbası",
+  "aliases": [
+   "yoğurtlu köfteli çorba",
+   "lebeniye"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 171284,
+    "g": 500,
+    "what": "yoğurt"
+   },
+   {
+    "id": 173757,
+    "g": 200,
+    "what": "nohut (haşlanmış)"
+   },
+   {
+    "id": 168880,
+    "g": 150,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 174032,
+    "g": 200,
+    "what": "küçük köfte (pişmiş kıyma)"
+   },
+   {
+    "id": 171287,
+    "g": 50,
+    "what": "yumurta"
+   },
+   {
+    "id": 168894,
+    "g": 20,
+    "what": "un"
+   },
+   {
+    "id": 173430,
+    "g": 25,
+    "what": "tereyağı"
+   },
+   {
+    "id": 172239,
+    "g": 3,
+    "what": "kuru nane"
+   },
+   {
+    "id": 174158,
+    "g": 1000,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "balik_corbasi",
+  "tr": "Balık çorbası",
+  "aliases": [
+   "balıklı çorba",
+   "terbiyeli balık çorbası"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 173694,
+    "g": 300,
+    "what": "balık eti (pişmiş)"
+   },
+   {
+    "id": 172885,
+    "g": 1400,
+    "what": "balık suyu"
+   },
+   {
+    "id": 170028,
+    "g": 200,
+    "what": "patates"
+   },
+   {
+    "id": 170393,
+    "g": 100,
+    "what": "havuç"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 169988,
+    "g": 50,
+    "what": "sap kereviz"
+   },
+   {
+    "id": 171413,
+    "g": 30,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 168894,
+    "g": 20,
+    "what": "un"
+   },
+   {
+    "id": 172184,
+    "g": 17,
+    "what": "yumurta sarısı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   }
+  ],
+  "note": "Balık olarak pişmiş levrek değeri kullanıldı."
+ },
+ {
+  "key": "misir_corbasi",
+  "tr": "Mısır çorbası",
+  "aliases": [
+   "mısırlı çorba",
+   "kremalı mısır çorbası"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169999,
+    "g": 400,
+    "what": "mısır (haşlanmış)"
+   },
+   {
+    "id": 170393,
+    "g": 80,
+    "what": "havuç"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 168894,
+    "g": 30,
+    "what": "un"
+   },
+   {
+    "id": 171265,
+    "g": 400,
+    "what": "süt"
+   },
+   {
+    "id": 174158,
+    "g": 700,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "kremali_tavuk_corbasi",
+  "tr": "Kremalı tavuk çorbası",
+  "aliases": [
+   "tavuk kremalı çorba",
+   "sütlü tavuk çorbası"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 171451,
+    "g": 250,
+    "what": "tavuk eti (haşlanmış, didilmiş)"
+   },
+   {
+    "id": 172884,
+    "g": 1200,
+    "what": "tavuk suyu"
+   },
+   {
+    "id": 168894,
+    "g": 50,
+    "what": "un"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171265,
+    "g": 300,
+    "what": "süt"
+   },
+   {
+    "id": 170859,
+    "g": 100,
+    "what": "krema"
+   }
+  ]
+ },
+ {
+  "key": "zeytinyagli_enginar",
+  "tr": "Zeytinyağlı enginar",
+  "aliases": [
+   "enginar",
+   "enginar yemeği"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 169205,
+    "g": 800,
+    "what": "enginar (çanak)"
+   },
+   {
+    "id": 170028,
+    "g": 150,
+    "what": "patates"
+   },
+   {
+    "id": 170393,
+    "g": 150,
+    "what": "havuç"
+   },
+   {
+    "id": 170419,
+    "g": 100,
+    "what": "bezelye"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "arpacık soğan"
+   },
+   {
+    "id": 171413,
+    "g": 80,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 40,
+    "what": "limon suyu"
+   },
+   {
+    "id": 169655,
+    "g": 10,
+    "what": "şeker"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   },
+   {
+    "id": 172233,
+    "g": 15,
+    "what": "dereotu"
+   }
+  ]
+ },
+ {
+  "key": "zeytinyagli_pirasa",
+  "tr": "Zeytinyağlı pırasa",
+  "aliases": [
+   "pırasa yemeği",
+   "pırasa"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 169246,
+    "g": 1000,
+    "what": "pırasa"
+   },
+   {
+    "id": 170393,
+    "g": 150,
+    "what": "havuç"
+   },
+   {
+    "id": 168880,
+    "g": 100,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 171413,
+    "g": 80,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 20,
+    "what": "limon suyu"
+   },
+   {
+    "id": 169655,
+    "g": 5,
+    "what": "şeker"
+   },
+   {
+    "id": 174158,
+    "g": 250,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "barbunya_pilaki",
+  "tr": "Barbunya pilaki",
+  "aliases": [
+   "zeytinyağlı barbunya",
+   "barbunya"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 175200,
+    "g": 600,
+    "what": "barbunya (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170393,
+    "g": 120,
+    "what": "havuç"
+   },
+   {
+    "id": 170028,
+    "g": 150,
+    "what": "patates"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates"
+   },
+   {
+    "id": 169230,
+    "g": 10,
+    "what": "sarımsak"
+   },
+   {
+    "id": 171413,
+    "g": 90,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 169655,
+    "g": 5,
+    "what": "şeker"
+   },
+   {
+    "id": 174158,
+    "g": 250,
+    "what": "su"
+   },
+   {
+    "id": 170416,
+    "g": 15,
+    "what": "maydanoz"
+   }
+  ],
+  "note": "Barbunya yerine benzer pinto fasulyesi ile hesaplandı. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "kuru_fasulye_pilaki",
+  "tr": "Kuru fasulye pilaki",
+  "aliases": [
+   "fasulye pilaki",
+   "zeytinyağlı kuru fasulye"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 175203,
+    "g": 600,
+    "what": "kuru fasulye (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170393,
+    "g": 120,
+    "what": "havuç"
+   },
+   {
+    "id": 170028,
+    "g": 100,
+    "what": "patates"
+   },
+   {
+    "id": 170457,
+    "g": 150,
+    "what": "domates"
+   },
+   {
+    "id": 169230,
+    "g": 10,
+    "what": "sarımsak"
+   },
+   {
+    "id": 171413,
+    "g": 80,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 174158,
+    "g": 250,
+    "what": "su"
+   },
+   {
+    "id": 170416,
+    "g": 15,
+    "what": "maydanoz"
+   }
+  ]
+ },
+ {
+  "key": "zeytinyagli_biber_dolmasi",
+  "tr": "Zeytinyağlı biber dolması",
+  "aliases": [
+   "biber dolması",
+   "etsiz biber dolması",
+   "dolma"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 170427,
+    "g": 600,
+    "what": "dolmalık biber"
+   },
+   {
+    "id": 168880,
+    "g": 450,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 200,
+    "what": "soğan"
+   },
+   {
+    "id": 171413,
+    "g": 100,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 170591,
+    "g": 20,
+    "what": "çam fıstığı"
+   },
+   {
+    "id": 171724,
+    "g": 20,
+    "what": "kuş üzümü"
+   },
+   {
+    "id": 169655,
+    "g": 10,
+    "what": "şeker"
+   },
+   {
+    "id": 170457,
+    "g": 100,
+    "what": "domates"
+   },
+   {
+    "id": 172233,
+    "g": 15,
+    "what": "dereotu"
+   },
+   {
+    "id": 172239,
+    "g": 3,
+    "what": "kuru nane"
+   },
+   {
+    "id": 171315,
+    "g": 2,
+    "what": "yenibahar"
+   },
+   {
+    "id": 174158,
+    "g": 150,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "zeytinyagli_lahana_sarmasi",
+  "tr": "Zeytinyağlı lahana sarması",
+  "aliases": [
+   "lahana sarması",
+   "etsiz lahana dolması"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 169335,
+    "g": 600,
+    "what": "lahana yaprağı"
+   },
+   {
+    "id": 168880,
+    "g": 400,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 171413,
+    "g": 80,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 170457,
+    "g": 100,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 172239,
+    "g": 3,
+    "what": "kuru nane"
+   },
+   {
+    "id": 174158,
+    "g": 150,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "zeytinyagli_bezelye",
+  "tr": "Zeytinyağlı bezelye",
+  "aliases": [
+   "bezelye yemeği",
+   "bezelye"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 170419,
+    "g": 500,
+    "what": "bezelye"
+   },
+   {
+    "id": 170393,
+    "g": 150,
+    "what": "havuç"
+   },
+   {
+    "id": 170028,
+    "g": 150,
+    "what": "patates"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 171413,
+    "g": 60,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 169655,
+    "g": 5,
+    "what": "şeker"
+   },
+   {
+    "id": 172233,
+    "g": 15,
+    "what": "dereotu"
+   },
+   {
+    "id": 174158,
+    "g": 250,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "zeytinyagli_kabak",
+  "tr": "Zeytinyağlı kabak",
+  "aliases": [
+   "kabak yemeği",
+   "zeytinyağlı kabak yemeği"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 169291,
+    "g": 1000,
+    "what": "kabak"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates"
+   },
+   {
+    "id": 168880,
+    "g": 100,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 171413,
+    "g": 60,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 172233,
+    "g": 15,
+    "what": "dereotu"
+   },
+   {
+    "id": 174158,
+    "g": 100,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "zeytinyagli_kereviz",
+  "tr": "Zeytinyağlı kereviz",
+  "aliases": [
+   "kereviz yemeği",
+   "kereviz"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 170400,
+    "g": 800,
+    "what": "kök kereviz"
+   },
+   {
+    "id": 170393,
+    "g": 150,
+    "what": "havuç"
+   },
+   {
+    "id": 170028,
+    "g": 100,
+    "what": "patates"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "arpacık soğan"
+   },
+   {
+    "id": 171413,
+    "g": 80,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 40,
+    "what": "limon suyu"
+   },
+   {
+    "id": 169655,
+    "g": 10,
+    "what": "şeker"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   },
+   {
+    "id": 172233,
+    "g": 10,
+    "what": "dereotu"
+   }
+  ]
+ },
+ {
+  "key": "zeytinyagli_taze_borulce",
+  "tr": "Zeytinyağlı taze börülce",
+  "aliases": [
+   "börülce",
+   "taze börülce"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 168405,
+    "g": 800,
+    "what": "taze börülce"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 169230,
+    "g": 10,
+    "what": "sarımsak"
+   },
+   {
+    "id": 171413,
+    "g": 80,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "zeytinyagli_bamya",
+  "tr": "Zeytinyağlı bamya",
+  "aliases": [
+   "bamya",
+   "etsiz bamya"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 169260,
+    "g": 700,
+    "what": "bamya"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 171413,
+    "g": 70,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "ispanak_yemegi",
+  "tr": "Ispanak yemeği",
+  "aliases": [
+   "pirinçli ıspanak",
+   "zeytinyağlı ıspanak",
+   "ıspanak"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 168463,
+    "g": 400,
+    "what": "ıspanak (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 120,
+    "what": "soğan"
+   },
+   {
+    "id": 168880,
+    "g": 100,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 171413,
+    "g": 50,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 100,
+    "what": "su"
+   }
+  ],
+  "note": "Ispanak pişmiş ağırlığıyla hesaplandı. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "zeytinyagli_karnabahar",
+  "tr": "Zeytinyağlı karnabahar",
+  "aliases": [
+   "karnabahar yemeği",
+   "karnabahar"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 169986,
+    "g": 800,
+    "what": "karnabahar"
+   },
+   {
+    "id": 170393,
+    "g": 100,
+    "what": "havuç"
+   },
+   {
+    "id": 170028,
+    "g": 150,
+    "what": "patates"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 171413,
+    "g": 60,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 20,
+    "what": "limon suyu"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "zeytinyagli_taze_bakla",
+  "tr": "Zeytinyağlı taze bakla",
+  "aliases": [
+   "taze bakla",
+   "bakla yemeği"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 168574,
+    "g": 800,
+    "what": "taze bakla (kabuklu)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 171413,
+    "g": 80,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 172233,
+    "g": 20,
+    "what": "dereotu"
+   },
+   {
+    "id": 167747,
+    "g": 20,
+    "what": "limon suyu"
+   },
+   {
+    "id": 169655,
+    "g": 5,
+    "what": "şeker"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "saksuka",
+  "tr": "Şakşuka",
+  "aliases": [
+   "patlıcan şakşuka",
+   "şakşuka meze"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 169228,
+    "g": 550,
+    "what": "patlıcan (kızarmış ağırlık)"
+   },
+   {
+    "id": 171025,
+    "g": 110,
+    "what": "kızartma yağı (emilen)"
+   },
+   {
+    "id": 170427,
+    "g": 150,
+    "what": "sivri biber"
+   },
+   {
+    "id": 170457,
+    "g": 400,
+    "what": "domates"
+   },
+   {
+    "id": 169230,
+    "g": 15,
+    "what": "sarımsak"
+   },
+   {
+    "id": 171413,
+    "g": 20,
+    "what": "zeytinyağı"
+   }
+  ],
+  "note": "Kızartmada kaybedilen su düşülerek (kızarmış ağırlık) hesaplandı."
+ },
+ {
+  "key": "turlu",
+  "tr": "Türlü",
+  "aliases": [
+   "etli türlü",
+   "sebzeli türlü",
+   "türlü yemeği"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 169444,
+    "g": 400,
+    "what": "dana kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 169228,
+    "g": 300,
+    "what": "patlıcan"
+   },
+   {
+    "id": 169291,
+    "g": 300,
+    "what": "kabak"
+   },
+   {
+    "id": 170028,
+    "g": 250,
+    "what": "patates"
+   },
+   {
+    "id": 169961,
+    "g": 200,
+    "what": "taze fasulye"
+   },
+   {
+    "id": 170427,
+    "g": 150,
+    "what": "biber"
+   },
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 50,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "hunkar_begendi",
+  "tr": "Hünkar beğendi",
+  "aliases": [
+   "hünkâr beğendi",
+   "beğendili kebap"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 172499,
+    "g": 500,
+    "what": "kuzu kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı (et)"
+   },
+   {
+    "id": 171025,
+    "g": 15,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   },
+   {
+    "id": 169229,
+    "g": 500,
+    "what": "patlıcan (közlenmiş)"
+   },
+   {
+    "id": 173430,
+    "g": 50,
+    "what": "tereyağı (beğendi)"
+   },
+   {
+    "id": 168894,
+    "g": 50,
+    "what": "un"
+   },
+   {
+    "id": 171265,
+    "g": 400,
+    "what": "süt"
+   },
+   {
+    "id": 170850,
+    "g": 60,
+    "what": "kaşar (rendelenmiş)"
+   }
+  ],
+  "note": "Közlenmiş patlıcan yerine haşlanmış patlıcan değeri kullanıldı. Kaşar yerine besin değeri çok yakın olan provolone ile hesaplandı. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "tas_kebabi",
+  "tr": "Tas kebabı",
+  "aliases": [
+   "tas kebap",
+   "dana tas kebabı"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169444,
+    "g": 600,
+    "what": "dana kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 200,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 9,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 21,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 173430,
+    "g": 30,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171025,
+    "g": 20,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "orman_kebabi",
+  "tr": "Orman kebabı",
+  "aliases": [
+   "orman kebap"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 172499,
+    "g": 500,
+    "what": "kuzu kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 170028,
+    "g": 300,
+    "what": "patates"
+   },
+   {
+    "id": 170393,
+    "g": 150,
+    "what": "havuç"
+   },
+   {
+    "id": 170419,
+    "g": 150,
+    "what": "bezelye"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "arpacık soğan"
+   },
+   {
+    "id": 170457,
+    "g": 150,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 173430,
+    "g": 25,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171025,
+    "g": 20,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "etli_bamya",
+  "tr": "Etli bamya",
+  "aliases": [
+   "bamya yemeği etli",
+   "kuşbaşılı bamya"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169444,
+    "g": 400,
+    "what": "dana kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 169260,
+    "g": 600,
+    "what": "bamya"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171025,
+    "g": 20,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "etli_taze_fasulye",
+  "tr": "Etli taze fasulye",
+  "aliases": [
+   "kuşbaşılı taze fasulye",
+   "etli fasulye"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169444,
+    "g": 300,
+    "what": "dana kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 169961,
+    "g": 1000,
+    "what": "taze fasulye"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 50,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "patates_oturtma",
+  "tr": "Patates oturtma",
+  "aliases": [
+   "kıymalı patates oturtma",
+   "oturtma"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 174034,
+    "g": 350,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 170093,
+    "g": 600,
+    "what": "patates (fırınlanmış)"
+   },
+   {
+    "id": 171025,
+    "g": 60,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170427,
+    "g": 150,
+    "what": "sivri biber"
+   },
+   {
+    "id": 170457,
+    "g": 250,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "izmir_kofte",
+  "tr": "İzmir köfte",
+  "aliases": [
+   "izmir köftesi",
+   "fırında izmir köfte"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 174032,
+    "g": 500,
+    "what": "köfte (pişmiş kıyma)"
+   },
+   {
+    "id": 174924,
+    "g": 50,
+    "what": "bayat ekmek"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 171287,
+    "g": 50,
+    "what": "yumurta"
+   },
+   {
+    "id": 170093,
+    "g": 500,
+    "what": "patates (fırınlanmış)"
+   },
+   {
+    "id": 171025,
+    "g": 40,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 170427,
+    "g": 200,
+    "what": "sivri biber"
+   },
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "kadinbudu_kofte",
+  "tr": "Kadınbudu köfte",
+  "aliases": [
+   "kadın budu köfte",
+   "kadınbudu"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 174034,
+    "g": 400,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 168880,
+    "g": 150,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 171287,
+    "g": 100,
+    "what": "yumurta (bulamaç)"
+   },
+   {
+    "id": 168894,
+    "g": 30,
+    "what": "un"
+   },
+   {
+    "id": 171025,
+    "g": 60,
+    "what": "kızartma yağı (emilen)"
+   },
+   {
+    "id": 170416,
+    "g": 15,
+    "what": "maydanoz"
+   }
+  ]
+ },
+ {
+  "key": "sulu_kofte",
+  "tr": "Sulu köfte",
+  "aliases": [
+   "terbiyeli sulu köfte",
+   "ekşili köfte",
+   "sulu köfte yemeği"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 174032,
+    "g": 400,
+    "what": "köfte (pişmiş kıyma)"
+   },
+   {
+    "id": 168880,
+    "g": 100,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 170028,
+    "g": 250,
+    "what": "patates"
+   },
+   {
+    "id": 170393,
+    "g": 100,
+    "what": "havuç"
+   },
+   {
+    "id": 168894,
+    "g": 20,
+    "what": "un"
+   },
+   {
+    "id": 172184,
+    "g": 17,
+    "what": "yumurta sarısı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 1000,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "urfa_kebap",
+  "tr": "Urfa kebap",
+  "aliases": [
+   "urfa kebabı",
+   "acısız kebap"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 172544,
+    "g": 500,
+    "what": "kuzu kıyma (ızgara)"
+   },
+   {
+    "id": 170108,
+    "g": 40,
+    "what": "kırmızı biber"
+   },
+   {
+    "id": 171329,
+    "g": 5,
+    "what": "toz biber"
+   }
+  ],
+  "note": "Lavaş ve garnitür dahil değil."
+ },
+ {
+  "key": "kuzu_sis_kebap",
+  "tr": "Kuzu şiş kebap",
+  "aliases": [
+   "şiş kebap",
+   "kuzu şiş",
+   "şiş"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 172485,
+    "g": 600,
+    "what": "kuzu but (ızgara)"
+   },
+   {
+    "id": 171413,
+    "g": 20,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 170000,
+    "g": 60,
+    "what": "soğan (marine)"
+   },
+   {
+    "id": 170427,
+    "g": 100,
+    "what": "biber"
+   },
+   {
+    "id": 170457,
+    "g": 100,
+    "what": "domates"
+   }
+  ],
+  "note": "Lavaş dahil değil; kuzu but için fırınlanmış değer kullanıldı."
+ },
+ {
+  "key": "beyti_kebap",
+  "tr": "Beyti kebap",
+  "aliases": [
+   "beyti sarma",
+   "beyti"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 172544,
+    "g": 300,
+    "what": "kuzu kıyma (ızgara)"
+   },
+   {
+    "id": 174032,
+    "g": 200,
+    "what": "dana kıyma (ızgara)"
+   },
+   {
+    "id": 175037,
+    "g": 200,
+    "what": "lavaş"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates sosu"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 173430,
+    "g": 30,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171284,
+    "g": 300,
+    "what": "yoğurt"
+   },
+   {
+    "id": 169230,
+    "g": 5,
+    "what": "sarımsak"
+   }
+  ],
+  "note": "Lavaş yerine buğday tortillası ile hesaplandı. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "cop_sis",
+  "tr": "Çöp şiş",
+  "aliases": [
+   "çöp şiş kebap",
+   "kuzu çöp şiş"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 172498,
+    "g": 500,
+    "what": "kuzu eti (ızgara)"
+   },
+   {
+    "id": 171413,
+    "g": 20,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 170000,
+    "g": 50,
+    "what": "soğan (marine)"
+   },
+   {
+    "id": 170938,
+    "g": 2,
+    "what": "kekik"
+   }
+  ],
+  "note": "Lavaş dahil değil."
+ },
+ {
+  "key": "tavuk_sote",
+  "tr": "Tavuk sote",
+  "aliases": [
+   "tavuk sote sebzeli",
+   "sebzeli tavuk"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 171140,
+    "g": 600,
+    "what": "tavuk göğsü (pişmiş)"
+   },
+   {
+    "id": 170427,
+    "g": 200,
+    "what": "yeşil biber"
+   },
+   {
+    "id": 170108,
+    "g": 100,
+    "what": "kırmızı biber"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 40,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 100,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "tavuk_haslama",
+  "tr": "Tavuk haşlama",
+  "aliases": [
+   "haşlanmış tavuk",
+   "sebzeli tavuk haşlama"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 171451,
+    "g": 500,
+    "what": "tavuk eti (haşlanmış)"
+   },
+   {
+    "id": 170028,
+    "g": 300,
+    "what": "patates"
+   },
+   {
+    "id": 170393,
+    "g": 200,
+    "what": "havuç"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 169988,
+    "g": 50,
+    "what": "sap kereviz"
+   },
+   {
+    "id": 172884,
+    "g": 600,
+    "what": "tavuk suyu"
+   },
+   {
+    "id": 167747,
+    "g": 20,
+    "what": "limon suyu"
+   }
+  ]
+ },
+ {
+  "key": "firin_tavuk_patates",
+  "tr": "Fırında tavuk patates",
+  "aliases": [
+   "fırın tavuk",
+   "tavuk but fırında",
+   "patatesli tavuk"
+  ],
+  "serving_g": 350,
+  "items": [
+   {
+    "id": 173617,
+    "g": 800,
+    "what": "tavuk but (fırınlanmış, derili)"
+   },
+   {
+    "id": 170093,
+    "g": 600,
+    "what": "patates (fırınlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170427,
+    "g": 150,
+    "what": "biber"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates"
+   },
+   {
+    "id": 171413,
+    "g": 50,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "balik_bugulama",
+  "tr": "Balık buğulama",
+  "aliases": [
+   "levrek buğulama",
+   "buğulama"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 173694,
+    "g": 600,
+    "what": "levrek (pişmiş)"
+   },
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170427,
+    "g": 100,
+    "what": "biber"
+   },
+   {
+    "id": 171413,
+    "g": 40,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   },
+   {
+    "id": 174158,
+    "g": 100,
+    "what": "su"
+   }
+  ],
+  "note": "Buğulama için kuru ısıda pişmiş levrek değeri kullanıldı."
+ },
+ {
+  "key": "kuzu_tandir",
+  "tr": "Kuzu tandır",
+  "aliases": [
+   "tandır",
+   "fırın kuzu"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 174325,
+    "g": 800,
+    "what": "kuzu kol (fırınlanmış, yağlı)"
+   },
+   {
+    "id": 170938,
+    "g": 3,
+    "what": "kekik"
+   },
+   {
+    "id": 170931,
+    "g": 2,
+    "what": "karabiber"
+   }
+  ]
+ },
+ {
+  "key": "kuzu_incik",
+  "tr": "Kuzu incik",
+  "aliases": [
+   "incik",
+   "sebzeli kuzu incik"
+  ],
+  "serving_g": 350,
+  "items": [
+   {
+    "id": 172482,
+    "g": 700,
+    "what": "kuzu incik (pişmiş eti)"
+   },
+   {
+    "id": 170028,
+    "g": 300,
+    "what": "patates"
+   },
+   {
+    "id": 170393,
+    "g": 150,
+    "what": "havuç"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "arpacık soğan"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "etli_guvec",
+  "tr": "Etli güveç",
+  "aliases": [
+   "güveç",
+   "sebzeli et güveç"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 169444,
+    "g": 500,
+    "what": "dana kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 169228,
+    "g": 300,
+    "what": "patlıcan"
+   },
+   {
+    "id": 170028,
+    "g": 300,
+    "what": "patates"
+   },
+   {
+    "id": 170427,
+    "g": 200,
+    "what": "biber"
+   },
+   {
+    "id": 170457,
+    "g": 400,
+    "what": "domates"
+   },
+   {
+    "id": 170000,
+    "g": 200,
+    "what": "soğan"
+   },
+   {
+    "id": 169230,
+    "g": 15,
+    "what": "sarımsak"
+   },
+   {
+    "id": 171025,
+    "g": 40,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 150,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "kiymali_patates",
+  "tr": "Kıymalı patates yemeği",
+  "aliases": [
+   "patates yemeği",
+   "kıymalı patates"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 174034,
+    "g": 250,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 170028,
+    "g": 800,
+    "what": "patates"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170427,
+    "g": 100,
+    "what": "biber"
+   },
+   {
+    "id": 170461,
+    "g": 9,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 21,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 40,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 400,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "kiymali_ispanak",
+  "tr": "Kıymalı ıspanak",
+  "aliases": [
+   "etli ıspanak",
+   "ıspanak yemeği kıymalı"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 168463,
+    "g": 600,
+    "what": "ıspanak (pişmiş)"
+   },
+   {
+    "id": 174034,
+    "g": 250,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 168880,
+    "g": 100,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170461,
+    "g": 4,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 11,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 40,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 150,
+    "what": "su"
+   }
+  ],
+  "note": "Ispanak pişmiş ağırlığıyla hesaplandı. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "etli_kabak_dolmasi",
+  "tr": "Etli kabak dolması",
+  "aliases": [
+   "kabak dolması",
+   "kıymalı kabak dolması"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 169291,
+    "g": 900,
+    "what": "kabak (oyulmuş)"
+   },
+   {
+    "id": 174034,
+    "g": 300,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 168880,
+    "g": 300,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 150,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 30,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 170416,
+    "g": 20,
+    "what": "maydanoz"
+   },
+   {
+    "id": 172239,
+    "g": 3,
+    "what": "kuru nane"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ],
+  "note": "Yanındaki yoğurt dahil değil. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "etli_biber_dolmasi",
+  "tr": "Etli biber dolması",
+  "aliases": [
+   "kıymalı biber dolması",
+   "etli dolma"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 170427,
+    "g": 600,
+    "what": "dolmalık biber"
+   },
+   {
+    "id": 174034,
+    "g": 300,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 168880,
+    "g": 300,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 30,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 170416,
+    "g": 20,
+    "what": "maydanoz"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "etli_yaprak_sarma",
+  "tr": "Etli yaprak sarma",
+  "aliases": [
+   "etli sarma",
+   "kıymalı yaprak sarma",
+   "etli dolma yaprak"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169393,
+    "g": 250,
+    "what": "asma yaprağı (salamura)"
+   },
+   {
+    "id": 174034,
+    "g": 350,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 168880,
+    "g": 350,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 30,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 172239,
+    "g": 3,
+    "what": "kuru nane"
+   },
+   {
+    "id": 174158,
+    "g": 150,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "etli_lahana_sarmasi",
+  "tr": "Etli lahana sarması",
+  "aliases": [
+   "etli lahana dolması",
+   "kıymalı lahana sarması"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169335,
+    "g": 700,
+    "what": "lahana yaprağı"
+   },
+   {
+    "id": 174034,
+    "g": 300,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 168880,
+    "g": 300,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170461,
+    "g": 7,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 18,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 30,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "patlican_musakka",
+  "tr": "Patlıcan musakka",
+  "aliases": [
+   "musakka",
+   "kıymalı patlıcan"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 169228,
+    "g": 500,
+    "what": "patlıcan (kızarmış ağırlık)"
+   },
+   {
+    "id": 171025,
+    "g": 100,
+    "what": "kızartma yağı (emilen)"
+   },
+   {
+    "id": 174034,
+    "g": 350,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170427,
+    "g": 150,
+    "what": "biber"
+   },
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ],
+  "note": "Kızartmada kaybedilen su düşülerek (kızarmış ağırlık) hesaplandı. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "ali_nazik",
+  "tr": "Ali nazik",
+  "aliases": [
+   "alinazik",
+   "ali nazik kebabı"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 169229,
+    "g": 500,
+    "what": "patlıcan (közlenmiş)"
+   },
+   {
+    "id": 171284,
+    "g": 400,
+    "what": "yoğurt"
+   },
+   {
+    "id": 169230,
+    "g": 10,
+    "what": "sarımsak"
+   },
+   {
+    "id": 172499,
+    "g": 400,
+    "what": "kuzu kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 170457,
+    "g": 100,
+    "what": "domates"
+   }
+  ],
+  "note": "Közlenmiş patlıcan yerine haşlanmış patlıcan değeri kullanıldı."
+ },
+ {
+  "key": "arnavut_cigeri",
+  "tr": "Arnavut ciğeri",
+  "aliases": [
+   "ciğer tava",
+   "arnavut ciğer"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 172533,
+    "g": 500,
+    "what": "kuzu ciğeri (tavada pişmiş)"
+   },
+   {
+    "id": 168894,
+    "g": 40,
+    "what": "un"
+   },
+   {
+    "id": 171025,
+    "g": 60,
+    "what": "kızartma yağı (emilen)"
+   },
+   {
+    "id": 170000,
+    "g": 200,
+    "what": "soğan (piyaz)"
+   },
+   {
+    "id": 170416,
+    "g": 30,
+    "what": "maydanoz"
+   },
+   {
+    "id": 170932,
+    "g": 3,
+    "what": "pul biber"
+   }
+  ]
+ },
+ {
+  "key": "et_kavurma",
+  "tr": "Et kavurma",
+  "aliases": [
+   "kavurma",
+   "dana kavurma",
+   "sac kavurma"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 169444,
+    "g": 600,
+    "what": "dana kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 173430,
+    "g": 50,
+    "what": "tereyağı"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170427,
+    "g": 100,
+    "what": "sivri biber"
+   },
+   {
+    "id": 170457,
+    "g": 150,
+    "what": "domates"
+   }
+  ]
+ },
+ {
+  "key": "etli_bezelye",
+  "tr": "Etli bezelye",
+  "aliases": [
+   "kuşbaşılı bezelye",
+   "etli bezelye yemeği"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 169444,
+    "g": 300,
+    "what": "dana kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 170419,
+    "g": 600,
+    "what": "bezelye"
+   },
+   {
+    "id": 170393,
+    "g": 150,
+    "what": "havuç"
+   },
+   {
+    "id": 170028,
+    "g": 200,
+    "what": "patates"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 40,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "firinda_kofte_patates",
+  "tr": "Fırında köfte patates",
+  "aliases": [
+   "fırın köfte",
+   "köfte patates fırında"
+  ],
+  "serving_g": 300,
+  "items": [
+   {
+    "id": 174032,
+    "g": 500,
+    "what": "köfte (pişmiş kıyma)"
+   },
+   {
+    "id": 174924,
+    "g": 50,
+    "what": "bayat ekmek"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 170093,
+    "g": 600,
+    "what": "patates (fırınlanmış)"
+   },
+   {
+    "id": 170457,
+    "g": 250,
+    "what": "domates"
+   },
+   {
+    "id": 170427,
+    "g": 150,
+    "what": "biber"
+   },
+   {
+    "id": 170461,
+    "g": 6,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 171025,
+    "g": 40,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 174158,
+    "g": 200,
+    "what": "su"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "sehriyeli_pirinc_pilavi",
+  "tr": "Şehriyeli pirinç pilavı",
+  "aliases": [
+   "şehriyeli pilav",
+   "tel şehriyeli pilav"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 168880,
+    "g": 900,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 169737,
+    "g": 120,
+    "what": "tel şehriye (pişmiş)"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171025,
+    "g": 15,
+    "what": "ayçiçek yağı"
+   }
+  ]
+ },
+ {
+  "key": "nohutlu_pilav",
+  "tr": "Nohutlu pilav",
+  "aliases": [
+   "nohutlu pirinç pilavı"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 168880,
+    "g": 900,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 173757,
+    "g": 250,
+    "what": "nohut (haşlanmış)"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171025,
+    "g": 15,
+    "what": "ayçiçek yağı"
+   }
+  ]
+ },
+ {
+  "key": "ic_pilav",
+  "tr": "İç pilav",
+  "aliases": [
+   "iç pilavı",
+   "ciğerli iç pilav",
+   "dolma içi pilav"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 168880,
+    "g": 900,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171025,
+    "g": 15,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 170591,
+    "g": 30,
+    "what": "çam fıstığı"
+   },
+   {
+    "id": 171724,
+    "g": 30,
+    "what": "kuş üzümü"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 172533,
+    "g": 100,
+    "what": "kuzu ciğeri (pişmiş)"
+   },
+   {
+    "id": 169655,
+    "g": 5,
+    "what": "şeker"
+   },
+   {
+    "id": 171315,
+    "g": 2,
+    "what": "yenibahar"
+   },
+   {
+    "id": 171320,
+    "g": 1,
+    "what": "tarçın"
+   },
+   {
+    "id": 172233,
+    "g": 15,
+    "what": "dereotu"
+   }
+  ]
+ },
+ {
+  "key": "domatesli_bulgur_pilavi",
+  "tr": "Domatesli bulgur pilavı",
+  "aliases": [
+   "salçalı bulgur pilavı",
+   "domatesli bulgur"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 170688,
+    "g": 400,
+    "what": "pilavlık bulgur (kuru)"
+   },
+   {
+    "id": 174158,
+    "g": 600,
+    "what": "su (çekilen)"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates"
+   },
+   {
+    "id": 170461,
+    "g": 7,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 18,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 170427,
+    "g": 80,
+    "what": "biber"
+   },
+   {
+    "id": 171025,
+    "g": 30,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   }
+  ],
+  "note": "Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "mercimekli_bulgur_pilavi",
+  "tr": "Mercimekli bulgur pilavı",
+  "aliases": [
+   "mercimekli pilav",
+   "müceddere"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 170688,
+    "g": 250,
+    "what": "pilavlık bulgur (kuru)"
+   },
+   {
+    "id": 174158,
+    "g": 450,
+    "what": "su (çekilen)"
+   },
+   {
+    "id": 172421,
+    "g": 300,
+    "what": "yeşil mercimek (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan (kavrulmuş)"
+   },
+   {
+    "id": 171025,
+    "g": 40,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 173430,
+    "g": 15,
+    "what": "tereyağı"
+   }
+  ]
+ },
+ {
+  "key": "tavuklu_pilav",
+  "tr": "Tavuklu pilav",
+  "aliases": [
+   "tavuklu pirinç pilavı",
+   "tavuk pilav"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 168880,
+    "g": 900,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 171451,
+    "g": 300,
+    "what": "tavuk eti (haşlanmış, didilmiş)"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171025,
+    "g": 10,
+    "what": "ayçiçek yağı"
+   }
+  ]
+ },
+ {
+  "key": "etli_pilav",
+  "tr": "Etli pilav",
+  "aliases": [
+   "kuşbaşılı pilav",
+   "etli pirinç pilavı"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 168880,
+    "g": 900,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 169444,
+    "g": 300,
+    "what": "dana kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   }
+  ]
+ },
+ {
+  "key": "arpa_sehriye_pilavi",
+  "tr": "Arpa şehriye pilavı",
+  "aliases": [
+   "arpa şehriye",
+   "şehriye pilavı"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 169737,
+    "g": 900,
+    "what": "arpa şehriye (pişmiş)"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171025,
+    "g": 15,
+    "what": "ayçiçek yağı"
+   }
+  ]
+ },
+ {
+  "key": "bezelyeli_pilav",
+  "tr": "Bezelyeli pilav",
+  "aliases": [
+   "bezelyeli pirinç pilavı",
+   "havuçlu bezelyeli pilav"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 168880,
+    "g": 900,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 170017,
+    "g": 200,
+    "what": "bezelye (haşlanmış)"
+   },
+   {
+    "id": 170393,
+    "g": 100,
+    "what": "havuç"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   }
+  ]
+ },
+ {
+  "key": "firin_makarna",
+  "tr": "Fırın makarna",
+  "aliases": [
+   "fırında makarna",
+   "beşamelli makarna"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 169737,
+    "g": 800,
+    "what": "makarna (haşlanmış)"
+   },
+   {
+    "id": 171265,
+    "g": 500,
+    "what": "süt"
+   },
+   {
+    "id": 171287,
+    "g": 100,
+    "what": "yumurta"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 168894,
+    "g": 30,
+    "what": "un"
+   },
+   {
+    "id": 170850,
+    "g": 100,
+    "what": "kaşar (rendelenmiş)"
+   }
+  ],
+  "note": "Kaşar yerine besin değeri çok yakın olan provolone ile hesaplandı."
+ },
+ {
+  "key": "ispanakli_borek",
+  "tr": "Ispanaklı börek",
+  "aliases": [
+   "ıspanaklı tepsi böreği",
+   "ıspanaklı peynirli börek"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 172791,
+    "g": 500,
+    "what": "yufka"
+   },
+   {
+    "id": 168463,
+    "g": 400,
+    "what": "ıspanak (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 173420,
+    "g": 150,
+    "what": "beyaz peynir"
+   },
+   {
+    "id": 171287,
+    "g": 150,
+    "what": "yumurta"
+   },
+   {
+    "id": 171265,
+    "g": 250,
+    "what": "süt"
+   },
+   {
+    "id": 171025,
+    "g": 120,
+    "what": "ayçiçek yağı"
+   }
+  ],
+  "note": "Yufka yerine phyllo hamuru ile hesaplandı. Beyaz peynir yerine feta ile hesaplandı."
+ },
+ {
+  "key": "kiymali_borek",
+  "tr": "Kıymalı börek",
+  "aliases": [
+   "kıymalı tepsi böreği",
+   "kıymalı yufka böreği"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 172791,
+    "g": 500,
+    "what": "yufka"
+   },
+   {
+    "id": 174034,
+    "g": 350,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 171287,
+    "g": 150,
+    "what": "yumurta"
+   },
+   {
+    "id": 171265,
+    "g": 250,
+    "what": "süt"
+   },
+   {
+    "id": 171025,
+    "g": 120,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 170416,
+    "g": 20,
+    "what": "maydanoz"
+   }
+  ],
+  "note": "Yufka yerine phyllo hamuru ile hesaplandı."
+ },
+ {
+  "key": "patatesli_borek",
+  "tr": "Patatesli börek",
+  "aliases": [
+   "patatesli tepsi böreği",
+   "patatesli yufka böreği"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 172791,
+    "g": 500,
+    "what": "yufka"
+   },
+   {
+    "id": 170438,
+    "g": 500,
+    "what": "patates (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 171287,
+    "g": 150,
+    "what": "yumurta"
+   },
+   {
+    "id": 171265,
+    "g": 250,
+    "what": "süt"
+   },
+   {
+    "id": 171025,
+    "g": 120,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 170932,
+    "g": 3,
+    "what": "pul biber"
+   }
+  ],
+  "note": "Yufka yerine phyllo hamuru ile hesaplandı."
+ },
+ {
+  "key": "peynirli_kol_boregi",
+  "tr": "Peynirli kol böreği",
+  "aliases": [
+   "kol böreği",
+   "peynirli börek"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 172791,
+    "g": 500,
+    "what": "yufka"
+   },
+   {
+    "id": 173420,
+    "g": 300,
+    "what": "beyaz peynir"
+   },
+   {
+    "id": 170416,
+    "g": 30,
+    "what": "maydanoz"
+   },
+   {
+    "id": 171287,
+    "g": 150,
+    "what": "yumurta"
+   },
+   {
+    "id": 171265,
+    "g": 200,
+    "what": "süt"
+   },
+   {
+    "id": 171025,
+    "g": 120,
+    "what": "ayçiçek yağı"
+   }
+  ],
+  "note": "Yufka yerine phyllo hamuru ile hesaplandı. Beyaz peynir yerine feta ile hesaplandı."
+ },
+ {
+  "key": "talas_boregi",
+  "tr": "Talaş böreği",
+  "aliases": [
+   "milföylü talaş böreği",
+   "talaş"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 172738,
+    "g": 400,
+    "what": "milföy hamuru (pişmiş)"
+   },
+   {
+    "id": 174034,
+    "g": 250,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 170419,
+    "g": 80,
+    "what": "bezelye"
+   },
+   {
+    "id": 170393,
+    "g": 60,
+    "what": "havuç"
+   },
+   {
+    "id": 171287,
+    "g": 50,
+    "what": "yumurta (üstüne)"
+   }
+  ]
+ },
+ {
+  "key": "kiymali_gozleme",
+  "tr": "Kıymalı gözleme",
+  "aliases": [
+   "kıymalı gözleme sac"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 172791,
+    "g": 400,
+    "what": "yufka"
+   },
+   {
+    "id": 174034,
+    "g": 240,
+    "what": "dana kıyma (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 173430,
+    "g": 50,
+    "what": "tereyağı"
+   }
+  ],
+  "note": "Yufka yerine phyllo hamuru ile hesaplandı."
+ },
+ {
+  "key": "patatesli_gozleme",
+  "tr": "Patatesli gözleme",
+  "aliases": [
+   "patatesli sac gözleme"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 172791,
+    "g": 400,
+    "what": "yufka"
+   },
+   {
+    "id": 170438,
+    "g": 400,
+    "what": "patates (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 173430,
+    "g": 50,
+    "what": "tereyağı"
+   },
+   {
+    "id": 170932,
+    "g": 2,
+    "what": "pul biber"
+   }
+  ],
+  "note": "Yufka yerine phyllo hamuru ile hesaplandı."
+ },
+ {
+  "key": "ispanakli_gozleme",
+  "tr": "Ispanaklı gözleme",
+  "aliases": [
+   "ıspanaklı peynirli gözleme"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 172791,
+    "g": 400,
+    "what": "yufka"
+   },
+   {
+    "id": 168463,
+    "g": 200,
+    "what": "ıspanak (pişmiş)"
+   },
+   {
+    "id": 173420,
+    "g": 120,
+    "what": "beyaz peynir"
+   },
+   {
+    "id": 170000,
+    "g": 60,
+    "what": "soğan"
+   },
+   {
+    "id": 173430,
+    "g": 50,
+    "what": "tereyağı"
+   }
+  ],
+  "note": "Yufka yerine phyllo hamuru ile hesaplandı. Beyaz peynir yerine feta ile hesaplandı."
+ },
+ {
+  "key": "kasarli_pide",
+  "tr": "Kaşarlı pide",
+  "aliases": [
+   "kaşarlı yumurtalı pide",
+   "peynirli pide"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 168894,
+    "g": 500,
+    "what": "un"
+   },
+   {
+    "id": 174158,
+    "g": 180,
+    "what": "su"
+   },
+   {
+    "id": 171025,
+    "g": 20,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 175043,
+    "g": 7,
+    "what": "kuru maya"
+   },
+   {
+    "id": 170850,
+    "g": 400,
+    "what": "kaşar"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171287,
+    "g": 50,
+    "what": "yumurta"
+   }
+  ],
+  "note": "Kaşar yerine besin değeri çok yakın olan provolone ile hesaplandı. Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "kusbasili_pide",
+  "tr": "Kuşbaşılı pide",
+  "aliases": [
+   "kuşbaşı pide",
+   "etli pide"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 168894,
+    "g": 500,
+    "what": "un"
+   },
+   {
+    "id": 174158,
+    "g": 180,
+    "what": "su"
+   },
+   {
+    "id": 171025,
+    "g": 20,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 175043,
+    "g": 7,
+    "what": "kuru maya"
+   },
+   {
+    "id": 169444,
+    "g": 300,
+    "what": "dana kuşbaşı (pişmiş)"
+   },
+   {
+    "id": 170457,
+    "g": 150,
+    "what": "domates"
+   },
+   {
+    "id": 170427,
+    "g": 100,
+    "what": "biber"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 173430,
+    "g": 40,
+    "what": "tereyağı"
+   }
+  ],
+  "note": "Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "bazlama",
+  "tr": "Bazlama",
+  "aliases": [
+   "köy bazlaması",
+   "sac bazlama"
+  ],
+  "serving_g": 100,
+  "items": [
+   {
+    "id": 168894,
+    "g": 500,
+    "what": "un"
+   },
+   {
+    "id": 171284,
+    "g": 150,
+    "what": "yoğurt"
+   },
+   {
+    "id": 174158,
+    "g": 150,
+    "what": "su"
+   },
+   {
+    "id": 175043,
+    "g": 7,
+    "what": "kuru maya"
+   },
+   {
+    "id": 171025,
+    "g": 10,
+    "what": "ayçiçek yağı"
+   }
+  ],
+  "note": "Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "muhlama",
+  "tr": "Muhlama",
+  "aliases": [
+   "kuymak",
+   "mıhlama"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 168867,
+    "g": 100,
+    "what": "mısır unu"
+   },
+   {
+    "id": 173430,
+    "g": 100,
+    "what": "tereyağı"
+   },
+   {
+    "id": 170846,
+    "g": 200,
+    "what": "kolot peyniri"
+   },
+   {
+    "id": 174158,
+    "g": 150,
+    "what": "su"
+   }
+  ],
+  "note": "Kolot/çeçil peyniri yerine mozzarella ile hesaplandı. Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "sade_omlet",
+  "tr": "Sade omlet",
+  "aliases": [
+   "omlet",
+   "yumurta omlet"
+  ],
+  "serving_g": 180,
+  "items": [
+   {
+    "id": 171287,
+    "g": 150,
+    "what": "yumurta (3 adet)"
+   },
+   {
+    "id": 171265,
+    "g": 30,
+    "what": "süt"
+   },
+   {
+    "id": 173430,
+    "g": 10,
+    "what": "tereyağı"
+   }
+  ]
+ },
+ {
+  "key": "peynirli_omlet",
+  "tr": "Peynirli omlet",
+  "aliases": [
+   "beyaz peynirli omlet"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 171287,
+    "g": 150,
+    "what": "yumurta (3 adet)"
+   },
+   {
+    "id": 173420,
+    "g": 40,
+    "what": "beyaz peynir"
+   },
+   {
+    "id": 171265,
+    "g": 20,
+    "what": "süt"
+   },
+   {
+    "id": 173430,
+    "g": 10,
+    "what": "tereyağı"
+   }
+  ],
+  "note": "Beyaz peynir yerine feta ile hesaplandı."
+ },
+ {
+  "key": "mantarli_omlet",
+  "tr": "Mantarlı omlet",
+  "aliases": [
+   "mantarlı yumurta"
+  ],
+  "serving_g": 230,
+  "items": [
+   {
+    "id": 171287,
+    "g": 150,
+    "what": "yumurta (3 adet)"
+   },
+   {
+    "id": 169251,
+    "g": 80,
+    "what": "mantar"
+   },
+   {
+    "id": 173430,
+    "g": 15,
+    "what": "tereyağı"
+   }
+  ]
+ },
+ {
+  "key": "ispanakli_yumurta",
+  "tr": "Ispanaklı yumurta",
+  "aliases": [
+   "yumurtalı ıspanak",
+   "ıspanak kavurma yumurtalı"
+  ],
+  "serving_g": 250,
+  "items": [
+   {
+    "id": 168463,
+    "g": 200,
+    "what": "ıspanak (pişmiş)"
+   },
+   {
+    "id": 170000,
+    "g": 50,
+    "what": "soğan"
+   },
+   {
+    "id": 171287,
+    "g": 100,
+    "what": "yumurta (2 adet)"
+   },
+   {
+    "id": 171413,
+    "g": 15,
+    "what": "zeytinyağı"
+   }
+  ]
+ },
+ {
+  "key": "cilbir",
+  "tr": "Çılbır",
+  "aliases": [
+   "yoğurtlu yumurta",
+   "çılbır yumurta"
+  ],
+  "serving_g": 325,
+  "items": [
+   {
+    "id": 172186,
+    "g": 100,
+    "what": "poşe yumurta (2 adet)"
+   },
+   {
+    "id": 171284,
+    "g": 200,
+    "what": "yoğurt"
+   },
+   {
+    "id": 169230,
+    "g": 5,
+    "what": "sarımsak"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   },
+   {
+    "id": 171329,
+    "g": 2,
+    "what": "toz biber"
+   }
+  ]
+ },
+ {
+  "key": "patatesli_yumurta",
+  "tr": "Patatesli yumurta",
+  "aliases": [
+   "yumurtalı patates",
+   "patates kavurma yumurtalı"
+  ],
+  "serving_g": 240,
+  "items": [
+   {
+    "id": 170438,
+    "g": 250,
+    "what": "patates (haşlanmış)"
+   },
+   {
+    "id": 171025,
+    "g": 25,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 171287,
+    "g": 150,
+    "what": "yumurta (3 adet)"
+   },
+   {
+    "id": 170000,
+    "g": 50,
+    "what": "soğan"
+   }
+  ]
+ },
+ {
+  "key": "coban_salata",
+  "tr": "Çoban salata",
+  "aliases": [
+   "çoban salatası",
+   "domates salatalık salatası"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 170457,
+    "g": 400,
+    "what": "domates"
+   },
+   {
+    "id": 168409,
+    "g": 300,
+    "what": "salatalık"
+   },
+   {
+    "id": 170427,
+    "g": 100,
+    "what": "sivri biber"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 170416,
+    "g": 30,
+    "what": "maydanoz"
+   },
+   {
+    "id": 171413,
+    "g": 40,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   }
+  ]
+ },
+ {
+  "key": "kisir",
+  "tr": "Kısır",
+  "aliases": [
+   "bulgur salatası",
+   "kısır salatası"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 170688,
+    "g": 250,
+    "what": "ince bulgur (kuru)"
+   },
+   {
+    "id": 174158,
+    "g": 250,
+    "what": "ıslatma suyu"
+   },
+   {
+    "id": 170461,
+    "g": 9,
+    "what": "domates salçası (domates tozu kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 21,
+    "what": "domates salçası (su kısmı)"
+   },
+   {
+    "id": 169373,
+    "g": 6,
+    "what": "biber salçası (kuru kırmızı biber kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "biber salçası (su kısmı)"
+   },
+   {
+    "id": 170005,
+    "g": 80,
+    "what": "yeşil soğan"
+   },
+   {
+    "id": 170457,
+    "g": 200,
+    "what": "domates"
+   },
+   {
+    "id": 168409,
+    "g": 150,
+    "what": "salatalık"
+   },
+   {
+    "id": 170416,
+    "g": 60,
+    "what": "maydanoz"
+   },
+   {
+    "id": 173475,
+    "g": 10,
+    "what": "taze nane"
+   },
+   {
+    "id": 171413,
+    "g": 60,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   },
+   {
+    "id": 167787,
+    "g": 30,
+    "what": "nar ekşisi"
+   }
+  ],
+  "note": "Nar ekşisi yerine nar suyu ile hesaplandı. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "piyaz",
+  "tr": "Piyaz",
+  "aliases": [
+   "fasulye piyazı",
+   "kuru fasulye piyazı"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 175203,
+    "g": 500,
+    "what": "kuru fasulye (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 150,
+    "what": "soğan"
+   },
+   {
+    "id": 170416,
+    "g": 40,
+    "what": "maydanoz"
+   },
+   {
+    "id": 170457,
+    "g": 150,
+    "what": "domates"
+   },
+   {
+    "id": 171413,
+    "g": 50,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   },
+   {
+    "id": 172237,
+    "g": 20,
+    "what": "sirke"
+   }
+  ]
+ },
+ {
+  "key": "haydari",
+  "tr": "Haydari",
+  "aliases": [
+   "süzme yoğurt mezesi",
+   "haydari meze"
+  ],
+  "serving_g": 60,
+  "items": [
+   {
+    "id": 171304,
+    "g": 400,
+    "what": "süzme yoğurt"
+   },
+   {
+    "id": 173420,
+    "g": 50,
+    "what": "beyaz peynir"
+   },
+   {
+    "id": 169230,
+    "g": 10,
+    "what": "sarımsak"
+   },
+   {
+    "id": 172233,
+    "g": 15,
+    "what": "dereotu"
+   },
+   {
+    "id": 172239,
+    "g": 3,
+    "what": "kuru nane"
+   },
+   {
+    "id": 171413,
+    "g": 25,
+    "what": "zeytinyağı"
+   }
+  ],
+  "note": "Süzme yoğurt için tam yağlı Yunan yoğurdu, beyaz peynir için feta kullanıldı."
+ },
+ {
+  "key": "acili_ezme",
+  "tr": "Acılı ezme",
+  "aliases": [
+   "ezme",
+   "domates ezmesi",
+   "acılı ezme salatası"
+  ],
+  "serving_g": 80,
+  "items": [
+   {
+    "id": 170457,
+    "g": 300,
+    "what": "domates"
+   },
+   {
+    "id": 170427,
+    "g": 100,
+    "what": "sivri biber"
+   },
+   {
+    "id": 170497,
+    "g": 30,
+    "what": "acı biber"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 170416,
+    "g": 40,
+    "what": "maydanoz"
+   },
+   {
+    "id": 169373,
+    "g": 6,
+    "what": "biber salçası (kuru kırmızı biber kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 14,
+    "what": "biber salçası (su kısmı)"
+   },
+   {
+    "id": 171413,
+    "g": 40,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167787,
+    "g": 20,
+    "what": "nar ekşisi"
+   },
+   {
+    "id": 167747,
+    "g": 15,
+    "what": "limon suyu"
+   },
+   {
+    "id": 169230,
+    "g": 5,
+    "what": "sarımsak"
+   }
+  ],
+  "note": "Nar ekşisi yerine nar suyu ile hesaplandı. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "humus",
+  "tr": "Humus",
+  "aliases": [
+   "humus meze",
+   "nohut ezmesi"
+  ],
+  "serving_g": 80,
+  "items": [
+   {
+    "id": 173757,
+    "g": 500,
+    "what": "nohut (haşlanmış)"
+   },
+   {
+    "id": 170191,
+    "g": 120,
+    "what": "tahin"
+   },
+   {
+    "id": 167747,
+    "g": 60,
+    "what": "limon suyu"
+   },
+   {
+    "id": 169230,
+    "g": 10,
+    "what": "sarımsak"
+   },
+   {
+    "id": 171413,
+    "g": 30,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 174158,
+    "g": 60,
+    "what": "haşlama suyu"
+   },
+   {
+    "id": 170923,
+    "g": 3,
+    "what": "kimyon"
+   }
+  ]
+ },
+ {
+  "key": "fava",
+  "tr": "Fava",
+  "aliases": [
+   "fava meze",
+   "bakla ezmesi"
+  ],
+  "serving_g": 80,
+  "items": [
+   {
+    "id": 173753,
+    "g": 400,
+    "what": "kuru bakla (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 171413,
+    "g": 80,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 172233,
+    "g": 15,
+    "what": "dereotu"
+   },
+   {
+    "id": 167747,
+    "g": 20,
+    "what": "limon suyu"
+   },
+   {
+    "id": 169655,
+    "g": 5,
+    "what": "şeker"
+   },
+   {
+    "id": 174158,
+    "g": 100,
+    "what": "su"
+   }
+  ]
+ },
+ {
+  "key": "patlican_salatasi",
+  "tr": "Patlıcan salatası",
+  "aliases": [
+   "közlenmiş patlıcan salatası",
+   "köz patlıcan"
+  ],
+  "serving_g": 120,
+  "items": [
+   {
+    "id": 169229,
+    "g": 500,
+    "what": "patlıcan (közlenmiş)"
+   },
+   {
+    "id": 170457,
+    "g": 100,
+    "what": "domates"
+   },
+   {
+    "id": 170427,
+    "g": 80,
+    "what": "biber"
+   },
+   {
+    "id": 169230,
+    "g": 8,
+    "what": "sarımsak"
+   },
+   {
+    "id": 170416,
+    "g": 20,
+    "what": "maydanoz"
+   },
+   {
+    "id": 171413,
+    "g": 40,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 20,
+    "what": "limon suyu"
+   },
+   {
+    "id": 172237,
+    "g": 10,
+    "what": "sirke"
+   }
+  ],
+  "note": "Közlenmiş patlıcan yerine haşlanmış patlıcan değeri kullanıldı."
+ },
+ {
+  "key": "gavurdagi_salatasi",
+  "tr": "Gavurdağı salatası",
+  "aliases": [
+   "gavurdağı",
+   "cevizli domates salatası"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 170457,
+    "g": 400,
+    "what": "domates"
+   },
+   {
+    "id": 170000,
+    "g": 100,
+    "what": "soğan"
+   },
+   {
+    "id": 170427,
+    "g": 100,
+    "what": "sivri biber"
+   },
+   {
+    "id": 170416,
+    "g": 50,
+    "what": "maydanoz"
+   },
+   {
+    "id": 170187,
+    "g": 60,
+    "what": "ceviz"
+   },
+   {
+    "id": 171413,
+    "g": 40,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167787,
+    "g": 30,
+    "what": "nar ekşisi"
+   },
+   {
+    "id": 167747,
+    "g": 15,
+    "what": "limon suyu"
+   }
+  ],
+  "note": "Nar ekşisi yerine nar suyu ile hesaplandı."
+ },
+ {
+  "key": "babagannus",
+  "tr": "Babagannuş",
+  "aliases": [
+   "baba ganuş",
+   "tahinli patlıcan"
+  ],
+  "serving_g": 80,
+  "items": [
+   {
+    "id": 169229,
+    "g": 500,
+    "what": "patlıcan (közlenmiş)"
+   },
+   {
+    "id": 170191,
+    "g": 60,
+    "what": "tahin"
+   },
+   {
+    "id": 169230,
+    "g": 8,
+    "what": "sarımsak"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   },
+   {
+    "id": 171413,
+    "g": 20,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 170416,
+    "g": 10,
+    "what": "maydanoz"
+   }
+  ],
+  "note": "Közlenmiş patlıcan yerine haşlanmış patlıcan değeri kullanıldı."
+ },
+ {
+  "key": "yogurtlu_semizotu",
+  "tr": "Yoğurtlu semizotu",
+  "aliases": [
+   "semizotu salatası",
+   "semizotu"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 169274,
+    "g": 300,
+    "what": "semizotu"
+   },
+   {
+    "id": 171284,
+    "g": 300,
+    "what": "yoğurt"
+   },
+   {
+    "id": 169230,
+    "g": 8,
+    "what": "sarımsak"
+   },
+   {
+    "id": 171413,
+    "g": 15,
+    "what": "zeytinyağı"
+   }
+  ]
+ },
+ {
+  "key": "pancar_salatasi",
+  "tr": "Pancar salatası",
+  "aliases": [
+   "kırmızı pancar salatası",
+   "pancar"
+  ],
+  "serving_g": 120,
+  "items": [
+   {
+    "id": 169146,
+    "g": 500,
+    "what": "pancar (haşlanmış)"
+   },
+   {
+    "id": 169230,
+    "g": 5,
+    "what": "sarımsak"
+   },
+   {
+    "id": 171413,
+    "g": 30,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 172237,
+    "g": 20,
+    "what": "sirke"
+   }
+  ]
+ },
+ {
+  "key": "havuc_tarator",
+  "tr": "Havuç tarator",
+  "aliases": [
+   "yoğurtlu havuç",
+   "havuçlu yoğurt mezesi"
+  ],
+  "serving_g": 100,
+  "items": [
+   {
+    "id": 170393,
+    "g": 400,
+    "what": "havuç (rendelenmiş)"
+   },
+   {
+    "id": 171413,
+    "g": 30,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 171284,
+    "g": 300,
+    "what": "yoğurt"
+   },
+   {
+    "id": 169230,
+    "g": 8,
+    "what": "sarımsak"
+   }
+  ]
+ },
+ {
+  "key": "yogurtlu_kabak",
+  "tr": "Yoğurtlu kabak",
+  "aliases": [
+   "kabak tarator",
+   "yoğurtlu kabak mezesi"
+  ],
+  "serving_g": 120,
+  "items": [
+   {
+    "id": 169291,
+    "g": 500,
+    "what": "kabak (rendelenmiş)"
+   },
+   {
+    "id": 171413,
+    "g": 20,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 171284,
+    "g": 300,
+    "what": "yoğurt"
+   },
+   {
+    "id": 169230,
+    "g": 8,
+    "what": "sarımsak"
+   },
+   {
+    "id": 172233,
+    "g": 10,
+    "what": "dereotu"
+   }
+  ]
+ },
+ {
+  "key": "rus_salatasi",
+  "tr": "Rus salatası",
+  "aliases": [
+   "amerikan salatası",
+   "mayonezli salata"
+  ],
+  "serving_g": 120,
+  "items": [
+   {
+    "id": 170438,
+    "g": 300,
+    "what": "patates (haşlanmış)"
+   },
+   {
+    "id": 170393,
+    "g": 150,
+    "what": "havuç"
+   },
+   {
+    "id": 170017,
+    "g": 150,
+    "what": "bezelye (haşlanmış)"
+   },
+   {
+    "id": 168558,
+    "g": 150,
+    "what": "kornişon turşu"
+   },
+   {
+    "id": 171009,
+    "g": 150,
+    "what": "mayonez"
+   },
+   {
+    "id": 171284,
+    "g": 150,
+    "what": "yoğurt"
+   }
+  ]
+ },
+ {
+  "key": "patates_salatasi",
+  "tr": "Patates salatası",
+  "aliases": [
+   "zeytinyağlı patates salatası"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 170438,
+    "g": 800,
+    "what": "patates (haşlanmış)"
+   },
+   {
+    "id": 170005,
+    "g": 80,
+    "what": "yeşil soğan"
+   },
+   {
+    "id": 170416,
+    "g": 40,
+    "what": "maydanoz"
+   },
+   {
+    "id": 171413,
+    "g": 60,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   },
+   {
+    "id": 170932,
+    "g": 2,
+    "what": "pul biber"
+   }
+  ]
+ },
+ {
+  "key": "yesil_mercimek_salatasi",
+  "tr": "Yeşil mercimek salatası",
+  "aliases": [
+   "mercimek salatası"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 172421,
+    "g": 400,
+    "what": "yeşil mercimek (haşlanmış)"
+   },
+   {
+    "id": 170000,
+    "g": 80,
+    "what": "soğan"
+   },
+   {
+    "id": 170457,
+    "g": 150,
+    "what": "domates"
+   },
+   {
+    "id": 168409,
+    "g": 100,
+    "what": "salatalık"
+   },
+   {
+    "id": 170416,
+    "g": 40,
+    "what": "maydanoz"
+   },
+   {
+    "id": 171413,
+    "g": 40,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 167747,
+    "g": 30,
+    "what": "limon suyu"
+   }
+  ]
+ },
+ {
+  "key": "muhammara",
+  "tr": "Muhammara",
+  "aliases": [
+   "cevizli biber",
+   "acuka",
+   "cevizli biber ezmesi"
+  ],
+  "serving_g": 50,
+  "items": [
+   {
+    "id": 169373,
+    "g": 29,
+    "what": "biber salçası (kuru kırmızı biber kısmı)"
+   },
+   {
+    "id": 174158,
+    "g": 71,
+    "what": "biber salçası (su kısmı)"
+   },
+   {
+    "id": 170187,
+    "g": 150,
+    "what": "ceviz"
+   },
+   {
+    "id": 174924,
+    "g": 60,
+    "what": "ekmek içi"
+   },
+   {
+    "id": 171413,
+    "g": 50,
+    "what": "zeytinyağı"
+   },
+   {
+    "id": 169230,
+    "g": 10,
+    "what": "sarımsak"
+   },
+   {
+    "id": 170923,
+    "g": 3,
+    "what": "kimyon"
+   },
+   {
+    "id": 167787,
+    "g": 30,
+    "what": "nar ekşisi"
+   }
+  ],
+  "note": "Nar ekşisi yerine nar suyu ile hesaplandı. Salça, USDA'da olmadığı için kuru domates/biber tozu + su olarak hesaplandı."
+ },
+ {
+  "key": "muhallebi",
+  "tr": "Muhallebi",
+  "aliases": [
+   "sütlü muhallebi",
+   "pirinç unlu muhallebi"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 171265,
+    "g": 1000,
+    "what": "süt"
+   },
+   {
+    "id": 169655,
+    "g": 150,
+    "what": "şeker"
+   },
+   {
+    "id": 169714,
+    "g": 60,
+    "what": "pirinç unu"
+   },
+   {
+    "id": 169698,
+    "g": 30,
+    "what": "nişasta"
+   }
+  ]
+ },
+ {
+  "key": "kazandibi",
+  "tr": "Kazandibi",
+  "aliases": [
+   "kazan dibi"
+  ],
+  "serving_g": 120,
+  "items": [
+   {
+    "id": 171265,
+    "g": 1000,
+    "what": "süt"
+   },
+   {
+    "id": 169655,
+    "g": 180,
+    "what": "şeker"
+   },
+   {
+    "id": 169714,
+    "g": 50,
+    "what": "pirinç unu"
+   },
+   {
+    "id": 169698,
+    "g": 40,
+    "what": "nişasta"
+   },
+   {
+    "id": 168894,
+    "g": 20,
+    "what": "un"
+   },
+   {
+    "id": 173430,
+    "g": 20,
+    "what": "tereyağı"
+   }
+  ]
+ },
+ {
+  "key": "irmik_helvasi",
+  "tr": "İrmik helvası",
+  "aliases": [
+   "sütlü irmik helvası",
+   "irmik helva"
+  ],
+  "serving_g": 100,
+  "items": [
+   {
+    "id": 169715,
+    "g": 250,
+    "what": "irmik"
+   },
+   {
+    "id": 173430,
+    "g": 100,
+    "what": "tereyağı"
+   },
+   {
+    "id": 169655,
+    "g": 250,
+    "what": "şeker"
+   },
+   {
+    "id": 171265,
+    "g": 500,
+    "what": "süt"
+   },
+   {
+    "id": 174158,
+    "g": 100,
+    "what": "su"
+   },
+   {
+    "id": 170591,
+    "g": 30,
+    "what": "çam fıstığı"
+   }
+  ],
+  "note": "Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "un_helvasi",
+  "tr": "Un helvası",
+  "aliases": [
+   "un helva"
+  ],
+  "serving_g": 80,
+  "items": [
+   {
+    "id": 168894,
+    "g": 250,
+    "what": "un"
+   },
+   {
+    "id": 173430,
+    "g": 150,
+    "what": "tereyağı"
+   },
+   {
+    "id": 169655,
+    "g": 250,
+    "what": "şeker"
+   },
+   {
+    "id": 174158,
+    "g": 250,
+    "what": "su"
+   }
+  ],
+  "note": "Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "revani",
+  "tr": "Revani",
+  "aliases": [
+   "şerbetli revani",
+   "irmikli revani"
+  ],
+  "serving_g": 80,
+  "items": [
+   {
+    "id": 169715,
+    "g": 170,
+    "what": "irmik"
+   },
+   {
+    "id": 168894,
+    "g": 120,
+    "what": "un"
+   },
+   {
+    "id": 169655,
+    "g": 150,
+    "what": "şeker (hamur)"
+   },
+   {
+    "id": 171287,
+    "g": 200,
+    "what": "yumurta"
+   },
+   {
+    "id": 171284,
+    "g": 150,
+    "what": "yoğurt"
+   },
+   {
+    "id": 171025,
+    "g": 100,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 172804,
+    "g": 10,
+    "what": "kabartma tozu"
+   },
+   {
+    "id": 169655,
+    "g": 400,
+    "what": "şeker (şerbet)"
+   },
+   {
+    "id": 174158,
+    "g": 350,
+    "what": "şerbet suyu"
+   }
+  ],
+  "note": "Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "asure",
+  "tr": "Aşure",
+  "aliases": [
+   "aşure tatlısı",
+   "aşura"
+  ],
+  "serving_g": 200,
+  "items": [
+   {
+    "id": 169720,
+    "g": 250,
+    "what": "aşurelik buğday (kuru)"
+   },
+   {
+    "id": 174158,
+    "g": 1800,
+    "what": "su"
+   },
+   {
+    "id": 169655,
+    "g": 400,
+    "what": "şeker"
+   },
+   {
+    "id": 173757,
+    "g": 200,
+    "what": "nohut (haşlanmış)"
+   },
+   {
+    "id": 175203,
+    "g": 200,
+    "what": "kuru fasulye (haşlanmış)"
+   },
+   {
+    "id": 173941,
+    "g": 150,
+    "what": "kuru kayısı"
+   },
+   {
+    "id": 174665,
+    "g": 150,
+    "what": "kuru incir"
+   },
+   {
+    "id": 168166,
+    "g": 100,
+    "what": "kuru üzüm"
+   },
+   {
+    "id": 170187,
+    "g": 80,
+    "what": "ceviz"
+   },
+   {
+    "id": 169134,
+    "g": 50,
+    "what": "nar"
+   }
+  ],
+  "note": "Yaklaşık tarif. Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "kabak_tatlisi",
+  "tr": "Kabak tatlısı",
+  "aliases": [
+   "balkabağı tatlısı",
+   "cevizli kabak tatlısı"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 168448,
+    "g": 1000,
+    "what": "balkabağı"
+   },
+   {
+    "id": 169655,
+    "g": 250,
+    "what": "şeker"
+   },
+   {
+    "id": 170187,
+    "g": 50,
+    "what": "ceviz"
+   }
+  ],
+  "note": "Kaymak/tahin dahil değil."
+ },
+ {
+  "key": "keskul",
+  "tr": "Keşkül",
+  "aliases": [
+   "bademli muhallebi",
+   "keşkül tatlısı"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 171265,
+    "g": 1000,
+    "what": "süt"
+   },
+   {
+    "id": 170567,
+    "g": 100,
+    "what": "badem (çekilmiş)"
+   },
+   {
+    "id": 169655,
+    "g": 180,
+    "what": "şeker"
+   },
+   {
+    "id": 169714,
+    "g": 40,
+    "what": "pirinç unu"
+   },
+   {
+    "id": 169698,
+    "g": 30,
+    "what": "nişasta"
+   },
+   {
+    "id": 172184,
+    "g": 34,
+    "what": "yumurta sarısı"
+   }
+  ]
+ },
+ {
+  "key": "ayva_tatlisi",
+  "tr": "Ayva tatlısı",
+  "aliases": [
+   "fırında ayva tatlısı"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 168163,
+    "g": 1000,
+    "what": "ayva"
+   },
+   {
+    "id": 169655,
+    "g": 300,
+    "what": "şeker"
+   },
+   {
+    "id": 174158,
+    "g": 150,
+    "what": "su"
+   },
+   {
+    "id": 171321,
+    "g": 1,
+    "what": "karanfil"
+   }
+  ],
+  "note": "Kaymak dahil değil. Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "supangle",
+  "tr": "Supangle",
+  "aliases": [
+   "kakaolu puding",
+   "çikolatalı muhallebi"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 171265,
+    "g": 1000,
+    "what": "süt"
+   },
+   {
+    "id": 169655,
+    "g": 200,
+    "what": "şeker"
+   },
+   {
+    "id": 169593,
+    "g": 40,
+    "what": "kakao"
+   },
+   {
+    "id": 168894,
+    "g": 40,
+    "what": "un"
+   },
+   {
+    "id": 169698,
+    "g": 30,
+    "what": "nişasta"
+   },
+   {
+    "id": 173430,
+    "g": 30,
+    "what": "tereyağı"
+   }
+  ]
+ },
+ {
+  "key": "zerde",
+  "tr": "Zerde",
+  "aliases": [
+   "safranlı zerde",
+   "zerde tatlısı"
+  ],
+  "serving_g": 150,
+  "items": [
+   {
+    "id": 168880,
+    "g": 400,
+    "what": "pirinç (pişmiş)"
+   },
+   {
+    "id": 174158,
+    "g": 1000,
+    "what": "su"
+   },
+   {
+    "id": 169655,
+    "g": 350,
+    "what": "şeker"
+   },
+   {
+    "id": 169698,
+    "g": 30,
+    "what": "nişasta"
+   },
+   {
+    "id": 170934,
+    "g": 1,
+    "what": "safran"
+   },
+   {
+    "id": 170591,
+    "g": 20,
+    "what": "çam fıstığı"
+   },
+   {
+    "id": 171724,
+    "g": 20,
+    "what": "kuş üzümü"
+   }
+  ]
+ },
+ {
+  "key": "sekerpare",
+  "tr": "Şekerpare",
+  "aliases": [
+   "şekerpare tatlısı",
+   "şerbetli kurabiye"
+  ],
+  "serving_g": 60,
+  "items": [
+   {
+    "id": 168894,
+    "g": 300,
+    "what": "un"
+   },
+   {
+    "id": 169715,
+    "g": 50,
+    "what": "irmik"
+   },
+   {
+    "id": 173430,
+    "g": 125,
+    "what": "tereyağı"
+   },
+   {
+    "id": 169656,
+    "g": 100,
+    "what": "pudra şekeri"
+   },
+   {
+    "id": 171287,
+    "g": 50,
+    "what": "yumurta"
+   },
+   {
+    "id": 172804,
+    "g": 10,
+    "what": "kabartma tozu"
+   },
+   {
+    "id": 170567,
+    "g": 20,
+    "what": "badem"
+   },
+   {
+    "id": 169655,
+    "g": 400,
+    "what": "şeker (şerbet)"
+   },
+   {
+    "id": 174158,
+    "g": 300,
+    "what": "şerbet suyu"
+   }
+  ],
+  "note": "Pişirmede buharlaşan suyun bir kısmı tarifteki sudan düşüldü."
+ },
+ {
+  "key": "un_kurabiyesi",
+  "tr": "Un kurabiyesi",
+  "aliases": [
+   "ağızda dağılan kurabiye",
+   "tereyağlı kurabiye"
+  ],
+  "serving_g": 30,
+  "items": [
+   {
+    "id": 168894,
+    "g": 400,
+    "what": "un"
+   },
+   {
+    "id": 173430,
+    "g": 250,
+    "what": "tereyağı"
+   },
+   {
+    "id": 169656,
+    "g": 120,
+    "what": "pudra şekeri"
+   }
+  ]
+ },
+ {
+  "key": "islak_kek",
+  "tr": "Islak kek",
+  "aliases": [
+   "kakaolu ıslak kek",
+   "brownie kek"
+  ],
+  "serving_g": 80,
+  "items": [
+   {
+    "id": 168894,
+    "g": 250,
+    "what": "un"
+   },
+   {
+    "id": 169655,
+    "g": 250,
+    "what": "şeker (kek)"
+   },
+   {
+    "id": 171287,
+    "g": 150,
+    "what": "yumurta"
+   },
+   {
+    "id": 171265,
+    "g": 200,
+    "what": "süt (kek)"
+   },
+   {
+    "id": 171025,
+    "g": 150,
+    "what": "ayçiçek yağı"
+   },
+   {
+    "id": 169593,
+    "g": 40,
+    "what": "kakao (kek)"
+   },
+   {
+    "id": 172804,
+    "g": 10,
+    "what": "kabartma tozu"
+   },
+   {
+    "id": 171265,
+    "g": 200,
+    "what": "süt (sos)"
+   },
+   {
+    "id": 169655,
+    "g": 100,
+    "what": "şeker (sos)"
+   },
+   {
+    "id": 169593,
+    "g": 20,
+    "what": "kakao (sos)"
+   }
+  ]
+ }
+]

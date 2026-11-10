@@ -1,14 +1,14 @@
 # AYK+ beslenme geliştirme planı (v14–v18)
 
-Kayıt tarihi: 9 Kasım 2026. Durum: **10 Kasım 2026'da ONAYLANDI. 5 paket tek seferde yapılıp birlikte gönderilecek** (her paket ayrı commit + ayrı test, hepsi geçince tek push).
+Kayıt tarihi: 9 Kasım 2026. Durum: **TAMAMLANDI (10 Kasım 2026).** Onaylandığı gibi 5 paket tek seferde yapıldı ve birlikte gönderildi (her paket ayrı commit + ayrı test, hepsi geçince tek push).
 
 ## İlerleme
 - [x] 1. paket (v14) — commit "AYK+ v14: ..."
 - [x] 2. paket (v15) — commit "AYK+ v15: ..." (madde 6 çiğ↔pişmiş yapılmadı, kullanıcı kararı)
 - [x] 3. paket (v16) — madde 8 ve 10 (madde 9 yapılmadı, kullanıcı kararı)
 - [x] 4. paket (v17)
-- [ ] 5. paket (v18)
-- [ ] Hepsi bitince tek push (main)
+- [x] 5. paket (v18) — 1.825 besin (124 tarif) + uygulamanın 89 besini; tam liste docs/besin-veritabani-listesi.csv
+- [x] Hepsi bitince tek push (main)
 
 ## Kullanıcının kararları (10 Kasım 2026)
 1. v13 zaten yayında (git kuruldu, main'e gönderildi).
