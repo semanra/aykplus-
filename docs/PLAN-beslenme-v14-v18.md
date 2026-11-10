@@ -2,6 +2,14 @@
 
 Kayıt tarihi: 9 Kasım 2026. Durum: **10 Kasım 2026'da ONAYLANDI. 5 paket tek seferde yapılıp birlikte gönderilecek** (her paket ayrı commit + ayrı test, hepsi geçince tek push).
 
+## İlerleme
+- [x] 1. paket (v14) — commit "AYK+ v14: ..."
+- [x] 2. paket (v15) — commit "AYK+ v15: ..." (madde 6 çiğ↔pişmiş yapılmadı, kullanıcı kararı)
+- [ ] 3. paket (v16) — madde 8 ve 10 (madde 9 yapılmayacak)
+- [ ] 4. paket (v17)
+- [ ] 5. paket (v18)
+- [ ] Hepsi bitince tek push (main)
+
 ## Kullanıcının kararları (10 Kasım 2026)
 1. v13 zaten yayında (git kuruldu, main'e gönderildi).
 2. **Bugün'deki değişiklikler yalnızca o günü etkiler**; menü yalnızca "Menüye de kaydet" seçilince değişir. ONAYLANDI.

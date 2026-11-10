@@ -142,6 +142,14 @@ function normalizeState(raw) {
     if (!Array.isArray(a)) { s.dayPlan[k] = null; return; }
     a.forEach(m => { if (!Array.isArray(m.items)) m.items = []; });
   });
+  // v15: komboalar, alışveriş listesi
+  if (!Array.isArray(s.combos)) s.combos = [];
+  s.combos = s.combos.filter(c => c && typeof c === "object" && Array.isArray(c.items)).map(c => ({
+    id: String(c.id || "combo_" + Math.random().toString(36).slice(2, 9)), name: String(c.name || "Kombo").slice(0, 40),
+    items: c.items.filter(i => i && i.foodId && num(i.amount, 0) > 0).map(i => ({ foodId: String(i.foodId), amount: num(i.amount, 0) }))
+  }));
+  if (!s.shopChecked || typeof s.shopChecked !== "object" || Array.isArray(s.shopChecked)) s.shopChecked = {};
+  if (!(Number.isInteger(s.shopTrainDays) && s.shopTrainDays >= 0 && s.shopTrainDays <= 7)) s.shopTrainDays = null;
   if (!["today", "program", "library", "history"].includes(s.gymView)) s.gymView = "today";
   if (!["today", "menus", "foods", "history"].includes(s.nutriView)) s.nutriView = "today";
   s.settings.nutriLight = !!s.settings.nutriLight;
@@ -251,7 +259,7 @@ function openModal(id) {
 function closeModal(id) { const m = $(id); m.classList.add("hidden"); m.classList.remove("flex"); }
 document.addEventListener("click", e => {
   const t = e.target;
-  if (t && t.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "settingsModal", "exSheet", "mealModal"].includes(t.id)) closeModal(t.id);
+  if (t && t.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "settingsModal", "exSheet", "mealModal", "shopModal"].includes(t.id)) closeModal(t.id);
 });
 
 // Temalı onay / metin penceresi. Sonuç: onay → true (veya yazılan metin), vazgeç → null.
@@ -427,10 +435,13 @@ function archiveDay(dateKey) {
     water: state.waterLiters || 0,
     mealsDone: dm.filter(m => m.done).length, mealsTotal: dm.length,
     supps: state.supplementList.filter(x => sup[x.id]).length, dayType: state.dayType,
-    calTarget: getTargets().calTarget, proTarget: getTargets().proTarget
+    calTarget: getTargets().calTarget, proTarget: getTargets().proTarget,
+    // v15: "Dünkü öğünü tekrarla" için öğünlerin içeriği (yalnızca son 7 gün saklanır)
+    meals: dm.map(m => ({ id: m.id, title: m.title, items: clone(m.items) }))
   };
   const keys = Object.keys(state.dailyLogs).sort();
   while (keys.length > 180) delete state.dailyLogs[keys.shift()];
+  keys.slice(0, Math.max(0, keys.length - 7)).forEach(k => { if (state.dailyLogs[k]) delete state.dailyLogs[k].meals; });
 }
 
 function resetDaily() {
@@ -958,11 +969,14 @@ function renderTodayMeals() {
           <span class="text-[13px] font-semibold n-muted tabular-nums w-10 text-right shrink-0">${Math.round(mac.cal)}</span>
         </div>`;
     }).join("");
+    const last1 = editing ? lastDayMealFor(meal) : null;
     const editPanel = editing ? `<div class="pt-2 n-bt space-y-2" data-edit-panel="${mIdx}">
         <div class="text-[12px] n-muted">Buradaki değişiklikler yalnızca bugünü etkiler; menün aynı kalır.</div>
         <div class="grid grid-cols-2 gap-2">
           <button onclick="halfMeal(${mIdx})" class="n-btn-ghost h-11 rounded-full text-[13px]">½ Yarısını yedim</button>
           <button onclick="openFreeMeal(${mIdx})" class="n-btn-ghost h-11 rounded-full text-[13px]">Dışarıda yedim</button>
+          ${last1 ? `<button onclick="repeatLastMeal(${mIdx})" class="n-btn-ghost h-11 rounded-full text-[13px] flex items-center justify-center gap-1.5" data-repeat="${mIdx}">${svgI("repeat", 16)}${dayLabelShort(last1.key)} gibi</button>` : ""}
+          <button onclick="saveMealAsCombo(${mIdx}, 'day')" class="n-btn-ghost h-11 rounded-full text-[13px] flex items-center justify-center gap-1.5 ${last1 ? "" : "col-span-2"}">${svgI("star", 16)}Kombo kaydet</button>
         </div>
       </div>` : "";
     const headOpen = meal.done && !editing;
@@ -1333,7 +1347,8 @@ function renderMenus() {
           <button onclick="quickAdd(${mIdx}, 'yesil_salata', 1)" class="n-chip">+ Salata</button>
           <button onclick="quickAdd(${mIdx}, 'ceviz', 20)" class="n-chip">+20 g Ceviz</button>
         </div>
-        <div class="flex items-center justify-end gap-1.5 pt-2 n-bt">
+        <div class="flex flex-wrap items-center justify-end gap-1.5 pt-2 n-bt">
+          <button onclick="saveMealAsCombo(${mIdx}, 'menu')" class="n-btn-ghost w-11 h-11 shrink-0 rounded-full flex items-center justify-center" aria-label="${esc(meal.title)}: kombo olarak kaydet">${svgI("star", 18)}</button>
           <button onclick="openMealModal(${mIdx})" class="n-btn-ghost w-11 h-11 shrink-0 rounded-full flex items-center justify-center" aria-label="${esc(meal.title)} öğününü düzenle">${svgI("edit", 18)}</button>
           <button onclick="copyMeal(${mIdx})" class="n-btn-ghost h-11 px-4 shrink-0 whitespace-nowrap rounded-full text-[13px] flex items-center gap-1.5">${svgI("copy", 16)}${copyLabel}</button>
           <button onclick="deleteMeal(${mIdx})" class="n-btn-ghost w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(meal.title)} öğününü sil">${svgI("trash", 18)}</button>
@@ -1384,6 +1399,8 @@ function renderFoods() {
   const db = getFoodDB();
   const cats = [];
   if (state.recentFoods.some(id => db[id])) cats.push(["recent", "Son kullanılanlar"]);
+  if (state.combos.length) cats.push(["combos", "Komboların"]);
+  if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", "Tariflerim"]);
   if (Object.keys(state.customFoods).length) cats.push(["custom", "Özel eklediklerim"]);
   [...new Set(Object.values(BASE_FOOD_DB).map(f => f.cat || "Diğer"))].forEach(c => cats.push([foodCatKey(c), stripEmoji(c)]));
   if (!cats.some(c => c[0] === foodUI.cat)) foodUI.cat = "all";
@@ -1426,6 +1443,12 @@ function renderFoodHead() {
 }
 
 function foodSelMacros() {
+  if (foodUI.sel && String(foodUI.sel).startsWith("combo:")) {
+    const c = state.combos.find(x => "combo:" + x.id === foodUI.sel);
+    if (!c) return null;
+    const t = itemsTotals(c.items);
+    return { combo: true, f: null, a: 1, p: t.p, c: t.c, fat: t.f, cal: t.cal };
+  }
   const f = foodUI.sel && getFoodDB()[foodUI.sel];
   if (!f) return null;
   const a = num(foodUI.amt, 0);
@@ -1448,7 +1471,18 @@ function renderFoodList() {
   const q = normSearch($("foodSearch").value).trim();
   const words = q.split(/\s+/).filter(Boolean);
   let ids;
+  // v15: komboalar ("Komboların" kategorisinde ve aramada adıyla eşleşenler)
+  let comboHtml = "";
+  if (foodUI.cat === "combos" || (foodUI.cat === "all" && words.length)) {
+    comboHtml = state.combos.filter(c => !words.length || words.every(w => normSearch(c.name).includes(w))).map(comboRowHtml).join("");
+  }
+  if (foodUI.cat === "combos") {
+    $("foodList").innerHTML = comboHtml || `<div class="text-[14px] n-muted text-center py-8">Henüz kombon yok. Bir öğünü açıp ★ Kombo olarak kaydedebilirsin.</div>`;
+    updateFoodSelUI();
+    return;
+  }
   if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id]);
+  else if (foodUI.cat === "recipes") ids = Object.keys(state.customFoods).filter(id => id.startsWith("custom_recipe_") && db[id]);
   else if (foodUI.cat === "custom") ids = Object.keys(state.customFoods).filter(id => db[id]);
   else if (foodUI.cat.startsWith("c:")) ids = Object.keys(db).filter(id => foodCatKey(db[id].cat) === foodUI.cat);
   else ids = Object.keys(db);
@@ -1496,14 +1530,14 @@ function renderFoodList() {
           </div>` : ""}
       </div>`;
   }).join("");
-  $("foodList").innerHTML = html || `<div class="text-[14px] n-muted text-center py-8">Sonuç bulunamadı. Barkod okutabilir ya da özel besin tanımlayabilirsin.</div>`;
+  $("foodList").innerHTML = (comboHtml + html) || `<div class="text-[14px] n-muted text-center py-8">Sonuç bulunamadı. Barkod okutabilir ya da özel besin tanımlayabilirsin.</div>`;
   updateFoodSelUI();
 }
 
 // Seçili besinin canlı değerleri (tam yeniden çizim yapmadan; iPhone'da klavye kapanmasın)
 function updateFoodSelUI() {
   const s = foodSelMacros();
-  if (s && $("foodSelKcal")) {
+  if (s && !s.combo && $("foodSelKcal")) {
     const tIdx = foodTargetIdx();
     $("foodSelKcal").textContent = fmtInt(s.cal);
     $("foodSelP").textContent = `${fmtNum(s.p)} g P`;
@@ -4196,7 +4230,12 @@ const ICON = {
   minus: "M5 12h14", trash: "M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13", play: "M7 4.5v15l12.5-7.5z", share: "M12 3v12M7 8l5-5 5 5M5 14v6h14v-6",
   search: "M11 4.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM20 20l-4-4",
   grip: "M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01", user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5",
-  x: "M6 6l12 12M18 6L6 18", copy: "M9 9h11v11H9zM15 9V4H4v11h5", chevD: "M6 9l6 6 6-6"
+  x: "M6 6l12 12M18 6L6 18", copy: "M9 9h11v11H9zM15 9V4H4v11h5", chevD: "M6 9l6 6 6-6",
+  // v15
+  star: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
+  cart: "M3 4h2.2l2.3 10.5h10.3l2.1-7.5H6.4M9.5 20a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4zM17 20a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4z",
+  pot: "M4 10h16v5.5a4.5 4.5 0 0 1-4.5 4.5h-7A4.5 4.5 0 0 1 4 15.5zM2 10h20M9 6.5c0-1.2 1.2-1.3 1.2-2.5M14 6.5c0-1.2 1.2-1.3 1.2-2.5",
+  repeat: "M17 2.5l3 3-3 3M4 11.5v-2a4 4 0 0 1 4-4h12M7 21.5l-3-3 3-3M20 12.5v2a4 4 0 0 1-4 4H4"
 };
 function svgI(name, size = 20, sw = 2) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICON[name]}"></path></svg>`;
@@ -4774,6 +4813,7 @@ let cfEditId = null;
 function editCustomFood(id) {
   const f = state.customFoods[id];
   if (!f) return;
+  if (f.recipe) { openRecipeModal(id); return; }
   closeModal("pickerModal");
   cfEditId = id;
   $("cfTitle").textContent = "✎ Özel Besini Düzenle";
@@ -4808,6 +4848,350 @@ function deleteCustomFood(id) {
   closeModal("pickerModal");
   renderAll();
   offerUndo(`🗑️ ${f.name} silindi`);
+}
+
+// ============================================================================
+// v15 — MUTFAK: kombo, tarif, dünkü öğünü tekrarla, haftalık alışveriş listesi
+// ============================================================================
+
+// Öğeleri bir öğüne ekler; aynı besin zaten varsa miktarları toplar (ham/saklanan miktar)
+function mergeItems(meal, items) {
+  const db = getFoodDB();
+  items.forEach(it => {
+    if (it.est) { meal.items.push(clone(it)); return; }
+    if (!db[it.foodId]) return;
+    const ex = meal.items.find(i => !i.est && i.foodId === it.foodId);
+    if (ex) ex.amount = round1(num(ex.amount) + num(it.amount));
+    else meal.items.push({ foodId: it.foodId, amount: num(it.amount) });
+  });
+}
+function itemsTotals(items) {
+  let p = 0, c = 0, f = 0, cal = 0;
+  items.forEach(i => { if (!i.est && !getFoodDB()[i.foodId]) return; const x = calcItemMacros(i); p += x.p; c += x.c; f += x.f; cal += x.cal; });
+  return { p, c, f, cal };
+}
+// "2. Öğün: Öğle Yemeği" → "Öğle Yemeği"
+function mealTitleBody(m) {
+  const t = String(m.title || "");
+  const i = t.indexOf(":");
+  return (i > 0 && i <= 16 ? t.slice(i + 1) : t).trim() || t;
+}
+
+// ---------------------------------------------------------------------------
+// KOMBO: bir öğünün besinleri "Favori Kase" gibi kaydedilir, tek dokunuşla eklenir
+// ---------------------------------------------------------------------------
+function saveMealAsCombo(mIdx, dest) {
+  const list = dest === "day" ? dayMeals() : curMeals();
+  const m = list[mIdx];
+  if (!m) return;
+  const db = getFoodDB();
+  const items = m.items.filter(i => !i.est && db[i.foodId]).map(i => ({ foodId: i.foodId, amount: num(i.amount) }));
+  if (!items.length) { alert("Bu öğünde kombo olarak kaydedilecek besin yok."); return; }
+  const name = prompt("Kombonun adı (örn: Favori Kase):", mealTitleBody(m).slice(0, 40));
+  if (name === null) return;
+  const nm = name.trim().slice(0, 40) || "Kombo";
+  state.combos.push({ id: "combo_" + Date.now().toString(36), name: nm, items });
+  renderAll();
+  toast(`★ "${nm}" kombo olarak kaydedildi (Besinler → Komboların)`);
+}
+function selectCombo(id) {
+  foodUI.sel = "combo:" + id;
+  renderFoodHead();
+  renderFoodList();
+  const el = $("comboSelCard");
+  if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+function addComboToMeal(id) {
+  const c = state.combos.find(x => x.id === id);
+  const tIdx = foodTargetIdx();
+  if (!c || tIdx < 0) return;
+  const day = foodUI.dest !== "menu";
+  const list = day ? ensureDayCopy() : curMeals();
+  const meal = list[tIdx];
+  mergeItems(meal, c.items);
+  foodUI.sel = null;
+  renderAll();
+  const mid = meal.id;
+  toast(`✓ ${c.name} → ${meal.title}${day ? " (yalnızca bugün)" : " (menü)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+    const mm = curMeals().find(x => x.id === mid);
+    if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
+    mergeItems(mm, c.items);
+    renderAll();
+    toast(`✓ Menüdeki "${mm.title}" öğününe de eklendi`);
+  } } : null);
+}
+function deleteCombo(id) {
+  const i = state.combos.findIndex(c => c.id === id);
+  if (i < 0) return;
+  snapshot();
+  const c = state.combos.splice(i, 1)[0];
+  foodUI.sel = null;
+  renderAll();
+  offerUndo(`🗑️ "${c.name}" kombosu silindi`);
+}
+function comboRowHtml(c) {
+  const db = getFoodDB();
+  const t = itemsTotals(c.items);
+  const names = c.items.filter(i => db[i.foodId]).map(i => stripEmoji(db[i.foodId].name).replace(/^⭐\s*/, "")).join(", ");
+  if (foodUI.sel === "combo:" + c.id) {
+    const rows = c.items.map(i => {
+      const f = db[i.foodId];
+      if (!f) return "";
+      return `<div class="flex items-center justify-between gap-2 py-1.5 text-[14px]"><span class="min-w-0 truncate">${esc(f.name)}</span><span class="n-muted whitespace-nowrap tabular-nums">${fmtNum(effAmount(i))} ${esc(f.unit)} · ${Math.round(calcItemMacros(i).cal)} kcal</span></div>`;
+    }).join("");
+    const tIdx = foodTargetIdx();
+    return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3 my-2" id="comboSelCard" data-combo="${esc(c.id)}">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(c.name)}</h3><div class="text-[12px] n-muted">Kombo · ${c.items.length} besin</div></div>
+          <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[28px] leading-none tabular-nums">${fmtInt(t.cal)}</span><span class="text-[12px] n-muted ml-1">kcal</span>
+            <div class="text-[12px] font-semibold tabular-nums">${macroLine(t.p, t.c, t.f)}</div></div>
+        </div>
+        <div class="n-div">${rows}</div>
+        <button id="comboAddBtn" onclick='addComboToMeal(${esc(JSON.stringify(c.id))})' class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}>${tIdx < 0 ? "Önce bir öğün oluştur" : `Öğüne ekle · ${fmtInt(t.cal)} kcal`}</button>
+        <div class="flex justify-end pt-1 n-bt">
+          <button onclick='deleteCombo(${esc(JSON.stringify(c.id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}Komboyu sil</button>
+        </div>
+      </div>`;
+  }
+  return `<button onclick='selectCombo(${esc(JSON.stringify(c.id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-combo="${esc(c.id)}">
+      <span class="min-w-0"><span class="flex items-center gap-1.5 text-[15px] font-bold leading-snug"><span class="n-accent shrink-0">${svgI("star", 16, 2)}</span><span class="truncate">${esc(c.name)}</span></span>
+        <span class="block text-[12px] n-muted mt-0.5 truncate">${fmtInt(t.cal)} kcal · ${Math.round(t.p)} g protein · ${esc(names)}</span></span>
+      <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
+    </button>`;
+}
+
+// ---------------------------------------------------------------------------
+// TARİF: malzemeler + pişmiş toplam ağırlık → 100 g makroları; tek besin olarak kaydedilir
+// ---------------------------------------------------------------------------
+let rcp = { id: null, items: [] };
+function openRecipeModal(editId) {
+  const f = editId && state.customFoods[editId];
+  const isRec = !!(f && f.recipe);
+  rcp = { id: isRec ? editId : null, items: isRec ? clone(f.recipe.items) : [] };
+  $("rcTitle").textContent = isRec ? "Tarifi düzenle" : "Yeni tarif";
+  $("rcName").value = isRec ? stripEmoji(f.name) : "";
+  $("rcCooked").value = isRec ? fmtNum(f.recipe.cooked) : "";
+  closeModal("pickerModal");
+  renderRecipe();
+  openModal("recipeModal");
+}
+function recipeTotals() {
+  const db = getFoodDB();
+  let p = 0, c = 0, f = 0, cal = 0, raw = 0;
+  rcp.items.forEach(i => {
+    const fd = db[i.foodId];
+    if (!fd) return;
+    const a = num(i.amount, 0);
+    p += fd.p * a; c += fd.c * a; f += fd.f * a; cal += kcalPerUnit(fd) * a;
+    if (isScalable(fd)) raw += a;
+  });
+  return { p, c, f, cal, raw };
+}
+function renderRecipe() {
+  const db = getFoodDB();
+  $("rcItems").innerHTML = rcp.items.map((it, i) => {
+    const fd = db[it.foodId];
+    if (!fd) return "";
+    return `<div class="flex items-center gap-1.5 py-1.5" data-rc-item="${i}">
+        <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(fd.name)}</div><div id="rcK${i}" class="text-[12px] n-muted tabular-nums">${Math.round(kcalPerUnit(fd) * num(it.amount))} kcal</div></div>
+        <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(fd.name)} miktarı" />
+        <span class="text-[11px] n-muted w-10 min-w-0 truncate">${esc(fd.unit)}</span>
+        <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(fd.name)} çıkar">${svgI("x", 18, 2.2)}</button>
+      </div>`;
+  }).join("") || `<p class="text-[13px] n-dim py-2">Henüz malzeme yok. Aşağıdan ekle.</p>`;
+  updateRecipeSummary();
+}
+function rcAmount(i, v) {
+  const it = rcp.items[i];
+  if (!it) return;
+  it.amount = Math.max(0, num(v, 0));
+  const fd = getFoodDB()[it.foodId];
+  if (fd && $("rcK" + i)) $("rcK" + i).textContent = `${Math.round(kcalPerUnit(fd) * it.amount)} kcal`;
+  updateRecipeSummary();
+}
+function rcRemove(i) { rcp.items.splice(i, 1); renderRecipe(); }
+function updateRecipeSummary() {
+  const t = recipeTotals();
+  const cooked = num($("rcCooked").value, 0);
+  $("rcCooked").placeholder = t.raw > 0 ? `çiğ malzemeler toplam ${fmtInt(t.raw)} g` : "örn: 1200";
+  const per = cooked > 0 ? 100 / cooked : 0;
+  $("rcSum").innerHTML = `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">Tarifin tamamı</span><strong class="tabular-nums">${fmtInt(t.cal)} kcal · ${macroLine(t.p, t.c, t.f)}</strong></div>`
+    + (cooked > 0
+      ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">Pişmiş 100 g</span><strong class="tabular-nums n-accent">${fmtInt(t.cal * per)} kcal</strong></div>
+         <div class="text-right text-[12px] font-semibold tabular-nums">${macroLine(t.p * per, t.c * per, t.f * per, true)}</div>`
+      : `<div class="text-[12px] n-dim mt-1">100 g değerlerini hesaplamam için pişmiş toplam ağırlığı yaz.</div>`);
+}
+function rcAddIngredient() {
+  const db = getFoodDB();
+  const cats = {};
+  Object.keys(db).forEach(id => {
+    if (id === rcp.id) return;
+    const f = db[id];
+    const cat = stripEmoji(f.cat || "Diğer");
+    (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: `${fmtNum(f.def)} ${f.unit} · ${Math.round(kcalPerUnit(f) * num(f.def, 1))} kcal` });
+  });
+  const groups = Object.keys(cats).map(c => ({ label: c, short: c.replace(/\s*[&/].*$/, ""), items: cats[c] }));
+  // Seçici, tarif penceresinin üstünde açılır; seçince tarif penceresi yerinde kalır
+  openPicker("Malzeme ekle", groups, it => {
+    const f = getFoodDB()[it.id];
+    const ex = rcp.items.find(x => x.foodId === it.id);
+    if (ex) ex.amount = round1(num(ex.amount) + num(f.def, 1)); else rcp.items.push({ foodId: it.id, amount: num(f.def, 1) });
+    renderRecipe();
+  });
+}
+function saveRecipe() {
+  const name = $("rcName").value.trim().slice(0, 50);
+  if (!name) { alert("Lütfen tarifin adını yaz."); return; }
+  if (!rcp.items.length) { alert("En az bir malzeme ekle."); return; }
+  const cooked = num($("rcCooked").value, 0);
+  if (!(cooked > 0) || cooked > 30000) { alert("Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş)."); return; }
+  const t = recipeTotals();
+  const id = rcp.id || "custom_recipe_" + Date.now().toString(36);
+  const editing = !!rcp.id;
+  state.customFoods[id] = {
+    name: "🍲 " + name, cat: "🍲 Tariflerim", unit: "g", step: 10, def: Math.max(10, Math.min(250, Math.round(cooked))),
+    p: t.p / cooked, c: t.c / cooked, f: t.f / cooked, kcal: t.cal / cooked,
+    recipe: { items: rcp.items.filter(i => num(i.amount) > 0).map(i => ({ foodId: i.foodId, amount: num(i.amount) })), cooked }
+  };
+  closeModal("recipeModal");
+  toast(editing ? `✓ ${name} tarifi güncellendi` : `🍲 ${name} tarifi besin listene eklendi`);
+  renderAll();
+  if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") { foodUI.cat = "recipes"; renderFoods(); selectFood(id); }
+}
+
+// ---------------------------------------------------------------------------
+// DÜNKÜ ÖĞÜNÜ TEKRARLA: son arşivlenen günde aynı öğünün içeriğini bugüne kopyalar
+// ---------------------------------------------------------------------------
+function lastDayMealFor(meal) {
+  const keys = Object.keys(state.dailyLogs).filter(k => k < dayKey() && Array.isArray(state.dailyLogs[k].meals)).sort().reverse();
+  if (!keys.length) return null;
+  const k = keys[0];
+  const ms = state.dailyLogs[k].meals;
+  const m = ms.find(x => x.id === meal.id) || ms.find(x => x.title === meal.title);
+  if (!m || !Array.isArray(m.items)) return null;
+  const db = getFoodDB();
+  const items = m.items.filter(i => i && (i.est || db[i.foodId]));
+  return items.length ? { key: k, items } : null;
+}
+function dayLabelShort(k) {
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  if (k === todayStr(y)) return "Dünkü";
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
+  return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }) + " günkü" : "Önceki";
+}
+function repeatLastMeal(mIdx) {
+  const cur = dayMeals()[mIdx];
+  const r = cur && lastDayMealFor(cur);
+  if (!r) return;
+  snapshot();
+  const c = ensureDayCopy();
+  const m = c[mIdx];
+  m.items = clone(r.items);
+  openEditMeals.delete(m.id);
+  renderAll();
+  offerUndo(`↻ ${shortMealTitle(m)}: ${dayLabelShort(r.key).toLocaleLowerCase("tr")} öğün tekrarlandı (yalnızca bugün)`);
+}
+
+// ---------------------------------------------------------------------------
+// HAFTALIK ALIŞVERİŞ LİSTESİ: antrenman menüsü × antrenman günü + dinlenme menüsü × kalan günler
+// Tarifler malzemelerine açılır. Gösterilen miktarlar kiloya göre gramaj dahil (yediğin kadar).
+// ---------------------------------------------------------------------------
+function shopTrainDays() {
+  const n = state.shopTrainDays;
+  return Number.isInteger(n) && n >= 0 && n <= 7 ? n : Math.max(0, Math.min(7, state.workoutDays.length));
+}
+function shopList() {
+  const db = getFoodDB();
+  const acc = {};
+  const expand = (id, amt, depth) => {
+    const f = db[id];
+    if (!f || !(amt > 0)) return;
+    if (f.recipe && depth < 4 && num(f.recipe.cooked, 0) > 0) {
+      const k = amt / num(f.recipe.cooked);
+      f.recipe.items.forEach(ri => expand(ri.foodId, num(ri.amount) * k, depth + 1));
+      return;
+    }
+    acc[id] = (acc[id] || 0) + amt;
+  };
+  const nT = shopTrainDays(), nR = 7 - nT;
+  [[state.meals, nT], [state.restMeals, nR]].forEach(([ms, n]) => {
+    if (!n) return;
+    ms.forEach(m => m.items.forEach(i => { if (!i.est) expand(i.foodId, effAmount(i) * n, 0); }));
+  });
+  return Object.keys(acc).map(id => ({ id, f: db[id], amt: acc[id] }))
+    .sort((a, b) => stripEmoji(a.f.cat || "").localeCompare(stripEmoji(b.f.cat || ""), "tr") || stripEmoji(a.f.name).localeCompare(stripEmoji(b.f.name), "tr"));
+}
+function fmtShopAmt(f, a) {
+  if (f.unit === "g") return a >= 1000 ? fmtKg(round2(a / 1000)) + " kg" : (Math.ceil(a / 10) * 10) + " g";
+  if (f.unit === "ml") return a >= 1000 ? fmtKg(round2(a / 1000)) + " L" : (Math.ceil(a / 10) * 10) + " ml";
+  if (f.unit === "adet") return Math.ceil(a - 1e-9) + " adet";
+  return fmtNum(Math.ceil(a * 2 - 1e-9) / 2) + " " + f.unit;
+}
+function shopName(f) { return stripEmoji(f.name).replace(/^⭐\s*/, ""); }
+function openShopList() { renderShopList(); openModal("shopModal"); }
+function setShopDays(d) {
+  state.shopTrainDays = Math.max(0, Math.min(7, shopTrainDays() + d));
+  renderAll();
+  renderShopList();
+}
+function toggleShop(id) {
+  if (state.shopChecked[id]) delete state.shopChecked[id]; else state.shopChecked[id] = true;
+  saveState();
+  renderShopList();
+}
+function clearShopChecks() { state.shopChecked = {}; saveState(); renderShopList(); }
+function renderShopList() {
+  const list = shopList();
+  const nT = shopTrainDays();
+  $("shopDays").innerHTML = `<div class="flex items-center justify-between gap-2">
+      <div class="min-w-0"><div class="text-[14px] font-bold">Antrenman günü</div><div class="text-[12px] n-muted">Haftanın kalan ${7 - nT} günü dinlenme menüsü</div></div>
+      <div class="flex items-center gap-1 shrink-0">
+        <button onclick="setShopDays(-1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="Antrenman gününü azalt">${svgI("minus", 18, 2.4)}</button>
+        <span id="shopDaysVal" class="t-display text-[24px] w-8 text-center tabular-nums">${nT}</span>
+        <button onclick="setShopDays(1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="Antrenman gününü artır">${svgI("plus", 18, 2.4)}</button>
+      </div>
+    </div>`;
+  let lastCat = null;
+  $("shopItems").innerHTML = list.length ? list.map(r => {
+    const cat = stripEmoji(r.f.cat || "Diğer");
+    const on = !!state.shopChecked[r.id];
+    const head = cat !== lastCat ? `<div class="n-label pt-3 pb-1">${esc(cat.toLocaleUpperCase("tr"))}</div>` : "";
+    lastCat = cat;
+    return head + `<label class="flex items-center gap-3 min-h-[48px] py-1 cursor-pointer n-bb" data-shop="${esc(r.id)}">
+        <input type="checkbox" class="n-check shrink-0" ${on ? "checked" : ""} onchange='toggleShop(${esc(JSON.stringify(r.id))})' aria-label="${esc(shopName(r.f))} alındı" />
+        <span class="flex-1 min-w-0 text-[15px] font-semibold ${on ? "line-through n-dim" : ""}">${esc(shopName(r.f))}</span>
+        <span class="shrink-0 text-[14px] font-bold tabular-nums ${on ? "line-through n-dim" : ""}">${esc(fmtShopAmt(r.f, r.amt))}</span>
+      </label>`;
+  }).join("") : `<p class="text-[14px] n-muted text-center py-6">Menülerinde besin yok.</p>`;
+  const left = list.filter(r => !state.shopChecked[r.id]).length;
+  $("shopCount").textContent = list.length ? `${left} / ${list.length} ürün alınacak` : "";
+}
+function shopText() {
+  const list = shopList();
+  const left = list.filter(r => !state.shopChecked[r.id]);
+  const rows = (left.length ? left : list).map(r => `• ${shopName(r.f)} — ${fmtShopAmt(r.f, r.amt)}`);
+  const nT = shopTrainDays();
+  return `AYK+ alışveriş listesi (7 gün: ${nT} antrenman, ${7 - nT} dinlenme)\n` + rows.join("\n");
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (e2) { ok = false; }
+    ta.remove();
+    return ok;
+  }
+}
+async function copyShopList() {
+  const ok = await copyText(shopText());
+  toast(ok ? "📋 Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin." : "Kopyalanamadı; Paylaş düğmesini dene.", ok ? "ok" : "error");
+}
+async function shareShopList() {
+  try { await navigator.share({ title: "Alışveriş listesi", text: shopText() }); }
+  catch (e) { if (e && e.name !== "AbortError") copyShopList(); }
 }
 
 // ---------------------------------------------------------------------------
