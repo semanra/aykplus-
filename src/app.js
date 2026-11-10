@@ -233,6 +233,7 @@ const USDA_DB = (() => {
       if (x.o) f.portions = x.o;
       if (x.x) f.kx = x.x;
       if (x.t) f.note = x.t;
+      if (x.z) f.hidden = 1;   // v20: pişmiş hâl — listede gösterilmez, menüde kullanılıyorsa çalışır
       out[id] = f;
     });
   } catch (e) { console.error(e); }
@@ -272,6 +273,9 @@ function getFoodDB() {
   return _fdb;
 }
 function invalidateFoodDB() { foodDbVer++; }
+// v20: Gizli besinler (pişmiş hâller, eski listedeki tekrarlar) ve bulunamayanlar arama/liste/seçici/önerilerde gösterilmez;
+// menüde kullanılıyorsa hesaplanmaya devam eder.
+function isHiddenFood(f) { return !!(f && (f._lost || f.hidden)); }
 // Kullanılan her besinin değerleri yedeklenir (her renderAll'da; yalnızca değişince yazılır)
 function foodRefIds() {
   const ids = new Set();
@@ -832,14 +836,20 @@ const SWAP_GROUPS = [
   ["badem", "ceviz", "findik", "kaju", "yer_fistigi", "kabak_cekirdegi", "fistik_ezmesi"],
   ["brokoli_karnabahar", "ispanak_kabak", "domates_salatalik"]
 ];
-function swapGroup(foodId) { return SWAP_GROUPS.find(g => g.includes(foodId)) || null; }
+// v20: gizlenen eski kayıt yerine listede kalan karşılığı (data.js "replace") kullanılır
+function swapVisibleId(id) {
+  const db = getFoodDB(), f = db[id];
+  return f && f.hidden && f.replace && db[f.replace] && !isHiddenFood(db[f.replace]) ? f.replace : id;
+}
+function swapGroup(foodId) { return SWAP_GROUPS.find(g => g.includes(foodId) || g.some(id => swapVisibleId(id) === foodId)) || null; }
 function swapOptions(item) {
   const db = getFoodDB();
   const g = swapGroup(item.foodId);
   const f0 = db[item.foodId];
   if (!g || !f0) return [];
   const kcal0 = kcalPerUnit(f0) * effAmount(item);
-  return g.filter(id => id !== item.foodId && db[id]).map(id => {
+  const self = swapVisibleId(item.foodId);
+  return [...new Set(g.map(swapVisibleId))].filter(id => id !== item.foodId && id !== self && db[id] && !isHiddenFood(db[id])).map(id => {
     const f = db[id];
     const eff = Math.max(5, Math.round(kcal0 / kcalPerUnit(f) / 5) * 5);
     return { id, f, eff, kcal: Math.round(kcalPerUnit(f) * eff), p: f.p * eff, c: f.c * eff, fat: f.f * eff };
@@ -1507,7 +1517,7 @@ function renderFoods() {
   $("foodMealChips").innerHTML = meals.map((m, i) => `<button onclick="setFoodMeal(${i})" class="n-chip ${i === tIdx ? "solid" : ""} max-w-[220px]" aria-pressed="${i === tIdx}"><span class="truncate">${esc(m.time ? m.time + " · " + m.title : m.title)}</span></button>`).join("");
   const db = getFoodDB();
   const cats = [];
-  if (state.recentFoods.some(id => db[id] && !db[id]._lost)) cats.push(["recent", "Son kullanılanlar"]);
+  if (state.recentFoods.some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["recent", "Son kullanılanlar"]);
   if (state.combos.length) cats.push(["combos", "Komboların"]);
   if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", "Tariflerim"]);
   if (Object.keys(state.customFoods).length) cats.push(["custom", "Özel eklediklerim"]);
@@ -1600,11 +1610,11 @@ function renderFoodList() {
     updateFoodSelUI();
     return;
   }
-  if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id] && !db[id]._lost);
+  if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id] && !isHiddenFood(db[id]));
   else if (foodUI.cat === "recipes") ids = Object.keys(state.customFoods).filter(id => id.startsWith("custom_recipe_") && db[id]);
   else if (foodUI.cat === "custom") ids = Object.keys(state.customFoods).filter(id => db[id]);
-  else if (foodUI.cat.startsWith("c:")) ids = Object.keys(db).filter(id => !db[id]._lost && foodCatKey(db[id].cat) === foodUI.cat);
-  else ids = Object.keys(db).filter(id => !db[id]._lost);
+  else if (foodUI.cat.startsWith("c:")) ids = Object.keys(db).filter(id => !isHiddenFood(db[id]) && foodCatKey(db[id].cat) === foodUI.cat);
+  else ids = Object.keys(db).filter(id => !isHiddenFood(db[id]));
   // v18: akıllı arama (Türkçe karakter, kelime sırası, eş anlamlı, küçük yazım hatası) + sıralama
   if (words.length) ids = searchFoods(ids, q);
   else if (foodUI.cat === "all") ids = rankBrowse(ids);
@@ -2192,7 +2202,7 @@ function openFoodPicker(mIdx) {
   const cats = {};
   Object.keys(db).forEach(id => {
     const f = db[id];
-    if (f._lost) return;
+    if (isHiddenFood(f)) return;
     const cat = f.cat || "Diğer";
     (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: sub(f), customId: id.startsWith("custom_") ? id : null });
   });
@@ -5211,7 +5221,7 @@ function rcAddIngredient() {
   Object.keys(db).forEach(id => {
     if (id === rcp.id) return;
     const f = db[id];
-    if (f._lost) return;
+    if (isHiddenFood(f)) return;
     const cat = stripEmoji(f.cat || "Diğer");
     (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: `${fmtNum(f.def)} ${f.unit} · ${Math.round(kcalPerUnit(f) * num(f.def, 1))} kcal` });
   });
@@ -5391,7 +5401,7 @@ async function shareShopList() {
 function frequentFoods(limit = 30) {
   const db = getFoodDB();
   const cnt = {};
-  const bump = (id, w) => { if (id && id !== "_est" && db[id] && !db[id]._lost) cnt[id] = (cnt[id] || 0) + w; };
+  const bump = (id, w) => { if (id && id !== "_est" && db[id] && !isHiddenFood(db[id])) cnt[id] = (cnt[id] || 0) + w; };
   allMealLists().forEach(ms => ms.forEach(m => m.items.forEach(i => bump(i.foodId, 1))));
   (state.combos || []).forEach(c => c.items.forEach(i => bump(i.foodId, 1)));
   state.recentFoods.forEach((id, i) => bump(id, 2 - i * 0.1));
@@ -5659,7 +5669,7 @@ function searchIndex() {
   _sIdx = {};
   Object.keys(db).forEach(id => {
     const f = db[id];
-    if (f._lost) return;
+    if (isHiddenFood(f)) return;
     const name = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
     const extra = normSearch((f.aliases || []).join(" ") + " " + stripEmoji(f.cat || ""));
     const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(t => t.length > 1);

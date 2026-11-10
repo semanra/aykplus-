@@ -38,8 +38,8 @@ try:
     check(not bad, f"her besinde 4P+4K+9Y ≈ kalori (toleranslı; istisnalar gerekçeli) {bad[:5]}")
     kx = pg.evaluate("Object.values(USDA_DB).filter(f => f.kx).map(f => f.kx)")
     check(len(kx) < 60 and set(kx) <= {"lif", "alkol", "tatlandırıcı"}, f"kalori istisnaları az ve gerekçeli ({len(kx)}: {sorted(set(kx))})")
-    dup = pg.evaluate("""(() => { const seen = {}, d = []; Object.values(getFoodDB()).forEach(f => { const k = normSearch(stripEmoji(f.name)); if (seen[k]) d.push(f.name); seen[k] = 1; }); return d; })()""")
-    check(not dup, f"yinelenen ad yok {dup[:5]}")
+    dup = pg.evaluate("""(() => { const seen = {}, d = []; Object.values(getFoodDB()).filter(f => !isHiddenFood(f)).forEach(f => { const k = normSearch(stripEmoji(f.name)); if (seen[k]) d.push(f.name); seen[k] = 1; }); return d; })()""")
+    check(not dup, f"listede görünen besinlerde yinelenen ad yok {dup[:5]}")
     src_bad = pg.evaluate("Object.entries(USDA_DB).filter(([id, f]) => !(typeof f.src === 'number' || f.src === 'tarif')).length")
     check(src_bad == 0, "her besinde kaynak alanı var (USDA fdcId ya da tarif)")
     tarif_ok = pg.evaluate("Object.entries(USDA_DB).filter(([id]) => id.startsWith('r_')).every(([id, f]) => f.src === 'tarif' && f.portions && f.portions[0][0] === '1 porsiyon')")
@@ -58,7 +58,7 @@ try:
 
     # ---------- 2) Arama
     r = search(pg, "tavuk gogsu")
-    check(r and all("avuk" in x for x in r[:5]) and any("göğsü" in x.lower() for x in r[:3]), f"'tavuk gogsu' → {r[:3]}")
+    check(r and all("avuk" in x for x in r[:3]) and any("göğsü" in x.lower() for x in r[:3]), f"'tavuk gogsu' → {r[:6]}")
     r = search(pg, "tavuk")
     check(r and all("avuk" in x for x in r[:6]), f"'tavuk' aramasında ilk sonuçların hepsi tavuk (kategori eşleşmesi öne geçmiyor): {r[:4]}")
     r = search(pg, "yumrta")

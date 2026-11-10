@@ -16,7 +16,7 @@ DROP = {171549, 169636, 168443}                     # jambonlu çorba; aynı ür
 RENAME = {
     170884: "Milkshake, vanilyalı (yoğun)", 173226: "Milkshake, vanilyalı (fast food)",
     168944: "Tam buğday unu (yumuşak buğday)",
-    170187: "Ceviz içi (USDA ölçümü)", 169640: "Bal (USDA ölçümü)",   # uygulamanın kendi listesinde aynı adlı kayıt var
+    170187: "Ceviz içi", 169640: "Bal",   # v20: uygulamanın eski listesindeki aynı adlı kayıtlar gizlendi (data.js hidden)
     173459: "Süt bazlı protein tozu (hazır karışım)", 173460: "Süt bazlı protein tozu, light (hazır karışım)",
 }
 
@@ -86,8 +86,10 @@ def portions_for(f):
 def r4(x): return round(x, 4)
 foods, names = {}, {}
 # Uygulamanın kendi listesindeki (src/data.js) adlarla da çakışmasın
-for m in re.finditer(r'name:\s*"([^"]+)"', open(os.path.join(REPO, "src", "data.js"), encoding="utf-8").read()):
-    names[norm(re.sub(r"^\W+", "", m.group(1)))] = "data.js"
+for line in open(os.path.join(REPO, "src", "data.js"), encoding="utf-8").read().splitlines():
+    m = re.search(r'name:\s*"([^"]+)"', line)
+    if m and "hidden: true" not in line:      # gizli eski kayıtlarla ad çakışması sorun değil
+        names[norm(re.sub(r"^\W+", "", m.group(1)))] = "data.js"
 problems = []
 for path in sorted(glob.glob(os.path.join(HERE, "tr", "tr_[A-Z].json"))):
     for x in json.load(open(path, encoding="utf-8")):
@@ -133,6 +135,42 @@ for x in json.load(open(os.path.join(HERE, "tr", "tr_recipes.json"), encoding="u
     if x.get("note"): e["t"] = x["note"]
     foods["r_" + x["key"]] = e
 
+# v20: Pişmiş hâller listeden GİZLENİR (silinmez; menüde kullanılıyorsa çalışmaya devam eder). Gerekçe: pişirince ağırlık
+# su kaybı/emilimiyle değişir, tutarlı hesap için çiğ (kuru) tartılır. Kavrulmuş kuruyemiş, konserve, şarküteri, ekmek,
+# hazır ürünler ve tarifler kalır (alındığı/yendiği hâliyle tartılır).
+HIDE_CATS = {"Kırmızı et", "Tavuk ve hindi", "Balık ve deniz ürünleri", "Sakatat", "Tahıllar ve makarna", "Baklagiller", "Sebzeler"}
+COOK_RX = re.compile(r"pişmiş|haşlanmış|haşlama|ızgara|fırında|kızartılmış|kızarmış|tavada|kavrulmuş|közlenmiş|buharda|tencerede|"
+                     r"çevirme|mikrodalga|pişirilmiş|hazırlanmış|sote|lapası")
+KEEP_RX = re.compile(r"çiğ|kuru\b|konserve|kavanoz|salamura|turşu|füme|pişmemiş|"
+                     r"hazır|pane|kroket|rösti|dondurulmuş, (fırında|tavada)|tofu, kızartılmış|vegan")   # hazır/dondurulmuş ürünler alındığı gibi
+HIDE_KEEP_IDS = set()      # kurala uyduğu hâlde görünür kalması istenenler (fdcId)
+def raw_key(n, parens=True):
+    n = norm(n)
+    if not parens: n = re.sub(r"\(.*?\)", " ", n)
+    n = re.sub(r"\b(cig|kuru|pismis|haslanmis|haslama|izgara|firinda|kizartilmis|kizarmis|tavada|kavrulmus|kozlenmis|buharda|"
+               r"tencerede|cevirme|mikrodalgada|pisirilmis|hazirlanmis|kisik|ateste|yagda|suyla|soyulup|kabugunda|kabuguyla|kabuklu)\b", " ", n)
+    return " ".join(re.sub(r"[^a-z0-9 ]", " ", n).split())
+raw_by_key, raw_by_key2 = {}, {}
+for k, e in foods.items():
+    if k.startswith("u") and re.search(r"\bçiğ\b|kuru \(çiğ\)|\bkuru\b", e["n"].lower()):
+        raw_by_key.setdefault(raw_key(e["n"]), k)
+        raw_by_key2.setdefault(raw_key(e["n"], False), k)
+hidden_rows = []
+for k, e in foods.items():
+    if not k.startswith("u") or e["c"] not in HIDE_CATS or e["s"] in HIDE_KEEP_IDS: continue
+    nl = e["n"].lower()
+    if COOK_RX.search(nl) and not KEEP_RX.search(nl):
+        e["z"] = 1
+        rk = raw_by_key.get(raw_key(e["n"])) or raw_by_key2.get(raw_key(e["n"], False))
+        hidden_rows.append((k, e["n"], e["c"], "pişmiş hâl (çiğ tartılır)", foods[rk]["n"] if rk else ""))
+# Uygulamanın kendi listesinde gizlenenler (src/data.js: hidden: true, replace: "<yerine>")
+data_txt = open(os.path.join(REPO, "src", "data.js"), encoding="utf-8").read()
+for m in re.finditer(r'^\s*([a-z0-9_]+): \{ name: "([^"]+)", cat: "([^"]+)".*?hidden: true(?:, replace: "([^"]*)")?', data_txt, re.M):
+    rep = m.group(4) or ""
+    if rep and rep not in foods: problems.append(f"data.js {m.group(1)}: yerine gösterilen besin yok ({rep})")
+    hidden_rows.append((m.group(1), m.group(2), m.group(3), "uygulamanın eski listesinde tekrar" if rep and "pişmiş" not in m.group(2).lower() else "pişmiş hâl (çiğ tartılır)",
+                        foods[rep]["n"] if rep in foods else ""))
+
 # v19: Yayındaki bir besin kimliği ASLA kaybolmamalı (kullanıcının menüsünde olabilir; uygulama "⚠" ile eski değerleri
 # gösterir ama bu bir yedektir, çözüm değildir). Bir besini bilerek kaldırmak gerekirse kimliği ALLOW_REMOVE'a yazılır.
 ALLOW_REMOVE = set()
@@ -160,6 +198,12 @@ with open(out, "w", encoding="utf-8") as o:
     o.write("const USDA_FOODS = ")
     json.dump(foods, o, ensure_ascii=False, separators=(",", ":"))
     o.write(";\n")
+import csv
+with open(os.path.join(REPO, "docs", "gizlenen-besinler.csv"), "w", encoding="utf-8-sig", newline="") as o:
+    w = csv.writer(o, delimiter=";")
+    w.writerow(["kimlik", "gizlenen besin", "kategori", "neden", "listede kalan karşılığı"])
+    for r in sorted(hidden_rows, key=lambda r: (r[2], r[1])): w.writerow(r)
+print(f"gizlenen: {sum(1 for v in foods.values() if v.get('z'))} veritabanı + {sum(1 for r in hidden_rows if not r[0].startswith('u'))} eski liste · görünen: {sum(1 for v in foods.values() if not v.get('z'))}")
 print(f"✓ foods.js: {len(foods)} besin ({sum(1 for k in foods if k.startswith('r_'))} tarif) · {os.path.getsize(out) // 1024} KB")
 for c, n in cats.most_common(): print(f"  {n:4d} {c}")
 print("kalori istisnası:", collections.Counter(v.get("x") for v in foods.values() if v.get("x")))

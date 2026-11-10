@@ -998,7 +998,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v19</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v20</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -1030,33 +1030,33 @@
 // 1. ZENGİN BESİN VERİTABANI
 // ============================================================================
 const BASE_FOOD_DB = {
-  tam_yumurta: { name: "Tam Yumurta (L Boy)", cat: "Protein & Kahvaltı", unit: "adet", step: 1, def: 3, p: 6.3, c: 0.4, f: 5.0 },
-  yumurta_beyazi: { name: "Yumurta Beyazı", cat: "Protein & Kahvaltı", unit: "adet", step: 1, def: 4, p: 3.6, c: 0.2, f: 0.0 },
+  tam_yumurta: { name: "Tam Yumurta (L Boy)", cat: "Protein & Kahvaltı", unit: "adet", step: 1, def: 3, p: 6.3, c: 0.4, f: 5.0, hidden: true, replace: "u171287" },
+  yumurta_beyazi: { name: "Yumurta Beyazı", cat: "Protein & Kahvaltı", unit: "adet", step: 1, def: 4, p: 3.6, c: 0.2, f: 0.0, hidden: true, replace: "u172183" },
   whey_shake: { name: "Whey Protein Shake (Su ile)", cat: "Protein & Kahvaltı", unit: "ölçek", step: 0.5, def: 1, p: 24.0, c: 2.0, f: 1.5 },
   lor_peyniri: { name: "Lor Peyniri / Az Yağlı Beyaz Peynir", cat: "Protein & Kahvaltı", unit: "g", step: 25, def: 100, p: 0.18, c: 0.02, f: 0.02 },
   hindi_fume: { name: "Hindi Füme", cat: "Protein & Kahvaltı", unit: "g", step: 20, def: 60, p: 0.18, c: 0.02, f: 0.02 },
-  suzme_yogurt: { name: "Süzme Yoğurt (Az Yağlı)", cat: "Protein & Kahvaltı", unit: "g", step: 50, def: 150, p: 0.10, c: 0.04, f: 0.015 },
+  suzme_yogurt: { name: "Süzme Yoğurt (Az Yağlı)", cat: "Protein & Kahvaltı", unit: "g", step: 50, def: 150, p: 0.10, c: 0.04, f: 0.015, hidden: true, replace: "u170903" },
   kefir: { name: "Sade Kefir", cat: "Protein & Kahvaltı", unit: "ml", step: 50, def: 250, p: 0.032, c: 0.04, f: 0.02 },
 
-  tavuk_gogsu: { name: "Tavuk Göğsü (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.23, c: 0.0, f: 0.015 },
+  tavuk_gogsu: { name: "Tavuk Göğsü (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.23, c: 0.0, f: 0.015, hidden: true, replace: "u171077" },
   tavuk_incik: { name: "Tavuk Kalça / İncik (Derisiz Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.19, c: 0.0, f: 0.06 },
-  hindi_gogsu: { name: "Hindi Göğsü (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.24, c: 0.0, f: 0.01 },
+  hindi_gogsu: { name: "Hindi Göğsü (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.24, c: 0.0, f: 0.01, hidden: true, replace: "u174515" },
   dana_kiyma: { name: "Yağsız Dana Kıyma / Biftek (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 200, p: 0.21, c: 0.0, f: 0.06 },
-  somon: { name: "Somon Balığı (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 180, p: 0.20, c: 0.0, f: 0.11 },
-  ton_baligi: { name: "Ton Balığı (Süzülmüş)", cat: "Et / Tavuk / Balık", unit: "g", step: 20, def: 120, p: 0.25, c: 0.0, f: 0.01 },
+  somon: { name: "Somon Balığı (Çiğ)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 180, p: 0.20, c: 0.0, f: 0.11, hidden: true, replace: "u175167" },
+  ton_baligi: { name: "Ton Balığı (Süzülmüş)", cat: "Et / Tavuk / Balık", unit: "g", step: 20, def: 120, p: 0.25, c: 0.0, f: 0.01, hidden: true, replace: "u171986" },
 
-  yulaf: { name: "Yulaf Ezmesi", cat: "Karbonhidratlar", unit: "g", step: 10, def: 80, p: 0.13, c: 0.60, f: 0.07 },
+  yulaf: { name: "Yulaf Ezmesi", cat: "Karbonhidratlar", unit: "g", step: 10, def: 80, p: 0.13, c: 0.60, f: 0.07, hidden: true, replace: "u173904" },
   pirinc: { name: "Baldo / Yasemin Pirinç (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 10, def: 90, p: 0.07, c: 0.78, f: 0.005 },
   basmati: { name: "Basmati Pirinç (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 10, def: 90, p: 0.08, c: 0.77, f: 0.006 },
   makarna_tam: { name: "Tam Buğday / Durum Makarna (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 10, def: 85, p: 0.12, c: 0.72, f: 0.018 },
   bulgur: { name: "Pilavlık Bulgur / Karabuğday (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 10, def: 85, p: 0.12, c: 0.70, f: 0.015 },
-  patates: { name: "Fırın / Haşlama Patates (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 50, def: 300, p: 0.02, c: 0.18, f: 0.001 },
-  tatli_patates: { name: "Tatlı Patates (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 50, def: 250, p: 0.016, c: 0.20, f: 0.001 },
+  patates: { name: "Fırın / Haşlama Patates (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 50, def: 300, p: 0.02, c: 0.18, f: 0.001, hidden: true, replace: "u170026" },
+  tatli_patates: { name: "Tatlı Patates (Çiğ)", cat: "Karbonhidratlar", unit: "g", step: 50, def: 250, p: 0.016, c: 0.20, f: 0.001, hidden: true, replace: "u168482" },
   tam_bugday_ekmek: { name: "Tam Buğday / Ekşi Mayalı Ekmek", cat: "Karbonhidratlar", unit: "dilim", step: 1, def: 2, p: 2.7, c: 14.0, f: 0.6 },
   lavas: { name: "Tam Buğday Lavaş", cat: "Karbonhidratlar", unit: "adet", step: 1, def: 1, p: 5.0, c: 28.0, f: 1.5 },
   pirinc_patlagi: { name: "Pirinç Patlağı", cat: "Karbonhidratlar", unit: "adet", step: 1, def: 4, p: 0.8, c: 7.0, f: 0.2 },
-  pirinc_unu: { name: "Pirinç Unu / Cream of Rice", cat: "Karbonhidratlar", unit: "g", step: 10, def: 60, p: 0.06, c: 0.80, f: 0.01 },
-  muz: { name: "Muz (Orta Boy)", cat: "Karbonhidratlar", unit: "adet", step: 0.5, def: 1, p: 1.3, c: 25.0, f: 0.4 },
+  pirinc_unu: { name: "Pirinç Unu / Cream of Rice", cat: "Karbonhidratlar", unit: "g", step: 10, def: 60, p: 0.06, c: 0.80, f: 0.01, hidden: true, replace: "u169714" },
+  muz: { name: "Muz (Orta Boy)", cat: "Karbonhidratlar", unit: "adet", step: 0.5, def: 1, p: 1.3, c: 25.0, f: 0.4, hidden: true, replace: "u173944" },
   yesil_elma: { name: "Yeşil Elma / Porsiyon Meyve", cat: "Karbonhidratlar", unit: "adet", step: 1, def: 1, p: 0.5, c: 18.0, f: 0.2 },
 
   yesil_salata: { name: "Dev Kase Yeşil Salata (Roka, Marul, Maydanoz, Salatalık)", cat: "Yeşillik & Sebzeler", unit: "kase", step: 1, def: 1, p: 2.0, c: 5.0, f: 0.3 },
@@ -1065,22 +1065,22 @@ const BASE_FOOD_DB = {
   domates_salatalik: { name: "Söğüş Domates & Salatalık & Biber", cat: "Yeşillik & Sebzeler", unit: "g", step: 50, def: 200, p: 0.01, c: 0.035, f: 0.002 },
   greens_scoop: { name: "Greens & Superfoods Tozu", cat: "Yeşillik & Sebzeler", unit: "ölçek", step: 1, def: 1, p: 1.0, c: 3.0, f: 0.0 },
 
-  badem: { name: "Çiğ Badem", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.21, c: 0.10, f: 0.50 },
-  ceviz: { name: "Ceviz İçi", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.15, c: 0.07, f: 0.65 },
-  findik: { name: "Çiğ Fındık", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.15, c: 0.10, f: 0.61 },
-  kaju: { name: "Çiğ Kaju", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.18, c: 0.27, f: 0.44 },
-  yer_fistigi: { name: "Kavrulmuş Yer Fıstığı", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.25, c: 0.13, f: 0.49 },
-  kabak_cekirdegi: { name: "Çiğ Kabak Çekirdeği İçi", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 20, p: 0.30, c: 0.10, f: 0.49 },
-  fistik_ezmesi: { name: "Şekersiz Fıstık Ezmesi (%100)", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 20, p: 0.25, c: 0.16, f: 0.50 },
-  avokado: { name: "Avokado (Soyulmuş)", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 25, def: 75, p: 0.02, c: 0.04, f: 0.15 },
-  zeytinyagi: { name: "Soğuk Sıkım Zeytinyağı (5g = 1 Tatlı Kaşığı)", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 10, p: 0.0, c: 0.0, f: 1.0 },
+  badem: { name: "Çiğ Badem", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.21, c: 0.10, f: 0.50, hidden: true, replace: "u170567" },
+  ceviz: { name: "Ceviz İçi", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.15, c: 0.07, f: 0.65, hidden: true, replace: "u170187" },
+  findik: { name: "Çiğ Fındık", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.15, c: 0.10, f: 0.61, hidden: true, replace: "u170581" },
+  kaju: { name: "Çiğ Kaju", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.18, c: 0.27, f: 0.44, hidden: true, replace: "u170162" },
+  yer_fistigi: { name: "Kavrulmuş Yer Fıstığı", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 25, p: 0.25, c: 0.13, f: 0.49, hidden: true, replace: "u173806" },
+  kabak_cekirdegi: { name: "Çiğ Kabak Çekirdeği İçi", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 20, p: 0.30, c: 0.10, f: 0.49, hidden: true, replace: "u170556" },
+  fistik_ezmesi: { name: "Şekersiz Fıstık Ezmesi (%100)", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 20, p: 0.25, c: 0.16, f: 0.50, hidden: true, replace: "u172470" },
+  avokado: { name: "Avokado (Soyulmuş)", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 25, def: 75, p: 0.02, c: 0.04, f: 0.15, hidden: true, replace: "u171705" },
+  zeytinyagi: { name: "Soğuk Sıkım Zeytinyağı (5g = 1 Tatlı Kaşığı)", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "g", step: 5, def: 10, p: 0.0, c: 0.0, f: 1.0, hidden: true, replace: "u171413" },
   zeytin: { name: "Siyah / Yeşil Zeytin", cat: "Kuruyemiş & Sağlıklı Yağlar", unit: "adet", step: 5, def: 10, p: 0.1, c: 0.2, f: 1.0 },
 
   peynirsiz_whopper: { name: "Burger (Peynirsiz / Klasik Etli)", cat: "🍔 Esnek Diyet / Dışarıdan", unit: "adet", step: 1, def: 1, p: 28.0, c: 49.0, f: 32.0 },
   ince_pizza_dilim: { name: "İnce Hamur Pizza (Margarita / Bol Malzemos)", cat: "🍔 Esnek Diyet / Dışarıdan", unit: "dilim", step: 1, def: 2, p: 9.0, c: 22.0, f: 7.5 },
   citir_tavuk_parca: { name: "Çıtır Tavuk Göğüs / Tenders", cat: "🍔 Esnek Diyet / Dışarıdan", unit: "parça", step: 1, def: 3, p: 11.0, c: 9.0, f: 6.0 },
   cig_kofte_durum: { name: "Çiğ Köfte Dürüm (Etsiz / Bol Yeşillikli)", cat: "🍔 Esnek Diyet / Dışarıdan", unit: "adet", step: 1, def: 1, p: 9.0, c: 72.0, f: 8.0 },
-  tavuk_gogsu_pismis: { name: "Tavuk Göğsü (Pişmiş / Izgara)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 150, p: 0.31, c: 0.0, f: 0.036 },
+  tavuk_gogsu_pismis: { name: "Tavuk Göğsü (Pişmiş / Izgara)", cat: "Et / Tavuk / Balık", unit: "g", step: 25, def: 150, p: 0.31, c: 0.0, f: 0.036, hidden: true, replace: "u171077" },
   patates_kizartmasi: { name: "Patates Kızartması (~150g porsiyon)", cat: "🍔 Esnek Diyet / Dışarıdan", unit: "porsiyon", step: 0.5, def: 1, p: 5.0, c: 50.0, f: 22.0 },
   tr_mercimek_corba: { name: "Mercimek Çorbası", cat: "🇹🇷 Türk Mutfağı", unit: "kase", step: 1, def: 1, p: 9, c: 25, f: 4 },
   tr_ezogelin: { name: "Ezogelin Çorbası", cat: "🇹🇷 Türk Mutfağı", unit: "kase", step: 1, def: 1, p: 7, c: 24, f: 4 },
@@ -1098,7 +1098,7 @@ const BASE_FOOD_DB = {
   tr_sucuklu_yumurta: { name: "Sucuklu Yumurta (porsiyon)", cat: "🇹🇷 Türk Mutfağı", unit: "porsiyon", step: 0.5, def: 1, p: 20, c: 2, f: 28 },
   tr_beyaz_peynir: { name: "Beyaz Peynir (Tam Yağlı)", cat: "🇹🇷 Türk Mutfağı", unit: "g", step: 10, def: 50, p: 0.17, c: 0.01, f: 0.21 },
   tr_kasar: { name: "Kaşar Peyniri", cat: "🇹🇷 Türk Mutfağı", unit: "g", step: 10, def: 30, p: 0.26, c: 0.01, f: 0.27 },
-  tr_bal: { name: "Bal", cat: "🇹🇷 Türk Mutfağı", unit: "g", step: 5, def: 15, p: 0.0, c: 0.82, f: 0.0 },
+  tr_bal: { name: "Bal", cat: "🇹🇷 Türk Mutfağı", unit: "g", step: 5, def: 15, p: 0.0, c: 0.82, f: 0.0, hidden: true, replace: "u169640" },
   tr_simit: { name: "Simit", cat: "🇹🇷 Türk Mutfağı", unit: "adet", step: 0.5, def: 1, p: 9, c: 52, f: 7 },
   tr_pogaca: { name: "Poğaça", cat: "🇹🇷 Türk Mutfağı", unit: "adet", step: 1, def: 1, p: 5, c: 30, f: 12 },
   tr_su_boregi: { name: "Su Böreği (dilim ~150g)", cat: "🇹🇷 Türk Mutfağı", unit: "dilim", step: 1, def: 1, p: 13, c: 35, f: 18 },
@@ -1762,6 +1762,7 @@ const USDA_DB = (() => {
       if (x.o) f.portions = x.o;
       if (x.x) f.kx = x.x;
       if (x.t) f.note = x.t;
+      if (x.z) f.hidden = 1;   // v20: pişmiş hâl — listede gösterilmez, menüde kullanılıyorsa çalışır
       out[id] = f;
     });
   } catch (e) { console.error(e); }
@@ -1801,6 +1802,9 @@ function getFoodDB() {
   return _fdb;
 }
 function invalidateFoodDB() { foodDbVer++; }
+// v20: Gizli besinler (pişmiş hâller, eski listedeki tekrarlar) ve bulunamayanlar arama/liste/seçici/önerilerde gösterilmez;
+// menüde kullanılıyorsa hesaplanmaya devam eder.
+function isHiddenFood(f) { return !!(f && (f._lost || f.hidden)); }
 // Kullanılan her besinin değerleri yedeklenir (her renderAll'da; yalnızca değişince yazılır)
 function foodRefIds() {
   const ids = new Set();
@@ -2361,14 +2365,20 @@ const SWAP_GROUPS = [
   ["badem", "ceviz", "findik", "kaju", "yer_fistigi", "kabak_cekirdegi", "fistik_ezmesi"],
   ["brokoli_karnabahar", "ispanak_kabak", "domates_salatalik"]
 ];
-function swapGroup(foodId) { return SWAP_GROUPS.find(g => g.includes(foodId)) || null; }
+// v20: gizlenen eski kayıt yerine listede kalan karşılığı (data.js "replace") kullanılır
+function swapVisibleId(id) {
+  const db = getFoodDB(), f = db[id];
+  return f && f.hidden && f.replace && db[f.replace] && !isHiddenFood(db[f.replace]) ? f.replace : id;
+}
+function swapGroup(foodId) { return SWAP_GROUPS.find(g => g.includes(foodId) || g.some(id => swapVisibleId(id) === foodId)) || null; }
 function swapOptions(item) {
   const db = getFoodDB();
   const g = swapGroup(item.foodId);
   const f0 = db[item.foodId];
   if (!g || !f0) return [];
   const kcal0 = kcalPerUnit(f0) * effAmount(item);
-  return g.filter(id => id !== item.foodId && db[id]).map(id => {
+  const self = swapVisibleId(item.foodId);
+  return [...new Set(g.map(swapVisibleId))].filter(id => id !== item.foodId && id !== self && db[id] && !isHiddenFood(db[id])).map(id => {
     const f = db[id];
     const eff = Math.max(5, Math.round(kcal0 / kcalPerUnit(f) / 5) * 5);
     return { id, f, eff, kcal: Math.round(kcalPerUnit(f) * eff), p: f.p * eff, c: f.c * eff, fat: f.f * eff };
@@ -3036,7 +3046,7 @@ function renderFoods() {
   $("foodMealChips").innerHTML = meals.map((m, i) => `<button onclick="setFoodMeal(${i})" class="n-chip ${i === tIdx ? "solid" : ""} max-w-[220px]" aria-pressed="${i === tIdx}"><span class="truncate">${esc(m.time ? m.time + " · " + m.title : m.title)}</span></button>`).join("");
   const db = getFoodDB();
   const cats = [];
-  if (state.recentFoods.some(id => db[id] && !db[id]._lost)) cats.push(["recent", "Son kullanılanlar"]);
+  if (state.recentFoods.some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["recent", "Son kullanılanlar"]);
   if (state.combos.length) cats.push(["combos", "Komboların"]);
   if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", "Tariflerim"]);
   if (Object.keys(state.customFoods).length) cats.push(["custom", "Özel eklediklerim"]);
@@ -3129,11 +3139,11 @@ function renderFoodList() {
     updateFoodSelUI();
     return;
   }
-  if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id] && !db[id]._lost);
+  if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id] && !isHiddenFood(db[id]));
   else if (foodUI.cat === "recipes") ids = Object.keys(state.customFoods).filter(id => id.startsWith("custom_recipe_") && db[id]);
   else if (foodUI.cat === "custom") ids = Object.keys(state.customFoods).filter(id => db[id]);
-  else if (foodUI.cat.startsWith("c:")) ids = Object.keys(db).filter(id => !db[id]._lost && foodCatKey(db[id].cat) === foodUI.cat);
-  else ids = Object.keys(db).filter(id => !db[id]._lost);
+  else if (foodUI.cat.startsWith("c:")) ids = Object.keys(db).filter(id => !isHiddenFood(db[id]) && foodCatKey(db[id].cat) === foodUI.cat);
+  else ids = Object.keys(db).filter(id => !isHiddenFood(db[id]));
   // v18: akıllı arama (Türkçe karakter, kelime sırası, eş anlamlı, küçük yazım hatası) + sıralama
   if (words.length) ids = searchFoods(ids, q);
   else if (foodUI.cat === "all") ids = rankBrowse(ids);
@@ -3721,7 +3731,7 @@ function openFoodPicker(mIdx) {
   const cats = {};
   Object.keys(db).forEach(id => {
     const f = db[id];
-    if (f._lost) return;
+    if (isHiddenFood(f)) return;
     const cat = f.cat || "Diğer";
     (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: sub(f), customId: id.startsWith("custom_") ? id : null });
   });
@@ -6740,7 +6750,7 @@ function rcAddIngredient() {
   Object.keys(db).forEach(id => {
     if (id === rcp.id) return;
     const f = db[id];
-    if (f._lost) return;
+    if (isHiddenFood(f)) return;
     const cat = stripEmoji(f.cat || "Diğer");
     (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: `${fmtNum(f.def)} ${f.unit} · ${Math.round(kcalPerUnit(f) * num(f.def, 1))} kcal` });
   });
@@ -6920,7 +6930,7 @@ async function shareShopList() {
 function frequentFoods(limit = 30) {
   const db = getFoodDB();
   const cnt = {};
-  const bump = (id, w) => { if (id && id !== "_est" && db[id] && !db[id]._lost) cnt[id] = (cnt[id] || 0) + w; };
+  const bump = (id, w) => { if (id && id !== "_est" && db[id] && !isHiddenFood(db[id])) cnt[id] = (cnt[id] || 0) + w; };
   allMealLists().forEach(ms => ms.forEach(m => m.items.forEach(i => bump(i.foodId, 1))));
   (state.combos || []).forEach(c => c.items.forEach(i => bump(i.foodId, 1)));
   state.recentFoods.forEach((id, i) => bump(id, 2 - i * 0.1));
@@ -7188,7 +7198,7 @@ function searchIndex() {
   _sIdx = {};
   Object.keys(db).forEach(id => {
     const f = db[id];
-    if (f._lost) return;
+    if (isHiddenFood(f)) return;
     const name = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
     const extra = normSearch((f.aliases || []).join(" ") + " " + stripEmoji(f.cat || ""));
     const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(t => t.length > 1);

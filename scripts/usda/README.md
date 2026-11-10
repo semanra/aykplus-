@@ -27,3 +27,7 @@ Tam liste (gözden geçirmek için): `docs/besin-veritabani-listesi.csv`.
 ## Besin kimlikleri asla kaybolmaz (v19)
 
 Yayındaki bir besin kimliği (`u…`, `r_…`) kullanıcının menüsünde olabilir. `build_foods.py` yeni çıktıyı mevcut `foods.js` ile karşılaştırır; bir kimlik kaybolacaksa **durur**. Bir besini bilerek kaldırmak gerekiyorsa kimliğini `ALLOW_REMOVE` listesine yaz. (Uygulama yine de bulunamayan besini "⚠" ile son kayıtlı değerleriyle gösterir; bu bir yedektir, çözüm değil.)
+
+## Gizli besinler (v20)
+
+Pişmiş hâller listeden **gizlenir** (silinmez): kategori `HIDE_CATS` içinde, adı `COOK_RX` ile eşleşen ve `KEEP_RX` ile eşleşmeyen besinler `z: 1` alır. Görünür kalması istenen bir besin için fdcId'sini `HIDE_KEEP_IDS`'e yaz. Eski listedeki tekrarlar `src/data.js` içinde `hidden: true, replace: "<USDA kimliği>"` ile işaretlenir. Her çalıştırmada `docs/gizlenen-besinler.csv` yeniden yazılır (gizlenen besin → listede kalan karşılığı).
