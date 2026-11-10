@@ -1,6 +1,6 @@
 # AYK+ — Proje Özeti (dış inceleme için)
 
-Son güncelleme: 10 Kasım 2026 · Uygulama sürümü **v22**
+Son güncelleme: 10 Kasım 2026 · Uygulama sürümü **v23**
 
 ## 1. Uygulama nedir?
 
@@ -33,7 +33,7 @@ Kullanım ortamı:
 - `scripts/build.mjs` bu üç dosyayı birleştirip Tailwind CSS'i (3.4.17, CDN yok) derler. Çıktı **tek bir `index.html`** dosyasıdır (~535 KB).
 - `foods.js` ayrı bir veri dosyasıdır: ~1.800 USDA besini ve 124 Türk yemeği tarifi. `scripts/usda/` içindeki Python betikleri USDA FoodData Central SR Legacy verisinden üretir.
 - **Tek global durum** nesnesi `state` vardır. Her değişiklikten sonra `renderAll()` çağrılır; tüm sekmeleri `innerHTML` ile yeniden çizer ve kaydeder. Sanal DOM yoktur.
-- **Testler:** `tests/` altında 18 Playwright (Python) paketi var. Gerçek Chromium'da, iPhone boyutunda (375 px ve 320 px) çalışırlar.
+- **Testler:** `tests/` altında 19 Playwright (Python) paketi var. Gerçek Chromium'da, iPhone boyutunda (375 px ve 320 px) çalışırlar.
 
 ## 3. Kesin kurallar (önerilerin bunlara uyması gerekir)
 
@@ -88,6 +88,7 @@ Kullanım ortamı:
 - **Analiz:**
   - Hareket başına tahmini 1RM grafiği.
   - Vücut haritası: kas grubu başına haftalık set; 10–20 set bandı.
+- **Set zorluğu:** isteğe bağlı (Kolay / Orta / Zor / Tükeniş). Kilo önerisi bunu hesaba katar; 3 hafta ilerleme yoksa ve setler zor geçiyorsa dinlenme haftası notu çıkar.
 - **Hareket türleri:** kardiyo ve süreli hareketler.
 
 ### Diğer
@@ -98,7 +99,6 @@ Kullanım ortamı:
 ## 5. Bilinen eksikler / sıradaki adaylar
 
 - **Tema:** Mobilite ve İlerleme sekmeleri henüz yeni temada değil. Mobilite hâlâ sistem `prompt()` kutusu kullanıyor.
-- **Antrenman:** set başına zorluk notu (RPE / RIR) yok. Yorgunluk / dinlenme haftası (deload) önerisi yok.
 - **Beslenme:** uygulamanın eski kendi listesindeki besinlerde (simit, döner gibi porsiyonlu kayıtlar) lif/tuz verisi yok.
 - **Kod yapısı:** `app.js` tek dosyada ~6.000 satır, bölümler yorum başlıklarıyla ayrılmış.
 

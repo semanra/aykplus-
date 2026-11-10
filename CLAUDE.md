@@ -34,7 +34,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 18 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 19 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
@@ -90,6 +90,7 @@ npm test             # 18 test paketi, gerçek Chromium'da iPhone boyutunda; hep
 - **Profil:** Üstteki profil düğmesi (`#profileBtn`) tam ekran `#profilePage`'i açar (eski Ayarlar penceresi kaldırıldı; `openSettings` = `openProfile`). Alan kimlikleri (`setAge`, `setBf`, `setRest`...) aynı. Kaydet: `saveSettings()` (`#profileSave`). Değişiklik varken Geri → uyarı. Kilo/hedef/ölçü kutuları `renderProfile()` ile `renderAll()` içinde güncellenir.
 - **Üst başlık (v12):** Sol üstte logo yok; `#tabTitle` açık sekmenin adını yazar (`TAB_TITLES`, `applyTabVisibility()` içinde). Yanındaki `#brandTag` ("AYK+") yalnızca sayfa yüklenirken CSS animasyonuyla (`brandOut`, ~2,3 sn sonra) kayarak kaybolur; açılış animasyonu kapalıysa `html.no-brand` ile hiç gösterilmez. "Kaydedildi" yazısı kaldırıldı (kayıt hatası yine toast ile bildirilir).
 - **Profil fotoğrafı (v12):** Eski "uygulama içi logo" alanı `state.customIconDataUrl` artık profil fotoğrafıdır; sağ üstteki `#profileBtn` içinde (`#profileAvatar`) ve Profil'de (`#pfAvatar`) görünür, yoksa kişi simgesi. Yüklenen fotoğraf `shrinkPhoto()` ile 320×320 JPEG'e küçültülür (localStorage dolmasın diye). Paylaşım kartı her zaman `icon.png` kullanır.
+- **Set zorluğu ve dinlenme haftası (v23):** Ağırlık setinde isteğe bağlı `s.e` = 1 Kolay · 2 Orta · 3 Zor · 4 Tükeniş (`EFFORT_LABELS`, dosyanın başında; `normalizeExercise` geçersiz/tamamlanmamış sette siler). Seçim satırı yalnızca hareketin son tamamlanan setinin altında (`effortRowHtml`, `[data-effort-row]`, `setEffort`); önceki setlerde numaranın altında etiket. Kayıtta geçmiş setlerine `e` yazılır. `overloadSuggestion`: hedef tamam ama son set Tükeniş veya puanlananların çoğu Zor/Tükeniş → `type: "hold"` (aynı kiloda kal, `[data-hold]`); hepsi Kolay → artır. `deloadInfo`/`deloadHtml` (`[data-deload]`): son 21 günde ≥3 seans, en iyi tahmini 1RM öncekini geçmedi ve puanlanan setlerin ≥%70'i Zor/Tükeniş → yalnızca not ("Anladım" → `ex.deloadDismiss`).
 - **Sayaç:** Üst bardaki kronometre v11'de kaldırıldı; tek sayaç alttaki `#restPill` (set tamamlanınca / `startTimer()`).
 - **Sürükle-bırak:** Tek `pointerdown/move/up` mantığı hem öğün kartlarını (`.drag-handle[data-midx]`, `#mealsContainer`) hem Programım'daki hareketleri (`.drag-handle[data-exidx]`, `#progExList [data-ex-row]`) taşır.
 - **Tek global durum:** `state` (bkz. `normalizeState`). Her değişiklikten sonra `renderAll()` çağrılır; o da tüm sekmeleri çizer ve `saveState()` yapar.
@@ -130,6 +131,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 **v21:** etiket/barkod tutarlılık kontrolü, makul başlangıç gramları, 43 ABD ürünü gizlendi, beslenmede temalı pencereler, Profil → Gün geçişi, bildirim yığılması ve gündüz teması düzeltmeleri.
 
 **v22:** lif/tuz takibi, yumurta gibi besinlerde adet sayacı, protein dağılımı, haftalık kas başına set listesi.
+
+**v23:** set başına zorluk (isteğe bağlı), zorluğu hesaba katan kilo önerisi, dinlenme haftası notu.
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 

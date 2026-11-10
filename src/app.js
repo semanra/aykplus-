@@ -81,6 +81,9 @@ function makeCardioRow(min = 30, km = "", lvl = "") { return { min, km, lvl, don
 // ---------------------------------------------------------------------------
 // DURUM (STATE) YÜKLEME, NORMALLEŞTİRME, KAYDETME
 // ---------------------------------------------------------------------------
+// v23: set zorluğu etiketleri (durum yüklenirken de kullanıldığı için en üstte)
+const EFFORT_LABELS = { 1: "Kolay", 2: "Orta", 3: "Zor", 4: "Tükeniş" };
+const EFFORT_COLORS = { 1: "#4ADE80", 2: "#1FD1C1", 3: "#FBBF24", 4: "#FF5A5F" };
 function normalizeExercise(ex) {
   if (!ex.kind) {
     ex.kind = detectKind(ex.name);
@@ -98,7 +101,7 @@ function normalizeExercise(ex) {
   if (!Array.isArray(ex.sets) || ex.sets.length === 0) {
     ex.sets = ex.kind === "cardio" ? [makeCardioRow(30)] : ex.kind === "time" ? makeTimeSets(3, 45) : makeWeightSets(3, "8–12");
   }
-  ex.sets.forEach(s => { s.done = !!s.done; });
+  ex.sets.forEach(s => { s.done = !!s.done; if (s.e != null && !(EFFORT_LABELS[s.e] && s.done)) delete s.e; });   // v23: set zorluğu (1–4)
   if (ex.note == null) ex.note = "";
   return ex;
 }
@@ -2645,6 +2648,7 @@ function toggleSetDone(exIdx, sIdx) {
   const s = ex.sets[sIdx];
   s.done = !s.done;
   s.pr = false;
+  if (!s.done) delete s.e;
   if (s.done && !state.workoutStartedAt) state.workoutStartedAt = Date.now();
   if (!s.done && !workoutInProgress()) state.workoutStartedAt = 0;
   if (s.done) {
@@ -2760,7 +2764,7 @@ async function finishAndLogWorkout() {
     const key = exKey(ex.name);
     const arr = state.exerciseHistory[key] || (state.exerciseHistory[key] = []);
     const sets = done.map(s => ex.kind === "cardio" ? { min: num(s.min), km: num(s.km), lvl: s.lvl || "" }
-      : ex.kind === "time" ? { sec: num(s.sec) } : { kg: num(s.kg), reps: num(s.reps) });
+      : ex.kind === "time" ? { sec: num(s.sec) } : (EFFORT_LABELS[s.e] ? { kg: num(s.kg), reps: num(s.reps), e: s.e } : { kg: num(s.kg), reps: num(s.reps) }));
     const sess = { ts, logId, kind: ex.kind, name: ex.name, sets };
     const mg = muscleOf(ex);
     if (mg) sess.muscle = mg;
@@ -2778,7 +2782,7 @@ async function finishAndLogWorkout() {
   });
   if (state.workoutLogs.length > 400) state.workoutLogs.splice(0, state.workoutLogs.length - 400);
 
-  day.exercises.forEach(ex => ex.sets.forEach(s => { s.done = false; s.pr = false; }));
+  day.exercises.forEach(ex => ex.sets.forEach(s => { s.done = false; s.pr = false; delete s.e; }));
   if (!workoutInProgress()) state.workoutStartedAt = 0;
   state.gymActive = false;
   stopTimer();
@@ -3413,6 +3417,26 @@ function overloadSuggestion(ex) {
   const allHit = sets.length >= ex.sets.length && sets.every(s => num(s.reps) >= range.hi);
   const misses = sets.filter(s => num(s.reps) < range.lo).length;
 
+  // v23: set zorluğu. Tüm setler hedefe ulaştı ama son set "Tükeniş" (ya da puanlananların çoğu Zor/Tükeniş) → artırma, aynı kiloda kal.
+  const rated = sets.filter(s => EFFORT_LABELS[s.e]);
+  const lastE = num(sets[sets.length - 1].e, 0);
+  const hardShare = rated.length ? rated.filter(s => s.e >= 3).length / rated.length : 0;
+  const tooHard = lastE === 4 || (rated.length >= 2 && hardShare > 0.5);
+  const allEasy = rated.length === sets.length && sets.length >= 2 && sets.every(s => s.e === 1) && misses === 0;
+  if (allHit && tooHard && maxKg > 0) {
+    if (curMax !== maxKg) return null;
+    return {
+      type: "hold", ts: last.ts, kg: maxKg, reps: range.hi,
+      text: `Geçen sefer tüm setlerde ${range.hi}+ tekrar yaptın ama setler çok zor geçti${lastE === 4 ? " (son sette tükeniş)" : ""}. ${fmtKg(maxKg)} kg'da bir seans daha kal; rahatlayınca artır.`
+    };
+  }
+  if (!allHit && allEasy && maxKg > 0 && curMax <= maxKg) {
+    const next = nextLevel(ex, maxKg);
+    return {
+      type: "up", ts: last.ts, kg: next, reps: range.lo,
+      text: `Geçen sefer tüm setleri "Kolay" işaretledin. Kiloyu ${fmtKg(maxKg)} → ${fmtKg(next)} kg'a çıkarmayı dene, ${range.lo} tekrardan başla.`
+    };
+  }
   if (allHit) {
     if (curMax > maxKg) return null; // zaten artırılmış
     const next = nextLevel(ex, maxKg);
@@ -3434,9 +3458,50 @@ function overloadSuggestion(ex) {
   return null;
 }
 
+// v23: Dinlenme haftası (deload) notu. Son 21 günde en az 3 seans var, bu seansların en iyi tahmini 1RM'i öncekilerin en iyisini
+// geçmedi ve puanlanan setlerin çoğu (en az %70, en az 3 set) Zor/Tükeniş → yalnızca not; programı değiştirmez.
+const DELOAD_WINDOW_MS = 21 * 24 * 3600000;
+function deloadInfo(ex) {
+  if (ex.kind !== "weight") return null;
+  const hist = historyFor(ex.name).filter(h => h.kind === "weight" && h.sets && h.sets.length);
+  if (!hist.length) return null;
+  const now = Date.now(), from = now - DELOAD_WINDOW_MS;
+  const win = hist.filter(h => h.ts >= from), before = hist.filter(h => h.ts < from);
+  if (win.length < 3 || !before.length) return null;
+  const best = hs => Math.max(...hs.map(h => Math.max(...h.sets.map(s => e1rm(s.kg, s.reps)))));
+  const bWin = best(win), bBefore = best(before);
+  if (!(bBefore > 0) || bWin > bBefore + 0.01) return null;
+  const rated = [].concat(...win.map(h => h.sets.filter(s => EFFORT_LABELS[s.e])));
+  if (rated.length < 3 || rated.filter(s => s.e >= 3).length / rated.length < 0.7) return null;
+  const lastTs = win[win.length - 1].ts;
+  if (ex.deloadDismiss === lastTs) return null;
+  return { ts: lastTs, best: Math.round(bBefore), sessions: win.length };
+}
+function deloadHtml(ex, exIdx) {
+  if (ex.sets.some(s => s.done)) return "";
+  const d = deloadInfo(ex);
+  if (!d) return "";
+  return `<div class="bg-[#2A1F0B] border border-[#6B4E16] rounded-2xl pl-3 pr-2 py-2 space-y-1.5" data-deload="${exIdx}">
+      <div class="flex items-start gap-2.5"><span style="color:#FBBF24" class="pt-0.5">${svgI("down", 20, 2.2)}</span>
+        <span class="text-[13px] leading-snug text-amber-100">Son 3 haftada ${d.sessions} seansta tahmini 1RM'in ~${d.best} kg'ı geçmedi ve setler çoğunlukla zor geçti. Bu hareket için bir hafta kiloyu ~%10 hafifletmeyi (dinlenme haftası) düşünebilirsin.</span></div>
+      <div class="flex justify-end"><button onclick="dismissDeload(${exIdx})" class="text-[12px] t-muted h-11 px-3">Anladım</button></div>
+    </div>`;
+}
+function dismissDeload(exIdx) {
+  const ex = activeDay().exercises[exIdx];
+  const d = ex && deloadInfo(ex);
+  if (!d) return;
+  ex.deloadDismiss = d.ts;
+  renderAll();
+}
 function suggestionHtml(ex, exIdx) {
   const sg = overloadSuggestion(ex);
-  if (!sg) return "";
+  if (!sg) return deloadHtml(ex, exIdx);
+  if (sg.type === "hold") return `${deloadHtml(ex, exIdx)}
+    <div class="t-panel rounded-2xl pl-3 pr-2 py-2 space-y-1.5" data-hold="${exIdx}">
+      <div class="flex items-start gap-2.5"><span style="color:#1FD1C1" class="pt-0.5">${svgI("check", 20, 2.2)}</span><span class="text-[13px] leading-snug text-[#CCF5F0]">${esc(sg.text)}</span></div>
+      <div class="flex justify-end"><button onclick="dismissSuggestion(${exIdx})" class="text-[12px] t-muted h-11 px-3">Anladım</button></div>
+    </div>`;
   const up = sg.type === "up";
   const noLv = usesLevels(ex) && !ex.levels && !inferLevels(ex);
   return `
@@ -4665,6 +4730,22 @@ function gymTodayHtml() {
     </div>`;
 }
 
+// v23: Set zorluğu (isteğe bağlı). 1 Kolay · 2 Orta · 3 Zor · 4 Tükeniş (son tekrarda başka tekrar kalmadı)
+function setEffort(exIdx, sIdx, v) {
+  const ex = activeDay().exercises[exIdx];
+  const s = ex && ex.sets[sIdx];
+  if (!s || !s.done || !EFFORT_LABELS[v]) return;
+  if (s.e === v) delete s.e; else s.e = v;
+  renderAll();
+}
+function effortRowHtml(exIdx, s, i) {
+  return `<div class="px-1 pt-1 pb-1.5 space-y-1.5" data-effort-row="${exIdx}-${i}">
+      <div class="text-[12px] t-muted">${i + 1}. set nasıl geçti? <span class="t-dim">(isteğe bağlı)</span></div>
+      <div class="grid grid-cols-4 gap-1.5" role="group" aria-label="${i + 1}. set zorluğu">
+        ${[1, 2, 3, 4].map(v => `<button onclick="setEffort(${exIdx}, ${i}, ${v})" aria-pressed="${s.e === v}" class="h-11 rounded-xl text-[13px] ${s.e === v ? "font-extrabold text-black" : "font-semibold bg-[#1E1E21] text-slate-200"}" ${s.e === v ? `style="background:${EFFORT_COLORS[v]}"` : ""}>${EFFORT_LABELS[v]}</button>`).join("")}
+      </div>
+    </div>`;
+}
 // Set satırları
 function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   const isNext = ptr && ptr.e === exIdx && ptr.s === i;
@@ -4688,13 +4769,16 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
       ${check}
     </div>`;
   }
-  return `<div class="grid items-center gap-2 h-14 px-1 rounded-2xl ${rowCls}" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px">
-    <span class="t-display text-[22px] text-center ${s.done || isNext ? "text-white" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-amber-400 text-sm">★</span>' : ""}</span>
+  let lastDone = -1;
+  ex.sets.forEach((x, j) => { if (x.done) lastDone = j; });
+  const effLbl = s.done && EFFORT_LABELS[s.e] ? `<span class="block font-sans text-[10px] font-bold leading-none mt-0.5" style="color:${EFFORT_COLORS[s.e]}">${EFFORT_LABELS[s.e]}</span>` : "";
+  return `<div class="rounded-2xl ${rowCls}"><div class="grid items-center gap-2 h-14 px-1" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px">
+    <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-white" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-amber-400 text-sm">★</span>' : ""}${effLbl}</span>
     <span class="text-[13px] t-dim truncate">${prev}</span>
     <input type="text" inputmode="decimal" aria-label="${i + 1}. set kilo" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtKg(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
     <input type="text" inputmode="numeric" aria-label="${i + 1}. set tekrar" data-fk="w-${exIdx}-${i}-reps" value="${num(s.reps)}" onchange="updateSetData(${exIdx}, ${i}, 'reps', this.value)" class="t-input w-full" />
     ${check}
-  </div>`;
+  </div>${s.done && i === lastDone ? effortRowHtml(exIdx, s, i) : ""}</div>`;
 }
 
 function gymActiveHtml() {
@@ -4711,7 +4795,7 @@ function gymActiveHtml() {
       return ps ? `${fmtKg(num(ps.kg))}×${num(ps.reps)}` : "—";
     };
     const head = ex.kind === "weight"
-      ? `<div class="grid gap-2 px-1 text-[11px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">SET</span><span>ÖNCEKİ</span><span class="text-center">KG</span><span class="text-center">TEKRAR</span><span></span></div>`
+      ? `<div class="grid gap-2 px-1 text-[11px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">SET</span><span class="truncate">ÖNCEKİ</span><span class="text-center">KG</span><span class="text-center">TEKRAR</span><span></span></div>`
       : ex.kind === "time" ? `<div class="grid gap-2 px-1 text-[11px] font-bold tracking-wider t-dim" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px"><span class="text-center">SET</span><span>SÜRE</span><span></span><span></span></div>` : "";
     return `
       <div id="exCard_${exIdx}" class="t-card rounded-[22px] p-4 space-y-3" style="scroll-margin-top: 9rem;">
