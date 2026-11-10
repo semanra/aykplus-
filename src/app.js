@@ -135,6 +135,13 @@ function normalizeState(raw) {
       seen.add(m.id);
     });
   });
+  // v14: bugüne özel menü kopyası ({ date, train, rest }); yalnızca o günün tarihiyle geçerli
+  if (!s.dayPlan || typeof s.dayPlan !== "object" || typeof s.dayPlan.date !== "string") s.dayPlan = null;
+  else ["train", "rest"].forEach(k => {
+    const a = s.dayPlan[k];
+    if (!Array.isArray(a)) { s.dayPlan[k] = null; return; }
+    a.forEach(m => { if (!Array.isArray(m.items)) m.items = []; });
+  });
   if (!["today", "program", "library", "history"].includes(s.gymView)) s.gymView = "today";
   if (!["today", "menus", "foods", "history"].includes(s.nutriView)) s.nutriView = "today";
   s.settings.nutriLight = !!s.settings.nutriLight;
@@ -401,9 +408,10 @@ function resetTimerUI() {
 // ---------------------------------------------------------------------------
 // GÜN DÖNÜMÜ (Gece yarısından sonra otomatik yeni gün + günlük arşiv)
 // ---------------------------------------------------------------------------
-function nutritionTotals() {
+// meals verilmezse bugünün planı (bugüne özel kopya varsa o) kullanılır
+function nutritionTotals(meals) {
   let p = 0, c = 0, f = 0, cal = 0;
-  curMeals().forEach(m => m.items.forEach(i => { const x = calcItemMacros(i); p += x.p; c += x.c; f += x.f; cal += x.cal; }));
+  (meals || dayMeals()).forEach(m => m.items.forEach(i => { const x = calcItemMacros(i); p += x.p; c += x.c; f += x.f; cal += x.cal; }));
   return { p, c, f, cal };
 }
 
@@ -412,11 +420,12 @@ function archiveDay(dateKey) {
   const t = nutritionTotals();
   const e = eatenTotals();
   const sup = state.supplements || {};
+  const dm = dayMeals();
   state.dailyLogs[dateKey] = {
     kcal: Math.round(t.cal), p: Math.round(t.p), c: Math.round(t.c), f: Math.round(t.f),
     eatenKcal: Math.round(e.cal), eatenP: Math.round(e.p),
     water: state.waterLiters || 0,
-    mealsDone: curMeals().filter(m => m.done).length, mealsTotal: curMeals().length,
+    mealsDone: dm.filter(m => m.done).length, mealsTotal: dm.length,
     supps: state.supplementList.filter(x => sup[x.id]).length, dayType: state.dayType,
     calTarget: getTargets().calTarget, proTarget: getTargets().proTarget
   };
@@ -427,6 +436,7 @@ function archiveDay(dateKey) {
 function resetDaily() {
   state.waterLiters = 0;
   state.supplements = {};
+  state.dayPlan = null;   // bugüne özel değişiklikler arşivlendi; yeni gün menüden temiz başlar
   state.meals.forEach(m => { m.done = false; });
   state.restMeals.forEach(m => { m.done = false; });
   state.mobilityRoutine.dynamic.forEach(i => { i.done = false; });
@@ -614,11 +624,15 @@ function updateBfHint() {
 }
 
 function calcItemMacros(item) {
+  if (item.est) {   // v14: "Dışarıda yedim" tahmini girişi
+    const e = item.est;
+    return { p: num(e.p, 0), c: num(e.c, 0), f: num(e.f, 0), cal: num(e.cal, 0) };
+  }
   const f = getFoodDB()[item.foodId];
   if (!f) return { p: 0, c: 0, f: 0, cal: 0 };
   const a = effAmount(item);
   const p = f.p * a, c = f.c * a, fat = f.f * a;
-  return { p, c, f: fat, cal: (p * 4) + (c * 4) + (fat * 9) };
+  return { p, c, f: fat, cal: kcalPerUnit(f) * a };
 }
 
 // ---------------------------------------------------------------------------
@@ -638,7 +652,12 @@ function toggleNutriLight() { state.settings.nutriLight = !state.settings.nutriL
 
 // Tam sayıyı Türkçe binlik ayırıcıyla yazar: 2478 → "2.478"
 function fmtInt(n) { return Math.round(num(n, 0)).toLocaleString("tr-TR"); }
-function kcalPerUnit(f) { return f ? (f.p * 4) + (f.c * 4) + (f.f * 9) : 0; }
+// Etiketten girilen kalori (f.kcal) varsa o kullanılır; yoksa 4P + 4K + 9Y
+function kcalPerUnit(f) {
+  if (!f) return 0;
+  if (f.kcal != null && isFinite(f.kcal) && f.kcal >= 0) return f.kcal;
+  return (f.p * 4) + (f.c * 4) + (f.f * 9);
+}
 // Baştaki emojiyi (bayraklar dahil) kaldırır: "🇹🇷 Türk Mutfağı" → "Türk Mutfağı"
 function stripEmoji(s) { return String(s || "").replace(/^(?:[\u{1F1E6}-\u{1F1FF}]+\s*)+/u, "").replace(EMOJI_LEAD, ""); }
 
@@ -674,7 +693,8 @@ function toggleWeightScale(on) {
 function resetScaleBase() {
   const k = scaleK();
   // Şu an görünen gramajlar yeni referans olsun: saklanan miktarları sabitle
-  if (k !== 1) [state.meals, state.restMeals].forEach(ms => ms.forEach(m => m.items.forEach(i => {
+  if (k !== 1) allMealLists().forEach(ms => ms.forEach(m => m.items.forEach(i => {
+    if (i.est) return;
     const f = getFoodDB()[i.foodId];
     if (isScalable(f)) i.amount = Math.max(1, Math.round(i.amount * k));
   })));
@@ -708,22 +728,25 @@ function swapOptions(item) {
     return { id, f, eff, kcal: Math.round(kcalPerUnit(f) * eff), p: f.p * eff, c: f.c * eff, fat: f.f * eff };
   });
 }
-function openSwap(mIdx, iIdx) {
-  const item = curMeals()[mIdx] && curMeals()[mIdx].items[iIdx];
-  if (!item) return;
+// dest: "menu" (Menülerim) veya "day" (Bugün: yalnızca bugünü değiştirir)
+function openSwap(mIdx, iIdx, dest) {
+  const list = dest === "day" ? dayMeals() : curMeals();
+  const item = list[mIdx] && list[mIdx].items[iIdx];
+  if (!item || item.est) return;
   const f0 = getFoodDB()[item.foodId];
   const opts = swapOptions(item);
   if (!opts.length) return;
   const items = opts.map(o => ({ id: o.id, eff: o.eff, label: o.f.name, sub: `${fmtNum(o.eff)} ${o.f.unit} · ${o.kcal} kcal · ${Math.round(o.p)}P ${Math.round(o.c)}K ${Math.round(o.fat)}Y` }));
   openPicker(`${f0.name} yerine`, [{ label: `Şu an: ${fmtNum(effAmount(item))} ${f0.unit} · ${Math.round(kcalPerUnit(f0) * effAmount(item))} kcal`, short: "Alternatifler", items }], it => {
-    const cur = curMeals()[mIdx] && curMeals()[mIdx].items[iIdx];
+    snapshot();
+    const l2 = dest === "day" ? ensureDayCopy() : curMeals();
+    const cur = l2[mIdx] && l2[mIdx].items[iIdx];
     if (!cur) return;
     const nf = getFoodDB()[it.id];
-    snapshot();
     cur.foodId = it.id;
     cur.amount = rawFromEff(nf, it.eff);
     renderAll();
-    offerUndo(`⇄ ${f0.name} → ${nf.name} (${fmtNum(it.eff)} ${nf.unit})`);
+    offerUndo(`⇄ ${f0.name} → ${nf.name} (${fmtNum(it.eff)} ${nf.unit})${dest === "day" ? " · yalnızca bugün" : ""}`);
   });
 }
 
@@ -733,7 +756,7 @@ function openSwap(mIdx, iIdx) {
 const openDoneMeals = new Set();   // Bugün: açılmış "yenmiş" öğünler (kaydedilmez)
 const openMenuMeals = new Set();   // Menülerim: açılmış öğünler (kaydedilmez)
 function toggleMealOpen(mIdx) {
-  const m = curMeals()[mIdx];
+  const m = dayMeals()[mIdx];
   if (!m) return;
   if (openDoneMeals.has(m.id)) openDoneMeals.delete(m.id); else openDoneMeals.add(m.id);
   renderAll();
@@ -747,7 +770,7 @@ function toggleMenuMeal(mIdx) {
 
 function mealTotals(meal) {
   let p = 0, c = 0, f = 0, cal = 0, n = 0;
-  meal.items.forEach(i => { if (!getFoodDB()[i.foodId]) return; const x = calcItemMacros(i); p += x.p; c += x.c; f += x.f; cal += x.cal; n++; });
+  meal.items.forEach(i => { if (!i.est && !getFoodDB()[i.foodId]) return; const x = calcItemMacros(i); p += x.p; c += x.c; f += x.f; cal += x.cal; n++; });
   return { p, c, f, cal, n };
 }
 function macroLine(p, c, f, dec) {
@@ -807,7 +830,7 @@ function renderHero() {
   updateMacroCard("pro", shown.p, targets.proTarget, "g");
   updateMacroCard("carb", shown.c, targets.carbTarget, "g");
   updateMacroCard("fat", shown.f, targets.fatTarget, "g");
-  const meals = curMeals();
+  const meals = dayMeals();
   $("mmPlanVal").textContent = fmtInt(plan.cal);
   $("mmEatenVal").textContent = fmtInt(eaten.cal);
   $("mmEatenMeals").textContent = `${meals.filter(m => m.done).length}/${meals.length}`;
@@ -857,65 +880,358 @@ function renderWater() {
 // ---------------------------------------------------------------------------
 function renderTodayMeals() {
   const db = getFoodDB();
-  const meals = curMeals();
+  const meals = dayMeals();
   const nextIdx = meals.findIndex(m => !m.done);
   if (!meals.length) {
     $("todayMeals").innerHTML = `<div class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[14px] n-muted">Bu menüde henüz öğün yok.</p>
       <button onclick="setNutriView('menus')" class="n-btn h-12 px-6 rounded-full text-[14px]">Menülerim'e git</button></div>`;
     return;
   }
-  $("todayMeals").innerHTML = meals.map((meal, mIdx) => {
+  const changed = dayChangedIds();
+  const savable = meals.some(m => changed.has(m.id) && !mealHasEst(m));
+  let banner = "";
+  if (dayCopy() && changed.size) {
+    const tg = getTargets().calTarget;
+    const over = Math.round(nutritionTotals(meals).cal - tg);
+    const canBalance = over > Math.max(50, Math.round(tg * 0.05)) && meals.some(m => !m.done);
+    banner = `<div id="dayDiffBanner" class="n-card rounded-[20px] p-3.5 mb-3 space-y-2.5">
+        <div class="text-[14px] font-bold">Bugüne özel değişiklikler var</div>
+        <p class="text-[12px] n-muted">Menülerim değişmedi. Bugünkü hâli menüye de kaydedebilir ya da menüdeki hâline dönebilirsin.${canBalance ? ` Bugün hedefi <strong class="n-over">${fmtInt(over)} kcal</strong> aşıyor.` : ""}</p>
+        <div class="grid grid-cols-2 gap-2">
+          ${savable ? `<button onclick="saveDayToMenu()" class="n-btn h-11 rounded-full text-[13px]">Menüye de kaydet</button>` : ""}
+          <button onclick="revertDayToMenu()" class="n-btn-ghost h-11 rounded-full text-[13px] ${savable ? "" : "col-span-2"}">Menüdeki hâline dön</button>
+          ${canBalance ? `<button onclick="balanceDayNow()" class="n-btn-outline h-11 rounded-full text-[13px] col-span-2">Günü dengele (kalan öğünlerden kıs)</button>` : ""}
+        </div>
+      </div>`;
+  }
+  $("todayMeals").innerHTML = banner + meals.map((meal, mIdx) => {
     const t = mealTotals(meal);
     const isNext = mIdx === nextIdx;
     const last = mIdx === meals.length - 1;
     const collapsed = meal.done && !openDoneMeals.has(meal.id);
+    const editing = openEditMeals.has(meal.id);
     const rail = `<div class="flex flex-col items-center w-11 shrink-0">
         <label class="w-11 h-11 flex items-center justify-center cursor-pointer"><input type="checkbox" ${meal.done ? "checked" : ""} onchange="toggleMealDone(${mIdx})" class="n-check" aria-label="${esc(meal.title)}: yedim" /></label>
         ${last ? "" : '<div class="w-[1.5px] flex-1 n-rail my-1 rounded-full"></div>'}
       </div>`;
     const time = meal.time ? esc(meal.time) : "";
-    if (collapsed) {
+    if (collapsed && !editing) {
       return `<div class="flex gap-2" data-today-meal="${mIdx}">${rail}
         <button onclick="toggleMealOpen(${mIdx})" class="flex-1 min-w-0 min-h-[52px] mb-3 flex items-center justify-between gap-3 text-left" aria-expanded="false" aria-label="${esc(meal.title)} öğününü aç">
-          <div class="min-w-0"><div class="text-[12px] font-semibold n-muted">${time ? time + " · " : ""}yendi</div><div class="text-[16px] font-bold n-muted truncate">${esc(meal.title)}</div></div>
+          <div class="min-w-0"><div class="text-[12px] font-semibold n-muted">${time ? time + " · " : ""}yendi${changed.has(meal.id) ? " · bugüne özel" : ""}</div><div class="text-[16px] font-bold n-muted truncate">${esc(meal.title)}</div></div>
           <div class="text-[14px] font-semibold n-muted whitespace-nowrap shrink-0">${fmtInt(t.cal)} kcal</div>
         </button></div>`;
     }
     const status = meal.done ? "TAMAMLANDI" : isNext ? "SIRADAKİ" : "";
-    const label = [time, status].filter(Boolean).join(" · ");
+    const label = [time, status, changed.has(meal.id) ? "BUGÜNE ÖZEL" : ""].filter(Boolean).join(" · ");
     const items = meal.items.map((item, iIdx) => {
+      if (item.est) {
+        const e = item.est;
+        return `<div class="flex items-center justify-between gap-2 min-h-[44px] py-1" data-est="1">
+            <div class="min-w-0 flex-1 text-[14px] leading-snug"><span class="font-semibold">${esc(e.name)}</span> <span class="n-muted whitespace-nowrap">· tahmini · ${fmtInt(num(e.p))} g P</span></div>
+            <span class="text-[13px] font-semibold n-muted tabular-nums w-10 text-right shrink-0">${fmtInt(num(e.cal))}</span>
+            ${editing ? `<button onclick="dayRemoveItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-1 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(e.name)} çıkar">${svgI("x", 18, 2.2)}</button>` : ""}
+          </div>`;
+      }
       const f = db[item.foodId];
       if (!f) return "";
       const mac = calcItemMacros(item);
       const canSwap = !!swapGroup(item.foodId);
+      if (editing) {
+        return `<div class="py-2">
+            <div class="flex items-center gap-1 min-h-[24px]">
+              <div class="flex-1 min-w-0 text-[14px] font-semibold truncate">${esc(f.name)}</div>
+              <div class="shrink-0 text-[13px] font-bold tabular-nums">${Math.round(mac.cal)} <span class="text-[11px] font-semibold n-dim">kcal</span></div>
+              <button onclick="dayRemoveItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(f.name)} bugünden çıkar">${svgI("x", 18, 2.2)}</button>
+            </div>
+            <div class="flex items-center justify-end gap-1 mt-1.5">
+              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(f.name)} azalt">${svgI("minus", 18, 2.4)}</button>
+              <input type="text" inputmode="decimal" data-fk="damt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="daySetAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt shrink-0" aria-label="${esc(f.name)} bugünkü miktarı" />
+              <span class="text-[11px] n-muted w-10 min-w-0 truncate">${esc(f.unit)}</span>
+              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(f.name)} artır">${svgI("plus", 18, 2.4)}</button>
+            </div>
+          </div>`;
+      }
       return `<div class="flex items-center justify-between gap-2 min-h-[44px] py-1">
           <div class="min-w-0 flex-1 text-[14px] leading-snug"><span class="font-semibold">${esc(f.name)}</span> <span class="n-muted whitespace-nowrap">· ${fmtNum(effAmount(item))} ${esc(f.unit)}</span></div>
-          ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx})" class="n-chip swap text-[12px]" aria-label="${esc(f.name)} için ikame seç">⇄ İkame</button>` : ""}
+          ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx}, 'day')" class="n-chip swap text-[12px]" aria-label="${esc(f.name)} için ikame seç">⇄ İkame</button>` : ""}
           <span class="text-[13px] font-semibold n-muted tabular-nums w-10 text-right shrink-0">${Math.round(mac.cal)}</span>
         </div>`;
     }).join("");
+    const editPanel = editing ? `<div class="pt-2 n-bt space-y-2" data-edit-panel="${mIdx}">
+        <div class="text-[12px] n-muted">Buradaki değişiklikler yalnızca bugünü etkiler; menün aynı kalır.</div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="halfMeal(${mIdx})" class="n-btn-ghost h-11 rounded-full text-[13px]">½ Yarısını yedim</button>
+          <button onclick="openFreeMeal(${mIdx})" class="n-btn-ghost h-11 rounded-full text-[13px]">Dışarıda yedim</button>
+        </div>
+      </div>` : "";
+    const headOpen = meal.done && !editing;
     return `<div class="flex gap-2" data-today-meal="${mIdx}">${rail}
       <div class="flex-1 min-w-0 pb-3">
         <div class="n-card ${isNext ? "n-next" : ""} rounded-[22px] p-4 space-y-2">
-          ${meal.done
+          ${headOpen
             ? `<button onclick="toggleMealOpen(${mIdx})" class="w-full flex items-start justify-between gap-3 text-left min-h-[44px]" aria-expanded="true" aria-label="${esc(meal.title)} öğününü kapat">`
             : `<div class="flex items-start justify-between gap-3">`}
             <div class="min-w-0">
               ${label ? `<div class="text-[11px] font-bold tracking-wide n-accent">${label}</div>` : ""}
               <h3 class="text-[18px] font-extrabold leading-tight mt-0.5 break-words">${esc(meal.title)}</h3>
               ${meal.targetNote ? `<div class="text-[12px] n-muted mt-0.5">${esc(meal.targetNote)}</div>` : ""}
+              ${num(meal.balanced, 0) < 0 ? `<div class="text-[12px] font-semibold n-k mt-0.5" data-balanced="${mIdx}">Gün dengelendi: bu öğünden ${fmtInt(-meal.balanced)} kcal kısıldı</div>` : ""}
             </div>
             <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[24px] leading-none tabular-nums">${fmtInt(t.cal)}</span><span class="text-[12px] n-muted ml-0.5">kcal</span>
               <div class="text-[11px] font-semibold tabular-nums mt-0.5">${macroLine(t.p, t.c, t.f)}</div></div>
-          ${meal.done ? "</button>" : "</div>"}
+          ${headOpen ? "</button>" : "</div>"}
           <div class="n-div">${items || '<div class="text-[13px] n-dim py-2">Bu öğünde henüz besin yok.</div>'}</div>
-          <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="toggleMealDone(${mIdx})" class="${meal.done ? "n-btn-ghost" : "n-btn"} h-12 rounded-full text-[14px] flex items-center justify-center gap-1.5">${meal.done ? svgI("check", 18, 2.6) + "Yendi" : "Yedim"}</button>
-            <button onclick="goAddFood(${mIdx})" class="n-btn-outline h-12 rounded-full text-[14px] flex items-center justify-center gap-1.5">${svgI("plus", 18, 2.4)}Besin</button>
+          ${editPanel}
+          <div class="flex gap-2 pt-1">
+            <button onclick="toggleMealDone(${mIdx})" class="${meal.done ? "n-btn-ghost" : "n-btn"} flex-1 min-w-0 h-12 rounded-full text-[14px] flex items-center justify-center gap-1.5">${meal.done ? svgI("check", 18, 2.6) + "Yendi" : "Yedim"}</button>
+            <button onclick="goAddFood(${mIdx}, 'day')" class="n-btn-outline flex-1 min-w-0 h-12 rounded-full text-[14px] flex items-center justify-center gap-1.5">${svgI("plus", 18, 2.4)}Besin</button>
+            <button onclick="toggleMealEdit(${mIdx})" class="${editing ? "n-btn" : "n-btn-ghost"} w-12 h-12 shrink-0 rounded-full flex items-center justify-center" aria-expanded="${editing}" aria-label="${esc(meal.title)}: bugün için düzenle" data-edit-btn="${mIdx}">${svgI(editing ? "check" : "edit", 18, 2.2)}</button>
           </div>
         </div>
       </div></div>`;
   }).join("");
+}
+
+// ---------------------------------------------------------------------------
+// v14 — "SADECE BUGÜN": Bugün ekranındaki değişiklikler menünün o güne ait
+// kopyasında yapılır (state.dayPlan). Menülerim yalnızca "Menüye de kaydet" ile değişir.
+// Gece yarısı kopya arşivlenir ve silinir; yeni gün menüden temiz başlar.
+// ---------------------------------------------------------------------------
+const openEditMeals = new Set();   // Bugün: düzenleme modu açık öğünler (kaydedilmez)
+function dayKind() { return state.dayType === "rest" ? "rest" : "train"; }
+function dayKey() { return state.today || todayStr(); }
+function dayCopy() {
+  const dp = state.dayPlan;
+  return dp && dp.date === dayKey() && Array.isArray(dp[dayKind()]) ? dp[dayKind()] : null;
+}
+function dayMeals() { return dayCopy() || curMeals(); }
+function ensureDayCopy() {
+  const c = dayCopy();
+  if (c) return c;
+  if (!state.dayPlan || state.dayPlan.date !== dayKey()) state.dayPlan = { date: dayKey(), train: null, rest: null };
+  const copy = clone(curMeals());
+  state.dayPlan[dayKind()] = copy;
+  return copy;
+}
+// Menüler + bugüne özel kopyalar (besin silme, gramaj sabitleme gibi toplu işlemler için)
+function allMealLists() {
+  const out = [state.meals, state.restMeals];
+  const dp = state.dayPlan;
+  if (dp) ["train", "rest"].forEach(k => { if (Array.isArray(dp[k])) out.push(dp[k]); });
+  return out;
+}
+function mealHasEst(m) { return m.items.some(i => i.est); }
+function itemsSig(items) {
+  return JSON.stringify(items.map(i => i.est ? ["~", String(i.est.name), num(i.est.cal)] : [i.foodId, round1(num(i.amount))]));
+}
+// Bugüne özel kopyada menüden farklı olan öğünlerin kimlikleri
+function dayChangedIds() {
+  const out = new Set();
+  const c = dayCopy();
+  if (!c) return out;
+  const menu = curMeals();
+  c.forEach(m => {
+    const mm = menu.find(x => x.id === m.id);
+    if (!mm || itemsSig(mm.items) !== itemsSig(m.items)) out.add(m.id);
+  });
+  return out;
+}
+function toggleMealEdit(mIdx) {
+  const m = dayMeals()[mIdx];
+  if (!m) return;
+  if (openEditMeals.has(m.id)) openEditMeals.delete(m.id); else openEditMeals.add(m.id);
+  renderAll();
+}
+function dayChangeAmount(mIdx, iIdx, dir) {
+  const c = ensureDayCopy();
+  const item = c[mIdx] && c[mIdx].items[iIdx];
+  if (!item || item.est) return;
+  const f = getFoodDB()[item.foodId];
+  const next = Math.max(0, round1(effAmount(item) + dir * (f ? num(f.step, 1) : 1)));
+  if (next === 0) { dayRemoveItem(mIdx, iIdx); return; }
+  item.amount = rawFromEff(f, next);
+  renderAll();
+}
+function daySetAmount(mIdx, iIdx, val) {
+  const n = num(val, NaN);
+  const c = ensureDayCopy();
+  const item = c[mIdx] && c[mIdx].items[iIdx];
+  if (!item || item.est) return;
+  if (!isFinite(n) || n <= 0) { dayRemoveItem(mIdx, iIdx); return; }
+  item.amount = rawFromEff(getFoodDB()[item.foodId], round1(n));
+  renderAll();
+}
+function dayRemoveItem(mIdx, iIdx) {
+  snapshot();
+  const c = ensureDayCopy();
+  if (!c[mIdx] || !c[mIdx].items[iIdx]) return;
+  const it = c[mIdx].items.splice(iIdx, 1)[0];
+  const f = it.est ? null : getFoodDB()[it.foodId];
+  renderAll();
+  offerUndo(`🗑️ ${it.est ? it.est.name : f ? f.name : "Besin"} bugünden çıkarıldı`);
+}
+// Öğünün yarısı yendi: bugünkü miktarlar yarıya iner, öğün yendi işaretlenir
+function halfMeal(mIdx) {
+  snapshot();
+  const c = ensureDayCopy();
+  const m = c[mIdx];
+  if (!m) return;
+  const db = getFoodDB();
+  m.items.forEach(it => {
+    if (it.est) { ["cal", "p", "c", "f"].forEach(k => { it.est[k] = round1(num(it.est[k]) / 2); }); return; }
+    const f = db[it.foodId];
+    if (!f) return;
+    it.amount = rawFromEff(f, Math.max(0.1, round1(effAmount(it) / 2)));
+  });
+  m.done = true;
+  openDoneMeals.delete(m.id);
+  openEditMeals.delete(m.id);
+  renderAll();
+  offerUndo(`½ ${m.title}: yarısı yendi (yalnızca bugün)`);
+}
+function saveDayToMenu() {
+  const c = dayCopy();
+  if (!c) return;
+  snapshot();
+  const changed = dayChangedIds();
+  const menu = curMeals();
+  let n = 0, skipped = 0;
+  c.forEach(m => {
+    if (!changed.has(m.id)) return;
+    if (mealHasEst(m)) { skipped++; return; }
+    const mm = menu.find(x => x.id === m.id);
+    if (!mm) return;
+    mm.items = clone(m.items);
+    n++;
+  });
+  renderAll();
+  offerUndo(`✓ ${n} öğün menüye kaydedildi${skipped ? ` · dışarıda yenen ${skipped} öğün menüye yazılmadı` : ""}`);
+}
+function revertDayToMenu() {
+  const c = dayCopy();
+  if (!c) return;
+  snapshot();
+  const menu = curMeals();
+  c.forEach(m => { const mm = menu.find(x => x.id === m.id); if (mm) mm.done = !!m.done; });
+  state.dayPlan[dayKind()] = null;
+  openEditMeals.clear();
+  renderAll();
+  offerUndo("↺ Bugün menüdeki hâline döndü");
+}
+
+// ---------------------------------------------------------------------------
+// v14 — DIŞARIDA YEDİM (tahmini giriş) ve GÜNÜ DENGELE
+// ---------------------------------------------------------------------------
+let fmIdx = -1;
+function openFreeMeal(mIdx) {
+  const m = dayMeals()[mIdx];
+  if (!m) return;
+  fmIdx = mIdx;
+  $("fmMeal").textContent = m.title;
+  ["fmName", "fmKcal", "fmP", "fmC", "fmF"].forEach(id => { $(id).value = ""; });
+  $("fmReplace").checked = true;
+  $("fmBalance").checked = false;
+  updateFreeMealHint();
+  openModal("freeMealModal");
+}
+function freeMealPreview() {
+  const meals = dayMeals();
+  const m = meals[fmIdx];
+  if (!m) return null;
+  const kcal = num($("fmKcal").value, 0);
+  const total = nutritionTotals(meals).cal - ($("fmReplace").checked ? mealTotals(m).cal : 0) + Math.max(0, kcal);
+  const target = getTargets().calTarget;
+  return { total, target, over: Math.round(total - target) };
+}
+function updateFreeMealHint() {
+  const pv = freeMealPreview();
+  if (!pv) return;
+  const tol = Math.max(50, Math.round(pv.target * 0.05));
+  $("fmHint").innerHTML = pv.over > 0
+    ? `Bu girişle bugün <strong>${fmtInt(pv.total)} kcal</strong> olur; hedefi <strong class="n-over">${fmtInt(pv.over)} kcal</strong> aşar.`
+    : `Bu girişle bugün <strong>${fmtInt(pv.total)} kcal</strong> olur; hedefin (${fmtInt(pv.target)} kcal) altında kalırsın.`;
+  const can = pv.over > tol;
+  $("fmBalance").disabled = !can;
+  if (!can) $("fmBalance").checked = false;
+  $("fmBalanceWrap").classList.toggle("opacity-50", !can);
+}
+function saveFreeMeal() {
+  const kcal = num($("fmKcal").value, NaN);
+  const p = num($("fmP").value, NaN);
+  if (!(kcal > 0) || kcal > 6000) { alert("Lütfen tahmini kaloriyi yaz (örn: 850)."); return; }
+  if (!isFinite(p) || p < 0 || p * 4 > kcal * 1.2) { alert("Lütfen tahmini proteini gram olarak yaz (bilmiyorsan 0 yazabilirsin). Protein, kaloriden fazla olamaz."); return; }
+  const cv = num($("fmC").value, NaN), fv = num($("fmF").value, NaN);
+  if ((isFinite(cv) && cv < 0) || (isFinite(fv) && fv < 0)) { alert("Karb ve yağ negatif olamaz."); return; }
+  snapshot();
+  const c = ensureDayCopy();
+  const m = c[fmIdx];
+  if (!m) return;
+  const est = { name: $("fmName").value.trim().slice(0, 50) || "Dışarıda yemek", cal: Math.round(kcal), p: round1(p), c: isFinite(cv) ? round1(cv) : 0, f: isFinite(fv) ? round1(fv) : 0 };
+  const it = { foodId: "_est", amount: 1, est };
+  if ($("fmReplace").checked) m.items = [it]; else m.items.push(it);
+  m.done = true;
+  openDoneMeals.delete(m.id);
+  openEditMeals.delete(m.id);
+  let msg = `✓ ${shortMealTitle(m)}: ${est.cal} kcal tahmini girildi (yalnızca bugün)`;
+  if ($("fmBalance").checked) msg += balanceDay(fmIdx).msg;
+  closeModal("freeMealModal");
+  renderAll();
+  offerUndo(msg);
+}
+function balanceDayNow() {
+  snapshot();
+  const r = balanceDay(-1);
+  renderAll();
+  if (r.parts.length) offerUndo("⚖️ " + r.msg.replace(/^ · /, "")); else toast(r.msg.replace(/^ · /, ""), "error");
+}
+// Kalan (yenmemiş) öğünlerde karb/yağ ağırlıklı besinleri orantılı kısar; protein kaynakları
+// (kalorisinin %40+'ı proteinden gelen besinler) değişmez. Hedef aşımını kapatmaya çalışır.
+function balanceDay(skipIdx) {
+  const meals = ensureDayCopy();
+  const target = getTargets().calTarget;
+  const over = nutritionTotals(meals).cal - target;
+  if (over <= 20) return { msg: " · gün zaten hedefte, kısmaya gerek yok", parts: [] };
+  const db = getFoodDB();
+  const cands = [];
+  meals.forEach((m, mi) => {
+    if (mi === skipIdx || m.done) return;
+    m.items.forEach(it => {
+      if (it.est) return;
+      const f = db[it.foodId];
+      if (!f) return;
+      const x = calcItemMacros(it);
+      // 50 kcal altı (sebze, salata gibi) ve protein ağırlıklı besinlere dokunulmaz
+      if (x.cal < 50 || (x.p * 4) / x.cal >= 0.4) return;
+      cands.push({ m, it, f, cal: x.cal });
+    });
+  });
+  // Her besinden en fazla %75 kısılır (en az dörtte biri kalır; besin tamamen silinmez)
+  const avail = cands.reduce((a, b) => a + b.cal, 0) * BALANCE_MAX_CUT;
+  if (avail <= 0) return { msg: " · kalan öğünlerde kısılabilecek karb/yağ ağırlıklı besin yok", parts: [] };
+  const k = 1 - BALANCE_MAX_CUT * Math.min(1, over / avail);
+  const before = new Map(meals.map(m => [m, mealTotals(m).cal]));
+  cands.forEach(c => {
+    const eff = effAmount(c.it);
+    let ne = eff * k;
+    ne = isScalable(c.f) ? Math.round(ne / 5) * 5 : Math.round(ne * 2) / 2;
+    ne = Math.max(ne, isScalable(c.f) ? 5 : 0.5, 0);
+    if (ne < eff) c.it.amount = rawFromEff(c.f, ne);
+  });
+  const parts = [];
+  meals.forEach(m => {
+    const d = Math.round(mealTotals(m).cal - before.get(m));
+    if (d < 0) { m.balanced = Math.round(num(m.balanced, 0) + d); parts.push(`${shortMealTitle(m)} −${fmtInt(-d)}`); }
+  });
+  return { msg: ` · Günü dengeledim: ${parts.join(", ")} kcal${avail < over ? " (aşımın tamamı kapatılamadı)" : ""}`, parts };
+}
+const BALANCE_MAX_CUT = 0.75;
+// "2. Öğün: Öğle Yemeği (...)" → "2. Öğün"; uzun adlar kısaltılır
+function shortMealTitle(m) {
+  const t = String(m.title || "");
+  const i = t.indexOf(":");
+  if (i > 0 && i <= 16) return t.slice(0, i);
+  return t.length > 18 ? t.slice(0, 17) + "…" : t;
 }
 
 // ---------------------------------------------------------------------------
@@ -924,7 +1240,7 @@ function renderTodayMeals() {
 function renderMenus() {
   const db = getFoodDB();
   const targets = getTargets();
-  const plan = nutritionTotals();
+  const plan = nutritionTotals(curMeals());
   const diff = Math.round(plan.cal) - targets.calTarget;
   const tol = Math.max(50, Math.round(targets.calTarget * 0.05));
   const ok = Math.abs(diff) <= tol;
@@ -963,7 +1279,8 @@ function renderMenus() {
         <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">Gramaj oranı</span><strong class="n-accent">%${Math.round(k * 100)}</strong></div>
       </div>
       <button onclick="resetScaleBase()" class="n-btn-outline w-full h-11 rounded-full text-[13px]">Şimdiki gramajları sabitle (referansı ${fmtNum(state.weight)} kg yap)</button>
-      <p class="text-[12px] n-dim">Yalnızca gram ve ml ile ölçülen besinler değişir (tavuk, pirinç, yulaf...). Adet, kase, ölçek gibi besinler aynı kalır. Oran en fazla %70–%130 arasında uygulanır. Ayarı kapatırsan menü ilk gramajlarına döner.</p>` : ""}`;
+      <p class="text-[12px] n-dim">Yalnızca gram ve ml ile ölçülen besinler değişir (tavuk, pirinç, yulaf...). Adet, kase, ölçek gibi besinler aynı kalır. Oran en fazla %70–%130 arasında uygulanır. Ayarı kapatırsan menü ilk gramajlarına döner.</p>
+      ${num(st.calAdjust, 0) !== 0 ? `<p id="scaleCoachNote" class="text-[12px] n-k border border-current rounded-2xl px-3 py-2">Kalori koçu hedefini ${num(st.calAdjust, 0) > 0 ? "+" : ""}${fmtInt(num(st.calAdjust, 0))} kcal ayarladı. İkisi aynı düzeltmeyi iki kez yapmaz: gramajlar yalnızca kilona göre değişir, koç yalnızca hedef kaloriyi değiştirir. Bu yüzden koçun düzeltmesi menüye kendiliğinden yansımaz; menü toplamını hedefe uydurmak için "Karbı dengele"yi kullan.</p>` : ""}` : ""}`;
 
   // Öğün listesi
   const meals = curMeals();
@@ -1010,7 +1327,7 @@ function renderMenus() {
         ${head}
         ${meal.targetNote ? `<div class="text-[12px] n-muted -mt-2 pl-10">${esc(meal.targetNote)}</div>` : ""}
         <div class="n-div n-bt">${items || '<div class="text-[13px] n-dim py-3">Bu öğünde henüz besin yok.</div>'}</div>
-        <button onclick="goAddFood(${mIdx})" class="n-btn w-full h-12 rounded-full text-[14px] flex items-center justify-center gap-1.5">${svgI("plus", 18, 2.4)}Besin ekle</button>
+        <button onclick="goAddFood(${mIdx}, 'menu')" class="n-btn w-full h-12 rounded-full text-[14px] flex items-center justify-center gap-1.5">${svgI("plus", 18, 2.4)}Besin ekle</button>
         <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-0.5 px-0.5">
           <button onclick="quickAdd(${mIdx}, 'whey_shake', 1)" class="n-chip">+1 Shake</button>
           <button onclick="quickAdd(${mIdx}, 'yesil_salata', 1)" class="n-chip">+ Salata</button>
@@ -1025,33 +1342,43 @@ function renderMenus() {
   }).join("");
   html += `<button onclick="openMealModal()" class="w-full min-h-[60px] rounded-[20px] border-[1.5px] border-dashed n-accent flex items-center justify-center gap-2 font-bold text-[14px]" style="border-color: var(--n-accent)">
     ${svgI("plus", 20, 2.4)}Yeni öğün ekle</button>`;
+  if (dayChangedIds().size) {
+    html = `<div id="menuDayNote" class="n-card rounded-[20px] p-3.5 space-y-2.5">
+        <p class="text-[13px] n-muted">Bugün için bu menüde ayrı değişiklikler yaptın. Burada yaptığın değişiklikler <strong class="n-text">bugünkü planı değiştirmez</strong>; yarından itibaren geçerli olur.</p>
+        <button onclick="revertDayToMenu()" class="n-btn-ghost w-full h-11 rounded-full text-[13px]">Bugünü de bu menüye eşitle</button>
+      </div>` + html;
+  }
   $("mealsContainer").innerHTML = html;
 }
 
 // ---------------------------------------------------------------------------
 // BESİNLER (arama, kategori, gramaj, hazır porsiyon, canlı kalan)
 // ---------------------------------------------------------------------------
-const foodUI = { meal: null, cat: "all", sel: null, amt: 0 };
+// dest: "day" → bugünkü plana (yalnızca bugün), "menu" → Menülerim'e
+const foodUI = { meal: null, cat: "all", sel: null, amt: 0, dest: "day" };
+function foodMeals() { return foodUI.dest === "menu" ? curMeals() : dayMeals(); }
 function foodTargetIdx() {
-  const meals = curMeals();
+  const meals = foodMeals();
   if (!meals.length) return -1;
   if (foodUI.meal != null && foodUI.meal >= 0 && foodUI.meal < meals.length) return foodUI.meal;
   const nx = meals.findIndex(m => !m.done);
   return nx >= 0 ? nx : 0;
 }
-function goAddFood(mIdx) {
+function goAddFood(mIdx, dest) {
   foodUI.meal = mIdx;
   foodUI.sel = null;
+  foodUI.dest = dest === "menu" ? "menu" : "day";
   state.nutriView = "foods";
   window.scrollTo(0, 0);
   renderAll();
 }
+function setFoodDest(d) { foodUI.dest = d === "menu" ? "menu" : "day"; renderAll(); }
 function setFoodMeal(i) { foodUI.meal = i; renderAll(); }
 function setFoodCat(c) { foodUI.cat = c; foodUI.sel = null; renderFoods(); }
 function foodCatKey(cat) { return "c:" + String(cat || "Diğer"); }
 
 function renderFoods() {
-  const meals = curMeals();
+  const meals = foodMeals();
   const tIdx = foodTargetIdx();
   $("foodMealChips").innerHTML = meals.map((m, i) => `<button onclick="setFoodMeal(${i})" class="n-chip ${i === tIdx ? "solid" : ""} max-w-[220px]" aria-pressed="${i === tIdx}"><span class="truncate">${esc(m.time ? m.time + " · " + m.title : m.title)}</span></button>`).join("");
   const db = getFoodDB();
@@ -1067,26 +1394,35 @@ function renderFoods() {
 
 function foodRemainingText(extraCal, extraP) {
   const targets = getTargets();
-  const plan = nutritionTotals();
+  const plan = nutritionTotals(foodMeals());
   const rc = targets.calTarget - Math.round(plan.cal + extraCal);
   const rp = targets.proTarget - Math.round(plan.p + extraP);
   const c = rc >= 0 ? `<strong class="tabular-nums">${fmtInt(rc)} kcal</strong> kalır` : `<strong class="tabular-nums n-over">${fmtInt(-rc)} kcal</strong> aşar`;
   const p = rp >= 0 ? `<strong class="n-p tabular-nums">${fmtInt(rp)} g</strong> protein kalır` : `protein hedefi <strong class="n-p">${fmtInt(-rp)} g</strong> aşılır`;
   return `${c} · ${p}`;
 }
+function foodRemainPrefix(sel) {
+  const where = foodUI.dest === "menu" ? "menüde" : "bugün";
+  return sel ? `Ekledikten sonra ${where} ` : (foodUI.dest === "menu" ? "Menüde " : "Bugün ");
+}
 function renderFoodHead() {
-  const meals = curMeals();
+  const meals = foodMeals();
   const tIdx = foodTargetIdx();
+  const day = foodUI.dest !== "menu";
+  const seg = `<div class="n-seg grid-cols-2 mb-3" aria-label="Nereye eklensin?">
+      <button id="fdDay" onclick="setFoodDest('day')" class="${day ? "on" : ""}" aria-pressed="${day}">Bugüne ekle</button>
+      <button id="fdMenu" onclick="setFoodDest('menu')" class="${day ? "" : "on"}" aria-pressed="${!day}">Menüye ekle</button>
+    </div>`;
   if (tIdx < 0) {
-    $("foodHead").innerHTML = `<div class="n-card rounded-[20px] p-4 text-[14px] n-muted">Besin eklemek için önce Menülerim'den bir öğün oluştur.</div>`;
+    $("foodHead").innerHTML = seg + `<div class="n-card rounded-[20px] p-4 text-[14px] n-muted">Besin eklemek için önce Menülerim'den bir öğün oluştur.</div>`;
     return;
   }
   const sel = foodSelMacros();
-  $("foodHead").innerHTML = `<div class="flex items-start justify-between gap-2">
-      <div class="min-w-0"><div class="n-label">HANGİ ÖĞÜNE?</div>
+  $("foodHead").innerHTML = seg + `<div class="flex items-start justify-between gap-2">
+      <div class="min-w-0"><div class="n-label">${day ? "BUGÜN HANGİ ÖĞÜNE?" : "MENÜDE HANGİ ÖĞÜNE?"}</div>
         <h2 class="text-[20px] font-extrabold leading-tight mt-0.5 break-words">${esc(meals[tIdx].title)}</h2></div>
     </div>
-    <p id="foodRemain" class="text-[13px] n-muted mt-1">${sel ? "Ekledikten sonra menüde " : "Menüde "}${foodRemainingText(sel ? sel.cal : 0, sel ? sel.p : 0)}</p>`;
+    <p id="foodRemain" class="text-[13px] n-muted mt-1">${foodRemainPrefix(sel)}${foodRemainingText(sel ? sel.cal : 0, sel ? sel.p : 0)}</p>`;
 }
 
 function foodSelMacros() {
@@ -1178,7 +1514,7 @@ function updateFoodSelUI() {
     document.querySelectorAll("#foodSelCard [data-preset]").forEach(b => b.classList.toggle("on", num(b.dataset.preset) === round1(s.a)));
   }
   const r = $("foodRemain");
-  if (r) r.innerHTML = (s ? "Ekledikten sonra menüde " : "Menüde ") + foodRemainingText(s ? s.cal : 0, s ? s.p : 0);
+  if (r) r.innerHTML = foodRemainPrefix(s) + foodRemainingText(s ? s.cal : 0, s ? s.p : 0);
 }
 function selectFood(id) {
   const f = getFoodDB()[id];
@@ -1207,11 +1543,27 @@ function addSelectedFood() {
   const s = foodSelMacros();
   const tIdx = foodTargetIdx();
   if (!s || tIdx < 0 || !(s.a > 0)) return;
-  const mealTitle = curMeals()[tIdx].title;
-  quickAdd(tIdx, foodUI.sel, s.a);
-  toast(`✓ ${fmtNum(s.a)} ${s.f.unit} ${s.f.name} → ${mealTitle}`);
+  const fid = foodUI.sel, amt = s.a;
+  if (foodUI.dest === "menu") {
+    const mealTitle = curMeals()[tIdx].title;
+    quickAdd(tIdx, fid, amt, curMeals());
+    toast(`✓ ${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${mealTitle} (menü)`);
+  } else {
+    const list = ensureDayCopy();
+    const meal = list[tIdx];
+    quickAdd(tIdx, fid, amt, list);
+    const mid = meal.id;
+    toast(`✓ ${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${meal.title} (yalnızca bugün)`, "ok", { label: "Menüye de kaydet", fn: () => addToMenuById(mid, fid, amt) });
+  }
   foodUI.sel = null;
   renderFoods();
+}
+// Bugüne eklenen besini, aynı kimlikli menü öğününe de ekler
+function addToMenuById(mealId, foodId, amount) {
+  const mi = curMeals().findIndex(m => m.id === mealId);
+  if (mi < 0) { toast("Bu öğün menüde bulunamadı", "error"); return; }
+  quickAdd(mi, foodId, amount, curMeals());
+  toast(`✓ Menüdeki "${curMeals()[mi].title}" öğününe de eklendi`);
 }
 
 // ---------------------------------------------------------------------------
@@ -1221,7 +1573,7 @@ function renderNutriHistory() {
   const t = getTargets();
   const plan = nutritionTotals();
   const eaten = eatenTotals();
-  const meals = curMeals();
+  const meals = dayMeals();
   const sup = state.supplements || {};
   const rows = [{
     key: state.today || todayStr(), live: true, dayType: state.dayType,
@@ -1360,8 +1712,9 @@ async function onBarcode(raw) {
   }
   if ($("bcManual").value !== code) return;   // bu arada başka barkod arandı
   if (!p) {
-    bcStatus(`${code} veritabanında bulunamadı.`);
-    bcManualButton(code, "");
+    // v14: bulunamayınca doğrudan etiket formu açılır
+    closeBarcode();
+    openLabelForm(code, "");
     return;
   }
   const n = p.nutriments || {};
@@ -1387,7 +1740,7 @@ async function onBarcode(raw) {
 }
 function bcManualButton(code, name) {
   bc.found = { code, name };
-  $("bcResult").innerHTML = `<button onclick="barcodeManualFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">Besini elle ekle</button>`;
+  $("bcResult").innerHTML = `<button onclick="barcodeManualFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">Etiketteki değerleri gir</button>`;
 }
 async function fetchOFF(code) {
   const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
@@ -1413,9 +1766,13 @@ function addBarcodeFood() {
 function barcodeManualFood() {
   const b = bc.found || {};
   closeBarcode();
+  if (b.code) {
+    openLabelForm(b.code, b.name || "");
+    $("cfHint").textContent = `Barkod ${b.code}. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.`;
+    return;
+  }
   openCustomFoodModal();
   if (b.name) $("cfName").value = b.name;
-  cfPendingBarcode = b.code || null;
 }
 function pickFoodInFoods(id) {
   state.nutriView = "foods";
@@ -1454,7 +1811,7 @@ function deleteWeightLog(idx) {
 function addWater(delta) { state.waterLiters = Math.max(0, Math.round(((state.waterLiters || 0) + delta) * 100) / 100); renderAll(); }
 function toggleSupp(key) { state.supplements[key] = !state.supplements[key]; renderAll(); }
 function toggleMealDone(mIdx) {
-  const m = curMeals()[mIdx];
+  const m = dayMeals()[mIdx];
   if (!m) return;
   m.done = !m.done;
   openDoneMeals.delete(m.id);
@@ -1493,20 +1850,22 @@ function removeItem(mIdx, iIdx) {
 }
 
 // amount: ekranda görünen miktar (ölçek açıksa saklanacak miktara çevrilir)
-function quickAdd(mIdx, foodId, amount) {
+// meals verilmezse Menülerim (curMeals) kullanılır
+function quickAdd(mIdx, foodId, amount, meals) {
+  const list = meals || curMeals();
   const f = getFoodDB()[foodId];
-  if (!f || !curMeals()[mIdx]) return;
+  if (!f || !list[mIdx]) return;
   const raw = rawFromEff(f, amount);
-  const existing = curMeals()[mIdx].items.find(i => i.foodId === foodId);
+  const existing = list[mIdx].items.find(i => i.foodId === foodId);
   if (existing) existing.amount = isScalable(f) && scaleK() !== 1 ? existing.amount + raw : round1(existing.amount + raw);
-  else curMeals()[mIdx].items.push({ foodId, amount: raw });
+  else list[mIdx].items.push({ foodId, amount: raw });
   state.recentFoods = [foodId, ...state.recentFoods.filter(id => id !== foodId)].slice(0, 8);
   renderAll();
 }
 
 function autoBalanceCarbs() {
   const targets = getTargets();
-  const calDiff = targets.calTarget - nutritionTotals().cal;
+  const calDiff = targets.calTarget - nutritionTotals(curMeals()).cal;
   const carbIds = ["pirinc", "basmati", "makarna_tam", "bulgur", "yulaf", "patates", "tatli_patates"];
   const carbItems = [];
   curMeals().forEach(m => m.items.forEach(i => { if (carbIds.includes(i.foodId)) carbItems.push(i); }));
@@ -1515,7 +1874,7 @@ function autoBalanceCarbs() {
   const per = calDiff / carbItems.length;
   carbItems.forEach(item => {
     const f = db[item.foodId];
-    const calPerUnit = (f.p * 4) + (f.c * 4) + (f.f * 9);
+    const calPerUnit = kcalPerUnit(f);
     const eff = Math.max(20, Math.round((effAmount(item) + per / calPerUnit) / 5) * 5);
     item.amount = rawFromEff(f, eff);
   });
@@ -1527,9 +1886,26 @@ function openCustomFoodModal() {
   cfEditId = null;
   cfPendingBarcode = null;
   $("cfTitle").textContent = "➕ Kendi Özel Besinini Tanımla";
+  $("cfHint").classList.add("hidden");
   $("cfName").value = ""; $("cfUnit").value = "100g"; $("cfDef").value = "100";
+  $("cfK").value = "";
   $("cfP").value = "20"; $("cfC").value = "10"; $("cfF").value = "5";
+  cfUnitChanged();
   openModal("customFoodModal");
+}
+// v14: barkod bulunamayınca doğrudan etiket formu (ürün bu barkodla kaydedilir)
+function openLabelForm(code, name) {
+  openCustomFoodModal();
+  cfPendingBarcode = code || null;
+  $("cfTitle").textContent = "Etiketteki değerleri gir";
+  $("cfHint").textContent = `Barkod ${code} veritabanında yok. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.`;
+  $("cfHint").classList.remove("hidden");
+  $("cfName").value = name || "";
+  ["cfK", "cfP", "cfC", "cfF"].forEach(id => { $(id).value = ""; });
+}
+function cfUnitChanged() {
+  const m = $("cfUnit").value;
+  $("cfDefLabel").textContent = m === "serv" ? "1 porsiyon kaç gram?" : m === "1adet" ? "Varsayılan miktar (adet):" : "Varsayılan miktar (g):";
 }
 function openFoodModalFromPicker() { closeModal("pickerModal"); openCustomFoodModal(); }
 function saveCustomFood() {
@@ -1538,15 +1914,23 @@ function saveCustomFood() {
   const unitMode = $("cfUnit").value;
   const def = num($("cfDef").value, 100) || 100;
   const p = num($("cfP").value), c = num($("cfC").value), f = num($("cfF").value);
+  const kRaw = $("cfK").value.trim();
+  const k = kRaw === "" ? null : num(kRaw, NaN);
+  if ([p, c, f].some(x => x < 0) || (k != null && !(k >= 0))) { alert("Değerler negatif olamaz; kaloriyi rakamla yaz."); return; }
+  if (unitMode === "serv" && !(def > 0 && def <= 2000)) { alert("Lütfen 1 porsiyonun kaç gram olduğunu yaz (etikette yazar, örn: 30)."); return; }
   const editing = cfEditId && state.customFoods[cfEditId];
   const prev = editing ? state.customFoods[cfEditId] : null;
   const barcode = prev && prev.barcode ? prev.barcode : cfPendingBarcode;
   const id = editing ? cfEditId : barcode ? "custom_bc_" + barcode : "custom_" + Date.now();
   cfEditId = null;
   cfPendingBarcode = null;
-  const food = unitMode === "100g"
-    ? { name: "⭐ " + name, cat: "⭐ Özel Eklediklerim", unit: prev && prev.unit === "ml" ? "ml" : "g", step: 10, def, p: p / 100, c: c / 100, f: f / 100 }
-    : { name: "⭐ " + name, cat: "⭐ Özel Eklediklerim", unit: "adet", step: 1, def, p, c, f };
+  const gUnit = prev && prev.unit === "ml" ? "ml" : "g";
+  const base = unitMode === "1adet" ? 1 : unitMode === "serv" ? def : 100;
+  const food = unitMode === "1adet"
+    ? { name: "⭐ " + name, cat: "⭐ Özel Eklediklerim", unit: "adet", step: 1, def, p, c, f }
+    : { name: "⭐ " + name, cat: "⭐ Özel Eklediklerim", unit: gUnit, step: 10, def, p: p / base, c: c / base, f: f / base };
+  if (unitMode === "serv") food.serv = def;
+  if (k != null) food.kcal = k / base;
   if (barcode) food.barcode = barcode;
   state.customFoods[id] = food;
   closeModal("customFoodModal");
@@ -1631,7 +2015,7 @@ function openFoodPicker(mIdx) {
   const db = getFoodDB();
   const sub = f => {
     const p = f.p * f.def, c = f.c * f.def, fat = f.f * f.def;
-    return `${fmtNum(f.def)} ${f.unit} • ${Math.round(p * 4 + c * 4 + fat * 9)} kcal • ${Math.round(p)}P ${Math.round(c)}K ${Math.round(fat)}Y`;
+    return `${fmtNum(f.def)} ${f.unit} • ${Math.round(kcalPerUnit(f) * f.def)} kcal • ${Math.round(p)}P ${Math.round(c)}K ${Math.round(fat)}Y`;
   };
   const cats = {};
   Object.keys(db).forEach(id => {
@@ -2946,7 +3330,7 @@ function renderPlateTool() {
 // ---------------------------------------------------------------------------
 function eatenTotals() {
   let p = 0, c = 0, f = 0, cal = 0;
-  curMeals().forEach(m => { if (!m.done) return; m.items.forEach(i => { const x = calcItemMacros(i); p += x.p; c += x.c; f += x.f; cal += x.cal; }); });
+  dayMeals().forEach(m => { if (!m.done) return; m.items.forEach(i => { const x = calcItemMacros(i); p += x.p; c += x.c; f += x.f; cal += x.cal; }); });
   return { p, c, f, cal };
 }
 function setMacroView(v) { state.settings.macroView = v === "eaten" ? "eaten" : "plan"; renderAll(); }
@@ -4394,17 +4778,22 @@ function editCustomFood(id) {
   cfEditId = id;
   $("cfTitle").textContent = "✎ Özel Besini Düzenle";
   $("cfName").value = String(f.name || "").replace(/^⭐\s*/, "");
-  const per100 = f.unit === "g";
-  $("cfUnit").value = per100 ? "100g" : "1adet";
-  $("cfDef").value = fmtNum(num(f.def, per100 ? 100 : 1));
-  $("cfP").value = fmtNum(per100 ? f.p * 100 : f.p);
-  $("cfC").value = fmtNum(per100 ? f.c * 100 : f.c);
-  $("cfF").value = fmtNum(per100 ? f.f * 100 : f.f);
+  $("cfHint").classList.add("hidden");
+  const gram = f.unit === "g" || f.unit === "ml";
+  const serv = gram && num(f.serv, 0) > 0;
+  const base = !gram ? 1 : serv ? num(f.serv) : 100;
+  $("cfUnit").value = !gram ? "1adet" : serv ? "serv" : "100g";
+  $("cfDef").value = fmtNum(serv ? num(f.serv) : num(f.def, gram ? 100 : 1));
+  $("cfP").value = fmtNum(f.p * base);
+  $("cfC").value = fmtNum(f.c * base);
+  $("cfF").value = fmtNum(f.f * base);
+  $("cfK").value = f.kcal != null ? fmtNum(f.kcal * base) : "";
+  cfUnitChanged();
   openModal("customFoodModal");
 }
 function customFoodUses(id) {
   let n = 0;
-  [state.meals, state.restMeals].forEach(ms => ms.forEach(m => m.items.forEach(i => { if (i.foodId === id) n++; })));
+  allMealLists().forEach(ms => ms.forEach(m => m.items.forEach(i => { if (i.foodId === id) n++; })));
   return n;
 }
 function deleteCustomFood(id) {
@@ -4414,7 +4803,7 @@ function deleteCustomFood(id) {
   if (uses > 0 && !confirm(`"${f.name}" ${uses} öğünde kullanılıyor. Silersen o öğünlerden de çıkarılacak. Devam edilsin mi?`)) return;
   snapshot();
   delete state.customFoods[id];
-  [state.meals, state.restMeals].forEach(ms => ms.forEach(m => { m.items = m.items.filter(i => i.foodId !== id); }));
+  allMealLists().forEach(ms => ms.forEach(m => { m.items = m.items.filter(i => i.foodId !== id); }));
   state.recentFoods = state.recentFoods.filter(x => x !== id);
   closeModal("pickerModal");
   renderAll();

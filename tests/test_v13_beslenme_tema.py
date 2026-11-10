@@ -77,7 +77,7 @@ try:
     pg.evaluate("setMacroView('plan')")
 
     # ---------- BUGÜN: zaman çizelgesi
-    check(pg.locator('#todayMeals [data-today-meal="0"] button[onclick="goAddFood(0)"]').count() == 0 and "yendi" in pg.inner_text('#todayMeals [data-today-meal="0"]'), "yenmiş öğün tek satıra kapandı ('yendi')")
+    check(pg.locator('#todayMeals [data-today-meal="0"] button[onclick^="goAddFood(0"]').count() == 0 and "yendi" in pg.inner_text('#todayMeals [data-today-meal="0"]'), "yenmiş öğün tek satıra kapandı ('yendi')")
     pg.locator('#todayMeals [onclick="toggleMealOpen(0)"]').click(); pg.wait_for_timeout(80)
     check("TAMAMLANDI" in pg.inner_text('#todayMeals [data-today-meal="0"]'), "dokununca açıldı, 'TAMAMLANDI' yazıyor")
     pg.locator('#todayMeals [data-today-meal="0"] button[onclick="toggleMealDone(0)"]').click(); pg.wait_for_timeout(80)
@@ -93,16 +93,17 @@ try:
     # ---------- İkame
     before = st(pg)["meals"][1]["items"][0]
     kcal_before = pg.evaluate("calcItemMacros(curMeals()[1].items[0]).cal")
-    pg.locator('#todayMeals [onclick="openSwap(1, 0)"]').click(); pg.wait_for_timeout(100)
+    pg.locator("#todayMeals [onclick=\"openSwap(1, 0, 'day')\"]").click(); pg.wait_for_timeout(100)
     check(pg.evaluate("$('pickerModal').classList.contains('nm')") and "yerine" in pg.inner_text("#pickerTitle"), "ikame penceresi açıldı (beslenme temasında)")
     opts = pg.locator("#pickerList button").all_inner_texts()
     check(len(opts) >= 3 and all("kcal" in o for o in opts), f"ikame seçenekleri gramaj ve kaloriyle listeleniyor ({len(opts)} seçenek)")
     pg.locator("#pickerList button", has_text="Hindi").first.click(); pg.wait_for_timeout(100)
-    after = st(pg)["meals"][1]["items"][0]
-    kcal_after = pg.evaluate("calcItemMacros(curMeals()[1].items[0]).cal")
+    after = pg.evaluate("dayMeals()[1].items[0]")
+    kcal_after = pg.evaluate("calcItemMacros(dayMeals()[1].items[0]).cal")
     check(after["foodId"] == "hindi_gogsu" and abs(kcal_after - kcal_before) <= 15, f"tavuk → hindi, kalori korunuyor ({round(kcal_before)} → {round(kcal_after)})")
+    check(st(pg)["meals"][1]["items"][0] == before, "v14: Bugün'deki ikame menüyü değiştirmiyor")
     pg.locator("#toastWrap button", has_text="Geri al").first.click(); pg.wait_for_timeout(100)
-    check(st(pg)["meals"][1]["items"][0] == before, "ikame Geri al ile geri alınıyor")
+    check(pg.evaluate("dayMeals()[1].items[0]") == before and st(pg)["dayPlan"] is None, "ikame Geri al ile geri alınıyor")
     check(pg.locator('#todayMeals [data-today-meal="1"] [onclick^="openSwap(1, 2)"]').count() == 0, "grubu olmayan besinde (salata) ikame düğmesi yok")
 
     # ---------- Su ve takviyeler
@@ -163,7 +164,7 @@ try:
 
     # ---------- BESİNLER
     view(pg, "today")
-    pg.locator(f'#todayMeals button[onclick="goAddFood({nxt})"]').click(); pg.wait_for_timeout(100)
+    pg.locator(f"#todayMeals button[onclick=\"goAddFood({nxt}, 'day')\"]").click(); pg.wait_for_timeout(100)
     check(pg.evaluate("state.nutriView") == "foods" and pg.evaluate("foodTargetIdx()") == nxt, "'+ Besin' Besinler'i doğru öğün seçili açıyor")
     cats = pg.locator("#foodCats button").all_inner_texts()
     check("Tümü" in cats and any("Türk Mutfağı" in c for c in cats) and not any("🇹🇷" in c for c in cats), "kategori düğmeleri (emojisiz)")
@@ -180,10 +181,12 @@ try:
     check(pg.inner_text("#foodSelKcal") == pg.evaluate(f"fmtInt({k65})") and str(k65) in pg.inner_text("#foodAddBtn").replace(".", ""), "elle yazılan miktarda kalori canlı güncelleniyor")
     check(pg.evaluate("document.activeElement && document.activeElement.id") == "foodAmt", "yazarken kutu odakta kalıyor (klavye kapanmıyor)")
     check("Ekledikten sonra" in pg.inner_text("#foodRemain"), "canlı 'ekledikten sonra kalan' yazısı")
-    before_items = len(st(pg)["meals"][nxt]["items"]); y0 = sum(i["amount"] for i in st(pg)["meals"][nxt]["items"] if i["foodId"] == "yulaf")
+    menu_before = st(pg)["meals"][nxt]["items"]
+    y0 = sum(i["amount"] for i in pg.evaluate(f"dayMeals()[{nxt}].items") if i["foodId"] == "yulaf")
     pg.locator("#foodAddBtn").click(); pg.wait_for_timeout(100)
-    y1 = sum(i["amount"] for i in st(pg)["meals"][nxt]["items"] if i["foodId"] == "yulaf")
-    check(y1 - y0 == 65, f"65 g yulaf seçili öğüne eklendi ({y0} → {y1})")
+    y1 = sum(i["amount"] for i in pg.evaluate(f"dayMeals()[{nxt}].items") if i["foodId"] == "yulaf")
+    check(y1 - y0 == 65, f"65 g yulaf seçili öğüne (bugün) eklendi ({y0} → {y1})")
+    check(st(pg)["meals"][nxt]["items"] == menu_before, "v14: Bugün'den eklenen besin menüyü değiştirmiyor")
     pg.locator("#foodMealChips button").nth(0).click(); pg.wait_for_timeout(50)
     check(pg.evaluate("foodTargetIdx()") == 0, "öğün düğmesiyle hedef öğün değişiyor")
     pg.fill("#foodSearch", ""); pg.evaluate("renderFoodList()")
@@ -210,9 +213,7 @@ try:
     check("internet gerekli" in pg.inner_text("#bcStatus") and len(off_calls) == n_calls, "internetsizken yeni barkodda 'internet gerekli' uyarısı")
     ctx.set_offline(False)
     pg.fill("#bcManual", "8690000000099"); pg.click("#bcSearchBtn"); pg.wait_for_timeout(400)
-    check("bulunamadı" in pg.inner_text("#bcStatus"), "veritabanında olmayan ürün için 'bulunamadı'")
-    pg.locator("#bcResult button", has_text="elle ekle").click(); pg.wait_for_timeout(150)
-    check(pg.evaluate("$('customFoodModal').classList.contains('flex') && $('customFoodModal').classList.contains('nm')"), "elle ekle → özel besin penceresi açıldı")
+    check(pg.evaluate("$('customFoodModal').classList.contains('flex') && $('customFoodModal').classList.contains('nm')") and "Etiketteki" in pg.inner_text("#cfTitle"), "v14: veritabanında olmayan üründe etiket formu doğrudan açıldı")
     pg.fill("#cfName", "Ev Yapımı Bar"); pg.fill("#cfP", "20"); pg.click("#customFoodModal >> text=Kaydet"); pg.wait_for_timeout(150)
     cf2 = st(pg)["customFoods"].get("custom_bc_8690000000099")
     check(cf2 is not None and cf2["barcode"] == "8690000000099", "elle eklenen besin barkodla kaydedildi")

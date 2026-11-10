@@ -1,11 +1,13 @@
 # AYK+ beslenme geliştirme planı (v14–v18)
 
-Kayıt tarihi: 9 Kasım 2026. Durum: **Kullanıcı onayı bekleniyor. Hiçbir paket başlamadı.**
+Kayıt tarihi: 9 Kasım 2026. Durum: **10 Kasım 2026'da ONAYLANDI. 5 paket tek seferde yapılıp birlikte gönderilecek** (her paket ayrı commit + ayrı test, hepsi geçince tek push).
 
-## Bekleyen kararlar (yeni oturumda önce bunları sor)
-1. Önce v13 yayınlansın mı, yoksa 1. pakete hemen mi başlansın? v13 henüz main'e gönderilmedi; bu bilgisayarda git yok ve kullanıcının GitHub'da sorunu var.
-2. 1. paketteki davranış değişikliği uygun mu? Bugün'deki değişiklikler varsayılan olarak yalnızca o günü etkileyecek; menü yalnızca "Menüye de kaydet" seçilince değişecek.
-3. 1. paket bu planla başlasın mı? 5. paket ayrıca onaylanacak.
+## Kullanıcının kararları (10 Kasım 2026)
+1. v13 zaten yayında (git kuruldu, main'e gönderildi).
+2. **Bugün'deki değişiklikler yalnızca o günü etkiler**; menü yalnızca "Menüye de kaydet" seçilince değişir. ONAYLANDI.
+3. **5. paket (USDA veritabanı) DAHİL.**
+4. **Çiğ ↔ pişmiş dönüştürücü (madde 6) YAPILMAYACAK** ("şimdilik olmasın"). Yol haritasında aday olarak kalır.
+5. **Antrenman saatine göre öğün kaydırma (madde 9) YAPILMAYACAK** ("bu özellik olmasın"). Uygulamada antrenman saati bilgisi yok.
 
 ## Kurallar (kullanıcının istediği)
 - Paketlere böl, her paketten önce onay bekle.

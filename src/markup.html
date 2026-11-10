@@ -379,7 +379,7 @@
 
       <div class="flex items-baseline justify-between gap-2 pt-1">
         <span class="n-label">BUGÜNÜN ÖĞÜNLERİ</span>
-        <span class="text-[12px] n-dim">Değiştirmek için ⇄ İkame</span>
+        <span class="text-[12px] n-dim text-right">Buradaki değişiklikler yalnızca bugünü etkiler</span>
       </div>
       <div id="todayMeals"></div>
     </div>
@@ -558,22 +558,28 @@
         <button onclick="closeModal('customFoodModal')" class="modal-x text-slate-400 text-2xl leading-none px-1">&times;</button>
       </div>
       <div class="space-y-2.5 text-xs">
+        <p id="cfHint" class="hidden text-[13px] text-slate-300"></p>
         <div>
-          <label class="block text-slate-300 mb-1">Besin Adı:</label>
+          <label for="cfName" class="block text-slate-300 mb-1">Besin Adı:</label>
           <input id="cfName" type="text" placeholder="Örn: Proteinli Süt / Ev Yapımı Köfte" class="w-full p-2 rounded-lg text-base" />
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-slate-300 mb-1">Birim Tipi:</label>
-            <select id="cfUnit" class="w-full p-2 rounded-lg">
-              <option value="100g">Gram (100g değeri)</option>
-              <option value="1adet">Adet (1 adet değeri)</option>
+            <label for="cfUnit" class="block text-slate-300 mb-1">Değerler neye göre?</label>
+            <select id="cfUnit" onchange="cfUnitChanged()" class="w-full p-2 rounded-lg">
+              <option value="100g">100 g (veya 100 ml)</option>
+              <option value="serv">1 porsiyon</option>
+              <option value="1adet">1 adet</option>
             </select>
           </div>
           <div>
-            <label class="block text-slate-300 mb-1">Varsayılan Miktar:</label>
+            <label id="cfDefLabel" for="cfDef" class="block text-slate-300 mb-1">Varsayılan Miktar (g):</label>
             <input id="cfDef" type="text" inputmode="decimal" value="100" class="w-full p-2 rounded-lg text-base" />
           </div>
+        </div>
+        <div>
+          <label for="cfK" class="block text-slate-300 mb-1">Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:</label>
+          <input id="cfK" type="text" inputmode="decimal" placeholder="Boş bırakırsan makrolardan hesaplanır" class="w-full p-2 rounded-lg text-base" />
         </div>
         <div class="grid grid-cols-3 gap-2">
           <div>
@@ -733,6 +739,45 @@
     </div>
   </div>
 
+  <!-- v14: DIŞARIDA YEDİM / TAHMİNİ GİRİŞ (beslenme temasında) -->
+  <div id="freeMealModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
+    <div role="dialog" aria-labelledby="fmTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
+      <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
+        <div class="min-w-0"><h3 id="fmTitle" class="text-[20px] font-extrabold">Dışarıda yedim</h3><div id="fmMeal" class="text-[13px] n-muted truncate"></div></div>
+        <button onclick="closeModal('freeMealModal')" aria-label="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
+        <p class="text-[13px] n-muted">Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.</p>
+        <div><label for="fmName" class="block text-[13px] font-semibold n-muted mb-1.5">Ne yedin? (isteğe bağlı)</label>
+          <input id="fmName" type="text" autocomplete="off" placeholder="örn: Döner dürüm + ayran" class="n-in w-full" /></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label for="fmKcal" class="block text-[13px] font-semibold mb-1.5">Kalori (kcal)</label>
+            <input id="fmKcal" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 850" oninput="updateFreeMealHint()" class="n-in w-full" /></div>
+          <div><label for="fmP" class="block text-[13px] font-semibold n-p mb-1.5">Protein (g)</label>
+            <input id="fmP" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 40" class="n-in w-full" /></div>
+          <div><label for="fmC" class="block text-[13px] font-semibold n-k mb-1.5">Karb (g) · isteğe bağlı</label>
+            <input id="fmC" type="text" inputmode="decimal" autocomplete="off" placeholder="—" class="n-in w-full" /></div>
+          <div><label for="fmF" class="block text-[13px] font-semibold n-y mb-1.5">Yağ (g) · isteğe bağlı</label>
+            <input id="fmF" type="text" inputmode="decimal" autocomplete="off" placeholder="—" class="n-in w-full" /></div>
+        </div>
+        <label class="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
+          <span class="text-[14px] font-semibold">Öğündeki planlı besinlerin yerine</span>
+          <input id="fmReplace" type="checkbox" class="n-sw" checked onchange="updateFreeMealHint()" />
+        </label>
+        <p id="fmHint" class="text-[13px] n-muted" role="status" aria-live="polite"></p>
+        <label id="fmBalanceWrap" class="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
+          <span class="min-w-0"><span class="block text-[14px] font-semibold">Günü dengele</span>
+            <span class="block text-[12px] n-muted">Aşımı kalan öğünlerdeki karb ve yağdan kısarım; protein kaynaklarına dokunmam.</span></span>
+          <input id="fmBalance" type="checkbox" class="n-sw" />
+        </label>
+      </div>
+      <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 n-bt">
+        <button onclick="closeModal('freeMealModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]">Vazgeç</button>
+        <button onclick="saveFreeMeal()" class="n-btn h-[52px] rounded-full text-[15px]">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ÖĞÜN EKLE / DÜZENLE -->
   <div id="mealModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
     <div class="card p-5 max-w-md w-full space-y-3.5">
@@ -880,7 +925,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v13</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v14</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
