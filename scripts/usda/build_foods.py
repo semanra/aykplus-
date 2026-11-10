@@ -133,6 +133,19 @@ for x in json.load(open(os.path.join(HERE, "tr", "tr_recipes.json"), encoding="u
     if x.get("note"): e["t"] = x["note"]
     foods["r_" + x["key"]] = e
 
+# v19: Yayındaki bir besin kimliği ASLA kaybolmamalı (kullanıcının menüsünde olabilir; uygulama "⚠" ile eski değerleri
+# gösterir ama bu bir yedektir, çözüm değildir). Bir besini bilerek kaldırmak gerekirse kimliği ALLOW_REMOVE'a yazılır.
+ALLOW_REMOVE = set()
+old_path = os.path.join(REPO, "foods.js")
+if os.path.exists(old_path):
+    old_txt = open(old_path, encoding="utf-8").read()
+    try:
+        old_ids = set(json.loads(old_txt[old_txt.index("{"):old_txt.rindex("}") + 1]).keys())
+    except Exception:
+        old_ids = set(re.findall(r'"((?:u\d+)|(?:r_[a-z0-9_]+))":\{', old_txt))
+    for gone in sorted(old_ids - set(foods) - ALLOW_REMOVE):
+        problems.append(f"yayındaki besin kaybolacaktı: {gone} (bilerek kaldırılıyorsa ALLOW_REMOVE'a ekle)")
+
 if problems:
     print("SORUNLAR:"); [print("  " + s) for s in problems]
     sys.exit(1)

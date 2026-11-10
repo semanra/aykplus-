@@ -23,3 +23,7 @@ python3 scripts/usda/build_foods.py usda_out/sr_candidates.json
 Kalori: uygulama USDA'nın ölçtüğü kaloriyi (`k`) kullanır. 4P+4K+9Y ile %20'den fazla farklı olan az sayıdaki besin `x` alanıyla işaretlidir (lif, alkol, tatlandırıcı) ve testte gerekçeli istisnadır.
 
 Tam liste (gözden geçirmek için): `docs/besin-veritabani-listesi.csv`.
+
+## Besin kimlikleri asla kaybolmaz (v19)
+
+Yayındaki bir besin kimliği (`u…`, `r_…`) kullanıcının menüsünde olabilir. `build_foods.py` yeni çıktıyı mevcut `foods.js` ile karşılaştırır; bir kimlik kaybolacaksa **durur**. Bir besini bilerek kaldırmak gerekiyorsa kimliğini `ALLOW_REMOVE` listesine yaz. (Uygulama yine de bulunamayan besini "⚠" ile son kayıtlı değerleriyle gösterir; bu bir yedektir, çözüm değil.)
