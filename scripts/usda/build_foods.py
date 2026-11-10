@@ -137,16 +137,22 @@ for path in sorted(glob.glob(os.path.join(HERE, "tr", "tr_[A-Z].json"))):
         if por: e["o"] = por
         e["d"] = first
         if ke: e["x"] = ke
+        if "fib" in src: e["b"] = r4(src["fib"] / 100)          # v22: lif (g/g)
+        if "na" in src: e["na"] = r4(src["na"] / 100)           # v22: sodyum (mg/g)
         foods["u%d" % i] = e
 
 # Tarifler: değerler USDA malzemelerinden hesaplanır (tarif hesaplaması, yaklaşık)
 for x in json.load(open(os.path.join(HERE, "tr", "tr_recipes.json"), encoding="utf-8")):
-    tot = {"kcal": 0, "p": 0, "c": 0, "f": 0}; g = 0; ok = True
+    tot = {"kcal": 0, "p": 0, "c": 0, "f": 0}; g = 0; ok = True; fib = 0; na = 0; has_fib = has_na = True
     for it in x["items"]:
         src = cand.get(int(it["id"]))
         if not src: problems.append(f"tarif {x['key']}: malzeme yok {it['id']}"); ok = False; break
         w = float(it["g"]); g += w
         for kk in tot: tot[kk] += src[kk] * w / 100
+        if "fib" in src: fib += src["fib"] * w / 100
+        else: has_fib = False
+        if "na" in src: na += src["na"] * w / 100
+        else: has_na = False
     if not ok or g <= 0: continue
     name = x["tr"].strip(); k = norm(name)
     if k in names: problems.append(f"tekrar ad (tarif): {name}"); continue
@@ -155,6 +161,8 @@ for x in json.load(open(os.path.join(HERE, "tr", "tr_recipes.json"), encoding="u
          "a": [a for a in dict.fromkeys(x.get("aliases", [])) if a and norm(a) != k][:5], "s": "tarif",
          "o": [["1 porsiyon", float(x["serving_g"])]], "d": float(x["serving_g"])}
     if x.get("note"): e["t"] = x["note"]
+    if has_fib: e["b"] = r4(fib / g)          # yalnızca tüm malzemelerde veri varsa
+    # Sodyum tariflerde YAZILMAZ: tariflere eklenen tuz malzeme listesinde yok, değer gerçeğinden düşük çıkardı
     foods["r_" + x["key"]] = e
 
 # v20: Pişmiş hâller listeden GİZLENİR (silinmez; menüde kullanılıyorsa çalışmaya devam eder). Gerekçe: pişirince ağırlık
@@ -234,6 +242,7 @@ with open(out, "w", encoding="utf-8") as o:
     o.write("// Kaynak: USDA FoodData Central, SR Legacy (kamu malı). Türk yemekleri: USDA malzemeleriyle tarif hesaplaması (yaklaşık).\n")
     o.write("// Alanlar (birim başına = 1 g): n ad, c kategori, k kcal, p protein, h karb, f yağ, a eş anlamlılar, s kaynak (fdcId | \"tarif\"),\n")
     o.write("// o porsiyonlar [[ad, gram]], d varsayılan gram, x kalori istisnası nedeni (lif/alkol/tatlandırıcı), t not (tarif yaklaşımları)\n")
+    o.write("// b lif (g/g), na sodyum (mg/g) — USDA ölçümü yoksa alan yoktur; z gizli (listede gösterilmez)\n")
     o.write("const USDA_FOODS = ")
     json.dump(foods, o, ensure_ascii=False, separators=(",", ":"))
     o.write(";\n")

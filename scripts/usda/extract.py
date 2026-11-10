@@ -18,7 +18,7 @@ for r in rows("food.csv"):
     d = r["description"]
     if BRAND.search(NOT_BRAND.sub("", d)) or "Pillsbury" in d: continue
     foods[r["fdc_id"]] = {"id": int(r["fdc_id"]), "desc": d, "cat": cats.get(r["food_category_id"], "?")}
-NUT = {"1008": "kcal", "1003": "p", "1004": "f", "1005": "c"}
+NUT = {"1008": "kcal", "1003": "p", "1004": "f", "1005": "c", "1079": "fib", "1093": "na"}   # v22: lif (g), sodyum (mg)
 for r in rows("food_nutrient.csv"):
     f = foods.get(r["fdc_id"])
     k = NUT.get(r["nutrient_id"])

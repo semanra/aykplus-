@@ -238,7 +238,9 @@ const USDA_DB = (() => {
       if (x.o) f.portions = x.o;
       if (x.x) f.kx = x.x;
       if (x.t) f.note = x.t;
-      if (x.z) f.hidden = 1;   // v20: pişmiş hâl — listede gösterilmez, menüde kullanılıyorsa çalışır
+      if (x.z) f.hidden = 1;
+      if (x.b != null) f.fib = x.b;     // v22: lif (g / g)
+      if (x.na != null) f.na = x.na;    // v22: sodyum (mg / g)   // v20: pişmiş hâl — listede gösterilmez, menüde kullanılıyorsa çalışır
       out[id] = f;
     });
   } catch (e) { console.error(e); }
@@ -986,6 +988,7 @@ function renderHero() {
   $("mmEatenMeals").textContent = `${meals.filter(m => m.done).length}/${meals.length}`;
   $("mmPlan").className = view === "plan" ? "on" : "";
   $("mmEaten").className = view === "eaten" ? "on" : "";
+  renderMicroLine(view);
 }
 
 function updateMacroCard(prefix, consumed, target, unit) {
@@ -1390,6 +1393,25 @@ function shortMealTitle(m) {
 // ---------------------------------------------------------------------------
 // MENÜLERİM
 // ---------------------------------------------------------------------------
+// v22: Proteinin öğünlere dağılımı (genel öneri: öğün başına ~20–40 g). Yalnızca içinde besin olan öğünler.
+function proteinSpreadHtml(meals) {
+  const rows = meals.filter(m => m.items.length).map(m => ({ t: shortMealTitle(m), p: mealTotals(m).p }));
+  if (rows.length < 2) return "";
+  const max = Math.max(40, ...rows.map(r => r.p));
+  const low = rows.filter(r => r.p < 20).length;
+  return `<div class="n-bt pt-3 space-y-1.5" data-protein-spread>
+      <div class="flex items-baseline justify-between gap-2"><span class="n-label">PROTEİN DAĞILIMI</span><span class="text-[11px] n-dim">öğün başına ~20–40 g önerilir</span></div>
+      ${rows.map(r => `<div class="flex items-center gap-2 text-[12px]">
+        <span class="w-[92px] shrink-0 truncate n-muted">${esc(r.t)}</span>
+        <span class="relative flex-1 h-2 rounded-full n-bar-bg overflow-hidden">
+          <span class="absolute inset-y-0 rounded-full" style="left:${20 / max * 100}%;width:${20 / max * 100}%;background:var(--n-accent-soft)"></span>
+          <span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, r.p / max * 100)}%;background:var(--n-p)"></span>
+        </span>
+        <span class="w-[46px] shrink-0 text-right tabular-nums ${r.p < 20 ? "n-k font-bold" : "n-text font-semibold"}">${Math.round(r.p)} g</span>
+      </div>`).join("")}
+      ${low ? `<p class="text-[11px] n-dim">${low} öğünde protein 20 g'ın altında; günlük toplam aynı kalsa da proteini öğünlere yaymak tokluk ve kas onarımı için daha iyi.</p>` : ""}
+    </div>`;
+}
 function renderMenus() {
   const db = getFoodDB();
   const targets = getTargets();
@@ -1414,7 +1436,8 @@ function renderMenus() {
       <div><strong class="n-p text-[14px]">${Math.round(plan.p)} g</strong> <span class="n-muted">protein</span><div class="n-dim">hedef ${targets.proTarget} g · %${pct(pk)}</div></div>
       <div><strong class="n-k text-[14px]">${Math.round(plan.c)} g</strong> <span class="n-muted">karb</span><div class="n-dim">hedef ${targets.carbTarget} g · %${pct(ck)}</div></div>
       <div><strong class="n-y text-[14px]">${Math.round(plan.f)} g</strong> <span class="n-muted">yağ</span><div class="n-dim">hedef ${targets.fatTarget} g · %${pct(fk)}</div></div>
-    </div>`;
+    </div>
+    ${proteinSpreadHtml(curMeals())}`;
 
   // Kiloya göre gramaj kartı
   const st = state.settings;
@@ -1672,6 +1695,13 @@ function renderFoodList() {
           </div>
           <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Artır">${svgI("plus", 20, 2.4)}</button>
         </div>
+        ${naturalUnit(f) ? `<div class="flex items-center justify-between gap-2 n-card rounded-full pl-4 pr-1 py-1" data-unit-row>
+            <span class="min-w-0 text-[13px] n-muted leading-tight"><strong id="foodUnitCount" class="n-text text-[15px]"></strong><span class="block text-[11px]">1 ${esc(naturalUnit(f).label)} = ${fmtNum(naturalUnit(f).g)} g</span></span>
+            <div class="flex gap-1 shrink-0">
+              <button onclick="foodUnitStep(-1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="Bir ${esc(naturalUnit(f).label)} azalt">${svgI("minus", 18, 2.4)}</button>
+              <button onclick="foodUnitStep(1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="Bir ${esc(naturalUnit(f).label)} artır">${svgI("plus", 18, 2.4)}</button>
+            </div>
+          </div>` : ""}
         <div class="flex items-center justify-start gap-2 flex-wrap" aria-label="Hazır porsiyonlar">
           ${pr.list.map(x => `<button onclick="foodPreset(${x.v})" class="n-chip ${round1(num(foodUI.amt)) === x.v ? "on" : ""}" data-preset="${x.v}">${esc(x.label)}</button>`).join("")}
           <button onclick="foodPreset(null, ${pr.plus})" class="n-chip">+${fmtNum(pr.plus)} ${esc(f.unit)}</button>
@@ -1681,6 +1711,7 @@ function renderFoodList() {
           <div id="foodSelC" class="py-2 rounded-full n-k" style="background: color-mix(in srgb, var(--n-k) 14%, transparent)"></div>
           <div id="foodSelF" class="py-2 rounded-full n-y" style="background: color-mix(in srgb, var(--n-y) 14%, transparent)"></div>
         </div>
+        ${microOf(f, 1) ? `<div id="foodSelMicro" class="text-[12px] n-muted text-center -mt-1"></div>` : ""}
         <button id="foodAddBtn" onclick="addSelectedFood()" class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}></button>
         ${custom ? `<div class="flex justify-end gap-2 pt-1 n-bt">
             <button onclick='editCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5">${svgI("edit", 16)}Düzenle</button>
@@ -1706,6 +1737,11 @@ function updateFoodSelUI() {
     $("foodAddBtn").textContent = tIdx >= 0 ? `Öğüne ekle · ${fmtInt(s.cal)} kcal` : "Önce bir öğün oluştur";
     $("foodAddBtn").disabled = tIdx < 0 || !(s.a > 0);
     document.querySelectorAll("#foodSelCard [data-preset]").forEach(b => b.classList.toggle("on", num(b.dataset.preset) === round1(s.a)));
+    const f = getFoodDB()[foodUI.sel];
+    const u = naturalUnit(f);
+    if (u && $("foodUnitCount")) $("foodUnitCount").textContent = `${fmtNum(round1(s.a / u.g))} × ${u.label}`;
+    const mi = microOf(f, s.a);
+    if ($("foodSelMicro")) $("foodSelMicro").textContent = mi ? [mi.fib != null ? `Lif ${fmtNum(mi.fib)} g` : "", mi.salt != null ? `Tuz ${fmtNum(mi.salt)} g` : ""].filter(Boolean).join(" · ") : "";
   }
   const r = $("foodRemain");
   if (r) r.innerHTML = foodRemainPrefix(s) + foodRemainingText(s ? s.cal : 0, s ? s.p : 0);
@@ -1719,6 +1755,60 @@ function selectFood(id) {
   renderFoodList();
   const el = $("foodSelCard");
   if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+// v22: Doğal birim (adet, dilim, parça...): gramla seçilen besinlerde "adet ile" sayaç. Varsayılan porsiyon doğal birimse o seçilir.
+const NATURAL_RX = /^1 (adet|dilim|parça|fileto|göğüs|baget|kanat|pirzola|köfte|yaprak|diş|sap|baş|koçan|çubuk|şerit|üst but)/;
+function naturalUnit(f) {
+  if (!f || f.unit !== "g" || !Array.isArray(f.portions)) return null;
+  const nat = f.portions.filter(([n, g]) => NATURAL_RX.test(n) && g > 0);
+  if (!nat.length) return null;
+  const p = nat.find(([, g]) => round1(g) === round1(num(f.def, 0))) || nat[0];
+  return { label: p[0].replace(/^1 /, ""), g: num(p[1], 0) };
+}
+function foodUnitStep(dir) {
+  const f = foodUI.sel && getFoodDB()[foodUI.sel];
+  const u = naturalUnit(f);
+  if (!u) return;
+  const n = Math.max(1, Math.round(num(foodUI.amt) / u.g) + dir);
+  foodUI.amt = round1(n * u.g);
+  $("foodAmt").value = fmtNum(foodUI.amt);
+  updateFoodSelUI();
+}
+// v22: lif ve tuz (tuz = sodyum × 2,5). Veri yalnızca veritabanı (USDA) besinlerinde var.
+function microOf(f, a) {
+  if (!f) return null;
+  const r = {};
+  if (f.fib != null) r.fib = f.fib * a;
+  if (f.na != null) r.salt = f.na * a * 2.5 / 1000;
+  return r.fib == null && r.salt == null ? null : r;
+}
+function microTotals(view) {
+  const db = getFoodDB();
+  let fib = 0, salt = 0, n = 0, mFib = 0, mSalt = 0;
+  dayMeals().forEach(m => {
+    if (view === "eaten" && !m.done) return;
+    m.items.forEach(it => {
+      n++;
+      const f = it.est ? null : db[it.foodId];
+      const x = f ? microOf(f, effAmount(it)) : null;
+      if (x && x.fib != null) fib += x.fib; else mFib++;
+      if (x && x.salt != null) salt += x.salt; else mSalt++;
+    });
+  });
+  return { fib, salt, n, miss: Math.max(mFib, mSalt) };
+}
+function fibTarget() { return Math.round(getTargets().calTarget / 1000 * 14); }   // 14 g / 1000 kcal (genel öneri)
+const SALT_LIMIT = 5;   // g/gün (DSÖ önerisi)
+function renderMicroLine(view) {
+  const el = $("microLine");
+  if (!el) return;
+  const t = microTotals(view);
+  if (!t.n) { el.innerHTML = ""; el.classList.add("hidden"); return; }
+  el.classList.remove("hidden");
+  const over = t.salt > SALT_LIMIT;
+  el.innerHTML = `<span>Lif <strong class="text-white tabular-nums">${fmtNum(t.fib)}</strong> / ${fibTarget()} g</span>
+    <span>Tuz <strong class="tabular-nums" style="color:${over ? "#FB7185" : "#fff"}">${fmtNum(t.salt)}</strong> / ${SALT_LIMIT} g</span>
+    ${t.miss ? `<span class="text-white/60" data-micro-miss>${t.miss} besinde lif/tuz verisi yok</span>` : ""}`;
 }
 function foodAmtInput(v) { foodUI.amt = Math.max(0, num(v, 0)); updateFoodSelUI(); }
 function foodStep(dir) {
@@ -4809,8 +4899,8 @@ function gymLibraryHtml() {
   const rangeBtn = (k, l) => `<button onclick="setLibRange('${k}')" aria-pressed="${range === k}" class="h-11 rounded-[11px] text-[13px] ${range === k ? "bg-white text-black font-bold" : "t-muted font-semibold"}">${l}</button>`;
   const rangeTxt = range === "today" ? "Bugünkü set sayısına göre" : range === "program" ? "Programının bir haftada verdiği set sayısı" : "Bu haftaki set sayısına göre";
   const rangeWord = range === "today" ? "Bugün" : range === "program" ? "Programında haftada" : "Bu hafta";
-  const pTotal = range === "program" ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
-  const pRows = range === "program" ? MUSCLES.map(m => {
+  const pTotal = range !== "today" ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
+  const pRows = range !== "today" ? MUSCLES.map(m => {
     const c = counts[m] || 0;
     const tg = c === 0 ? "yok" : c < 10 ? "az" : c <= 20 ? "ideal" : "yüksek";
     const col = c === 0 ? "#3A3A40" : c < 10 ? "#3E8F88" : c <= 20 ? "#14D9C6" : "#00FFE5";
@@ -4846,6 +4936,10 @@ function gymLibraryHtml() {
       <div class="flex items-baseline justify-between pb-1"><span class="t-label">PROGRAMIN HAFTALIK ETKİSİ</span><span class="text-xs t-dim">${state.workoutDays.length} gün · ${pTotal} set</span></div>
       ${pRows}
       <p class="text-[12px] t-dim pt-1.5">Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.</p>
+    </div>` : range === "week" && pTotal ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5" data-week-muscles>
+      <div class="flex items-baseline justify-between pb-1"><span class="t-label">BU HAFTA · KAS BAŞINA SET</span><span class="text-xs t-dim">${pTotal} set</span></div>
+      ${pRows}
+      <p class="text-[12px] t-dim pt-1.5">Pazartesiden bu yana kaydedilen setler. Kas gelişimi için genel öneri haftada 10–20 set.</p>
     </div>` : ""}
     ${sel ? `<div class="t-card rounded-[18px] min-h-[64px] px-4 flex items-center justify-between gap-2">
       <span class="flex flex-col gap-0.5"><span class="text-base font-bold">${esc(sel)}</span><span class="text-[13px] t-muted">${rangeWord} <b class="text-white">${n} set</b> · ${range === "program" && n === 0 ? "programında yok" : tag}</span></span>
