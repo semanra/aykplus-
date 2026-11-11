@@ -148,6 +148,7 @@ Sıradaki adaylar (kullanıcı onayı gerekir):
 - Antrenman saatine göre öğün kaydırma (planda madde 9; kullanıcı "bu özellik olmasın" dedi).
 - Kas grubu sayımında ikincil kasların da sayılması (kullanıcı "sonra" dedi).
 - "Akıllı öneri": makinede büyük kademe sıçramasında önce tekrar artırma (kullanıcı bu turda istemedi; tekrar sorulabilir).
-- Mobilite sekmesinin geliştirilmesi, ilk açılış kurulum ekranı.
+- Mobilite sekmesinin geliştirilmesi: tasarım seçildi (11 Kasım 2026) → `tasarimlar/mobilite-son.html` / `.png` (C "Bölge" temeli, lavanta `#B3A6FF`, detay ekranı B'den: set/süre/taraf/tür −/+ ile, nefes dairesi sayaç). İlk öneriler `mobilite-A/B/C.*`; diğer AI'lar için soru metni `tasarimlar/INCELEME-mobilite.md`. Uygulamadan önce gelen yorumlar değerlendirilecek. Yeni veri alanları (bölge, set, süre, taraf) eski `prescription` metninden göç ettirilmeli, eski veri silinmemeli. Not: AYKDisplay iki `@font-face` parçasından oluşur (Latin + Latin Ext.); tasarım dosyasına ikisi birden gömülmeli, yoksa "MOBİLİTE" karışık yazı tipiyle görünür.
+- İlk açılış kurulum ekranı.
 
 Tasarım taslağı (claude.ai tuvali): https://claude.ai/artifact/D1oHvwvwnFMnJULVg2fHhz
