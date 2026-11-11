@@ -107,12 +107,12 @@ try:
     check(pg.locator('#todayMeals [data-today-meal="1"] [onclick^="openSwap(1, 2)"]').count() == 0, "grubu olmayan besinde (salata) ikame düğmesi yok")
 
     # ---------- Su ve takviyeler
-    pg.evaluate("state.waterLiters = 0; state.settings.waterTarget = 3.5; renderAll()")
+    pg.evaluate("state.waterLiters = 0; state.settings.waterTarget = 3.5; state.settings.waterAuto = false; renderAll()")
     pg.locator("#nvToday button", has_text="+500 ml").click(); pg.locator("#nvToday button", has_text="+250 ml").click(); pg.wait_for_timeout(80)
-    cups = pg.evaluate("[...document.querySelectorAll('#waterCups .n-cup')].map(c => c.firstChild.style.height)")
-    check(pg.inner_text("#waterVal") == "0,75" and len(cups) == 7 and cups[:3] == ["100%", "50%", "0%"], f"su 0,75 L, 7 bardak: {cups[:3]}")
-    pg.locator("#suppList button").first.click(); pg.wait_for_timeout(80)
-    check("on" in pg.locator("#suppList button").first.get_attribute("class"), "takviye işaretleniyor")
+    ring = pg.evaluate("document.getElementById('waterRing').style.strokeDashoffset")
+    check(pg.inner_text("#waterVal") == "0,75" and pg.inner_text("#waterPct") == "%21" and abs(float(ring) - 364.42 * 0.79) < 0.5, f"v24: su 0,75 L, %21, halka {ring}")
+    pg.locator("#suppList .n-pill-main").first.click(); pg.wait_for_timeout(80)
+    check("taken" in pg.locator("#suppList .n-pill").first.get_attribute("class"), "takviye işaretleniyor")
 
     # ---------- MENÜLERİM
     view(pg, "menus")

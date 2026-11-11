@@ -197,9 +197,37 @@
     .n-check:checked::after { content: ""; position: absolute; left: 8.5px; top: 4px; width: 7px; height: 13px; border: solid var(--n-tick); border-width: 0 3px 3px 0; transform: rotate(45deg); }
     .n-next { border-color: var(--n-accent); box-shadow: 0 8px 28px -6px var(--n-accent-soft); }
     .n-sel { border: 1.5px solid var(--n-accent); box-shadow: 0 10px 30px -10px var(--n-accent-soft); }
-    .n-cup { position: relative; flex: 1 1 0; height: 26px; max-width: 30px; border: 1.5px solid var(--n-cup-line); border-radius: 3px 3px 8px 8px; overflow: hidden; }
-    .n-cup > i { position: absolute; left: 0; right: 0; bottom: 0; background: var(--n-water); }
-    .n-cup.full { border-color: var(--n-water); }
+    /* v24: Su + Takviye Rutini kartları */
+    .n-hs-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .n-pills { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    @media (min-width: 768px) { .n-hs-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); } }
+    @media (min-width: 1024px) { .n-pills { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .n-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+    .n-badge.water { background: var(--n-water-soft); color: var(--n-water-text); }
+    .n-badge.acc { background: var(--n-accent-soft); color: var(--n-accent-text); }
+    .n-wring { transform: rotate(-90deg); }
+    .n-wring circle { fill: none; stroke-width: 12; }
+    .n-wring .bg { stroke: var(--n-elev2); }
+    .n-wring .fg { stroke: var(--n-water); stroke-linecap: round; stroke-dasharray: 364.42; stroke-dashoffset: 364.42; transition: stroke-dashoffset .4s cubic-bezier(.4, 0, .2, 1); }
+    .n-sbar { height: 6px; background: var(--n-elev2); border-radius: 99px; overflow: hidden; }
+    .n-sbar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--n-btn), var(--n-accent)); transition: width .3s ease; }
+    .n-sgroup { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--n-muted); padding-top: 4px; }
+    .n-pill { display: flex; align-items: center; gap: 4px; padding: 2px; background: var(--n-elev); border: 1px solid var(--n-line); border-radius: 14px; transition: background .2s, border-color .2s; }
+    .n-pill-edit { border: 1px solid var(--n-line2); border-radius: 14px; padding: 8px; }
+    .n-pill-main { flex: 1 1 0; min-width: 0; min-height: 52px; display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 10px; text-align: left; border-radius: 12px; }
+    .n-pill-check { width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--n-cup-line); display: flex; align-items: center; justify-content: center; color: transparent; flex-shrink: 0; transition: background .2s, border-color .2s; }
+    .n-pill-name { display: block; font-size: 14px; font-weight: 600; line-height: 1.25; color: var(--n-text); overflow-wrap: anywhere; }
+    .n-pill-dose { display: block; font-size: 12px; line-height: 1.3; color: var(--n-dim); margin-top: 1px; }
+    .n-pill-dose b { color: var(--n-text2); font-weight: 700; }
+    .n-step { display: flex; align-items: center; gap: 2px; background: var(--n-card); border: 1px solid var(--n-line); border-radius: 12px; padding: 2px; flex-shrink: 0; }
+    .n-step button { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--n-text2); }
+    .n-step button:active { background: var(--n-elev2); }
+    .n-step button:disabled { opacity: .3; }
+    .n-pill.taken { background: var(--n-accent-soft); border-color: var(--n-accent); }
+    .n-pill.taken .n-pill-check { background: var(--n-accent); border-color: var(--n-accent); color: var(--n-tick); }
+    .n-pill.taken .n-pill-name { color: var(--n-accent-text); text-decoration: line-through; }
+    #suppCard { transition: border-color .3s ease, box-shadow .3s ease; }
+    #suppCard.all-done { border-color: var(--n-accent); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
     .n-sw { appearance: none; -webkit-appearance: none; width: 51px; height: 31px; border-radius: 999px; background: var(--n-line2); position: relative; flex-shrink: 0; transition: background .2s; margin: 0; }
     .n-sw::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
     .n-sw:checked { background: var(--n-accent); } .n-sw:checked::after { transform: translateX(20px); }
@@ -377,26 +405,39 @@
         </div>
       </section>
 
-      <!-- Su + takviyeler -->
-      <section class="n-card rounded-[22px] p-4 space-y-3" aria-label="Su ve takviyeler">
-        <div class="flex items-baseline justify-between gap-2">
-          <span class="n-label">SU</span>
-          <span class="text-[13px] n-muted"><strong id="waterVal" class="t-display text-[24px] n-text tabular-nums">0,00</strong> / <span id="waterTarget">3,5</span> L</span>
-        </div>
-        <div id="waterCups" class="flex items-end gap-1.5" aria-hidden="true"></div>
-        <div class="grid grid-cols-3 gap-2">
-          <button onclick="addWater(-0.25)" class="n-btn-ghost h-11 rounded-full text-[14px]" aria-label="250 mililitre çıkar">− 250 ml</button>
-          <button onclick="addWater(0.25)" class="n-water-btn h-11 rounded-full text-[14px]">+250 ml</button>
-          <button onclick="addWater(0.5)" class="n-water-btn h-11 rounded-full text-[14px]">+500 ml</button>
-        </div>
-        <div class="pt-3 n-bt space-y-2.5">
-          <div class="flex items-center justify-between gap-2">
-            <span class="n-label">TAKVİYELER</span>
+      <!-- v24: Su + takviye rutini (iPhone'da alt alta, iPad'de yan yana) -->
+      <div class="n-hs-grid">
+        <section id="waterCard" class="n-card rounded-[22px] p-4 flex flex-col gap-3" aria-label="Günlük su">
+          <div class="flex items-start justify-between gap-2">
+            <div><div class="n-label">HİDRASYON</div><h3 class="text-[18px] font-bold n-text leading-tight mt-0.5">Günlük Su</h3></div>
+            <span id="waterPct" class="n-badge water tabular-nums">%0</span>
+          </div>
+          <div class="relative flex items-center justify-center py-1">
+            <svg class="n-wring" width="140" height="140" viewBox="0 0 140 140" aria-hidden="true"><circle class="bg" cx="70" cy="70" r="58"></circle><circle id="waterRing" class="fg" cx="70" cy="70" r="58"></circle></svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center" aria-live="polite">
+              <strong id="waterVal" class="t-display text-[30px] leading-none n-text tabular-nums">0,00</strong>
+              <span class="text-[12px] n-muted mt-1">/ <span id="waterTarget">3,5</span> L</span>
+            </div>
+          </div>
+          <p id="waterNote" class="text-[12px] n-dim text-center leading-snug"></p>
+          <div class="grid grid-cols-[0.7fr_1fr_1fr] gap-2 mt-auto">
+            <button onclick="addWater(-0.25)" class="n-btn-ghost h-11 rounded-full text-[16px] font-bold" aria-label="250 mililitre çıkar">−</button>
+            <button onclick="addWater(0.25)" class="n-water-btn h-11 rounded-full text-[14px]">+250 ml</button>
+            <button onclick="addWater(0.5)" class="n-water-btn h-11 rounded-full text-[14px]">+500 ml</button>
+          </div>
+        </section>
+        <section id="suppCard" class="n-card rounded-[22px] p-4 flex flex-col gap-3" aria-label="Takviye rutini">
+          <div class="flex items-start justify-between gap-2">
+            <div><div class="n-label">MİKRO &amp; ERGOJENİK</div><h3 class="text-[18px] font-bold n-text leading-tight mt-0.5">Takviye Rutini</h3></div>
+            <span id="suppCounter" class="n-badge acc tabular-nums">0 / 0 Tamamlandı</span>
+          </div>
+          <div id="suppBarWrap" class="n-sbar" aria-hidden="true"><i id="suppBar"></i></div>
+          <div id="suppList" class="space-y-2"></div>
+          <div class="flex justify-end">
             <button onclick="manualNewDay()" class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M5.6 7.6L7 9M18.4 7.6L17 9M3 17h18M7 17a5 5 0 0 1 10 0M8 21h8"></path></svg>Yeni gün</button>
           </div>
-          <div id="suppList" class="flex flex-wrap gap-2"></div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <div class="flex items-baseline justify-between gap-2 pt-1">
         <span class="n-label">BUGÜNÜN ÖĞÜNLERİ</span>
@@ -927,7 +968,7 @@
           <div id="pfH2" class="t-label">KİLOM</div>
           <div class="t-card rounded-[22px] p-4 space-y-3">
             <div class="flex items-end gap-2.5">
-              <div class="flex-1"><label for="pfWeight" class="t-field">Güncel kilo (kg)</label><input id="pfWeight" type="text" inputmode="decimal" class="t-in text-center font-bold text-[20px]" /></div>
+              <div class="flex-1"><label for="pfWeight" class="t-field">Güncel kilo (kg)</label><input id="pfWeight" type="text" inputmode="decimal" oninput="updateWaterAutoHint()" class="t-in text-center font-bold text-[20px]" /></div>
               <button onclick="profileLogWeight()" class="t-btn-outline h-12 px-4 rounded-xl text-[14px] shrink-0">Tartıyı kaydet</button>
             </div>
             <div id="pfWeightBox"></div>
@@ -944,6 +985,10 @@
               <div><label for="setTargetBf" class="t-field">Hedef yağ oranı (%)</label><input id="setTargetBf" type="text" inputmode="decimal" placeholder="Örn: 15" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
             </div>
             <p class="text-[12px] text-[#8B8B93] -mt-1">Yağ oranını bilmiyorsan boş bırakabilirsin.</p>
+            <label class="flex items-center justify-between gap-3 min-h-[52px]">
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-white">Su hedefi kiloya göre</span><span id="setWaterHint" class="block text-[13px] text-[#8B8B93]">Kilo × 35 ml; listende kreatin varsa +0,5 L.</span></span>
+              <input id="setWaterAuto" type="checkbox" class="t-sw" onchange="updateWaterAutoHint()" />
+            </label>
             <div id="setBfHint" class="hidden bg-[#0E0E10] border border-[#2A2A2E] rounded-2xl px-3.5 py-3 text-[13px] text-slate-300"></div>
             <div id="pfTargetsBox"></div>
           </div>
@@ -1015,7 +1060,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v23</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v24</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

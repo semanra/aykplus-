@@ -14,6 +14,18 @@ const DEFAULT_SUPPS = [
   { id: "greens", name: "🥬 Greens" },
   { id: "omega", name: "🐟 Omega/Vit" }
 ];
+// v24: hazır takviyeler (Düzenle'de tek dokunuşla eklenir; listede adı m'ye uyan takviye varsa gösterilmez)
+const SUPP_PRESETS = [
+  { key: "d3k2", m: /d3|d vitamin/, name: "Vitamin D3 + K2", dose: 1, step: 1, min: 1, max: 10, unit: "damla/kapsül", note: "Tok karnına", time: "morning" },
+  { key: "omega3", m: /omega/, name: "Omega-3", dose: 2, step: 1, min: 1, max: 6, unit: "softjel", note: "Tok karnına", time: "morning" },
+  { key: "creatine", m: /kreatin|creatine/, name: "Kreatin Monohidrat", dose: 5, step: 1, min: 3, max: 10, unit: "g", note: "Bol su ile", time: "post" },
+  { key: "whey", m: /whey|protein tozu/, name: "Whey Protein", dose: 1, step: 0.5, min: 0.5, max: 4, unit: "ölçek", note: "Antrenman sonrası", time: "post" },
+  { key: "magnesium", m: /magnez/, name: "Magnezyum", dose: 200, step: 100, min: 100, max: 600, unit: "mg", note: "Uykudan 1 saat önce", time: "bed" },
+  { key: "zinc", m: /cinko|zinc/, name: "Çinko", dose: 15, step: 5, min: 5, max: 50, unit: "mg", note: "Akşam", time: "bed" }
+];
+const r2 = v => Math.round(v * 100) / 100;
+function fmtDose(v) { return String(r2(v)).replace(".", ","); }
+const SUPP_DOSE_KEYS = ["dose", "unit", "step", "min", "max"];
 const TABS = ["nutrition", "gym", "mobility", "progress"];
 const DAY_MS = 86400000;
 
@@ -132,6 +144,7 @@ function normalizeState(raw) {
   s.supplementList.forEach(x => {
     if (!["morning", "pre", "post", "bed", "custom"].includes(x.time)) delete x.time;
     if (x.time === "custom") x.timeLabel = String(x.timeLabel || "Özel").slice(0, 24); else delete x.timeLabel;
+    normalizeSuppDose(x);   // v24: isteğe bağlı doz / birim / adım
   });
   if (!Array.isArray(s.restMeals)) s.restMeals = [];
   s.restMeals.forEach(m => { if (!Array.isArray(m.items)) m.items = []; });
@@ -182,6 +195,7 @@ function normalizeState(raw) {
   if (!["today", "menus", "foods", "history"].includes(s.nutriView)) s.nutriView = "today";
   s.settings.nutriLight = !!s.settings.nutriLight;
   { const h = parseInt(s.settings.dayStartHour, 10); s.settings.dayStartHour = h >= 0 && h <= 5 ? h : 0; }   // v21
+  s.settings.waterAuto = s.settings.waterAuto !== false;   // v24: su hedefi kiloya göre (varsayılan açık)
   s.settings.scaleOn = !!s.settings.scaleOn;
   s.settings.scaleBase = num(s.settings.scaleBase, 0);
   if (s.settings.scaleOn && !(s.settings.scaleBase > 0)) s.settings.scaleOn = false;
@@ -1016,19 +1030,30 @@ function updateMacroCard(prefix, consumed, target, unit) {
   $(`${prefix}Bar`).style.width = `${pct}%`;
 }
 
-// Su: her bardak 0,5 L; hedef kadar bardak çizilir, kısmen dolanlar kısmen boyanır
+// v24: Su hedefi. Açıkken kilo × 35 ml (+0,5 L listede kreatin varsa), kapalıyken Profil'de elle yazılan değer.
+function hasCreatine() { return state.supplementList.some(x => /kreatin|creatine/.test(normSearch(x.name))); }
+function waterAutoInfo(weight) {
+  const w = num(weight === undefined ? state.weight : weight, 0);
+  if (!(w >= 30 && w <= 300)) return null;
+  const base = Math.round(w * 0.035 * 10) / 10, cr = hasCreatine();
+  return { w, base, cr, total: Math.round((base + (cr ? 0.5 : 0)) * 10) / 10 };
+}
+function waterTargetL() {
+  if (state.settings.waterAuto !== false) { const a = waterAutoInfo(); if (a) return a.total; }
+  return num(state.settings.waterTarget, 3.5);
+}
+const WATER_RING_C = 364.42;   // 2π × 58
 function renderWater() {
-  const wt = num(state.settings.waterTarget, 3.5);
+  const wt = waterTargetL();
   const w = state.waterLiters || 0;
+  const pct = wt > 0 ? Math.min(100, Math.round(w / wt * 100)) : 0;
   $("waterVal").textContent = w.toFixed(2).replace(".", ",");
   $("waterTarget").textContent = fmtNum(wt);
-  const cups = Math.max(4, Math.min(10, Math.ceil(wt / 0.5)));
-  let h = "";
-  for (let i = 0; i < cups; i++) {
-    const fill = Math.max(0, Math.min(1, (w - i * 0.5) / 0.5));
-    h += `<span class="n-cup ${fill >= 1 ? "full" : ""}"><i style="height:${Math.round(fill * 100)}%"></i></span>`;
-  }
-  $("waterCups").innerHTML = h;
+  $("waterPct").textContent = "%" + pct;
+  $("waterRing").style.strokeDashoffset = String(Math.round(WATER_RING_C * (1 - pct / 100) * 100) / 100);
+  const a = state.settings.waterAuto !== false ? waterAutoInfo() : null;
+  $("waterNote").textContent = a ? `Kilona göre: ${fmtNum(a.w)} kg × 35 ml${a.cr ? " + 0,5 L kreatin" : ""}`
+    : state.settings.waterAuto !== false ? "Kilo girilmemiş; Profil'deki hedef kullanılıyor." : "Hedef Profil'de elle ayarlı.";
 }
 
 // ---------------------------------------------------------------------------
@@ -3044,7 +3069,7 @@ function renderProgress() {
         ${stat("🏋️ Antrenman", weekLogs.length, "text-emerald-400", wPr ? `🏆 ${wPr} rekor` : "")}
         ${stat("⚡ Toplam Tonaj", Math.round(wVol).toLocaleString("tr-TR") + " kg", "text-amber-400")}
         ${stat("🏃 Kardiyo", fmtNum(wMin) + " dk", "text-sky-400", wKm > 0 ? fmtNum(wKm) + " km" : "")}
-        ${stat("💧 Ort. Su", fmtNum(avgWater) + " L", "text-sky-300", "Hedef " + fmtNum(num(state.settings.waterTarget, 3.5)) + " L")}
+        ${stat("💧 Ort. Su", fmtNum(avgWater) + " L", "text-sky-300", "Hedef " + fmtNum(waterTargetL()) + " L")}
       </div>
     </div>
 
@@ -3095,7 +3120,7 @@ function renderProgress() {
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setSplash", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setSplash", "setDayStart"];
 let pfSnap = "";
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 function pfValues() { return JSON.stringify(PF_FIELDS.map(id => { const el = $(id); return el.type === "checkbox" ? el.checked : el.value; })); }
@@ -3107,6 +3132,8 @@ function fillProfileFields() {
   $("pfWeight").value = fmtNum(num(state.weight, 0));
   $("setTarget").value = fmtNum(num(st.targetWeight, 82));
   $("setWater").value = fmtNum(num(st.waterTarget, 3.5));
+  $("setWaterAuto").checked = st.waterAuto !== false;
+  updateWaterAutoHint();
   $("setBf").value = validBf(st.bodyFat) ? fmtNum(validBf(st.bodyFat)) : "";
   $("setTargetBf").value = validBf(st.targetBodyFat) ? fmtNum(validBf(st.targetBodyFat)) : "";
   $("setRest").value = st.restSec;
@@ -3191,6 +3218,15 @@ function renderProfile() {
     : "Henüz yedek alınmadı. Verilerin sadece bu telefonda duruyor; düzenli yedek almanı öneririm.";
 }
 
+// v24: "Su hedefi kiloya göre" açıkken elle hedef kutusu pasif, hesap açıklamada
+function updateWaterAutoHint() {
+  const on = $("setWaterAuto").checked, a = waterAutoInfo(readProfileWeight() || state.weight);
+  $("setWater").disabled = on && !!a;
+  $("setWater").classList.toggle("opacity-50", on && !!a);
+  $("setWaterHint").textContent = on
+    ? (a ? `${fmtNum(a.w)} kg × 35 ml = ${fmtNum(a.base)} L${a.cr ? " + 0,5 L kreatin" : ""} → ${fmtNum(a.total)} L` : "Kilo girilince hesaplanır; şimdilik elle yazdığın hedef kullanılır.")
+    : "Kapalı: yukarıda elle yazdığın hedef kullanılır.";
+}
 function readProfileWeight() {
   const raw = $("pfWeight").value.trim();
   const w = round1(num(raw, 0));
@@ -3217,6 +3253,7 @@ function saveSettings() {
   st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));
   st.targetWeight = Math.max(30, Math.min(250, round1(num($("setTarget").value, st.targetWeight))));
   st.waterTarget = Math.max(0.5, Math.min(10, round1(num($("setWater").value, st.waterTarget))));
+  st.waterAuto = $("setWaterAuto").checked;
   st.restSec = Math.max(10, Math.min(900, Math.round(num($("setRest").value, st.restSec))));
   st.bodyFat = bfRaw ? round1(validBf(bfRaw)) : "";
   st.targetBodyFat = tbfRaw ? round1(validBf(tbfRaw)) : "";
@@ -4018,44 +4055,121 @@ function copyMeal(mIdx) {
 // TAKVİYELER (düzenlenebilir liste)
 // ---------------------------------------------------------------------------
 let suppEdit = false;
-// v17: takviye zamanlama etiketleri (Bugün'de bu sırayla gruplanır)
+// v17: takviye zamanlama etiketleri
 const SUPP_TIMES = [["morning", "Sabah tok"], ["pre", "Antrenman öncesi"], ["post", "Antrenman sonrası"], ["bed", "Yatmadan önce"], ["custom", "Özel"]];
+// v24: Bugün'de 3 ana grup (zaman → grup); özel etiketler kendi başlığıyla, zamansızlar "Diğer"
+const SUPP_GROUPS = [["İlk öğünle", "sun", ["morning"]], ["Antrenman / Gün içi", "zap", ["pre", "post"]], ["Akşam / Uyku öncesi", "moon", ["bed"]]];
+function normalizeSuppDose(x) {
+  if (x.note !== undefined) { x.note = String(x.note || "").slice(0, 40); if (!x.note) delete x.note; }
+  if (x.preset !== undefined && !SUPP_PRESETS.some(p => p.key === x.preset)) delete x.preset;
+  const d = num(x.dose, 0);
+  if (!(d > 0)) { SUPP_DOSE_KEYS.forEach(k => delete x[k]); return; }
+  x.dose = r2(d);
+  x.unit = String(x.unit || "").slice(0, 16);
+  x.step = num(x.step, 0) > 0 ? r2(num(x.step)) : 1;
+  x.min = num(x.min, 0) > 0 ? Math.min(r2(num(x.min)), x.dose) : Math.min(x.step, x.dose);
+  x.max = num(x.max, 0) >= x.dose ? r2(num(x.max)) : Math.max(x.dose, x.step * 10);
+}
+// Elle yazılan doz için mantıklı adım ve sınırlar
+function suppDoseDefaults(dose, unit) {
+  const u = normSearch(unit);
+  let step = /olcek|scoop/.test(u) ? 0.5 : /^(mcg|µg|ug|iu)$/.test(u) ? (dose >= 1000 ? 500 : dose >= 100 ? 50 : 5)
+    : u === "mg" ? (dose >= 100 ? 50 : 5) : dose >= 100 ? 50 : dose >= 20 ? 5 : dose % 1 ? 0.5 : 1;
+  step = Math.min(step, dose);
+  return { step, min: step, max: r2(Math.max(dose * 4, step * 10)) };
+}
 function suppTimeLabel(s) {
   if (s.time === "custom") return s.timeLabel || "Özel";
   const t = SUPP_TIMES.find(x => x[0] === s.time);
   return t ? t[1] : "";
 }
+function suppDoseText(s) { return s.dose ? `${fmtDose(s.dose)} ${s.unit || ""}`.trim() : ""; }
+function suppPillHtml(s) {
+  const on = !!state.supplements[s.id], sid = esc(JSON.stringify(s.id));
+  const sub = [s.dose ? `<b>${esc(suppDoseText(s))}</b>` : "", esc(s.note || (s.time === "pre" || s.time === "post" ? suppTimeLabel(s) : ""))].filter(Boolean).join(" · ");
+  const stepper = s.dose ? `<div class="n-step">
+      <button onclick="changeSuppDose(${sid}, -1)" ${s.dose - s.step < s.min - 1e-9 ? "disabled" : ""} aria-label="${esc(s.name)} dozunu azalt">${svgI("minus", 18, 2.5)}</button>
+      <button onclick="changeSuppDose(${sid}, 1)" ${s.dose + s.step > s.max + 1e-9 ? "disabled" : ""} aria-label="${esc(s.name)} dozunu artır">${svgI("plus", 18, 2.5)}</button>
+    </div>` : "";
+  return `<div class="n-pill ${on ? "taken" : ""}" data-supp-pill="${esc(s.id)}">
+    <button onclick="toggleSupp(${sid})" class="n-pill-main" aria-pressed="${on ? "true" : "false"}">
+      <span class="n-pill-check">${svgI("check", 14, 3)}</span>
+      <span class="min-w-0"><span class="n-pill-name">${esc(s.name)}</span>${sub ? `<span class="n-pill-dose">${sub}</span>` : ""}</span>
+    </button>${stepper}
+  </div>`;
+}
 function renderSupps() {
   const list = state.supplementList;
+  const done = list.filter(s => state.supplements[s.id]).length;
+  $("suppCounter").textContent = `${done} / ${list.length} Tamamlandı`;
+  $("suppCounter").classList.toggle("hidden", !list.length);
+  $("suppBarWrap").classList.toggle("hidden", !list.length);
+  $("suppBar").style.width = (list.length ? Math.round(done / list.length * 100) : 0) + "%";
+  $("suppCard").classList.toggle("all-done", list.length > 0 && done === list.length);
   let html;
   if (suppEdit) {
-    html = `<div class="w-full space-y-2" id="suppEditList">${list.map((s, i) => `<div class="flex items-center gap-2 min-h-[44px]" data-supp-row="${i}">
-        <span class="flex-1 min-w-0 text-[14px] font-semibold truncate">${esc(s.name)}</span>
-        <select onchange="setSuppTime(${i}, this.value)" class="n-in h-11 w-[150px] shrink-0" aria-label="${esc(s.name)} ne zaman alınır?">
-          <option value="" ${!s.time ? "selected" : ""}>Zaman seç</option>
-          ${SUPP_TIMES.map(([k, l]) => `<option value="${k}" ${s.time === k ? "selected" : ""}>${k === "custom" && s.time === "custom" ? esc(suppTimeLabel(s)) : l}</option>`).join("")}
-        </select>
-        <button onclick="removeSupp(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(s.name)} sil">${svgI("trash", 18)}</button>
+    html = `<div class="w-full space-y-2" id="suppEditList">${list.map((s, i) => `<div class="n-pill-edit space-y-1.5" data-supp-row="${i}">
+        <div class="flex items-center gap-2 min-h-[44px]">
+          <span class="flex-1 min-w-0 text-[14px] font-semibold pl-1 n-text" style="overflow-wrap:anywhere">${esc(s.name)}</span>
+          <button onclick="removeSupp(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(s.name)} sil">${svgI("trash", 18)}</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <select onchange="setSuppTime(${i}, this.value)" class="n-in h-11 flex-1 min-w-0" aria-label="${esc(s.name)} ne zaman alınır?">
+            <option value="" ${!s.time ? "selected" : ""}>Zaman seç</option>
+            ${SUPP_TIMES.map(([k, l]) => `<option value="${k}" ${s.time === k ? "selected" : ""}>${k === "custom" && s.time === "custom" ? esc(suppTimeLabel(s)) : l}</option>`).join("")}
+          </select>
+          <button onclick="editSuppDose(${i})" class="n-chip shrink-0" data-supp-dose="${i}" aria-label="${esc(s.name)} dozu">${s.dose ? "Doz: " + esc(suppDoseText(s)) : "+ Doz"}</button>
+        </div>
       </div>`).join("")}</div>`;
-    html += `<button onclick="addSupp()" class="n-chip add">+ Ekle</button>`;
-    html += `<button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}Bitti</button>`;
+    const presets = SUPP_PRESETS.filter(p => !list.some(s => s.preset === p.key || p.m.test(normSearch(s.name))));
+    if (presets.length) html += `<div class="n-sgroup">Hazır takviyeler</div><div class="flex flex-wrap gap-2" id="suppPresets">${presets.map(p =>
+      `<button onclick="addPresetSupp('${p.key}')" class="n-chip add">+ ${esc(p.name)}</button>`).join("")}</div>`;
+    html += `<div class="flex flex-wrap gap-2 pt-1"><button onclick="addSupp()" class="n-chip add">+ Ekle</button>
+      <button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}Bitti</button></div>`;
   } else {
-    const chip = s => `<button onclick="toggleSupp(${esc(JSON.stringify(s.id))})" class="n-chip ${state.supplements[s.id] ? "on" : ""}" aria-pressed="${state.supplements[s.id] ? "true" : "false"}">${state.supplements[s.id] ? svgI("check", 14, 3) : ""}${esc(s.name)}</button>`;
-    const groups = [];
-    SUPP_TIMES.forEach(([k]) => {
-      if (k === "custom") {
-        const labels = [...new Set(list.filter(s => s.time === "custom").map(suppTimeLabel))];
-        labels.forEach(l => groups.push([l, list.filter(s => s.time === "custom" && suppTimeLabel(s) === l)]));
-      } else groups.push([SUPP_TIMES.find(x => x[0] === k)[1], list.filter(s => s.time === k)]);
-    });
+    const groups = SUPP_GROUPS.map(([l, ic, times]) => [l, ic, times.flatMap(t => list.filter(s => s.time === t))]);
+    [...new Set(list.filter(s => s.time === "custom").map(suppTimeLabel))]
+      .forEach(l => groups.push([l, "clock", list.filter(s => s.time === "custom" && suppTimeLabel(s) === l)]));
     const untimed = list.filter(s => !suppTimeLabel(s));
-    const timed = groups.filter(g => g[1].length);
-    if (untimed.length) groups.push([timed.length ? "Diğer" : "", untimed]);
-    html = groups.filter(g => g[1].length).map(([l, ss]) => (l ? `<div class="w-full text-[12px] font-bold n-muted pt-1" data-supp-group="${esc(l)}">${esc(l)}</div>` : "") + ss.map(chip).join("")).join("");
-    html += `<button onclick="suppEdit = true; renderAll();" class="n-chip" aria-label="Takviyeleri düzenle">${svgI("edit", 14)}Düzenle</button>`;
-    if (!list.length) html = `<span class="text-[13px] n-dim self-center">Takviye listen boş.</span>` + html;
+    const anyTimed = groups.some(g => g[2].length);
+    if (untimed.length) groups.push([anyTimed ? "Diğer" : "", "", untimed]);
+    html = groups.filter(g => g[2].length).map(([l, ic, ss]) =>
+      (l ? `<div class="n-sgroup" data-supp-group="${esc(l)}">${ic ? svgI(ic, 15) : ""}${esc(l)}</div>` : "")
+      + `<div class="n-pills">${ss.map(suppPillHtml).join("")}</div>`).join("");
+    if (!list.length) html = `<p class="text-[13px] n-dim">Takviye listen boş. Düzenle'den ekleyebilirsin.</p>`;
+    html += `<div class="pt-1"><button onclick="suppEdit = true; renderAll();" class="n-chip" aria-label="Takviyeleri düzenle">${svgI("edit", 14)}Düzenle</button></div>`;
   }
   $("suppList").innerHTML = html;
+}
+function changeSuppDose(id, dir) {
+  const s = state.supplementList.find(x => x.id === id);
+  if (!s || !s.dose) return;
+  const nd = r2(s.dose + dir * s.step);
+  if (nd < s.min - 1e-9 || nd > s.max + 1e-9) return;
+  s.dose = nd;
+  renderAll();
+}
+async function editSuppDose(i) {
+  const s = state.supplementList[i];
+  if (!s) return;
+  const v = await askText("Doz ve birim", suppDoseText(s), "örn: 5 g · 2 softjel · 1 ölçek", "Boş bırakırsan doz gösterilmez.", "Kaydet");
+  if (v === null) return;
+  const t = String(v).trim();
+  if (!t) { SUPP_DOSE_KEYS.forEach(k => delete s[k]); renderAll(); return; }
+  const m = t.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
+  const d = m ? r2(num(m[1], 0)) : 0;
+  if (!(d > 0) || d > 100000) { sayAlert("Doz anlaşılamadı", "Önce sayı, sonra birim yaz (örn: 5 g veya 2 softjel)."); return; }
+  const unit = m[2].trim().slice(0, 16);
+  if (s.dose && d >= s.min && d <= s.max && normSearch(unit) === normSearch(s.unit)) s.dose = d;   // aynı birim: adım/sınır korunur
+  else Object.assign(s, { dose: d, unit }, suppDoseDefaults(d, unit));
+  renderAll();
+}
+function addPresetSupp(key) {
+  const p = SUPP_PRESETS.find(x => x.key === key);
+  if (!p) return;
+  const { m, key: k, ...rest } = p;
+  state.supplementList.push({ id: "sup_" + k + "_" + Date.now(), preset: k, ...clone(rest) });
+  renderAll();
 }
 async function setSuppTime(i, v) {
   const s = state.supplementList[i];
@@ -4400,7 +4514,7 @@ function historyCardHtml() {
   }
 
   const ser = historySeries(histRange);
-  const waterT = num(state.settings.waterTarget, 3.5);
+  const waterT = waterTargetL();
   const past = ser.filter(s => !s.empty && !s.live);
 
   // Özet istatistikler (bugün hariç, sadece veri olan günler)
@@ -4640,7 +4754,11 @@ const ICON = {
   star: "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
   cart: "M3 4h2.2l2.3 10.5h10.3l2.1-7.5H6.4M9.5 20a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4zM17 20a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4z",
   pot: "M4 10h16v5.5a4.5 4.5 0 0 1-4.5 4.5h-7A4.5 4.5 0 0 1 4 15.5zM2 10h20M9 6.5c0-1.2 1.2-1.3 1.2-2.5M14 6.5c0-1.2 1.2-1.3 1.2-2.5",
-  repeat: "M17 2.5l3 3-3 3M4 11.5v-2a4 4 0 0 1 4-4h12M7 21.5l-3-3 3-3M20 12.5v2a4 4 0 0 1-4 4H4"
+  repeat: "M17 2.5l3 3-3 3M4 11.5v-2a4 4 0 0 1 4-4h12M7 21.5l-3-3 3-3M20 12.5v2a4 4 0 0 1-4 4H4",
+  sun: "M12 2.5v2M12 19.5v2M4.6 4.6L6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4M12 7.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9z",
+  zap: "M13 2.5L4.5 13.5H11l-1 8 8.5-11H12z",
+  moon: "M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z",
+  clock: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7.5V12l3 2"
 };
 function svgI(name, size = 20, sw = 2) {
   return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICON[name]}"></path></svg>`;

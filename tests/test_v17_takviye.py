@@ -57,9 +57,9 @@ try:
 
     # Gruplama ve sıralama: Sabah tok → Antrenman sonrası → Özel
     groups = pg.locator("[data-supp-group]").all_inner_texts()
-    check(groups == ["Sabah tok", "Antrenman sonrası", "Öğle yemeğiyle"], f"Bugün'de zamana göre gruplandı ve sıralandı: {groups}")
-    order = pg.evaluate("[...document.querySelectorAll('#suppList > *')].map(e => e.dataset.suppGroup ? '#' + e.dataset.suppGroup : e.textContent.trim())")
-    check(order[:6] == ["#Sabah tok", "🥬 Greens", "#Antrenman sonrası", "⚡ Kreatin (5g)", "#Öğle yemeğiyle", "🐟 Omega/Vit"], f"sıra doğru: {order[:6]}")
+    check(groups == ["İlk öğünle", "Antrenman / Gün içi", "Öğle yemeğiyle"], f"v24: Bugün'de 3 ana gruba göre gruplandı ve sıralandı: {groups}")
+    order = pg.evaluate("[...document.querySelectorAll('#suppList [data-supp-group], #suppList .n-pill-name')].map(e => e.dataset.suppGroup ? '#' + e.dataset.suppGroup : e.textContent.trim())")
+    check(order[:6] == ["#İlk öğünle", "🥬 Greens", "#Antrenman / Gün içi", "⚡ Kreatin (5g)", "#Öğle yemeğiyle", "🐟 Omega/Vit"], f"sıra doğru: {order[:6]}")
     # İşaretleme hâlâ çalışıyor
     pg.locator("#suppList button", has_text="Kreatin").click(); pg.wait_for_timeout(60)
     check(st(pg)["supplements"].get("creatine") is True, "gruplu görünümde işaretleme çalışıyor")
