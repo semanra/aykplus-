@@ -9,7 +9,7 @@ AYK+, kullanıcının kendi kişisel fitness uygulamasıdır: **beslenme (makro 
 - **Platform:** iPhone'da ana ekrana eklenmiş bir PWA (web uygulaması). App Store uygulaması değildir.
 - **Yayın:** Bu depo GitHub Pages ile yayınlanır. Depodaki `index.html` = canlı uygulama. `main` dalına gönderilen her değişiklik 1–2 dakika içinde kullanıcının telefonuna gelir.
 - **Veri:** Tamamen telefonda, `localStorage` içinde. Sunucu, hesap, senkronizasyon yok. Kullanıcı Ayarlar → Yedek ile JSON yedek alır.
-- **Çevrimdışı:** `sw.js` (service worker) dosyaları önbelleğe alır; spor salonunda internetsiz çalışır.
+- **Çevrimdışı:** `sw.js` (service worker) dosyaları önbelleğe alır; spor salonunda internetsiz çalışır. v25'ten beri: önce internet; internet yoksa, sunucu 404/5xx döndürürse veya 3 sn'de yanıt gelmezse önbellekteki kopya açılır (zaman aşımından sonra 30 sn boyunca dosyalar beklemeden önbellekten verilir, yanıt arka planda önbelleği günceller). `index.html` yedeği yalnızca sayfa açılışında (`navigate`) kullanılır. Test: `tests/test_v25_sw.py` (kendi sunucusuyla 404/503/yavaş/çevrimdışı).
 - **Kullanıcının cihazları:** iPhone ve iPad. **Mac yok.** iOS Safari davranışı her zaman öncelikli.
 
 ## 2. Dosya yapısı
@@ -34,7 +34,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 20 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 22 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
@@ -54,7 +54,7 @@ npm test             # 20 test paketi, gerçek Chromium'da iPhone boyutunda; hep
 ## 5. Kesin kurallar
 
 - **Depolama anahtarı `ayk_plus_v5_state` asla değişmez.** Yeni alanlar `normalizeState()` içinde varsayılan değerle eklenir; eski kullanıcı verisi her zaman göç ettirilir, asla silinmez.
-- **Kullanıcı verisi kutsaldır.** Veri yapısını değiştiren her işte, eski formatla kaydedilmiş veriyle test yaz (bkz. `test_v6_temel.py` içindeki "legacy" tohum verisi).
+- **Kullanıcı verisi kutsaldır.** Veri yapısını değiştiren her işte, eski formatla kaydedilmiş veriyle test yaz (bkz. `test_v6_temel.py` içindeki "legacy" tohum verisi, `test_v25_guvenlik.py` içindeki bozuk kayıt). `dailyLogs` özetleri hiç silinmez (v25'te 180 gün sınırı kaldırıldı; yalnızca öğün içerikleri son 7 günde tutulur). `normalizeState` öğün/kalem/özel besin/günlük kayıtları `normItems` / `normMealList` / `isObj` ile temizler (boş kayıt atılır, metin miktar sayıya çevrilir, okunamayan miktar 0 olur; değer uydurulmaz). Kayıt yine de okunamazsa `loadState` ham veriyi `ayk_plus_v5_state_kurtarma` anahtarına kopyalar (varsa üzerine yazmaz) ve açılışta uyarır; bozuk yedek geri yüklenirken mevcut veri değişmez.
 - **Kullanıcı metni HTML'e eklenirken her zaman `esc()`** kullan. `onclick` içine metin geçirirken `esc(JSON.stringify(metin))` kalıbını kullan.
 - **Sayılar:** Kullanıcı Türkçe ondalık virgül yazar. Okurken `num()`, gösterirken `fmtNum()` (1 ondalık) veya `fmtKg()` (2 ondalık; 1,25 kg plakalar için) kullan. Sayı girişleri `type="text" inputmode="decimal"`.
 - **Dokunma alanı en az 44 px.** Buton ve ikonlar küçük olmamalı; kullanıcı bunu açıkça istedi.
@@ -69,7 +69,7 @@ npm test             # 20 test paketi, gerçek Chromium'da iPhone boyutunda; hep
 - **Yeni tema pencereleri:** Ortak pencereler (`pickerModal`, `chartModal`, `customFoodModal`) `openModal()` ile açılırken `trainCtx()` (antrenman sekmesi veya Profil açık) doğruysa `.tm` sınıfı alır; `src/markup.html` içindeki `.tm` CSS kuralları eski renkleri yeni temaya çevirir ve başlıktaki emojiyi kaldırır. Beslenmeden açılınca eski temada kalır. `exerciseModal` yalnızca antrenmanda kullanıldığı için doğrudan yeni temada yazıldı (`t-in`, `t-seg`, `t-field`).
 - **Beslenme (v13):** Beslenme sekmesindeyken `body.theme-nutri` (+ gündüz teması açıksa `nutri-light`; `state.settings.nutriLight`, üstteki `#nutriThemeBtn`). Renkler CSS değişkenleri (`--n-*`); `.n-hero` her iki temada koyu kalır. Ortak pencereler beslenmeden açılınca (`nutriCtx()`) `.nm` alır. Alt sekmeler `state.nutriView` = `today | menus | foods | history` (`setNutriView`), her biri `#nvToday/#nvMenus/#nvFoods/#nvHistory`:
   - **Bugün:** gün tipi (`#btnTrain/#btnRest`), kalori halkası (`#calRing`, `updateMacroCard`), su bardakları (`renderWater`), takviyeler (`#suppList`), zaman çizelgesi (`#todayMeals`, `[data-today-meal]`, daire = `toggleMealDone` onay kutusu). Yenmiş öğün tek satıra kapanır.
-  - **Menülerim:** menü seçimi (`#mnTrain/#mnRest`), menü toplamı (`#menuTotal`), kilo/açık kartı, kiloya göre gramaj (`#scaleCard`), öğün listesi `#mealsContainer [data-meal-card]` (sürükle-bırak burada; öğün açılınca gramaj düzenleme, ⇄, kopyala/sil).
+  - **Menülerim:** menü seçimi (`#mnTrain/#mnRest`), menü toplamı (`#menuTotal`), kilo/açık kartı, kiloya göre gramaj (`#scaleCard`), öğün listesi `#mealsContainer [data-meal-card]` (sürükle-bırak burada; öğün açılınca gramaj düzenleme, ⇄, kopyala/sil). Gramı 0 yapmak (− veya 0 yazmak) `removeItem` ile Geri al'lı siler; boş/geçersiz giriş besini silmez, eski gram geri gelir (v25). "Karbı dengele" (`autoBalanceCarbs`) v25'te kaldırıldı.
   - **Besinler:** hedef öğün (`foodUI.meal`, `goAddFood(mIdx)`), arama `#foodSearch` (statik; yeniden çizilmez), kategoriler, seçili besin kartı `#foodSelCard` (gramaj yazarken tam çizim YAPILMAZ: `foodAmtInput` → `updateFoodSelUI`), hazır porsiyonlar (`foodPresets`), barkod.
   - **Geçmiş:** `state.dailyLogs` + bugünün canlı özeti (`renderNutriHistory`).
   - Açık/kapalı öğün bilgisi kaydedilmez; öğün **kimliğiyle** tutulur (`openDoneMeals`, `openMenuMeals` Set). `normalizeState` kimliği olmayan öğünlere kimlik verir.
@@ -136,6 +136,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 **v23:** set başına zorluk (isteğe bağlı), zorluğu hesaba katan kilo önerisi, dinlenme haftası notu.
 
 **v24:** Su ve Takviye Rutini kartları (halka, kiloya göre su hedefi, doz ayarlayıcı, hazır takviyeler).
+
+**v25 (güvenlik):** service worker hata/yavaş internet düzeltmesi, günlük özetler artık silinmiyor, bozuk kayıt/yedek temizliği + kurtarma kopyası, Menülerim 0 gram silmesi Geri al'lı, "Karbı dengele" kaldırıldı, "Dünkü" etiketi gün geçiş saatine göre (`dayLabelShort` → `logicalNow`), yeni gün onayı "Beslenme → Geçmiş". Eksik analizi: `docs/ANALIZ-beslenme.md` (v26: arama hızı, metinler, kalori halkası varsayılanı; 3.2 "yalnızca açık sekmeyi çiz" ayrıca konuşulacak).
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 
