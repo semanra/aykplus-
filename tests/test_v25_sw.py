@@ -7,6 +7,8 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
 os.makedirs(SHOTS, exist_ok=True)
 PORT = 8782
+import re
+CACHE = re.search(r"const CACHE = '([^']+)'", open(os.path.join(REPO, "sw.js"), encoding="utf-8").read()).group(1)
 MODE = {"m": "ok"}
 
 class H(SimpleHTTPRequestHandler):
@@ -57,10 +59,10 @@ try:
     # Kurulum: ilk açılış, service worker yüklenir ve dosyaları önbelleğe alır
     pg.goto(URL); pg.wait_for_function(APP_OK)
     pg.evaluate("navigator.serviceWorker.ready.then(() => true)")
-    pg.wait_for_function("""caches.keys().then(k => window.__k = k) && (window.__k || []).includes('aykplus-v25')""", timeout=15000, polling=200)
+    pg.wait_for_function(f"""caches.keys().then(k => window.__k = k) && (window.__k || []).includes('{CACHE}')""", timeout=15000, polling=200)
     pg.reload(); pg.wait_for_function(APP_OK)
     check(pg.evaluate("!!navigator.serviceWorker.controller"), "service worker sayfayı yönetiyor")
-    n = pg.evaluate("caches.open('aykplus-v25').then(c => c.keys()).then(k => k.length)")
+    n = pg.evaluate("caches.open('" + CACHE + "').then(c => c.keys()).then(k => k.length)")
     check(n >= 9, f"tüm dosyalar önbellekte ({n})")
 
     # 1) Sunucu 404 → önbellek

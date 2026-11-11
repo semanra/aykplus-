@@ -44,7 +44,7 @@ try:
     check(pg.inner_text("#waterVal") == "1,25" and pg.inner_text("#waterPct") == "%31", f"1,25 / 4 L → %31 ({pg.inner_text('#waterPct')})")
     pg.locator("#waterCard button", has_text="+500 ml").click(); pg.locator("#waterCard button", has_text="+250 ml").click(); pg.wait_for_timeout(80)
     ring = float(pg.evaluate("document.getElementById('waterRing').style.strokeDashoffset"))
-    check(pg.inner_text("#waterVal") == "2,00" and pg.inner_text("#waterPct") == "%50" and abs(ring - 182.21) < 0.5, f"2 L → %50, halka yarıda ({ring})")
+    check(pg.inner_text("#waterVal") == "2" and pg.inner_text("#waterPct") == "%50" and abs(ring - 182.21) < 0.5, f"2 L → %50, halka yarıda ({ring})")
     pg.locator("#waterCard button[aria-label='250 mililitre çıkar']").click(); pg.wait_for_timeout(60)
     check(st(pg)["waterLiters"] == 1.75, "− düğmesi 250 ml azaltıyor")
     pg.evaluate("state.waterLiters = 9; renderAll()")

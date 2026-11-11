@@ -168,7 +168,7 @@ try:
     check(pg.evaluate("state.nutriView") == "foods" and pg.evaluate("foodTargetIdx()") == nxt, "'+ Besin' Besinler'i doğru öğün seçili açıyor")
     cats = pg.locator("#foodCats button").all_inner_texts()
     check("Tümü" in cats and any("Türk Mutfağı" in c for c in cats) and not any("🇹🇷" in c for c in cats), "kategori düğmeleri (emojisiz)")
-    pg.fill("#foodSearch", "yulaf"); pg.wait_for_timeout(80)
+    pg.fill("#foodSearch", "yulaf"); pg.wait_for_timeout(300)   # v26: arama ~150 ms bekler
     check(pg.locator("#foodList [data-food]").count() >= 1 and "Yulaf" in pg.inner_text("#foodList"), "arama sonuç veriyor")
     pg.locator('#foodList [data-food="u173904"]').click(); pg.wait_for_timeout(100)
     check(pg.locator("#foodSelCard").count() == 1 and pg.input_value("#foodAmt") == pg.evaluate("fmtNum(getFoodDB().u173904.def)"), "besin seçilince varsayılan porsiyonu ile kart açılıyor")

@@ -123,6 +123,7 @@
       --n-accent: #22C55E; --n-accent-text: #22C55E; --n-accent-soft: rgba(34, 197, 94, 0.16);
       --n-btn: #16A34A; --n-btn-text: #FFFFFF; --n-on-bg: #FFFFFF; --n-on-text: #050706; --n-tick: #04130A;
       --n-p: #58B9F7; --n-k: #E5B85B; --n-y: #E27C66; --n-over: #FB7185; --n-over-soft: rgba(251, 113, 133, 0.12);
+      --n-p-soft: rgba(88, 185, 247, 0.14); --n-k-soft: rgba(229, 184, 91, 0.14); --n-y-soft: rgba(226, 124, 102, 0.14);
       --n-water: #4EA8DE; --n-water-soft: rgba(78, 168, 222, 0.16); --n-water-text: #8CCBF0; --n-cup-line: #3B4A5C;
       --n-nav: rgba(10, 14, 12, 0.95);
       background-color: var(--n-bg);
@@ -133,6 +134,7 @@
       --n-accent: #059669; --n-accent-text: #047857; --n-accent-soft: rgba(16, 185, 129, 0.14);
       --n-btn: #047857; --n-btn-text: #FFFFFF; --n-on-bg: #0F172A; --n-on-text: #FFFFFF; --n-tick: #FFFFFF;
       --n-p: #0369A1; --n-k: #A16207; --n-y: #C2410C; --n-over: #E11D48; --n-over-soft: rgba(225, 29, 72, 0.10);
+      --n-p-soft: rgba(3, 105, 161, 0.12); --n-k-soft: rgba(161, 98, 7, 0.12); --n-y-soft: rgba(194, 65, 12, 0.12);
       --n-water: #0284C7; --n-water-soft: rgba(2, 132, 199, 0.12); --n-water-text: #075985; --n-cup-line: #94A3B8;
       --n-nav: rgba(255, 255, 255, 0.95);
     }
@@ -400,7 +402,7 @@
         </div>
         <div id="microLine" class="hidden flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-white/75" aria-label="Lif ve tuz"></div>
         <div class="n-seg grid-cols-2" aria-label="Gösterilen değerler">
-          <button id="mmPlan" onclick="setMacroView('plan')">Plan · <span id="mmPlanVal">0</span> kcal</button>
+          <button id="mmPlan" onclick="setMacroView('plan')">Menü · <span id="mmPlanVal">0</span> kcal</button>
           <button id="mmEaten" onclick="setMacroView('eaten')">Yenen · <span id="mmEatenVal">0</span> · <span id="mmEatenMeals">0/0</span></button>
         </div>
       </section>
@@ -509,7 +511,7 @@
       <section id="foodSuggest" class="hidden" aria-label="Kalan hedefini kapatan seçenekler"></section>
       <div class="flex items-center gap-1 n-elev rounded-full pl-4 pr-1 h-[52px]">
         <svg class="n-muted shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M11 4.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM20 20l-4-4"></path></svg>
-        <input id="foodSearch" type="text" placeholder="Besin ara (tavuk, mercimek, yulaf...)" oninput="foodUI.limit = 0; renderFoodList()" autocomplete="off" aria-label="Besin ara" class="n-search flex-1 min-w-0 h-11 pl-1" />
+        <input id="foodSearch" type="text" placeholder="Besin ara (tavuk, mercimek, yulaf...)" oninput="foodSearchInput()" autocomplete="off" aria-label="Besin ara" class="n-search flex-1 min-w-0 h-11 pl-1" />
         <button onclick="openBarcode()" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-accent" aria-label="Barkod okut"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13.5 8v8M17 8v8"></path></svg></button>
       </div>
       <div id="foodCats" class="flex gap-2 overflow-x-auto no-scrollbar -mx-0.5 px-0.5"></div>
@@ -829,7 +831,7 @@
             <input id="fmF" type="text" inputmode="decimal" autocomplete="off" placeholder="—" class="n-in w-full" /></div>
         </div>
         <label class="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
-          <span class="text-[14px] font-semibold">Öğündeki planlı besinlerin yerine</span>
+          <span class="text-[14px] font-semibold">Bu öğündeki besinlerin yerine say</span>
           <input id="fmReplace" type="checkbox" class="n-sw" checked onchange="updateFreeMealHint()" />
         </label>
         <p id="fmHint" class="text-[13px] n-muted" role="status" aria-live="polite"></p>
@@ -1059,7 +1061,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v25</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v26</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

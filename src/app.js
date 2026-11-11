@@ -6,7 +6,7 @@ const DEFAULT_SETTINGS = {
   sex: "male", height: 180, age: 26, targetWeight: 82,
   waterTarget: 3.5, restSec: 90, sound: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
-  macroView: "plan", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
+  macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
   nutriLight: false, scaleOn: false, scaleBase: 0
 };
 const DEFAULT_SUPPS = [
@@ -236,6 +236,10 @@ function normalizeState(raw) {
   if (!["today", "program", "library", "history"].includes(s.gymView)) s.gymView = "today";
   if (!["today", "menus", "foods", "history"].includes(s.nutriView)) s.nutriView = "today";
   s.settings.nutriLight = !!s.settings.nutriLight;
+  // v26: kalori halkası bir kereliğine "Yenen"e geçer (eskiden varsayılan "Plan" da kaydediliyordu, seçimle ayırt edilemiyordu);
+  // işaret kaydedilir, sonra kullanıcının seçimi korunur.
+  if (!s.settings.macroViewV26) { s.settings.macroView = "eaten"; s.settings.macroViewV26 = 1; }
+  if (s.settings.macroView !== "plan") s.settings.macroView = "eaten";
   { const h = parseInt(s.settings.dayStartHour, 10); s.settings.dayStartHour = h >= 0 && h <= 5 ? h : 0; }   // v21
   s.settings.waterAuto = s.settings.waterAuto !== false;   // v24: su hedefi kiloya göre (varsayılan açık)
   s.settings.scaleOn = !!s.settings.scaleOn;
@@ -901,9 +905,10 @@ function toggleWeightScale(on) {
   state.settings.scaleOn = !!on;
   if (on) state.settings.scaleBase = state.weight;
   renderAll();
-  toast(on ? `Gramajlar artık ${fmtNum(state.weight)} kg'a göre ayarlanacak` : "Kiloya göre gramaj kapatıldı; menü eski gramajlarına döndü");
+  toast(on ? `Gramajlar artık ${fmtNum(state.weight)} kg'a göre ayarlanacak` : "Kiloya göre gramaj kapatıldı; menü son başlangıç gramajlarına döndü");
 }
 function resetScaleBase() {
+  snapshot();   // v26: Geri al
   const k = scaleK();
   // Şu an görünen gramajlar yeni referans olsun: saklanan miktarları sabitle
   if (k !== 1) allMealLists().forEach(ms => ms.forEach(m => m.items.forEach(i => {
@@ -913,7 +918,7 @@ function resetScaleBase() {
   })));
   state.settings.scaleBase = state.weight;
   renderAll();
-  toast(`Referans kilo ${fmtNum(state.weight)} kg yapıldı; gramajlar olduğu gibi kaldı`);
+  offerUndo(`Gramajlar ${fmtNum(state.weight)} kg için yeni başlangıç oldu`);
 }
 
 // ---------------------------------------------------------------------------
@@ -1022,7 +1027,7 @@ function renderNutrition() {
   const diffKg = state.weight - target;
   const weeklyLoss = (state.deficit * 7) / 7700;
   $("timelineInfo").textContent = diffKg <= 0 ? `${fmtNum(target)} kg hedefine ulaştın!`
-    : weeklyLoss > 0 ? `Haftalık ~${weeklyLoss.toFixed(2).replace(".", ",")} kg kayıp → ${fmtNum(target)} kg hedefine ~${Math.ceil(diffKg / weeklyLoss)} hafta`
+    : weeklyLoss > 0 ? `Haftalık ~${fmtKg(weeklyLoss)} kg kayıp → ${fmtNum(target)} kg hedefine ~${Math.ceil(diffKg / weeklyLoss)} hafta`
     : "Kalori açığı yok: kilo koruma modu";
   const hint = coachHintText();
   $("coachHint").classList.toggle("hidden", !hint);
@@ -1046,7 +1051,7 @@ function renderHero() {
   const targets = getTargets();
   const plan = nutritionTotals();
   const eaten = eatenTotals();
-  const view = state.settings.macroView === "eaten" ? "eaten" : "plan";
+  const view = state.settings.macroView === "plan" ? "plan" : "eaten";
   const shown = view === "eaten" ? eaten : plan;
   updateMacroCard("cal", shown.cal, targets.calTarget, "kcal");
   updateMacroCard("pro", shown.p, targets.proTarget, "g");
@@ -1100,7 +1105,7 @@ function renderWater() {
   const wt = waterTargetL();
   const w = state.waterLiters || 0;
   const pct = wt > 0 ? Math.min(100, Math.round(w / wt * 100)) : 0;
-  $("waterVal").textContent = w.toFixed(2).replace(".", ",");
+  $("waterVal").textContent = fmtKg(w);
   $("waterTarget").textContent = fmtNum(wt);
   $("waterPct").textContent = "%" + pct;
   $("waterRing").style.strokeDashoffset = String(Math.round(WATER_RING_C * (1 - pct / 100) * 100) / 100);
@@ -1133,7 +1138,7 @@ function renderTodayMeals() {
         <p class="text-[12px] n-muted">Menülerim değişmedi. Bugünkü hâli menüye de kaydedebilir ya da menüdeki hâline dönebilirsin.${canBalance ? ` Bugün hedefi <strong class="n-over">${fmtInt(over)} kcal</strong> aşıyor.` : ""}</p>
         <div class="grid grid-cols-2 gap-2">
           ${savable ? `<button onclick="saveDayToMenu()" class="n-btn h-11 rounded-full text-[13px]">Menüye de kaydet</button>` : ""}
-          <button onclick="revertDayToMenu()" class="n-btn-ghost h-11 rounded-full text-[13px] ${savable ? "" : "col-span-2"}">Menüdeki hâline dön</button>
+          <button onclick="revertDayToMenu()" class="n-btn-ghost h-11 rounded-full text-[13px] ${savable ? "" : "col-span-2"}">Bugünü menüye geri döndür</button>
           ${canBalance ? `<button onclick="balanceDayNow()" class="n-btn-outline h-11 rounded-full text-[13px] col-span-2">Günü dengele (kalan öğünlerden kıs)</button>` : ""}
         </div>
       </div>`;
@@ -1531,13 +1536,13 @@ function renderMenus() {
     </label>
     ${st.scaleOn ? `
       <div class="n-elev rounded-2xl px-3.5 py-3 space-y-1">
-        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">Referans kilo</span><strong>${fmtNum(num(st.scaleBase, state.weight))} kg</strong></div>
+        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">Başlangıç kilosu</span><strong>${fmtNum(num(st.scaleBase, state.weight))} kg</strong></div>
         <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">Şimdiki kilo</span><strong>${fmtNum(state.weight)} kg</strong></div>
         <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">Gramaj oranı</span><strong class="n-accent">%${Math.round(k * 100)}</strong></div>
       </div>
-      <button onclick="resetScaleBase()" class="n-btn-outline w-full h-11 rounded-full text-[13px]">Şimdiki gramajları sabitle (referansı ${fmtNum(state.weight)} kg yap)</button>
-      <p class="text-[12px] n-dim">Yalnızca gram ve ml ile ölçülen besinler değişir (tavuk, pirinç, yulaf...). Adet, kase, ölçek gibi besinler aynı kalır. Oran en fazla %70–%130 arasında uygulanır. Ayarı kapatırsan menü ilk gramajlarına döner.</p>
-      ${num(st.calAdjust, 0) !== 0 ? `<p id="scaleCoachNote" class="text-[12px] n-k border border-current rounded-2xl px-3 py-2">Kalori koçu hedefini ${num(st.calAdjust, 0) > 0 ? "+" : ""}${fmtInt(num(st.calAdjust, 0))} kcal ayarladı. İkisi aynı düzeltmeyi iki kez yapmaz: gramajlar yalnızca kilona göre değişir, koç yalnızca hedef kaloriyi değiştirir. Bu yüzden koçun düzeltmesi menüye kendiliğinden yansımaz; menü toplamını hedefe uydurmak için "Karbı dengele"yi kullan.</p>` : ""}` : ""}`;
+      <button onclick="resetScaleBase()" class="n-btn-outline w-full h-11 rounded-full text-[13px]">Bu gramajları yeni başlangıç yap (${fmtNum(state.weight)} kg)</button>
+      <p class="text-[12px] n-dim">Yalnızca gram ve ml ile ölçülen besinler değişir (tavuk, pirinç, yulaf...). Adet, kase, ölçek gibi besinler aynı kalır. Oran en fazla %70–%130 arasında uygulanır. Ayarı kapatırsan menü son başlangıç yaptığın gramajlara döner.</p>
+      ${num(st.calAdjust, 0) !== 0 ? `<p id="scaleCoachNote" class="text-[12px] n-k border border-current rounded-2xl px-3 py-2">Kalori koçu hedefini ${num(st.calAdjust, 0) > 0 ? "+" : ""}${fmtInt(num(st.calAdjust, 0))} kcal ayarladı. İkisi aynı düzeltmeyi iki kez yapmaz: gramajlar yalnızca kilona göre değişir, koç yalnızca hedef kaloriyi değiştirir. Bu yüzden koçun düzeltmesi menüye kendiliğinden yansımaz; menü toplamını hedefe uydurmak için öğünlerdeki gramajları ayarla.</p>` : ""}` : ""}`;
 
   // Öğün listesi
   const meals = curMeals();
@@ -1602,8 +1607,8 @@ function renderMenus() {
     ${svgI("plus", 20, 2.4)}Yeni öğün ekle</button>`;
   if (dayChangedIds().size) {
     html = `<div id="menuDayNote" class="n-card rounded-[20px] p-3.5 space-y-2.5">
-        <p class="text-[13px] n-muted">Bugün için bu menüde ayrı değişiklikler yaptın. Burada yaptığın değişiklikler <strong class="n-text">bugünkü planı değiştirmez</strong>; yarından itibaren geçerli olur.</p>
-        <button onclick="revertDayToMenu()" class="n-btn-ghost w-full h-11 rounded-full text-[13px]">Bugünü de bu menüye eşitle</button>
+        <p class="text-[13px] n-muted">Bugün ekranında bugüne özel değişiklikler yaptın. Burada yaptıkların <strong class="n-text">bugünü değiştirmez</strong>; yarından itibaren geçerli olur.</p>
+        <button onclick="revertDayToMenu()" class="n-btn-ghost w-full h-11 rounded-full text-[13px]">Bugünü menüye geri döndür</button>
       </div>` + html;
   }
   $("mealsContainer").innerHTML = html;
@@ -1671,10 +1676,11 @@ function renderFoodHead() {
   const meals = foodMeals();
   const tIdx = foodTargetIdx();
   const day = foodUI.dest !== "menu";
-  const seg = `<div class="n-seg grid-cols-2 mb-3" aria-label="Nereye eklensin?">
-      <button id="fdDay" onclick="setFoodDest('day')" class="${day ? "on" : ""}" aria-pressed="${day}">Bugüne ekle</button>
-      <button id="fdMenu" onclick="setFoodDest('menu')" class="${day ? "" : "on"}" aria-pressed="${!day}">Menüye ekle</button>
-    </div>`;
+  const seg = `<div class="n-seg grid-cols-2 mb-1.5" aria-label="Nereye eklensin?">
+      <button id="fdDay" onclick="setFoodDest('day')" class="${day ? "on" : ""}" aria-pressed="${day}">Sadece bugüne</button>
+      <button id="fdMenu" onclick="setFoodDest('menu')" class="${day ? "" : "on"}" aria-pressed="${!day}">Menüme (her gün)</button>
+    </div>
+    <p id="fdHint" class="text-[12px] n-dim mb-3 px-1">${day ? "Yalnızca bugünkü öğüne eklenir; menün değişmez." : "Menüne eklenir; her gün geçerli olur."}</p>`;
   if (tIdx < 0) {
     $("foodHead").innerHTML = seg + `<div class="n-card rounded-[20px] p-4 text-[14px] n-muted">Besin eklemek için önce Menülerim'den bir öğün oluştur.</div>`;
     return;
@@ -1788,9 +1794,9 @@ function renderFoodList() {
           <button onclick="foodPreset(null, ${pr.plus})" class="n-chip">+${fmtNum(pr.plus)} ${esc(f.unit)}</button>
         </div>
         <div class="grid grid-cols-3 gap-2 text-center text-[13px] font-extrabold">
-          <div id="foodSelP" class="py-2 rounded-full n-p" style="background: color-mix(in srgb, var(--n-p) 14%, transparent)"></div>
-          <div id="foodSelC" class="py-2 rounded-full n-k" style="background: color-mix(in srgb, var(--n-k) 14%, transparent)"></div>
-          <div id="foodSelF" class="py-2 rounded-full n-y" style="background: color-mix(in srgb, var(--n-y) 14%, transparent)"></div>
+          <div id="foodSelP" class="py-2 rounded-full n-p" style="background: var(--n-p-soft)"></div>
+          <div id="foodSelC" class="py-2 rounded-full n-k" style="background: var(--n-k-soft)"></div>
+          <div id="foodSelF" class="py-2 rounded-full n-y" style="background: var(--n-y-soft)"></div>
         </div>
         ${microOf(f, 1) ? `<div id="foodSelMicro" class="text-[12px] n-muted text-center -mt-1"></div>` : ""}
         <button id="foodAddBtn" onclick="addSelectedFood()" class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}></button>
@@ -1912,7 +1918,7 @@ function addSelectedFood() {
   if (foodUI.dest === "menu") {
     const mealTitle = curMeals()[tIdx].title;
     quickAdd(tIdx, fid, amt, curMeals());
-    toast(`✓ ${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${mealTitle} (menü)`);
+    toast(`✓ ${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${mealTitle} (menüne, her gün)`);
   } else {
     const list = ensureDayCopy();
     const meal = list[tIdx];
@@ -3807,7 +3813,7 @@ function eatenTotals() {
   dayMeals().forEach(m => { if (!m.done) return; m.items.forEach(i => { const x = calcItemMacros(i); p += x.p; c += x.c; f += x.f; cal += x.cal; }); });
   return { p, c, f, cal };
 }
-function setMacroView(v) { state.settings.macroView = v === "eaten" ? "eaten" : "plan"; renderAll(); }
+function setMacroView(v) { state.settings.macroView = v === "plan" ? "plan" : "eaten"; renderAll(); }
 
 // ---------------------------------------------------------------------------
 // AKILLI KALORİ KOÇU
@@ -4194,7 +4200,10 @@ async function editSuppDose(i) {
   const v = await askText("Doz ve birim", suppDoseText(s), "örn: 5 g · 2 softjel · 1 ölçek", "Boş bırakırsan doz gösterilmez.", "Kaydet");
   if (v === null) return;
   const t = String(v).trim();
-  if (!t) { SUPP_DOSE_KEYS.forEach(k => delete s[k]); renderAll(); return; }
+  if (!t) {   // v26: doz silme Geri al'lı
+    if (!SUPP_DOSE_KEYS.some(k => s[k] != null)) return;
+    snapshot(); SUPP_DOSE_KEYS.forEach(k => delete s[k]); renderAll(); offerUndo(`${s.name}: doz kaldırıldı`); return;
+  }
   const m = t.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
   const d = m ? r2(num(m[1], 0)) : 0;
   if (!(d > 0) || d > 100000) { sayAlert("Doz anlaşılamadı", "Önce sayı, sonra birim yaz (örn: 5 g veya 2 softjel)."); return; }
@@ -5501,7 +5510,7 @@ function addComboToMeal(id) {
   foodUI.sel = null;
   renderAll();
   const mid = meal.id;
-  toast(`✓ ${c.name} → ${meal.title}${day ? " (yalnızca bugün)" : " (menü)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+  toast(`✓ ${c.name} → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
     const mm = curMeals().find(x => x.id === mid);
     if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
     mergeItems(mm, c.items);
@@ -5730,7 +5739,10 @@ function toggleShop(id) {
   saveState();
   renderShopList();
 }
-function clearShopChecks() { state.shopChecked = {}; saveState(); renderShopList(); }
+function clearShopChecks() {   // v26: Geri al
+  snapshot(); state.shopChecked = {}; saveState(); renderShopList();
+  toast("İşaretler temizlendi", "ok", { label: "↶ Geri al", fn: () => { doUndo(); renderShopList(); } });
+}
 function renderShopList() {
   const list = shopList();
   const nT = shopTrainDays();
@@ -5793,6 +5805,19 @@ async function shareShopList() {
 // KALAN HEDEFİ KAPATAN SEÇENEKLER: yalnızca kullanıcının sık yediği/kayıtlı besinlerden,
 // önce kalan protein, sonra kalan kalori hedeflenir.
 // ---------------------------------------------------------------------------
+// v26: arama her harfte yeniden saymasın (besin tablosu sürümü değişince yenilenir)
+let _freqC = null;
+function frequentFoodsCached(limit) {
+  if (!_freqC || _freqC.ver !== foodDbVer || _freqC.limit !== limit) _freqC = { ver: foodDbVer, limit, ids: frequentFoods(limit) };
+  return _freqC.ids;
+}
+// v26: arama kutusu: yazmayı ~150 ms bırakınca aranır (boşaltınca hemen)
+let _fsTimer = null;
+function foodSearchInput() {
+  clearTimeout(_fsTimer);
+  const run = () => { _fsTimer = null; foodUI.limit = 0; renderFoodList(); };
+  if (!$("foodSearch").value.trim()) run(); else _fsTimer = setTimeout(run, 150);
+}
 function frequentFoods(limit = 30) {
   const db = getFoodDB();
   const cnt = {};
@@ -5906,7 +5931,7 @@ function addSuggestion(i) {
   o.parts.forEach(p => { state.recentFoods = [p.id, ...state.recentFoods.filter(x => x !== p.id)].slice(0, 8); });
   renderAll();
   const mid = meal.id;
-  toast(`✓ ${o.parts.length} besin → ${meal.title}${day ? " (yalnızca bugün)" : " (menü)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+  toast(`✓ ${o.parts.length} besin → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
     const mm = curMeals().find(x => x.id === mid);
     if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
     mergeItems(mm, items);
@@ -6058,6 +6083,7 @@ function editDist(a, b) {
   return d[m][n];
 }
 let _sIdx = null, _sIdxDb = null;
+const _sEntry = new WeakMap();   // v26: besin nesnesi başına hazır arama kaydı (her renderAll'da yeniden hesaplanmasın)
 function searchIndex() {
   const db = getFoodDB();
   if (_sIdx && _sIdxDb === db) return _sIdx;
@@ -6065,16 +6091,21 @@ function searchIndex() {
   Object.keys(db).forEach(id => {
     const f = db[id];
     if (isHiddenFood(f)) return;
+    const src = f.name + "|" + (f.cat || "") + "|" + (f.aliases || []).join(" ");
+    const old = _sEntry.get(f);
+    if (old && old.src === src) { _sIdx[id] = old; return; }   // özel besin yerinde düzenlenirse src değişir → yeniden hesaplanır
     const name = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
     const extra = normSearch((f.aliases || []).join(" ") + " " + stripEmoji(f.cat || ""));
     const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(t => t.length > 1);
-    _sIdx[id] = { name, nameTok: name.split(/[^a-z0-9%]+/).filter(Boolean), extra, tokens };
+    const e = { src, name, nameTok: name.split(/[^a-z0-9%]+/).filter(Boolean), extra, tokens };
+    _sEntry.set(f, e);
+    _sIdx[id] = e;
   });
   _sIdxDb = db;
   return _sIdx;
 }
-// Tek kelimenin bir besine uyum puanı (0 = uymuyor)
-function wordScore(w, e) {
+// Tek kelimenin bir besine uyum puanı (0 = uymuyor). fuzzy = yazım hatası taraması (yavaş; v26'dan beri yalnızca az sonuçta)
+function wordScore(w, e, fuzzy = true) {
   const alts = SEARCH_SYN[w] || [w];
   let best = 0;
   for (const a of alts) {
@@ -6082,27 +6113,43 @@ function wordScore(w, e) {
     else if (e.name.includes(a)) best = Math.max(best, 100);
     else if (e.extra.includes(a)) best = Math.max(best, 60);
   }
-  if (best || w.length < 4) return best;
-  const k = w.length >= 7 ? 2 : 1;
-  for (const t of e.tokens) {
-    for (const L of [w.length - 1, w.length, w.length + 1]) {
-      if (L < 3 || L > t.length) continue;
-      if (editDist(w, t.slice(0, L)) <= k) return 25;
-    }
-  }
+  if (best || !fuzzy || w.length < 4) return best;
+  for (const t of e.tokens) if (fuzzyTokHit(w, t)) return 25;
   return 0;
 }
+// v26: kelime–token yazım hatası sonucu hatırlanır (aynı token yüzlerce besinde geçiyor)
+const _fzMemo = new Map();
+function fuzzyTokHit(w, t) {
+  const key = w + "|" + t;
+  let r = _fzMemo.get(key);
+  if (r !== undefined) return r;
+  r = false;
+  const k = w.length >= 7 ? 2 : 1;
+  for (const L of [w.length - 1, w.length, w.length + 1]) {
+    if (L < 3 || L > t.length) continue;
+    if (editDist(w, t.slice(0, L)) <= k) { r = true; break; }
+  }
+  if (_fzMemo.size > 200000) _fzMemo.clear();
+  _fzMemo.set(key, r);
+  return r;
+}
 // Sıralama: sık kullanılanlar > tam eşleşme > kelimeyle başlayan > içinde geçen (> eş anlamlı > yazım hatası)
+const FUZZY_MIN = 10;   // v26: normal eşleşme bundan azsa yazım hatası taraması da yapılır
 function searchFoods(ids, q) {
+  const r = searchFoodsPass(ids, q, false);
+  if (r.length >= FUZZY_MIN || !q.split(/\s+/).some(w => w.length >= 4)) return r;
+  return searchFoodsPass(ids, q, true);
+}
+function searchFoodsPass(ids, q, fuzzy) {
   const idx = searchIndex();
   const words = q.split(/\s+/).filter(Boolean);
-  const freq = new Set(frequentFoods(40));
+  const freq = new Set(frequentFoodsCached(40));
   const out = [];
   ids.forEach(id => {
     const e = idx[id];
     if (!e) return;
     let sc = 0, inName = true;
-    for (const w of words) { const s = wordScore(w, e); if (!s) return; sc += s; if (s < 100) inName = false; }
+    for (const w of words) { const s = wordScore(w, e, fuzzy); if (!s) return; sc += s; if (s < 100) inName = false; }
     if (e.name === q) sc += 600;
     else if (e.name.startsWith(q)) sc += 300;
     if (freq.has(id) && inName) sc += 1000;   // sık kullanılan önceliği yalnızca adı eşleşince (kategori/eş anlamlıyla değil)
@@ -6152,7 +6199,10 @@ function noteMissSearch(raw) {
   }, 1500);
 }
 function cancelMissSearch() { clearTimeout(missTimer); }
-function clearMissSearches() { state.missSearches = []; saveState(); renderMissList(); }
+function clearMissSearches() {   // v26: Geri al
+  snapshot(); state.missSearches = []; saveState(); renderMissList();
+  toast("Bulunamayan aramalar temizlendi", "ok", { label: "↶ Geri al", fn: () => { doUndo(); renderMissList(); } });
+}
 function renderMissList() {
   const el = $("missList");
   if (!el) return;

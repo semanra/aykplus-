@@ -51,6 +51,7 @@ try:
         return [Math.round(f * 10) / 10, Math.round(s * 10) / 10]; })()""")
     mt = pg.evaluate("(() => { const t = microTotals('plan'); return [Math.round(t.fib * 10) / 10, Math.round(t.salt * 10) / 10, t.miss]; })()")
     check(mt[:2] == exp and mt[2] == 1, f"günlük lif {mt[0]} g, tuz {mt[1]} g, 1 besinde veri yok ({mt})")
+    pg.evaluate("setMacroView('plan')"); pg.wait_for_timeout(60)   # v26: varsayılan görünüm Yenen; bu kontrol menü değerleri için
     txt = pg.inner_text("#microLine")
     check("Lif" in txt and "Tuz" in txt and "/ 5 g" in txt and "1 besinde lif/tuz verisi yok" in txt, f"Bugün kartında lif/tuz satırı ({txt!r})")
     pg.locator("#microLine").scroll_into_view_if_needed(); pg.screenshot(path=os.path.join(SHOTS, "v22_lif_tuz.png"))

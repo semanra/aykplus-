@@ -45,7 +45,7 @@ try:
     check(st(pg)["dayPlan"]["train"][1]["items"][1]["amount"] == 120.5, "bugünkü miktar virgüllü yazılabiliyor")
     check(pg.evaluate("Math.round(nutritionTotals().cal)") != pg.evaluate("Math.round(nutritionTotals(curMeals()).cal)"), "halka bugünkü planı, Menülerim menüyü hesaplıyor")
     view(pg, "menus")
-    check(pg.locator("#menuDayNote").count() == 1 and "bugünkü planı değiştirmez" in pg.inner_text("#menuDayNote"), "Menülerim'de 'bugüne özel değişiklik var' notu")
+    check(pg.locator("#menuDayNote").count() == 1 and "bugünü değiştirmez" in pg.inner_text("#menuDayNote"), "Menülerim'de 'bugüne özel değişiklik var' notu")
     view(pg, "today")
     pg.evaluate("document.querySelector('#dayDiffBanner').scrollIntoView({block:'start'}); window.scrollBy(0,-70)"); pg.wait_for_timeout(80)
     pg.screenshot(path=SHOTS + "/v14_today_edit.png")
@@ -65,7 +65,7 @@ try:
     check(len(pg.evaluate("dayMeals()[1].items")) == n_day, "çıkarma Geri al ile geri geldi")
 
     # Menüdeki hâline dön
-    pg.locator("#dayDiffBanner button", has_text="Menüdeki hâline dön").click(); pg.wait_for_timeout(100)
+    pg.locator("#dayDiffBanner button", has_text="Bugünü menüye geri döndür").click(); pg.wait_for_timeout(100)
     check(st(pg)["dayPlan"]["train"] is None and pg.locator("#dayDiffBanner").count() == 0, "'Menüdeki hâline dön' bugünkü kopyayı sildi")
 
     # ---------- 2) Yarısını yedim
