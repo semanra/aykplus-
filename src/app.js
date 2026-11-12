@@ -141,6 +141,61 @@ function normMealList(list) {
   return list.filter(isObj).map(m => { m.items = normItems(m.items); return m; });
 }
 
+// v27: MOBİLİTE VERİSİ — eski "uygulama" yazısını (örn. "Sağ ve Sol için 2'şer Set x 30 sn") alanlara çevirir.
+// Aralıklarda üst değer alınır; hiçbir değer okunamazsa ok:false (varsayılanlar kullanılır, yazı rx'te saklanır).
+function parseMobRx(rx) {
+  const t = String(rx || "");
+  const out = { ok: false };
+  const sm = t.match(/(\d+)\s*(?:['’]?\s*(?:er|şer|ar|şar))?\s*set/i);
+  if (sm) out.sets = parseInt(sm[1], 10);
+  const rm = t.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:tekrar|tur)/i);
+  const tm = t.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:sn|saniye|sec)(?![a-zçğıöşü])/i);
+  if (tm) { out.mode = "time"; out.sec = parseInt(tm[2] || tm[1], 10); out.ok = true; }
+  else if (rm) { out.mode = "reps"; out.reps = parseInt(rm[2] || rm[1], 10); out.ok = true; }
+  if (/sa[gğ]\s*(?:ve|\/|-)\s*sol|her\s*(?:ayak|kol|y[oö]n|bacak|taraf)/i.test(t)) out.sides = 2;
+  return out;
+}
+function mobLibEntry(name) {
+  for (const [ci, cat] of Object.keys(MOBILITY_LIBRARY).entries()) {
+    const m = MOBILITY_LIBRARY[cat].find(x => x.name === name);
+    if (m) return { m, type: MOB_TYPES[Math.min(ci, 2)][0] };
+  }
+  return null;
+}
+function mobNewId() { return "mob_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function mobFromLegacy(x, type) {
+  if (!isObj(x) || !String(x.name || "").trim()) return null;
+  const lib = mobLibEntry(x.name);
+  if (lib && lib.type === "release") type = "release";
+  const rx = String(x.prescription || "");
+  const r = parseMobRx(rx);
+  const timer = num(x.timerSec, 0);
+  if (r.mode === "time" && timer > 0) r.sec = timer;
+  const reg = MOB_LIB_REGIONS[x.name] || [];
+  return {
+    id: mobNewId(), name: x.name, type, region: reg[0] || "", region2: reg[1] || "",
+    sets: r.sets || (r.ok ? 1 : (type === "dynamic" ? 1 : 2)),
+    mode: r.mode || (type === "dynamic" ? "reps" : "time"),
+    reps: r.reps || 10, sec: r.sec || (timer > 0 ? timer : 30), sides: r.sides || 1,
+    note: x.note || "", rx, rxOk: r.ok, done: !!x.done
+  };
+}
+const MOB_REGION_KEYS = MOB_REGIONS.map(r => r[0]);
+function normMobItem(x) {
+  if (!isObj(x) || !String(x.name || "").trim()) return null;
+  const clampInt = (v, lo, hi, d) => { const n = Math.round(num(v, d)); return Math.min(hi, Math.max(lo, isFinite(n) ? n : d)); };
+  const region = MOB_REGION_KEYS.includes(x.region) ? x.region : "";
+  const region2 = MOB_REGION_KEYS.includes(x.region2) && x.region2 !== region ? x.region2 : "";
+  return {
+    id: String(x.id || mobNewId()), name: String(x.name).trim().slice(0, 80),
+    type: MOB_TYPES.some(t => t[0] === x.type) ? x.type : "static",
+    region, region2,
+    sets: clampInt(x.sets, 1, 10, 1), mode: x.mode === "reps" ? "reps" : "time",
+    reps: clampInt(x.reps, 1, 100, 10), sec: clampInt(x.sec, 5, 600, 30), sides: num(x.sides, 1) === 2 ? 2 : 1,
+    note: String(x.note || ""), rx: String(x.rx || ""), rxOk: x.rxOk !== false, done: !!x.done
+  };
+}
+
 function normalizeState(raw) {
   const s = { ...clone(DEFAULT_STATE), ...(raw || {}) };
   s.settings = { ...DEFAULT_SETTINGS, ...((raw && raw.settings) || {}) };
@@ -152,9 +207,14 @@ function normalizeState(raw) {
     if (!Array.isArray(day.exercises)) day.exercises = [];
     day.exercises.forEach(normalizeExercise);
   });
-  if (!s.mobilityRoutine) s.mobilityRoutine = clone(DEFAULT_STATE.mobilityRoutine);
+  if (!isObj(s.mobilityRoutine)) s.mobilityRoutine = clone(DEFAULT_STATE.mobilityRoutine);
   if (!Array.isArray(s.mobilityRoutine.dynamic)) s.mobilityRoutine.dynamic = [];
   if (!Array.isArray(s.mobilityRoutine.static)) s.mobilityRoutine.static = [];
+  // v27: iki eski liste bir kez tek sıralı listeye çevrilir; eski diziler yedek olarak dokunulmadan kalır
+  const mr = s.mobilityRoutine;
+  if (!Array.isArray(mr.items)) mr.items = [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
+  mr.items = mr.items.map(normMobItem).filter(Boolean);
+  if (!isObj(s.mobilityLog)) s.mobilityLog = {};
   if (!Array.isArray(s.workoutLogs)) s.workoutLogs = [];
   if (!Array.isArray(s.weightLogs)) s.weightLogs = [];
   if (!s.exerciseHistory || typeof s.exerciseHistory !== "object") s.exerciseHistory = {};
@@ -631,6 +691,9 @@ function nutritionTotals(meals) {
 
 function archiveDay(dateKey) {
   if (!dateKey) return;
+  // v27: o gün yapılan mobilite hareketleri sessizce saklanır (boş gün yazılmaz, kayıt silinmez)
+  const mobDone = state.mobilityRoutine.items.filter(i => i.done).map(i => i.name);
+  if (mobDone.length) state.mobilityLog[dateKey] = mobDone;
   const t = nutritionTotals();
   const e = eatenTotals();
   const sup = state.supplements || {};
@@ -656,8 +719,7 @@ function resetDaily() {
   state.dayPlan = null;   // bugüne özel değişiklikler arşivlendi; yeni gün menüden temiz başlar
   state.meals.forEach(m => { m.done = false; });
   state.restMeals.forEach(m => { m.done = false; });
-  state.mobilityRoutine.dynamic.forEach(i => { i.done = false; });
-  state.mobilityRoutine.static.forEach(i => { i.done = false; });
+  state.mobilityRoutine.items.forEach(i => { i.done = false; });
 }
 
 function checkNewDay() {

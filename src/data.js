@@ -343,6 +343,29 @@ const MOBILITY_LIBRARY = {
   ]
 };
 
+// v27: Mobilite bölgeleri ve türleri. Kütüphane kategorileri sırasıyla dynamic / static / release türüne karşılık gelir.
+const MOB_REGIONS = [["hip", "Kalça"], ["shoulder", "Omuz"], ["spine", "Omurga"], ["chest", "Göğüs"], ["hamstring", "Arka bacak"], ["ankle", "Ayak bileği"]];
+const MOB_TYPES = [["dynamic", "Dinamik"], ["static", "Statik"], ["release", "Foam roller"]];
+// Kütüphanedeki her hareketin ana ve (varsa) ikincil bölgesi
+const MOB_LIB_REGIONS = {
+  "World’s Greatest Stretch": ["hip", "spine"], "90/90 Hip Switch": ["hip"], "Kneeling Ankle Dorsiflexion": ["ankle"],
+  "Quadruped Cat-Cow": ["spine"], "Towel/Band Shoulder Dislocates": ["shoulder", "chest"],
+  "Quadruped Thoracic Rotation (T-Spine)": ["spine", "shoulder"], "Deep Squat Hold with Pry & Thoracic Reach": ["hip", "ankle"],
+  "Scapular Push-Up & Wall Slides": ["shoulder"], "Cossack Squat (Dinamik Yan Lunge)": ["hip", "hamstring"],
+  "Leg Swings (Öne-Arkaya & Yana)": ["hip", "hamstring"], "Inchworm to Cobra Flow": ["hamstring", "spine"],
+  "Quadruped Hip CARs (Controlled Articular Rotations)": ["hip"], "Shoulder CARs (Ayakta Tam Daire)": ["shoulder"],
+  "Thread the Needle (Dinamik)": ["spine", "shoulder"], "Banded Pull-Apart & External Rotation": ["shoulder"], "Glute Bridge March": ["hip"],
+  "Doorway Pec & Biceps Stretch": ["chest", "shoulder"], "Child’s Pose with Lat Reach": ["shoulder", "spine"], "Couch Stretch": ["hip"],
+  "Supine Figure-4 Glute Stretch": ["hip"], "Single-Leg Seated Hamstring Stretch": ["hamstring"], "Pigeon Pose (Güvercin Pozu)": ["hip"],
+  "Frog Stretch (Kurbağa Esnemesi)": ["hip"], "Half-Kneeling Hip Flexor Stretch": ["hip"], "Butterfly Groin Stretch": ["hip"],
+  "Standing Wall Calf & Soleus Stretch": ["ankle"], "Overhead Triceps & Lat Side Lean Stretch": ["shoulder", "spine"],
+  "Cross-Body Posterior Shoulder Stretch": ["shoulder"], "Upper Trap & Levator Scapulae Neck Stretch": ["shoulder", "spine"],
+  "Cobra / Sphinx Abdominal Stretch": ["spine", "chest"], "Supine Spinal Twist (Yatarak Omurga Rotasyonu)": ["spine"],
+  "Dead Hang (Barfikste Pasif Asılma)": ["shoulder", "spine"],
+  "Thoracic Spine Foam Roll": ["spine"], "Latissimus Dorsi Foam Roll": ["shoulder"], "Quadriceps & Hip Flexor Foam Roll": ["hip"],
+  "Glute / Piriformis Lacrosse Ball Release": ["hip"], "Plantar Fascia (Ayak Tabanı) Top Masajı": ["ankle"]
+};
+
 const STORAGE_KEY = "ayk_plus_v5_state";
 
 // Yardımcı fonksiyon: Belirtilen set sayısı ve hedef tekrar aralığıyla set dizisi üretir
