@@ -3010,7 +3010,106 @@ function mobReset() {
   renderAll();
   offerUndo("Tikler sıfırlandı");
 }
-//__MOB_DETAIL__
+// --- Hareket detayı (anında kayıt) ---
+const MOB_SWITCH_SEC = 5;   // turlar arası "taraf değiştir" arası
+function mobRounds(it) { return it.sets * it.sides; }
+function mobTotalSec(it) { const r = mobRounds(it); return r * it.sec + (r - 1) * MOB_SWITCH_SEC; }
+function mobPreviewHtml(it) {
+  if (it.mode === "reps") return `Her sette <b>${it.reps} tekrar</b>${it.sides === 2 ? " (her taraf)" : ""}. Sayaç yok; yapınca tikle.`;
+  const tot = `Toplam ≈ ${Math.max(1, Math.round(mobTotalSec(it) / 60))} dk.`;
+  return it.sides === 2
+    ? `Sayaçta: <b>sağ ${it.sec} sn → sol ${it.sec} sn</b>, ${it.sets} tur. ${tot}`
+    : `Sayaçta: <b>${it.sets} × ${it.sec} sn</b>. ${tot}`;
+}
+function mobDetailHtml() {
+  const it = mobFind(mobUI.id);
+  const idx = mobItems().indexOf(it);
+  const id = mobArg(it.id);
+  const crumb = (MOB_REGION_LABEL[it.region] || "Bölgesiz") + " · " + (idx + 1) + ". hareket";
+  const time = it.mode === "time";
+  const stepper = (label, field, val, valId, minD, maxD) => `<div class="m-st"><div class="k">${label}</div><div class="v">
+      <button class="m-pm" data-mob-step="${field}:-1" onclick="mobStep(${id}, '${field}', -1)" ${minD ? "disabled" : ""} aria-label="${label} azalt">${svgI("minus", 18, 2.6)}</button>
+      <b id="${valId}" class="t-display">${val}</b>
+      <button class="m-pm" data-mob-step="${field}:1" onclick="mobStep(${id}, '${field}', 1)" ${maxD ? "disabled" : ""} aria-label="${label} artır">${svgI("plus", 18, 2.6)}</button></div></div>`;
+  const seg = (attr, field, opts, cur) => `<div class="m-seg" style="grid-template-columns:repeat(${opts.length},minmax(0,1fr))">${opts.map(([k, l]) =>
+    `<button data-mob-${attr}="${k}" onclick="mobSet(${id}, '${field}', '${k}')" class="${String(cur) === String(k) ? "on" : ""}" aria-pressed="${String(cur) === String(k)}">${l}</button>`).join("")}</div>`;
+  const chips = (attr, field, opts, cur) => `<div class="flex flex-wrap gap-2">${opts.map(([k, l]) =>
+    `<button data-mob-${attr}="${k}" onclick="mobSet(${id}, '${field}', '${k}')" class="m-chip ${cur === k ? "on" : ""}" aria-pressed="${cur === k}">${l}</button>`).join("")}</div>`;
+  const vMin = time ? it.sec <= 5 : it.reps <= 1, vMax = time ? it.sec >= 600 : it.reps >= 100;
+  return `<div id="mobDetail">
+    <div class="flex items-center justify-between gap-2 -mx-1">
+      <button id="mobDtBack" onclick="mobBack()" class="m-round" aria-label="Geri">${svgI("chevL", 20, 2.2)}</button>
+      <span id="mobDtCrumb" class="text-[15px] text-[#A1A1AA] truncate">${esc(crumb)}</span>
+      <span class="w-11 shrink-0"></span>
+    </div>
+    <button id="mobDtTitle" onclick="mobRename(${id})" class="t-display text-[32px] leading-[1.02] text-white text-left mt-3 min-h-[44px] w-full break-words" aria-label="Adı değiştir">${esc(it.name)}</button>
+    <div class="text-[13px] font-semibold ${it.type === "dynamic" ? "text-[#8B8B93]" : "text-[#B3A6FF]"} mt-1">${MOB_TYPE_LABEL[it.type]}</div>
+    ${it.rxOk ? "" : `<div id="mobDtRx" class="mt-3 text-[13.5px] text-[#E5B85B] bg-[#1E1E21] rounded-2xl px-3.5 py-2.5">Eski yazım: ${esc(it.rx)}<br><span class="text-[#A1A1AA]">Okunamadı; değerleri kontrol et.</span></div>`}
+    <div class="m-lbl">Uygulama</div>
+    ${seg("mode", "mode", [["reps", "Tekrar"], ["time", "Süre"]], it.mode)}
+    <div class="grid grid-cols-2 gap-2.5 mt-2.5">
+      ${stepper("Set", "sets", it.sets, "mobDtSets", it.sets <= 1, it.sets >= 10)}
+      ${stepper(time ? "Süre (sn)" : "Tekrar", "val", time ? it.sec : it.reps, "mobDtVal", vMin, vMax)}
+    </div>
+    <div class="m-lbl">Taraf</div>
+    ${seg("sides", "sides", [[1, "Tek"], [2, "Sağ ve sol"]], it.sides)}
+    <div id="mobDtPreview" class="m-preview">${mobPreviewHtml(it)}</div>
+    <div class="m-lbl">Tür</div>
+    ${seg("type", "type", MOB_TYPES, it.type)}
+    <div class="m-lbl">Ana bölge</div>
+    ${chips("r1", "region", MOB_REGIONS, it.region)}
+    <div class="m-lbl">İkincil bölge <span class="font-normal text-[#8B8B93]">(isteğe bağlı, yarım sayılır)</span></div>
+    ${chips("r2", "region2", [["", "Yok"], ...MOB_REGIONS.filter(r => r[0] !== it.region)], it.region2)}
+    <div class="m-lbl">Not</div>
+    <textarea id="mobDtNote" data-fk="mob-note" rows="2" class="m-in" placeholder="Not ekle…" onchange="mobSet(${id}, 'note', this.value)">${esc(it.note)}</textarea>
+    <div class="grid grid-cols-[1fr_1.6fr] gap-2.5 mt-5">
+      <button id="mobDtRemove" onclick="mobRemove(${id})" class="m-btn del">${svgI("trash", 19)}Kaldır</button>
+      ${time
+        ? `<button id="mobDtStart" onclick="mobTimerStart(${id})" class="m-btn pri">${svgI("clock", 20, 2.2)}Sayacı başlat</button>`
+        : `<button id="mobDtDone" onclick="mobToggle(${id})" class="m-btn ${it.done ? "ghost" : "pri"}">${svgI("check", 20, 2.6)}${it.done ? "Yapıldı (geri al)" : "Yapıldı"}</button>`}
+    </div>
+  </div>`;
+}
+function mobOpen(id) { if (!mobFind(id)) return; mobUI.view = "detail"; mobUI.id = id; window.scrollTo(0, 0); renderMobility(); }
+function mobBack() { mobUI.view = "list"; mobUI.id = null; window.scrollTo(0, 0); renderMobility(); }
+function mobStep(id, field, d) {
+  const it = mobFind(id); if (!it) return;
+  if (field === "sets") it.sets = Math.min(10, Math.max(1, it.sets + d));
+  else if (it.mode === "time") it.sec = Math.min(600, Math.max(5, it.sec + d * 5));
+  else it.reps = Math.min(100, Math.max(1, it.reps + d));
+  renderAll();
+}
+function mobSet(id, field, val) {
+  const it = mobFind(id); if (!it) return;
+  if (field === "mode") it.mode = val === "reps" ? "reps" : "time";
+  else if (field === "sides") it.sides = num(val, 1) === 2 ? 2 : 1;
+  else if (field === "type") { if (MOB_TYPE_LABEL[val]) it.type = val; }
+  else if (field === "region") { if (MOB_REGION_LABEL[val]) { it.region = val; if (it.region2 === val) it.region2 = ""; } }
+  else if (field === "region2") it.region2 = MOB_REGION_LABEL[val] && val !== it.region ? val : "";
+  else if (field === "note") it.note = String(val || "").slice(0, 300);
+  else return;
+  renderAll();
+}
+async function mobRename(id) {
+  const it = mobFind(id); if (!it) return;
+  const v = await askText("Hareketin adı", it.name, "Örn. Couch Stretch");
+  if (v == null || !String(v).trim()) return;
+  const cur = mobFind(id); if (!cur) return;
+  cur.name = String(v).trim().slice(0, 80);
+  renderAll();
+}
+function mobRemove(id) {
+  const i = mobItems().findIndex(x => x.id === id);
+  if (i < 0) return;
+  if (typeof mobT !== "undefined" && mobT && mobT.id === id) mobTimerClose();
+  snapshot();
+  const [it] = mobItems().splice(i, 1);
+  mobUI.view = "list"; mobUI.id = null;
+  window.scrollTo(0, 0);
+  renderAll();
+  offerUndo(`${it.name} kaldırıldı`);
+}
+//__MOB_ADD__
 
 // ---------------------------------------------------------------------------
 // GRAFİK (SVG)
