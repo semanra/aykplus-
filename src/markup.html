@@ -115,6 +115,73 @@
     .no-brand #brandTag { display: none; }
     body.theme-train #brandPlus { color: #1FD1C1; }
     body.theme-train #profileBtn { background: #141416; border-color: #2A2A2E; color: #E4E4E7; }
+    /* v27 MOBİLİTE TEMASI: antrenman temasının kardeşi, vurgu lavanta #B3A6FF */
+    body.theme-mob { background-color: #000000; padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px)); }
+    body.theme-mob .sticky-bar { background-color: #000000; border-bottom-color: #1E1E21; }
+    body.theme-mob .bottom-nav { background-color: rgba(14, 14, 16, 0.97); border-top-color: #1E1E21; }
+    body.theme-mob #brandPlus { color: #B3A6FF; }
+    body.theme-mob #profileBtn { background: #141416; border-color: #2A2A2E; color: #E4E4E7; }
+    body.theme-mob .t-btn { background: #B3A6FF; color: #1B1446; }
+    body.theme-mob input.t-in:focus, body.theme-mob .tm input:focus { outline-color: #B3A6FF; }
+    body.theme-mob #toastWrap .toast { border-color: #4B4380; }
+    .m-regs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .m-reg { position: relative; height: 84px; border-radius: 18px; background: #141416; overflow: hidden; text-align: left; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; color: #fff; }
+    .m-reg .m-lvl { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(179,166,255,0.15); border-top: 2px solid rgba(179,166,255,0.55); transition: height .3s; }
+    .m-reg .m-lvl.zero { border-top-width: 0; }
+    .m-reg b { position: relative; font-size: 20px; line-height: 1; }
+    .m-reg span { position: relative; font-size: 12.5px; color: #A1A1AA; }
+    .m-reg.on { outline: 2px solid #B3A6FF; outline-offset: -2px; }
+    .m-reg.full .m-lvl { background: rgba(179,166,255,0.30); border-top-color: #B3A6FF; }
+    .m-reg.full span { color: #B3A6FF; font-weight: 650; }
+    .m-card { display: flex; align-items: center; gap: 8px; padding: 12px 4px 12px 12px; border-radius: 18px; background: #141416; min-height: 76px; border: 1px solid transparent; }
+    .m-card.done { background: transparent; border-color: #2A2A2E; }
+    .m-card.done .m-name { color: #8B8B93; }
+    .m-name { font-size: 15.5px; font-weight: 650; line-height: 1.25; color: #fff; }
+    .m-rx { font-size: 12.5px; color: #A1A1AA; margin-top: 3px; }
+    .m-kind { display: inline-block; font-size: 11.5px; font-weight: 650; color: #8B8B93; margin-bottom: 2px; }
+    .m-kind.s { color: #B3A6FF; }
+    .m-chk { width: 44px; height: 44px; border-radius: 14px; border: 2px solid #3A3A40; display: grid; place-items: center; color: transparent; flex: none; }
+    .m-card.done .m-chk { background: #B3A6FF; border-color: #B3A6FF; color: #1B1446; }
+    .m-tbtn { width: 52px; height: 44px; border-radius: 14px; background: rgba(179,166,255,0.15); color: #B3A6FF; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex: none; gap: 1px; }
+    .m-grip { width: 44px; min-height: 44px; margin-left: -6px; display: grid; place-items: center; color: #52525B; flex: none; touch-action: none; }
+    .m-btn { min-height: 52px; border-radius: 16px; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; background: #1E1E21; color: #fff; padding: 0 16px; }
+    .m-btn.pri { background: #B3A6FF; color: #1B1446; }
+    .m-btn.ghost { background: none; border: 1px solid #2A2A2E; color: #A1A1AA; }
+    .m-btn.del { background: none; border: 1px solid #2A2A2E; color: #FB7185; }
+    .m-pill { min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid #2A2A2E; font-size: 13.5px; font-weight: 600; color: #A1A1AA; }
+    .m-round { width: 44px; height: 44px; border-radius: 50%; background: #141416; border: 1px solid #2A2A2E; display: grid; place-items: center; color: #A1A1AA; flex: none; }
+    .m-chip { min-height: 44px; padding: 0 15px; border-radius: 22px; background: #1E1E21; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; flex: none; color: #E4E4E7; }
+    .m-chip.on { background: #B3A6FF; color: #1B1446; }
+    .m-lbl { font-size: 13px; color: #A1A1AA; margin: 18px 0 8px; font-weight: 600; }
+    .m-st { background: #141416; border-radius: 18px; padding: 10px 12px 12px; }
+    .m-st .k { font-size: 13px; color: #A1A1AA; }
+    .m-st .v { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+    .m-st .v b { font-size: 36px; line-height: 1; color: #fff; }
+    .m-pm { width: 44px; height: 44px; border-radius: 14px; background: #1E1E21; display: grid; place-items: center; color: #fff; }
+    .m-pm:disabled { opacity: .35; }
+    .m-seg { display: grid; background: #141416; border-radius: 16px; padding: 4px; gap: 4px; }
+    .m-seg > button { min-height: 44px; border-radius: 12px; color: #A1A1AA; font-weight: 600; font-size: 15px; }
+    .m-seg > button.on { background: #1E1E21; color: #fff; box-shadow: inset 0 0 0 1.5px #B3A6FF; }
+    .m-preview { margin-top: 8px; font-size: 13.5px; color: #8B8B93; }
+    .m-preview b { color: #fff; font-weight: 600; }
+    input.m-in, textarea.m-in { width: 100%; background: #141416; border: 0; color: #fff; border-radius: 14px; min-height: 50px; padding: 14px; font-size: 16px; }
+    input.m-in:focus, textarea.m-in:focus { outline: 2px solid #B3A6FF; outline-offset: 0; }
+    input.m-in::placeholder, textarea.m-in::placeholder { color: #71717A; }
+    .m-add { width: 44px; height: 44px; border-radius: 14px; background: #B3A6FF; color: #1B1446; display: grid; place-items: center; flex: none; }
+    #mobTimer { position: fixed; inset: 0; z-index: 70; background: #000; color: #fff; flex-direction: column; align-items: center; overflow-y: auto; padding: env(safe-area-inset-top, 0px) 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .m-breath { position: relative; width: min(300px, 78vw); height: min(300px, 78vw); display: grid; place-items: center; flex: none; }
+    .m-breath .o { position: absolute; border-radius: 50%; border: 1.5px solid rgba(179,166,255,0.25); }
+    .m-breath .o1 { width: 94%; height: 94%; } .m-breath .o2 { width: 75%; height: 75%; border-color: rgba(179,166,255,0.35); }
+    .m-breath .core { width: 66%; height: 66%; border-radius: 50%; background: radial-gradient(circle at 50% 40%, rgba(179,166,255,0.30), rgba(179,166,255,0.08) 70%); border: 2px solid #B3A6FF; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: mBreathe 10s ease-in-out infinite; }
+    .m-breath.pause .core { animation: none; border-color: #3A3A40; background: #141416; }
+    .m-breath .core b { font-size: 76px; line-height: 0.85; }
+    .m-breath .core span { font-size: 15px; color: #B3A6FF; font-weight: 650; margin-top: 6px; }
+    @keyframes mBreathe { 0%, 100% { transform: scale(0.86); } 40% { transform: scale(1.08); } }
+    @media (prefers-reduced-motion: reduce) { .m-breath .core { animation: none; } }
+    .m-rounds { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+    .m-rounds i { flex: 1 1 56px; height: 52px; border-radius: 14px; border: 1px solid #2A2A2E; display: grid; place-items: center; font-style: normal; font-size: 13px; color: #A1A1AA; }
+    .m-rounds i.d { background: rgba(179,166,255,0.15); color: #B3A6FF; border-color: transparent; }
+    .m-rounds i.n { border-color: #B3A6FF; color: #fff; font-weight: 650; }
     /* BESLENME TEMASI (v13 · Emerald Obsidian + gündüz teması "Warm Alabaster").
        Renkler değişkenlerle tanımlı; gündüz teması yalnızca değişkenleri değiştirir. */
     body.theme-nutri {
@@ -323,18 +390,6 @@
         </div>
       </div>
 
-      <!-- MOBİLİTE ÖZET BARI -->
-      <div id="mobilityHeaderBar" class="hidden grid-cols-2 gap-1.5">
-        <div class="bg-slate-800/95 border border-slate-700 rounded-xl px-2 py-1.5">
-          <div class="text-[10px] text-slate-400">🔥 Dinamik Mobilite</div>
-          <div class="text-sm font-bold text-emerald-400"><span id="mobDynamicDone">0</span> / <span id="mobDynamicTotal">0</span> Hareket</div>
-        </div>
-        <div class="bg-slate-800/95 border border-slate-700 rounded-xl px-2 py-1.5">
-          <div class="text-[10px] text-slate-400">🧘 Statik Stretching</div>
-          <div class="text-sm font-bold text-sky-400"><span id="mobStaticDone">0</span> / <span id="mobStaticTotal">0</span> Hareket</div>
-        </div>
-      </div>
-
       <!-- İLERLEME ÖZET BARI -->
       <div id="progressHeaderBar" class="hidden">
         <div class="text-xs text-slate-400 px-1">📊 Haftalık özet, kilo grafiği, rekorlar ve hareket ilerlemen</div>
@@ -538,47 +593,8 @@
   <!-- ========================================================= -->
   <!-- SEKME 3: MOBİLİTE & ESNEME                                 -->
   <!-- ========================================================= -->
-  <div id="tabMobility" class="max-w-5xl mx-auto px-3.5 mt-4 space-y-5 hidden">
-    <div class="card p-4 space-y-3">
-      <div class="flex flex-wrap items-start justify-between gap-2">
-        <div class="min-w-0">
-          <h2 class="text-base font-bold text-white">🧘 Mobilite & Stretching</h2>
-          <p class="text-xs text-slate-400">Her hareketin set/süre hedefini düzenleyebilir veya kütüphaneden yeni hareket ekleyebilirsin.</p>
-        </div>
-        <button onclick="resetMobilityChecks()" class="text-xs bg-slate-800 text-emerald-300 border border-slate-700 px-3 py-1.5 rounded-lg font-medium shrink-0">↺ Tikleri Sıfırla</button>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-2 border-t border-slate-800">
-        <select id="mobilityTargetType" class="w-full text-xs rounded-lg px-2.5 py-2">
-          <option value="dynamic">🔥 Dinamik Mobiliteye Ekle</option>
-          <option value="static">🧘 Statik Stretching'e Ekle</option>
-        </select>
-        <button onclick="openMobilityPicker()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-2 px-3 rounded-lg">🔍 Kütüphaneden Seç</button>
-        <button onclick="addCustomMobilityPrompt()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 px-3 rounded-lg">✍️ Elle Ekle</button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="card p-4 space-y-3">
-        <div class="flex justify-between items-start gap-2 border-b border-slate-700/80 pb-2.5">
-          <div>
-            <h3 class="font-bold text-base text-emerald-400">🔥 1. Dinamik Mobilite Akışı</h3>
-            <p class="text-xs text-slate-400">Her hareket 1 Set x 8–10 Tekrar</p>
-          </div>
-          <span class="text-xs bg-emerald-950 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded-lg shrink-0">Eklem & Akış</span>
-        </div>
-        <div id="dynamicMobilityList" class="space-y-2.5"></div>
-      </div>
-      <div class="card p-4 space-y-3">
-        <div class="flex justify-between items-start gap-2 border-b border-slate-700/80 pb-2.5">
-          <div>
-            <h3 class="font-bold text-base text-sky-400">🧘 2. Statik Stretching</h3>
-            <p class="text-xs text-slate-400">2 Set x 30–45 Saniye • 8–10 Dakika</p>
-          </div>
-          <span class="text-xs bg-sky-950 text-sky-300 border border-sky-700/50 px-2 py-0.5 rounded-lg shrink-0">Esneklik</span>
-        </div>
-        <div id="staticMobilityList" class="space-y-2.5"></div>
-      </div>
-    </div>
+  <div id="tabMobility" class="max-w-lg mx-auto px-4 mt-3 hidden">
+    <div id="mobRoot"></div>
   </div>
 
   <!-- ========================================================= -->
@@ -587,6 +603,9 @@
   <div id="tabProgress" class="max-w-5xl mx-auto px-3.5 mt-4 space-y-5 hidden">
     <div id="progressContent" class="space-y-5"></div>
   </div>
+
+  <!-- v27: MOBİLİTE SAYACI (tam ekran) -->
+  <div id="mobTimer" class="hidden" role="dialog" aria-label="Mobilite sayacı"></div>
 
   <!-- YÜZEN DİNLENME SAYACI -->
   <div id="restPill" class="rest-pill hidden">

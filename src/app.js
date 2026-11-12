@@ -497,7 +497,7 @@ window.addEventListener("error", e => { toast("⚠️ Hata: " + (e.message || "b
 // MODAL YÖNETİMİ
 // ---------------------------------------------------------------------------
 // Antrenman sekmesinden veya Profil ekranından açılan ortak pencereler yeni (siyah) temada görünür.
-function trainCtx() { try { return state.activeTab === "gym" || profileIsOpen(); } catch (e) { return false; } }
+function trainCtx() { try { return state.activeTab === "gym" || state.activeTab === "mobility" || profileIsOpen(); } catch (e) { return false; } }
 // Beslenme sekmesinden a\u00E7\u0131lan ortak pencereler beslenme temas\u0131nda (.nm) g\u00F6r\u00FCn\u00FCr.
 function nutriCtx() { try { return !trainCtx() && state.activeTab === "nutrition"; } catch (e) { return false; } }
 const EMOJI_LEAD = /^(?:[\p{Extended_Pictographic}\u2190-\u21FF\u2700-\u27BF\uFE0F\u200D]+\s*)+/u;
@@ -761,12 +761,13 @@ function applyTabVisibility() {
   const map = {
     nutrition: ["tabNutrition", "nutritionHeaderBar", "navBtnNutrition", "block"],
     gym: ["tabGym", "gymHeaderBar", "navBtnGym", "grid"],
-    mobility: ["tabMobility", "mobilityHeaderBar", "navBtnMobility", "grid"],
+    mobility: ["tabMobility", null, "navBtnMobility", "grid"],
     progress: ["tabProgress", "progressHeaderBar", "navBtnProgress", "block"]
   };
-  const activeCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-bold text-[11px] " + (state.activeTab === "gym" ? "text-[#1FD1C1]" : state.activeTab === "nutrition" ? "text-[#22C55E]" : "text-emerald-400");
+  const activeCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-bold text-[11px] " + (state.activeTab === "gym" ? "text-[#1FD1C1]" : state.activeTab === "nutrition" ? "text-[#22C55E]" : state.activeTab === "mobility" ? "text-[#B3A6FF]" : "text-emerald-400");
   const idleCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-semibold text-[11px] text-[#8B8B93]";
   document.body.classList.toggle("theme-train", state.activeTab === "gym");
+  document.body.classList.toggle("theme-mob", state.activeTab === "mobility");
   const nutri = state.activeTab === "nutrition";
   document.body.classList.toggle("theme-nutri", nutri);
   document.body.classList.toggle("nutri-light", nutri && !!state.settings.nutriLight);
@@ -789,8 +790,7 @@ function applyTabVisibility() {
     const [tabId, headId, btnId, disp] = map[k];
     const on = k === state.activeTab;
     $(tabId).classList.toggle("hidden", !on);
-    $(headId).classList.toggle("hidden", !on);
-    $(headId).classList.toggle(disp, on);
+    if (headId) { $(headId).classList.toggle("hidden", !on); $(headId).classList.toggle(disp, on); }
     $(btnId).className = on ? activeCls : idleCls;
   });
 }
@@ -2507,24 +2507,6 @@ function openExercisePicker() {
     { label: "Listede yok mu? Özel hareket yaz", onClick: () => openExerciseModal({ name: "", kind: "weight" }) });
 }
 
-function openMobilityPicker() {
-  const groups = Object.keys(MOBILITY_LIBRARY).map(cat => ({
-    label: cat,
-    short: cat.replace(/\s*\(.*$/, "").replace(/ & .*$/, ""),
-    items: MOBILITY_LIBRARY[cat].map((m, i) => ({ id: cat + "__" + i, label: m.name, sub: m.prescription + (m.note ? " • " + m.note : ""), data: m }))
-  }));
-  const targetType = $("mobilityTargetType").value;
-  openPicker(targetType === "dynamic" ? "🔥 Dinamik Mobiliteye Ekle" : "🧘 Statik Stretching'e Ekle", groups, it => {
-    const m = it.data;
-    state.mobilityRoutine[targetType].push({
-      name: m.name, prescription: m.prescription, timerSec: /45/.test(m.prescription) ? 45 : /60/.test(m.prescription) ? 60 : 30,
-      note: m.note || "", done: false
-    });
-    toast("✓ " + m.name + " eklendi");
-    renderAll();
-  }, { label: "✍️ Listede yok mu? Elle ekle", onClick: addCustomMobilityPrompt });
-}
-
 // ---------------------------------------------------------------------------
 // HAREKET EKLE / DÜZENLE MODALI
 // ---------------------------------------------------------------------------
@@ -2939,73 +2921,96 @@ function deleteWorkoutLog(idx) {
 }
 
 // ---------------------------------------------------------------------------
-// MOBİLİTE
+// MOBİLİTE (v27): bölge ızgarası + tek sıralı liste, hareket detayı, hareket ekle, nefes daireli sayaç.
+// Görünüm durumu kaydedilmez (mobUI). Veri: state.mobilityRoutine.items (bkz. normMobItem).
 // ---------------------------------------------------------------------------
+let mobUI = { view: "list", region: "", id: null, q: "", filter: "all" };
+const MOB_REGION_LABEL = Object.fromEntries(MOB_REGIONS);
+const MOB_TYPE_LABEL = Object.fromEntries(MOB_TYPES);
+function mobItems() { return state.mobilityRoutine.items; }
+function mobFind(id) { return mobItems().find(i => i.id === id) || null; }
+function mobUpper(t) { return String(t).toLocaleUpperCase("tr-TR"); }
+function mobArg(id) { return esc(JSON.stringify(String(id))); }
+function mobSummary(it) {
+  const amt = it.mode === "time" ? it.sec + " sn" : it.reps + " tekrar";
+  return (it.sides === 2 ? "Sağ/sol · " : "") + it.sets + " set × " + amt;
+}
+// Ana bölge 1 puan, ikincil 0,5 puan; "x / y" sayısı yalnızca ana bölgesi o bölge olanları sayar.
+function mobRegionStats() {
+  const st = {};
+  MOB_REGIONS.forEach(([k]) => { st[k] = { n: 0, nDone: 0, pts: 0, ptsDone: 0 }; });
+  mobItems().forEach(it => {
+    const a = st[it.region], b = st[it.region2];
+    if (a) { a.n++; a.pts += 1; if (it.done) { a.nDone++; a.ptsDone += 1; } }
+    if (b) { b.pts += 0.5; if (it.done) b.ptsDone += 0.5; }
+  });
+  return st;
+}
+function mobVisible() {
+  const all = mobItems();
+  if (!mobUI.region) return all.map(it => ({ it, sec: false }));
+  return [...all.filter(i => i.region === mobUI.region).map(it => ({ it, sec: false })),
+    ...all.filter(i => i.region2 === mobUI.region).map(it => ({ it, sec: true }))];
+}
+function mobCardHtml({ it, sec }, idx, drag) {
+  const id = mobArg(it.id);
+  const timeBtn = it.mode === "time"
+    ? `<button data-mob-timer onclick="mobTimerStart(${id})" class="m-tbtn" aria-label="${it.sec} saniyelik sayacı başlat">${svgI("clock", 18, 2.2)}<span>${it.sec} sn</span></button>` : "";
+  return `<div data-mob-row="${esc(it.id)}" class="m-card ${it.done ? "done" : ""}">
+    <button data-mob-check onclick="mobToggle(${id})" class="m-chk" aria-pressed="${it.done}" aria-label="${it.done ? "Yapıldı işaretini kaldır" : "Yapıldı olarak işaretle"}">${svgI("check", 20, 3)}</button>
+    <button data-mob-open onclick="mobOpen(${id})" class="flex-1 min-w-0 min-h-[44px] text-left">
+      <span class="m-kind ${it.type === "dynamic" ? "" : "s"}">${MOB_TYPE_LABEL[it.type]}${sec ? " · ikincil" : ""}</span>
+      <span class="m-name block">${esc(it.name)}</span>
+      <span class="m-rx block">${esc(mobSummary(it))}</span>
+    </button>
+    ${timeBtn}
+    ${drag ? `<span class="drag-handle m-grip" data-mobidx="${idx}" role="img" aria-label="Sürükleyerek sırala">${svgI("grip", 18)}</span>` : ""}
+  </div>`;
+}
+function mobListHtml() {
+  const stats = mobRegionStats();
+  const all = mobItems();
+  const regs = MOB_REGIONS.map(([k, label]) => {
+    const r = stats[k];
+    const pct = r.pts ? Math.round(r.ptsDone / r.pts * 100) : 0;
+    const full = r.n > 0 && r.nDone === r.n;
+    const txt = r.n === 0 ? "—" : full ? "Tamam" : `${r.nDone} / ${r.n}`;
+    return `<button data-mob-region="${k}" onclick="mobRegion('${k}')" class="m-reg ${mobUI.region === k ? "on" : ""} ${full ? "full" : ""}" aria-pressed="${mobUI.region === k}">
+      <div data-mob-lvl class="m-lvl ${pct ? "" : "zero"}" style="height:${pct}%"></div>
+      <b class="t-display">${mobUpper(label)}</b><span>${txt}</span></button>`;
+  }).join("");
+  const vis = mobVisible();
+  const drag = !mobUI.region && vis.length > 1;
+  const title = mobUI.region ? MOB_REGION_LABEL[mobUI.region] : "Rutin";
+  const empty = mobUI.region ? "Bu bölgede hareket yok. Aşağıdan ekleyebilirsin." : "Rutin boş. Aşağıdan hareket ekle.";
+  return `<div class="m-regs">${regs}</div>
+    <div class="flex items-center justify-between gap-2 mt-4 mb-2.5 px-0.5">
+      <h3 id="mobListTitle" class="t-display text-[22px] text-white truncate">${mobUpper(title)}</h3>
+      <button id="mobAllBtn" onclick="mobRegion('')" class="m-pill shrink-0 ${mobUI.region ? "" : "!text-white !border-[#B3A6FF]"}">Tümü (${all.filter(i => i.done).length} / ${all.length})</button>
+    </div>
+    <div id="mobList" class="space-y-2">${vis.map((v, i) => mobCardHtml(v, i, drag)).join("") || `<div class="text-[14px] text-[#8B8B93] py-6 text-center">${empty}</div>`}</div>
+    <div class="grid grid-cols-[1fr_auto] gap-2.5 mt-3">
+      <button id="mobAddBtn" onclick="mobAddOpen()" class="m-btn pri">${svgI("plus", 20, 2.4)}Hareket ekle</button>
+      <button id="mobResetBtn" onclick="mobReset()" class="m-btn ghost" aria-label="Tikleri sıfırla">${svgI("undo", 19)}Sıfırla</button>
+    </div>`;
+}
 function renderMobility() {
-  const r = state.mobilityRoutine;
-  const item = (type, it, idx, accent) => {
-    const sec = num(it.timerSec, 30) || 30;
-    return `
-      <div class="p-3 rounded-xl border ${it.done ? "set-done" : "bg-slate-900/90 border-slate-800"}">
-        <div class="flex items-start justify-between gap-2">
-          <div class="flex items-start gap-2.5 flex-1 min-w-0">
-            <button onclick="toggleMobilityDone('${type}', ${idx})" class="mt-0.5 w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 ${it.done ? "bg-emerald-500 text-slate-950" : "bg-slate-800 text-slate-400 border border-slate-700"}">✓</button>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-start justify-between gap-2">
-                <span class="font-bold text-sm ${it.done ? "line-through text-emerald-300" : "text-white"}">${idx + 1}. ${esc(it.name)}</span>
-                ${type === "static" ? `<button onclick="startTimer(${sec}, ${esc(JSON.stringify(it.name.slice(0, 40)))})" class="text-[11px] bg-sky-900/70 text-sky-200 border border-sky-700/50 px-2 py-0.5 rounded-md font-semibold shrink-0">⏱️ ${sec} sn</button>` : ""}
-              </div>
-              <div class="flex flex-wrap items-center gap-2 mt-1">
-                <input type="text" data-fk="mp-${type}-${idx}" value="${esc(it.prescription)}" onchange="updateMobilityField('${type}', ${idx}, 'prescription', this.value)"
-                  class="text-xs font-semibold ${accent} rounded px-2 py-0.5 w-full sm:w-56" />
-                <input type="text" data-fk="mn-${type}-${idx}" value="${esc(it.note || "")}" placeholder="Not ekle..." onchange="updateMobilityField('${type}', ${idx}, 'note', this.value)"
-                  class="text-xs text-slate-400 border-0 border-b border-slate-700 focus:outline-none flex-1 min-w-[120px]" style="background:transparent;border-left:0;border-right:0;border-top:0;" />
-              </div>
-            </div>
-          </div>
-          <button onclick="removeMobilityItem('${type}', ${idx})" class="text-rose-400 text-lg leading-none px-1 font-bold">&times;</button>
-        </div>
-      </div>`;
-  };
-  $("dynamicMobilityList").innerHTML = r.dynamic.map((it, i) => item("dynamic", it, i, "text-emerald-400")).join("") || `<div class="text-xs text-slate-500 italic">Liste boş.</div>`;
-  $("staticMobilityList").innerHTML = r.static.map((it, i) => item("static", it, i, "text-sky-400")).join("") || `<div class="text-xs text-slate-500 italic">Liste boş.</div>`;
-  $("mobDynamicDone").textContent = r.dynamic.filter(i => i.done).length;
-  $("mobDynamicTotal").textContent = r.dynamic.length;
-  $("mobStaticDone").textContent = r.static.filter(i => i.done).length;
-  $("mobStaticTotal").textContent = r.static.length;
+  const root = $("mobRoot");
+  if (!root || state.activeTab !== "mobility") return;
+  if (mobUI.view === "detail" && !mobFind(mobUI.id)) mobUI.view = "list";
+  root.innerHTML = mobUI.view === "detail" ? mobDetailHtml() : mobUI.view === "add" ? mobAddHtml() : mobListHtml();
+  if (mobUI.view === "add") mobRenderAddList();
 }
-
-function toggleMobilityDone(type, idx) { const it = state.mobilityRoutine[type][idx]; it.done = !it.done; renderAll(); }
-function updateMobilityField(type, idx, field, val) {
-  const it = state.mobilityRoutine[type][idx];
-  it[field] = val;
-  if (field === "prescription") {
-    const m = String(val).match(/(\d+)\s*(sn|saniye|sec|s\b)/i);
-    if (m) it.timerSec = Math.max(5, parseInt(m[1]));
-  }
-  renderAll();
-}
-function removeMobilityItem(type, idx) {
+function mobRegion(k) { mobUI.region = mobUI.region === k ? "" : k; renderMobility(); }
+function mobToggle(id) { const it = mobFind(id); if (!it) return; it.done = !it.done; renderAll(); }
+function mobReset() {
+  if (!mobItems().some(i => i.done)) { toast("Tikli hareket yok"); return; }
   snapshot();
-  const it = state.mobilityRoutine[type].splice(idx, 1)[0];
+  mobItems().forEach(i => { i.done = false; });
   renderAll();
-  offerUndo(`🗑️ ${it ? it.name : "Hareket"} kaldırıldı`);
+  offerUndo("Tikler sıfırlandı");
 }
-function resetMobilityChecks() {
-  state.mobilityRoutine.dynamic.forEach(i => { i.done = false; });
-  state.mobilityRoutine.static.forEach(i => { i.done = false; });
-  renderAll();
-}
-function addCustomMobilityPrompt() {
-  const type = $("mobilityTargetType").value;
-  const name = prompt("Eklemek istediğin mobilite veya esneme hareketinin adını yaz:");
-  if (!name || !name.trim()) return;
-  const def = type === "dynamic" ? "1 Set x 8–10 Tekrar" : "2 Set x 30 sn";
-  const prescription = prompt("Uygulama (set / tekrar / saniye):", def) || def;
-  const m = prescription.match(/(\d+)\s*(sn|saniye|sec)/i);
-  state.mobilityRoutine[type].push({ name: name.trim(), prescription, timerSec: m ? Math.max(5, parseInt(m[1])) : 30, note: "", done: false });
-  renderAll();
-}
+//__MOB_DETAIL__
 
 // ---------------------------------------------------------------------------
 // GRAFİK (SVG)
@@ -4853,6 +4858,8 @@ function readExLevels() {
 // ---------------------------------------------------------------------------
 const GYM_VIEWS = [["today", "Bugün"], ["program", "Programım"], ["library", "Hareketler"], ["history", "Geçmiş"]];
 const ICON = {
+  undo: "M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5", vol: "M11 5L6 9H3v6h3l5 4V5zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13",
+  volOff: "M11 5L6 9H3v6h3l5 4V5zM16 9.5l5 5M21 9.5l-5 5",
   chevL: "M15 6l-6 6 6 6", chevR: "M9 6l6 6-6 6", check: "M5 12.5l4.5 4.5L19 7.5", plus: "M12 5v14M5 12h14",
   chart: "M4 20V11M10 20V5M16 20v-6M2 20h20", calc: "M5 3h14v18H5zM8 7h8M8 11h2M12 11h2M8 15h2M12 15h2M16 11v4",
   edit: "M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4", up: "M12 19V5M5 12l7-7 7 7", down: "M12 5v14M19 12l-7 7-7-7",
@@ -5401,15 +5408,15 @@ let mealDrag = null;
 document.addEventListener("pointerdown", e => {
   const h = e.target && e.target.closest ? e.target.closest(".drag-handle") : null;
   if (!h) return;
-  const isEx = h.dataset.exidx != null;
-  const cards = [...document.querySelectorAll(isEx ? "#progExList [data-ex-row]" : "#mealsContainer [data-meal-card]")];
-  const from = parseInt(isEx ? h.dataset.exidx : h.dataset.midx, 10);
+  const isEx = h.dataset.exidx != null, isMob = h.dataset.mobidx != null;
+  const cards = [...document.querySelectorAll(isMob ? "#mobList [data-mob-row]" : isEx ? "#progExList [data-ex-row]" : "#mealsContainer [data-meal-card]")];
+  const from = parseInt(isMob ? h.dataset.mobidx : isEx ? h.dataset.exidx : h.dataset.midx, 10);
   const card = cards[from];
   if (!card || cards.length < 2) return;
   e.preventDefault();
   const sy = window.scrollY;
   mealDrag = {
-    kind: isEx ? "ex" : "meal", dayIdx: state.activeWorkoutDayIdx,
+    kind: isMob ? "mob" : isEx ? "ex" : "meal", dayIdx: state.activeWorkoutDayIdx,
     from, to: from, card, cards, startX: e.clientX, startY: e.clientY + sy,
     centers: cards.map(c => { const r = c.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + sy + r.height / 2 }; })
   };
@@ -5424,7 +5431,7 @@ document.addEventListener("pointermove", e => {
   const sy = window.scrollY;
   if (e.clientY < 140) window.scrollBy(0, -14);
   else if (e.clientY > window.innerHeight - 150) window.scrollBy(0, 14);
-  const isEx = mealDrag.kind === "ex";
+  const isEx = mealDrag.kind !== "meal";
   const dx = isEx ? 0 : e.clientX - mealDrag.startX, dy = e.clientY + sy - mealDrag.startY;
   mealDrag.card.style.transform = `translate(${dx}px, ${dy}px) scale(1.02)`;
   const c0 = mealDrag.centers[mealDrag.from];
@@ -5434,7 +5441,7 @@ document.addEventListener("pointermove", e => {
   if (best !== mealDrag.to) {
     if (mealDrag.cards[mealDrag.to] && mealDrag.to !== mealDrag.from) mealDrag.cards[mealDrag.to].style.outline = "";
     mealDrag.to = best;
-    if (best !== mealDrag.from) mealDrag.cards[best].style.outline = isEx ? "2px dashed #1FD1C1" : "2px dashed #22C55E";
+    if (best !== mealDrag.from) mealDrag.cards[best].style.outline = mealDrag.kind === "mob" ? "2px dashed #B3A6FF" : isEx ? "2px dashed #1FD1C1" : "2px dashed #22C55E";
   }
 });
 function endMealDrag() {
@@ -5444,6 +5451,15 @@ function endMealDrag() {
   card.style.transform = ""; card.style.zIndex = ""; card.style.boxShadow = ""; card.style.position = "";
   cards.forEach(c => { c.style.outline = ""; });
   if (to === from) return;
+  if (kind === "mob") {
+    const list = state.mobilityRoutine.items;
+    if (mobUI.region || !list[from]) { renderAll(); return; }
+    const [x] = list.splice(from, 1);
+    list.splice(to, 0, x);
+    renderAll();
+    toast("Hareket taşındı");
+    return;
+  }
   if (kind === "ex") {
     const day = state.workoutDays[dayIdx];
     if (!day || dayIdx !== state.activeWorkoutDayIdx) { renderAll(); return; }

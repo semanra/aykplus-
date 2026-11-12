@@ -95,6 +95,56 @@ try:
     seed(pg, nd)
     check("2026-01-06" not in st(pg)["mobilityLog"], "hiç hareket yapılmayan gün kaydedilmiyor")
 
+    # ================= 2) ANA EKRAN =================
+    seed(pg, LEGACY)
+    def reg(key): return pg.locator(f'[data-mob-region="{key}"]')
+    def lvl(key): return pg.evaluate(f"document.querySelector('[data-mob-region=\"{key}\"] [data-mob-lvl]').style.height")
+    check("theme-mob" in (pg.get_attribute("body", "class") or ""), "Mobilite sekmesinde lavanta tema (body.theme-mob)")
+    check("B3A6FF" in (pg.get_attribute("#navBtnMobility", "class") or ""), "alt menüde Mobilite lavanta")
+    check(pg.locator("#mobilityHeaderBar").count() == 0 and pg.locator("#mobilityTargetType").count() == 0, "eski üst şerit ve tür seçimi kaldırıldı")
+    check(reg("hip").inner_text().replace("\n", " ").upper().startswith("KALÇA") and "1 / 3" in reg("hip").inner_text(), f"Kalça: 1 / 3 ({reg('hip').inner_text()!r})")
+    check(lvl("hip") == "33%", f"Kalça doluluk %33 ({lvl('hip')})")
+    check("0 / 1" in reg("spine").inner_text() and lvl("spine") == "25%", f"Omurga: ikincil WGS yarım puan → %25 ({lvl('spine')})")
+    check(lvl("chest") == "0%" and "—" in reg("chest").inner_text(), "Göğüs: hareket yok → —")
+    check(pg.inner_text("#mobAllBtn") == "Tümü (1 / 7)", f"Tümü sayacı ({pg.inner_text('#mobAllBtn')})")
+    check(pg.locator("#mobList [data-mob-row]").count() == 7, "Tümü: 7 hareket")
+    check(pg.locator("#mobList [data-mob-timer]").count() == 4, "yalnızca süreli 4 harekette sayaç düğmesi")
+    check(pg.locator("#mobList .drag-handle").count() == 7, "Tümü'nde sürükleme tutamacı")
+    check("Sağ/sol · 2 set × 40 sn" in pg.locator("#mobList [data-mob-row]").nth(3).inner_text(), f"kartta özet ({pg.locator('#mobList [data-mob-row]').nth(3).inner_text()!r})")
+    small = pg.evaluate(SMALL_JS, "#mobRoot button")
+    check(not small, f"tüm düğmeler ≥ 44 px ({small})")
+    check(ov(pg), "yatay taşma yok")
+    pg.screenshot(path=SHOTS + "/v27_1_ana.png", full_page=True)
+    # Bölgeye süz
+    reg("hip").click(); pg.wait_for_timeout(80)
+    rows = pg.locator("#mobList [data-mob-row]").all_inner_texts()
+    check(len(rows) == 3 and "KALÇA" in pg.inner_text("#mobListTitle").upper(), f"Kalça süzüldü: 3 hareket ({len(rows)})")
+    check(pg.locator("#mobList .drag-handle").count() == 0, "süzülmüş listede sürükleme yok")
+    reg("spine").click(); pg.wait_for_timeout(80)
+    rows = pg.locator("#mobList [data-mob-row]").all_inner_texts()
+    check(len(rows) == 3 and "Thoracic Spine" in rows[0] and "ikincil" in rows[1].lower() and "ikincil" in rows[2].lower(), f"Omurga: ana önce, ikinciller etiketli sonda ({rows})")
+    pg.screenshot(path=SHOTS + "/v27_2_bolge.png", full_page=True)
+    reg("spine").click(); pg.wait_for_timeout(80)
+    check(pg.locator("#mobList [data-mob-row]").count() == 7, "aynı bölgeye tekrar dokununca Tümü")
+    reg("hip").click(); pg.click("#mobAllBtn"); pg.wait_for_timeout(80)
+    check(pg.locator("#mobList [data-mob-row]").count() == 7, "Tümü düğmesi süzmeyi kaldırıyor")
+    # Tik
+    pg.locator("#mobList [data-mob-row]").nth(3).locator("[data-mob-check]").click(); pg.wait_for_timeout(80)
+    check(items(pg)[3]["done"] is True and "2 / 3" in reg("hip").inner_text(), "tik → kayıt + Kalça 2 / 3")
+    # Sıfırla + Geri al
+    pg.click("#mobResetBtn"); pg.wait_for_timeout(80)
+    check(not any(x["done"] for x in items(pg)), "Sıfırla tüm tikleri kaldırıyor")
+    pg.locator("#toastWrap button", has_text="Geri al").click(); pg.wait_for_timeout(100)
+    check(items(pg)[0]["done"] and items(pg)[3]["done"], "Geri al tikleri geri getiriyor")
+    # Sürükle-bırak
+    first = items(pg)[0]["id"]; pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(50)
+    h = pg.locator('#mobList .drag-handle[data-mobidx="0"]').bounding_box(); t = pg.locator('#mobList [data-mob-row]').nth(2).bounding_box()
+    x, y = h["x"] + h["width"] / 2, h["y"] + h["height"] / 2; ty = t["y"] + t["height"] / 2
+    pg.mouse.move(x, y); pg.mouse.down()
+    for i in range(1, 9): pg.mouse.move(x, y + (ty - y) * i / 8); pg.wait_for_timeout(16)
+    pg.mouse.up(); pg.wait_for_timeout(150)
+    check(items(pg)[2]["id"] == first, "sürükle-bırak sırayı değiştiriyor")
+
     #__NEXT__
 
     check(not errs, f"sayfa hatası yok ({errs[:3]})")
