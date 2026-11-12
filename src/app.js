@@ -4,7 +4,7 @@
 
 const DEFAULT_SETTINGS = {
   sex: "male", height: 180, age: 26, targetWeight: 82,
-  waterTarget: 3.5, restSec: 90, sound: true, keepAwake: true,
+  waterTarget: 3.5, restSec: 90, sound: true, mobSound: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
   macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
   nutriLight: false, scaleOn: false, scaleBase: 0
@@ -581,8 +581,9 @@ function unlockAudio() {
 }
 document.addEventListener("pointerdown", unlockAudio, { passive: true });
 
-function beep() {
-  if (!state.settings.sound || !audioCtx) return;
+// force: Mobilite sayacı kendi ses ayarını (settings.mobSound) kullanır
+function beep(force) {
+  if ((!force && !state.settings.sound) || !audioCtx) return;
   try {
     const t0 = audioCtx.currentTime + 0.02;
     [0, 0.28, 0.56].forEach((d, i) => {
@@ -602,7 +603,7 @@ function beep() {
 let wakeLock = null, wakeBusy = false;
 async function updateWakeLock() {
   if (!("wakeLock" in navigator) || wakeBusy) return;
-  const want = state.settings.keepAwake && state.activeTab === "gym" && document.visibilityState === "visible";
+  const want = state.settings.keepAwake && (state.activeTab === "gym" || !!mobT) && document.visibilityState === "visible";
   wakeBusy = true;
   try {
     if (want && !wakeLock) {
@@ -3177,7 +3178,103 @@ async function mobAddCustom() {
   window.scrollTo(0, 0);
   renderAll();
 }
-//__MOB_TIMER__
+// --- Sayaç (tam ekran, nefes dairesi). Bitiş zamanına göre çalışır; arka plandan dönünce kaçırılan aşamalar ilerletilir.
+// Akış: tur → ses → 5 sn ara → sonraki tur; son tur bitince hareket tiklenir. iOS: uygulama kapalıyken/sessizde ses yok.
+let mobT = null;
+function mobFmt(sec) { sec = Math.max(0, Math.ceil(sec)); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
+function mobBeep() { if (state.settings.mobSound !== false) beep(true); }
+function mobTimerStart(id) {
+  const it = mobFind(id);
+  if (!it || it.mode !== "time") return;
+  unlockAudio();
+  if (mobT) clearInterval(mobT.iv);
+  const rounds = [];
+  for (let s = 1; s <= it.sets; s++) (it.sides === 2 ? ["Sağ", "Sol"] : [null]).forEach(side => rounds.push({ side, set: s }));
+  const now = Date.now();
+  mobT = { id: it.id, name: it.name, region: MOB_REGION_LABEL[it.region] || "", sec: it.sec, sets: it.sets, rounds, idx: 0, phase: "work", endAt: now + it.sec * 1000, t0: now, iv: 0, quiet: false };
+  mobT.iv = setInterval(mobTimerTick, 250);
+  const m = $("mobTimer"); m.classList.remove("hidden"); m.classList.add("flex");
+  document.body.classList.add("pf-open");
+  mobTimerRender();
+  updateWakeLock();
+}
+function mobTimerTick() {
+  if (!mobT) return;
+  let changed = false;
+  while (mobT && Date.now() >= mobT.endAt) {
+    const late = Date.now() - mobT.endAt;
+    if (mobT.phase === "work") {
+      if (!mobT.quiet && late < 2000) mobBeep();
+      if (mobT.idx >= mobT.rounds.length - 1) { mobTimerFinish(); return; }
+      mobT.phase = "switch"; mobT.endAt += MOB_SWITCH_SEC * 1000;
+    } else {
+      mobT.idx++; mobT.phase = "work"; mobT.endAt += mobT.sec * 1000;
+    }
+    mobT.quiet = false;
+    changed = true;
+  }
+  if (changed) mobTimerRender(); else mobTimerUpdate();
+}
+function mobTimerFinish() {
+  const id = mobT.id, name = mobT.name;
+  mobTimerClose();
+  const it = mobFind(id);
+  if (it) it.done = true;
+  renderAll();
+  toast(name + " tamamlandı");
+}
+function mobTimerClose() {
+  if (mobT) clearInterval(mobT.iv);
+  mobT = null;
+  const m = $("mobTimer"); m.classList.add("hidden"); m.classList.remove("flex"); m.innerHTML = "";
+  document.body.classList.remove("pf-open");
+  updateWakeLock();
+}
+function mobTimerAdjust(d) { if (!mobT) return; mobT.endAt += d * 1000; if (mobT.endAt <= Date.now()) mobT.quiet = true; mobTimerTick(); }
+function mobTimerSkip() { if (!mobT) return; mobT.endAt = Date.now(); mobT.quiet = true; mobTimerTick(); }
+function mobTimerSound() { state.settings.mobSound = state.settings.mobSound === false; saveState(); mobTimerRender(); }
+function mobBreathLabel() { return ((Date.now() - mobT.t0) % 10000) < 4000 ? "Nefes al" : "Nefes ver"; }
+function mobTimerUpdate() {
+  if (!mobT) return;
+  const t = $("mobTTime"); if (t) t.textContent = mobFmt((mobT.endAt - Date.now()) / 1000);
+  const b = $("mobTBreath"); if (b && mobT.phase === "work") b.textContent = mobBreathLabel();
+}
+function mobTimerRender() {
+  if (!mobT) return;
+  const T = mobT, r = T.rounds[T.idx], work = T.phase === "work";
+  const next = T.rounds[T.idx + 1];
+  const sub = work
+    ? (r.side ? `${r.side} taraf · ${r.set}. tur / ${T.sets}` : `Set ${r.set} / ${T.sets}`)
+    : (next && next.side === "Sol" ? "Sola geç" : next && next.side === "Sağ" ? "Sağa geç" : "Sıradaki set") + ` · ${next ? (next.side ? next.side + " " + next.set : "Set " + next.set) : ""}`;
+  const snd = state.settings.mobSound !== false;
+  const boxes = T.rounds.map((x, i) => {
+    const cls = i < T.idx || (i === T.idx && !work) ? "d" : i === T.idx ? "n" : "";
+    return `<i class="${cls}">${x.side ? x.side + " " + x.set : "Set " + x.set}</i>`;
+  }).join("");
+  $("mobTimer").innerHTML = `
+    <div class="w-full max-w-lg flex items-center justify-between pt-3">
+      <button id="mobTClose" onclick="mobTimerClose()" class="m-round" aria-label="Sayacı kapat">${svgI("x", 20, 2.2)}</button>
+      <span id="mobTRegion" class="text-[15px] text-[#A1A1AA]">${esc(T.region)}</span>
+      <button id="mobTSound" onclick="mobTimerSound()" class="m-round" aria-label="${snd ? "Sesi kapat" : "Sesi aç"}">${svgI(snd ? "vol" : "volOff", 20)}</button>
+    </div>
+    <div class="text-center mt-4 px-2 w-full max-w-lg">
+      <h3 id="mobTTitle" class="t-display text-[30px] leading-[1.05]">${esc(T.name)}</h3>
+      <p id="mobTSub" class="text-[15px] ${work ? "text-[#A1A1AA]" : "text-[#B3A6FF] font-semibold"} mt-1.5">${sub}</p>
+    </div>
+    <div id="mobTCircle" class="m-breath mt-4 ${work ? "" : "pause"}">
+      <span class="o o1"></span><span class="o o2"></span>
+      <div class="core" style="animation-delay:-${(Date.now() - T.t0) % 10000}ms"><b id="mobTTime" class="t-display">${mobFmt((T.endAt - Date.now()) / 1000)}</b><span id="mobTBreath">${work ? mobBreathLabel() : "Hazırlan"}</span></div>
+    </div>
+    <div class="text-[13.5px] text-[#8B8B93] mt-1 text-center">${work ? "4 sn al, 6 sn ver. Her verişte biraz daha derine." : "Sıradaki tur birazdan kendiliğinden başlar."}</div>
+    <div class="w-full max-w-lg mt-auto pt-5">
+      <div class="grid grid-cols-[1fr_1fr_1.3fr] gap-2.5">
+        <button id="mobTMinus" onclick="mobTimerAdjust(-15)" class="h-[60px] rounded-[18px] bg-[#1E1E21] text-[17px] font-bold">−15</button>
+        <button id="mobTPlus" onclick="mobTimerAdjust(15)" class="h-[60px] rounded-[18px] bg-[#1E1E21] text-[17px] font-bold">+15</button>
+        <button id="mobTSkip" onclick="mobTimerSkip()" class="h-[60px] rounded-[18px] bg-white text-black text-[17px] font-bold">Atla</button>
+      </div>
+      <div id="mobTRounds" class="m-rounds mt-3">${boxes}</div>
+    </div>`;
+}
 
 // ---------------------------------------------------------------------------
 // GRAFİK (SVG)
@@ -6521,6 +6618,7 @@ document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
     if (checkNewDay()) { autoSelectNextDay(); renderAll(); }
     if (timer.running) tickTimer();
+    if (mobT) mobTimerTick();
     updateWakeLock();
   }
 });
