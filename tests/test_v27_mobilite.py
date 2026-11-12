@@ -195,7 +195,46 @@ try:
     check(len(items(pg)) == 6 and pg.locator("#mobList").count() == 1, "Kaldır → listeye dönüyor, hareket silindi")
     pg.locator("#toastWrap button", has_text="Geri al").click(); pg.wait_for_timeout(100)
     check(len(items(pg)) == 7 and items(pg)[1]["name"] == "Kendi hareketim", "Geri al hareketi yerine getiriyor")
-    check("<b>" not in pg.inner_html("#mobList").replace("<b class", ""), "kullanıcı metni kaçışlı")
+    row(3).locator("[data-mob-open]").click(); pg.wait_for_timeout(60)
+    check(pg.locator("#mobDtNote").input_value() == "Kalçayı sık <b>" and pg.locator("#mobDetail b", has_text="sık").count() == 0, "kullanıcı notu kaçışlı (HTML olarak çizilmiyor)")
+    pg.click("#mobDtBack"); pg.wait_for_timeout(40)
+
+    # ================= 4) HAREKET EKLE =================
+    seed(pg, LEGACY)
+    pg.locator('[data-mob-region="hip"]').click(); pg.click("#mobAddBtn"); pg.wait_for_timeout(80)
+    def libnames(): return [t.split("\n") for t in pg.locator("#mobAddList [data-mob-lib]").all_inner_texts()]
+    groups = pg.locator("#mobAddList [data-mob-group]").all_inner_texts()
+    check(pg.is_visible("#mobAdd") and groups[0] == "Kalça" and len(groups) == 6, f"ekleme ekranı; seçili bölge (Kalça) en üstte ({groups})")
+    check(pg.locator("#mobAddList [data-mob-lib]").count() == 37, "kütüphanedeki 37 hareket")
+    pg.click('[data-mob-filter="release"]'); pg.wait_for_timeout(50)
+    check(pg.locator("#mobAddList [data-mob-lib]").count() == 5, "Foam roller süzgeci: 5 hareket")
+    pg.click('[data-mob-filter="all"]'); pg.wait_for_timeout(50)
+    pg.locator("#mobSearch").click(); pg.keyboard.type("couch"); pg.wait_for_timeout(80)
+    rows = pg.locator("#mobAddList [data-mob-lib]").all_inner_texts()
+    check(len(rows) == 1 and "Couch Stretch" in rows[0] and "Rutinde" in rows[0], f"arama: Couch Stretch, Rutinde etiketli ({rows})")
+    check(pg.evaluate("document.activeElement && document.activeElement.id") == "mobSearch", "yazarken arama kutusu odakta kalıyor")
+    pg.fill("#mobSearch", "omuz kapsülü"); pg.wait_for_timeout(80)
+    check(pg.locator("#mobAddList [data-mob-lib]").count() >= 1, "notta geçen kelimeyle de bulunuyor")
+    pg.fill("#mobSearch", "zzzz"); pg.wait_for_timeout(80)
+    check(pg.locator("#mobAddList [data-mob-lib]").count() == 0 and "bulunamadı" in pg.inner_text("#mobAddList"), "sonuç yoksa bilgi yazısı")
+    pg.fill("#mobSearch", ""); pg.wait_for_timeout(80)
+    pg.locator('#mobAddList [data-mob-lib]', has_text="Shoulder CARs").locator("[data-mob-add]").click(); pg.wait_for_timeout(100)
+    n = items(pg)[-1]
+    check(len(items(pg)) == 8 and n["name"] == "Shoulder CARs (Ayakta Tam Daire)" and n["type"] == "dynamic" and n["region"] == "shoulder"
+          and n["sides"] == 2 and n["mode"] == "reps" and n["reps"] == 5 and n["sets"] == 1 and n["note"] == "Omuz eklem sağlığı", f"kütüphaneden ekleme değerleri ({n})")
+    check(pg.is_visible("#mobAdd") and "Rutinde" in pg.locator('#mobAddList [data-mob-lib]', has_text="Shoulder CARs").inner_text(), "ekledikten sonra ekran açık, Rutinde etiketi")
+    small = pg.evaluate(SMALL_JS, "#mobRoot button")
+    check(not small, f"ekle ekranında düğmeler ≥ 44 px ({small})")
+    check(ov(pg), "ekle ekranında yatay taşma yok")
+    pg.evaluate("window.scrollTo(0, 0)"); pg.screenshot(path=SHOTS + "/v27_4_ekle.png", full_page=True)
+    pg.click("#mobAddCustom"); pg.wait_for_timeout(80)
+    pg.fill("#uiDlgInput", "Kendi esnemem"); pg.click("#uiDlgOk"); pg.wait_for_timeout(100)
+    n = items(pg)[-1]
+    check(n["name"] == "Kendi esnemem" and n["type"] == "static" and n["region"] == "hip" and n["sets"] == 2 and n["mode"] == "time" and n["sec"] == 30,
+          f"elle ekle: statik 2 × 30 sn, seçili bölge ({n})")
+    check(pg.is_visible("#mobDetail") and pg.inner_text("#mobDtTitle").strip() == "Kendi esnemem", "elle eklenen hareketin detayı açılıyor")
+    pg.click("#mobDtBack"); pg.click("#mobAddBtn"); pg.wait_for_timeout(50); pg.click("#mobAddClose"); pg.wait_for_timeout(50)
+    check(pg.locator("#mobList").count() == 1, "Kapat → liste")
 
     #__NEXT__
 

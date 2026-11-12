@@ -3109,7 +3109,75 @@ function mobRemove(id) {
   renderAll();
   offerUndo(`${it.name} kaldırıldı`);
 }
-//__MOB_ADD__
+// --- Hareket ekle (kütüphane; arama yazılırken yalnızca liste kısmı yeniden çizilir, klavye kapanmaz) ---
+function mobLibAll() {
+  const out = [];
+  Object.keys(MOBILITY_LIBRARY).forEach((cat, ci) => MOBILITY_LIBRARY[cat].forEach((m, i) => {
+    const reg = MOB_LIB_REGIONS[m.name] || [];
+    out.push({ key: ci + "_" + i, m, type: MOB_TYPES[Math.min(ci, 2)][0], region: reg[0] || "" });
+  }));
+  return out;
+}
+function mobNorm(t) { return String(t || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
+function mobAddHtml() {
+  const f = mobUI.filter;
+  return `<div id="mobAdd">
+    <div class="flex items-center justify-between gap-2">
+      <h3 class="t-display text-[30px] text-white">HAREKET EKLE</h3>
+      <button id="mobAddClose" onclick="mobBack()" class="m-round" aria-label="Kapat">${svgI("x", 20, 2.2)}</button>
+    </div>
+    <label class="flex items-center gap-2.5 h-[50px] rounded-2xl bg-[#141416] px-3.5 mt-3 text-[#8B8B93]">${svgI("search", 20)}
+      <input id="mobSearch" type="search" value="${esc(mobUI.q)}" placeholder="Hareket ara" autocomplete="off" oninput="mobAddSearch(this.value)" class="t-search flex-1 min-w-0 h-full !text-[16px]" /></label>
+    <div class="flex gap-2 mt-3 overflow-x-auto no-scrollbar -mx-4 px-4">${[["all", "Tümü"], ...MOB_TYPES].map(([k, l]) =>
+      `<button data-mob-filter="${k}" onclick="mobAddFilter('${k}')" class="m-chip ${f === k ? "on" : ""}" aria-pressed="${f === k}">${l}</button>`).join("")}</div>
+    <div id="mobAddList"></div>
+    <button id="mobAddCustom" onclick="mobAddCustom()" class="m-btn w-full mt-4">${svgI("edit", 19)}Listede yok mu? Elle ekle</button>
+  </div>`;
+}
+function mobRenderAddList() {
+  const box = $("mobAddList"); if (!box) return;
+  const q = mobNorm(mobUI.q).trim().split(/\s+/).filter(Boolean);
+  const inRoutine = new Set(mobItems().map(i => i.name));
+  const list = mobLibAll().filter(x => (mobUI.filter === "all" || x.type === mobUI.filter)
+    && q.every(w => mobNorm(x.m.name + " " + x.m.note).includes(w)));
+  const order = [...(mobUI.region ? [mobUI.region] : []), ...MOB_REGION_KEYS.filter(k => k !== mobUI.region), ""];
+  box.innerHTML = order.map(rk => {
+    const rows = list.filter(x => x.region === rk);
+    if (!rows.length) return "";
+    return `<div data-mob-group class="text-[13px] font-semibold text-[#A1A1AA] mt-4 mb-2 px-0.5">${esc(MOB_REGION_LABEL[rk] || "Bölgesiz")}</div>
+      <div class="space-y-2">${rows.map(x => {
+        const sum = mobSummary(normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription }, x.type)));
+        const has = inRoutine.has(x.m.name);
+        return `<div data-mob-lib="${x.key}" class="m-card">
+          <div class="flex-1 min-w-0"><span class="m-kind ${x.type === "dynamic" ? "" : "s"}">${MOB_TYPE_LABEL[x.type]}${has ? ` · <span class="text-white">Rutinde</span>` : ""}</span>
+            <span class="m-name block">${esc(x.m.name)}</span><span class="m-rx block">${esc(sum)}</span></div>
+          <button data-mob-add onclick="mobAddLib('${x.key}')" class="m-add mr-1.5" aria-label="${esc(x.m.name)} ekle">${svgI("plus", 20, 2.6)}</button>
+        </div>`;
+      }).join("")}</div>`;
+  }).join("") || `<div class="text-[14px] text-[#8B8B93] py-6 text-center">Hareket bulunamadı. Aşağıdan elle ekleyebilirsin.</div>`;
+}
+function mobAddOpen() { mobUI.view = "add"; mobUI.q = ""; window.scrollTo(0, 0); renderMobility(); }
+function mobAddSearch(v) { mobUI.q = String(v || ""); mobRenderAddList(); }
+function mobAddFilter(k) { mobUI.filter = k; mobRenderAddList(); document.querySelectorAll("[data-mob-filter]").forEach(b => { const on = b.dataset.mobFilter === k; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); }); }
+function mobAddLib(key) {
+  const x = mobLibAll().find(e => e.key === key); if (!x) return;
+  const it = normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription, note: x.m.note }, x.type));
+  mobItems().push(it);
+  renderAll();
+  toast(it.name + " eklendi");
+}
+async function mobAddCustom() {
+  const v = await askText("Hareketin adı", "", "Örn. Duvarda göğüs esnetme");
+  if (v == null || !String(v).trim()) return;
+  const type = mobUI.filter === "all" ? "static" : mobUI.filter;
+  const dyn = type === "dynamic";
+  const it = normMobItem({ name: String(v).trim(), type, region: mobUI.region || "", sets: dyn ? 1 : 2, mode: dyn ? "reps" : "time", reps: 10, sec: 30, sides: 1 });
+  mobItems().push(it);
+  mobUI.view = "detail"; mobUI.id = it.id;
+  window.scrollTo(0, 0);
+  renderAll();
+}
+//__MOB_TIMER__
 
 // ---------------------------------------------------------------------------
 // GRAFİK (SVG)
