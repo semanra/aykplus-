@@ -20,7 +20,10 @@ SMALL_JS = """(sel) => [...document.querySelectorAll(sel)]
   .map(e => (e.textContent || e.getAttribute('aria-label') || e.tagName).trim().slice(0, 30) + ' ' + Math.round(e.getBoundingClientRect().width) + 'x' + Math.round(e.getBoundingClientRect().height))"""
 URL = "http://localhost:8777/index.html"
 
-LEGACY = {"activeTab": "mobility", "today": "2026-11-12", "mobilityRoutine": {
+# v28: "today" bugünün tarihi olmalı; sabit tarih ertesi gün "yeni gün" sayılıp tikleri sıfırlıyordu.
+import datetime
+TODAY = datetime.date.today().isoformat()
+LEGACY = {"activeTab": "mobility", "today": TODAY, "mobilityRoutine": {
     "dynamic": [
         {"name": "World’s Greatest Stretch", "prescription": "1 Set x 8–10 Tekrar", "note": "Sağ ve sol akıcı geçiş", "done": True},
         {"name": "Kendi hareketim", "prescription": "birkaç kez", "note": "", "done": False},

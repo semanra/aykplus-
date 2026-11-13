@@ -478,7 +478,7 @@ function toast(msg, type = "ok", action = null) {
     b.textContent = action.label;
     b.className = tm ? "t-btn shrink-0 h-11 px-4 rounded-xl text-[13px]"
       : nm ? "n-btn shrink-0 h-11 px-4 rounded-full text-[13px]"
-      : "shrink-0 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg";
+      : "shrink-0 bg-emerald-600 text-white text-xs font-bold px-3 min-h-11 rounded-lg";
     b.onclick = () => { el.remove(); action.fn(); };
     el.append(sp, b);
   }
@@ -3152,7 +3152,7 @@ function mobRenderAddList() {
         return `<div data-mob-lib="${x.key}" class="m-card">
           <div class="flex-1 min-w-0"><span class="m-kind ${x.type === "dynamic" ? "" : "s"}">${MOB_TYPE_LABEL[x.type]}${has ? ` · <span class="text-white">Rutinde</span>` : ""}</span>
             <span class="m-name block">${esc(x.m.name)}</span><span class="m-rx block">${esc(sum)}</span></div>
-          <button data-mob-add onclick="mobAddLib('${x.key}')" class="m-add mr-1.5" aria-label="${esc(x.m.name)} ekle">${svgI("plus", 20, 2.6)}</button>
+          <button data-mob-add onclick="mobAddLib('${x.key}')" class="m-add mr-1.5 ${has ? "in" : ""}" aria-label="${esc(x.m.name)} ${has ? "zaten rutinde, yine de ekle" : "ekle"}">${svgI(has ? "check" : "plus", 20, 2.6)}</button>
         </div>`;
       }).join("")}</div>`;
   }).join("") || `<div class="text-[14px] text-[#8B8B93] py-6 text-center">Hareket bulunamadı. Aşağıdan elle ekleyebilirsin.</div>`;
@@ -3160,8 +3160,11 @@ function mobRenderAddList() {
 function mobAddOpen() { mobUI.view = "add"; mobUI.q = ""; window.scrollTo(0, 0); renderMobility(); }
 function mobAddSearch(v) { mobUI.q = String(v || ""); mobRenderAddList(); }
 function mobAddFilter(k) { mobUI.filter = k; mobRenderAddList(); document.querySelectorAll("[data-mob-filter]").forEach(b => { const on = b.dataset.mobFilter === k; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); }); }
-function mobAddLib(key) {
+async function mobAddLib(key) {
   const x = mobLibAll().find(e => e.key === key); if (!x) return;
+  // v28: rutinde zaten varsa yanlışlıkla ikinci kez eklenmesin
+  if (mobItems().some(i => i.name === x.m.name)
+    && !(await askConfirm("Zaten rutinde", x.m.name + " rutininde var. Bir kez daha eklensin mi?", "Yine de ekle"))) return;
   const it = normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription, note: x.m.note }, x.type));
   mobItems().push(it);
   renderAll();
@@ -3389,7 +3392,7 @@ function renderProgress() {
     <div class="flex items-center justify-between text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5">
       <span class="text-slate-400">${esc(l.ts ? fmtDate(l.ts) : l.date)}</span>
       <span class="flex items-center gap-2">${l.bf ? `<span class="text-slate-400">%${fmtNum(num(l.bf))} yağ</span>` : ""}<span class="font-bold text-emerald-400">${fmtNum(num(l.weight))} kg</span>
-      <button onclick="deleteWeightLog(${state.weightLogs.indexOf(l)})" class="text-slate-500 text-base leading-none">&times;</button></span>
+      <button onclick="deleteWeightLog(${state.weightLogs.indexOf(l)})" aria-label="Tartıyı sil" class="text-slate-500 text-base leading-none">&times;</button></span>
     </div>`).join("");
 
   // Takvim (son 5 hafta)
@@ -3524,14 +3527,14 @@ function openProfile() {
   renderProfile();
   const el = $("profilePage");
   el.classList.remove("hidden"); el.classList.add("flex");
-  document.body.classList.add("pf-open");
+  document.body.classList.add("pf-open", "pf-page");
   $("pfScroll").scrollTop = 0;
 }
 const openSettings = openProfile;
 function hideProfile() {
   const el = $("profilePage");
   el.classList.add("hidden"); el.classList.remove("flex");
-  document.body.classList.remove("pf-open");
+  document.body.classList.remove("pf-open", "pf-page");
 }
 async function closeProfile() {
   if (profileIsOpen() && pfValues() !== pfSnap) {
@@ -4654,7 +4657,7 @@ function measureCardHtml() {
     <div class="flex items-center justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5">
       <span class="text-slate-400 shrink-0">${fmtDate(m.ts)}</span>
       <span class="text-slate-300 truncate text-right">${MEASURES.filter(([k]) => m[k] != null).map(([k, n]) => `${n.split(" ")[0]} ${fmtNum(m[k])}`).join(" • ")}</span>
-      <button onclick="deleteMeasurement(${i})" class="text-slate-500 text-base leading-none shrink-0">&times;</button>
+      <button onclick="deleteMeasurement(${i})" aria-label="Ölçüyü sil" class="text-slate-500 text-base leading-none shrink-0">&times;</button>
     </div>`).join("");
   return `
     <div class="card p-4 space-y-3">
@@ -5160,7 +5163,7 @@ function startWorkout() {
 function exitActiveWorkout() { state.gymActive = false; window.scrollTo(0, 0); renderAll(); }
 
 function gymSubNav() {
-  return `<nav class="flex gap-5 border-b border-[#2A2A2E] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="Antrenman bölümleri">
+  return `<nav class="gym-subnav flex gap-5 border-b border-[#2A2A2E] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="Antrenman bölümleri">
     ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 text-[15px] ${state.gymView === k ? "font-bold text-white border-b-2 border-[#1FD1C1] -mb-px" : "font-medium t-muted"}">${l}</button>`).join("")}
   </nav>`;
 }
@@ -5199,7 +5202,7 @@ function gymTodayHtml() {
   const wVol = weekLogs.reduce((a, l) => a + num(l.volume), 0);
   const wMin = weekLogs.reduce((a, l) => a + num(l.durationMin), 0);
   const last = state.workoutLogs[state.workoutLogs.length - 1];
-  const dayChips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-10 px-3.5 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-white text-black font-bold" : "bg-[#1E1E21] text-slate-200 font-semibold"}">${esc(d.name.split(":")[0])}${i === nIdx ? ' <span class="t-accent">•</span>' : ""}</button>`).join("");
+  const dayChips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-3.5 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-white text-black font-bold" : "bg-[#1E1E21] text-slate-200 font-semibold"}">${esc(d.name.split(":")[0])}${i === nIdx ? ' <span class="t-accent">•</span>' : ""}</button>`).join("");
 
   return `
     <div class="grid grid-cols-7 gap-1.5">${strip}</div>

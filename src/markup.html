@@ -47,7 +47,7 @@
     .t-btn-ghost { background: #1E1E21; color: #E4E4E7; font-weight: 600; }
     input.t-input { background: #26262A; border: 0; color: #FFFFFF; border-radius: 12px; height: 44px; text-align: center; font-weight: 700; font-size: 18px; padding: 0 4px; }
     input.t-input:focus { outline: 2px solid #1FD1C1; outline-offset: 0; }
-    input.t-note { background: transparent; border: 0; border-bottom: 1px solid #2A2A2E; color: #D4D4D8; padding: 6px 0; border-radius: 0; }
+    input.t-note { background: transparent; border: 0; border-bottom: 1px solid #2A2A2E; color: #D4D4D8; padding: 6px 0; border-radius: 0; min-height: 44px; }
     input.t-search { background: transparent; border: 0; color: #FFFFFF; font-size: 15px; outline: none; }
     .drag-handle:active { cursor: grabbing; }
     /* YENİ TEMA PENCERELERİ: antrenman veya profil ekranından açılan ortak pencerelere .tm eklenir */
@@ -115,17 +115,19 @@
     .no-brand #brandTag { display: none; }
     body.theme-train #brandPlus { color: #1FD1C1; }
     body.theme-train #profileBtn { background: #141416; border-color: #2A2A2E; color: #E4E4E7; }
-    /* v27 MOBİLİTE TEMASI: antrenman temasının kardeşi, vurgu lavanta #B3A6FF */
-    body.theme-mob { background-color: #000000; padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px)); }
-    body.theme-mob .sticky-bar { background-color: #000000; border-bottom-color: #1E1E21; }
-    body.theme-mob .bottom-nav { background-color: rgba(14, 14, 16, 0.97); border-top-color: #1E1E21; }
+    /* v27 MOBİLİTE TEMASI: antrenman temasının kardeşi, vurgu lavanta #B3A6FF.
+       v28 "Alacakaranlık": zeminler indigo boyalı siyah (Beslenme'nin yeşil-siyahı gibi), değişkenlerle. */
+    body.theme-mob { --m-bg: #07060D; --m-card: #13111C; --m-elev: #1B1927; --m-line: #2A2738; --m-chk: #6B6680; --m-grip: #7D7894; --m-nav: rgba(13, 12, 20, 0.97);
+      background-color: var(--m-bg); padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px)); }
+    body.theme-mob .sticky-bar { background-color: var(--m-bg); border-bottom-color: var(--m-elev); }
+    body.theme-mob .bottom-nav { background-color: var(--m-nav); border-top-color: var(--m-elev); }
     body.theme-mob #brandPlus { color: #B3A6FF; }
-    body.theme-mob #profileBtn { background: #141416; border-color: #2A2A2E; color: #E4E4E7; }
+    body.theme-mob #profileBtn { background: var(--m-card); border-color: var(--m-line); color: #E4E4E7; }
     body.theme-mob .t-btn { background: #B3A6FF; color: #1B1446; }
     body.theme-mob input.t-in:focus, body.theme-mob .tm input:focus { outline-color: #B3A6FF; }
     body.theme-mob #toastWrap .toast { border-color: #4B4380; }
     .m-regs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-    .m-reg { position: relative; height: 84px; border-radius: 18px; background: #141416; overflow: hidden; text-align: left; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; color: #fff; }
+    .m-reg { position: relative; height: 84px; border-radius: 18px; background: var(--m-card); overflow: hidden; text-align: left; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; color: #fff; }
     .m-reg .m-lvl { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(179,166,255,0.15); border-top: 2px solid rgba(179,166,255,0.55); transition: height .3s; }
     .m-reg .m-lvl.zero { border-top-width: 0; }
     .m-reg b { position: relative; font-size: 20px; line-height: 1; }
@@ -133,62 +135,86 @@
     .m-reg.on { outline: 2px solid #B3A6FF; outline-offset: -2px; }
     .m-reg.full .m-lvl { background: rgba(179,166,255,0.30); border-top-color: #B3A6FF; }
     .m-reg.full span { color: #B3A6FF; font-weight: 650; }
-    .m-card { display: flex; align-items: center; gap: 8px; padding: 12px 4px 12px 12px; border-radius: 18px; background: #141416; min-height: 76px; border: 1px solid transparent; }
-    .m-card.done { background: transparent; border-color: #2A2A2E; }
+    .m-card { display: flex; align-items: center; gap: 8px; padding: 12px 4px 12px 12px; border-radius: 18px; background: var(--m-card); min-height: 76px; border: 1px solid transparent; }
+    .m-card.done { background: transparent; border-color: var(--m-line); }
     .m-card.done .m-name { color: #8B8B93; }
     .m-name { font-size: 15.5px; font-weight: 650; line-height: 1.25; color: #fff; }
     .m-rx { font-size: 12.5px; color: #A1A1AA; margin-top: 3px; }
     .m-kind { display: inline-block; font-size: 11.5px; font-weight: 650; color: #8B8B93; margin-bottom: 2px; }
     .m-kind.s { color: #B3A6FF; }
-    .m-chk { width: 44px; height: 44px; border-radius: 14px; border: 2px solid #3A3A40; display: grid; place-items: center; color: transparent; flex: none; }
+    .m-chk { width: 44px; height: 44px; border-radius: 14px; border: 2px solid var(--m-chk); display: grid; place-items: center; color: transparent; flex: none; }
     .m-card.done .m-chk { background: #B3A6FF; border-color: #B3A6FF; color: #1B1446; }
     .m-tbtn { width: 52px; height: 44px; border-radius: 14px; background: rgba(179,166,255,0.15); color: #B3A6FF; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex: none; gap: 1px; }
-    .m-grip { width: 44px; min-height: 44px; margin-left: -6px; display: grid; place-items: center; color: #52525B; flex: none; touch-action: none; }
-    .m-btn { min-height: 52px; border-radius: 16px; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; background: #1E1E21; color: #fff; padding: 0 16px; }
+    .m-grip { width: 44px; min-height: 44px; margin-left: -6px; display: grid; place-items: center; color: var(--m-grip); flex: none; touch-action: none; }
+    .m-btn { min-height: 52px; border-radius: 16px; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--m-elev); color: #fff; padding: 0 16px; }
     .m-btn.pri { background: #B3A6FF; color: #1B1446; }
-    .m-btn.ghost { background: none; border: 1px solid #2A2A2E; color: #A1A1AA; }
-    .m-btn.del { background: none; border: 1px solid #2A2A2E; color: #FB7185; }
-    .m-pill { min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid #2A2A2E; font-size: 13.5px; font-weight: 600; color: #A1A1AA; }
-    .m-round { width: 44px; height: 44px; border-radius: 50%; background: #141416; border: 1px solid #2A2A2E; display: grid; place-items: center; color: #A1A1AA; flex: none; }
-    .m-chip { min-height: 44px; padding: 0 15px; border-radius: 22px; background: #1E1E21; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; flex: none; color: #E4E4E7; }
+    .m-btn.ghost { background: none; border: 1px solid var(--m-line); color: #A1A1AA; }
+    .m-btn.del { background: none; border: 1px solid var(--m-line); color: #FB7185; }
+    .m-pill { min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--m-line); font-size: 13.5px; font-weight: 600; color: #A1A1AA; }
+    .m-round { width: 44px; height: 44px; border-radius: 50%; background: var(--m-card); border: 1px solid var(--m-line); display: grid; place-items: center; color: #A1A1AA; flex: none; }
+    .m-chip { min-height: 44px; padding: 0 15px; border-radius: 22px; background: var(--m-elev); font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; flex: none; color: #E4E4E7; }
     .m-chip.on { background: #B3A6FF; color: #1B1446; }
     .m-lbl { font-size: 13px; color: #A1A1AA; margin: 18px 0 8px; font-weight: 600; }
-    .m-st { background: #141416; border-radius: 18px; padding: 10px 12px 12px; }
+    .m-st { background: var(--m-card); border-radius: 18px; padding: 10px 12px 12px; }
     .m-st .k { font-size: 13px; color: #A1A1AA; }
     .m-st .v { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
     .m-st .v b { font-size: 36px; line-height: 1; color: #fff; }
-    .m-pm { width: 44px; height: 44px; border-radius: 14px; background: #1E1E21; display: grid; place-items: center; color: #fff; }
+    .m-pm { width: 44px; height: 44px; border-radius: 14px; background: var(--m-elev); display: grid; place-items: center; color: #fff; }
     .m-pm:disabled { opacity: .35; }
-    .m-seg { display: grid; background: #141416; border-radius: 16px; padding: 4px; gap: 4px; }
+    .m-seg { display: grid; background: var(--m-card); border-radius: 16px; padding: 4px; gap: 4px; }
     .m-seg > button { min-height: 44px; border-radius: 12px; color: #A1A1AA; font-weight: 600; font-size: 15px; }
-    .m-seg > button.on { background: #1E1E21; color: #fff; box-shadow: inset 0 0 0 1.5px #B3A6FF; }
+    .m-seg > button.on { background: var(--m-elev); color: #fff; box-shadow: inset 0 0 0 1.5px #B3A6FF; }
     .m-preview { margin-top: 8px; font-size: 13.5px; color: #8B8B93; }
     .m-preview b { color: #fff; font-weight: 600; }
-    input.m-in, textarea.m-in { width: 100%; background: #141416; border: 0; color: #fff; border-radius: 14px; min-height: 50px; padding: 14px; font-size: 16px; }
+    input.m-in, textarea.m-in { width: 100%; background: var(--m-card); border: 0; color: #fff; border-radius: 14px; min-height: 50px; padding: 14px; font-size: 16px; }
     input.m-in:focus, textarea.m-in:focus { outline: 2px solid #B3A6FF; outline-offset: 0; }
     input.m-in::placeholder, textarea.m-in::placeholder { color: #71717A; }
     .m-add { width: 44px; height: 44px; border-radius: 14px; background: #B3A6FF; color: #1B1446; display: grid; place-items: center; flex: none; }
-    #mobTimer { position: fixed; inset: 0; z-index: 70; background: #000; color: #fff; flex-direction: column; align-items: center; overflow-y: auto; padding: env(safe-area-inset-top, 0px) 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+    #mobTimer { position: fixed; inset: 0; z-index: 70; background: var(--m-bg, #000); color: #fff; flex-direction: column; align-items: center; overflow-y: auto; padding: env(safe-area-inset-top, 0px) 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
     .m-breath { position: relative; width: min(300px, 78vw); height: min(300px, 78vw); display: grid; place-items: center; flex: none; }
     .m-breath .o { position: absolute; border-radius: 50%; border: 1.5px solid rgba(179,166,255,0.25); }
     .m-breath .o1 { width: 94%; height: 94%; } .m-breath .o2 { width: 75%; height: 75%; border-color: rgba(179,166,255,0.35); }
     .m-breath .core { width: 66%; height: 66%; border-radius: 50%; background: radial-gradient(circle at 50% 40%, rgba(179,166,255,0.30), rgba(179,166,255,0.08) 70%); border: 2px solid #B3A6FF; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: mBreathe 10s ease-in-out infinite; }
-    .m-breath.pause .core { animation: none; border-color: #3A3A40; background: #141416; }
+    .m-breath.pause .core { animation: none; border-color: var(--m-chk); background: var(--m-card); }
     .m-breath .core b { font-size: 76px; line-height: 0.85; }
     .m-breath .core span { font-size: 15px; color: #B3A6FF; font-weight: 650; margin-top: 6px; }
     @keyframes mBreathe { 0%, 100% { transform: scale(0.86); } 40% { transform: scale(1.08); } }
     @media (prefers-reduced-motion: reduce) { .m-breath .core { animation: none; } }
     .m-rounds { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
-    .m-rounds i { flex: 1 1 56px; height: 52px; border-radius: 14px; border: 1px solid #2A2A2E; display: grid; place-items: center; font-style: normal; font-size: 13px; color: #A1A1AA; }
+    .m-rounds i { flex: 1 1 56px; height: 52px; border-radius: 14px; border: 1px solid var(--m-line); display: grid; place-items: center; font-style: normal; font-size: 13px; color: #A1A1AA; }
     .m-rounds i.d { background: rgba(179,166,255,0.15); color: #B3A6FF; border-color: transparent; }
     .m-rounds i.n { border-color: #B3A6FF; color: #fff; font-weight: 650; }
+    /* v28: Mobilite ekranındaki sabit yüzey sınıfları da indigo tonlarını alır */
+    #mobRoot .bg-\[\#141416\], #mobTimer .bg-\[\#141416\] { background-color: var(--m-card); }
+    #mobRoot .bg-\[\#1E1E21\], #mobTimer .bg-\[\#1E1E21\] { background-color: var(--m-elev); }
+    /* v28: rutinde olan hareketin ekle düğmesi: dolu "+" yerine çerçeveli ✓ */
+    .m-add.in { background: transparent; border: 1.5px solid #B3A6FF; color: #B3A6FF; }
+    /* v28 PROFİL "Grafit": Profil hiçbir bölüme ait değil; turkuaz yerine kırık beyaz vurgu (#F4F4F5, üstünde #09090B).
+       body.pf-page hem Profil sayfasını hem Profil'den açılan pencereleri kapsar. */
+    body.pf-page .t-accent { color: #F4F4F5; }
+    body.pf-page .t-chip-accent { color: #F4F4F5; border-color: #F4F4F5; }
+    body.pf-page .t-btn { background: #F4F4F5; color: #09090B; }
+    body.pf-page .t-btn-outline { border-color: #F4F4F5; color: #F4F4F5; }
+    body.pf-page .t-sw:checked { background: #F4F4F5; } body.pf-page .t-sw:checked::after { background: #09090B; }
+    body.pf-page input.t-in:focus, body.pf-page select.t-in:focus, body.pf-page input.t-input:focus,
+    body.pf-page .tm select:focus, body.pf-page .tm input:focus, body.pf-page .tm textarea:focus { outline-color: #F4F4F5; }
+    body.pf-page .tm .text-emerald-400, body.pf-page .tm .text-emerald-300, body.pf-page .tm .text-emerald-200 { color: #F4F4F5 !important; }
+    body.pf-page .tm .bg-emerald-600, body.pf-page .tm .bg-emerald-700, body.pf-page .tm .bg-emerald-500, body.pf-page .tm .bg-indigo-600 { background-color: #F4F4F5 !important; color: #09090B !important; border-color: #F4F4F5 !important; }
+    /* v28 İLERLEME (eski tema, yeniden tasarıma kadar): okunurluk ve dokunma alanı düzeltmeleri.
+       Gri yazı #64748B (3,1:1) → #94A3B8 (5,7:1); yeşil düğme #059669 (3,8:1) → #047857 (5,5:1); tüm düğmeler ≥ 44 px. */
+    #progressContent .text-slate-500 { color: #94A3B8; }
+    #progressContent .text-slate-700 { color: #808EA3; }
+    #progressContent .bg-emerald-600 { background-color: #047857; }
+    #progressContent button { min-height: 44px; }
+    #progressContent button[onclick^="deleteWeightLog"], #progressContent button[onclick^="deleteMeasurement"] {
+      min-width: 44px; display: inline-flex; align-items: center; justify-content: center; margin: -10px -10px -10px 0; font-size: 20px; }
     /* BESLENME TEMASI (v13 · Emerald Obsidian + gündüz teması "Warm Alabaster").
        Renkler değişkenlerle tanımlı; gündüz teması yalnızca değişkenleri değiştirir. */
     body.theme-nutri {
       --n-bg: #050706; --n-card: #0E1210; --n-elev: #151B18; --n-elev2: #1A211D; --n-line: #1A211D; --n-line2: #2A332E;
       --n-text: #F8FAFC; --n-text2: #E2E8F0; --n-muted: #94A3B8; --n-dim: #7C8A9E;
       --n-accent: #22C55E; --n-accent-text: #22C55E; --n-accent-soft: rgba(34, 197, 94, 0.16);
-      --n-btn: #16A34A; --n-btn-text: #FFFFFF; --n-on-bg: #FFFFFF; --n-on-text: #050706; --n-tick: #04130A;
+      --n-btn: #15803D; --n-btn-text: #FFFFFF; --n-on-bg: #FFFFFF; --n-on-text: #050706; --n-tick: #04130A;
       --n-p: #58B9F7; --n-k: #E5B85B; --n-y: #E27C66; --n-over: #FB7185; --n-over-soft: rgba(251, 113, 133, 0.12);
       --n-p-soft: rgba(88, 185, 247, 0.14); --n-k-soft: rgba(229, 184, 91, 0.14); --n-y-soft: rgba(226, 124, 102, 0.14);
       --n-water: #4EA8DE; --n-water-soft: rgba(78, 168, 222, 0.16); --n-water-text: #8CCBF0; --n-cup-line: #3B4A5C;
@@ -237,6 +263,11 @@
     .n-hero .n-seg { background: rgba(0, 0, 0, 0.28); border-color: rgba(255, 255, 255, 0.08); }
     .n-tab { flex-shrink: 0; height: 44px; font-size: 15px; font-weight: 500; color: var(--n-muted); border-bottom: 2.5px solid transparent; margin-bottom: -1px; }
     .n-tab.on { color: var(--n-text); font-weight: 800; border-bottom-color: var(--n-accent); }
+    /* v28: dar ekranda (iPhone SE) dört alt sekme yana kaydırmadan sığar; "Geçmiş" kesilmez */
+    @media (max-width: 379px) {
+      #nutriNav, nav.gym-subnav { justify-content: space-between; gap: 8px; }
+      #nutriNav .n-tab, nav.gym-subnav > button { font-size: 14px; min-width: 44px; }
+    }
     .n-chip { min-height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--n-elev); color: var(--n-muted); border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; white-space: nowrap; }
     .n-chip.on { background: var(--n-accent-soft); color: var(--n-accent-text); border-color: var(--n-accent); font-weight: 700; }
     .n-chip.solid { background: var(--n-on-bg); color: var(--n-on-text); border-color: var(--n-on-bg); font-weight: 800; }
@@ -244,6 +275,8 @@
     .n-chip.add { background: transparent; color: var(--n-accent-text); border: 1.5px dashed var(--n-accent); }
     #foodSelCard .n-chip:not(.on) { background: var(--n-card); border-color: var(--n-line); }
     body.nutri-light #navBtnNutrition { color: var(--n-accent-text); }
+    /* v28: gündüz temasında seçili olmayan alt menü adları okunur olsun (#8B8B93 → #71717A, 4,8:1) */
+    body.nutri-light .bottom-nav .nav-btn:not(#navBtnNutrition) { color: #71717A; }
     .n-chip.swap { color: var(--n-accent-text); background: var(--n-accent-soft); font-weight: 700; padding: 0 12px; }
     /* v16: hedef tutturma takvimi */
     .n-heat { aspect-ratio: 1 / 1; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: var(--n-elev); color: var(--n-dim); }
@@ -998,7 +1031,7 @@
         <section class="space-y-2.5" aria-labelledby="pfH3">
           <div id="pfH3" class="t-label">HEDEFLERİM</div>
           <div class="t-card rounded-[22px] p-4 space-y-3">
-            <div class="grid grid-cols-2 gap-2.5">
+            <div class="grid grid-cols-2 gap-2.5 items-end">
               <div><label for="setTarget" class="t-field">Hedef kilo (kg)</label><input id="setTarget" type="text" inputmode="decimal" class="t-in text-center font-bold" /></div>
               <div><label for="setWater" class="t-field">Su hedefi (L)</label><input id="setWater" type="text" inputmode="decimal" class="t-in text-center font-bold" /></div>
               <div><label for="setBf" class="t-field">Güncel yağ oranı (%)</label><input id="setBf" type="text" inputmode="decimal" placeholder="—" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
@@ -1080,7 +1113,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[#8B8B93]">AYK+ v27</span>
+          <span class="text-[12px] text-[#8B8B93]">AYK+ v28</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[#2A1517] text-[#FF8A8A]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
