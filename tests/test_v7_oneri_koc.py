@@ -73,7 +73,7 @@ with sync_playwright() as p:
     print("hint:", pg.evaluate("coachHintText()"))
     pg.screenshot(path=""+SHOTS+"/v7_coach.png")
     before=pg.evaluate("getTargets().calTarget")
-    pg.click("text=✓ Öneriyi uygula"); pg.wait_for_timeout(200)
+    pg.click('#pCoach [onclick="applyCoach()"]')  # v29: yeni İlerleme koç kartı; pg.wait_for_timeout(200)
     after=pg.evaluate("getTargets().calTarget"); print("calTarget", before, "->", after, "adj", st(pg)["settings"]["calAdjust"], "delta after:", pg.evaluate("coachAnalysis().delta"))
     pg.screenshot(path=""+SHOTS+"/v7_coach2.png")
     pg.click("button[onclick=\"resetCoachAdjust()\"]"); pg.wait_for_timeout(100); print("reset:", pg.evaluate("getTargets().calTarget"))

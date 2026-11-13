@@ -27,22 +27,22 @@ with sync_playwright() as p:
     pg.click("#profileBtn"); pg.locator("#setSplash").uncheck(); pg.click("#profileSave"); pg.wait_for_timeout(100)
     pg.reload(); pg.wait_for_timeout(60); print("disabled -> splash on reload:", pg.locator("#splash").count())
     # history
-    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps({"activeTab":"progress","waterLiters":1.5,"dailyLogs":dl,"settings":{"splash":False}}))
+    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps({"activeTab":"progress","progressView":"beslenme","waterLiters":1.5,"dailyLogs":dl,"settings":{"splash":False}}))
     pg.reload(); pg.wait_for_timeout(400)
-    card=pg.locator(".card", has_text="Su & Beslenme Geçmişi")
-    print("card stats:", card.inner_text().replace("\n"," | ")[:220])
-    print("bars 14:", card.locator("svg").first.locator("rect").count())
+    card=pg.locator("#pKcal")  # v29: İlerleme → Beslenme alt sekmesi
+    print("card stats:", pg.inner_text("#pNutriHist").replace("\n"," | ")[:220])
+    print("bars 14:", card.locator("svg path").count())
     card.screenshot(path=""+SHOTS+"/v9_hist14.png")
     pg.click("#tabProgress >> text=30 gün"); pg.wait_for_timeout(200)
-    card=pg.locator(".card", has_text="Su & Beslenme Geçmişi")
-    print("bars 30:", card.locator("svg").first.locator("rect").count())
+    card=pg.locator("#pKcal")  # v29: İlerleme → Beslenme alt sekmesi
+    print("bars 30:", card.locator("svg path").count())
     card.screenshot(path=""+SHOTS+"/v9_hist30.png")
     w=pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]"); print("overflow:", w)
     # archive stores targets
     pg.evaluate("()=>{state.today='2026-09-01'; checkNewDay();}")
     print("archived targets:", pg.evaluate("JSON.stringify([state.dailyLogs['2026-09-01'].calTarget, state.dailyLogs['2026-09-01'].proTarget])"))
     # empty state
-    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps({"activeTab":"progress","settings":{"splash":False}}))
+    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps({"activeTab":"progress","progressView":"beslenme","settings":{"splash":False}}))
     pg.reload(); pg.wait_for_timeout(300)
     print("empty msg:", "İlk günün yarın" in pg.inner_text("#progressContent"))
     b.close()

@@ -36,8 +36,10 @@ try:
 
       # ---- Sürüm
       if W == 390:
-        check("AYK+ v28" in pg.content(), "Ayarlar'da sürüm etiketi v28")
-        check("aykplus-v28" in open(os.path.join(REPO, "sw.js"), encoding="utf-8").read(), "sw.js önbellek aykplus-v28")
+        import re
+        v = int(re.search(r"AYK\+ v(\d+)", pg.content()).group(1)); c = int(re.search(r"aykplus-v(\d+)", open(os.path.join(REPO, "sw.js"), encoding="utf-8").read()).group(1))
+        check(v >= 28, f"Ayarlar'da sürüm etiketi v28 veya sonrası (v{v})")
+        check(c == v, f"sw.js önbellek sürümü uygulamayla aynı (aykplus-v{c})")
 
       # ---- Beslenme: alt sekmeler sığıyor, "Yedim" koyu yeşil
       pg.evaluate("switchTab('nutrition'); setNutriView('today')"); pg.wait_for_timeout(150)
@@ -125,13 +127,11 @@ try:
 
       # ---- İlerleme: dokunma alanı + kontrast
       pg.evaluate("""() => { for (let i = 5; i >= 1; i--) { const t = Date.now() - i*864e5; state.weightLogs.push({ date: fmtDate(t), weight: 100 + i/10, ts: t }); }
-        state.bodyMeasurements = state.bodyMeasurements || []; switchTab('progress'); }"""); pg.wait_for_timeout(200)
+        switchTab('progress'); setProgressView('kilo'); }"""); pg.wait_for_timeout(200)  # v29: tartı listesi Kilo alt sekmesinde
       small = pg.evaluate(SMALL_JS, "#progressContent button")
       check(not small, tag + f"İlerleme'deki tüm düğmeler ≥ 44 px ({small[:4]})")
       check(pg.locator("#progressContent button[aria-label='Tartıyı sil']").count() >= 1, tag + "tartı silme düğmesinin sesli adı var")
-      check(css(pg, "#progressContent .text-slate-500", "color") == "rgb(148, 163, 184)", tag + "İlerleme gri yazı #94A3B8")
-      g = css(pg, "#progressContent .bg-emerald-600", "backgroundColor")
-      check(g in (None, "rgb(4, 120, 87)"), tag + f"İlerleme yeşil düğme #047857 ({g})")
+      check(css(pg, "#progressContent .p-dim", "color") == "rgb(139, 139, 147)", tag + "İlerleme (v29) gri yazı #8B8B93 (siyah zeminde 6,2:1)")
       check(ov(pg), tag + "İlerleme yatay taşma yok")
       n = len(st(pg)["weightLogs"])
       pg.locator("#progressContent button[aria-label='Tartıyı sil']").first.click(); pg.wait_for_timeout(150)

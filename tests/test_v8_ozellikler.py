@@ -90,13 +90,13 @@ with sync_playwright() as p:
     print("supp buttons:", pg.inner_text("#suppList").replace("\n"," | "))
     ov(pg,"nutrition")
     # ---------- 7) ölçüler
-    pg.click("#navBtnProgress"); pg.wait_for_timeout(200)
-    pg.locator("text=+ Ölçü Ekle").first.click(); pg.fill("#ms_bel","95,5"); pg.fill("#ms_kol","38"); pg.click("#chartModal >> text=Kaydet"); pg.wait_for_timeout(200)
+    pg.click("#navBtnProgress"); pg.wait_for_timeout(200); pg.evaluate("setProgressView('kilo')"); pg.wait_for_timeout(150)  # v29: ölçüler Kilo alt sekmesinde
+    pg.locator("#pMeasure >> text=Ölçü ekle").first.click(); pg.fill("#ms_bel","95,5"); pg.fill("#ms_kol","38"); pg.click("#chartModal >> text=Kaydet"); pg.wait_for_timeout(200)
     pg.evaluate("()=>{state.measurements.unshift({ts:Date.now()-14*86400000, bel:98, kol:37.5, gogus:110}); renderAll();}")
     pg.wait_for_timeout(200)
-    txt=pg.locator(".card", has_text="Vücut Ölçüleri").inner_text().replace("\n"," | ")
+    txt=pg.locator("#pMeasure").inner_text().replace("\n"," | ")
     print("measure card:", txt[:260])
-    pg.locator(".card", has_text="Vücut Ölçüleri").screenshot(path=""+SHOTS+"/v8_measure.png")
+    pg.locator("#pMeasure").screenshot(path=""+SHOTS+"/v8_measure.png")
     ov(pg,"progress")
     # rollover resets supps
     pg.evaluate("()=>{const s=JSON.parse(localStorage.getItem('ayk_plus_v5_state')); s.today='2026-10-01'; localStorage.setItem('ayk_plus_v5_state', JSON.stringify(s));}")

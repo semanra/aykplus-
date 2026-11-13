@@ -236,7 +236,7 @@ try:
     # Eski yerler duruyor: Beslenme'de kilo, İlerleme'de ölçüler
     pg.click("#navBtnNutrition"); pg.wait_for_timeout(150)
     check(pg.locator('#tabNutrition [onclick="logCurrentWeight()"]').count() == 1, "Beslenme'deki kilo bölümü yerinde")
-    pg.click("#navBtnProgress"); pg.wait_for_timeout(250)
+    pg.click("#navBtnProgress"); pg.wait_for_timeout(250); pg.evaluate("setProgressView('kilo')"); pg.wait_for_timeout(150)  # v29: ölçüler Kilo alt sekmesinde
     check("96,5" in pg.inner_text("#progressContent"), "İlerleme'deki ölçü bölümü aynı veriyi gösteriyor")
     # Profil, beslenmeden açılsa da yeni temada; içinden açılan onay da temalı
     pg.click("#profileBtn"); pg.wait_for_timeout(150)
