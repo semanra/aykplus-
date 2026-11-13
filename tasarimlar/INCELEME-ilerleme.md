@@ -2,8 +2,9 @@
 
 Aşağıdaki metni, inceleme yapacak sohbete (Gemini, ChatGPT, başka bir Claude sohbeti) yapıştır. Şu dosyaları ekle:
 
-- `ilerleme-A.png`, `ilerleme-B.png`, `ilerleme-C.png`: üç önerinin ekran görüntüleri (her birinde 4 ekran alt alta)
-- İstersen `ilerleme-A.html`, `-B.html`, `-C.html`: aynı tasarımlar; tarayıcıda açılabilir, iPhone genişliğinde (390 px)
+- `ilerleme-A-390.png`, `ilerleme-B-genel-390.png` (ve B'nin kilo/guc/beslenme görüntüleri), `ilerleme-C-390.png`: üç önerinin ekran görüntüleri (her biri sayfanın tamamı); 320 px karşılıkları `-320.png`
+- İstersen `ilerleme-A.html`, `-B.html`, `-C.html`: aynı tasarımlar; tarayıcıda açılabilir, iPhone genişliğinde
+- Ayrıntılı açıklama: `ilerleme-ozet.md`
 - Karşılaştırma için `mobilite-son.png`: uygulamanın yeni tasarlanmış kardeş sekmesi
 
 ---
@@ -15,7 +16,7 @@ Merhaba. **AYK+** adlı kişisel fitness uygulamamın **İlerleme** sekmesi içi
 - iPhone'da ana ekrana eklenen bir web uygulaması (PWA). Türkçe. Tek kullanıcı: ben.
 - Veriler yalnızca telefonda duruyor. Sunucu, hesap ya da bildirim yok.
 - Dört sekme var: Beslenme, Antrenman, Mobilite, İlerleme. Her sekmenin kendi vurgu rengi var:
-  - Antrenman turkuaz `#1FD1C1`, Beslenme zümrüt yeşili `#22C55E`, Mobilite lavanta `#B3A6FF`.
+  - Antrenman turkuaz `#1FD1C1`, Beslenme zümrüt yeşili `#22C55E`, Mobilite lavanta `#B3A6FF` (zemini indigo-siyah), Profil kırık beyaz `#F4F4F5` ("Grafit").
   - Ortak zemin: saf siyah `#000`, yüzey `#141416`, yükseltilmiş yüzey `#1E1E21`, çizgi `#2A2A2E`; metin beyaz / `#A1A1AA` / `#8B8B93`.
   - Başlıklar ve büyük sayılar için Barlow Condensed 800 italik (uygulamada adı "AYKDisplay").
 - İlerleme şu an eski bir lacivert temada ve emojili; yeni tasarımla diğer sekmelerin ailesine katılacak.
@@ -32,21 +33,23 @@ Merhaba. **AYK+** adlı kişisel fitness uygulamamın **İlerleme** sekmesi içi
 - **Kişisel rekorlar:** her hareketin en iyi seti (tahmini 1RM), dokununca grafiği açılır.
 - **Geçmiş:** su ve beslenme grafikleri (7/30 gün).
 
-## Üç öneri
+## Üç öneri (ortak renk düzeni: "Grafit + kaynak renkleri")
 
-- **A · Pano (vurgu amber `#F5B544`):** açılışta haftanın tamamı tek ekranda. Üstte "hafta puanı" halkası ve üç tutturma çubuğu (antrenman, beslenme hedefi, mobilite), altında 4 kutu (kilo, tonaj, kardiyo, su) ve koç yorumu. Kutulara dokununca Kilo, Güç ve Geçmiş ayrıntı sayfaları açılır. Hafta oklarıyla geçmiş haftalara gidilir.
-- **B · Alt sekmeler (vurgu mercan `#FF8A65`):** Antrenman ve Beslenme sekmelerindeki gibi üstte dört alt sekme: Genel · Kilo · Güç · Beslenme. Az kart, büyük sayılar, ince ayırıcılar. Genel sayfası kalori koçuyla açılır.
-- **C · Haftalık rapor (ayrı vurgu yok):** her hafta bir "rapor". Üstte hafta numarası ve oklar, bir özet cümlesi, 7 günlük şerit (antrenman / beslenme / mobilite yapılan günler) ve üç bölüm. Her bölüm kendi sekmesinin rengini taşır, böylece İlerleme diğer üç sekmeyi bir araya getirir. Son ekranda geçmiş haftalar tek satır hâlinde listelenir.
+İlerleme'nin kendine ait vurgu rengi yok: dokunulan şeyler kırık beyaz `#F4F4F5`, veriler geldikleri sekmenin rengini taşıyor (antrenman turkuaz, beslenme yeşil, mobilite lavanta, su mavi, kilo beyaz). Anlam hiçbir yerde yalnızca renkle verilmiyor (✓ ~ ! ↑ * simgeleri, çizgili/kesik desenler, çizgi uçlarında ad + değer). 4'ten az veri noktası olan yerde grafik yerine sayı kartı var.
 
-Her öneride 4 ekran var: ana görünüm, kilo ve vücut, güç (1RM ve rekorlar), takvim ve geçmiş. Veriler örnektir (bugün 12 Kasım Perşembe kabul edildi).
+- **A · Tek akış (pano):** tek kaydırmalı sayfa. 4 haftalık sayı kutusu, koç, kilo (günlük nokta + 7 günlük ortalama çizgisi), antrenman (5 haftalık takvim, tonaj çubukları, kas başına set bullet grafiği, 1RM, en iyiler), beslenme (kalori ve su çubukları, hedef çizgisi), vücut ölçüleri.
+- **B · Alt sekmeler:** Genel · Kilo · Güç · Beslenme. Genel'de "Bu hafta, gün gün" şeridi (antrenman / beslenme hedefi / mobilite × 7 gün, simgeli).
+- **C · Haftalık rapor:** "46. HAFTA" ve hafta okları, tek cümlelik özet, "Geçen haftaya göre" tablosu, koç, takvim, haftalık kilo ortalaması, kalori; altta uzun vade ve önceki haftalar.
+
+Veriler örnektir (bugün 14 Kasım Cumartesi kabul edildi).
 
 ## Senden istediklerim
 
 1. **Hangisi?** Üç öneriden hangisini seçerdin, neden? İkisinin birleşimi daha iyi olur mu (hangi parça hangisinden)?
 2. **Kullanılabilirlik:** Spor salonunda ya da sabah tartıdan sonra hızlıca bakarken en önemli bilgiyi kaç saniyede görürüm? Tartı kaydetmek, bir hareketin grafiğini açmak kaç dokunuş?
 3. **Grafikler:** Kilo grafiği günlük mü, haftalık ortalama mı olmalı? 1RM grafiği, kas başına set çubukları, 7 günlük kalori çubukları anlaşılır mı? Yanıltıcı bir ölçek var mı?
-4. **"Hafta puanı" (A) ve 7 günlük şerit (C):** işe yarar mı, yoksa gereksiz bir sayı mı? Nasıl hesaplanmalı?
-5. **Görsel:** Vurgu rengi (amber / mercan / sekme renkleri) diğer sekmelerle uyumlu mu? Kontrast, boşluk, hizalama, tutarsızlık açısından göze batan bir şey var mı?
+4. **"Bu hafta, gün gün" şeridi (B) ve "Geçen haftaya göre" tablosu (C):** işe yarar mı? Hangi ölçüler olmalı?
+5. **Görsel:** Kendi vurgusu olmayan "Grafit + kaynak renkleri" düzeni diğer sekmelerle uyumlu mu, yoksa İlerleme'nin kendi rengi mi olmalı? Kontrast, boşluk, hizalama, tutarsızlık açısından göze batan bir şey var mı?
 6. **Eksik veya fazla:** Mevcut özelliklerden atlanan bir şey var mı? Gereksiz bulduğun bir parça var mı?
 
 Her başlık için **en önemli 3–5 bulguyu** önem sırasıyla yaz; hangi öneride ve hangi ekranda olduğunu belirt.
