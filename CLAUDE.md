@@ -153,6 +153,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 
 **v30–v31 (tema, 14 Kasım 2026):** v30 renkler tek yerde (`--t-*`, görünüm değişmedi; v29 ile piksel karşılaştırması), v31 aydınlık tema her yerde + Görünüm: Sistem/Koyu/Aydınlık (varsayılan Sistem). Plan: `docs/PLAN-tema-v30-v32.md`.
 
+**v32 (ortak kurallar, 14 Kasım 2026):** bölüm etiketleri (`.t-label`, `.n-label`) cümle düzeninde, tek CSS kuralıyla (`text-transform: lowercase` + `::first-letter`; kaynak metinler büyük harf kalır, geri almak için `src/markup.html` "v32 ORTAK KURALLAR" bloğundaki iki satır silinir; testlerde etiket metnini `.lower()` ile karşılaştır). Beslenme → Geçmiş hedef takviminde ✓ ~ ! simgeleri (`.n-heat-sym`). Dar ekranda İkame yalnız simge (`.swap-txt`). Mobilite bölge dolumu sayı yazısının üstünden başlar (`data-pct` = yüzde). Antrenman Geçmiş boşken "Bugünün antrenmanına git"; kilo girilmeden "~0 kg" satırı yok. Profil kalori binlik ayırıcılı. Yazılar en az 12 px (grafik ekseni 11 px). Klavye odak çerçevesi (`:focus-visible`), "Hareketi azalt" her yerde, yatay tutuşta yan kenar boşluğu, Mobilite sayaç dairesi kısa ekranda küçülür (`42vh`). Kart köşeleri 20–22 px, ana düğme 52 px.
+
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 
 Sıradaki adaylar (kullanıcı onayı gerekir):

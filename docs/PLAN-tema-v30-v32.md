@@ -1,4 +1,4 @@
-# Tema planı v30–v32 (14 Kasım 2026, kullanıcı onayladı: "Tavsiyelerin hepsini uygula")
+# Tema planı v30–v32 (14 Kasım 2026, kullanıcı onayladı: "Tavsiyelerin hepsini uygula") — TAMAMLANDI (v30, v31, v32 yerelde commit)
 
 Kararlar (kullanıcı):
 - Görünüm: **Sistem / Koyu / Aydınlık**, varsayılan **Sistem**; Profil'den ve başlıktaki güneş/ay düğmesinden değiştirilebilir.
@@ -20,7 +20,7 @@ Kararlar (kullanıcı):
 - Etkin tema: `html.light` sınıfı; `matchMedia('(prefers-color-scheme: light)')` dinlenir. Açılışta yanıp sönmesin diye `<head>` içinde küçük betik `ayk_theme` aynasını okur.
 - Beslenme: `nutri-light` artık etkin temadan gelir. Diğer bölümler `html.light` altında `--t-*` aydınlık değerleri.
 - Vurgu aydınlıkta koyulaşır: turkuaz yazı `--t-acc-text` koyu turkuaz, lavanta koyu lavanta, Grafit → koyu grafit dolgu + beyaz yazı.
-- Vücut haritası: denenip seçilecek (koyu "sahne" kartı veya ters çevrilmiş çizim).
+- Vücut haritası: denendi (koyu sahne / ters çevrilmiş çizim ×2); ters çevrilmiş hâl röntgen negatifi gibi göründüğü için **koyu sahne kartı** seçildi.
 - `theme-color` ve durum çubuğu meta'sı temaya göre (iOS'ta durum çubuğu bir sonraki açılışta güncellenebilir).
 - Testler: kontrast (her ekranda 4,5:1), varsayılan Sistem, geçiş, kalıcılık.
 

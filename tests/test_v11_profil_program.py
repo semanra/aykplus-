@@ -129,7 +129,7 @@ try:
     pg.click("text=Günü sil"); pg.wait_for_timeout(100); pg.click("#uiDlgCancel"); pg.wait_for_timeout(100)
     check(len(st(pg)["workoutDays"]) == nd + 1, "Günü sil → Vazgeç silmiyor")
     pg.click("text=Günü sil"); pg.wait_for_timeout(100)
-    check("FF5A5F" in (pg.get_attribute("#uiDlgOk", "class") or ""), "silme onayı kırmızı düğmeli")
+    check(pg.evaluate("getComputedStyle(document.getElementById('uiDlgOk')).backgroundColor") == "rgb(255, 90, 95)", "silme onayı kırmızı düğmeli")
     pg.click("#uiDlgOk"); pg.wait_for_timeout(150)
     check(len(st(pg)["workoutDays"]) == nd and pg.locator("#toastWrap button", has_text="Geri al").count() >= 1, "gün silindi, Geri al sunuldu")
     # Antrenmanı bitir: temalı onay
@@ -156,7 +156,7 @@ try:
     got = pg.evaluate("programMuscleSets()")
     check(got == exp and sum(got.values()) > 0, "Programım sayımı tüm günlerdeki planlı setlere eşit")
     txt = pg.inner_text("#gymRoot")
-    check("PROGRAMIN HAFTALIK ETKİSİ" in txt and "Göğüs" in txt, "programın haftalık etkisi tablosu görünüyor")
+    check("programın haftalık etkisi" in txt.lower() and "Göğüs" in txt, "programın haftalık etkisi tablosu görünüyor")  # v32: etiketler cümle düzeninde
     check(st(pg)["libRange"] == "program", "seçim kaydediliyor")
     pg.evaluate("selectMuscle('Göğüs')"); pg.wait_for_timeout(100)
     check(f"{got['Göğüs']} set" in pg.inner_text("#gymRoot"), "kasa dokununca programdaki set sayısı yazıyor")
@@ -174,8 +174,8 @@ try:
     check(pg.is_visible("#profilePage") and not pg.is_visible("#settingsModal") if pg.locator("#settingsModal").count() else pg.is_visible("#profilePage"), "Profil sayfası açılıyor (eski Ayarlar penceresi yok)")
     check(pg.evaluate("getComputedStyle($('profilePage')).backgroundColor") == "rgb(0, 0, 0)", "Profil siyah temada")
     t = pg.inner_text("#profilePage")
-    for sec in ["KİŞİSEL BİLGİLER", "KİLOM", "HEDEFLERİM", "VÜCUT ÖLÇÜLERİM", "AYARLAR", "YEDEKLEME", "AYK+ v"]:
-        check(sec in t, "Profilde bölüm: " + sec)
+    for sec in ["kişisel bilgiler", "kilom", "hedeflerim", "vücut ölçülerim", "ayarlar", "yedekleme", "ayk+ v"]:  # v32: cümle düzeni
+        check(sec in t.lower(), "Profilde bölüm: " + sec)
     pg.screenshot(path=SHOTS + "/v11_profile.png")
     check(ov(pg), "Profil yatay taşma yok")
     small = pg.evaluate("""[...document.querySelectorAll('#profilePage button, #profilePage label.cursor-pointer')].filter(e => e.offsetParent && e.getBoundingClientRect().height < 44).map(e => e.textContent.trim())""")

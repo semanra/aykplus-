@@ -2,6 +2,8 @@
 
 Bu belge ilk hâlinde yalnızca **inceleme ve öneri** içeriyordu.
 
+> **Durum (v32, 14 Kasım 2026):** v28'de kalanların hepsi v29–v32'de uygulandı (İlerleme yeniden tasarım v29, renk değişkenleri v30, aydınlık tema v31, A2.6, A2.7, A3.2, A3.4–A3.8, A4.x, A5.2–A5.5, A6.2–A6.6 v32). A6.1 (yakınlaştırma engeli) bilinçli olarak bırakıldı. A1.5 (vücut haritasındaki küçük kaslar) çizimin doğası gereği; altında liste var.
+>
 > **Durum (v28, 14 Kasım 2026):** "Hemen" listesi uygulandı: A1.1, A1.2, A1.3, A1.4, A2.1, A2.2, A2.3 (b: `#15803D`), A2.4, A2.5, A3.1, A3.3, A5.1. Renk kararı: Mobilite **M3 Alacakaranlık**; vurgu `#A99CFF` yerine mevcut lavanta `#B3A6FF` kaldı, çünkü `#A99CFF` ailenin en sönük vurgusuydu. Profil **P2 Grafit**. Diğer maddeler açık. Doğrulama: `tests/test_v28_tasarim.py`; aynı ölçüm betiği v28'de bu ekranlarda kontrast uyarısı, taşma ve 44 px altı düğme bulmadı. Kalan tek uyarı vücut haritasındaki kas bölgeleri (A1.5).
 
 **Yöntem**

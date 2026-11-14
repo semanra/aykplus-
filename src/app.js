@@ -769,8 +769,8 @@ function applyTabVisibility() {
     mobility: ["tabMobility", null, "navBtnMobility", "grid"],
     progress: ["tabProgress", "progressHeaderBar", "navBtnProgress", "block"]
   };
-  const activeCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-bold text-[11px] " + (state.activeTab === "gym" ? "text-[var(--t-acc-text)]" : state.activeTab === "nutrition" ? "text-[#22C55E]" : state.activeTab === "mobility" ? "text-[var(--t-acc-text)]" : "text-[var(--t-text1)]");
-  const idleCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-semibold text-[11px] text-[var(--t-dim)]";
+  const activeCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-bold text-[12px] " + (state.activeTab === "gym" ? "text-[var(--t-acc-text)]" : state.activeTab === "nutrition" ? "text-[#22C55E]" : state.activeTab === "mobility" ? "text-[var(--t-acc-text)]" : "text-[var(--t-text1)]");
+  const idleCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-semibold text-[12px] text-[var(--t-dim)]";
   document.body.classList.toggle("theme-train", state.activeTab === "gym");
   document.body.classList.toggle("theme-mob", state.activeTab === "mobility");
   document.body.classList.toggle("theme-prog", state.activeTab === "progress");
@@ -1172,7 +1172,7 @@ function updateMacroCard(prefix, consumed, target, unit) {
     return;
   }
   st.textContent = over ? `+${Math.abs(diff)} ${unit} aşım` : `${diff} ${unit} kaldı`;
-  st.className = "text-[11px] mt-0.5 font-semibold " + (over ? "text-[#FB7185]" : "text-white/60");
+  st.className = "text-[12px] mt-0.5 font-semibold " + (over ? "text-[#FB7185]" : "text-white/60");
   $(`${prefix}Bar`).style.width = `${pct}%`;
 }
 
@@ -1268,20 +1268,20 @@ function renderTodayMeals() {
         return `<div class="py-2">
             <div class="flex items-center gap-1 min-h-[24px]">
               <div class="flex-1 min-w-0 text-[14px] font-semibold truncate">${esc(f.name)}</div>
-              <div class="shrink-0 text-[13px] font-bold tabular-nums">${Math.round(mac.cal)} <span class="text-[11px] font-semibold n-dim">kcal</span></div>
+              <div class="shrink-0 text-[13px] font-bold tabular-nums">${Math.round(mac.cal)} <span class="text-[12px] font-semibold n-dim">kcal</span></div>
               <button onclick="dayRemoveItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(f.name)} bugünden çıkar">${svgI("x", 18, 2.2)}</button>
             </div>
             <div class="flex items-center justify-end gap-1 mt-1.5">
               <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(f.name)} azalt">${svgI("minus", 18, 2.4)}</button>
               <input type="text" inputmode="decimal" data-fk="damt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="daySetAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt shrink-0" aria-label="${esc(f.name)} bugünkü miktarı" />
-              <span class="text-[11px] n-muted w-10 min-w-0 truncate">${esc(f.unit)}</span>
+              <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(f.unit)}</span>
               <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(f.name)} artır">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>`;
       }
       return `<div class="flex items-center justify-between gap-2 min-h-[44px] py-1">
           <div class="min-w-0 flex-1 text-[14px] leading-snug"><span class="font-semibold">${esc(f.name)}</span> <span class="n-muted whitespace-nowrap">· ${fmtNum(effAmount(item))} ${esc(f.unit)}</span></div>
-          ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx}, 'day')" class="n-chip swap text-[12px]" aria-label="${esc(f.name)} için ikame seç">⇄ İkame</button>` : ""}
+          ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx}, 'day')" class="n-chip swap text-[12px]" aria-label="${esc(f.name)} için ikame seç">⇄<span class="swap-txt"> İkame</span></button>` : ""}
           <span class="text-[13px] font-semibold n-muted tabular-nums w-10 text-right shrink-0">${Math.round(mac.cal)}</span>
         </div>`;
     }).join("");
@@ -1303,13 +1303,13 @@ function renderTodayMeals() {
             ? `<button onclick="toggleMealOpen(${mIdx})" class="w-full flex items-start justify-between gap-3 text-left min-h-[44px]" aria-expanded="true" aria-label="${esc(meal.title)} öğününü kapat">`
             : `<div class="flex items-start justify-between gap-3">`}
             <div class="min-w-0">
-              ${label ? `<div class="text-[11px] font-bold tracking-wide n-accent">${label}</div>` : ""}
+              ${label ? `<div class="text-[12px] font-bold tracking-wide n-accent">${label}</div>` : ""}
               <h3 class="text-[18px] font-extrabold leading-tight mt-0.5 break-words">${esc(meal.title)}</h3>
               ${meal.targetNote ? `<div class="text-[12px] n-muted mt-0.5">${esc(meal.targetNote)}</div>` : ""}
               ${num(meal.balanced, 0) < 0 ? `<div class="text-[12px] font-semibold n-k mt-0.5" data-balanced="${mIdx}">Gün dengelendi: bu öğünden ${fmtInt(-meal.balanced)} kcal kısıldı</div>` : ""}
             </div>
             <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[24px] leading-none tabular-nums">${fmtInt(t.cal)}</span><span class="text-[12px] n-muted ml-0.5">kcal</span>
-              <div class="text-[11px] font-semibold tabular-nums mt-0.5">${macroLine(t.p, t.c, t.f)}</div></div>
+              <div class="text-[12px] font-semibold tabular-nums mt-0.5">${macroLine(t.p, t.c, t.f)}</div></div>
           ${headOpen ? "</button>" : "</div>"}
           <div class="n-div">${items || '<div class="text-[13px] n-dim py-2">Bu öğünde henüz besin yok.</div>'}</div>
           ${editPanel}
@@ -1574,7 +1574,7 @@ function proteinSpreadHtml(meals) {
   const max = Math.max(40, ...rows.map(r => r.p));
   const low = rows.filter(r => r.p < 20).length;
   return `<div class="n-bt pt-3 space-y-1.5" data-protein-spread>
-      <div class="flex items-baseline justify-between gap-2"><span class="n-label">PROTEİN DAĞILIMI</span><span class="text-[11px] n-dim">öğün başına ~20–40 g önerilir</span></div>
+      <div class="flex items-baseline justify-between gap-2"><span class="n-label">PROTEİN DAĞILIMI</span><span class="text-[12px] n-dim">öğün başına ~20–40 g önerilir</span></div>
       ${rows.map(r => `<div class="flex items-center gap-2 text-[12px]">
         <span class="w-[92px] shrink-0 truncate n-muted">${esc(r.t)}</span>
         <span class="relative flex-1 h-2 rounded-full n-bar-bg overflow-hidden">
@@ -1583,7 +1583,7 @@ function proteinSpreadHtml(meals) {
         </span>
         <span class="w-[46px] shrink-0 text-right tabular-nums ${r.p < 20 ? "n-k font-bold" : "n-text font-semibold"}">${Math.round(r.p)} g</span>
       </div>`).join("")}
-      ${low ? `<p class="text-[11px] n-dim">${low} öğünde protein 20 g'ın altında; günlük toplam aynı kalsa da proteini öğünlere yaymak tokluk ve kas onarımı için daha iyi.</p>` : ""}
+      ${low ? `<p class="text-[12px] n-dim">${low} öğünde protein 20 g'ın altında; günlük toplam aynı kalsa da proteini öğünlere yaymak tokluk ve kas onarımı için daha iyi.</p>` : ""}
     </div>`;
 }
 function renderMenus() {
@@ -1667,7 +1667,7 @@ function renderMenus() {
             <div class="flex items-center gap-1 shrink-0">
               <button onclick="changeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(f.name)} azalt">${svgI("minus", 18, 2.4)}</button>
               <input type="text" inputmode="decimal" data-fk="amt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="setAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt" aria-label="${esc(f.name)} miktarı" />
-              <span class="text-[11px] n-muted w-12 truncate">${esc(f.unit)}</span>
+              <span class="text-[12px] n-muted w-12 truncate">${esc(f.unit)}</span>
               <button onclick="changeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(f.name)} artır">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>
@@ -1857,9 +1857,9 @@ function renderFoodList() {
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(f.name)}</h3>
             <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? " · barkod " + esc(f.barcode) : ""}</div>
-            ${foodSourceText(f) ? `<div class="text-[11px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
-            ${f.note ? `<div class="text-[11px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
-            ${f.kx ? `<div class="text-[11px] n-dim mt-0.5">Kalori USDA ölçümüdür (${esc(f.kx)} nedeniyle makrolardan hesaplanandan farklı).</div>` : ""}</div>
+            ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
+            ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
+            ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">Kalori USDA ölçümüdür (${esc(f.kx)} nedeniyle makrolardan hesaplanandan farklı).</div>` : ""}</div>
           <div class="text-right shrink-0 whitespace-nowrap"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
         </div>
         <div class="flex items-center justify-between px-1">
@@ -1871,7 +1871,7 @@ function renderFoodList() {
           <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Artır">${svgI("plus", 20, 2.4)}</button>
         </div>
         ${naturalUnit(f) ? `<div class="flex items-center justify-between gap-2 n-card rounded-full pl-4 pr-1 py-1" data-unit-row>
-            <span class="min-w-0 text-[13px] n-muted leading-tight"><strong id="foodUnitCount" class="n-text text-[15px]"></strong><span class="block text-[11px]">1 ${esc(naturalUnit(f).label)} = ${fmtNum(naturalUnit(f).g)} g</span></span>
+            <span class="min-w-0 text-[13px] n-muted leading-tight"><strong id="foodUnitCount" class="n-text text-[15px]"></strong><span class="block text-[12px]">1 ${esc(naturalUnit(f).label)} = ${fmtNum(naturalUnit(f).g)} g</span></span>
             <div class="flex gap-1 shrink-0">
               <button onclick="foodUnitStep(-1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="Bir ${esc(naturalUnit(f).label)} azalt">${svgI("minus", 18, 2.4)}</button>
               <button onclick="foodUnitStep(1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="Bir ${esc(naturalUnit(f).label)} artır">${svgI("plus", 18, 2.4)}</button>
@@ -2442,7 +2442,7 @@ function openPicker(title, groups, onPick, extra) {
 function renderPickerChips() {
   const chip = (key, label) => {
     const on = picker.cat === key;
-    return `<button onclick="setPickerCat('${key}')" class="shrink-0 text-[11px] px-2.5 py-1 rounded-full border ${on ? "bg-emerald-600 border-emerald-500 text-white font-semibold" : "bg-slate-800 border-slate-700 text-slate-300"}">${esc(label)}</button>`;
+    return `<button onclick="setPickerCat('${key}')" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${on ? "bg-emerald-600 border-emerald-500 text-white font-semibold" : "bg-slate-800 border-slate-700 text-slate-300"}">${esc(label)}</button>`;
   };
   $("pickerChips").innerHTML = chip("all", "Tümü") + picker.groups.map((g, i) => chip(String(i), g.short || g.label)).join("");
 }
@@ -2466,14 +2466,14 @@ function renderPickerList() {
     if (!items.length) return;
     // v18: çok uzun listede (binlerce besin) ilk 150 sonuç; gerisi için arama daraltılır
     if (shown >= 150) { hidden += items.length; return; }
-    html += `<div class="text-[11px] font-bold text-slate-500 tracking-wide pt-2">${esc(g.label)}</div>`;
+    html += `<div class="text-[12px] font-bold text-slate-500 tracking-wide pt-2">${esc(g.label)}</div>`;
     items.forEach(it => {
       if (shown >= 150) { hidden++; return; }
       shown++;
       const idx = picker.flat.push(it) - 1;
       const main = `<button onclick="pickerChoose(${idx})" class="flex-1 min-w-0 text-left px-3 py-2.5">
         <div class="text-sm font-medium text-slate-100">${esc(it.label)}</div>
-        ${it.sub ? `<div class="text-[11px] text-slate-400 mt-0.5">${esc(it.sub)}</div>` : ""}
+        ${it.sub ? `<div class="text-[12px] text-slate-400 mt-0.5">${esc(it.sub)}</div>` : ""}
       </button>`;
       html += it.customId
         ? `<div class="flex items-center bg-slate-800/80 border border-slate-700 rounded-xl pr-1">${main}
@@ -2735,15 +2735,15 @@ function exRightHtml(ex) {
   if (ex.kind === "cardio") {
     const t = cardioTotals(ex.sets, false);
     const pace = paceText(t.min, t.km);
-    return `<div class="text-xs font-semibold text-sky-300">${fmtNum(t.min)} dk${t.km > 0 ? " • " + fmtNum(t.km) + " km" : ""}</div>${pace ? `<div class="text-[11px] text-slate-400">${pace}</div>` : ""}`;
+    return `<div class="text-xs font-semibold text-sky-300">${fmtNum(t.min)} dk${t.km > 0 ? " • " + fmtNum(t.km) + " km" : ""}</div>${pace ? `<div class="text-[12px] text-slate-400">${pace}</div>` : ""}`;
   }
   if (ex.kind === "time") {
     const total = ex.sets.reduce((a, s) => a + num(s.sec), 0);
-    return `<div class="text-xs font-semibold text-sky-300">Toplam: ${total} sn</div>${ex.rest ? `<div class="text-[11px] text-slate-400">Dinlenme: ${ex.rest} sn</div>` : ""}`;
+    return `<div class="text-xs font-semibold text-sky-300">Toplam: ${total} sn</div>${ex.rest ? `<div class="text-[12px] text-slate-400">Dinlenme: ${ex.rest} sn</div>` : ""}`;
   }
   let vol = 0, best = 0;
   ex.sets.forEach(s => { vol += num(s.kg) * num(s.reps); best = Math.max(best, e1rm(s.kg, s.reps)); });
-  return `<div class="text-xs font-semibold text-amber-400">1RM: ~${Math.round(best)} kg</div><div class="text-[11px] text-slate-400">Tonaj: ${Math.round(vol)} kg</div>`;
+  return `<div class="text-xs font-semibold text-amber-400">1RM: ~${Math.round(best)} kg</div><div class="text-[12px] text-slate-400">Tonaj: ${Math.round(vol)} kg</div>`;
 }
 
 function updateGymHeader() {
@@ -3002,7 +3002,7 @@ function mobListHtml() {
     const full = r.n > 0 && r.nDone === r.n;
     const txt = r.n === 0 ? "—" : full ? "Tamam" : `${r.nDone} / ${r.n}`;
     return `<button data-mob-region="${k}" onclick="mobRegion('${k}')" class="m-reg ${mobUI.region === k ? "on" : ""} ${full ? "full" : ""}" aria-pressed="${mobUI.region === k}">
-      <div data-mob-lvl class="m-lvl ${pct ? "" : "zero"}" style="height:${pct}%"></div>
+      <div data-mob-lvl data-pct="${pct}" class="m-lvl ${pct ? "" : "zero"}" style="height:${pct ? `calc(30px + (100% - 30px) * ${pct / 100})` : "0"}"></div>
       <b class="t-display">${mobUpper(label)}</b><span>${txt}</span></button>`;
   }).join("");
   const vis = mobVisible();
@@ -3366,8 +3366,8 @@ function exerciseChartHtml(name, accent) {
     <div class="flex justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5">
       <span class="text-slate-400 shrink-0">${fmtDate(h.ts)}</span><span class="text-[var(--t-text2)] text-right truncate">${esc(sessionSummary(h))}</span>
     </div>`).join("");
-  return `<div class="text-[11px] text-slate-400 mb-1">${ser.metric}</div>${lineChart(ser.points.slice(-30), ser.color, ser.unit)}
-    <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-3 mb-1.5">Son kayıtlar</div><div class="space-y-1">${rows}</div>`;
+  return `<div class="text-[12px] text-slate-400 mb-1">${ser.metric}</div>${lineChart(ser.points.slice(-30), ser.color, ser.unit)}
+    <div class="text-[12px] font-bold text-slate-500 uppercase tracking-wide mt-3 mb-1.5">Son kayıtlar</div><div class="space-y-1">${rows}</div>`;
 }
 
 function openExerciseChart(exIdx) {
@@ -3874,9 +3874,9 @@ function renderProfile() {
   if (wl.length) {
     const d = round1(num(lastW.weight) - num(firstW.weight));
     wh += `<div class="grid grid-cols-3 gap-2">
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Son tartı</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : lastW.date || "")}</div></div>
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Değişim</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${wl.length} kayıt</div></div>
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Hedefe</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${!tW ? "hedef yok" : left > 0 ? "verilecek" : left < 0 ? "alınacak" : "hedeftesin"}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Son tartı</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : lastW.date || "")}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Değişim</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${wl.length} kayıt</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Hedefe</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${!tW ? "hedef yok" : left > 0 ? "verilecek" : left < 0 ? "alınacak" : "hedeftesin"}</div></div>
     </div>`;
     const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date || "")}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">· %${fmtNum(validBf(l.bf))} yağ</span>` : ""}</span></div>`).join("");
     wh += `<div class="mt-2">${rows}</div>`;
@@ -3887,7 +3887,7 @@ function renderProfile() {
   // Günlük hedefler (hesaplanan)
   const t = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
-    ${[["Kalori", Math.round(t.calTarget), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[11px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[10px] t-dim">${u}</div></div>`).join("")}
+    ${[["Kalori", Math.round(t.calTarget).toLocaleString("tr-TR"), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[10px] t-dim">${u}</div></div>`).join("")}
   </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme) ve Beslenme sekmesindeki açık ayarından hesaplanır.</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
@@ -3901,7 +3901,7 @@ function renderProfile() {
     return `<div class="bg-[var(--t-surface)] border border-[var(--t-line)] rounded-2xl px-3 py-2.5 min-w-0">
       <div class="text-[12px] t-muted truncate">${n}</div>
       <div class="t-display text-[22px]">${fmtNum(l[k])}<span class="t-dim text-sm"> cm</span></div>
-      <div class="text-[11px] ${good == null ? "t-dim" : good ? "t-accent" : "text-[var(--t-danger-text)]"}">${d === 0 ? "değişim yok" : (d > 0 ? "+" : "") + fmtNum(d) + " cm"}</div>
+      <div class="text-[12px] ${good == null ? "t-dim" : good ? "t-accent" : "text-[var(--t-danger-text)]"}">${d === 0 ? "değişim yok" : (d > 0 ? "+" : "") + fmtNum(d) + " cm"}</div>
     </div>`;
   }).join("");
   const lastM = ms[ms.length - 1];
@@ -4307,7 +4307,7 @@ function platesFor(total, bar) {
 
 function plateChips(list) {
   if (!list.length) return `<span class="text-slate-500">Plaka yok (sadece bar)</span>`;
-  return list.map(p => `<span class="inline-flex items-center justify-center min-w-[2.25rem] px-1.5 py-1 rounded-md text-[11px] font-bold ${PLATE_CLS[p]}">${fmtKg(p)}</span>`).join("");
+  return list.map(p => `<span class="inline-flex items-center justify-center min-w-[2.25rem] px-1.5 py-1 rounded-md text-[12px] font-bold ${PLATE_CLS[p]}">${fmtKg(p)}</span>`).join("");
 }
 
 function warmupSets(W, bar) {
@@ -4360,9 +4360,9 @@ function renderLevelTool() {
   const W = Math.max(0, num($("ptKg").value, 0));
   if (W <= 0) {
     out.innerHTML = `<div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-      <div class="text-[11px] text-slate-400 mb-1.5">Bu makinenin kademeleri:</div>
+      <div class="text-[12px] text-slate-400 mb-1.5">Bu makinenin kademeleri:</div>
       <div class="flex flex-wrap gap-1.5">${list.slice(0, 12).map(v => `<span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1.5 rounded-lg text-[12px] font-bold bg-slate-800 text-[var(--t-text2)]">${fmtKg(v)}</span>`).join("")}${list.length > 12 ? '<span class="text-slate-500 text-xs self-center">…</span>' : ""}</div>
-      <div class="text-[11px] text-slate-500 mt-2">Isınma setlerini görmek için çalışma kilonu yaz.</div></div>`;
+      <div class="text-[12px] text-slate-500 mt-2">Isınma setlerini görmek için çalışma kilonu yaz.</div></div>`;
     return;
   }
   const near = nearestLevelBelow(list, W);
@@ -4378,15 +4378,15 @@ function renderLevelTool() {
   });
   out.innerHTML = `
     <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-      <div class="text-[11px] text-slate-400 mb-1.5">Bu kiloya yakın kademeler:</div>
+      <div class="text-[12px] text-slate-400 mb-1.5">Bu kiloya yakın kademeler:</div>
       <div class="flex flex-wrap gap-1.5">${chips}</div>
-      ${exact ? "" : `<div class="text-[11px] text-amber-300 mt-2">${fmtKg(W)} kg bu makinede yok; en yakın alt kademe <b>${fmtKg(near)} kg</b>.</div>`}
+      ${exact ? "" : `<div class="text-[12px] text-amber-300 mt-2">${fmtKg(W)} kg bu makinede yok; en yakın alt kademe <b>${fmtKg(near)} kg</b>.</div>`}
     </div>
     <div>
-      <div class="text-[11px] font-bold text-slate-500 tracking-wide mb-1.5">ISINMA SETLERİ</div>
+      <div class="text-[12px] font-bold text-slate-500 tracking-wide mb-1.5">ISINMA SETLERİ</div>
       ${wu.length ? `<div class="space-y-1">${wu.map(w => `<div class="flex items-center justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5"><span class="text-slate-400 w-14">${w.label}</span><span class="font-bold text-slate-100">${fmtKg(w.kg)} kg × ${w.reps}</span><span></span></div>`).join("")}
         <div class="flex items-center justify-between gap-2 text-xs bg-emerald-950/60 border border-emerald-700/60 rounded-lg px-2.5 py-1.5"><span class="text-emerald-300 w-14">Çalışma</span><span class="font-bold text-emerald-200">${fmtKg(W)} kg</span><span></span></div></div>
-        <p class="text-[11px] text-slate-500 mt-1.5">Isınma kiloları makinede var olan kademelere yuvarlandı. Tonaja ve set sayısına dahil edilmez.</p>`
+        <p class="text-[12px] text-slate-500 mt-1.5">Isınma kiloları makinede var olan kademelere yuvarlandı. Tonaja ve set sayısına dahil edilmez.</p>`
       : `<div class="text-xs text-slate-500">Bu kiloda ayrı ısınma setine gerek yok.</div>`}
     </div>`;
 }
@@ -4404,15 +4404,15 @@ function renderPlateTool() {
       html += `<div class="text-xs text-amber-300 bg-amber-950/50 border border-amber-800/60 rounded-lg px-3 py-2">Bu kilo ${fmtKg(bar)} kg'lık bardan hafif.</div>`;
     } else {
       html += `<div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-        <div class="text-[11px] text-slate-400 mb-1.5">Barın HER İKİ tarafına takılacak plakalar (${fmtKg(r.perSide)} kg / taraf):</div>
+        <div class="text-[12px] text-slate-400 mb-1.5">Barın HER İKİ tarafına takılacak plakalar (${fmtKg(r.perSide)} kg / taraf):</div>
         <div class="flex flex-wrap gap-1.5">${plateChips(r.list)}</div>
-        ${r.ok ? "" : `<div class="text-[11px] text-amber-300 mt-2">Elindeki plakalarla tam ${fmtKg(W)} kg yapılamıyor; en yakın: <b>${fmtKg(r.achieved)} kg</b></div>`}
+        ${r.ok ? "" : `<div class="text-[12px] text-amber-300 mt-2">Elindeki plakalarla tam ${fmtKg(W)} kg yapılamıyor; en yakın: <b>${fmtKg(r.achieved)} kg</b></div>`}
       </div>`;
     }
   }
   const wu = warmupSets(W, bar);
   html += `<div>
-    <div class="text-[11px] font-bold text-slate-500 tracking-wide mb-1.5">ISINMA SETLERİ</div>
+    <div class="text-[12px] font-bold text-slate-500 tracking-wide mb-1.5">ISINMA SETLERİ</div>
     ${wu.length ? `<div class="space-y-1">${wu.map(w => {
       const pr = bar > 0 ? platesFor(w.kg, bar) : null;
       return `<div class="flex items-center justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5">
@@ -4424,7 +4424,7 @@ function renderPlateTool() {
     <div class="flex items-center justify-between gap-2 text-xs bg-emerald-950/60 border border-emerald-700/60 rounded-lg px-2.5 py-1.5">
       <span class="text-emerald-300 w-14 shrink-0">Çalışma</span><span class="font-bold text-emerald-200">${fmtKg(W)} kg</span><span></span>
     </div></div>
-    <p class="text-[11px] text-slate-500 mt-1.5">Isınma setleri yorulmadan yapılır, aralarında 1–2 dk dinlen. Tonaja ve set sayısına dahil edilmez.</p>`
+    <p class="text-[12px] text-slate-500 mt-1.5">Isınma setleri yorulmadan yapılır, aralarında 1–2 dk dinlen. Tonaja ve set sayısına dahil edilmez.</p>`
     : `<div class="text-xs text-slate-500">Isınma önerisi için çalışma kilosu gir (hafif kilolarda ayrı ısınma gerekmez).</div>`}
   </div>`;
   out.innerHTML = html;
@@ -4824,7 +4824,7 @@ function openMeasureModal() {
       ${MEASURES.map(([k, n]) => `<div><label class="block text-slate-400 mb-1">${n}</label>
         <input id="ms_${k}" type="text" inputmode="decimal" placeholder="—" value="${last[k] ? esc(fmtNum(last[k])) : ""}" class="w-full p-2 rounded-lg text-base text-center" /></div>`).join("")}
     </div>
-    <p class="text-[11px] text-slate-500 mt-2">İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.</p>
+    <p class="text-[12px] text-slate-500 mt-2">İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.</p>
     <div class="flex justify-end gap-2 mt-3">
       <button onclick="closeModal('chartModal')" class="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-lg">İptal</button>
       <button onclick="saveMeasurement()" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
@@ -4976,7 +4976,7 @@ async function openShareCard(logIdx) {
     $("chartBody").innerHTML = `
       <img src="${url}" alt="Antrenman özeti" class="w-full rounded-xl border border-slate-700" />
       <button onclick="shareWorkoutCard()" class="w-full mt-3 bg-emerald-600 text-white text-sm font-semibold py-2.5 rounded-lg">Paylaş / Fotoğraflara Kaydet</button>
-      <p class="text-[11px] text-slate-500 mt-2 text-center">Paylaş menüsünden Instagram, WhatsApp veya "Görüntüyü Kaydet"i seçebilirsin.</p>`;
+      <p class="text-[12px] text-slate-500 mt-2 text-center">Paylaş menüsünden Instagram, WhatsApp veya "Görüntüyü Kaydet"i seçebilirsin.</p>`;
   } catch (e) {
     $("chartBody").innerHTML = `<div class="text-xs text-rose-300 text-center py-8">Kart oluşturulamadı.</div>`;
   }
@@ -5266,7 +5266,7 @@ function gymTodayHtml() {
     const d = new Date(ws + i * DAY_MS + 12 * 3600000);
     const k = todayStr(d), today = k === tKey, done = doneDays[k];
     return `<div class="h-16 rounded-2xl flex flex-col items-center justify-center gap-0.5 ${today ? "bg-[var(--t-acc)] text-[var(--t-on-acc)]" : "bg-[var(--t-surface)] " + (done ? "text-[var(--t-text)]" : "t-muted")}">
-      <span class="text-[11px] font-semibold tracking-wide">${n}</span>
+      <span class="text-[12px] font-semibold tracking-wide">${n}</span>
       <span class="t-display text-xl leading-none">${d.getDate()}</span>
       <span class="w-1.5 h-1.5 rounded-full ${today ? (done ? "bg-[var(--t-on-acc)]" : "") : (done ? "bg-[var(--t-acc)]" : "")}"></span>
     </div>`;
@@ -5329,14 +5329,14 @@ function effortRowHtml(exIdx, s, i) {
 function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   const isNext = ptr && ptr.e === exIdx && ptr.s === i;
   const rowCls = s.done ? "bg-[var(--t-panel)]" : isNext ? "bg-[var(--t-elev0)] ring-[1.5px] ring-[var(--t-acc-text)] ring-inset" : "";
-  const check = `<button onclick="toggleSetDone(${exIdx}, ${i})" aria-label="Seti tamamla" class="w-11 h-11 rounded-xl flex items-center justify-center ${s.done ? "bg-[var(--t-acc)] text-[var(--t-on-acc)]" : "border-[1.5px] border-[var(--t-line2)] t-muted"}">${svgI("check", 22, 2.6)}</button>`;
+  const check = `<button onclick="toggleSetDone(${exIdx}, ${i})" aria-label="Seti tamamla" class="w-11 h-11 rounded-xl flex items-center justify-center ${s.done ? "bg-[var(--t-acc)] text-[var(--t-on-acc)]" : "border-[1.5px] border-[var(--t-faint)] t-muted"}">${svgI("check", 22, 2.6)}</button>`;
   if (ex.kind === "cardio") {
     return `<div class="rounded-2xl p-2.5 space-y-2 ${rowCls}">
       <div class="flex items-center justify-between"><span class="text-xs font-bold t-muted">${ex.sets.length > 1 ? (i + 1) + ". BÖLÜM" : "KARDİYO"}</span>${check}</div>
       <div class="grid grid-cols-3 gap-2">
-        <label class="block"><span class="block text-[11px] t-muted mb-1">Süre (dk)</span><input type="text" inputmode="decimal" data-fk="c-${exIdx}-${i}-min" value="${esc(s.min === "" ? "" : fmtNum(num(s.min)))}" onchange="updateSetData(${exIdx}, ${i}, 'min', this.value)" class="t-input w-full" /></label>
-        <label class="block"><span class="block text-[11px] t-muted mb-1">Mesafe (km)</span><input type="text" inputmode="decimal" placeholder="—" data-fk="c-${exIdx}-${i}-km" value="${esc(s.km === "" || s.km == null ? "" : fmtNum(num(s.km)))}" onchange="updateSetData(${exIdx}, ${i}, 'km', this.value)" class="t-input w-full" /></label>
-        <label class="block"><span class="block text-[11px] t-muted mb-1">Eğim/Seviye</span><input type="text" placeholder="—" data-fk="c-${exIdx}-${i}-lvl" value="${esc(s.lvl || "")}" onchange="updateSetData(${exIdx}, ${i}, 'lvl', this.value)" class="t-input w-full" /></label>
+        <label class="block"><span class="block text-[12px] t-muted mb-1">Süre (dk)</span><input type="text" inputmode="decimal" data-fk="c-${exIdx}-${i}-min" value="${esc(s.min === "" ? "" : fmtNum(num(s.min)))}" onchange="updateSetData(${exIdx}, ${i}, 'min', this.value)" class="t-input w-full" /></label>
+        <label class="block"><span class="block text-[12px] t-muted mb-1">Mesafe (km)</span><input type="text" inputmode="decimal" placeholder="—" data-fk="c-${exIdx}-${i}-km" value="${esc(s.km === "" || s.km == null ? "" : fmtNum(num(s.km)))}" onchange="updateSetData(${exIdx}, ${i}, 'km', this.value)" class="t-input w-full" /></label>
+        <label class="block"><span class="block text-[12px] t-muted mb-1">Eğim/Seviye</span><input type="text" placeholder="—" data-fk="c-${exIdx}-${i}-lvl" value="${esc(s.lvl || "")}" onchange="updateSetData(${exIdx}, ${i}, 'lvl', this.value)" class="t-input w-full" /></label>
       </div>
     </div>`;
   }
@@ -5374,8 +5374,8 @@ function gymActiveHtml() {
       return ps ? `${fmtKg(num(ps.kg))}×${num(ps.reps)}` : "—";
     };
     const head = ex.kind === "weight"
-      ? `<div class="grid gap-2 px-1 text-[11px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">SET</span><span class="truncate">ÖNCEKİ</span><span class="text-center">KG</span><span class="text-center">TEKRAR</span><span></span></div>`
-      : ex.kind === "time" ? `<div class="grid gap-2 px-1 text-[11px] font-bold tracking-wider t-dim" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px"><span class="text-center">SET</span><span>SÜRE</span><span></span><span></span></div>` : "";
+      ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">SET</span><span class="truncate">ÖNCEKİ</span><span class="text-center">KG</span><span class="text-center">TEKRAR</span><span></span></div>`
+      : ex.kind === "time" ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px"><span class="text-center">SET</span><span>SÜRE</span><span></span><span></span></div>` : "";
     return `
       <div id="exCard_${exIdx}" class="t-card rounded-[22px] p-4 space-y-3" style="scroll-margin-top: 9rem;">
         <div class="flex items-start justify-between gap-2">
@@ -5428,6 +5428,7 @@ function exRightText(ex) {
   let vol = 0, best = 0;
   ex.sets.forEach(s => { vol += num(s.kg) * num(s.reps); best = Math.max(best, e1rm(s.kg, s.reps)); });
   const lv = usesLevels(ex) ? levelsSummary(ex) : "";
+  if (best <= 0 && vol <= 0) return lv ? "Kademe: " + lv : "";   // v32: kilo girilmeden "~0 kg" gösterme
   return `Tahmini 1RM ~${Math.round(best)} kg · Tonaj ${Math.round(vol).toLocaleString("tr-TR")} kg${lv ? " · Kademe: " + lv : ""}`;
 }
 
@@ -5438,11 +5439,11 @@ function gymProgramHtml() {
   const rows = day.exercises.map((ex, i) => {
     const eq = equipOf(ex);
     const meta = [ex.targetInfo, muscleOf(ex), eq ? EQUIP_SHORT[eq] : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
-    const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[11px] text-amber-300">Kademe tanımlı değil</span>` : usesLevels(ex) ? `<span class="text-[11px] t-dim">Kademe: ${esc(levelsSummary(ex))}</span>` : "";
+    const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[12px] text-amber-300">Kademe tanımlı değil</span>` : usesLevels(ex) ? `<span class="text-[12px] t-dim">Kademe: ${esc(levelsSummary(ex))}</span>` : "";
     return `<div data-ex-row="${i}" class="t-card-flat rounded-2xl min-h-[64px] pl-1 pr-1.5 py-2 flex items-center gap-2">
       ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${esc(ex.name)} hareketini sürükleyerek taşı" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
       <span class="t-display text-xl t-dim w-6 text-center">${i + 1}</span>
-      <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold truncate">${esc(ex.name)}</span><span class="text-xs t-muted truncate">${esc(meta)}</span>${lvWarn}</span>
+      <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold line-clamp-2 leading-snug">${esc(ex.name)}</span><span class="text-xs t-muted truncate">${esc(meta)}</span>${lvWarn}</span>
       <button onclick="openExSheet(${i})" aria-label="${esc(ex.name)} seçenekleri" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-muted">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
       </button>
@@ -5570,7 +5571,7 @@ function gymLibraryHtml() {
     return `<button onclick="selectMuscle(${esc(JSON.stringify(m))})" class="w-full min-h-[44px] flex items-center gap-2.5 text-left">
       <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} truncate">${esc(m)}</span>
       <span class="relative flex-1 h-2.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / 24 * 100)}%;background:${col}"></span></span>
-      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b> <span class="t-dim text-[11px]">${tg}</span></span>
+      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b> <span class="t-dim text-[12px]">${tg}</span></span>
     </button>`;
   }).join("") : "";
   return `
@@ -5585,11 +5586,11 @@ function gymLibraryHtml() {
           <g style="mix-blend-mode: color">${polys}</g>
           <g style="pointer-events:none">${sels}</g>
         </svg>
-        <span class="absolute left-1.5 bottom-1 text-[11px] font-bold tracking-widest t-muted">ÖN</span>
-        <span class="absolute right-1.5 bottom-1 text-[11px] font-bold tracking-widest t-muted">ARKA</span>
+        <span class="absolute left-1.5 bottom-1 text-[12px] font-bold tracking-widest t-muted">ÖN</span>
+        <span class="absolute right-1.5 bottom-1 text-[12px] font-bold tracking-widest t-muted">ARKA</span>
       </div>
     </div>
-    <div class="flex items-center justify-center gap-3.5 text-[11px] t-muted">
+    <div class="flex items-center justify-center gap-3.5 text-[12px] t-muted">
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#9A9AA0]"></span>0</span>
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#6FA39E]"></span>1–9</span>
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#2FC4B6]"></span>10–20</span>
@@ -5625,7 +5626,7 @@ function gymHistoryHtml() {
       <div class="flex-1 min-w-0">
         <div class="text-xs t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date)}</div>
         <div class="text-[15px] font-semibold truncate">${esc(l.dayName)}</div>
-        <div class="text-xs t-muted mt-0.5">${l.sets} set · ${num(l.volume).toLocaleString("tr-TR")} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + fmtNum(num(l.cardioMin)) + " dk kardiyo" : ""}${num(l.prs) ? ` · <span class="text-amber-300">${l.prs} rekor</span>` : ""}</div>
+        <div class="text-xs t-muted mt-0.5">${num(l.sets)} set · ${num(l.volume).toLocaleString("tr-TR")} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + fmtNum(num(l.cardioMin)) + " dk kardiyo" : ""}${num(l.prs) ? ` · <span class="text-amber-300">${l.prs} rekor</span>` : ""}</div>
       </div>
       <button onclick="openShareCard(${i})" aria-label="Paylaş" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("share", 20)}</button>
       <button onclick="deleteWorkoutLog(${i})" aria-label="Kaydı sil" class="w-11 h-11 rounded-xl flex items-center justify-center t-dim">${svgI("trash", 19)}</button>
@@ -5636,8 +5637,8 @@ function gymHistoryHtml() {
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">Tonaj</div><div class="t-display text-[26px]">${fmtNum(weekLogs.reduce((a, l) => a + num(l.volume), 0) / 1000)}<span class="t-dim text-lg"> t</span></div></div>
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">Toplam</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> antr.</span></div></div>
     </div>
-    <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center text-sm t-muted">Henüz kaydedilmiş antrenman yok.</div>`}</div>
-    <button onclick="switchTab('progress')" class="t-btn-ghost w-full h-11 rounded-xl text-sm">Grafikler ve rekorlar için İlerleme sekmesi →</button>`;
+    <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">Bugünün antrenmanına git</button></div>`}</div>
+    <button onclick="switchTab('progress')" class="t-btn-ghost w-full min-h-11 px-4 py-2 rounded-xl text-sm">Grafikler ve rekorlar: İlerleme sekmesi</button>`;
 }
 
 function renderGym() {
@@ -6015,7 +6016,7 @@ function renderRecipe() {
     return `<div class="flex items-center gap-1.5 py-1.5" data-rc-item="${i}">
         <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(fd.name)}</div><div id="rcK${i}" class="text-[12px] n-muted tabular-nums">${Math.round(kcalPerUnit(fd) * num(it.amount))} kcal</div></div>
         <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(fd.name)} miktarı" />
-        <span class="text-[11px] n-muted w-10 min-w-0 truncate">${esc(fd.unit)}</span>
+        <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(fd.unit)}</span>
         <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(fd.name)} çıkar">${svgI("x", 18, 2.2)}</button>
       </div>`;
   }).join("") || `<p class="text-[13px] n-dim py-2">Henüz malzeme yok. Aşağıdan ekle.</p>`;
@@ -6428,9 +6429,10 @@ function heatHtml(n) {
     const d = keyToDate(k);
     const lbl = d.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
     const tip = isToday ? `${lbl}: bugün (devam ediyor)` : x ? `${lbl}: ${fmtInt(x.k)} / ${fmtInt(x.t)} kcal` : `${lbl}: kayıt yok`;
-    cells.push(`<span class="n-heat ${cls}" data-heat="${k}" data-cls="${cls}" role="img" aria-label="${esc(tip)}" title="${esc(tip)}">${d.getDate()}</span>`);
+    const sym = { ok: "✓", near: "~", far: "!" }[cls] || "";   // v32: renk tek başına anlam taşımaz (İlerleme şeridiyle aynı dil)
+    cells.push(`<span class="n-heat ${cls}" data-heat="${k}" data-cls="${cls}" role="img" aria-label="${esc(tip)}" title="${esc(tip)}">${d.getDate()}${sym ? `<i class="n-heat-sym" aria-hidden="true">${sym}</i>` : ""}</span>`);
   }
-  const wd = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"].map(x => `<span class="text-[11px] n-dim text-center">${x}</span>`).join("");
+  const wd = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"].map(x => `<span class="text-[12px] n-dim text-center">${x}</span>`).join("");
   return `<div class="grid grid-cols-7 gap-1.5">${wd}${cells.join("")}</div>`;
 }
 function weekCardHtml() {
@@ -6443,8 +6445,8 @@ function weekCardHtml() {
   return `<section id="weekCard" class="n-card rounded-[22px] p-4 space-y-4" aria-label="Haftalık görünüm">
       <div class="flex items-baseline justify-between gap-2"><span class="n-label">SON 7 GÜN</span><span class="text-[12px] n-dim">${w.n7} gün kayıt</span></div>
       <div class="grid grid-cols-2 gap-3">
-        <div><div class="text-[12px] n-muted">Ortalama kalori</div><div class="t-display text-[26px] leading-none tabular-nums mt-1" id="avgKcal">${w.n7 ? fmtInt(w.avgK) : "—"}</div><div class="text-[11px] n-dim">kcal / gün</div></div>
-        <div><div class="text-[12px] n-muted">Ortalama protein</div><div class="t-display text-[26px] leading-none tabular-nums mt-1 n-p" id="avgPro">${w.n7 ? fmtInt(w.avgP) : "—"}</div><div class="text-[11px] n-dim">g / gün</div></div>
+        <div><div class="text-[12px] n-muted">Ortalama kalori</div><div class="t-display text-[26px] leading-none tabular-nums mt-1" id="avgKcal">${w.n7 ? fmtInt(w.avgK) : "—"}</div><div class="text-[12px] n-dim">kcal / gün</div></div>
+        <div><div class="text-[12px] n-muted">Ortalama protein</div><div class="t-display text-[26px] leading-none tabular-nums mt-1 n-p" id="avgPro">${w.n7 ? fmtInt(w.avgP) : "—"}</div><div class="text-[12px] n-dim">g / gün</div></div>
       </div>
       <div class="pt-3 n-bt space-y-2.5">
         <div class="flex items-center justify-between gap-2">
@@ -6455,10 +6457,10 @@ function weekCardHtml() {
           </div>
         </div>
         <div id="heatGrid">${heatHtml(range === "30" ? 30 : 7)}</div>
-        <div class="flex flex-wrap gap-x-3 gap-y-1 text-[11px] n-muted">
-          <span class="flex items-center gap-1"><i class="n-heat-dot ok"></i>Hedefte (±%5)</span>
-          <span class="flex items-center gap-1"><i class="n-heat-dot near"></i>Yakın (±%15)</span>
-          <span class="flex items-center gap-1"><i class="n-heat-dot far"></i>Uzak</span>
+        <div class="flex flex-wrap gap-x-3 gap-y-1 text-[12px] n-muted">
+          <span class="flex items-center gap-1"><i class="n-heat-dot ok">✓</i>Hedefte (±%5)</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot near">~</i>Yakın (±%15)</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot far">!</i>Uzak</span>
           <span class="flex items-center gap-1"><i class="n-heat-dot none"></i>Kayıt yok</span>
         </div>
       </div>
@@ -6471,7 +6473,7 @@ function weekCardHtml() {
       </div>
       <div class="pt-3 n-bt flex items-center justify-between gap-2 text-[14px]" id="weightAvgRow">
         <span class="n-muted">Kilo${last ? ` · son tartı <strong class="n-text">${fmtNum(last)} kg</strong>` : ""}</span>
-        <span>${wa ? `7 günlük ort. <strong class="tabular-nums">${fmtNum(wa.avg)} kg</strong> <span class="text-[11px] n-dim">(${wa.n} tartı)</span>` : `<span class="n-dim text-[12px]">Son 7 günde tartı yok</span>`}</span>
+        <span>${wa ? `7 günlük ort. <strong class="tabular-nums">${fmtNum(wa.avg)} kg</strong> <span class="text-[12px] n-dim">(${wa.n} tartı)</span>` : `<span class="n-dim text-[12px]">Son 7 günde tartı yok</span>`}</span>
       </div>
     </section>`;
 }

@@ -134,14 +134,14 @@ try:
 
     # ---------- 5) Besinler: Bugüne ekle + 'Menüye de kaydet' (bildirimden)
     pg.evaluate("goAddFood(2, 'day')"); pg.wait_for_timeout(100)
-    check("on" in pg.get_attribute("#fdDay", "class") and "BUGÜN" in pg.inner_text("#foodHead"), "Besinler 'Bugüne ekle' seçili açıldı")
+    check("on" in pg.get_attribute("#fdDay", "class") and "bugün hangi" in pg.inner_text("#foodHead").lower(), "Besinler 'Bugüne ekle' seçili açıldı")
     pg.evaluate("selectFood('u170567')"); pg.wait_for_timeout(50)
     pg.locator("#foodAmt").fill("30"); pg.locator("#foodAddBtn").click(); pg.wait_for_timeout(100)
     check(any(i["foodId"] == "u170567" for i in pg.evaluate("dayMeals()[2].items")) and not any(i["foodId"] == "u170567" for i in st(pg)["meals"][2]["items"]), "badem bugüne eklendi, menüye değil")
     pg.locator("#toastWrap button", has_text="Menüye de kaydet").last.click(); pg.wait_for_timeout(100)
     check(any(i["foodId"] == "u170567" and i["amount"] == 30 for i in st(pg)["meals"][2]["items"]), "'Menüye de kaydet' bademi menüye de ekledi")
     pg.click("#fdMenu"); pg.wait_for_timeout(50)
-    check("MENÜDE" in pg.inner_text("#foodHead") and "menüde" in pg.inner_text("#foodRemain").lower(), "'Menüye ekle' seçilince başlık ve kalan yazısı menüye göre")
+    check("menüde hangi" in pg.inner_text("#foodHead").lower() and "menüde" in pg.inner_text("#foodRemain").lower(), "'Menüye ekle' seçilince başlık ve kalan yazısı menüye göre")
     pg.screenshot(path=SHOTS + "/v14_foods_dest.png")
 
     # ---------- 6) Barkod bulunamadı → etiket formu (porsiyon başına + kalori)

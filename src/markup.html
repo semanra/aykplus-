@@ -132,7 +132,7 @@
     .tm .border-emerald-700\/60, .tm .border-emerald-800, .tm .border-emerald-500 { border-color: var(--t-panel-line) !important; }
     .tm .bg-emerald-600, .tm .bg-emerald-700, .tm .bg-emerald-500, .tm .bg-indigo-600 { background-color: var(--t-acc) !important; color: var(--t-on-acc) !important; font-weight: 800 !important; border-color: var(--t-acc-text) !important; }
     .tm button, .tm label.cursor-pointer { min-height: 44px; }
-    .tm .text-xs { font-size: 13px; } .tm .text-\[11px\] { font-size: 12px; }
+    .tm .text-xs { font-size: 13px; }
     .tm select, .tm input[type="text"], .tm input[inputmode], .tm input[type="time"], .tm textarea { background-color: var(--t-elev2) !important; border: 0 !important; color: var(--t-text) !important; border-radius: 12px !important; min-height: 44px; }
     .tm select:focus, .tm input:focus, .tm textarea:focus { outline: 2px solid var(--t-acc-text); outline-offset: 0; }
     .tm input::placeholder { color: var(--t-faint); }
@@ -205,11 +205,11 @@
     .m-card.done .m-name { color: var(--t-dim); }
     .m-name { font-size: 15.5px; font-weight: 650; line-height: 1.25; color: var(--t-text); }
     .m-rx { font-size: 12.5px; color: var(--t-muted); margin-top: 3px; }
-    .m-kind { display: inline-block; font-size: 11.5px; font-weight: 650; color: var(--t-dim); margin-bottom: 2px; }
+    .m-kind { display: inline-block; font-size: 12px; font-weight: 650; color: var(--t-dim); margin-bottom: 2px; }
     .m-kind.s { color: var(--t-acc-text); }
     .m-chk { width: 44px; height: 44px; border-radius: 14px; border: 2px solid var(--m-chk); display: grid; place-items: center; color: transparent; flex: none; }
     .m-card.done .m-chk { background: var(--t-acc); border-color: var(--t-acc-text); color: var(--t-on-acc); }
-    .m-tbtn { width: 52px; height: 44px; border-radius: 14px; background: rgba(var(--t-acc-rgb), 0.15); color: var(--t-acc-text); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex: none; gap: 1px; }
+    .m-tbtn { width: 52px; height: 44px; border-radius: 14px; background: rgba(var(--t-acc-rgb), 0.15); color: var(--t-acc-text); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex: none; gap: 1px; }
     .m-grip { width: 44px; min-height: 44px; margin-left: -6px; display: grid; place-items: center; color: var(--m-grip); flex: none; touch-action: none; }
     .m-btn { min-height: 52px; border-radius: 16px; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--t-elev); color: var(--t-text); padding: 0 16px; }
     .m-btn.pri { background: var(--t-acc); color: var(--t-on-acc); }
@@ -236,7 +236,7 @@
     input.m-in::placeholder, textarea.m-in::placeholder { color: var(--t-faint); }
     .m-add { width: 44px; height: 44px; border-radius: 14px; background: var(--t-acc); color: var(--t-on-acc); display: grid; place-items: center; flex: none; }
     #mobTimer { position: fixed; inset: 0; z-index: 70; background: var(--t-bg); color: var(--t-text); flex-direction: column; align-items: center; overflow-y: auto; padding: env(safe-area-inset-top, 0px) 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
-    .m-breath { position: relative; width: min(300px, 78vw); height: min(300px, 78vw); display: grid; place-items: center; flex: none; }
+    .m-breath { position: relative; width: min(300px, 78vw, 42vh); height: min(300px, 78vw, 42vh); display: grid; place-items: center; flex: none; }
     .m-breath .o { position: absolute; border-radius: 50%; border: 1.5px solid rgba(var(--t-acc-rgb), 0.25); }
     .m-breath .o1 { width: 94%; height: 94%; } .m-breath .o2 { width: 75%; height: 75%; border-color: rgba(var(--t-acc-rgb), 0.35); }
     .m-breath .core { width: 66%; height: 66%; border-radius: 50%; background: radial-gradient(circle at 50% 40%, rgba(var(--t-acc-rgb), 0.30), rgba(var(--t-acc-rgb), 0.08) 70%); border: 2px solid var(--t-acc-text); display: flex; flex-direction: column; align-items: center; justify-content: center; animation: mBreathe 10s ease-in-out infinite; }
@@ -332,7 +332,7 @@
     .p-sr { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 40px; }
     .p-sr > span { font-size: 13px; color: var(--t-text3); display: flex; align-items: center; gap: 7px; min-width: 0; }
     .p-sc { display: grid; grid-template-columns: repeat(7, 26px); gap: 5px; }
-    .p-sr.hdr b { font-size: 11.5px; color: var(--t-dim); text-align: center; font-weight: 600; }
+    .p-sr.hdr b { font-size: 12px; color: var(--t-dim); text-align: center; font-weight: 600; }
     .p-sd { width: 26px; height: 26px; border-radius: 8px; background: var(--t-elev); display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 14px; }
     .p-sd.fut { background: var(--t-sunk); } .p-sd.today { box-shadow: inset 0 0 0 1.5px var(--t-faint2); background: transparent; }
     .p-sd.tq { background: var(--d-tq); color: var(--d-on-tq); } .p-sd.lv { background: var(--d-lv); color: var(--d-on-lv); } .p-sd.gr { background: var(--d-gr); color: var(--d-on-gr); }
@@ -542,11 +542,36 @@
     .nm .bg-emerald-600, .nm .bg-emerald-700, .nm .bg-emerald-500, .nm .bg-indigo-600 { background-color: var(--n-btn) !important; color: var(--n-btn-text) !important; font-weight: 800 !important; border-color: var(--n-btn) !important; }
     .nm button, .nm label.cursor-pointer { min-height: 44px; }
     .nm #pickerChips button { padding-left: 14px; padding-right: 14px; font-size: 13px; }
-    .nm .text-xs { font-size: 13px; } .nm .text-\[11px\] { font-size: 12px; }
+    .nm .text-xs { font-size: 13px; }
     .nm select, .nm input[type="text"], .nm input[inputmode], .nm input[type="time"], .nm textarea { background-color: var(--n-elev2) !important; border: 0 !important; color: var(--n-text) !important; border-radius: 12px !important; min-height: 44px; }
     .nm select:focus, .nm input:focus, .nm textarea:focus { outline: 2px solid var(--n-accent); outline-offset: 0; }
     .nm input::placeholder { color: var(--n-dim); }
     .nm .modal-x { width: 44px; height: 44px; border-radius: 999px; background: var(--n-elev); color: var(--n-muted) !important; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
+    /* v32 ORTAK KURALLAR (docs/PLAN-tema-v30-v32.md) */
+    /* Başlık kuralı: bölüm etiketleri cümle düzeninde (Türkçe küçültme lang="tr" ile doğru: İ→i, I→ı). Geri almak için bu iki satırı silmek yeter. */
+    .t-label, .n-label { text-transform: lowercase; letter-spacing: 0; font-size: 13px; font-weight: 650; }
+    span.t-label, span.n-label { display: inline-block; } .t-label::first-letter, .n-label::first-letter { text-transform: uppercase; }
+    /* Hedef takvimi: renk + simge (✓ hedefte, ~ yakın, ! uzak) */
+    .n-heat { position: relative; }
+    .n-heat-sym { position: absolute; top: 1px; right: 4px; font-style: normal; font-size: 11px; font-weight: 800; line-height: 1; }
+    .n-heat-dot { width: 14px; height: 14px; border-radius: 4px; display: inline-grid; place-items: center; font-style: normal; font-size: 10px; font-weight: 800; color: #fff; }
+    .n-heat-dot.none { box-shadow: inset 0 0 0 1px var(--n-line2); }
+    .n-heat-dot.ok { color: #04130A; } .n-heat-dot.near { color: #1F1503; } .n-heat-dot.far { color: #2A0710; } body.nutri-light .n-heat-dot { color: #fff; }
+    .n-heat .n-heat-sym { color: inherit; }
+    /* Dar ekranda İkame düğmesi yalnızca simge (ad 2 satıra iner) */
+    @media (max-width: 359px) { .swap-txt { display: none; } .n-chip.swap { min-width: 44px; padding: 0 10px; } .m-st .v b { font-size: 32px; } }
+    /* Ölçü ölçeği: kart köşeleri ve ana düğme yüksekliği tek */
+    .m-card, .m-reg, .m-st { border-radius: 20px; }
+    .p-btn { min-height: 52px; }
+    /* Klavye odağı (iPad + klavye): yalnızca klavyeyle gezinirken görünür */
+    button:focus-visible, a:focus-visible, summary:focus-visible, [role="button"]:focus-visible, select:focus-visible { outline: 2px solid var(--t-acc-text); outline-offset: 2px; }
+    body.theme-nutri button:focus-visible, body.theme-nutri summary:focus-visible { outline-color: var(--n-accent-text); }
+    /* Yatay tutuş / iPad: çentik yanındaki kenar boşluğu */
+    body { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+    /* "Hareketi azalt" açıkken tüm geçiş ve animasyonlar kısalır */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
     @media (prefers-reduced-motion: reduce) {
       #splash { animation-duration: .01s; animation-delay: .35s; }
       #splash img, #splash .t, #splash .logo-wrap::before { animation: none; }
@@ -646,7 +671,7 @@
             </svg>
             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
               <span id="calConsumed" class="t-display text-[30px] leading-none text-white tabular-nums">0</span>
-              <span class="text-[11px] text-white/70 font-medium mt-1">/ <span id="calTarget">0</span> kcal</span>
+              <span class="text-[12px] text-white/70 font-medium mt-1">/ <span id="calTarget">0</span> kcal</span>
             </div>
           </div>
           <div class="flex-1 min-w-0 space-y-2.5">
@@ -654,17 +679,17 @@
             <div>
               <div class="flex items-baseline justify-between gap-2 text-[12px]"><span class="font-bold">Protein</span><span class="text-white/80 tabular-nums"><span id="proConsumed" class="font-bold text-white">0</span> / <span id="proTarget">0</span> g</span></div>
               <div class="h-1.5 rounded-full bg-white/15 overflow-hidden mt-1"><div id="proBar" class="h-full rounded-full transition-all duration-500" style="width:0%;background:#58B9F7"></div></div>
-              <div id="proStatus" class="text-[11px] mt-0.5"></div>
+              <div id="proStatus" class="text-[12px] mt-0.5"></div>
             </div>
             <div>
               <div class="flex items-baseline justify-between gap-2 text-[12px]"><span class="font-bold">Karb</span><span class="text-white/80 tabular-nums"><span id="carbConsumed" class="font-bold text-white">0</span> / <span id="carbTarget">0</span> g</span></div>
               <div class="h-1.5 rounded-full bg-white/15 overflow-hidden mt-1"><div id="carbBar" class="h-full rounded-full transition-all duration-500" style="width:0%;background:#E5B85B"></div></div>
-              <div id="carbStatus" class="text-[11px] mt-0.5"></div>
+              <div id="carbStatus" class="text-[12px] mt-0.5"></div>
             </div>
             <div>
               <div class="flex items-baseline justify-between gap-2 text-[12px]"><span class="font-bold">Yağ</span><span class="text-white/80 tabular-nums"><span id="fatConsumed" class="font-bold text-white">0</span> / <span id="fatTarget">0</span> g</span></div>
               <div class="h-1.5 rounded-full bg-white/15 overflow-hidden mt-1"><div id="fatBar" class="h-full rounded-full transition-all duration-500" style="width:0%;background:#E27C66"></div></div>
-              <div id="fatStatus" class="text-[11px] mt-0.5"></div>
+              <div id="fatStatus" class="text-[12px] mt-0.5"></div>
             </div>
           </div>
         </div>
@@ -824,7 +849,7 @@
   <div id="restPill" class="rest-pill hidden">
     <div id="restPillInner" class="max-w-lg mx-auto flex items-center justify-between gap-2 pl-4 pr-2 py-2 bg-[var(--t-well)] border border-[var(--t-line)] rounded-2xl shadow-2xl">
       <div class="min-w-0">
-        <div id="restPillLabel" class="text-[11px] font-bold tracking-wider text-[var(--t-muted)] truncate max-w-[150px]">DİNLENME</div>
+        <div id="restPillLabel" class="text-[12px] font-bold tracking-wider text-[var(--t-muted)] truncate max-w-[150px]">DİNLENME</div>
         <div id="restPillTime" class="t-display text-[30px] leading-none tabular-nums text-[var(--t-acc-text)]">01:30</div>
       </div>
       <div class="flex gap-1.5">
@@ -1140,7 +1165,7 @@
           <div><label for="mmTime" class="block text-slate-300 mb-1">Saat (isteğe bağlı)</label><input id="mmTime" type="time" class="w-full p-2 rounded-lg text-base bg-[#0f172a] border border-[#475569] text-white" /></div>
           <div><label for="mmNote" class="block text-slate-300 mb-1">Kısa not</label><input id="mmNote" type="text" placeholder="örn: 50g protein" class="w-full p-2 rounded-lg text-base" /></div>
         </div>
-        <p class="text-[11px] text-slate-500">Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.</p>
+        <p class="text-[12px] text-slate-500">Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.</p>
       </div>
       <div class="flex justify-end gap-2 pt-1">
         <button onclick="closeModal('mealModal')" class="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-lg">İptal</button>
@@ -1301,7 +1326,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v31</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v32</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

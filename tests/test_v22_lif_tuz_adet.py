@@ -76,7 +76,7 @@ try:
     # 4) Protein dağılımı (Menülerim)
     pg.evaluate("setNutriView('menus')"); pg.wait_for_timeout(120)
     sp = pg.inner_text("[data-protein-spread]")
-    check("PROTEİN DAĞILIMI" in sp and "Kahvaltı" in sp and "Öğle" in sp, "Menülerim'de protein dağılımı")
+    check("protein dağılımı" in sp.lower() and "Kahvaltı" in sp and "Öğle" in sp, "Menülerim'de protein dağılımı")
     check("öğünde protein 20 g'ın altında" in sp, "20 g altındaki öğün için not")
     pg.locator("[data-protein-spread]").scroll_into_view_if_needed(); pg.screenshot(path=os.path.join(SHOTS, "v22_protein_dagilimi.png"))
     w = pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]")

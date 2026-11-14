@@ -101,9 +101,10 @@ try:
     # ================= 2) ANA EKRAN =================
     seed(pg, LEGACY)
     def reg(key): return pg.locator(f'[data-mob-region="{key}"]')
-    def lvl(key): return pg.evaluate(f"document.querySelector('[data-mob-region=\"{key}\"] [data-mob-lvl]').style.height")
+    # v32: dolum yüksekliği sayı yazısının üstünden başlar (calc); yüzde data-pct'te
+    def lvl(key): return pg.evaluate(f"document.querySelector('[data-mob-region=\"{key}\"] [data-mob-lvl]').dataset.pct") + "%"
     check("theme-mob" in (pg.get_attribute("body", "class") or ""), "Mobilite sekmesinde lavanta tema (body.theme-mob)")
-    check("B3A6FF" in (pg.get_attribute("#navBtnMobility", "class") or ""), "alt menüde Mobilite lavanta")
+    check(pg.evaluate("getComputedStyle(document.getElementById('navBtnMobility')).color") == "rgb(179, 166, 255)", "alt menüde Mobilite lavanta")
     check(pg.locator("#mobilityHeaderBar").count() == 0 and pg.locator("#mobilityTargetType").count() == 0, "eski üst şerit ve tür seçimi kaldırıldı")
     check(reg("hip").inner_text().replace("\n", " ").upper().startswith("KALÇA") and "1 / 3" in reg("hip").inner_text(), f"Kalça: 1 / 3 ({reg('hip').inner_text()!r})")
     check(lvl("hip") == "33%", f"Kalça doluluk %33 ({lvl('hip')})")

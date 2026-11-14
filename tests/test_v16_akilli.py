@@ -37,7 +37,7 @@ try:
     check(remP > 20 and remK > 200, f"kalan var: {round(remK)} kcal, {round(remP)} g P")
     sug = pg.locator("#foodSuggest [data-suggest]")
     check(not pg.evaluate("$('foodSuggest').classList.contains('hidden')") and 2 <= sug.count() <= 3, f"2–3 seçenek gösteriliyor ({sug.count()})")
-    check("KALAN HEDEFİNİ KAPATAN" in pg.inner_text("#foodSuggest"), "başlık: Kalan hedefini kapatan seçenekler")
+    check("kalan hedefini kapatan" in pg.inner_text("#foodSuggest").lower(), "başlık: Kalan hedefini kapatan seçenekler")
     cache = pg.evaluate("foodSuggestCache")
     freq = pg.evaluate("frequentFoods(30)")
     check(all(pt["id"] in freq for o in cache for pt in o["parts"]), "öneriler yalnızca sık yenen/kayıtlı besinlerden")

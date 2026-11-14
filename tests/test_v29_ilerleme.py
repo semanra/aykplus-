@@ -161,7 +161,7 @@ try:
     # --- Beslenme
     pg.click('#progNav [data-pv="beslenme"]'); pg.wait_for_timeout(150)
     check(pg.locator("#pKcal svg.p-chart").count() == 1 and pg.locator("#pWater svg.p-chart").count() == 1, "kalori ve su grafikleri")
-    check(pg.locator("#pKcal path[fill^='url(#phkc']").count() >= 1, "hedef üstü gün çizgili desenle (renk dışı işaret)")
+    check(pg.locator("#pKcal path[style*='url(#phkc']").count() >= 1, "hedef üstü gün çizgili desenle (renk dışı işaret)")
     check(pg.locator("#pKcal path[stroke-dasharray]").count() >= 1, "işaretlenmemiş gün kesik çerçeveyle")
     check("Hedef" in pg.inner_text("#pKcal .p-lg"), "hedef çizgisi açıklamada")
     pg.click("#pv_beslenme >> text=30 gün"); pg.wait_for_timeout(150)
