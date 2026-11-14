@@ -2,7 +2,7 @@
 // MOBİLİTE (v27): bölge ızgarası + tek sıralı liste, hareket detayı, hareket ekle, nefes daireli sayaç.
 // Görünüm durumu kaydedilmez (mobUI). Veri: state.mobilityRoutine.routines[].items (v39; bkz. normMobItem).
 // ---------------------------------------------------------------------------
-let mobUI = { view: "list", rid: null, edit: false, region: "", id: null, q: "", filter: "all" };
+let mobUI = { view: "home", rid: null, edit: false, region: "", id: null, q: "", filter: "all" };
 const MOB_REGION_LABEL = Object.fromEntries(MOB_REGIONS);
 const MOB_TYPE_LABEL = Object.fromEntries(MOB_TYPES);
 // v39: rutinler (state.mobilityRoutine.routines = [{ id, name, items }]); mobUI.rid = açık rutin
@@ -94,8 +94,9 @@ function mobListHtml() {
 function renderMobility() {
   const root = $("mobRoot");
   if (!root || state.activeTab !== "mobility") return;
-  if (mobUI.view === "detail" && !mobFind(mobUI.id)) mobUI.view = "list";
-  root.innerHTML = mobUI.view === "detail" ? mobDetailHtml() : mobUI.view === "add" ? mobAddHtml() : mobListHtml();
+  if (mobUI.view !== "home" && !mobRoutine(mobUI.rid)) { mobUI.view = "home"; mobUI.rid = null; mobUI.edit = false; }
+  if (mobUI.view === "detail" && !mobFind(mobUI.id)) mobUI.view = "routine";
+  root.innerHTML = mobUI.view === "detail" ? mobDetailHtml() : mobUI.view === "add" ? mobAddHtml() : mobUI.view === "routine" ? mobListHtml() : mobHomeHtml();
   if (mobUI.view === "add") mobRenderAddList();
 }
 function mobRegion(k) { mobUI.region = mobUI.region === k ? "" : k; renderMobility(); }
@@ -106,6 +107,104 @@ function mobReset() {
   mobItems().forEach(i => { i.done = false; });
   renderAll();
   offerUndo("Tikler sıfırlandı");
+}
+// --- v39: ANA EKRAN (bu hafta, rutin kartları, bölgeler · son çalışma) ---
+const MOB_DAY_LABELS = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"];
+function mobTodayKey() { return todayStr(logicalNow()); }
+function mobShiftKey(key, off) { const d = new Date(key + "T12:00:00"); d.setDate(d.getDate() + off); return todayStr(d); }
+function mobDaysAgo(key) { return Math.round((new Date(mobTodayKey() + "T12:00:00") - new Date(key + "T12:00:00")) / DAY_MS); }
+function mobItemSec(it) { return it.mode === "time" ? mobTotalSec(it) : mobRounds(it) * it.reps * 4; }
+function mobRoutineMin(r) { return Math.max(1, Math.round(r.items.reduce((s, it) => s + mobItemSec(it), 0) / 60)); }
+// Hareket yapılan günler: gece arşivi (mobilityLog) + bugün herhangi bir rutinde tik varsa bugün
+function mobDoneDays() {
+  const d = new Set();
+  Object.keys(state.mobilityLog || {}).forEach(k => { if ((state.mobilityLog[k] || []).length) d.add(k); });
+  if (mobAllItems().some(i => i.done)) d.add(mobTodayKey());
+  return d;
+}
+// Bu hafta (Pt–Pz) yapılan günler, sayısı ve seri (bugün yapılmadıysa dünden geriye kesintisiz günler)
+function mobWeekStats() {
+  const done = mobDoneDays(), t = mobTodayKey();
+  const dow = (new Date(t + "T12:00:00").getDay() + 6) % 7;
+  const days = MOB_DAY_LABELS.map((_, i) => done.has(mobShiftKey(t, i - dow)));
+  let k = done.has(t) ? t : mobShiftKey(t, -1), streak = 0;
+  while (done.has(k)) { streak++; k = mobShiftKey(k, -1); }
+  return { days, count: days.filter(Boolean).length, streak, dow };
+}
+// Ad → bölgeler: kütüphane, üzerine rutinlerdeki hareketler (ana + ikincil)
+function mobNameRegions() {
+  const m = {};
+  Object.keys(MOB_LIB_REGIONS).forEach(n => { m[mobNorm(n)] = MOB_LIB_REGIONS[n]; });
+  mobAllItems().forEach(it => { m[mobNorm(it.name)] = [it.region, it.region2].filter(Boolean); });
+  return m;
+}
+// Bölge başına en son kaç gün önce çalışıldı (0 = bugün, null = hiç)
+function mobRegionLast() {
+  const out = {}, nr = mobNameRegions();
+  MOB_REGIONS.forEach(([k]) => { out[k] = null; });
+  const mark = (name, ago) => (nr[mobNorm(name)] || []).forEach(r => { if (r in out && (out[r] == null || ago < out[r])) out[r] = ago; });
+  Object.keys(state.mobilityLog || {}).forEach(k => { const ago = mobDaysAgo(k); if (ago >= 0) (state.mobilityLog[k] || []).forEach(n => mark(n, ago)); });
+  mobAllItems().filter(i => i.done).forEach(i => mark(i.name, 0));
+  return out;
+}
+// Rutinin hareketlerinden biri en son kaç gün önce yapıldı (null = hiç)
+function mobLastDone(r) {
+  if (r.items.some(i => i.done)) return 0;
+  const names = new Set(r.items.map(i => mobNorm(i.name)));
+  let best = null;
+  Object.keys(state.mobilityLog || {}).forEach(k => {
+    const ago = mobDaysAgo(k);
+    if (ago >= 0 && (best == null || ago < best) && (state.mobilityLog[k] || []).some(n => names.has(mobNorm(n)))) best = ago;
+  });
+  return best;
+}
+function mobAgoText(ago) { return ago === 0 ? "Bugün" : ago === 1 ? "Dün" : ago + " gün önce"; }
+function mobRoutineCardHtml(r) {
+  const id = mobArg(r.id), n = r.items.length, last = mobLastDone(r);
+  const regs = [...new Set(r.items.map(i => i.region).filter(Boolean))].slice(0, 3);
+  return `<div data-mob-routine="${esc(r.id)}" class="m-rt">
+    <div class="flex items-start justify-between gap-2">
+      <div class="min-w-0"><h3 class="m-rt-name t-display">${esc(r.name)}</h3>
+        <div class="m-rt-meta">${n ? `${n} hareket · ~${mobRoutineMin(r)} dk` : "Henüz hareket yok"}</div></div>
+      ${last == null ? "" : `<span class="m-rt-last ${last === 0 ? "on" : ""}">${mobAgoText(last)}${last <= 1 ? " yapıldı" : ""}</span>`}
+    </div>
+    ${regs.length ? `<div class="flex flex-wrap gap-1.5 mt-2.5">${regs.map(k => `<span class="m-tag">${esc(MOB_REGION_LABEL[k])}</span>`).join("")}</div>` : ""}
+    <div class="grid ${n ? "grid-cols-[1fr_auto]" : "grid-cols-1"} gap-2.5 mt-3.5">
+      ${n ? `<button data-mob-start onclick="mobSesStart(${id})" class="m-btn pri">${svgI("play", 18, 2.4)}Başlat</button>` : ""}
+      <button data-mob-openr onclick="mobOpenRoutine(${id})" class="m-btn ghost">${n ? "Aç" : "Aç ve hareket ekle"}</button>
+    </div>
+  </div>`;
+}
+function mobHomeHtml() {
+  const w = mobWeekStats(), last = mobRegionLast();
+  const regs = MOB_REGIONS.map(([k, label]) => {
+    const a = last[k], warn = a != null && a >= 7;
+    const txt = a == null ? "Henüz yok" : warn ? a + " gündür yok" : mobAgoText(a);
+    return `<div data-mob-reg="${k}" class="m-rg ${a === 0 ? "ok" : ""} ${warn ? "warn" : ""}"><b class="t-display">${mobUpper(label)}</b><span>${txt}</span></div>`;
+  }).join("");
+  return `<div id="mobHome">
+    <div class="grid grid-cols-2 gap-2">
+      <div class="m-wk"><b class="t-display">${w.count}</b><span>gün bu hafta</span></div>
+      <div class="m-wk"><b class="t-display">${w.streak}</b><span>gün üst üste</span></div>
+    </div>
+    <div class="m-days" aria-label="Bu hafta mobilite yapılan günler">${MOB_DAY_LABELS.map((l, i) =>
+      `<i class="${w.days[i] ? "d" : ""} ${i === w.dow ? "t" : ""}" aria-label="${l}${w.days[i] ? " yapıldı" : ""}">${l}</i>`).join("")}</div>
+    <div class="m-lbl">Rutinlerin</div>
+    <div class="space-y-2.5">${mobRoutines().map(mobRoutineCardHtml).join("")}</div>
+    <button id="mobNewRoutine" onclick="mobNewRoutine()" class="m-btn ghost w-full mt-2.5 !border-dashed">${svgI("plus", 18, 2.4)}Yeni rutin</button>
+    <div class="m-lbl">Bölgeler · son çalışma</div>
+    <div class="grid grid-cols-3 gap-2">${regs}</div>
+  </div>`;
+}
+function mobOpenRoutine(rid) { if (!mobRoutine(rid)) return; mobUI.view = "routine"; mobUI.rid = rid; mobUI.edit = false; window.scrollTo(0, 0); renderMobility(); }
+async function mobNewRoutine() {
+  const v = await askText("Yeni rutin", "", "Örn. Sabah rutini", "", "Oluştur");
+  if (v == null || !String(v).trim()) return;
+  const r = { id: mobNewRoutineId(), name: String(v).trim().slice(0, 40), items: [] };
+  mobRoutines().push(r);
+  mobUI.view = "routine"; mobUI.rid = r.id; mobUI.edit = true;
+  window.scrollTo(0, 0);
+  renderAll();
 }
 // --- Hareket detayı (anında kayıt) ---
 const MOB_SWITCH_SEC = 5;   // turlar arası "taraf değiştir" arası
@@ -168,8 +267,16 @@ function mobDetailHtml() {
     </div>
   </div>`;
 }
-function mobOpen(id) { if (!mobFind(id)) return; mobUI.view = "detail"; mobUI.id = id; window.scrollTo(0, 0); renderMobility(); }
-function mobBack() { mobUI.view = "list"; mobUI.id = null; window.scrollTo(0, 0); renderMobility(); }
+function mobOpen(id) {
+  const r = mobRoutines().find(x => x.items.some(i => i.id === id)); if (!r) return;
+  mobUI.rid = r.id; mobUI.view = "detail"; mobUI.id = id; window.scrollTo(0, 0); renderMobility();
+}
+// Detay/ekle → rutinin içi; rutinin içi → ana ekran
+function mobBack() {
+  if (mobUI.view === "routine" && !mobUI.edit) { mobUI.view = "home"; mobUI.rid = null; }
+  else mobUI.view = "routine";
+  mobUI.id = null; window.scrollTo(0, 0); renderMobility();
+}
 function mobStep(id, field, d) {
   const it = mobFind(id); if (!it) return;
   if (field === "sets") it.sets = Math.min(10, Math.max(1, it.sets + d));

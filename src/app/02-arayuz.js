@@ -331,6 +331,7 @@ function switchTab(tab) {
   if (tab !== state.activeTab) {
     state.activeTab = tab;
     window.scrollTo(0, 0);
+    if (tab === "mobility") { mobUI.view = "home"; mobUI.rid = null; mobUI.edit = false; }   // v39: mobilite her girişte ana ekranla açılır
   }
   renderAll();
   updateWakeLock();

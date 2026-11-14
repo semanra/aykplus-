@@ -225,6 +225,26 @@
     .m-seg > button.on { background: var(--t-elev); color: var(--t-text); box-shadow: inset 0 0 0 1.5px var(--t-acc-text); }
     .m-preview { margin-top: 8px; font-size: 13.5px; color: var(--t-dim); }
     .m-preview b { color: var(--t-text); font-weight: 600; }
+    /* v39: mobilite ana ekranı */
+    .m-wk { background: var(--t-surface); border-radius: 18px; padding: 12px 14px; }
+    .m-wk b { display: block; font-size: 34px; line-height: 1; color: var(--t-text); }
+    .m-wk span { display: block; font-size: 12.5px; color: var(--t-muted); margin-top: 4px; }
+    .m-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+    .m-days i { height: 34px; border-radius: 10px; background: var(--t-surface); font-style: normal; font-size: 12px; color: var(--t-muted); display: grid; place-items: center; }
+    .m-days i.d { background: rgba(var(--t-acc-rgb), 0.18); color: var(--t-acc-text); font-weight: 700; }
+    .m-days i.t { box-shadow: inset 0 0 0 1.5px var(--t-acc-text); color: var(--t-text); }
+    .m-rt { background: var(--t-surface); border-radius: 22px; padding: 16px; }
+    .m-rt-name { font-size: 26px; line-height: 1.02; color: var(--t-text); text-transform: uppercase; word-break: break-word; }
+    .m-rt-meta { font-size: 13px; color: var(--t-muted); margin-top: 6px; }
+    .m-rt-last { font-size: 12.5px; color: var(--t-muted); font-weight: 650; white-space: nowrap; padding-top: 4px; }
+    .m-rt-last.on { color: var(--t-acc-text); }
+    .m-tag { height: 28px; padding: 0 11px; border-radius: 14px; background: var(--t-elev); font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; color: var(--t-text2); }
+    .m-rg { background: var(--t-surface); border-radius: 16px; padding: 10px 12px; min-height: 64px; }
+    .m-rg b { display: block; font-size: 17px; line-height: 1.05; color: var(--t-text); }
+    .m-rg span { display: block; font-size: 12.5px; color: var(--t-muted); margin-top: 6px; }
+    .m-rg.ok span { color: var(--t-acc-text); font-weight: 650; }
+    .m-rg.warn span { color: var(--t-warn-text); font-weight: 650; }
+    html.light .m-rt, html.light .m-wk, html.light .m-rg { box-shadow: 0 1px 2px rgba(9, 9, 11, 0.06); }
     /* v39: nasıl yapılır kutusu (detay + seans) */
     .m-guide { background: var(--t-surface); border-radius: 18px; padding: 12px 14px; margin-top: 18px; }
     .m-guide-h { font-size: 13.5px; font-weight: 700; color: var(--t-acc-text); }

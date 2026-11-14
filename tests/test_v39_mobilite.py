@@ -81,6 +81,45 @@ try:
     pg.evaluate("mobOpen(mobRoutines()[0].items[2].id)"); pg.wait_for_timeout(150)
     check(pg.query_selector("#mobDtGuide") is None, "elle eklenmiş harekette kılavuz yok")
 
+    # ================= 3) ANA EKRAN =================
+    ctx3 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
+    ctx3.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    p3 = ctx3.new_page(); p3.on("pageerror", lambda e: errs.append(str(e)))
+    p3.clock.install(time=datetime.datetime.fromisoformat("2026-11-13T10:00:00"))   # Cuma
+    home = {"activeTab": "mobility", "today": "2026-11-13", "settings": {"splash": False},
+            "mobilityLog": {"2026-11-04": ["Kneeling Ankle Dorsiflexion"], "2026-11-09": ["Couch Stretch"], "2026-11-11": ["Couch Stretch"], "2026-11-12": ["X2"]},
+            "mobilityRoutine": {"dynamic": [], "static": [], "routines": [
+                {"id": "a", "name": "<b>A</b>", "items": [it("Couch Stretch", done=True), it("Leg Swings", region="hamstring"), it("Kneeling Ankle Dorsiflexion", region="ankle", mode="time", sec=30, sets=2, sides=2)]},
+                {"id": "e", "name": "Boş", "items": []}]}}
+    seed(p3, home); p3.evaluate("switchTab('mobility')"); p3.wait_for_timeout(150)
+    w = p3.evaluate("mobWeekStats()")
+    check(w["days"] == [True, False, True, True, True, False, False] and w["count"] == 4 and w["streak"] == 3, f"bu hafta: Pt Ça Pe Cu, 4 gün, seri 3 ({w})")
+    p3.evaluate("mobRoutines()[0].items[0].done = false; renderAll()")
+    w = p3.evaluate("mobWeekStats()")
+    check(w["count"] == 3 and w["streak"] == 2, f"bugün yapılmadıysa seri dünden sayılır ({w})")
+    p3.evaluate("mobRoutines()[0].items[0].done = true; renderAll()")
+    check(p3.evaluate("mobUI.view") == "home" and p3.is_visible("#mobHome"), "mobilite ana ekranla açılıyor")
+    cards = p3.query_selector_all("[data-mob-routine]")
+    check(len(cards) == 2, f"her rutin için bir kart ({len(cards)})")
+    t0 = cards[0].inner_text() if cards else ""
+    check("<b>a</b>" in t0.lower() and "3 hareket" in t0 and "dk" in t0 and "Bugün yapıldı" in t0, f"kart: ad kaçışlı, hareket sayısı, süre, son yapılma ({t0[:80]!r})")
+    check(p3.query_selector('[data-mob-routine="a"] [data-mob-start]') is not None and p3.query_selector('[data-mob-routine="e"] [data-mob-start]') is None, "boş rutinde Başlat yok")
+    rg = p3.evaluate("mobRegionLast()")
+    check(rg.get("hip") == 0 and rg.get("ankle") == 9 and rg.get("shoulder") is None, f"bölgeler son çalışma ({rg})")
+    ank = p3.inner_text('[data-mob-reg="ankle"]'); hip = p3.inner_text('[data-mob-reg="hip"]'); sh = p3.inner_text('[data-mob-reg="shoulder"]')
+    check("9 gündür yok" in ank and "warn" in (p3.get_attribute('[data-mob-reg="ankle"]', "class") or "") and "Bugün" in hip and "Henüz yok" in sh,
+          f"bölge kutuları ({ank!r}, {hip!r}, {sh!r})")
+    small = p3.evaluate("""[...document.querySelectorAll('#mobHome button')].filter(e => { const r = e.getBoundingClientRect(); return r.width && (r.width < 44 || r.height < 44); }).length""")
+    check(small == 0, f"ana ekrandaki düğmeler ≥ 44 px ({small})")
+    p3.click("#mobNewRoutine"); p3.wait_for_timeout(150); p3.fill("#uiDlgInput", "Akşam"); p3.click("#uiDlgOk"); p3.wait_for_timeout(200)
+    rs = mr(p3)["routines"]
+    check(len(rs) == 3 and rs[-1]["name"] == "Akşam" and rs[-1]["items"] == [] and p3.evaluate("mobUI.view === 'routine' && mobUI.edit && mobUI.rid") == rs[-1]["id"],
+          "Yeni rutin: ad soruldu, boş rutin açıldı, Düzenle açık")
+    p3.evaluate("switchTab('gym'); switchTab('mobility')"); p3.wait_for_timeout(100)
+    check(p3.evaluate("mobUI.view") == "home", "sekmeye dönünce ana ekran")
+    p3.screenshot(path=os.path.join(SHOTS, "v39_ana.png"), full_page=True)
+    ctx3.close()
+
     check(not errs, f"sayfa hatası yok ({errs[:3]})")
     b.close()
 finally:
