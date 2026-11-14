@@ -11,7 +11,7 @@ URL = "http://localhost:8772/index.html"
 def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 def toasts(pg): return pg.evaluate("[...document.querySelectorAll('#toastWrap > div')].map(e => e.textContent).join(' | ')")
 SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 

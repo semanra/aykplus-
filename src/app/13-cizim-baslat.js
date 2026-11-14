@@ -38,40 +38,49 @@ function renderAll() {
 // ---------------------------------------------------------------------------
 // BAŞLAT
 // ---------------------------------------------------------------------------
-(function hideSplash() {
-  const sp = document.getElementById("splash");
-  if (!sp) return;
-  if (state.settings.splash === false) { sp.remove(); return; }
-  setTimeout(() => { if (sp.parentNode) sp.remove(); }, 1300);
-})();
-checkNewDay();
-autoSelectNextDay();
-if (workoutInProgress()) { state.gymActive = true; state.gymView = "today"; }
-resetTimerUI();
-resumeTimer();   // v36
-renderAll();
-updateWakeLock();
-// v37: eski sürümlerden kalan yük. (1) Küçültülmemiş eski fotoğraf. (2) Bu uygulamanın ilk sürümlerinin kaydı
-// (ayk_plus_v4_state): içindekiler ilk açılışta bugünkü kayda taşındı, sonra hiç okunmadı ama yer tutmaya devam ediyordu.
-// Yalnızca açılışta bugünkü kayıt zaten vardı ve sorunsuz okunduysa silinir (ilk taşıma açılışında dokunulmaz).
-slimOldPhoto();
-try { if (hadV5State && !loadFailed && localStorage.getItem("ayk_plus_v4_state") != null) localStorage.removeItem("ayk_plus_v4_state"); } catch (e) { /* yok sayılır */ }
-setTimeout(checkFoodHealth, 1500);
-setTimeout(checkStorageWarn, 2500);   // v36
-if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);
+// v41: açılış, kayıt depolamadan yüklendikten sonra (storageInit → bootApp). Açılış ekranı (splash) bu sırada görünür.
+function bootApp() {
+  (function hideSplash() {
+    const sp = document.getElementById("splash");
+    if (!sp) return;
+    if (state.settings.splash === false) { sp.remove(); return; }
+    setTimeout(() => { if (sp.parentNode) sp.remove(); }, 1300);
+  })();
+  checkNewDay();
+  autoSelectNextDay();
+  if (workoutInProgress()) { state.gymActive = true; state.gymView = "today"; }
+  resetTimerUI();
+  resumeTimer();   // v36
+  renderAll();
+  updateWakeLock();
+  // v37: eski sürümlerden kalan yük. (1) Küçültülmemiş eski fotoğraf. (2) Bu uygulamanın ilk sürümlerinin kaydı
+  // (ayk_plus_v4_state): içindekiler ilk açılışta bugünkü kayda taşındı, sonra hiç okunmadı ama yer tutmaya devam ediyordu.
+  // Yalnızca açılışta bugünkü kayıt zaten vardı ve sorunsuz okunduysa silinir (ilk taşıma açılışında dokunulmaz).
+  slimOldPhoto();
+  try { if (hadV5State && !loadFailed && localStorage.getItem("ayk_plus_v4_state") != null) localStorage.removeItem("ayk_plus_v4_state"); } catch (e) { /* yok sayılır */ }
+  setTimeout(checkFoodHealth, 1500);
+  setTimeout(checkStorageWarn, 2500);   // v36
+  if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);
 
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") {
-    if (checkNewDay()) { autoSelectNextDay(); renderAll(); }
-    if (timer.running) tickTimer();
-    if (mobT) mobTimerTick();
-    updateWakeLock();
-  }
-});
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      if (checkNewDay()) { autoSelectNextDay(); renderAll(); autoSnapshot(); }
+      if (timer.running) tickTimer();
+      if (mobT) mobTimerTick();
+      updateWakeLock();
+    }
+  });
 
-// v36: uygulama gece yarısı ekranda açık kalırsa da gün değişsin (eskiden yalnızca açılışta / uygulamaya dönüşte bakılıyordu;
-// 00:05'te içilen su önceki güne yazılıyordu). Yarım dakikada bir, yalnızca ekran görünürken.
-setInterval(() => { if (document.visibilityState === "visible" && checkNewDay()) { autoSelectNextDay(); renderAll(); } }, 30000);
+  // v36: uygulama gece yarısı ekranda açık kalırsa da gün değişsin (eskiden yalnızca açılışta / uygulamaya dönüşte bakılıyordu;
+  // 00:05'te içilen su önceki güne yazılıyordu). Yarım dakikada bir, yalnızca ekran görünürken.
+  setInterval(() => { if (document.visibilityState === "visible" && checkNewDay()) { autoSelectNextDay(); renderAll(); autoSnapshot(); } }, 30000);
+  autoSnapshot();   // v41: günün iç yedeği (yoksa)
+  // v41: arka plana geçerken / sayfa kapanırken localStorage aynası güncellenir
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") writeMirror(); });
+  window.addEventListener("pagehide", () => writeMirror());
+  window.aykBooted = true;
+}
+storageInit().then(bootApp, e => { console.error(e); storageUseLegacy(); bootApp(); });
 
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* yoksay */ }
 if ("serviceWorker" in navigator) {

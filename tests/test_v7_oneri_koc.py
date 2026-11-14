@@ -7,7 +7,7 @@ srv=subprocess.Popen(['python3','-m','http.server','8765'],cwd=REPO,stdout=subpr
 from playwright.sync_api import sync_playwright
 DAY=86400000; now=int(time.time()*1000)
 errs=[]
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 with sync_playwright() as p:
     b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
     pg=ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
@@ -78,7 +78,7 @@ with sync_playwright() as p:
     pg.screenshot(path=""+SHOTS+"/v7_coach2.png")
     pg.click("button[onclick=\"resetCoachAdjust()\"]"); pg.wait_for_timeout(100); print("reset:", pg.evaluate("getTargets().calTarget"))
     # not ready
-    pg.evaluate("localStorage.clear()"); pg.reload(); pg.click("#navBtnProgress"); pg.wait_for_timeout(300)
+    pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.click("#navBtnProgress"); pg.wait_for_timeout(300)
     print("not ready text ok:", "en az 4 tartı" in pg.inner_text("#progressContent"))
     b.close()
 srv.terminate(); print("errors:",errs)

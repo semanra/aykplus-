@@ -11,7 +11,7 @@ errs = []; fails = []
 def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 def items(pg): return st(pg)["mobilityRoutine"]["routines"][0]["items"]
 def ov(pg):
     w = pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]"); return w[0] <= w[1]
@@ -85,7 +85,7 @@ try:
     check(len(bi) == 1 and bi[0]["sets"] == 1 and bi[0]["sec"] == 600 and bi[0]["mode"] == "time" and bi[0]["region"] == "" and bi[0]["sides"] == 1,
           f"bozuk items: boşlar atıldı, sayılar sınırlandı ({bi})")
     # Yeni kullanıcı: varsayılan rutin de yeni modelde
-    pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(300)
+    pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.wait_for_timeout(300)
     ni = items(pg)
     check(len(ni) == 10 and ni[0]["region"] == "hip" and ni[5]["type"] == "static", f"yeni kullanıcı: 10 hareket yeni modelde ({len(ni)})")
     # Gün arşivi: yapılanlar mobilityLog'a, tikler sıfırlanır

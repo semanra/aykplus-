@@ -1315,6 +1315,11 @@
                 <button onclick="restoreBackupFromText()" class="t-btn-outline h-11 rounded-xl">Kodu yükle</button>
               </div>
             </details>
+            <details class="bg-[var(--t-elev)] rounded-2xl px-3.5 py-1">
+              <summary class="min-h-[48px] flex items-center justify-between cursor-pointer text-[14px] font-semibold text-[var(--t-text)]">Otomatik iç yedekler<span class="text-[12px] font-normal text-[var(--t-dim)]">son 7 gece + 4 hafta</span></summary>
+              <p class="text-[12.5px] text-[var(--t-dim)] pb-1">Uygulama her gün bütün verinin bir kopyasını telefonda saklar. Bir şey ters giderse o günkü hâline dönebilirsin.</p>
+              <div id="pfSnaps" class="pb-2"></div>
+            </details>
             <div id="pfRescue" class="hidden bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)] rounded-2xl p-3.5 space-y-2.5">
               <p class="text-[13px] leading-snug text-[var(--t-warn-hi)]"><b>Kurtarma kopyası var.</b> Uygulama bir açılışta kayıtlı verini okuyamadı ve okunamayan hâlini burada sakladı. Önce dosya olarak indir, sonra geri yüklemeyi dene.</p>
               <div class="grid grid-cols-3 gap-2">
@@ -1336,7 +1341,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v40</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v41</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

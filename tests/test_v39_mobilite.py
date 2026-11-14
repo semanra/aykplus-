@@ -10,7 +10,7 @@ def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
 URL = "http://localhost:8798/index.html"
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 def mr(pg): return st(pg)["mobilityRoutine"]
 TODAY = datetime.date.today().isoformat()
 def it(name, **kw):
@@ -26,7 +26,7 @@ PRE27 = {"activeTab": "mobility", "today": TODAY, "settings": {"splash": False},
 
 def seed(pg, data):
     pg.goto(URL); pg.wait_for_timeout(200)
-    pg.evaluate("s => { localStorage.clear(); localStorage.setItem('ayk_plus_v5_state', s); }", json.dumps(data)); pg.reload(); pg.wait_for_timeout(350)
+    pg.evaluate("s => { (localStorage.clear(), void indexedDB.deleteDatabase('aykplus')); localStorage.setItem('ayk_plus_v5_state', s); }", json.dumps(data)); pg.reload(); pg.wait_for_timeout(350)
 
 try:
   with sync_playwright() as p:
@@ -66,7 +66,7 @@ try:
     pg.evaluate("switchTab('progress'); switchTab('mobility'); switchTab('gym'); setGymView('library'); switchTab('mobility')"); pg.wait_for_timeout(200)
     check(mr(pg)["routines"] == [], "bütün rutinler silinmişken açılış/gün geçişi/sekmeler çalışıyor")
 
-    pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(300); r = mr(pg)["routines"]
+    pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.wait_for_timeout(300); r = mr(pg)["routines"]
     check(len(r) == 1 and r[0]["name"] == "Rutinim" and len(r[0]["items"]) == 10, "yeni kullanıcı: varsayılan 10 hareket 'Rutinim' içinde")
 
     # ================= 2) NASIL YAPILIR =================

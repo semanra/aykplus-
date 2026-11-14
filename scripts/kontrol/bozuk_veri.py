@@ -28,7 +28,7 @@ RICH = r"""() => {
   state.supplementList[0].dose = 5; state.supplementList[0].unit = "g"; state.supplementList[0].time = "post";
   state.missSearches = [{ q: "kinoa", n: 2, ts: now }];
   renderAll();
-  return JSON.parse(localStorage.getItem('ayk_plus_v5_state'));
+  return aykStoredState();
 }"""
 
 JUNK = [None, "", "abc", 0, -5, 1e12, "12,5", [], {}, True, [None], {"x": 1}, "<b>x</b>", -0.0001]
@@ -62,7 +62,7 @@ VISIT = r"""async () => {
   const steps = [
     "switchTab('nutrition'); setNutriView('today')", "setNutriView('menus')", "setNutriView('foods')", "setNutriView('history')",
     "switchTab('gym'); setGymView('today')", "setGymView('program')", "setGymView('library')", "setGymView('history')", "startWorkout()",
-    "state.gymActive = false; switchTab('mobility')", "mobOpen(state.mobilityRoutine.routines[0].items[0] && state.mobilityRoutine.routines[0].items[0].id)", "mobAddOpen()",
+    "state.gymActive = false; switchTab('mobility')", "(r => r && r.items[0] && mobOpen(r.items[0].id))(mobRoutines()[0])", "mobAddOpen()",
     "switchTab('progress'); setProgressView('genel')", "setProgressView('kilo')", "setProgressView('guc')", "setProgressView('beslenme')",
     "openProfile()", "hideProfile(); switchTab('nutrition'); openShopList()", "closeModal('shopModal'); checkNewDay()"
   ];
@@ -85,7 +85,7 @@ def main():
         for it in range(N):
             k = rng.choice([1, 1, 2, 3, 5, 8, 12])
             s, done = mutate(base, rng, k)
-            pg.evaluate("s => { localStorage.clear(); localStorage.setItem('ayk_plus_v5_state', s); }", json.dumps(s))
+            pg.evaluate("s => { (localStorage.clear(), void indexedDB.deleteDatabase('aykplus')); localStorage.setItem('ayk_plus_v5_state', s); }", json.dumps(s))
             perr.clear(); pg.reload(); pg.wait_for_timeout(120)
             failed = pg.evaluate("!!localStorage.getItem('ayk_plus_v5_state_kurtarma')")
             errs = pg.evaluate(VISIT)

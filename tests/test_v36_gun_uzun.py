@@ -10,7 +10,7 @@ def check(cond, label):
     if not cond: fails.append(label)
 URL = "http://localhost:8796/index.html"
 T = datetime.datetime.fromisoformat
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 def vis(pg): pg.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); pg.wait_for_timeout(60)
 def ok(pg): pg.wait_for_timeout(100); pg.click("#uiDlgOk"); pg.wait_for_timeout(100)
 def pick(d, *ks): return {k: d.get(k) for k in ks}
@@ -94,13 +94,15 @@ try:
     pg.evaluate("openProfile()"); pg.wait_for_timeout(100)
     txt = pg.inner_text("#pfStorageTxt")
     check(txt.startswith("%") and "dolu" in txt and not pg.is_visible("#pfStorageWarn"), f"Profil → Yedekleme: kayıt alanı gösteriliyor ({txt})")
-    pg.evaluate("localStorage.setItem('__dolgu', 'x'.repeat(1900000)); hideProfile(); openProfile()"); pg.wait_for_timeout(100)
+    # v41: kayıt IndexedDB'de; doluluk tarayıcının ayırdığı alana göre (navigator.storage.estimate) — %80 dolu taklidi
+    FULL = "Object.defineProperty(navigator.storage, 'estimate', { value: async () => ({ usage: 80e6, quota: 100e6 }), configurable: true })"
+    pg.context.add_init_script(FULL); pg.evaluate(FULL)
+    pg.evaluate("hideProfile(); openProfile()"); pg.wait_for_timeout(150)
     check(pg.is_visible("#pfStorageWarn") and int(pg.inner_text("#pfStorageTxt")[1:].split()[0]) >= 70, "%70 üstünde uyarı çıkıyor")
     pg.reload(); pg.clock.run_for(3000); pg.wait_for_timeout(100)
     check("kayıt alanının" in pg.inner_text("#toastWrap"), "açılışta alan uyarısı (haftada en fazla bir)")
     pg.reload(); pg.clock.run_for(3000); pg.wait_for_timeout(100)
     check("kayıt alanının" not in pg.inner_text("#toastWrap"), "aynı hafta ikinci açılışta tekrar uyarmıyor")
-    pg.evaluate("localStorage.removeItem('__dolgu')")
     ctx.close()
 
     # ===== 6) DİNLENME SAYACI: iOS uygulamayı kapatıp açınca kaldığı yerden sürer =====
@@ -116,7 +118,8 @@ try:
 
     # ===== 7) KAYIT HATASI (alan dolu): uygulama çalışmaya devam eder, uyarır =====
     ctx, pg = page("2026-03-09T09:00:00")
-    pg.evaluate("() => { const orig = Storage.prototype.setItem; window.__restore = () => { Storage.prototype.setItem = orig; }; Storage.prototype.setItem = function (k, v) { if (k === 'ayk_plus_v5_state') throw new DOMException('dolu', 'QuotaExceededError'); return orig.call(this, k, v); }; }")
+    # v41: kayıt IndexedDB'de; yazma hatası taklidi
+    pg.evaluate("() => { const orig = IDBObjectStore.prototype.put; window.__restore = () => { IDBObjectStore.prototype.put = orig; }; IDBObjectStore.prototype.put = function () { throw new DOMException('dolu', 'QuotaExceededError'); }; }")
     pg.evaluate("addWater(0.5)"); pg.wait_for_timeout(100)
     check("kaydedilemedi" in pg.inner_text("#toastWrap") and pg.evaluate("state.waterLiters") == 0.5, "kayıt yapılamayınca uyarı çıkıyor, ekrandaki veri kaybolmuyor")
     pg.evaluate("__restore(); addWater(0.5)")

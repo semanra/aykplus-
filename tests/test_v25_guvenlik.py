@@ -13,7 +13,7 @@ KEY = "ayk_plus_v5_state"
 def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
-def st(pg): return pg.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
+def st(pg): return pg.evaluate(f"aykStoredState()")
 def undo(pg): pg.locator("#toastWrap button", has_text="Geri al").last.click(); pg.wait_for_timeout(100)
 SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 def new_page(b, clock=None, raw=None):
@@ -24,7 +24,7 @@ def new_page(b, clock=None, raw=None):
     if clock: pg.clock.set_fixed_time(clock)
     pg.goto(URL); pg.wait_for_timeout(300)
     if raw is not None:
-        pg.evaluate(f"r => {{ localStorage.clear(); localStorage.setItem('{KEY}', r); }}", raw if isinstance(raw, str) else json.dumps(raw))
+        pg.evaluate(f"r => {{ (localStorage.clear(), void indexedDB.deleteDatabase('aykplus')); localStorage.setItem('{KEY}', r); }}", raw if isinstance(raw, str) else json.dumps(raw))
         pg.reload(); pg.wait_for_timeout(500)
     return ctx, pg, errs, native
 

@@ -10,7 +10,7 @@ def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
 URL = "http://localhost:8780/index.html"
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 def bg(pg, sel="body"): return pg.evaluate("s => getComputedStyle(document.querySelector(s)).backgroundColor", sel)
 def is_light(pg): return pg.evaluate("document.documentElement.classList.contains('light')")
 

@@ -10,7 +10,7 @@ def check(cond, label):
     if not cond: fails.append(label)
 URL = "http://localhost:8799/index.html"
 T = datetime.datetime.fromisoformat
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 def it(name, **kw):
     d = {"id": "i_" + name.replace(" ", "_"), "name": name, "type": "dynamic", "region": "hip", "region2": "", "sets": 1, "mode": "reps",
          "reps": 8, "sec": 30, "sides": 1, "note": "", "rx": "", "rxOk": True, "done": False}
@@ -31,7 +31,7 @@ try:
         pg.clock.install(time=T(t0)); pg.goto(URL); pg.wait_for_timeout(200)
         return ctx, pg
     def seed(pg, data):
-        pg.evaluate("s => { localStorage.clear(); localStorage.setItem('ayk_plus_v5_state', s); }", json.dumps(data)); pg.reload(); pg.wait_for_timeout(350)
+        pg.evaluate("s => { (localStorage.clear(), void indexedDB.deleteDatabase('aykplus')); localStorage.setItem('ayk_plus_v5_state', s); }", json.dumps(data)); pg.reload(); pg.wait_for_timeout(350)
     def tick(pg, ms): pg.clock.run_for(ms); pg.wait_for_timeout(30)
 
     # ================= 1) ERTELENENLER =================

@@ -1315,6 +1315,11 @@
                 <button onclick="restoreBackupFromText()" class="t-btn-outline h-11 rounded-xl">Kodu yükle</button>
               </div>
             </details>
+            <details class="bg-[var(--t-elev)] rounded-2xl px-3.5 py-1">
+              <summary class="min-h-[48px] flex items-center justify-between cursor-pointer text-[14px] font-semibold text-[var(--t-text)]">Otomatik iç yedekler<span class="text-[12px] font-normal text-[var(--t-dim)]">son 7 gece + 4 hafta</span></summary>
+              <p class="text-[12.5px] text-[var(--t-dim)] pb-1">Uygulama her gün bütün verinin bir kopyasını telefonda saklar. Bir şey ters giderse o günkü hâline dönebilirsin.</p>
+              <div id="pfSnaps" class="pb-2"></div>
+            </details>
             <div id="pfRescue" class="hidden bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)] rounded-2xl p-3.5 space-y-2.5">
               <p class="text-[13px] leading-snug text-[var(--t-warn-hi)]"><b>Kurtarma kopyası var.</b> Uygulama bir açılışta kayıtlı verini okuyamadı ve okunamayan hâlini burada sakladı. Önce dosya olarak indir, sonra geri yüklemeyi dene.</p>
               <div class="grid grid-cols-3 gap-2">
@@ -1336,7 +1341,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v40</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v41</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -2083,6 +2088,279 @@ const DEFAULT_STATE = {
 
 </script>
 <script>
+// ---------------------------------------------------------------------------
+// DEPOLAMA (v41, App Store Aşama 1). Bütün kalıcı kayıt bu katmandan geçer.
+// - IndexedDB "aykplus": veri parçalara bölünür (STORE_PARTS + "core"); dokunuşta yalnızca değişen parça yazılır (tek işlem).
+// - localStorage "ayk_plus_v5_state" SİLİNMEZ: "ayna" olarak, dokunuşlar durunca (2 sn) ve arka plana geçerken güncellenir.
+//   Önbellekteki eski sürümler ve dışarıdan yazılan kayıt (eski sürüm, test) böylece çalışır; dolarsa ayna durur.
+// - Açılışta localStorage'ın imzası son aynayla aynı değilse kayıt dışarıdan değişmiştir → içe alınır (önceki hâl iç yedek).
+// - IndexedDB açılamazsa "ls" (eski) modu: davranış v40 ile birebir.
+// - İç yedekler (snaps): her gün ilk açılışta günün kopyası; son 7 gece + son 4 haftanın birer kopyası, "Geçiş öncesi" kalıcı.
+// Bu dosya yalnızca tanımlar içerir; başlatma 13-cizim-baslat.js → storageInit().then(bootApp).
+// ---------------------------------------------------------------------------
+const IDB_NAME = "aykplus";
+const STORE_PARTS = ["dailyLogs", "exerciseHistory", "workoutLogs", "weightLogs", "mobilityLog", "mobilityRoutineLog", "measurements", "foodSnap"];
+const MIRROR_DELAY_MS = 2000;
+const MIRROR_SIG_KEY = "ayk_plus_v5_imza";   // aynanın imzası, aynayla aynı anda (eşzamanlı) yazılır
+var storeMode = "boot";          // boot | idb | ls
+var storeReady = false;          // açılış bitmeden hiçbir şey yazılmaz
+var aykDB = null;
+var storeLast = {};              // parça → son yazılan JSON metni
+var storeMeta = { migratedAt: 0, mirrorSig: "", mirrorOff: false };
+var storeLoadNote = "";          // açılışta kullanıcıya gösterilecek kurtarma notu
+let saveQueued = false, mirrorTimer = 0, mirrorDirty = false;
+
+function strSig(s) {   // uzunluk + FNV-1a (32 bit): aynanın dışarıdan değişip değişmediğini anlamak için
+  s = String(s || "");
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+  return s.length + ":" + (h >>> 0).toString(36);
+}
+// Anahtar sırasından bağımsız JSON (geçiş doğrulaması için)
+function stableStr(v) {
+  if (Array.isArray(v)) return "[" + v.map(stableStr).join(",") + "]";
+  if (v && typeof v === "object") return "{" + Object.keys(v).filter(k => v[k] !== undefined).sort().map(k => JSON.stringify(k) + ":" + stableStr(v[k])).join(",") + "}";
+  return JSON.stringify(v === undefined ? null : v);
+}
+function idbReq(r) { return new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+function idbOpen() {
+  return new Promise((res, rej) => {
+    let done = false;
+    const to = setTimeout(() => { if (!done) { done = true; rej(new Error("zaman aşımı")); } }, 3000);
+    try {
+      if (!window.indexedDB) throw new Error("IndexedDB yok");
+      const r = indexedDB.open(IDB_NAME, 1);
+      r.onupgradeneeded = () => { const db = r.result; ["parts", "meta", "snaps"].forEach(n => { if (!db.objectStoreNames.contains(n)) db.createObjectStore(n); }); };
+      r.onsuccess = () => {
+        const db = r.result;
+        db.onversionchange = () => { try { db.close(); } catch (e) {} aykDB = null; };
+        if (done) { db.close(); return; }
+        done = true; clearTimeout(to); res(db);
+      };
+      r.onerror = () => { if (!done) { done = true; clearTimeout(to); rej(r.error); } };
+      r.onblocked = () => {};
+    } catch (e) { if (!done) { done = true; clearTimeout(to); rej(e); } }
+  });
+}
+function idbGet(store, key) { return idbReq(aykDB.transaction(store).objectStore(store).get(key)); }
+function idbGetAll(store) {
+  return new Promise((res, rej) => {
+    const out = {}, tx = aykDB.transaction(store), c = tx.objectStore(store).openCursor();
+    c.onsuccess = () => { const cur = c.result; if (cur) { out[cur.key] = cur.value; cur.continue(); } };
+    tx.oncomplete = () => res(out); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+  });
+}
+// Birden çok mağazaya tek işlemde yazar: puts = [[store, key, value]], dels = [[store, key]]
+function idbWrite(puts, dels = []) {
+  return new Promise((res, rej) => {
+    try {
+      const stores = [...new Set([...puts, ...dels].map(x => x[0]))];
+      const tx = aykDB.transaction(stores, "readwrite");
+      tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error || new Error("iptal"));
+      puts.forEach(([s, k, v]) => tx.objectStore(s).put(v, k));
+      dels.forEach(([s, k]) => tx.objectStore(s).delete(k));
+    } catch (e) { rej(e); }
+  });
+}
+function stateParts(st) {   // state → { core, dailyLogs, … } (JSON metinleri)
+  const core = { ...st }, out = {};
+  STORE_PARTS.forEach(k => { out[k] = JSON.stringify(st[k] === undefined ? null : st[k]); delete core[k]; });
+  out.core = JSON.stringify(core);
+  return out;
+}
+function partsToRaw(parts) {   // { core, … } metinleri → ham nesne; okunamayan parçaların adlarını döndürür
+  const bad = [];
+  let raw = {};
+  try { raw = JSON.parse(parts.core); if (!isObj(raw)) throw new Error("core"); } catch (e) { bad.push("core"); raw = {}; }
+  STORE_PARTS.forEach(k => {
+    if (parts[k] == null) return;
+    try { const v = JSON.parse(parts[k]); if (v !== null) raw[k] = v; } catch (e) { bad.push(k); }
+  });
+  return { raw, bad };
+}
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+// --- Açılış ---
+async function storageInit() {
+  try { aykDB = await idbOpen(); } catch (e) { aykDB = null; }
+  if (!aykDB) return storageUseLegacy();
+  try {
+    storeMeta = { ...storeMeta, ...((await idbGet("meta", "main")) || {}) };
+    const lsStr = lsGet(STORAGE_KEY);
+    const lastSig = lsGet(MIRROR_SIG_KEY) || storeMeta.mirrorSig;
+    if (lsGet(MIRROR_SIG_KEY)) storeMeta.mirrorSig = lsGet(MIRROR_SIG_KEY);
+    const outside = lsStr != null && strSig(lsStr) !== lastSig;
+    if (storeMeta.migratedAt && !outside) {
+      const parts = await idbGetAll("parts");
+      const { raw, bad } = partsToRaw(parts);
+      if (bad.length) await storageRecoverParts(raw, bad, parts);
+      state = normalizeState(raw);
+      hadV5State = true;
+      storeMode = "idb";
+      storeLast = stateParts(state);
+      bad.forEach(k => { delete storeLast[k]; });   // kurtarılan parçalar ilk kayıtta yeniden yazılır
+    } else {
+      await storageImportFromLocal(lsStr);
+      if (storeMode !== "idb") return;
+      storeLast = stateParts(state);
+    }
+    storeReady = true;
+  } catch (e) {
+    console.error(e);
+    return storageUseLegacy();
+  }
+}
+function storageUseLegacy() {
+  aykDB = null;
+  state = loadState();
+  storeMode = "ls";
+  storeReady = true;
+}
+// İlk geçiş ya da localStorage dışarıdan değişti: ham kayıt (v4/kurtarma mantığıyla) okunur, parçalar yazılır, geri okunup doğrulanır.
+async function storageImportFromLocal(lsStr) {
+  const now = Date.now(), puts = [];
+  if (storeMeta.migratedAt) {   // mevcut IndexedDB hâli kaybolmasın
+    const cur = await idbGetAll("parts");
+    const { raw, bad } = partsToRaw(cur);
+    if (!bad.length && Object.keys(cur).length) puts.push(["snaps", "import-" + now, { kind: "import", date: todayStr(), ts: now, json: JSON.stringify(raw) }]);
+  } else if (lsStr != null) {
+    puts.push(["snaps", "pre", { kind: "pre", date: todayStr(), ts: now, json: lsStr }]);
+  }
+  state = loadState();
+  const parts = stateParts(state);
+  Object.keys(parts).forEach(k => puts.push(["parts", k, parts[k]]));
+  await idbWrite(puts);
+  const back = partsToRaw(await idbGetAll("parts"));
+  if (back.bad.length || stableStr(normalizeState(back.raw)) !== stableStr(normalizeState(JSON.parse(JSON.stringify(state))))) {
+    console.error("depolama doğrulaması tutmadı; eski moda geçiliyor");
+    return storageUseLegacy();
+  }
+  storeMeta = { migratedAt: storeMeta.migratedAt || now, mirrorSig: lsStr != null ? strSig(lsStr) : "", mirrorOff: false };
+  try { localStorage.setItem(MIRROR_SIG_KEY, storeMeta.mirrorSig); } catch (e) {}
+  await idbWrite([["meta", "main", storeMeta]]);
+  await storagePruneImports();
+  storeMode = "idb";
+}
+// Okunamayan parça: ham hâli kurtarma kopyasına (yoksa), yerine en yeni iç yedekteki aynı parça (yoksa boş).
+async function storageRecoverParts(raw, bad, parts) {
+  try {   // okunabilen bölümler + okunamayanların ham metni; çekirdek okunabildiyse Profil'den geri yüklenebilir
+    if (!localStorage.getItem(RESCUE_KEY)) {
+      const keep = { ...raw, _okunamayanBolumler: {} };
+      bad.forEach(k => { keep._okunamayanBolumler[k] = String(parts[k] == null ? "" : parts[k]).slice(0, 2000000); });
+      localStorage.setItem(RESCUE_KEY, JSON.stringify(keep));
+    }
+  } catch (e) {}
+  const snaps = Object.values(await idbGetAll("snaps")).sort((a, b) => b.ts - a.ts);
+  let src = null;
+  for (const s of snaps) { try { src = JSON.parse(s.json); if (isObj(src)) break; } catch (e) { src = null; } }
+  bad.forEach(k => {
+    if (k === "core") { Object.keys(src || {}).forEach(f => { if (!STORE_PARTS.includes(f)) raw[f] = src[f]; }); }
+    else if (src && src[k] !== undefined) raw[k] = src[k];
+  });
+  loadFailed = true;
+  storeLoadNote = src ? "Kaydın bir bölümü okunamadı; o bölüm son iç yedekten geri getirildi." : "Kaydın bir bölümü okunamadı.";
+}
+
+// --- Kayıt ---
+function saveState() {
+  if (!storeReady) return;
+  if (storeMode !== "idb") return saveStateLegacy();
+  if (saveQueued) return;
+  saveQueued = true;
+  Promise.resolve().then(flushSave);
+}
+function saveStateLegacy() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    saveFailNotified = false;
+  } catch (e) {
+    console.error(e);
+    if (!saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
+  }
+}
+function flushSave() {
+  saveQueued = false;
+  if (storeMode !== "idb" || !storeReady) return;
+  const parts = stateParts(state), puts = [];
+  Object.keys(parts).forEach(k => { if (parts[k] !== storeLast[k]) puts.push(["parts", k, parts[k]]); });
+  if (!puts.length) return;
+  mirrorDirty = true;
+  const onFail = e => {
+    console.error(e);
+    if (!saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
+  };
+  try {
+    if (!aykDB) throw new Error("bağlantı yok");
+    idbWrite(puts).then(() => { puts.forEach(([, k, v]) => { storeLast[k] = v; }); saveFailNotified = false; }, onFail);
+  } catch (e) { onFail(e); }
+  scheduleMirror();
+}
+function scheduleMirror() {
+  if (storeMeta.mirrorOff) return;
+  clearTimeout(mirrorTimer);
+  mirrorTimer = setTimeout(writeMirror, MIRROR_DELAY_MS);
+}
+function writeMirror() {
+  clearTimeout(mirrorTimer); mirrorTimer = 0;
+  if (storeMode !== "idb" || !storeReady || storeMeta.mirrorOff || !aykDB) return;
+  // localStorage'daki kayıt bizim son yazdığımız değilse (eski sürüm / yedek aracı yazdı) ezilmez; sonraki açılışta içe alınır.
+  const cur = lsGet(STORAGE_KEY);
+  if (cur != null && strSig(cur) !== storeMeta.mirrorSig) return;
+  if (!mirrorDirty && cur != null) return;
+  const s = JSON.stringify(state);
+  try {
+    localStorage.setItem(STORAGE_KEY, s);
+    storeMeta.mirrorSig = strSig(s);
+    localStorage.setItem(MIRROR_SIG_KEY, storeMeta.mirrorSig);
+    mirrorDirty = false;
+  } catch (e) { storeMeta.mirrorOff = true; storeMeta.mirrorSig = strSig(lsGet(STORAGE_KEY)); try { localStorage.setItem(MIRROR_SIG_KEY, storeMeta.mirrorSig); } catch (e2) {} }
+  idbWrite([["meta", "main", { ...storeMeta }]]).catch(e => console.error(e));
+}
+
+// --- İç yedekler ---
+async function autoSnapshot() {
+  if (storeMode !== "idb" || !aykDB) return;
+  try {
+    const day = logicalToday(), key = "day-" + day;
+    if (await idbGet("snaps", key)) return;
+    await idbWrite([["snaps", key, { kind: "day", date: day, ts: Date.now(), json: JSON.stringify(state) }]]);
+    await storagePruneSnaps();
+  } catch (e) { console.error(e); }
+}
+function isoWeekKey(d) { const t = new Date(d + "T12:00:00"); t.setDate(t.getDate() - ((t.getDay() + 6) % 7)); return todayStr(t); }
+// Son 7 gece "day"; daha eskiler arasında en yeni 4 haftanın her birinden en yeni kopya "week"; gerisi silinir.
+async function storagePruneSnaps() {
+  const all = await idbGetAll("snaps");
+  const dayKeys = Object.keys(all).filter(k => all[k].kind === "day" || all[k].kind === "week").sort((a, b) => all[b].date.localeCompare(all[a].date));
+  const puts = [], dels = [], weeks = new Set();
+  dayKeys.forEach((k, i) => {
+    const s = all[k];
+    if (i < 7) { if (s.kind !== "day") puts.push(["snaps", k, { ...s, kind: "day" }]); return; }
+    const w = isoWeekKey(s.date);
+    if (!weeks.has(w) && weeks.size < 4) { weeks.add(w); if (s.kind !== "week") puts.push(["snaps", k, { ...s, kind: "week" }]); }
+    else dels.push(["snaps", k]);
+  });
+  if (puts.length || dels.length) await idbWrite(puts, dels);
+}
+async function storagePruneImports() {
+  const all = await idbGetAll("snaps");
+  const imp = Object.keys(all).filter(k => all[k].kind === "import").sort((a, b) => all[b].ts - all[a].ts);
+  if (imp.length > 2) await idbWrite([], imp.slice(2).map(k => ["snaps", k]));
+}
+async function aykSnapList() {
+  if (storeMode !== "idb" || !aykDB) return [];
+  const all = await idbGetAll("snaps");
+  return Object.keys(all).map(k => ({ key: k, kind: all[k].kind, date: all[k].date, ts: all[k].ts, size: (all[k].json || "").length }))
+    .sort((a, b) => b.ts - a.ts);
+}
+async function aykSnapJson(key) { if (!aykDB) return null; const s = await idbGet("snaps", key); return s ? s.json : null; }
+
+// --- Okuma yardımcıları (Profil göstergesi, testler, kurtarma) ---
+async function aykStoredState() {
+  if (storeMode === "idb" && aykDB) { const { raw } = partsToRaw(await idbGetAll("parts")); return raw; }
+  try { return JSON.parse(lsGet(STORAGE_KEY)); } catch (e) { return null; }
+}
+async function aykRawPut(store, key, value) { await idbWrite([[store, key, value]]); }
 // ============================================================================
 // AYK+ — UYGULAMA MANTIĞI (sürüm: src/markup.html Ayarlar etiketi ve sw.js CACHE)
 // ============================================================================
@@ -2490,17 +2768,9 @@ var loadFailed = false;
 var hadV5State = false;   // v37: açılışta bugünkü kayıt vardı ve okundu (eski v4 kaydı ancak o zaman silinir)
 
 let saveFailNotified = false;
-function saveState() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    saveFailNotified = false;
-  } catch (e) {
-    console.error(e);
-    if (!saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
-  }
-}
-
-let state = loadState();
+// v41: saveState / kalıcı kayıt 00-depolama.js'de. Açılışta state bir yer tutucudur; asıl kayıt storageInit() ile yüklenir
+// (o bitene dek hiçbir şey yazılmaz).
+let state = normalizeState({});
 let progressSel = "";
 
 // v18: USDA veritabanı (foods.js) uygulama biçimine bir kez çevrilir; birleşik tablo önbellekte tutulur
@@ -6368,6 +6638,7 @@ function closeSettings() { hideProfile(); }
 function renderProfile() {
   $("pfRescue").classList.toggle("hidden", !rescueText());   // v35
   renderStorageMeter();   // v36
+  renderSnapList();   // v41
   document.querySelectorAll("[data-theme-opt]").forEach(b => { const on = b.dataset.themeOpt === state.settings.theme; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
   // Kilo kayıtları
@@ -6510,24 +6781,61 @@ async function exportBackupFile() {
 // v36: KAYIT ALANI — bütün veri tek localStorage kaydında. iPhone Safari'nin sınırı kesin bilinmiyor; temkinli tahmin
 // ~2,5 milyon karakter (5 MB). Ölçüm: yoğun kullanımla 5 yılda ~2,1 milyon. %70'te uyarı (açılışta en fazla haftada bir).
 const STORAGE_LIMIT_CHARS = 2500000;
-function storagePct() {
+function storagePct() {   // eski mod (localStorage) için; IndexedDB modunda storageEstimate()
   let n = 0;
   try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); n += k.length + (localStorage.getItem(k) || "").length; } } catch (e) { return 0; }
   return Math.min(100, Math.round(n / STORAGE_LIMIT_CHARS * 100));
 }
-function renderStorageMeter() {
-  const pct = storagePct(), hi = pct >= 70;
-  $("pfStorageTxt").textContent = `%${pct} dolu`;
-  $("pfStorageBar").style.width = Math.max(2, pct) + "%";
-  $("pfStorageBar").style.background = hi ? "var(--t-warn-icon)" : "";
-  $("pfStorageWarn").classList.toggle("hidden", !hi);
-  if (hi) $("pfStorageWarn").textContent = "Alan dolmak üzere. Hemen yedek dosyası kaydet; kayıt dolarsa yeni bilgiler kaydedilemez.";
+// v41: IndexedDB modunda tarayıcının ayırdığı alana göre (navigator.storage.estimate); yoksa kayıt boyutundan.
+async function storageEstimate() {
+  if (storeMode !== "idb") return { pct: storagePct(), mb: null };
+  let usage = 0, quota = 0;
+  try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); usage = e.usage || 0; quota = e.quota || 0; } } catch (e) {}
+  if (!usage) usage = JSON.stringify(state).length * 2;
+  return { pct: quota ? Math.min(100, Math.round(usage / quota * 100)) : 0, mb: usage / 1048576 };
 }
-function checkStorageWarn() {
-  const pct = storagePct();
+function renderStorageMeter() {
+  storageEstimate().then(({ pct, mb }) => {
+    if (!$("pfStorageTxt")) return;
+    const hi = pct >= 70;
+    $("pfStorageTxt").textContent = `%${pct} dolu` + (mb != null ? ` · ${fmtNum(mb)} MB` : "");
+    $("pfStorageBar").style.width = Math.max(2, pct) + "%";
+    $("pfStorageBar").style.background = hi ? "var(--t-warn-icon)" : "";
+    $("pfStorageWarn").classList.toggle("hidden", !hi);
+    if (hi) $("pfStorageWarn").textContent = "Alan dolmak üzere. Hemen yedek dosyası kaydet; kayıt dolarsa yeni bilgiler kaydedilemez.";
+  });
+}
+async function checkStorageWarn() {
+  const { pct } = await storageEstimate();
   if (pct < 70 || Date.now() - num(state.storageWarnAt, 0) < 7 * DAY_MS) return;
   state.storageWarnAt = Date.now(); saveState();
   toast(`Telefondaki kayıt alanının %${pct}'i dolu. Yedek dosyası kaydet (Profil → Yedekleme).`, "error");
+}
+
+// v41: OTOMATİK İÇ YEDEKLER — her gün ilk açılışta bütün verinin kopyası (son 7 gece + son 4 hafta + "Geçiş öncesi").
+const SNAP_KIND_LABEL = { day: "Gece yedeği", week: "Haftalık yedek", pre: "Geçiş öncesi", import: "Değişiklik öncesi" };
+function renderSnapList() {
+  const box = $("pfSnaps"); if (!box) return;
+  if (storeMode !== "idb") { box.innerHTML = `<p class="text-[13px] text-[var(--t-dim)]">Otomatik iç yedek bu cihazda kullanılamıyor; yedek dosyası kaydet.</p>`; return; }
+  aykSnapList().then(list => {
+    if (!$("pfSnaps")) return;
+    box.innerHTML = list.length ? list.map(x => `<div data-snap="${esc(x.key)}" class="flex items-center justify-between gap-3 min-h-[52px] border-t border-[var(--t-line)] first:border-t-0">
+        <span class="min-w-0"><span class="block text-[14px] font-semibold text-[var(--t-text)]">${esc(fmtDate(new Date(x.date + "T12:00:00").getTime()))}</span>
+          <span class="block text-[12px] text-[var(--t-dim)]">${esc(SNAP_KIND_LABEL[x.kind] || "Yedek")} · ${fmtNum(x.size / 1048576 * 2)} MB</span></span>
+        <button data-snap-restore onclick='aykSnapRestore(${esc(JSON.stringify(x.key))})' class="t-btn-ghost h-11 px-3.5 rounded-xl text-[13px] shrink-0">Bu hâle dön</button>
+      </div>`).join("") : `<p class="text-[13px] text-[var(--t-dim)]">İlk iç yedek yarın oluşacak.</p>`;
+  });
+}
+async function aykSnapRestore(key) {
+  const json = await aykSnapJson(key); if (!json) return;
+  let next;
+  try { next = normalizeState(JSON.parse(json)); } catch (e) { sayAlert("Yedek okunamadı", "Bu iç yedek okunamadı; mevcut verilerin değişmedi."); return; }
+  if (!(await askConfirm("Bu hâle dönülsün mü?", "Bütün verilerin bu yedekteki hâline döner. İstersen hemen ardından Geri al ile vazgeçebilirsin.", "Bu hâle dön", true))) return;
+  snapshot();
+  state = next;
+  checkNewDay();
+  renderAll();
+  offerUndo("Yedekteki hâle dönüldü");
 }
 
 // v35: KURTARMA KOPYASI — açılışta okunamayan kaydın ham hâli (RESCUE_KEY). Önceden yalnızca saklanıyordu,
@@ -9171,40 +9479,49 @@ function renderAll() {
 // ---------------------------------------------------------------------------
 // BAŞLAT
 // ---------------------------------------------------------------------------
-(function hideSplash() {
-  const sp = document.getElementById("splash");
-  if (!sp) return;
-  if (state.settings.splash === false) { sp.remove(); return; }
-  setTimeout(() => { if (sp.parentNode) sp.remove(); }, 1300);
-})();
-checkNewDay();
-autoSelectNextDay();
-if (workoutInProgress()) { state.gymActive = true; state.gymView = "today"; }
-resetTimerUI();
-resumeTimer();   // v36
-renderAll();
-updateWakeLock();
-// v37: eski sürümlerden kalan yük. (1) Küçültülmemiş eski fotoğraf. (2) Bu uygulamanın ilk sürümlerinin kaydı
-// (ayk_plus_v4_state): içindekiler ilk açılışta bugünkü kayda taşındı, sonra hiç okunmadı ama yer tutmaya devam ediyordu.
-// Yalnızca açılışta bugünkü kayıt zaten vardı ve sorunsuz okunduysa silinir (ilk taşıma açılışında dokunulmaz).
-slimOldPhoto();
-try { if (hadV5State && !loadFailed && localStorage.getItem("ayk_plus_v4_state") != null) localStorage.removeItem("ayk_plus_v4_state"); } catch (e) { /* yok sayılır */ }
-setTimeout(checkFoodHealth, 1500);
-setTimeout(checkStorageWarn, 2500);   // v36
-if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);
+// v41: açılış, kayıt depolamadan yüklendikten sonra (storageInit → bootApp). Açılış ekranı (splash) bu sırada görünür.
+function bootApp() {
+  (function hideSplash() {
+    const sp = document.getElementById("splash");
+    if (!sp) return;
+    if (state.settings.splash === false) { sp.remove(); return; }
+    setTimeout(() => { if (sp.parentNode) sp.remove(); }, 1300);
+  })();
+  checkNewDay();
+  autoSelectNextDay();
+  if (workoutInProgress()) { state.gymActive = true; state.gymView = "today"; }
+  resetTimerUI();
+  resumeTimer();   // v36
+  renderAll();
+  updateWakeLock();
+  // v37: eski sürümlerden kalan yük. (1) Küçültülmemiş eski fotoğraf. (2) Bu uygulamanın ilk sürümlerinin kaydı
+  // (ayk_plus_v4_state): içindekiler ilk açılışta bugünkü kayda taşındı, sonra hiç okunmadı ama yer tutmaya devam ediyordu.
+  // Yalnızca açılışta bugünkü kayıt zaten vardı ve sorunsuz okunduysa silinir (ilk taşıma açılışında dokunulmaz).
+  slimOldPhoto();
+  try { if (hadV5State && !loadFailed && localStorage.getItem("ayk_plus_v4_state") != null) localStorage.removeItem("ayk_plus_v4_state"); } catch (e) { /* yok sayılır */ }
+  setTimeout(checkFoodHealth, 1500);
+  setTimeout(checkStorageWarn, 2500);   // v36
+  if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);
 
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") {
-    if (checkNewDay()) { autoSelectNextDay(); renderAll(); }
-    if (timer.running) tickTimer();
-    if (mobT) mobTimerTick();
-    updateWakeLock();
-  }
-});
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      if (checkNewDay()) { autoSelectNextDay(); renderAll(); autoSnapshot(); }
+      if (timer.running) tickTimer();
+      if (mobT) mobTimerTick();
+      updateWakeLock();
+    }
+  });
 
-// v36: uygulama gece yarısı ekranda açık kalırsa da gün değişsin (eskiden yalnızca açılışta / uygulamaya dönüşte bakılıyordu;
-// 00:05'te içilen su önceki güne yazılıyordu). Yarım dakikada bir, yalnızca ekran görünürken.
-setInterval(() => { if (document.visibilityState === "visible" && checkNewDay()) { autoSelectNextDay(); renderAll(); } }, 30000);
+  // v36: uygulama gece yarısı ekranda açık kalırsa da gün değişsin (eskiden yalnızca açılışta / uygulamaya dönüşte bakılıyordu;
+  // 00:05'te içilen su önceki güne yazılıyordu). Yarım dakikada bir, yalnızca ekran görünürken.
+  setInterval(() => { if (document.visibilityState === "visible" && checkNewDay()) { autoSelectNextDay(); renderAll(); autoSnapshot(); } }, 30000);
+  autoSnapshot();   // v41: günün iç yedeği (yoksa)
+  // v41: arka plana geçerken / sayfa kapanırken localStorage aynası güncellenir
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") writeMirror(); });
+  window.addEventListener("pagehide", () => writeMirror());
+  window.aykBooted = true;
+}
+storageInit().then(bootApp, e => { console.error(e); storageUseLegacy(); bootApp(); });
 
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* yoksay */ }
 if ("serviceWorker" in navigator) {

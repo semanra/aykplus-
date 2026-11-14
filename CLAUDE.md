@@ -8,7 +8,7 @@ AYK+, kullanıcının kendi kişisel fitness uygulamasıdır: **beslenme (makro 
 
 - **Platform:** iPhone'da ana ekrana eklenmiş bir PWA (web uygulaması). App Store uygulaması değildir.
 - **Yayın:** Bu depo GitHub Pages ile yayınlanır. Depodaki `index.html` = canlı uygulama. `main` dalına gönderilen her değişiklik 1–2 dakika içinde kullanıcının telefonuna gelir.
-- **Veri:** Tamamen telefonda, `localStorage` içinde. Sunucu, hesap, senkronizasyon yok. Kullanıcı Ayarlar → Yedek ile JSON yedek alır.
+- **Veri:** Tamamen telefonda. v41'den beri asıl kayıt **IndexedDB** (`aykplus`, parçalı); `localStorage` `ayk_plus_v5_state` silinmez, "ayna" olarak güncel tutulur. Sunucu, hesap, senkronizasyon yok. Kullanıcı Profil → Yedekleme ile JSON yedek alır; uygulama ayrıca otomatik iç yedek tutar (son 7 gece + 4 hafta).
 - **Çevrimdışı:** `sw.js` (service worker) dosyaları önbelleğe alır; spor salonunda internetsiz çalışır. v25'ten beri: önce internet; internet yoksa, sunucu 404/5xx döndürürse veya 3 sn'de yanıt gelmezse önbellekteki kopya açılır (zaman aşımından sonra 30 sn boyunca dosyalar beklemeden önbellekten verilir, yanıt arka planda önbelleği günceller). `index.html` yedeği yalnızca sayfa açılışında (`navigate`) kullanılır. Test: `tests/test_v25_sw.py` (kendi sunucusuyla 404/503/yavaş/çevrimdışı).
 - **Kullanıcının cihazları:** iPhone ve iPad. **Mac yok.** iOS Safari davranışı her zaman öncelikli.
 
@@ -20,7 +20,7 @@ sw.js               ← Service worker (önbellek sürümü burada)
 manifest.json, icon*.png, anatomy.jpg, anatomy-light.webp   ← Statik dosyalar
 src/markup.html     ← HTML iskeleti + özel CSS + gömülü yazı tipi (AYKDisplay = Barlow Condensed 800 italik, OFL)
 src/app/            ← Uygulama mantığı, bölümlere ayrılmış (v34). Derlemede AD SIRASIYLA birleştirilir:
-                      01-temel (yardımcılar, durum) · 02-arayuz (bildirim, pencere, ses, sayaç, gün dönümü, sekmeler, tema)
+                      00-depolama (v41: IndexedDB, ayna, iç yedekler) · 01-temel (yardımcılar, durum) · 02-arayuz (bildirim, pencere, ses, sayaç, gün dönümü, sekmeler, tema)
                       03-beslenme · 04-besinler-barkod · 05-secici-hareket · 06-mobilite · 07-grafik-ilerleme
                       08-profil-yedek · 09-kas-plaka-koc-takviye · 10-antrenman-arayuzu · 11-mutfak-akilli
                       12-besin-veritabani · 13-cizim-baslat (renderAll + başlat)
@@ -38,7 +38,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 32 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 33 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 pip install pillow   # ilk seferde (kontrol aracı için)
 npm run kontrol      # son commit ile karşılaştırma: 36 ekran × 2 tema piksel farkı + okunurluk/44 px/taşma + hız (`-- --hizli` hızsız)
 ```
@@ -62,6 +62,7 @@ npm run kontrol      # son commit ile karşılaştırma: 36 ekran × 2 tema piks
 
 - **Depolama anahtarı `ayk_plus_v5_state` asla değişmez.** Yeni alanlar `normalizeState()` içinde varsayılan değerle eklenir; eski kullanıcı verisi her zaman göç ettirilir, asla silinmez.
 - **Kullanıcı verisi kutsaldır.** Veri yapısını değiştiren her işte, eski formatla kaydedilmiş veriyle test yaz (bkz. `test_v6_temel.py` içindeki "legacy" tohum verisi, `test_v25_guvenlik.py` içindeki bozuk kayıt). `dailyLogs` özetleri hiç silinmez (v25'te 180 gün sınırı kaldırıldı; yalnızca öğün içerikleri son 7 günde tutulur). `normalizeState` öğün/kalem/özel besin/günlük kayıtları `normItems` / `normMealList` / `isObj` ile temizler (boş kayıt atılır, metin miktar sayıya çevrilir, okunamayan miktar 0 olur; değer uydurulmaz). Kayıt yine de okunamazsa `loadState` ham veriyi `ayk_plus_v5_state_kurtarma` anahtarına kopyalar (varsa üzerine yazmaz) ve açılışta uyarır; bozuk yedek geri yüklenirken mevcut veri değişmez. v35: kurtarma kopyası Profil → Yedekleme'de `#pfRescue` kartında görünür (İndir `downloadRescue` / Geri yükle `restoreRescue` / Sil `deleteRescue`; dosya kaydı `saveTextFile` ile yedekle ortak). Tek bir bozuk kayıt (nesne olmayan hareket/set/oturum/kayıt, sayı olan ad) artık bütün kaydı okunamaz yapmaz: `normalizeState` yalnızca o kaydı atar, adı metne çevirir (`test_v35_veri.py`). Bozuk `state.today` silinir; kayıttaki gün bugünden ≥ 2 gün ilerideyse (telefon saati ileri alınmış) arşivlenmeden bugüne çekilir — 1 gün geri olması gün geçiş saati değişiminde normaldir, dokunulmaz (`checkNewDay`).
+- **Depolama (v41, `src/app/00-depolama.js`):** Açılış `storageInit().then(bootApp)` (`13`); o bitene dek `state` yer tutucudur ve `saveState` hiçbir şey yazmaz (`storeReady`). IndexedDB `aykplus` (mağazalar `parts` / `meta` / `snaps`); parçalar `STORE_PARTS` + `core`, `saveState` → mikro görev sonunda `flushSave()` yalnızca değişen parçayı tek işlemde yazar (5 yıllık veride ~22 ms → ~7 ms). Ayna: `writeMirror()` 2 sn sessizlikten sonra ve arka plana geçerken `ayk_plus_v5_state`'i günceller, imzası eşzamanlı `ayk_plus_v5_imza`'ya; localStorage'daki kayıt son aynamız değilse (eski sürüm / test tohumu yazdı) EZİLMEZ, sonraki açılışta içe alınır (önceki hâl `import` iç yedeği). İlk geçişte ham kayıt `pre` ("Geçiş öncesi") iç yedeği; yazılan parçalar geri okunup `stableStr` ile karşılaştırılır, tutmazsa eski moda (`storeMode = "ls"`, v40 davranışı) düşülür; IndexedDB açılamazsa da eski mod. Bozuk parça: ham hâli `_okunamayanBolumler` ile kurtarma kopyasına, yerine en yeni iç yedekteki parça, ilk kayıtta yeniden yazılır. İç yedek `autoSnapshot()` (açılışta ve gün değişince): son 7 gece `day` + 4 hafta `week`, `import` son 2; Profil → Yedekleme `#pfSnaps` "Bu hâle dön" (`aykSnapRestore`, Geri al'lı). Kayıt alanı göstergesi IndexedDB modunda `navigator.storage.estimate()`. **Testlerde** kalıcı kayıt `aykStoredState()` ile okunur; temiz başlangıç `localStorage.clear()` + `indexedDB.deleteDatabase('aykplus')`. Test: `tests/test_v41_depolama.py`.
 - **Gün dönümü (v36):** `archiveDay` aynı tarihe ikinci kez yazarken eski özet `manual` işaretliyse ("Yeni gün" düğmesi `manualNewDay` veya saat düzeltmesi) EZMEZ: yenen/su/öğün/takviye sayaçlarında büyük olan tutulur, mobilite günlüğü birleşir. Uygulama ekranda açıkken de 30 sn'de bir `checkNewDay` çalışır. Antrenman geçmişi artık hiç kırpılmaz (eskiden hareket başına 60 seans, toplam 400 antrenman). Kayıt alanı: Profil → Yedekleme `#pfStorage` (`storagePct`, temkinli sınır `STORAGE_LIMIT_CHARS` = 2,5 milyon karakter; %70'te uyarı, açılışta haftada en fazla bir `checkStorageWarn`, `state.storageWarnAt`). Ölçüm: yoğun kullanımla 5 yılda ~2,15 milyon karakter; her dokunuşta kayıt (saveState) ~40 ms — asıl çözüm (IndexedDB / parçalı kayıt) yol haritasında. Dinlenme sayacı ayrı anahtarda (`ayk_timer`, `timerPersist`/`resumeTimer`): iOS uygulamayı kapatırsa açılışta sürer.
 - **Kullanıcı metni HTML'e eklenirken her zaman `esc()`** kullan. `onclick` içine metin geçirirken `esc(JSON.stringify(metin))` kalıbını kullan.
 - **Sayılar:** Kullanıcı Türkçe ondalık virgül yazar. Okurken `num()`, gösterirken `fmtNum()` (1 ondalık) veya `fmtKg()` (2 ondalık; 1,25 kg plakalar için) kullan. Sayı girişleri `type="text" inputmode="decimal"`.
@@ -178,6 +179,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 **v38 (14 Kasım 2026):** aydınlık temada vücut haritasının siyah zemini kaldırıldı (zeminsiz WebP kopya, 203 KB, `sw.js` önbelleğinde).
 
 **v39 (Mobilite, 14 Kasım 2026):** birden fazla rutin, ana ekran (hafta/seri, bölgeler son çalışma), belirgin Düzenle, Başlat ile baştan sona rehberli seans + bitiş özeti, her hareket için nasıl yapılır, kütüphane 37 → 104 hareket. **v40:** antrenmanda isteğe bağlı ısınma kartı, isteğe bağlı sesli yönlendirme (varsayılan kapalı), v39 inceleme artıkları. Poz resimleri sonra (App Store öncesi).
+
+**v41 (depolama, 14 Kasım 2026):** App Store Aşama 1a — IndexedDB parçalı kayıt, localStorage aynası (silinmez), güvenli geçiş + doğrulama, otomatik iç yedekler ve geri dönme.
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 

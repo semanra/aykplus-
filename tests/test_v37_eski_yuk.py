@@ -10,7 +10,7 @@ def check(cond, label):
     if not cond: fails.append(label)
 URL = "http://localhost:8797/index.html"
 KEY, V4 = "ayk_plus_v5_state", "ayk_plus_v4_state"
-def st(pg): return pg.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
+def st(pg): return pg.evaluate(f"aykStoredState()")
 def ls(pg, k): return pg.evaluate(f"localStorage.getItem('{k}')")
 # Telefondan seçilmiş, küçültülmemiş fotoğraf yerine: 1200×900 gürültülü JPEG (birkaç yüz bin karakter)
 BIG_JS = """() => { const c = document.createElement('canvas'); c.width = 1200; c.height = 900; const x = c.getContext('2d');
@@ -29,7 +29,7 @@ try:
         pg.goto(URL); pg.wait_for_timeout(300)
         return ctx, pg
     def seed(pg, items):
-        pg.evaluate("items => { localStorage.clear(); for (const k in items) localStorage.setItem(k, items[k]); }", items)
+        pg.evaluate("items => { (localStorage.clear(), void indexedDB.deleteDatabase('aykplus')); for (const k in items) localStorage.setItem(k, items[k]); }", items)
         pg.reload(); pg.wait_for_timeout(1200)
 
     ctx, pg = page()

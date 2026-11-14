@@ -7,7 +7,7 @@ srv=subprocess.Popen(['python3','-m','http.server','8765'],cwd=REPO,stdout=subpr
 from playwright.sync_api import sync_playwright
 DAY=86400000; now=int(time.time()*1000)
 errs=[]; prompts=[]
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 def ov(pg,tag):
     w=pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]"); print(tag,"overflow" if w[0]>w[1] else "ok",w)
 with sync_playwright() as p:
@@ -26,7 +26,7 @@ with sync_playwright() as p:
     pg.reload(); pg.wait_for_timeout(300)
     print("next by legacy name (day4 -> wraps to day1):", pg.evaluate("state.activeWorkoutDayIdx"))
     # ---------- 2) aktif set halkası + otomatik kaydırma + süre
-    pg.evaluate("localStorage.clear()"); pg.reload(); pg.click("#navBtnGym"); pg.wait_for_timeout(200); pg.evaluate("startWorkout()"); pg.wait_for_timeout(150)
+    pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.click("#navBtnGym"); pg.wait_for_timeout(200); pg.evaluate("startWorkout()"); pg.wait_for_timeout(150)
     print("ring on first set:", pg.locator("#exCard_0 .ring-inset").count(), "elapsed:", pg.inner_text("#gymElapsed"))  # v33: gizli eski özet kutusu kaldırıldı
     for i in range(3): pg.locator(f'[onclick="toggleSetDone(0, {i})"]').tap(); pg.wait_for_timeout(80)
     pg.wait_for_timeout(700)
@@ -95,7 +95,7 @@ with sync_playwright() as p:
     pg.locator("#pMeasure").screenshot(path=""+SHOTS+"/v8_measure.png")
     ov(pg,"progress")
     # rollover resets supps
-    pg.evaluate("()=>{const s=JSON.parse(localStorage.getItem('ayk_plus_v5_state')); s.today='2026-10-01'; localStorage.setItem('ayk_plus_v5_state', JSON.stringify(s));}")
+    pg.evaluate("()=>{const s=aykStoredState(); s.today='2026-10-01'; localStorage.setItem('ayk_plus_v5_state', JSON.stringify(s));}")
     pg.reload(); pg.wait_for_timeout(300)
     s=st(pg); print("rollover supps:", s["supplements"], "restMeals done:", [m["done"] for m in s["restMeals"]][:2], "dailyLog supps:", s["dailyLogs"]["2026-10-01"]["supps"])
     b.close()

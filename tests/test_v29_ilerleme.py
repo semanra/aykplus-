@@ -10,7 +10,7 @@ def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
 URL = "http://localhost:8779/index.html"
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 def ov(pg):
     w = pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]"); return w[0] <= w[1]
 SMALL_JS = """() => [...document.querySelectorAll('#progressContent button, #progressContent select, #progressContent summary')]

@@ -10,7 +10,7 @@ def check(cond, label):
     if not cond: fails.append(label)
 URL = "http://localhost:8795/index.html"
 KEY = "ayk_plus_v5_state"; RESCUE = "ayk_plus_v5_state_kurtarma"
-def st(pg): return pg.evaluate(f"JSON.parse(localStorage.getItem('{KEY}'))")
+def st(pg): return pg.evaluate(f"aykStoredState()")
 VISIT = """() => { const out = []; for (const s of ["switchTab('nutrition'); setNutriView('today')", "setNutriView('menus')", "setNutriView('foods')", "setNutriView('history')",
   "switchTab('gym'); setGymView('today')", "setGymView('program')", "setGymView('library')", "setGymView('history')", "switchTab('mobility')",
   "switchTab('progress'); setProgressView('genel')", "setProgressView('kilo')", "setProgressView('guc')", "setProgressView('beslenme')", "openProfile()", "hideProfile()"]) {
@@ -25,7 +25,7 @@ def new_page(b, clock=None):
 
 def seed(pg, data, raw=False):
     pg.goto(URL); pg.wait_for_timeout(200)
-    pg.evaluate("([k, v]) => { localStorage.clear(); localStorage.setItem(k, v); }", [KEY, data if raw else json.dumps(data)])
+    pg.evaluate("([k, v]) => { (localStorage.clear(), void indexedDB.deleteDatabase('aykplus')); localStorage.setItem(k, v); }", [KEY, data if raw else json.dumps(data)])
     pg.reload(); pg.wait_for_timeout(350)
 
 try:
@@ -95,11 +95,11 @@ try:
     d = dl.value
     path = d.path(); content = open(path, encoding="utf-8").read()
     check(d.suggested_filename.startswith("AYK-kurtarma-") and content == '{"meals": [ bozuk json', f"kurtarma kopyası dosya olarak indi ({d.suggested_filename})")
-    before = pg.evaluate(f"localStorage.getItem('{KEY}')")
+    before = json.dumps(pg.evaluate("aykStoredState()"), sort_keys=True)
     pg.click("#pfRescueRestore"); pg.wait_for_timeout(150)
     check(pg.is_visible("#uiDlgOk") and "Geçersiz" in pg.inner_text("#uiDlgTitle"), "bozuk kopyayı geri yükleme açıkça reddediliyor")
     pg.click("#uiDlgOk"); pg.wait_for_timeout(100)
-    check(pg.evaluate(f"localStorage.getItem('{KEY}')") == before, "reddedilince mevcut veri değişmedi")
+    check(json.dumps(pg.evaluate("aykStoredState()"), sort_keys=True) == before, "reddedilince mevcut veri değişmedi")
     # Geçerli bir kurtarma kopyası geri yüklenebilir
     good = json.dumps({"meals": [{"id": "m1", "title": "Kurtarılan öğün", "items": []}], "weight": 88})
     pg.evaluate(f"v => localStorage.setItem('{RESCUE}', v)", good)

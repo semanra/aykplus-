@@ -55,6 +55,7 @@ function closeSettings() { hideProfile(); }
 function renderProfile() {
   $("pfRescue").classList.toggle("hidden", !rescueText());   // v35
   renderStorageMeter();   // v36
+  renderSnapList();   // v41
   document.querySelectorAll("[data-theme-opt]").forEach(b => { const on = b.dataset.themeOpt === state.settings.theme; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
   // Kilo kayıtları
@@ -197,24 +198,61 @@ async function exportBackupFile() {
 // v36: KAYIT ALANI — bütün veri tek localStorage kaydında. iPhone Safari'nin sınırı kesin bilinmiyor; temkinli tahmin
 // ~2,5 milyon karakter (5 MB). Ölçüm: yoğun kullanımla 5 yılda ~2,1 milyon. %70'te uyarı (açılışta en fazla haftada bir).
 const STORAGE_LIMIT_CHARS = 2500000;
-function storagePct() {
+function storagePct() {   // eski mod (localStorage) için; IndexedDB modunda storageEstimate()
   let n = 0;
   try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); n += k.length + (localStorage.getItem(k) || "").length; } } catch (e) { return 0; }
   return Math.min(100, Math.round(n / STORAGE_LIMIT_CHARS * 100));
 }
-function renderStorageMeter() {
-  const pct = storagePct(), hi = pct >= 70;
-  $("pfStorageTxt").textContent = `%${pct} dolu`;
-  $("pfStorageBar").style.width = Math.max(2, pct) + "%";
-  $("pfStorageBar").style.background = hi ? "var(--t-warn-icon)" : "";
-  $("pfStorageWarn").classList.toggle("hidden", !hi);
-  if (hi) $("pfStorageWarn").textContent = "Alan dolmak üzere. Hemen yedek dosyası kaydet; kayıt dolarsa yeni bilgiler kaydedilemez.";
+// v41: IndexedDB modunda tarayıcının ayırdığı alana göre (navigator.storage.estimate); yoksa kayıt boyutundan.
+async function storageEstimate() {
+  if (storeMode !== "idb") return { pct: storagePct(), mb: null };
+  let usage = 0, quota = 0;
+  try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); usage = e.usage || 0; quota = e.quota || 0; } } catch (e) {}
+  if (!usage) usage = JSON.stringify(state).length * 2;
+  return { pct: quota ? Math.min(100, Math.round(usage / quota * 100)) : 0, mb: usage / 1048576 };
 }
-function checkStorageWarn() {
-  const pct = storagePct();
+function renderStorageMeter() {
+  storageEstimate().then(({ pct, mb }) => {
+    if (!$("pfStorageTxt")) return;
+    const hi = pct >= 70;
+    $("pfStorageTxt").textContent = `%${pct} dolu` + (mb != null ? ` · ${fmtNum(mb)} MB` : "");
+    $("pfStorageBar").style.width = Math.max(2, pct) + "%";
+    $("pfStorageBar").style.background = hi ? "var(--t-warn-icon)" : "";
+    $("pfStorageWarn").classList.toggle("hidden", !hi);
+    if (hi) $("pfStorageWarn").textContent = "Alan dolmak üzere. Hemen yedek dosyası kaydet; kayıt dolarsa yeni bilgiler kaydedilemez.";
+  });
+}
+async function checkStorageWarn() {
+  const { pct } = await storageEstimate();
   if (pct < 70 || Date.now() - num(state.storageWarnAt, 0) < 7 * DAY_MS) return;
   state.storageWarnAt = Date.now(); saveState();
   toast(`Telefondaki kayıt alanının %${pct}'i dolu. Yedek dosyası kaydet (Profil → Yedekleme).`, "error");
+}
+
+// v41: OTOMATİK İÇ YEDEKLER — her gün ilk açılışta bütün verinin kopyası (son 7 gece + son 4 hafta + "Geçiş öncesi").
+const SNAP_KIND_LABEL = { day: "Gece yedeği", week: "Haftalık yedek", pre: "Geçiş öncesi", import: "Değişiklik öncesi" };
+function renderSnapList() {
+  const box = $("pfSnaps"); if (!box) return;
+  if (storeMode !== "idb") { box.innerHTML = `<p class="text-[13px] text-[var(--t-dim)]">Otomatik iç yedek bu cihazda kullanılamıyor; yedek dosyası kaydet.</p>`; return; }
+  aykSnapList().then(list => {
+    if (!$("pfSnaps")) return;
+    box.innerHTML = list.length ? list.map(x => `<div data-snap="${esc(x.key)}" class="flex items-center justify-between gap-3 min-h-[52px] border-t border-[var(--t-line)] first:border-t-0">
+        <span class="min-w-0"><span class="block text-[14px] font-semibold text-[var(--t-text)]">${esc(fmtDate(new Date(x.date + "T12:00:00").getTime()))}</span>
+          <span class="block text-[12px] text-[var(--t-dim)]">${esc(SNAP_KIND_LABEL[x.kind] || "Yedek")} · ${fmtNum(x.size / 1048576 * 2)} MB</span></span>
+        <button data-snap-restore onclick='aykSnapRestore(${esc(JSON.stringify(x.key))})' class="t-btn-ghost h-11 px-3.5 rounded-xl text-[13px] shrink-0">Bu hâle dön</button>
+      </div>`).join("") : `<p class="text-[13px] text-[var(--t-dim)]">İlk iç yedek yarın oluşacak.</p>`;
+  });
+}
+async function aykSnapRestore(key) {
+  const json = await aykSnapJson(key); if (!json) return;
+  let next;
+  try { next = normalizeState(JSON.parse(json)); } catch (e) { sayAlert("Yedek okunamadı", "Bu iç yedek okunamadı; mevcut verilerin değişmedi."); return; }
+  if (!(await askConfirm("Bu hâle dönülsün mü?", "Bütün verilerin bu yedekteki hâline döner. İstersen hemen ardından Geri al ile vazgeçebilirsin.", "Bu hâle dön", true))) return;
+  snapshot();
+  state = next;
+  checkNewDay();
+  renderAll();
+  offerUndo("Yedekteki hâle dönüldü");
 }
 
 // v35: KURTARMA KOPYASI — açılışta okunamayan kaydın ham hâli (RESCUE_KEY). Önceden yalnızca saklanıyordu,

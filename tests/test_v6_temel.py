@@ -31,7 +31,7 @@ with sync_playwright() as p:
         w=pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]")
         print(tag,"scrollWidth/clientWidth",w, "OVERFLOW!" if w[0]>w[1] else "ok")
     # migration check
-    st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+    st=pg.evaluate("aykStoredState()")
     exs=st["workoutDays"][0]["exercises"]
     print("kinds:",[e["kind"] for e in exs], "cardio sets:",exs[1]["sets"], "time sets:",exs[2]["sets"])
     pg.screenshot(path=""+SHOTS+"/1_gym.png", full_page=True); overflow("gym")
@@ -43,7 +43,7 @@ with sync_playwright() as p:
     pg.keyboard.press("Control+A"); pg.keyboard.type("7")
     pg.locator("body").tap(position={"x":5,"y":400})
     pg.wait_for_timeout(200)
-    st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+    st=pg.evaluate("aykStoredState()")
     print("set0 after edit:",st["workoutDays"][0]["exercises"][0]["sets"][0])
     # cardio fill
     pg.locator('[onchange="updateSetData(1, 0, \'min\', this.value)"]').fill("35")
@@ -77,12 +77,12 @@ with sync_playwright() as p:
     print("modal kind cardio visible:", pg.is_visible("#exSec_cardio"), pg.is_visible("#exSec_weight"))
     pg.screenshot(path=""+SHOTS+"/5_exmodal.png")
     pg.click("#exerciseModal >> text=Kaydet"); pg.wait_for_timeout(300)
-    st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+    st=pg.evaluate("aykStoredState()")
     print("added:", st["workoutDays"][0]["exercises"][-1])
     # weight custom exercise with target
     pg.evaluate("openExerciseModal({name:'',kind:'weight'})"); pg.fill("#exName","Test Press"); pg.fill("#exSetCount","4"); pg.fill("#exRepRange","6-8"); pg.fill("#exStartKg","40")
     pg.click("#exerciseModal >> text=Kaydet"); pg.wait_for_timeout(200)
-    st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+    st=pg.evaluate("aykStoredState()")
     e=st["workoutDays"][0]["exercises"][-1]; print("custom:", e["targetInfo"], len(e["sets"]), e["sets"][0])
     # nutrition
     pg.click("#navBtnNutrition"); pg.wait_for_timeout(300)
@@ -90,7 +90,7 @@ with sync_playwright() as p:
     pg.evaluate("goAddFood(0, 'menu')"); pg.fill("#foodSearch","tavuk gogsu"); pg.wait_for_timeout(300)   # v33: Besinler ekranı (eski seçici kaldırıldı)
     pg.screenshot(path=""+SHOTS+"/7_foodpicker.png")
     pg.evaluate("quickAdd(0, 'tavuk_gogsu', 100)"); pg.wait_for_timeout(200)
-    st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+    st=pg.evaluate("aykStoredState()")
     print("meal0 items:", [i["foodId"] for i in st["meals"][0]["items"]])
     # amount focus test (gramaj kutuları Menülerim'de, öğün açıkken)
     pg.evaluate("setNutriView('menus'); toggleMenuMeal(0)"); pg.wait_for_timeout(100)
@@ -101,24 +101,24 @@ with sync_playwright() as p:
     pg.click("#navBtnProgress"); pg.wait_for_timeout(300); pg.screenshot(path=""+SHOTS+"/9_progress.png", full_page=True); overflow("progress")
     pg.click("#profileBtn"); pg.wait_for_timeout(200); pg.screenshot(path=""+SHOTS+"/10_settings.png")
     pg.fill("#setAge","30"); pg.click("#profileSave"); pg.wait_for_timeout(200)
-    st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))"); print("settings:", st["settings"])
+    st=pg.evaluate("aykStoredState()"); print("settings:", st["settings"])
     # new day rollover
-    pg.evaluate("()=>{const s=JSON.parse(localStorage.getItem('ayk_plus_v5_state')); s.today='2026-10-20'; localStorage.setItem('ayk_plus_v5_state', JSON.stringify(s));}")
+    pg.evaluate("()=>{const s=aykStoredState(); s.today='2026-10-20'; localStorage.setItem('ayk_plus_v5_state', JSON.stringify(s));}")
     pg.reload(); pg.wait_for_timeout(400)
-    st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))"); print("rollover:", st["today"], list(st["dailyLogs"].keys()), st["waterLiters"])
+    st=pg.evaluate("aykStoredState()"); print("rollover:", st["today"], list(st["dailyLogs"].keys()), st["waterLiters"])
     # backup roundtrip
     backup=pg.evaluate("JSON.stringify(state)")
-    pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(300)
+    pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.wait_for_timeout(300)
     pg.evaluate("t=>{ void restoreFromText(t); }", backup); pg.wait_for_timeout(300)
     if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(300)   # v21: temalı onay
-    st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+    st=pg.evaluate("aykStoredState()")
     print("restored logs:", len(st["workoutLogs"]), "history keys:", list(st["exerciseHistory"].keys()))
     pg.evaluate("t=>{ void restoreFromText(t); }", json.dumps(legacy)); pg.wait_for_timeout(200)
     if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(300)   # v21: temalı onay
-    st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+    st=pg.evaluate("aykStoredState()")
     print("legacy restore kinds:", [e["kind"] for e in st["workoutDays"][0]["exercises"]])
     # fresh install
-    pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(400)
+    pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.wait_for_timeout(400)
     pg.screenshot(path=""+SHOTS+"/11_fresh.png"); overflow("fresh")
     b.close()
 print("ERRORS:", errors or "none")

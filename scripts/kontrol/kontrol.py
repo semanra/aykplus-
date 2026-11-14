@@ -29,7 +29,7 @@ def shoot(root, out_dir, scheme):
         ctx.add_init_script(NO_ANIM)
         pg = ctx.new_page(); pg.clock.set_fixed_time(FIXED_TIME)
         pg.on("pageerror", lambda e: errs.append(str(e)))
-        pg.goto(url); pg.wait_for_timeout(400); pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(400)
+        pg.goto(url); pg.wait_for_timeout(400); pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.wait_for_timeout(400)
         pg.evaluate(SEED); pg.wait_for_timeout(250)
         for name, js in SCREENS:
             try: pg.evaluate("() => { " + js + " }")
@@ -96,7 +96,7 @@ def perf(root):
             for tab in ["nutrition", "gym", "mobility", "progress"]:
                 pg.evaluate(f"switchTab('{tab}')"); pg.wait_for_timeout(80)
                 r[tab] = pg.evaluate("(() => { const t = []; for (let i = 0; i < 12; i++) { const a = performance.now(); renderAll(); t.push(performance.now() - a); } t.sort((x, y) => x - y); return Math.round(t[6] * 10) / 10; })()")
-            r["kayıt KB"] = pg.evaluate("Math.round(localStorage.getItem('ayk_plus_v5_state').length / 1024)")
+            r["kayıt KB"] = pg.evaluate("Math.round(JSON.stringify(state).length / 1024)")
             out[f"{rate}x"] = r; ctx.close()
         b.close()
     return out

@@ -7,7 +7,7 @@ srv=subprocess.Popen(['python3','-m','http.server','8765'],cwd=REPO,stdout=subpr
 from playwright.sync_api import sync_playwright
 DAY=86400000; now=int(time.time()*1000)
 errs=[]
-def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
+def st(pg): return pg.evaluate("aykStoredState()")
 with sync_playwright() as p:
     b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":390,"height":844},device_scale_factor=2,is_mobile=True,has_touch=True)
     ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
@@ -81,7 +81,7 @@ with sync_playwright() as p:
     print("search:", pg.inner_text("#libList").replace("\n"," | ")[:120])
     pg.screenshot(path=""+SHOTS+"/v10_lib2.png")
     # --- öğün: saat yerleştirme
-    pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(300)
+    pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.wait_for_timeout(300)
     pg.evaluate("()=>{curMeals()[0].time='08:00'; curMeals()[1].time='13:00'; renderAll();}")
     pg.evaluate("setNutriView('menus')"); pg.wait_for_timeout(100)
     pg.locator("text=Yeni öğün ekle").click(); pg.fill("#mmName","Ara Öğün"); pg.fill("#mmTime","10:30"); pg.click("#mealModal >> text=Kaydet"); pg.wait_for_timeout(200)

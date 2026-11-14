@@ -405,17 +405,9 @@ var loadFailed = false;
 var hadV5State = false;   // v37: açılışta bugünkü kayıt vardı ve okundu (eski v4 kaydı ancak o zaman silinir)
 
 let saveFailNotified = false;
-function saveState() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    saveFailNotified = false;
-  } catch (e) {
-    console.error(e);
-    if (!saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
-  }
-}
-
-let state = loadState();
+// v41: saveState / kalıcı kayıt 00-depolama.js'de. Açılışta state bir yer tutucudur; asıl kayıt storageInit() ile yüklenir
+// (o bitene dek hiçbir şey yazılmaz).
+let state = normalizeState({});
 let progressSel = "";
 
 // v18: USDA veritabanı (foods.js) uygulama biçimine bir kez çevrilir; birleşik tablo önbellekte tutulur
