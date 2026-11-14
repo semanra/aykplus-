@@ -9,7 +9,7 @@ DAY=86400000; now=int(time.time()*1000)
 errs=[]
 def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
 with sync_playwright() as p:
-    b=p.chromium.launch(); ctx=b.new_context(viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
     pg=ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
     pg.goto("http://localhost:8765/index.html"); pg.wait_for_timeout(300)
     print("rules:", pg.evaluate("['Incline Press','Seated Two-Arm Overhead Dumbbell Extension','Leg Press','Dumbbell Shoulder Press','Close-Grip Bench Press'].map(n=>n+'→'+autoMuscle(n))"))

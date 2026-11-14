@@ -14,7 +14,7 @@ def check(cond, label):
 def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
 SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 def new_page(b, clock=None, state=None):
-    ctx = b.new_context(viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(SPLASH)
     pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
     native = []; pg.on("dialog", lambda d: (native.append(d.message), d.accept()))
@@ -64,14 +64,14 @@ try:
     pg.fill("#uiDlgInput", "Magnezyum"); pg.click("#uiDlgOk"); pg.wait_for_timeout(100)
     check(any(x["name"] == "Magnezyum" for x in st(pg)["supplementList"]), "takviye temalı pencereden eklendi")
     # gündüz teması
-    pg.evaluate("state.settings.nutriLight = true; renderAll(); void addMeal()"); pg.wait_for_timeout(120)
+    pg.evaluate("state.settings.theme = 'light'; renderAll(); void addMeal()"); pg.wait_for_timeout(120)
     bg = pg.evaluate("getComputedStyle(document.querySelector('#uiDialog [role=dialog]')).backgroundColor")
     col = pg.evaluate("getComputedStyle(document.querySelector('#uiDlgTitle')).color")
     check(bg == "rgb(255, 255, 255)" and col == "rgb(15, 23, 42)", f"gündüz temasında beyaz kart, koyu yazı ({bg}, {col})")
     pg.screenshot(path=os.path.join(SHOTS, "v21_dialog_gunduz.png"))
     pg.click("#uiDlgCancel"); pg.wait_for_timeout(80)
     check(not pg.is_visible("#uiDialog"), "Vazgeç pencereyi kapatıyor")
-    pg.evaluate("state.settings.nutriLight = false; renderAll()")
+    pg.evaluate("state.settings.theme = 'dark'; renderAll()")
 
     # 5) Elle girilen tutarsız etiket: uyarı → Vazgeç kaydetmez, Yine de kaydet kaydeder
     pg.evaluate("setNutriView('foods'); openCustomFoodModal()"); pg.wait_for_timeout(100)

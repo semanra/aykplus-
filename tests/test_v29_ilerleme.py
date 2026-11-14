@@ -39,7 +39,7 @@ def history(name, muscle, n, base, last_days_ago=1):
 try:
   with sync_playwright() as p:
     b = p.chromium.launch()
-    ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
 
@@ -186,7 +186,7 @@ try:
     check("en az 4 tartı" in pg.inner_text("#pWeight"), "Kilo: az tartıda grafik yerine açıklama")
 
     # ================= 4) 320 px =================
-    ctx2 = b.new_context(viewport={"width": 320, "height": 568}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    ctx2 = b.new_context(color_scheme="dark", viewport={"width": 320, "height": 568}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx2.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
     p2 = ctx2.new_page(); p2.on("pageerror", lambda e: errs.append(str(e)))
     seed(p2, rich)

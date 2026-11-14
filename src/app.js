@@ -7,7 +7,8 @@ const DEFAULT_SETTINGS = {
   waterTarget: 3.5, restSec: 90, sound: true, mobSound: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
   macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
-  nutriLight: false, scaleOn: false, scaleBase: 0
+  nutriLight: false, scaleOn: false, scaleBase: 0,
+  theme: "system"   // v31: system | dark | light (nutriLight eski alan, artık kullanılmıyor ama silinmez)
 };
 const DEFAULT_SUPPS = [
   { id: "creatine", name: "⚡ Kreatin (5g)" },
@@ -298,6 +299,7 @@ function normalizeState(raw) {
   // v29: İlerleme alt sekmesi (son açılan hatırlanır)
   if (!["genel", "kilo", "guc", "beslenme"].includes(s.progressView)) s.progressView = "genel";
   s.settings.nutriLight = !!s.settings.nutriLight;
+  if (!["system", "dark", "light"].includes(s.settings.theme)) s.settings.theme = "system";
   // v26: kalori halkası bir kereliğine "Yenen"e geçer (eskiden varsayılan "Plan" da kaydediliyordu, seçimle ayırt edilemiyordu);
   // işaret kaydedilir, sonra kullanıcının seçimi korunur.
   if (!s.settings.macroViewV26) { s.settings.macroView = "eaten"; s.settings.macroViewV26 = 1; }
@@ -774,18 +776,18 @@ function applyTabVisibility() {
   document.body.classList.toggle("theme-prog", state.activeTab === "progress");
   const nutri = state.activeTab === "nutrition";
   document.body.classList.toggle("theme-nutri", nutri);
-  document.body.classList.toggle("nutri-light", nutri && !!state.settings.nutriLight);
+  applyTheme();
+  // v31: güneş/ay düğmesi her sekmede; tüm uygulamanın temasını değiştirir
   const tb = $("nutriThemeBtn");
-  tb.classList.toggle("hidden", !nutri);
-  tb.classList.toggle("flex", nutri);
-  const light = !!state.settings.nutriLight;
+  tb.classList.remove("hidden"); tb.classList.add("flex");
+  const light = themeIsLight();
   const want = light ? "moon" : "sun";
   if (tb.dataset.icon !== want) {
     tb.dataset.icon = want;
     tb.innerHTML = light
       ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>'
       : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
-    tb.setAttribute("aria-label", light ? "Gece temasına geç" : "Gündüz temasına geç");
+    tb.setAttribute("aria-label", light ? "Koyu temaya geç" : "Aydınlık temaya geç");
   }
   const tt = $("tabTitle");
   const title = TAB_TITLES[state.activeTab] || "AYK+";
@@ -931,7 +933,27 @@ function setNutriView(v) {
   window.scrollTo(0, 0);
   renderAll();
 }
-function toggleNutriLight() { state.settings.nutriLight = !state.settings.nutriLight; renderAll(); }
+// v31: Görünüm (Sistem / Koyu / Aydınlık). Etkin tema html.light sınıfıyla uygulanır; Beslenme'de nutri-light.
+// Açılışta yanıp sönmesin diye <head> içindeki betik "ayk_theme" aynasını okur (asıl kayıt state.settings.theme).
+const THEME_MQ = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
+function themeIsLight() { const t = state.settings.theme; return t === "light" || (t !== "dark" && !!(THEME_MQ && THEME_MQ.matches)); }
+function applyTheme() {
+  const light = themeIsLight();
+  document.documentElement.classList.toggle("light", light);
+  document.body.classList.toggle("nutri-light", state.activeTab === "nutrition" && light);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) { const bg = getComputedStyle(document.body).backgroundColor; if (bg && meta.getAttribute("content") !== bg) meta.setAttribute("content", bg); }
+  try { if (localStorage.getItem("ayk_theme") !== state.settings.theme) localStorage.setItem("ayk_theme", state.settings.theme); } catch (e) {}
+}
+function setTheme(t) { state.settings.theme = ["system", "dark", "light"].includes(t) ? t : "system"; renderAll(); }
+function toggleTheme() { setTheme(themeIsLight() ? "dark" : "light"); }
+const toggleNutriLight = toggleTheme;   // eski ad (başlıktaki düğme)
+// Sistem teması değişince: olay + yedek olarak uygulamaya dönüşte yeniden bak (iOS arka plandayken olayı kaçırabilir)
+function onSystemTheme() { try { if (state.settings.theme === "system" && themeIsLight() !== document.documentElement.classList.contains("light")) applyTabVisibility(); } catch (e) {} }
+if (THEME_MQ) { if (THEME_MQ.addEventListener) THEME_MQ.addEventListener("change", onSystemTheme); else if (THEME_MQ.addListener) THEME_MQ.addListener(onSystemTheme); }
+document.addEventListener("visibilitychange", () => { if (!document.hidden) onSystemTheme(); });
+window.addEventListener("focus", onSystemTheme);
+window.addEventListener("pageshow", onSystemTheme);
 
 // Tam sayıyı Türkçe binlik ayırıcıyla yazar: 2478 → "2.478"
 function fmtInt(n) { return Math.round(num(n, 0)).toLocaleString("tr-TR"); }
@@ -1142,7 +1164,7 @@ function updateMacroCard(prefix, consumed, target, unit) {
   const st = $(`${prefix}Status`);
   if (prefix === "cal") {
     st.innerHTML = `<div class="text-[12px] font-semibold ${over ? "text-[#FB7185]" : "text-white/70"}">${over ? "Aşım" : "Kalan"}</div>
-      <div class="flex items-baseline gap-1 whitespace-nowrap"><span class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-[var(--t-text)]"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
+      <div class="flex items-baseline gap-1 whitespace-nowrap"><span class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-white"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
     const ring = $("calRing");
     const C = 301.59;
     ring.style.strokeDashoffset = String(C - (C * pct) / 100);
@@ -3841,6 +3863,7 @@ async function closeProfile() {
 function closeSettings() { hideProfile(); }
 
 function renderProfile() {
+  document.querySelectorAll("[data-theme-opt]").forEach(b => { const on = b.dataset.themeOpt === state.settings.theme; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
   // Kilo kayıtları
   const wl = state.weightLogs.filter(l => num(l.weight) > 0);
@@ -5556,7 +5579,7 @@ function gymLibraryHtml() {
     </div>
     <div class="grid grid-cols-3 gap-0.5 bg-[var(--t-surface)] border border-[var(--t-line)] rounded-[14px] p-0.5">${rangeBtn("week", "Bu hafta")}${rangeBtn("today", "Bugün")}${rangeBtn("program", "Programım")}</div>
     <div class="flex justify-center">
-      <div class="relative" style="width: min(100%, 340px); aspect-ratio: 765 / 1024;">
+      <div class="relative t-bodymap" style="width: min(100%, 340px); aspect-ratio: 765 / 1024;">
         <img src="anatomy.jpg" alt="Önden ve arkadan kas anatomisi" class="absolute inset-0 w-full h-full select-none" draggable="false" />
         <svg viewBox="0 0 765 1024" class="absolute inset-0 w-full h-full" role="img" aria-label="Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç">
           <g style="mix-blend-mode: color">${polys}</g>

@@ -21,7 +21,7 @@ def supp(pg, name): return [x for x in st(pg)["supplementList"] if name in x["na
 
 try:
   with sync_playwright() as p:
-    b = p.chromium.launch(); ctx = b.new_context(viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    b = p.chromium.launch(); ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
 
@@ -120,10 +120,10 @@ try:
     pg.locator("#suppCard").screenshot(path=SHOTS + "/v24_takviye_320.png")
     pg.set_viewport_size({"width": 375, "height": 812})
     # Gündüz teması
-    pg.evaluate("state.settings.nutriLight = true; renderAll()"); pg.wait_for_timeout(80)
+    pg.evaluate("state.settings.theme = 'light'; renderAll()"); pg.wait_for_timeout(80)
     pg.locator("#waterCard").scroll_into_view_if_needed()
     pg.screenshot(path=SHOTS + "/v24_su_takviye_gunduz.png", full_page=False)
-    pg.evaluate("state.settings.nutriLight = false; renderAll()")
+    pg.evaluate("state.settings.theme = 'dark'; renderAll()")
 
     # ---------- Yeni gün: işaretler ve su sıfır, dozlar korunur
     pg.evaluate("void manualNewDay()"); pg.wait_for_timeout(80); pg.click("#uiDlgOk"); pg.wait_for_timeout(120)

@@ -37,7 +37,7 @@ OFF_NOVAL = {"status": 1, "product": {"product_name": "Değersiz Ürün", "nutri
 
 try:
   with sync_playwright() as p:
-    b = p.chromium.launch(); ctx = b.new_context(viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    b = p.chromium.launch(); ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
     off_calls = []
@@ -63,7 +63,7 @@ try:
     check(pg.evaluate("state.nutriView") == "menus" and not pg.evaluate("$('nvMenus').classList.contains('hidden')"), "açık alt sekme yeniden açılışta hatırlanıyor")
     view(pg, "today")
     pg.evaluate("switchTab('gym')"); pg.wait_for_timeout(80)
-    check(pg.evaluate("!document.body.classList.contains('theme-nutri') && $('nutriThemeBtn').classList.contains('hidden')"), "antrenmanda beslenme teması ve güneş düğmesi yok")
+    check(pg.evaluate("!document.body.classList.contains('theme-nutri') && !$('nutriThemeBtn').classList.contains('hidden')"), "antrenmanda beslenme teması yok; v31: tema düğmesi her sekmede")
     pg.evaluate("switchTab('nutrition')"); pg.wait_for_timeout(80)
 
     # ---------- Kalori halkası
@@ -237,12 +237,12 @@ try:
     # ---------- Gündüz teması
     view(pg, "today")
     pg.click("#nutriThemeBtn"); pg.wait_for_timeout(100)
-    check(pg.evaluate("document.body.classList.contains('nutri-light')") and pg.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(243, 245, 242)" and st(pg)["settings"]["nutriLight"] is True, "güneş düğmesi gündüz temasını açıyor ve kaydediyor")
+    check(pg.evaluate("document.body.classList.contains('nutri-light')") and pg.evaluate("getComputedStyle(document.body).backgroundColor") == "rgb(243, 245, 242)" and st(pg)["settings"]["theme"] == "light", "güneş düğmesi gündüz temasını açıyor ve kaydediyor")
     check(pg.evaluate("getComputedStyle(document.querySelector('.n-hero')).color") == "rgb(255, 255, 255)", "gündüzde özet kartı koyu kalıyor")
-    check(pg.get_attribute("#nutriThemeBtn", "aria-label") == "Gece temasına geç", "düğme 'Gece temasına geç' oldu")
+    check(pg.get_attribute("#nutriThemeBtn", "aria-label") == "Koyu temaya geç", "düğme 'Koyu temaya geç' oldu")
     pg.screenshot(path=SHOTS + "/v13_light.png")
     pg.evaluate("switchTab('gym')"); pg.wait_for_timeout(80)
-    check(not pg.evaluate("document.body.classList.contains('nutri-light')"), "antrenman sekmesi gündüz temasından etkilenmiyor")
+    check(not pg.evaluate("document.body.classList.contains('nutri-light')") and pg.evaluate("document.documentElement.classList.contains('light')"), "v31: aydınlık tema tüm uygulamada (antrenmanda html.light, nutri-light yalnız beslenmede)")
     pg.evaluate("switchTab('nutrition')"); pg.click("#nutriThemeBtn"); pg.wait_for_timeout(80)
     check(not pg.evaluate("document.body.classList.contains('nutri-light')"), "tekrar basınca gece temasına dönüyor")
 
@@ -268,7 +268,7 @@ try:
     pg.reload(); pg.wait_for_timeout(400)
     s2 = st(pg)
     check(s2["meals"][0]["title"] == "Kahvaltı" and s2["meals"][0]["done"] is True and s2["weight"] == 98.4 and s2["waterLiters"] == 1.75, "eski kayıt bozulmadan yüklendi")
-    check(s2["nutriView"] == "today" and s2["settings"]["scaleOn"] is False and s2["settings"]["nutriLight"] is False, "yeni alanlar varsayılan değerle eklendi")
+    check(s2["nutriView"] == "today" and s2["settings"]["scaleOn"] is False and s2["settings"]["nutriLight"] is False and s2["settings"]["theme"] == "system", "yeni alanlar varsayılan değerle eklendi")
     check(pg.locator('#todayMeals [data-today-meal]').count() == 3, "eski kayıttaki 3 öğün Bugün'de görünüyor")
     check(pg.locator("#todayMeals b").count() == 0 and "<b>" in pg.inner_text('#todayMeals [data-today-meal="1"]'), "öğün adındaki HTML metin olarak gösteriliyor")
     view(pg, "history")

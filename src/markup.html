@@ -7,7 +7,14 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-mobile-web-app-title" content="AYK+" />
-  <meta name="theme-color" content="#0b1120" />
+  <meta name="theme-color" content="#000000" />
+  <script>/* v31: tema açılışta, sayfa çizilmeden uygulanır (asıl kayıt state.settings.theme; burada yalnızca ayna okunur) */
+    try { var t = localStorage.getItem("ayk_theme") || "system";
+      var L = t === "light" || (t !== "dark" && window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches);
+      if (L) document.documentElement.classList.add("light");
+      document.querySelector('meta[name="theme-color"]').setAttribute("content", L ? "#F2F2F5" : "#000000");
+      document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').setAttribute("content", L ? "default" : "black");
+    } catch (e) {}</script>
   <link id="appAppleIcon" rel="apple-touch-icon" sizes="180x180" href="icon.png" />
   <link rel="manifest" href="manifest.json" />
   <link id="appFavicon" rel="icon" type="image/png" href="icon.png" />
@@ -45,6 +52,49 @@
       --d-tq: #1FD1C1; --d-on-tq: #00201D; --d-gr: #22C55E; --d-on-gr: #04130A; --d-gr-soft: #16241B; --d-lv: #B3A6FF; --d-on-lv: #1B1446;
       --d-wa: #4EA8DE; --d-kg: #F4F4F5; --d-over: #FB7185; --d-dot: #6B6B73;
     }
+    /* v31 AYDINLIK TEMA (html.light). Aynı aile: nötr açık yüzeyler, tek vurgu; vurgu yazı/çizgi olarak koyulaşır (beyazda ≥ 4,5:1).
+       Beslenme kendi değişkenleriyle (nutri-light) çalışır; burada Antrenman ailesi. */
+    html.light {
+      --t-bg: #F2F2F5; --t-surface: #FFFFFF; --t-elev: #EDEDF0; --t-elev2: #E6E6EB; --t-elev0: #F6F6F8; --t-sunk: #E9E9ED;
+      --t-line: #E2E2E7; --t-line2: #D4D4D8; --t-line3: #C8C8CF; --t-grid: #ECECEF;
+      --t-text: #09090B; --t-text1: #18181B; --t-text2: #27272A; --t-text3: #3F3F46; --t-muted: #52525B; --t-dim: #63636B; --t-faint: #8A8A93; --t-faint2: #A1A1AA;
+      --t-nav: rgba(255, 255, 255, 0.96); --t-scrim: rgba(9, 9, 11, 0.45);
+      --t-acc: #1FD1C1; --t-acc-rgb: 31, 209, 193; --t-on-acc: #00201D; --t-acc-text: #0E7C72; --t-knob-on: #FFFFFF;
+      --t-panel: #E3F7F5; --t-panel-line: #9ADDD6; --t-panel-text: #0B4F49; --t-well: #F6F6F8;
+      --t-danger: #DC2626; --t-danger-text: #C81E1E; --t-danger-bg: #FDECEC; --t-warn-bg: #FFF4DB; --t-warn-line: #F0CF85; --t-warn-text: #8A5A00; --t-warn-icon: #B7791F;
+      --d-tq: #0F766E; --d-on-tq: #FFFFFF; --d-gr: #15803D; --d-on-gr: #FFFFFF; --d-gr-soft: #E7F6EC; --d-lv: #7C6BE0; --d-on-lv: #FFFFFF;
+      --d-wa: #0284C7; --d-kg: #18181B; --d-over: #BE123C; --d-dot: #A1A1AA;
+      color-scheme: light;
+    }
+    html.light body.theme-mob {
+      --t-bg: #F5F4FA; --t-surface: #FFFFFF; --t-elev: #EFEDF7; --t-line: #E3E0EF; --t-nav: rgba(255, 255, 255, 0.96);
+      --t-acc: #B3A6FF; --t-acc-rgb: 124, 107, 224; --t-on-acc: #1B1446; --t-acc-text: #5B47C9;
+      --m-chk: #8E88AA; --m-grip: #8A84A6; }
+    html.light body.theme-prog, html.light body.pf-page {
+      --t-acc: #18181B; --t-acc-rgb: 24, 24, 27; --t-on-acc: #FFFFFF; --t-acc-text: #18181B; --t-knob-on: #FFFFFF; }
+    html.light body.pf-page { --t-bg: #F2F2F5; --t-surface: #FFFFFF; --t-elev: #EDEDF0; --t-line: #E2E2E7; --t-nav: rgba(255, 255, 255, 0.96); }
+    html:not(.light) { color-scheme: dark; }
+    /* Başlıktaki tema düğmesi (Beslenme dışında Antrenman ailesi renkleri) */
+    body:not(.theme-nutri) #nutriThemeBtn { background: var(--t-surface); border: 1px solid var(--t-line); color: var(--t-text2); }
+    /* Karartma katmanları aydınlıkta daha hafif */
+    html.light .bg-black\/80, html.light .bg-black\/70 { background-color: rgba(9, 9, 11, 0.45); }
+    html.light #uiDialog.nd { background-color: rgba(9, 9, 11, 0.45); }
+    /* Aydınlıkta gölge: kartlar zeminden ayrılsın (koyuda gerekmiyor) */
+    html.light .t-card, html.light .m-card:not(.done), html.light .p-card, html.light .p-tile, html.light .m-reg, html.light .m-st { box-shadow: 0 1px 2px rgba(9, 9, 11, 0.06); }
+    html.light .bottom-nav { border-top-color: var(--t-line) !important; }
+    /* Rengi açıkça verilmemiş yazılar eski laciverd temanın açık gri taban rengini almasın */
+    body.theme-train, body.theme-mob, body.theme-prog { color: var(--t-text); }
+    /* Vücut haritası: çizim siyah zeminli → aydınlıkta koyu "sahne" kartında (Beslenme özet kartı gibi her temada koyu) */
+    html.light .t-bodymap { background: #0B0B0D; border-radius: 22px; overflow: hidden; box-shadow: 0 1px 3px rgba(9, 9, 11, 0.12); }
+    html.light .t-bodymap > span { color: #A1A1AA !important; }
+    /* Eski renkli uyarı/hata sınıflarının aydınlık karşılıkları (plaka/kademe araçları, bildirimler) */
+    html.light .bg-amber-950, html.light .bg-amber-950\/50 { background-color: var(--t-warn-bg); }
+    html.light .border-amber-800\/60, html.light .border-amber-500 { border-color: var(--t-warn-line); }
+    html.light .text-amber-100, html.light .text-amber-200, html.light .text-amber-300, html.light .text-amber-400 { color: var(--t-warn-text); }
+    html.light .bg-rose-950 { background-color: var(--t-danger-bg); }
+    html.light .border-rose-700 { border-color: #F3A6A6; }
+    html.light .text-rose-100, html.light .text-rose-300, html.light .text-rose-400 { color: var(--t-danger-text); }
+    html.light .text-sky-300 { color: #0369A1; }
     body.theme-train { background-color: var(--t-bg); padding-bottom: calc(11rem + env(safe-area-inset-bottom, 0px)); }
     body.theme-train .sticky-bar { background-color: var(--t-bg); border-bottom-color: var(--t-elev); }
     body.theme-train .bottom-nav { background-color: var(--t-nav); border-top-color: var(--t-elev); }
@@ -164,7 +214,7 @@
     .m-btn { min-height: 52px; border-radius: 16px; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--t-elev); color: var(--t-text); padding: 0 16px; }
     .m-btn.pri { background: var(--t-acc); color: var(--t-on-acc); }
     .m-btn.ghost { background: none; border: 1px solid var(--t-line); color: var(--t-muted); }
-    .m-btn.del { background: none; border: 1px solid var(--t-line); color: #FB7185; }
+    .m-btn.del { background: none; border: 1px solid var(--t-line); color: var(--d-over); }
     .m-pill { min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid var(--t-line); font-size: 13.5px; font-weight: 600; color: var(--t-muted); }
     .m-round { width: 44px; height: 44px; border-radius: 50%; background: var(--t-surface); border: 1px solid var(--t-line); display: grid; place-items: center; color: var(--t-muted); flex: none; }
     .m-chip { min-height: 44px; padding: 0 15px; border-radius: 22px; background: var(--t-elev); font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; flex: none; color: var(--t-text2); }
@@ -331,7 +381,7 @@
     .p-cal-d em { position: absolute; top: 3px; right: 3px; color: var(--d-on-tq); }
     .p-cal-d u { position: absolute; left: 22%; right: 22%; bottom: 4px; height: 3px; border-radius: 2px; background: var(--d-lv); }
     .p-cal-d.w u { background: var(--d-on-lv); }
-    .p-cal-d.fut { background: var(--t-sunk); color: var(--t-faint2); }
+    .p-cal-d.fut { background: var(--t-sunk); color: var(--t-dim); }
     .p-cal-d.today { box-shadow: inset 0 0 0 2px var(--t-text); }
     @media (max-width: 359px) { .p-cal { gap: 4px; } .p-cal-d { font-size: 12px; border-radius: 8px; } }
     .p-mt-g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
@@ -355,7 +405,7 @@
       --n-text: #0F172A; --n-text2: #1E293B; --n-muted: #475569; --n-dim: #5B6B80;
       --n-accent: #059669; --n-accent-text: #047857; --n-accent-soft: rgba(16, 185, 129, 0.14);
       --n-btn: #047857; --n-btn-text: #FFFFFF; --n-on-bg: #0F172A; --n-on-text: #FFFFFF; --n-tick: #FFFFFF;
-      --n-p: #0369A1; --n-k: #A16207; --n-y: #C2410C; --n-over: #E11D48; --n-over-soft: rgba(225, 29, 72, 0.10);
+      --n-p: #0369A1; --n-k: #A16207; --n-y: #C2410C; --n-over: #BE123C; --n-over-soft: rgba(225, 29, 72, 0.10);
       --n-p-soft: rgba(3, 105, 161, 0.12); --n-k-soft: rgba(161, 98, 7, 0.12); --n-y-soft: rgba(194, 65, 12, 0.12);
       --n-water: #0284C7; --n-water-soft: rgba(2, 132, 199, 0.12); --n-water-text: #075985; --n-cup-line: #94A3B8;
       --n-nav: rgba(255, 255, 255, 0.95);
@@ -473,6 +523,8 @@
     body:not(.theme-nutri) .n-toast { background: #0E1210; border-color: #166534; color: #fff; }
     /* v21: gündüz temasında takvim kutularındaki rakamlar okunur olsun */
     body.nutri-light .n-heat.ok, body.nutri-light .n-heat.near, body.nutri-light .n-heat.far { color: #fff; }
+    /* v31: aydınlıkta "hedefte" kutusu koyu yeşil (beyaz rakam 5,5:1) */
+    body.nutri-light .n-heat.ok, body.nutri-light .n-heat-dot.ok { background: var(--n-btn); }
     /* Beslenmeden açılan ortak pencereler (.nm): eski lacivert renkleri beslenme temasına çevirir */
     .nm { background-color: rgba(0,0,0,.72) !important; }
     .nm .card, .nm .sheet, .nm .sheet.bg-slate-900 { background: var(--n-card) !important; border: 1px solid var(--n-line) !important; border-radius: 24px !important; color: var(--n-text); }
@@ -1184,7 +1236,15 @@
         <section class="space-y-2.5" aria-labelledby="pfH5">
           <div id="pfH5" class="t-label">AYARLAR</div>
           <div class="t-card rounded-[22px] overflow-hidden">
-            <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5">
+            <div class="px-4 py-3 space-y-2.5" id="pfTheme">
+              <div><span class="block text-[15px] font-semibold text-[var(--t-text)]">Görünüm</span><span class="block text-[13px] text-[var(--t-dim)]">Sistem: iPhone'un ayarına uyar (gündüz aydınlık, gece koyu).</span></div>
+              <div class="t-seg grid-cols-3" role="group" aria-label="Görünüm">
+                <button type="button" data-theme-opt="system" onclick="setTheme('system')">Sistem</button>
+                <button type="button" data-theme-opt="dark" onclick="setTheme('dark')">Koyu</button>
+                <button type="button" data-theme-opt="light" onclick="setTheme('light')">Aydınlık</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
               <label for="setRest" class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]">Varsayılan dinlenme</span><span class="block text-[13px] text-[var(--t-dim)]">Saniye. Hareketin kendi süresi yoksa kullanılır.</span></label>
               <input id="setRest" type="text" inputmode="numeric" class="t-in text-center font-bold" style="width: 84px;" />
             </div>
@@ -1241,7 +1301,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v30</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v31</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

@@ -15,7 +15,7 @@ for d in range(1,30):
     dl[k]={"kcal":2487,"p":211,"eatenKcal":random.choice([2100,2300,2450,2550,2800]) if eaten else 0,"eatenP":random.choice([170,195,205,215]) if eaten else 0,
            "mealsDone":4 if eaten else 0,"mealsTotal":4,"water":random.choice([2.0,2.75,3.0,3.5,3.75,4.0]),"calTarget":2478,"proTarget":201}
 with sync_playwright() as p:
-    b=p.chromium.launch(); ctx=b.new_context(viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True)
+    b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True)
     pg=ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
     pg.goto("http://localhost:8765/index.html")
     print("meta status bar:", pg.get_attribute('meta[name="apple-mobile-web-app-status-bar-style"]','content'))

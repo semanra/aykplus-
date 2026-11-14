@@ -28,7 +28,7 @@ try:
   with sync_playwright() as p:
     b = p.chromium.launch()
     for W in (320, 390):
-      ctx = b.new_context(viewport={"width": W, "height": 700}, device_scale_factor=2, is_mobile=True, has_touch=True)
+      ctx = b.new_context(color_scheme="dark", viewport={"width": W, "height": 700}, device_scale_factor=2, is_mobile=True, has_touch=True)
       ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
       pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
       pg.goto(URL); pg.wait_for_timeout(400)
@@ -49,10 +49,10 @@ try:
       check(yedim.evaluate("e => getComputedStyle(e).backgroundColor") == "rgb(21, 128, 61)", tag + "Yedim düğmesi #15803D (beyaz yazı 5,0:1)")
       check(ov(pg), tag + "Beslenme yatay taşma yok")
       if W == 390:
-        pg.evaluate("state.settings.nutriLight = true; renderAll()"); pg.wait_for_timeout(100)
+        pg.evaluate("state.settings.theme = 'light'; renderAll()"); pg.wait_for_timeout(100)
         check(css(pg, "#navBtnGym", "color") == "rgb(113, 113, 122)", "gündüz teması: seçili olmayan alt menü #71717A")
         check(css(pg, "#navBtnNutrition", "color") != "rgb(113, 113, 122)", "gündüz teması: seçili Beslenme kendi renginde")
-        pg.evaluate("state.settings.nutriLight = false; renderAll()"); pg.wait_for_timeout(100)
+        pg.evaluate("state.settings.theme = 'dark'; renderAll()"); pg.wait_for_timeout(100)
         check(css(pg, "#navBtnGym", "color") == "rgb(139, 139, 147)", "koyu tema: alt menü rengi değişmedi (#8B8B93)")
 
       # ---- Antrenman: alt sekmeler, gün düğmeleri, not kutusu
