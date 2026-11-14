@@ -741,8 +741,8 @@ function endMealDrag() {
   cards.forEach(c => { c.style.outline = ""; });
   if (to === from) return;
   if (kind === "mob") {
-    const list = state.mobilityRoutine.items;
-    if (mobUI.region || !list[from]) { renderAll(); return; }
+    const list = mobItems();
+    if (!list[from]) { renderAll(); return; }
     const [x] = list.splice(from, 1);
     list.splice(to, 0, x);
     renderAll();

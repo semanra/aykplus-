@@ -225,8 +225,18 @@ function normalizeState(raw) {
   if (!Array.isArray(s.mobilityRoutine.static)) s.mobilityRoutine.static = [];
   // v27: iki eski liste bir kez tek sıralı listeye çevrilir; eski diziler yedek olarak dokunulmadan kalır
   const mr = s.mobilityRoutine;
-  if (!Array.isArray(mr.items)) mr.items = [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
-  mr.items = mr.items.map(normMobItem).filter(Boolean);
+  // v39: birden fazla rutin. Eski tek liste (items; o da yoksa eski dynamic/static) bir kez "Rutinim"e taşınır ve
+  // items kopyası silinir (veri taşındı). routines varken eski diziler hiç okunmaz.
+  if (!Array.isArray(mr.routines)) {
+    const items = Array.isArray(mr.items) ? mr.items : [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
+    mr.routines = [{ id: "mr_main", name: "Rutinim", items }];
+  }
+  delete mr.items;
+  mr.routines = mr.routines.filter(isObj).map(r => ({
+    id: typeof r.id === "string" && r.id ? r.id : "mr_" + Math.random().toString(36).slice(2, 9),
+    name: (r.name != null && typeof r.name !== "object" ? String(r.name) : "").trim().slice(0, 40) || "Rutin",
+    items: Array.isArray(r.items) ? r.items.map(normMobItem).filter(Boolean) : []
+  }));
   if (!isObj(s.mobilityLog)) s.mobilityLog = {};
   if (!Array.isArray(s.workoutLogs)) s.workoutLogs = [];
   if (!Array.isArray(s.weightLogs)) s.weightLogs = [];

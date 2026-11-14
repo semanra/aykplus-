@@ -24,7 +24,7 @@ RICH = r"""() => {
   state.customFoods["custom_recipe_x"] = { name: "🍲 Mercimek", cat: "🍲 Tariflerim", unit: "g", step: 10, def: 250, p: 0.08, c: 0.15, f: 0.02, kcal: 1.1, recipe: { items: [{ foodId: "yulaf", amount: 100 }], cooked: 400 } };
   state.combos = [{ id: "c1", name: "Kahvaltı kasesi", items: [{ foodId: "yulaf", amount: 60 }, { foodId: "custom_abc", amount: 150 }] }];
   ensureDayCopy(); dayMeals()[0].items.push({ foodId: "_est", amount: 1, est: { name: "Dışarıda", cal: 600, p: 30, c: 60, f: 20 } });
-  state.mobilityLog[key(now - D)] = ["Couch Stretch"]; state.mobilityRoutine.items[0].done = true;
+  state.mobilityLog[key(now - D)] = ["Couch Stretch"]; state.mobilityRoutine.routines[0].items[0].done = true;
   state.supplementList[0].dose = 5; state.supplementList[0].unit = "g"; state.supplementList[0].time = "post";
   state.missSearches = [{ q: "kinoa", n: 2, ts: now }];
   renderAll();
@@ -62,7 +62,7 @@ VISIT = r"""async () => {
   const steps = [
     "switchTab('nutrition'); setNutriView('today')", "setNutriView('menus')", "setNutriView('foods')", "setNutriView('history')",
     "switchTab('gym'); setGymView('today')", "setGymView('program')", "setGymView('library')", "setGymView('history')", "startWorkout()",
-    "state.gymActive = false; switchTab('mobility')", "mobOpen(state.mobilityRoutine.items[0] && state.mobilityRoutine.items[0].id)", "mobAddOpen()",
+    "state.gymActive = false; switchTab('mobility')", "mobOpen(state.mobilityRoutine.routines[0].items[0] && state.mobilityRoutine.routines[0].items[0].id)", "mobAddOpen()",
     "switchTab('progress'); setProgressView('genel')", "setProgressView('kilo')", "setProgressView('guc')", "setProgressView('beslenme')",
     "openProfile()", "hideProfile(); switchTab('nutrition'); openShopList()", "closeModal('shopModal'); checkNewDay()"
   ];

@@ -196,7 +196,7 @@ function progWorkoutDays() {
 function progMobDays() {
   const m = {};
   Object.keys(state.mobilityLog || {}).forEach(k => { if ((state.mobilityLog[k] || []).length) m[k] = 1; });
-  if (state.mobilityRoutine.items.some(i => i.done)) m[todayStr(logicalNow())] = 1;
+  if (mobAllItems().some(i => i.done)) m[todayStr(logicalNow())] = 1;
   return m;
 }
 function progWeekDays() {   // Pazartesi'den başlayan 7 gün (öğlen saatiyle; yaz saati kaymasın)

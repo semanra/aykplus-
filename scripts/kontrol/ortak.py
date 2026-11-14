@@ -46,7 +46,7 @@ SEED = r"""() => {
   state.dailyLogs = {};
   for (let i = 1; i <= 20; i++) { const k = key(now - i * D); state.dailyLogs[k] = { kcal: 2480, p: 200, eatenKcal: [2450, 2610, 2300, 2490, 2900, 2380, 2470][i % 7], eatenP: 185, mealsDone: i % 6 === 0 ? 0 : 4, mealsTotal: 4, water: [3.8, 4.4, 3.1, 4.2, 2.9][i % 5], calTarget: 2478, proTarget: 201 }; }
   state.mobilityLog = {}; [1, 2, 4, 5, 8].forEach(i => { state.mobilityLog[key(now - i * D)] = ["Couch Stretch"]; });
-  state.mobilityRoutine.items[0].done = true;
+  state.mobilityRoutine.routines[0].items[0].done = true;
   const m = dayMeals(); if (m[0]) m[0].done = true;
   state.waterLiters = 1.5; state.lastBackupAt = Date.now(); state.backupSnoozeUntil = Date.now() + 9e9;
   state.settings.bodyFat = 24; state.settings.targetBodyFat = 15;
@@ -84,9 +84,9 @@ SCREENS = [
   ("g-toast", "uiDialogDone(false); toast('Deneme bildirimi', 'ok', { label: 'Geri al', fn: () => {} })"),
   ("g-paylas", "document.getElementById('toastWrap').innerHTML=''; state.gymActive = false; stopTimer(); setGymView('history'); openShareCard(0)"),
   ("m-liste", "closeModal('chartModal'); switchTab('mobility')"),
-  ("m-detay", "mobOpen(state.mobilityRoutine.items[0].id)"),
+  ("m-detay", "mobOpen(state.mobilityRoutine.routines[0].items[0].id)"),
   ("m-ekle", "mobAddOpen()"),
-  ("m-sayac", "mobBack(); const t = state.mobilityRoutine.items.find(i => i.mode === 'time'); mobTimerStart(t.id)"),
+  ("m-sayac", "mobBack(); const t = state.mobilityRoutine.routines[0].items.find(i => i.mode === 'time'); mobTimerStart(t.id)"),
   ("p-genel", "mobTimerClose(); switchTab('progress'); setProgressView('genel')"),
   ("p-kilo", "setProgressView('kilo')"),
   ("p-guc", "setProgressView('guc')"),

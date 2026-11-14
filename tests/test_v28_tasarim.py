@@ -68,7 +68,7 @@ try:
       check(ov(pg), tag + "Antrenman yatay taşma yok")
 
       # ---- Mobilite: Alacakaranlık zeminleri, onay kutusu çerçevesi
-      pg.evaluate("state.mobilityRoutine.items[0].done = true; switchTab('mobility')"); pg.wait_for_timeout(150)
+      pg.evaluate("state.mobilityRoutine.routines[0].items[0].done = true; switchTab('mobility')"); pg.wait_for_timeout(150)
       check(css(pg, "body", "backgroundColor") == "rgb(7, 6, 13)", tag + "Mobilite zemini indigo-siyah #07060D")
       check(css(pg, "#mobList .m-card:not(.done)", "backgroundColor") == "rgb(19, 17, 28)", tag + "Mobilite kartı #13111C")
       check(css(pg, "#mobList .m-card:not(.done) .m-chk", "borderTopColor") == "rgb(107, 102, 128)", tag + "boş onay kutusu çerçevesi #6B6680 (≥ 3:1)")
@@ -82,7 +82,7 @@ try:
       if W == 390:
         # Hareket ekle: rutinde olan → çerçeveli ✓ + onay
         pg.evaluate("switchTab('mobility'); mobAddOpen()"); pg.wait_for_timeout(150)
-        n0 = len(st(pg)["mobilityRoutine"]["items"])
+        n0 = len(st(pg)["mobilityRoutine"]["routines"][0]["items"])
         row_in = pg.locator("#mobAddList [data-mob-lib]", has_text="Rutinde").first
         btn_in = row_in.locator("[data-mob-add]")
         check("in" in (btn_in.get_attribute("class") or "").split() and "zaten rutinde" in (btn_in.get_attribute("aria-label") or ""),
@@ -91,18 +91,18 @@ try:
         btn_in.click(); pg.wait_for_timeout(120)
         check(pg.is_visible("#uiDlgOk") and "Zaten rutinde" in pg.inner_text("#uiDlgTitle"), "rutindekini eklemek onay soruyor")
         pg.click("#uiDlgCancel"); pg.wait_for_timeout(120)
-        check(len(st(pg)["mobilityRoutine"]["items"]) == n0, "Vazgeç → eklenmedi")
+        check(len(st(pg)["mobilityRoutine"]["routines"][0]["items"]) == n0, "Vazgeç → eklenmedi")
         btn_in.click(); pg.wait_for_timeout(120); pg.click("#uiDlgOk"); pg.wait_for_timeout(150)
-        check(len(st(pg)["mobilityRoutine"]["items"]) == n0 + 1, "Yine de ekle → eklendi")
+        check(len(st(pg)["mobilityRoutine"]["routines"][0]["items"]) == n0 + 1, "Yine de ekle → eklendi")
         row_new = pg.locator("#mobAddList [data-mob-lib]:not(:has-text('Rutinde'))").first
         name_new = row_new.locator(".m-name").inner_text().strip()
         btn_new = row_new.locator("[data-mob-add]")
         check("in" not in (btn_new.get_attribute("class") or "").split(), "rutinde olmayan harekette dolu +")
         btn_new.click(); pg.wait_for_timeout(150)
-        check(not pg.is_visible("#uiDlgOk") and st(pg)["mobilityRoutine"]["items"][-1]["name"] == name_new, "rutinde olmayan soru sormadan eklenir")
+        check(not pg.is_visible("#uiDlgOk") and st(pg)["mobilityRoutine"]["routines"][0]["items"][-1]["name"] == name_new, "rutinde olmayan soru sormadan eklenir")
         pg.screenshot(path=SHOTS + "/v28_mob_ekle.png")
         # Sayaç: Profil rengi sızmıyor
-        pg.evaluate("mobBack(); const t = state.mobilityRoutine.items.find(i => i.mode === 'time'); mobTimerStart(t.id)"); pg.wait_for_timeout(150)
+        pg.evaluate("mobBack(); const t = state.mobilityRoutine.routines[0].items.find(i => i.mode === 'time'); mobTimerStart(t.id)"); pg.wait_for_timeout(150)
         check(pg.evaluate("document.body.classList.contains('pf-open') && !document.body.classList.contains('pf-page')"), "sayaç açıkken Profil rengi devrede değil")
         check(css(pg, "#mobTimer", "backgroundColor") == "rgb(7, 6, 13)", "sayaç zemini indigo-siyah")
         pg.screenshot(path=SHOTS + "/v28_mob_sayac.png")

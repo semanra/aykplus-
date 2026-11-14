@@ -141,7 +141,7 @@ try:
       state.customFoods.custom_x = { name: X('f'), cat: X('c'), unit: 'g', step: 10, def: 100, p: .2, c: .1, f: .05 };
       state.meals[0].title = X('m'); state.meals[0].items.push({ foodId: 'custom_x', amount: 100 }); state.workoutDays[0].name = X('d');
       state.workoutDays[0].exercises[0].name = X('e'); state.supplementList.push({ id: 's', name: X('s') });
-      state.mobilityRoutine.items.unshift(normMobItem({ name: X('mo'), type: 'static', mode: 'time', sec: 30 }));
+      state.mobilityRoutine.routines[0].items.unshift(normMobItem({ name: X('mo'), type: 'static', mode: 'time', sec: 30 }));
       state.combos = [{ id: 'c', name: X('k'), items: [{ foodId: 'custom_x', amount: 1 }] }]; renderAll(); }""", X("TAG"))
     pg.reload(); pg.wait_for_timeout(300)
     bad = pg.evaluate(VISIT)

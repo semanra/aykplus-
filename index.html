@@ -2074,8 +2074,18 @@ function normalizeState(raw) {
   if (!Array.isArray(s.mobilityRoutine.static)) s.mobilityRoutine.static = [];
   // v27: iki eski liste bir kez tek sıralı listeye çevrilir; eski diziler yedek olarak dokunulmadan kalır
   const mr = s.mobilityRoutine;
-  if (!Array.isArray(mr.items)) mr.items = [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
-  mr.items = mr.items.map(normMobItem).filter(Boolean);
+  // v39: birden fazla rutin. Eski tek liste (items; o da yoksa eski dynamic/static) bir kez "Rutinim"e taşınır ve
+  // items kopyası silinir (veri taşındı). routines varken eski diziler hiç okunmaz.
+  if (!Array.isArray(mr.routines)) {
+    const items = Array.isArray(mr.items) ? mr.items : [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
+    mr.routines = [{ id: "mr_main", name: "Rutinim", items }];
+  }
+  delete mr.items;
+  mr.routines = mr.routines.filter(isObj).map(r => ({
+    id: typeof r.id === "string" && r.id ? r.id : "mr_" + Math.random().toString(36).slice(2, 9),
+    name: (r.name != null && typeof r.name !== "object" ? String(r.name) : "").trim().slice(0, 40) || "Rutin",
+    items: Array.isArray(r.items) ? r.items.map(normMobItem).filter(Boolean) : []
+  }));
   if (!isObj(s.mobilityLog)) s.mobilityLog = {};
   if (!Array.isArray(s.workoutLogs)) s.workoutLogs = [];
   if (!Array.isArray(s.weightLogs)) s.weightLogs = [];
@@ -2589,7 +2599,7 @@ function nutritionTotals(meals) {
 function archiveDay(dateKey) {
   if (!dateKey) return;
   // v27: o gün yapılan mobilite hareketleri sessizce saklanır (boş gün yazılmaz, kayıt silinmez)
-  const mobDone = state.mobilityRoutine.items.filter(i => i.done).map(i => i.name);
+  const mobDone = [...new Set(mobAllItems().filter(i => i.done).map(i => i.name))];
   const prevMob = Array.isArray(state.mobilityLog[dateKey]) ? state.mobilityLog[dateKey] : [];
   if (mobDone.length) state.mobilityLog[dateKey] = [...new Set([...prevMob, ...mobDone])];
   const t = nutritionTotals();
@@ -2625,7 +2635,7 @@ function resetDaily() {
   state.dayPlan = null;   // bugüne özel değişiklikler arşivlendi; yeni gün menüden temiz başlar
   state.meals.forEach(m => { m.done = false; });
   state.restMeals.forEach(m => { m.done = false; });
-  state.mobilityRoutine.items.forEach(i => { i.done = false; });
+  mobAllItems().forEach(i => { i.done = false; });
 }
 
 function checkNewDay() {
@@ -4829,12 +4839,17 @@ function deleteWorkoutLog(idx) {
 
 // ---------------------------------------------------------------------------
 // MOBİLİTE (v27): bölge ızgarası + tek sıralı liste, hareket detayı, hareket ekle, nefes daireli sayaç.
-// Görünüm durumu kaydedilmez (mobUI). Veri: state.mobilityRoutine.items (bkz. normMobItem).
+// Görünüm durumu kaydedilmez (mobUI). Veri: state.mobilityRoutine.routines[].items (v39; bkz. normMobItem).
 // ---------------------------------------------------------------------------
-let mobUI = { view: "list", region: "", id: null, q: "", filter: "all" };
+let mobUI = { view: "list", rid: null, edit: false, region: "", id: null, q: "", filter: "all" };
 const MOB_REGION_LABEL = Object.fromEntries(MOB_REGIONS);
 const MOB_TYPE_LABEL = Object.fromEntries(MOB_TYPES);
-function mobItems() { return state.mobilityRoutine.items; }
+// v39: rutinler (state.mobilityRoutine.routines = [{ id, name, items }]); mobUI.rid = açık rutin
+function mobRoutines() { return state.mobilityRoutine.routines; }
+function mobAllItems() { return mobRoutines().flatMap(r => r.items); }
+function mobRoutine(rid) { return mobRoutines().find(r => r.id === rid) || null; }
+function mobNewRoutineId() { return "mr_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function mobItems() { const r = mobRoutine(mobUI.rid) || mobRoutines()[0]; return r ? r.items : []; }
 function mobFind(id) { return mobItems().find(i => i.id === id) || null; }
 function mobUpper(t) { return String(t).toLocaleUpperCase("tr-TR"); }
 function mobArg(id) { return esc(JSON.stringify(String(id))); }
@@ -5383,7 +5398,7 @@ function progWorkoutDays() {
 function progMobDays() {
   const m = {};
   Object.keys(state.mobilityLog || {}).forEach(k => { if ((state.mobilityLog[k] || []).length) m[k] = 1; });
-  if (state.mobilityRoutine.items.some(i => i.done)) m[todayStr(logicalNow())] = 1;
+  if (mobAllItems().some(i => i.done)) m[todayStr(logicalNow())] = 1;
   return m;
 }
 function progWeekDays() {   // Pazartesi'den başlayan 7 gün (öğlen saatiyle; yaz saati kaymasın)
@@ -7651,8 +7666,8 @@ function endMealDrag() {
   cards.forEach(c => { c.style.outline = ""; });
   if (to === from) return;
   if (kind === "mob") {
-    const list = state.mobilityRoutine.items;
-    if (mobUI.region || !list[from]) { renderAll(); return; }
+    const list = mobItems();
+    if (!list[from]) { renderAll(); return; }
     const [x] = list.splice(from, 1);
     list.splice(to, 0, x);
     renderAll();

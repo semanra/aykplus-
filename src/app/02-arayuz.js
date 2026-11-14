@@ -252,7 +252,7 @@ function nutritionTotals(meals) {
 function archiveDay(dateKey) {
   if (!dateKey) return;
   // v27: o gün yapılan mobilite hareketleri sessizce saklanır (boş gün yazılmaz, kayıt silinmez)
-  const mobDone = state.mobilityRoutine.items.filter(i => i.done).map(i => i.name);
+  const mobDone = [...new Set(mobAllItems().filter(i => i.done).map(i => i.name))];
   const prevMob = Array.isArray(state.mobilityLog[dateKey]) ? state.mobilityLog[dateKey] : [];
   if (mobDone.length) state.mobilityLog[dateKey] = [...new Set([...prevMob, ...mobDone])];
   const t = nutritionTotals();
@@ -288,7 +288,7 @@ function resetDaily() {
   state.dayPlan = null;   // bugüne özel değişiklikler arşivlendi; yeni gün menüden temiz başlar
   state.meals.forEach(m => { m.done = false; });
   state.restMeals.forEach(m => { m.done = false; });
-  state.mobilityRoutine.items.forEach(i => { i.done = false; });
+  mobAllItems().forEach(i => { i.done = false; });
 }
 
 function checkNewDay() {

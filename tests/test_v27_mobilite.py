@@ -12,7 +12,7 @@ def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
 def st(pg): return pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
-def items(pg): return st(pg)["mobilityRoutine"]["items"]
+def items(pg): return st(pg)["mobilityRoutine"]["routines"][0]["items"]
 def ov(pg):
     w = pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]"); return w[0] <= w[1]
 SMALL_JS = """(sel) => [...document.querySelectorAll(sel)]
@@ -47,7 +47,7 @@ try:
 
     # ================= 1) GÖÇ =================
     seed(pg, LEGACY)
-    s = st(pg); it = s["mobilityRoutine"]["items"]
+    s = st(pg); it = s["mobilityRoutine"]["routines"][0]["items"]
     names = [x["name"] for x in it]
     check(names == ["World’s Greatest Stretch", "Kendi hareketim", "Deep Squat Hold with Pry & Thoracic Reach", "Couch Stretch",
                     "Dead Hang (Barfikste Pasif Asılma)", "Thoracic Spine Foam Roll", "Kneeling Ankle Dorsiflexion"],
@@ -91,7 +91,7 @@ try:
     seed(pg, old)
     s = st(pg)
     check(s["mobilityLog"].get("2026-01-05") == ["World’s Greatest Stretch"], f"gün geçişi: yapılan hareket kaydedildi ({s['mobilityLog']})")
-    check(not any(x["done"] for x in s["mobilityRoutine"]["items"]), "gün geçişi: tikler sıfırlandı")
+    check(not any(x["done"] for x in s["mobilityRoutine"]["routines"][0]["items"]), "gün geçişi: tikler sıfırlandı")
     nd = json.loads(json.dumps(LEGACY)); nd["today"] = "2026-01-06"
     for x in nd["mobilityRoutine"]["dynamic"]:
         if isinstance(x, dict): x["done"] = False

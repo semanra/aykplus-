@@ -59,7 +59,7 @@ SEED = r"""() => {
   for (let i = 20; i >= 1; i--) state.weightLogs.push({ date: fmtDate(now - i * D), weight: 98 - i * 0.05, ts: now - i * D });
   for (let i = 1; i <= 10; i++) state.dailyLogs[key(now - i * D)] = { kcal: 2400, p: 190, eatenKcal: [2300, 2600, 2900, 2450][i % 4], eatenP: 180, mealsDone: i % 5 ? 4 : 0, mealsTotal: 4, water: 3, calTarget: 2400, proTarget: 190 };
   state.measurements = [{ ts: now - 20 * D, bel: 100 }, { ts: now - 2 * D, bel: 98 }];
-  state.mobilityRoutine.items[0].done = true; const m = dayMeals(); if (m[0]) m[0].done = true;
+  state.mobilityRoutine.routines[0].items[0].done = true; const m = dayMeals(); if (m[0]) m[0].done = true;
   renderAll();
 }"""
 SCREENS = [
@@ -68,8 +68,8 @@ SCREENS = [
   ("antrenman-bugün", "switchTab('gym'); setGymView('today')", None), ("antrenman-program", "setGymView('program')", None),
   ("antrenman-hareketler", "setGymView('library')", None), ("antrenman-geçmiş", "setGymView('history')", None),
   ("antrenman-aktif", "setGymView('today'); startWorkout()", None),
-  ("mobilite-liste", "state.gymActive = false; switchTab('mobility')", None), ("mobilite-detay", "mobOpen(state.mobilityRoutine.items[0].id)", None),
-  ("mobilite-ekle", "mobAddOpen()", None), ("mobilite-sayaç", "mobBack(); mobTimerStart(state.mobilityRoutine.items.find(i => i.mode === 'time').id)", "#mobTimer"),
+  ("mobilite-liste", "state.gymActive = false; switchTab('mobility')", None), ("mobilite-detay", "mobOpen(state.mobilityRoutine.routines[0].items[0].id)", None),
+  ("mobilite-ekle", "mobAddOpen()", None), ("mobilite-sayaç", "mobBack(); mobTimerStart(state.mobilityRoutine.routines[0].items.find(i => i.mode === 'time').id)", "#mobTimer"),
   ("ilerleme-genel", "mobTimerClose(); switchTab('progress'); setProgressView('genel')", None), ("ilerleme-kilo", "setProgressView('kilo')", None),
   ("ilerleme-güç", "setProgressView('guc')", None), ("ilerleme-beslenme", "setProgressView('beslenme')", None),
   ("profil", "openProfile()", "#profilePage"),

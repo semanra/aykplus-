@@ -1,11 +1,16 @@
 // ---------------------------------------------------------------------------
 // MOBİLİTE (v27): bölge ızgarası + tek sıralı liste, hareket detayı, hareket ekle, nefes daireli sayaç.
-// Görünüm durumu kaydedilmez (mobUI). Veri: state.mobilityRoutine.items (bkz. normMobItem).
+// Görünüm durumu kaydedilmez (mobUI). Veri: state.mobilityRoutine.routines[].items (v39; bkz. normMobItem).
 // ---------------------------------------------------------------------------
-let mobUI = { view: "list", region: "", id: null, q: "", filter: "all" };
+let mobUI = { view: "list", rid: null, edit: false, region: "", id: null, q: "", filter: "all" };
 const MOB_REGION_LABEL = Object.fromEntries(MOB_REGIONS);
 const MOB_TYPE_LABEL = Object.fromEntries(MOB_TYPES);
-function mobItems() { return state.mobilityRoutine.items; }
+// v39: rutinler (state.mobilityRoutine.routines = [{ id, name, items }]); mobUI.rid = açık rutin
+function mobRoutines() { return state.mobilityRoutine.routines; }
+function mobAllItems() { return mobRoutines().flatMap(r => r.items); }
+function mobRoutine(rid) { return mobRoutines().find(r => r.id === rid) || null; }
+function mobNewRoutineId() { return "mr_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function mobItems() { const r = mobRoutine(mobUI.rid) || mobRoutines()[0]; return r ? r.items : []; }
 function mobFind(id) { return mobItems().find(i => i.id === id) || null; }
 function mobUpper(t) { return String(t).toLocaleUpperCase("tr-TR"); }
 function mobArg(id) { return esc(JSON.stringify(String(id))); }

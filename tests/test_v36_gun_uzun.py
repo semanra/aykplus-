@@ -27,7 +27,7 @@ try:
 
     # ===== 1) TAM GÜN: sabah tikleri, öğlen bugüne özel değişiklik, akşam antrenman, gece yarısı uygulama AÇIK =====
     ctx, pg = page("2026-03-09T07:00:00")
-    pg.evaluate("toggleMealDone(0); addWater(0.5); toggleSupp(state.supplementList[0].id); state.mobilityRoutine.items[0].done = true; renderAll(); logCurrentWeight()")
+    pg.evaluate("toggleMealDone(0); addWater(0.5); toggleSupp(state.supplementList[0].id); state.mobilityRoutine.routines[0].items[0].done = true; renderAll(); logCurrentWeight()")
     pg.clock.set_system_time(T("2026-03-09T12:30:00"))
     pg.evaluate("ensureDayCopy(); dayMeals()[1].items.push({ foodId: '_est', amount: 1, est: { name: 'Dışarıda', cal: 700, p: 35, c: 70, f: 25 } }); toggleMealDone(1)")
     pg.clock.set_system_time(T("2026-03-09T18:00:00")); pg.evaluate("switchTab('gym'); startWorkout(); toggleSetDone(0,0); toggleSetDone(0,1)")
@@ -51,11 +51,11 @@ try:
 
     # ===== 2) "YENİ GÜN" DÜĞMESİ: aynı gün iki kez + gece yarısı — özet ezilmez =====
     ctx, pg = page("2026-03-09T10:00:00")
-    pg.evaluate("toggleMealDone(0); toggleMealDone(1); addWater(2); state.mobilityRoutine.items[0].done = true; renderAll()")
+    pg.evaluate("toggleMealDone(0); toggleMealDone(1); addWater(2); state.mobilityRoutine.routines[0].items[0].done = true; renderAll()")
     pg.evaluate("void manualNewDay()"); ok(pg)
     d = st(pg)["dailyLogs"]["2026-03-09"]
     check(d["water"] == 2 and d["mealsDone"] == 2 and d.get("manual"), "1. basış: gün arşivlendi")
-    pg.evaluate("addWater(1); state.mobilityRoutine.items[1].done = true; renderAll()"); pg.evaluate("void manualNewDay()"); ok(pg)
+    pg.evaluate("addWater(1); state.mobilityRoutine.routines[0].items[1].done = true; renderAll()"); pg.evaluate("void manualNewDay()"); ok(pg)
     s = st(pg); d = s["dailyLogs"]["2026-03-09"]
     check(d["water"] == 2 and d["mealsDone"] == 2, f"2. basış: önceki özet ezilmedi ({pick(d, 'water', 'mealsDone')})")
     check(len(s["mobilityLog"]["2026-03-09"]) == 2, "mobilite günlüğü birleşti (iki hareket)")
