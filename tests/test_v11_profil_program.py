@@ -183,25 +183,18 @@ try:
     # Kaydet
     pg.fill("#setAge", "31"); pg.fill("#setHeight", "182"); pg.fill("#pfWeight", "101,4"); pg.fill("#setTarget", "88"); pg.fill("#setRest", "120")
     pg.locator("#setSound").uncheck()
-    pg.click("#profileSave"); pg.wait_for_timeout(200)
+    pg.evaluate("saveSettings(); void closeProfile()"); pg.wait_for_timeout(200)
     s = st(pg)
     check(s["settings"]["age"] == 31 and s["settings"]["height"] == 182 and s["weight"] == 101.4 and s["settings"]["targetWeight"] == 88 and s["settings"]["restSec"] == 120 and s["settings"]["sound"] is False, "Profil kaydı tüm alanları yazıyor")
-    check(not pg.is_visible("#profilePage"), "kaydedince Profil kapanıyor")
-    # Kaydedilmemiş değişiklik uyarısı
+    check(not pg.is_visible("#profilePage"), "Geri ile Profil kapanıyor")
+    # v42: otomatik kayıt — "kaydedilmedi" uyarısı yok; Geri, yazılmakta olan alanı da kaydedip kapatır
     pg.click("#profileBtn"); pg.wait_for_timeout(150)
     check(pg.input_value("#setAge") == "31" and pg.input_value("#pfWeight") == "101,4", "Profil kayıtlı değerlerle açılıyor")
     pg.click("#profilePage button[aria-label=Geri]"); pg.wait_for_timeout(150)
     check(not pg.is_visible("#profilePage") and not pg.is_visible("#uiDialog"), "değişiklik yoksa Geri doğrudan kapatıyor")
-    pg.click("#profileBtn"); pg.wait_for_timeout(150); pg.fill("#setAge", "40")
-    pg.click("#profilePage button[aria-label=Geri]"); pg.wait_for_timeout(150)
-    check(pg.is_visible("#uiDialog") and "kaydedilmedi" in pg.inner_text("#uiDlgTitle"), "değişiklik varken Geri uyarı veriyor")
-    pg.mouse.click(10, 10); pg.wait_for_timeout(100)
-    check(pg.is_visible("#uiDialog"), "uyarı boşluğa dokunarak kapanmıyor (yanlışlıkla kayıp yok)")
-    pg.click("#uiDlgCancel"); pg.wait_for_timeout(150)
-    check(not pg.is_visible("#profilePage") and st(pg)["settings"]["age"] == 31, "Kaydetmeden çık → değişiklik kaydedilmedi")
     pg.click("#profileBtn"); pg.wait_for_timeout(150); pg.fill("#setAge", "33")
-    pg.click("#profilePage button[aria-label=Geri]"); pg.wait_for_timeout(150); pg.click("#uiDlgOk"); pg.wait_for_timeout(150)
-    check(st(pg)["settings"]["age"] == 33, "uyarıda Kaydet → değişiklik kaydedildi")
+    pg.click("#profilePage button[aria-label=Geri]"); pg.wait_for_timeout(150)
+    check(not pg.is_visible("#profilePage") and not pg.is_visible("#uiDialog") and st(pg)["settings"]["age"] == 33, "değişiklik varken Geri soru sormadan kaydedip kapatıyor")
     # Tartı kaydı
     pg.click("#profileBtn"); pg.wait_for_timeout(150)
     nw = len(st(pg)["weightLogs"])
@@ -212,11 +205,11 @@ try:
     check(pg.is_visible("#uiDialog") and len(st(pg)["weightLogs"]) == nw + 1, "geçersiz kilo kaydedilmiyor, temalı uyarı")
     pg.click("#uiDlgOk"); pg.fill("#pfWeight", "100,2")
     # Yağ oranı doğrulaması
-    pg.fill("#setBf", "80"); pg.click("#profileSave"); pg.wait_for_timeout(100)
-    check(pg.is_visible("#uiDialog") and "%3" in pg.inner_text("#uiDlgMsg") and pg.is_visible("#profilePage"), "geçersiz yağ oranı uyarısı, Profil açık kalıyor")
-    pg.click("#uiDlgOk"); pg.fill("#setBf", "24"); pg.fill("#setTargetBf", "15"); pg.wait_for_timeout(50)
+    pg.fill("#setBf", "80"); pg.press("#setBf", "Tab"); pg.wait_for_timeout(100)
+    check("%3" in pg.inner_text("#toastWrap") and pg.input_value("#setBf") == "" and pg.is_visible("#profilePage"), "geçersiz yağ oranı: uyarı, eski değer geri geldi, Profil açık")
+    pg.fill("#setBf", "24"); pg.fill("#setTargetBf", "15"); pg.wait_for_timeout(50)
     check(pg.is_visible("#setBfHint") and "Bunu hedef kilom yap" in pg.inner_text("#setBfHint"), "yağ oranı ipucu Profilde")
-    pg.click("#profileSave"); pg.wait_for_timeout(150)
+    pg.evaluate("saveSettings(); void closeProfile()"); pg.wait_for_timeout(150)
     check(st(pg)["settings"]["bodyFat"] == 24, "yağ oranı kaydedildi")
     # Ölçü ekleme Profilden (yeni tema)
     pg.click("#profileBtn"); pg.wait_for_timeout(150)
@@ -231,7 +224,7 @@ try:
     check("96,5" in pg.inner_text("#pfMeasureBox"), "ölçü Profilde hemen görünüyor")
     pg.screenshot(path=SHOTS + "/v11_profile_measure.png")
     # Ayarlar Profilin içinde: açılış animasyonu
-    pg.locator("#setSplash").uncheck(); pg.click("#profileSave"); pg.wait_for_timeout(150)
+    pg.locator("#setSplash").uncheck(); pg.evaluate("saveSettings(); void closeProfile()"); pg.wait_for_timeout(150)
     check(st(pg)["settings"]["splash"] is False, "Profil içindeki ayar (açılış animasyonu) kaydediliyor")
     # Eski yerler duruyor: Beslenme'de kilo, İlerleme'de ölçüler
     pg.click("#navBtnNutrition"); pg.wait_for_timeout(150)
@@ -244,7 +237,7 @@ try:
     check(pg.is_visible("#uiDialog") and native == [], "Fabrika sıfırlama temalı onay")
     pg.click("#uiDlgCancel"); pg.wait_for_timeout(100)
     check(len(st(pg)["measurements"]) >= 1, "Vazgeç ile hiçbir şey silinmedi")
-    pg.click("#profileSave"); pg.wait_for_timeout(100)
+    pg.evaluate("saveSettings(); void closeProfile()"); pg.wait_for_timeout(100)
 
     # ---------- Eski (v10) kayıtla açılış: veri kaybı yok
     legacy = {"weight": 97.3, "settings": {"sex": "female", "age": 29, "height": 168, "targetWeight": 70, "bodyFat": 28, "targetBodyFat": 22, "waterTarget": 2.5, "restSec": 75, "sound": True, "keepAwake": False, "splash": False},

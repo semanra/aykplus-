@@ -3,9 +3,7 @@
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
 const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
-let pfSnap = "";
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
-function pfValues() { return JSON.stringify(PF_FIELDS.map(id => { const el = $(id); return el.type === "checkbox" ? el.checked : el.value; })); }
 function fillProfileFields() {
   const st = state.settings;
   $("setSex").value = st.sex;
@@ -26,7 +24,6 @@ function fillProfileFields() {
   $("setSplash").checked = st.splash !== false;
   $("setDayStart").value = String(dayStartHour());
   updateBfHint();
-  pfSnap = pfValues();
 }
 function openProfile() {
   fillProfileFields();
@@ -43,11 +40,10 @@ function hideProfile() {
   el.classList.add("hidden"); el.classList.remove("flex");
   document.body.classList.remove("pf-open", "pf-page");
 }
+// v42: Profil otomatik kaydeder (alan kutudan çıkınca); "Kaydet" düğmesi ve "kaydedilmedi" uyarısı yok.
 async function closeProfile() {
-  if (profileIsOpen() && pfValues() !== pfSnap) {
-    const r = await uiAsk({ title: "Değişiklikler kaydedilmedi", message: "Profilde yaptığın değişiklikler kaydedilsin mi?", ok: "Kaydet", cancel: "Kaydetmeden çık", dismissable: false });
-    if (r) { saveSettings(); return; }
-  }
+  const a = document.activeElement;
+  if (a && a.blur && $("profilePage").contains(a)) a.blur();   // yazılmakta olan alan önce kaydedilsin
   hideProfile();
 }
 function closeSettings() { hideProfile(); }
@@ -55,7 +51,6 @@ function closeSettings() { hideProfile(); }
 function renderProfile() {
   $("pfRescue").classList.toggle("hidden", !rescueText());   // v35
   renderStorageMeter();   // v36
-  renderSnapList();   // v41
   document.querySelectorAll("[data-theme-opt]").forEach(b => { const on = b.dataset.themeOpt === state.settings.theme; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
   // Kilo kayıtları
@@ -126,16 +121,33 @@ function profileLogWeight() {
   state.weight = w;
   logCurrentWeight();
   $("pfWeight").value = fmtNum(w);
-  pfSnap = pfValues();
 }
 
-function saveSettings() {
+// v42: OTOMATİK KAYIT. Alan değişince (yazı kutusunda kutudan çıkınca; anahtar/seçimde hemen) bütün profil alanları
+// doğrulanıp kaydedilir. Sınırlar eskisi gibi (yaş 12–99, boy 120–230 …). Geçersiz yağ oranı / kilo kaydedilmez, eski değer
+// geri yazılır (kilo kutusu olduğu gibi kalır, kaydedilmez). Her kayıtta "Kaydedildi · Geri al". Kilo kutusu yalnızca güncel kiloyu değiştirir; tartı geçmişine ayrı düğme yazar.
+function profileAutoSaveInit() {
+  const det = $("pfSnaps") && $("pfSnaps").closest("details");   // v41: iç yedek listesi yalnızca açılınca okunur
+  if (det && !det.dataset.snapInit) { det.dataset.snapInit = "1"; det.addEventListener("toggle", () => { if (det.open) renderSnapList(); }); }
+  PF_FIELDS.forEach(id => { const el = $(id); if (el && !el.dataset.autosave) { el.dataset.autosave = "1"; el.addEventListener("change", () => applyProfileFields(id)); } });
+}
+function applyProfileFields(changedId) {
   const st = state.settings;
   const bfRaw = $("setBf").value.trim(), tbfRaw = $("setTargetBf").value.trim();
-  if ((bfRaw && !validBf(bfRaw)) || (tbfRaw && !validBf(tbfRaw))) { uiAlert("Yağ oranı geçersiz", "Yağ oranı %3 ile %60 arasında olmalı (bilmiyorsan boş bırak)."); return; }
-  const wRaw = $("pfWeight").value.trim();
-  const w = readProfileWeight();
-  if (wRaw && !w) { uiAlert("Kilo geçersiz", "Kilonu 30 ile 300 kg arasında yaz (örn: 98,4)."); return; }
+  if ((bfRaw && !validBf(bfRaw)) || (tbfRaw && !validBf(tbfRaw))) {
+    $("setBf").value = validBf(st.bodyFat) ? fmtNum(validBf(st.bodyFat)) : "";
+    $("setTargetBf").value = validBf(st.targetBodyFat) ? fmtNum(validBf(st.targetBodyFat)) : "";
+    updateBfHint();
+    toast("Yağ oranı %3 ile %60 arasında olmalı; eski değer geri geldi.", "error");
+    return false;
+  }
+  const wRaw = $("pfWeight").value.trim(), w = readProfileWeight();
+  if (wRaw && !w) {   // kutu olduğu gibi kalır ("Tartıyı kaydet" de bu değeri reddeder); kayıtlı kilo değişmez
+    toast("Kilo 30 ile 300 kg arasında olmalı; kaydedilmedi.", "error");
+    return false;
+  }
+  const before = JSON.stringify([state.settings, state.weight]);
+  const undo = JSON.stringify(state);
   st.sex = $("setSex").value === "female" ? "female" : "male";
   st.age = Math.max(12, Math.min(99, Math.round(num($("setAge").value, st.age))));
   st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));
@@ -152,12 +164,20 @@ function saveSettings() {
   st.splash = $("setSplash").checked;
   st.dayStartHour = Math.max(0, Math.min(5, parseInt($("setDayStart").value, 10) || 0));
   if (w) state.weight = w;
+  if (JSON.stringify([state.settings, state.weight]) === before) { fillProfileFields(); return true; }
+  undoSnap = undo;   // Geri al bu değişiklikten önceki hâle döner
   if (!timer.running) resetTimerUI();
-  pfSnap = pfValues();
-  hideProfile();
-  toast("Profil kaydedildi");
   renderAll();
+  fillProfileFields();   // sınırlanan değerler kutuda düzgün görünsün
   updateWakeLock();
+  offerUndo("Kaydedildi");
+  return true;
+}
+// Eski adı (testler ve eski çağrılar): bekleyen alanı kaydeder; profili kapatmaz.
+function saveSettings() {
+  const a = document.activeElement;
+  if (a && a.blur && $("profilePage").contains(a)) a.blur();
+  applyProfileFields();
 }
 
 // Bağlama göre onay: profil/antrenman ekranında temalı pencere, diğer yerlerde sistem kutusu.
@@ -248,10 +268,12 @@ async function aykSnapRestore(key) {
   let next;
   try { next = normalizeState(JSON.parse(json)); } catch (e) { sayAlert("Yedek okunamadı", "Bu iç yedek okunamadı; mevcut verilerin değişmedi."); return; }
   if (!(await askConfirm("Bu hâle dönülsün mü?", "Bütün verilerin bu yedekteki hâline döner. İstersen hemen ardından Geri al ile vazgeçebilirsin.", "Bu hâle dön", true))) return;
+  await storageSnapshotNow();   // dönmeden önceki hâl de iç yedekte kalsın
   snapshot();
   state = next;
   checkNewDay();
   renderAll();
+  renderSnapList();
   offerUndo("Yedekteki hâle dönüldü");
 }
 
@@ -280,6 +302,7 @@ async function restoreFromText(text) {
   if (!(await askConfirm("Yedek geri yüklensin mi?", "Mevcut tüm verilerin bu yedekle DEĞİŞTİRİLECEK. Devam edilsin mi?", "Geri yükle", true))) return false;
   let next;
   try { next = normalizeState(parsed); } catch (e) { console.error(e); sayAlert("Yedek okunamadı", "Yedek dosyası bozuk görünüyor; mevcut verilerin değiştirilmedi."); return false; }
+  await storageSnapshotNow();   // v41: geri yüklemeden önceki hâl iç yedekte
   state = next;
   state.lastBackupAt = state.lastBackupAt || Date.now();
   checkNewDay();
@@ -316,6 +339,7 @@ function restoreBackupFromText() { restoreFromText($("backupText").value); }
 async function resetToDefaults() {
   if (!(await askConfirm("Fabrika ayarlarına sıfırla", "TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?", "Devam et", true))) return;
   if (!(await askConfirm("Son onay", "Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?", "Sıfırla", true))) return;
+  await storageSnapshotNow();   // v41: sıfırlamadan önceki hâl iç yedekte (Profil → Otomatik iç yedekler)
   state = normalizeState({});
   state.today = logicalToday();
   closeSettings();

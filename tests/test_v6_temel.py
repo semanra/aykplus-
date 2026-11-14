@@ -100,7 +100,7 @@ with sync_playwright() as p:
     pg.click("#navBtnMobility"); pg.wait_for_timeout(200); pg.screenshot(path=""+SHOTS+"/8_mobility.png", full_page=True); overflow("mobility")
     pg.click("#navBtnProgress"); pg.wait_for_timeout(300); pg.screenshot(path=""+SHOTS+"/9_progress.png", full_page=True); overflow("progress")
     pg.click("#profileBtn"); pg.wait_for_timeout(200); pg.screenshot(path=""+SHOTS+"/10_settings.png")
-    pg.fill("#setAge","30"); pg.click("#profileSave"); pg.wait_for_timeout(200)
+    pg.fill("#setAge","30"); pg.evaluate("saveSettings(); void closeProfile()"); pg.wait_for_timeout(200)
     st=pg.evaluate("aykStoredState()"); print("settings:", st["settings"])
     # new day rollover
     pg.evaluate("()=>{const s=aykStoredState(); s.today='2026-10-20'; localStorage.setItem('ayk_plus_v5_state', JSON.stringify(s));}")

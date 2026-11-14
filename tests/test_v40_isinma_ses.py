@@ -100,7 +100,7 @@ try:
     check(pg.is_visible("#gymWarmup"), "Gizle → Geri al")
     pg.evaluate("openProfile()"); pg.wait_for_timeout(100)
     check(pg.is_checked("#setWarmup"), "Profil'de ısınma kartı anahtarı açık")
-    pg.uncheck("#setWarmup"); pg.click("#profileSave"); pg.wait_for_timeout(150)
+    pg.uncheck("#setWarmup"); pg.evaluate("saveSettings(); void closeProfile()"); pg.wait_for_timeout(150)
     check(st(pg)["settings"]["warmupCard"] is False, "Profil'den kapatıldı")
     pg.evaluate("hideProfile && hideProfile(); state.settings.warmupCard = true; renderAll()"); pg.wait_for_timeout(80)
     pg.evaluate("selectWorkoutDay(1)"); pg.wait_for_timeout(80)
@@ -141,7 +141,7 @@ try:
     check(pg.evaluate("window.__cancel") > c0, "seans kapatılınca konuşma susuyor")
     pg.evaluate("openProfile()"); pg.wait_for_timeout(100)
     check(pg.is_checked("#setMobVoice"), "Profil'de sesli yönlendirme anahtarı ayarla aynı")
-    pg.uncheck("#setMobVoice"); pg.click("#profileSave"); pg.wait_for_timeout(150)
+    pg.uncheck("#setMobVoice"); pg.evaluate("saveSettings(); void closeProfile()"); pg.wait_for_timeout(150)
     check(st(pg)["settings"]["mobVoice"] is False, "Profil'den kapatıldı")
     # Eski kayıt: yeni ayarlar yok → varsayılanlar
     seed(pg, {"settings": {"splash": False}, "mobilityRoutine": {"dynamic": [], "static": [], "items": []}})

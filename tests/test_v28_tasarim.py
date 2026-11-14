@@ -113,8 +113,7 @@ try:
 
       # ---- Profil: Grafit, yağ oranı kutuları hizalı
       pg.evaluate("switchTab('gym'); openProfile()"); pg.wait_for_timeout(200)
-      check(css(pg, "#profileSave", "backgroundColor") == "rgb(244, 244, 245)" and css(pg, "#profileSave", "color") == "rgb(9, 9, 11)",
-            tag + "Profil 'Kaydet' kırık beyaz, yazı koyu")
+      check(pg.query_selector("#profileSave") is None, tag + "Profil otomatik kaydediyor (v42: Kaydet düğmesi yok)")
       bf, tbf = box(pg, "#setBf"), box(pg, "#setTargetBf")
       check(abs(bf[1] - tbf[1]) < 1 and abs(bf[3] - tbf[3]) < 1, tag + f"yağ oranı kutuları aynı hizada ({bf[1]:.0f} / {tbf[1]:.0f})")
       if W == 390:

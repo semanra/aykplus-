@@ -464,6 +464,7 @@ function doUndo() {
   state = normalizeState(JSON.parse(undoSnap));
   undoSnap = null;
   renderAll();
+  if (profileIsOpen()) fillProfileFields();   // v42: Profil otomatik kaydında Geri al kutuları da geri getirir
   toast("Geri alındı");
 }
 

@@ -69,9 +69,13 @@ try:
     # ===== 4) Yazma hatası =====
     pg.evaluate("() => { window.__put = IDBObjectStore.prototype.put; IDBObjectStore.prototype.put = function () { throw new DOMException('dolu', 'QuotaExceededError'); }; }")
     pg.evaluate("addWater(0.5)"); pg.wait_for_timeout(150)
-    check("kaydedilemedi" in pg.inner_text("#toastWrap") and pg.evaluate("state.waterLiters") == 2, "yazma hatasında uyarı, ekrandaki veri duruyor")
-    pg.evaluate("() => { IDBObjectStore.prototype.put = window.__put; addWater(0.5); }"); pg.wait_for_timeout(100)
-    check(stored(pg)["waterLiters"] == 2.5, "hata geçince bir sonraki dokunuşta kaydediliyor")
+    m = json.loads(ls(pg))
+    check(pg.evaluate("state.waterLiters") == 2 and m["waterLiters"] == 2 and pg.evaluate("localStorage.getItem('ayk_plus_v5_imza')") is None,
+          "IndexedDB yazamayınca veri hemen localStorage'a (imzasız), ekrandaki veri duruyor")
+    pg.evaluate("() => { IDBObjectStore.prototype.put = window.__put; addWater(0.5); }"); pg.wait_for_timeout(300)
+    check(stored(pg)["waterLiters"] == 2.5, "hata geçince yeniden bağlanıp her şeyi yazıyor")
+    pg.clock.run_for(2600); pg.wait_for_timeout(80)
+    check(pg.evaluate("localStorage.getItem('ayk_plus_v5_imza')") is not None, "IndexedDB yeniden onaylayınca ayna imzalandı")
     # ===== 5) Bozuk parça → en yeni iç yedek + kurtarma kopyası =====
     pg.evaluate("aykRawPut('parts', 'dailyLogs', '{bozuk')"); reload(pg)
     s = stored(pg)
@@ -144,6 +148,42 @@ try:
     check(r["chars"] > 1400000 and r["idb"] < r["legacy"], f"5 yıllık veride dokunuş kaydı eskisinden hızlı ({r['idb']:.1f} < {r['legacy']:.1f} ms)")
     ctx.close()
 
+
+    # ===== 10) İnceleme senaryoları: veri hiçbir yolda eskiye dönmemeli =====
+    ctx, pg = page(); go(pg)
+    # C1: IndexedDB yazamıyor → ayna arka planda yazılıyor → yeniden açılış en yeni veriyi göstermeli
+    pg.evaluate("() => { window.__put = IDBObjectStore.prototype.put; IDBObjectStore.prototype.put = function () { throw new DOMException('kayıp', 'UnknownError'); }; }")
+    pg.evaluate("state.weight = 111; renderAll()"); pg.wait_for_timeout(50)
+    pg.evaluate("() => { writeMirror(); }")
+    pg.evaluate("() => { IDBObjectStore.prototype.put = window.__put; }"); reload(pg)
+    check(pg.evaluate("state.weight") == 111, f"C1: yazma hatasından sonra yeniden açılış en yeni veri ({pg.evaluate('state.weight')})")
+    # I1: bağlantı kapandı (onversionchange) → sonraki değişiklikler kaybolmamalı
+    pg.evaluate("() => { aykDB.close(); aykDB = null; }")
+    pg.evaluate("state.weight = 99; renderAll()"); pg.wait_for_timeout(400)
+    reload(pg)
+    check(pg.evaluate("state.weight") == 99, f"I1: bağlantı kopunca değişiklik kaybolmuyor ({pg.evaluate('state.weight')})")
+    # I2: geciken yazma + geri dönüş → son hâl kalmalı
+    pg.evaluate("""() => { const orig = idbWrite; window.__iw = orig; idbWrite = (p, d) => new Promise(r => setTimeout(() => orig(p, d).then(r), 100)); }""")
+    pg.evaluate("state.weight = 71; renderAll()"); pg.evaluate("state.weight = 99; renderAll()")
+    pg.clock.run_for(300); pg.wait_for_timeout(200)
+    pg.evaluate("() => { idbWrite = window.__iw; }"); pg.clock.run_for(2600); pg.wait_for_timeout(100)
+    reload(pg)
+    check(pg.evaluate("state.weight") == 99, f"I2: geciken yazma son hâli ezmiyor ({pg.evaluate('state.weight')})")
+    # I3: çekirdek bozuk, iç yedek yok → imzalı aynadan (en yeni) kurtarılmalı
+    pg.evaluate("state.weight = 95; renderAll()"); pg.clock.run_for(2600); pg.wait_for_timeout(100)
+    pg.evaluate("aykRawPut('parts', 'core', '{bozuk')")
+    pg.evaluate("() => new Promise(r => { const tx = aykDB.transaction('snaps', 'readwrite'); tx.objectStore('snaps').clear(); tx.oncomplete = r; })")
+    reload(pg)
+    check(pg.evaluate("state.weight") == 95 and len(pg.evaluate("state.meals")) > 0, f"I3: bozuk çekirdek aynadan geri geldi ({pg.evaluate('state.weight')})")
+    # I6: kurtarma kopyasını geri yükleyince ham metin kayda taşınmıyor
+    pg.evaluate("state._okunamayanBolumler = { core: 'x'.repeat(1000) }; state = normalizeState(JSON.parse(JSON.stringify(state))); renderAll()")
+    check(pg.evaluate("'_okunamayanBolumler' in state") is False, "I6: kurtarma alanı kayıttan ayıklanıyor")
+    # M1: fabrika ayarlarından önce iç yedek
+    n = len([x for x in snaps(pg) if x["kind"] == "import"])
+    pg.evaluate("openProfile(); void resetToDefaults()"); pg.wait_for_timeout(150); pg.click("#uiDlgOk"); pg.wait_for_timeout(150); pg.click("#uiDlgOk"); pg.wait_for_timeout(250)
+    imp = [x for x in snaps(pg) if x["kind"] == "import"]
+    check(len(imp) == n + 1 and json.loads(pg.evaluate("aykSnapJson(%s)" % json.dumps(sorted(imp, key=lambda x: -x["ts"])[0]["key"])))["weight"] == 95, "M1: sıfırlamadan önceki hâl iç yedekte")
+    ctx.close()
     check(not errs, f"sayfa hatası yok ({errs[:3]})")
     b.close()
 finally:

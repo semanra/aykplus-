@@ -11,7 +11,8 @@
 const IDB_NAME = "aykplus";
 const STORE_PARTS = ["dailyLogs", "exerciseHistory", "workoutLogs", "weightLogs", "mobilityLog", "mobilityRoutineLog", "measurements", "foodSnap"];
 const MIRROR_DELAY_MS = 2000;
-const MIRROR_SIG_KEY = "ayk_plus_v5_imza";   // aynanın imzası, aynayla aynı anda (eşzamanlı) yazılır
+const MIRROR_SIG_KEY = "ayk_plus_v5_imza";   // aynanın imzası: yalnızca IndexedDB onaylıyken (eşzamanlı) yazılır
+const MIRROR_OFF_KEY = "ayk_plus_v5_ayna_kapali";   // localStorage doldu, ayna eski kalmış olabilir
 var storeMode = "boot";          // boot | idb | ls
 var storeReady = false;          // açılış bitmeden hiçbir şey yazılmaz
 var aykDB = null;
@@ -19,6 +20,8 @@ var storeLast = {};              // parça → son yazılan JSON metni
 var storeMeta = { migratedAt: 0, mirrorSig: "", mirrorOff: false };
 var storeLoadNote = "";          // açılışta kullanıcıya gösterilecek kurtarma notu
 let saveQueued = false, mirrorTimer = 0, mirrorDirty = false;
+let idbPending = 0, idbBroken = false, idbReconnecting = false, lastWrittenSig = "";
+var storeReadOnly = false;      // depo açılamadı ve localStorage eski olabilir: bu açılışta yazma yok
 
 function strSig(s) {   // uzunluk + FNV-1a (32 bit): aynanın dışarıdan değişip değişmediğini anlamak için
   s = String(s || "");
@@ -33,10 +36,10 @@ function stableStr(v) {
   return JSON.stringify(v === undefined ? null : v);
 }
 function idbReq(r) { return new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
-function idbOpen() {
+function idbOpen(timeoutMs = 3000) {
   return new Promise((res, rej) => {
     let done = false;
-    const to = setTimeout(() => { if (!done) { done = true; rej(new Error("zaman aşımı")); } }, 3000);
+    const to = setTimeout(() => { if (!done) { done = true; rej(new Error("zaman aşımı")); } }, timeoutMs);
     try {
       if (!window.indexedDB) throw new Error("IndexedDB yok");
       const r = indexedDB.open(IDB_NAME, 1);
@@ -91,19 +94,26 @@ function partsToRaw(parts) {   // { core, … } metinleri → ham nesne; okunama
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 
 // --- Açılış ---
+// Aynanın imzası (ayk_plus_v5_imza) YALNIZCA IndexedDB her şeyi onayladığında yazılır. İmza yoksa ya da tutmuyorsa
+// localStorage'daki kayıt en yenisidir (IndexedDB yazamadı, uygulama yazma bitmeden kapandı, eski sürüm/yedek aracı yazdı)
+// ve açılışta içe alınır. Ayna dolduysa (mirrorOff) imza eski aynayı gösterir ve "ayna kapalı" işareti tutulur.
 async function storageInit() {
   try { aykDB = await idbOpen(); } catch (e) { aykDB = null; }
+  if (!aykDB && lsGet(MIRROR_OFF_KEY) === "1") {   // localStorage eski kalmış olabilir: bir kez daha, daha uzun dene
+    try { aykDB = await idbOpen(10000); } catch (e) { aykDB = null; }
+    if (!aykDB) { storageUseLegacy(); storeReadOnly = true; return; }
+  }
   if (!aykDB) return storageUseLegacy();
   try {
     storeMeta = { ...storeMeta, ...((await idbGet("meta", "main")) || {}) };
-    const lsStr = lsGet(STORAGE_KEY);
-    const lastSig = lsGet(MIRROR_SIG_KEY) || storeMeta.mirrorSig;
-    if (lsGet(MIRROR_SIG_KEY)) storeMeta.mirrorSig = lsGet(MIRROR_SIG_KEY);
-    const outside = lsStr != null && strSig(lsStr) !== lastSig;
+    const lsStr = lsGet(STORAGE_KEY), sig = lsGet(MIRROR_SIG_KEY);
+    lastWrittenSig = lsStr != null ? strSig(lsStr) : "";
+    const outside = lsStr != null && strSig(lsStr) !== sig;
     if (storeMeta.migratedAt && !outside) {
       const parts = await idbGetAll("parts");
+      if (parts.core == null) parts.core = "";   // çekirdek hiç yoksa okunamamış say
       const { raw, bad } = partsToRaw(parts);
-      if (bad.length) await storageRecoverParts(raw, bad, parts);
+      if (bad.length) await storageRecoverParts(raw, bad, parts, lsStr);
       state = normalizeState(raw);
       hadV5State = true;
       storeMode = "idb";
@@ -115,6 +125,7 @@ async function storageInit() {
       storeLast = stateParts(state);
     }
     storeReady = true;
+    if (storeMeta.mirrorOff) writeMirror(true);   // yer açıldıysa ayna yeniden çalışsın
   } catch (e) {
     console.error(e);
     return storageUseLegacy();
@@ -126,13 +137,18 @@ function storageUseLegacy() {
   storeMode = "ls";
   storeReady = true;
 }
-// İlk geçiş ya da localStorage dışarıdan değişti: ham kayıt (v4/kurtarma mantığıyla) okunur, parçalar yazılır, geri okunup doğrulanır.
+// İlk geçiş ya da localStorage daha yeni: ham kayıt (v4/kurtarma mantığıyla) okunur, parçalar yazılır, geri okunup doğrulanır.
 async function storageImportFromLocal(lsStr) {
   const now = Date.now(), puts = [];
-  if (storeMeta.migratedAt) {   // mevcut IndexedDB hâli kaybolmasın
+  if (storeMeta.migratedAt) {   // mevcut IndexedDB hâli kaybolmasın (aynı içerik zaten yedekliyse tekrar eklenmez)
     const cur = await idbGetAll("parts");
     const { raw, bad } = partsToRaw(cur);
-    if (!bad.length && Object.keys(cur).length) puts.push(["snaps", "import-" + now, { kind: "import", date: todayStr(), ts: now, json: JSON.stringify(raw) }]);
+    if (!bad.length && cur.core) {
+      const json = JSON.stringify(raw), jsig = strSig(json);
+      const snaps = await idbGetAll("snaps");
+      if (!Object.values(snaps).some(x => x.kind === "import" && x.sig === jsig))
+        puts.push(["snaps", "import-" + now, { kind: "import", date: todayStr(), ts: now, sig: jsig, json }]);
+    }
   } else if (lsStr != null) {
     puts.push(["snaps", "pre", { kind: "pre", date: todayStr(), ts: now, json: lsStr }]);
   }
@@ -145,35 +161,40 @@ async function storageImportFromLocal(lsStr) {
     console.error("depolama doğrulaması tutmadı; eski moda geçiliyor");
     return storageUseLegacy();
   }
-  storeMeta = { migratedAt: storeMeta.migratedAt || now, mirrorSig: lsStr != null ? strSig(lsStr) : "", mirrorOff: false };
-  try { localStorage.setItem(MIRROR_SIG_KEY, storeMeta.mirrorSig); } catch (e) {}
+  storeMeta = { ...storeMeta, migratedAt: storeMeta.migratedAt || now, mirrorOff: false };
   await idbWrite([["meta", "main", storeMeta]]);
+  // IndexedDB artık localStorage ile aynı: imzala
+  try { if (lsStr != null) localStorage.setItem(MIRROR_SIG_KEY, strSig(lsStr)); localStorage.removeItem(MIRROR_OFF_KEY); } catch (e) {}
   await storagePruneImports();
   storeMode = "idb";
 }
-// Okunamayan parça: ham hâli kurtarma kopyasına (yoksa), yerine en yeni iç yedekteki aynı parça (yoksa boş).
-async function storageRecoverParts(raw, bad, parts) {
-  try {   // okunabilen bölümler + okunamayanların ham metni; çekirdek okunabildiyse Profil'den geri yüklenebilir
+// Okunamayan parça. Kaynak sırası: (1) imzalı localStorage aynası (IndexedDB'nin son onaylı hâlinin birebir kopyası),
+// (2) en yeni iç yedek, (3) boş. Ham metin kurtarma kopyasına (yoksa) yazılır.
+async function storageRecoverParts(raw, bad, parts, lsStr) {
+  try {
     if (!localStorage.getItem(RESCUE_KEY)) {
       const keep = { ...raw, _okunamayanBolumler: {} };
       bad.forEach(k => { keep._okunamayanBolumler[k] = String(parts[k] == null ? "" : parts[k]).slice(0, 2000000); });
       localStorage.setItem(RESCUE_KEY, JSON.stringify(keep));
     }
   } catch (e) {}
-  const snaps = Object.values(await idbGetAll("snaps")).sort((a, b) => b.ts - a.ts);
-  let src = null;
-  for (const s of snaps) { try { src = JSON.parse(s.json); if (isObj(src)) break; } catch (e) { src = null; } }
+  let src = null, from = "";
+  try { const o = lsStr ? JSON.parse(lsStr) : null; if (isObj(o)) { src = o; from = "ayna"; } } catch (e) {}
+  if (!src) {
+    const snaps = Object.values(await idbGetAll("snaps")).sort((a, b) => b.ts - a.ts);
+    for (const s of snaps) { try { const o = JSON.parse(s.json); if (isObj(o)) { src = o; from = "yedek"; break; } } catch (e) {} }
+  }
   bad.forEach(k => {
     if (k === "core") { Object.keys(src || {}).forEach(f => { if (!STORE_PARTS.includes(f)) raw[f] = src[f]; }); }
     else if (src && src[k] !== undefined) raw[k] = src[k];
   });
   loadFailed = true;
-  storeLoadNote = src ? "Kaydın bir bölümü okunamadı; o bölüm son iç yedekten geri getirildi." : "Kaydın bir bölümü okunamadı.";
+  storeLoadNote = from;
 }
 
 // --- Kayıt ---
 function saveState() {
-  if (!storeReady) return;
+  if (!storeReady || storeReadOnly) return;
   if (storeMode !== "idb") return saveStateLegacy();
   if (saveQueued) return;
   saveQueued = true;
@@ -188,43 +209,80 @@ function saveStateLegacy() {
     if (!saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
   }
 }
+function storageSaveFailed(e) {
+  console.error(e);
+  idbBroken = true;
+  storeLast = {};   // bağlantı geri gelince her şey baştan yazılır
+  try { localStorage.removeItem(MIRROR_SIG_KEY); } catch (e2) {}
+  writeMirror(true);   // veri hemen localStorage'a (imzasız → sonraki açılış buradan açar)
+  // localStorage da yazamadıysa veri hiçbir yere kaydedilemedi: uyar. Ayna tuttuysa veri güvende (sonraki açılış oradan açar).
+  if (lsGet(STORAGE_KEY) !== JSON.stringify(state) && !saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
+  if (!idbReconnecting) {
+    idbReconnecting = true;
+    aykDB = null;
+    idbOpen().then(db => { aykDB = db; idbReconnecting = false; flushSave(); }, () => { idbReconnecting = false; });
+  }
+}
 function flushSave() {
   saveQueued = false;
-  if (storeMode !== "idb" || !storeReady) return;
+  if (storeMode !== "idb" || !storeReady || storeReadOnly) return;
   const parts = stateParts(state), puts = [];
   Object.keys(parts).forEach(k => { if (parts[k] !== storeLast[k]) puts.push(["parts", k, parts[k]]); });
   if (!puts.length) return;
+  const full = puts.length === Object.keys(parts).length;
+  puts.forEach(([, k, v]) => { storeLast[k] = v; });   // gönderildiği anda (sıradaki yazma bununla karşılaştırır)
   mirrorDirty = true;
-  const onFail = e => {
-    console.error(e);
-    if (!saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
-  };
+  if (!aykDB) { storageSaveFailed(new Error("bağlantı yok")); return; }
+  idbPending++;
   try {
-    if (!aykDB) throw new Error("bağlantı yok");
-    idbWrite(puts).then(() => { puts.forEach(([, k, v]) => { storeLast[k] = v; }); saveFailNotified = false; }, onFail);
-  } catch (e) { onFail(e); }
+    idbWrite(puts).then(() => {
+      idbPending--;
+      if (full) idbBroken = false;
+      saveFailNotified = false;
+    }, e => { idbPending--; storageSaveFailed(e); });
+  } catch (e) { idbPending--; storageSaveFailed(e); }
   scheduleMirror();
 }
 function scheduleMirror() {
-  if (storeMeta.mirrorOff) return;
   clearTimeout(mirrorTimer);
-  mirrorTimer = setTimeout(writeMirror, MIRROR_DELAY_MS);
+  mirrorTimer = setTimeout(() => writeMirror(), MIRROR_DELAY_MS);
 }
-function writeMirror() {
+// force: değişiklik olmasa da yaz (hata anında, ayna yeniden açılırken)
+function writeMirror(force) {
   clearTimeout(mirrorTimer); mirrorTimer = 0;
-  if (storeMode !== "idb" || !storeReady || storeMeta.mirrorOff || !aykDB) return;
+  if (storeMode !== "idb" || !storeReady || storeReadOnly) return;
+  if (saveQueued) flushSave();
   // localStorage'daki kayıt bizim son yazdığımız değilse (eski sürüm / yedek aracı yazdı) ezilmez; sonraki açılışta içe alınır.
   const cur = lsGet(STORAGE_KEY);
-  if (cur != null && strSig(cur) !== storeMeta.mirrorSig) return;
-  if (!mirrorDirty && cur != null) return;
-  const s = JSON.stringify(state);
+  if (cur != null && strSig(cur) !== lastWrittenSig) return;
+  if (cur == null && lastWrittenSig) return;   // biz yazdıktan sonra dışarıdan silindi: yeniden oluşturma
+  if (!force && !mirrorDirty && cur != null && !storeMeta.mirrorOff) return;
+  const s = JSON.stringify(state), sig = strSig(s);
+  const synced = idbPending === 0 && !idbBroken && !!aykDB;
   try {
     localStorage.setItem(STORAGE_KEY, s);
-    storeMeta.mirrorSig = strSig(s);
-    localStorage.setItem(MIRROR_SIG_KEY, storeMeta.mirrorSig);
+    lastWrittenSig = sig;
+    if (synced) localStorage.setItem(MIRROR_SIG_KEY, sig); else localStorage.removeItem(MIRROR_SIG_KEY);
     mirrorDirty = false;
-  } catch (e) { storeMeta.mirrorOff = true; storeMeta.mirrorSig = strSig(lsGet(STORAGE_KEY)); try { localStorage.setItem(MIRROR_SIG_KEY, storeMeta.mirrorSig); } catch (e2) {} }
-  idbWrite([["meta", "main", { ...storeMeta }]]).catch(e => console.error(e));
+    if (storeMeta.mirrorOff) { storeMeta.mirrorOff = false; try { localStorage.removeItem(MIRROR_OFF_KEY); } catch (e) {} }
+  } catch (e) {
+    // localStorage dolu: ayna durur, eski ayna imzalı kalır (IndexedDB güncel); eski moda düşülürse yazma kapanır
+    if (!storeMeta.mirrorOff) {
+      storeMeta.mirrorOff = true;
+      try { localStorage.setItem(MIRROR_OFF_KEY, "1"); } catch (e2) {}
+      if (synced && cur != null) try { localStorage.setItem(MIRROR_SIG_KEY, strSig(cur)); } catch (e2) {}
+    }
+  }
+  if (aykDB) idbWrite([["meta", "main", { ...storeMeta }]]).catch(err => console.error(err));
+}
+// İçeriği tamamen değiştiren işlemlerden önce (iç yedeğe dönme, yedek dosyası, fabrika ayarları) o anki hâl iç yedeğe
+async function storageSnapshotNow() {
+  if (storeMode !== "idb" || !aykDB) return;
+  try {
+    const now = Date.now(), json = JSON.stringify(state);
+    await idbWrite([["snaps", "import-" + now, { kind: "import", date: todayStr(), ts: now, sig: strSig(json), json }]]);
+    await storagePruneImports();
+  } catch (e) { console.error(e); }
 }
 
 // --- İç yedekler ---
@@ -241,8 +299,10 @@ function isoWeekKey(d) { const t = new Date(d + "T12:00:00"); t.setDate(t.getDat
 // Son 7 gece "day"; daha eskiler arasında en yeni 4 haftanın her birinden en yeni kopya "week"; gerisi silinir.
 async function storagePruneSnaps() {
   const all = await idbGetAll("snaps");
-  const dayKeys = Object.keys(all).filter(k => all[k].kind === "day" || all[k].kind === "week").sort((a, b) => all[b].date.localeCompare(all[a].date));
+  const tomorrow = todayStr(new Date(Date.now() + 2 * DAY_MS));
   const puts = [], dels = [], weeks = new Set();
+  Object.keys(all).forEach(k => { if ((all[k].kind === "day" || all[k].kind === "week") && all[k].date > tomorrow) { dels.push(["snaps", k]); delete all[k]; } });
+  const dayKeys = Object.keys(all).filter(k => all[k].kind === "day" || all[k].kind === "week").sort((a, b) => all[b].date.localeCompare(all[a].date));
   dayKeys.forEach((k, i) => {
     const s = all[k];
     if (i < 7) { if (s.kind !== "day") puts.push(["snaps", k, { ...s, kind: "day" }]); return; }
@@ -255,7 +315,7 @@ async function storagePruneSnaps() {
 async function storagePruneImports() {
   const all = await idbGetAll("snaps");
   const imp = Object.keys(all).filter(k => all[k].kind === "import").sort((a, b) => all[b].ts - all[a].ts);
-  if (imp.length > 2) await idbWrite([], imp.slice(2).map(k => ["snaps", k]));
+  if (imp.length > 3) await idbWrite([], imp.slice(3).map(k => ["snaps", k]));
 }
 async function aykSnapList() {
   if (storeMode !== "idb" || !aykDB) return [];

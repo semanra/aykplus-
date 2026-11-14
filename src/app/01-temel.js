@@ -207,6 +207,28 @@ function normMobItem(x) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// GÖÇ ZİNCİRİ (v42). Eski kayıt biçimleri burada, sırayla çevrilir; kayıttaki dataVer bir adımı geçtiyse o adım bir daha
+// çalışmaz. normalizeState yalnızca doğrulama/temizlik yapar. Yeni bir biçim değişikliği = yeni adım + DATA_VER + 1.
+// (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
+// ---------------------------------------------------------------------------
+const DATA_VER = 2;
+function migrateState(s) {
+  const v = Number.isInteger(s.dataVer) && s.dataVer >= 0 ? s.dataVer : 0;
+  if (v < 1) {   // v27 + v39: mobilitenin eski listeleri (dynamic/static, sonra tek items) → rutinler; eski diziler yedek olarak kalır
+    const mr = s.mobilityRoutine;
+    if (!Array.isArray(mr.routines)) {
+      const items = Array.isArray(mr.items) ? mr.items : [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
+      mr.routines = [{ id: "mr_main", name: "Rutinim", items }];
+    }
+  }
+  if (v < 2) {   // v26: kalori halkası bir kereliğine "Yenen"e (eskiden varsayılan "Plan" da kaydediliyordu)
+    if (!s.settings.macroViewV26) s.settings.macroView = "eaten";
+    delete s.settings.macroViewV26;
+  }
+  s.dataVer = Math.max(v, DATA_VER);
+}
+
 function normalizeState(raw) {
   const s = { ...clone(DEFAULT_STATE), ...(raw || {}) };
   s.settings = { ...DEFAULT_SETTINGS, ...((raw && raw.settings) || {}) };
@@ -225,12 +247,8 @@ function normalizeState(raw) {
   if (!Array.isArray(s.mobilityRoutine.static)) s.mobilityRoutine.static = [];
   // v27: iki eski liste bir kez tek sıralı listeye çevrilir; eski diziler yedek olarak dokunulmadan kalır
   const mr = s.mobilityRoutine;
-  // v39: birden fazla rutin. Eski tek liste (items; o da yoksa eski dynamic/static) bir kez "Rutinim"e taşınır ve
-  // items kopyası silinir (veri taşındı). routines varken eski diziler hiç okunmaz.
-  if (!Array.isArray(mr.routines)) {
-    const items = Array.isArray(mr.items) ? mr.items : [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
-    mr.routines = [{ id: "mr_main", name: "Rutinim", items }];
-  }
+  migrateState(s);   // v42: eski biçim çevirileri (tek zincir, kayıt başına bir kez)
+  if (!Array.isArray(mr.routines)) mr.routines = [];
   delete mr.items;
   mr.routines = mr.routines.filter(isObj).map(r => ({
     id: typeof r.id === "string" && r.id ? r.id : "mr_" + Math.random().toString(36).slice(2, 9),
@@ -350,9 +368,6 @@ function normalizeState(raw) {
   if (!["genel", "kilo", "guc", "beslenme"].includes(s.progressView)) s.progressView = "genel";
   s.settings.nutriLight = !!s.settings.nutriLight;
   if (!["system", "dark", "light"].includes(s.settings.theme)) s.settings.theme = "system";
-  // v26: kalori halkası bir kereliğine "Yenen"e geçer (eskiden varsayılan "Plan" da kaydediliyordu, seçimle ayırt edilemiyordu);
-  // işaret kaydedilir, sonra kullanıcının seçimi korunur.
-  if (!s.settings.macroViewV26) { s.settings.macroView = "eaten"; s.settings.macroViewV26 = 1; }
   if (s.settings.macroView !== "plan") s.settings.macroView = "eaten";
   { const h = parseInt(s.settings.dayStartHour, 10); s.settings.dayStartHour = h >= 0 && h <= 5 ? h : 0; }   // v21
   s.settings.waterAuto = s.settings.waterAuto !== false;   // v24: su hedefi kiloya göre (varsayılan açık)
@@ -370,6 +385,7 @@ function normalizeState(raw) {
   s.deficit = num(s.deficit, 700);
   s.waterLiters = num(s.waterLiters, 0);
   if (!s.createdAt) s.createdAt = Date.now();
+  delete s._okunamayanBolumler;   // v41: kurtarma kopyasındaki ham metin kayda taşınmasın
   // v35: bozuk "bugün" tarihi gün geçişini sessizce durdurmasın (checkNewDay bugünün tarihini yazar; arşivlenecek gün uydurulmaz)
   if (typeof s.today !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s.today)) delete s.today;
   return s;

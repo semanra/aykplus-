@@ -60,6 +60,7 @@ function bootApp() {
   try { if (hadV5State && !loadFailed && localStorage.getItem("ayk_plus_v4_state") != null) localStorage.removeItem("ayk_plus_v4_state"); } catch (e) { /* yok sayılır */ }
   setTimeout(checkFoodHealth, 1500);
   setTimeout(checkStorageWarn, 2500);   // v36
+  if (storeReadOnly) setTimeout(() => toast("Kayıt deposu açılamadı. Verilerin güvende; uygulamayı tamamen kapatıp yeniden aç. Bu açılışta yapılan değişiklikler kaydedilmez.", "error"), 300);
   if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);
 
   document.addEventListener("visibilitychange", () => {
@@ -75,6 +76,7 @@ function bootApp() {
   // 00:05'te içilen su önceki güne yazılıyordu). Yarım dakikada bir, yalnızca ekran görünürken.
   setInterval(() => { if (document.visibilityState === "visible" && checkNewDay()) { autoSelectNextDay(); renderAll(); autoSnapshot(); } }, 30000);
   autoSnapshot();   // v41: günün iç yedeği (yoksa)
+  profileAutoSaveInit();   // v42
   // v41: arka plana geçerken / sayfa kapanırken localStorage aynası güncellenir
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") writeMirror(); });
   window.addEventListener("pagehide", () => writeMirror());

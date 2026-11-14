@@ -144,7 +144,7 @@ try:
     pg.fill("#pfWeight", "100")
     pg.uncheck("#setWaterAuto"); pg.wait_for_timeout(40)
     check(not pg.is_disabled("#setWater"), "kapatınca elle hedef yazılabiliyor")
-    pg.fill("#setWater", "3,1"); pg.click("#profileSave"); pg.wait_for_timeout(150)
+    pg.fill("#setWater", "3,1"); pg.evaluate("saveSettings(); void closeProfile()"); pg.wait_for_timeout(150)
     s = st(pg)
     check(s["settings"]["waterAuto"] is False and s["settings"]["waterTarget"] == 3.1, "kaydedildi: otomatik kapalı, 3,1 L")
     pg.evaluate("closeProfile && closeProfile()") if pg.evaluate("typeof closeProfile === 'function'") else None

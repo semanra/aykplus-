@@ -99,9 +99,9 @@ try:
     pg.context.add_init_script(FULL); pg.evaluate(FULL)
     pg.evaluate("hideProfile(); openProfile()"); pg.wait_for_timeout(150)
     check(pg.is_visible("#pfStorageWarn") and int(pg.inner_text("#pfStorageTxt")[1:].split()[0]) >= 70, "%70 üstünde uyarı çıkıyor")
-    pg.reload(); pg.clock.run_for(3000); pg.wait_for_timeout(100)
+    pg.reload(); pg.wait_for_function("window.aykBooted === true"); pg.clock.run_for(3000); pg.wait_for_timeout(100)
     check("kayıt alanının" in pg.inner_text("#toastWrap"), "açılışta alan uyarısı (haftada en fazla bir)")
-    pg.reload(); pg.clock.run_for(3000); pg.wait_for_timeout(100)
+    pg.reload(); pg.wait_for_function("window.aykBooted === true"); pg.clock.run_for(3000); pg.wait_for_timeout(100)
     check("kayıt alanının" not in pg.inner_text("#toastWrap"), "aynı hafta ikinci açılışta tekrar uyarmıyor")
     ctx.close()
 
@@ -121,7 +121,8 @@ try:
     # v41: kayıt IndexedDB'de; yazma hatası taklidi
     pg.evaluate("() => { const orig = IDBObjectStore.prototype.put; window.__restore = () => { IDBObjectStore.prototype.put = orig; }; IDBObjectStore.prototype.put = function () { throw new DOMException('dolu', 'QuotaExceededError'); }; }")
     pg.evaluate("addWater(0.5)"); pg.wait_for_timeout(100)
-    check("kaydedilemedi" in pg.inner_text("#toastWrap") and pg.evaluate("state.waterLiters") == 0.5, "kayıt yapılamayınca uyarı çıkıyor, ekrandaki veri kaybolmuyor")
+    check(json.loads(pg.evaluate("localStorage.getItem('ayk_plus_v5_state')"))["waterLiters"] == 0.5 and pg.evaluate("state.waterLiters") == 0.5,
+          "IndexedDB yazamayınca veri localStorage'a kaydediliyor, ekrandaki veri kaybolmuyor")
     pg.evaluate("__restore(); addWater(0.5)")
     check(st(pg)["waterLiters"] == 1, "alan açılınca bir sonraki dokunuşta her şey kaydediliyor")
     ctx.close()

@@ -118,7 +118,6 @@ try:
     check(pressed == ["system:false", "dark:true", "light:false"], f"Profil → Görünüm: seçili Koyu ({pressed})")
     pg.click('[data-theme-opt="light"]'); pg.wait_for_timeout(120)
     check(is_light(pg) and st(pg)["settings"]["theme"] == "light", "Profil'de Aydınlık → anında aydınlık, Kaydet beklemeden")
-    check(bg(pg, "#profileSave") == "rgb(24, 24, 27)", "Profil 'Kaydet' aydınlıkta koyu grafit")
     small = pg.evaluate("""() => [...document.querySelectorAll('[data-theme-opt]')].filter(e => e.getBoundingClientRect().height < 44).length""")
     check(small == 0, "Görünüm düğmeleri ≥ 44 px")
     pg.click('[data-theme-opt="system"]'); pg.wait_for_timeout(120)

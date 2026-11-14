@@ -35,7 +35,7 @@ try:
     ctx, pg, errs, native = new_page(b)
     pg.evaluate("switchTab('nutrition'); setNutriView('today')"); pg.wait_for_timeout(80)
     s = st(pg)["settings"]
-    check(s["macroView"] == "eaten" and s.get("macroViewV26") == 1, f"yeni kurulum: halka Yenen, geçiş işareti kayıtlı ({s['macroView']})")
+    check(s["macroView"] == "eaten" and st(pg).get("dataVer", 0) >= 2, f"yeni kurulum: halka Yenen, geçiş veri sürümüyle kayıtlı (v42) ({s['macroView']})")
     check("on" in (pg.get_attribute("#mmEaten", "class") or "") and "Menü ·" in pg.inner_text("#mmPlan"), "Yenen seçili; diğer düğme 'Menü · … kcal'")
     ctx.close()
 
@@ -43,7 +43,7 @@ try:
     old = {"activeTab": "nutrition", "settings": {"macroView": "plan"}}
     ctx, pg, errs2, _ = new_page(b, state=old)
     s = st(pg)["settings"]
-    check(s["macroView"] == "eaten" and s.get("macroViewV26") == 1, "eski kayıt: Plan → bir kereliğine Yenen, işaret yazıldı")
+    check(s["macroView"] == "eaten" and st(pg).get("dataVer", 0) >= 2, "eski kayıt: Plan → bir kereliğine Yenen, veri sürümü yazıldı (v42)")
     pg.evaluate("setMacroView('plan')"); pg.wait_for_timeout(60)
     pg.reload(); pg.wait_for_timeout(400)
     check(st(pg)["settings"]["macroView"] == "plan", "kullanıcı Plan'ı seçince yeniden açılışta korunuyor (geçiş tekrar etmedi)")
