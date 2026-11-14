@@ -143,7 +143,12 @@ try:
             check(ov <= 0, f"[{scheme}] {name}: yatay taşma yok")
         if scheme == "light":
             pg.evaluate("hideProfile(); switchTab('gym'); setGymView('library')"); pg.wait_for_timeout(150)
-            check(bg(pg, ".t-bodymap") == "rgb(11, 11, 13)", "aydınlıkta vücut haritası koyu sahne kartında")
+            # v38: koyu sahne kartı yerine zeminsiz çizim (anatomy-light.webp) açık kartta; siyah zeminli resim gizli
+            bm = pg.evaluate("""(() => { const e = document.querySelector('.t-bodymap'), cs = getComputedStyle(e);
+              return { bg: cs.backgroundColor, img: cs.backgroundImage, vis: getComputedStyle(e.querySelector('img')).visibility }; })()""")
+            check(bm["bg"] != "rgb(11, 11, 13)" and "anatomy-light.webp" in bm["img"] and bm["vis"] == "hidden", f"aydınlıkta vücut haritası açık kartta, zeminsiz çizimle ({bm})")
+            ok_img = pg.evaluate("new Promise(r => { const i = new Image(); i.onload = () => r(i.naturalWidth); i.onerror = () => r(0); i.src = 'anatomy-light.webp'; })")
+            check(ok_img == 765, f"zeminsiz çizim yükleniyor ({ok_img} px)")
             pg.screenshot(path=SHOTS + "/v31_aydinlik_hareketler.png")
             pg.evaluate("setGymView('today')"); pg.wait_for_timeout(100); pg.screenshot(path=SHOTS + "/v31_aydinlik_antrenman.png")
             pg.evaluate("switchTab('mobility')"); pg.wait_for_timeout(100); pg.screenshot(path=SHOTS + "/v31_aydinlik_mobilite.png")

@@ -1,6 +1,6 @@
 // AYK+ çevrimdışı önbellek. Uygulamayı güncellediğinde aşağıdaki sürümü artır (v4, v5...).
-const CACHE = 'aykplus-v37';
-const FILES = ['./', './index.html', './manifest.json', './icon.png', './icon-192.png', './icon-512.png', './anatomy.jpg', './vendor/zxing.min.js', './foods.js'];
+const CACHE = 'aykplus-v38';
+const FILES = ['./', './index.html', './manifest.json', './icon.png', './icon-192.png', './icon-512.png', './anatomy.jpg', './anatomy-light.webp', './vendor/zxing.min.js', './foods.js'];
 // İnternet bu süre içinde yanıt vermezse (spor salonunda zayıf sinyal) önbellekteki kopya açılır.
 const NET_TIMEOUT_MS = 3000;
 // Bir istek zaman aşımına uğrar ya da internet yoksa, sonraki 30 sn boyunca dosyalar beklemeden önbellekten verilir

@@ -82,9 +82,10 @@
     html.light .bottom-nav { border-top-color: var(--t-line) !important; }
     /* Rengi açıkça verilmemiş yazılar eski laciverd temanın açık gri taban rengini almasın */
     body.theme-train, body.theme-mob, body.theme-prog { color: var(--t-text); }
-    /* Vücut haritası: çizim siyah zeminli → aydınlıkta koyu "sahne" kartında (Beslenme özet kartı gibi her temada koyu) */
-    html.light .t-bodymap { background: #0B0B0D; border-radius: 22px; overflow: hidden; box-shadow: 0 1px 3px rgba(9, 9, 11, 0.12); }
-    html.light .t-bodymap > span { color: #A1A1AA !important; }
+    /* Vücut haritası (v38): aydınlıkta çizimin zeminsiz kopyası (anatomy-light.webp, scripts/anatomy_light.py) kartın
+       arka planı olur; siyah zeminli asıl resim gizlenir. Arka plan resmi yalnızca aydınlık temada yüklenir. */
+    html.light .t-bodymap { background: var(--t-surface) url("anatomy-light.webp") center / 100% 100% no-repeat; border: 1px solid var(--t-line); border-radius: 22px; overflow: hidden; box-shadow: 0 1px 2px rgba(9, 9, 11, 0.06); }
+    html.light .t-bodymap > img { visibility: hidden; }
     body.theme-train { background-color: var(--t-bg); padding-bottom: calc(11rem + env(safe-area-inset-bottom, 0px)); }
     body.theme-train .sticky-bar { background-color: var(--t-bg); border-bottom-color: var(--t-elev); }
     body.theme-train .bottom-nav { background-color: var(--t-nav); border-top-color: var(--t-elev); }
@@ -1294,7 +1295,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v37</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v38</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
