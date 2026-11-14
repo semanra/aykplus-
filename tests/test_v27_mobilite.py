@@ -38,6 +38,8 @@ LEGACY = {"activeTab": "mobility", "today": TODAY, "mobilityRoutine": {
 def seed(pg, data):
     pg.goto(URL); pg.wait_for_timeout(200)
     pg.evaluate("s => localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(data)); pg.reload(); pg.wait_for_timeout(300)
+    # v39: mobilite ana ekranla açılır; bu test rutinin içinden (ilk rutin) yürür
+    pg.evaluate("if (state.activeTab === 'mobility' && mobRoutines()[0]) mobOpenRoutine(mobRoutines()[0].id)"); pg.wait_for_timeout(80)
 
 try:
   with sync_playwright() as p:
@@ -98,48 +100,29 @@ try:
     seed(pg, nd)
     check("2026-01-06" not in st(pg)["mobilityLog"], "hiç hareket yapılmayan gün kaydedilmiyor")
 
-    # ================= 2) ANA EKRAN =================
+    # ================= 2) RUTİNİN İÇİ (v39: bölge ızgarası ana ekrana taşındı, süzme yok) =================
     seed(pg, LEGACY)
-    def reg(key): return pg.locator(f'[data-mob-region="{key}"]')
-    # v32: dolum yüksekliği sayı yazısının üstünden başlar (calc); yüzde data-pct'te
-    def lvl(key): return pg.evaluate(f"document.querySelector('[data-mob-region=\"{key}\"] [data-mob-lvl]').dataset.pct") + "%"
     check("theme-mob" in (pg.get_attribute("body", "class") or ""), "Mobilite sekmesinde lavanta tema (body.theme-mob)")
     check(pg.evaluate("getComputedStyle(document.getElementById('navBtnMobility')).color") == "rgb(179, 166, 255)", "alt menüde Mobilite lavanta")
     check(pg.locator("#mobilityHeaderBar").count() == 0 and pg.locator("#mobilityTargetType").count() == 0, "eski üst şerit ve tür seçimi kaldırıldı")
-    check(reg("hip").inner_text().replace("\n", " ").upper().startswith("KALÇA") and "1 / 3" in reg("hip").inner_text(), f"Kalça: 1 / 3 ({reg('hip').inner_text()!r})")
-    check(lvl("hip") == "33%", f"Kalça doluluk %33 ({lvl('hip')})")
-    check("0 / 1" in reg("spine").inner_text() and lvl("spine") == "25%", f"Omurga: ikincil WGS yarım puan → %25 ({lvl('spine')})")
-    check(lvl("chest") == "0%" and "—" in reg("chest").inner_text(), "Göğüs: hareket yok → —")
-    check(pg.inner_text("#mobAllBtn") == "Tümü (1 / 7)", f"Tümü sayacı ({pg.inner_text('#mobAllBtn')})")
-    check(pg.locator("#mobList [data-mob-row]").count() == 7, "Tümü: 7 hareket")
+    check(pg.locator("#mobList [data-mob-row]").count() == 7, "rutinde 7 hareket")
     check(pg.locator("#mobList [data-mob-timer]").count() == 4, "yalnızca süreli 4 harekette sayaç düğmesi")
-    check(pg.locator("#mobList .drag-handle").count() == 7, "Tümü'nde sürükleme tutamacı")
     check("Sağ/sol · 2 set × 40 sn" in pg.locator("#mobList [data-mob-row]").nth(3).inner_text(), f"kartta özet ({pg.locator('#mobList [data-mob-row]').nth(3).inner_text()!r})")
     small = pg.evaluate(SMALL_JS, "#mobRoot button")
     check(not small, f"tüm düğmeler ≥ 44 px ({small})")
     check(ov(pg), "yatay taşma yok")
     pg.screenshot(path=SHOTS + "/v27_1_ana.png", full_page=True)
-    # Bölgeye süz
-    reg("hip").click(); pg.wait_for_timeout(80)
-    rows = pg.locator("#mobList [data-mob-row]").all_inner_texts()
-    check(len(rows) == 3 and "KALÇA" in pg.inner_text("#mobListTitle").upper(), f"Kalça süzüldü: 3 hareket ({len(rows)})")
-    check(pg.locator("#mobList .drag-handle").count() == 0, "süzülmüş listede sürükleme yok")
-    reg("spine").click(); pg.wait_for_timeout(80)
-    rows = pg.locator("#mobList [data-mob-row]").all_inner_texts()
-    check(len(rows) == 3 and "Thoracic Spine" in rows[0] and "ikincil" in rows[1].lower() and "ikincil" in rows[2].lower(), f"Omurga: ana önce, ikinciller etiketli sonda ({rows})")
-    pg.screenshot(path=SHOTS + "/v27_2_bolge.png", full_page=True)
-    reg("spine").click(); pg.wait_for_timeout(80)
-    check(pg.locator("#mobList [data-mob-row]").count() == 7, "aynı bölgeye tekrar dokununca Tümü")
-    reg("hip").click(); pg.click("#mobAllBtn"); pg.wait_for_timeout(80)
-    check(pg.locator("#mobList [data-mob-row]").count() == 7, "Tümü düğmesi süzmeyi kaldırıyor")
     # Tik
     pg.locator("#mobList [data-mob-row]").nth(3).locator("[data-mob-check]").click(); pg.wait_for_timeout(80)
-    check(items(pg)[3]["done"] is True and "2 / 3" in reg("hip").inner_text(), "tik → kayıt + Kalça 2 / 3")
-    # Sıfırla + Geri al
+    check(items(pg)[3]["done"] is True, "tik → kayıt")
+    # Düzenle: tutamaç; Tikleri sıfırla + Geri al
+    pg.click("#mobEditBtn"); pg.wait_for_timeout(80)
+    check(pg.locator("#mobList .drag-handle").count() == 7, "Düzenle'de sürükleme tutamacı")
     pg.click("#mobResetBtn"); pg.wait_for_timeout(80)
-    check(not any(x["done"] for x in items(pg)), "Sıfırla tüm tikleri kaldırıyor")
+    check(not any(x["done"] for x in items(pg)), "Tikleri sıfırla tüm tikleri kaldırıyor")
     pg.locator("#toastWrap button", has_text="Geri al").click(); pg.wait_for_timeout(100)
     check(items(pg)[0]["done"] and items(pg)[3]["done"], "Geri al tikleri geri getiriyor")
+    if not pg.evaluate("mobUI.edit"): pg.click("#mobEditBtn"); pg.wait_for_timeout(80)
     # Sürükle-bırak
     first = items(pg)[0]["id"]; pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(50)
     h = pg.locator('#mobList .drag-handle[data-mobidx="0"]').bounding_box(); t = pg.locator('#mobList [data-mob-row]').nth(2).bounding_box()
@@ -205,10 +188,10 @@ try:
 
     # ================= 4) HAREKET EKLE =================
     seed(pg, LEGACY)
-    pg.locator('[data-mob-region="hip"]').click(); pg.click("#mobAddBtn"); pg.wait_for_timeout(80)
+    pg.evaluate("mobEdit(true)"); pg.click("#mobAddBtn"); pg.wait_for_timeout(80)
     def libnames(): return [t.split("\n") for t in pg.locator("#mobAddList [data-mob-lib]").all_inner_texts()]
     groups = pg.locator("#mobAddList [data-mob-group]").all_inner_texts()
-    check(pg.is_visible("#mobAdd") and groups[0] == "Kalça" and len(groups) == 6, f"ekleme ekranı; seçili bölge (Kalça) en üstte ({groups})")
+    check(pg.is_visible("#mobAdd") and groups[0] == "Kalça" and len(groups) == 6, f"ekleme ekranı; bölgelere göre gruplu ({groups})")
     check(pg.locator("#mobAddList [data-mob-lib]").count() == 37, "kütüphanedeki 37 hareket")
     pg.click('[data-mob-filter="release"]'); pg.wait_for_timeout(50)
     check(pg.locator("#mobAddList [data-mob-lib]").count() == 5, "Foam roller süzgeci: 5 hareket")
@@ -234,8 +217,8 @@ try:
     pg.click("#mobAddCustom"); pg.wait_for_timeout(80)
     pg.fill("#uiDlgInput", "Kendi esnemem"); pg.click("#uiDlgOk"); pg.wait_for_timeout(100)
     n = items(pg)[-1]
-    check(n["name"] == "Kendi esnemem" and n["type"] == "static" and n["region"] == "hip" and n["sets"] == 2 and n["mode"] == "time" and n["sec"] == 30,
-          f"elle ekle: statik 2 × 30 sn, seçili bölge ({n})")
+    check(n["name"] == "Kendi esnemem" and n["type"] == "static" and n["region"] == "" and n["sets"] == 2 and n["mode"] == "time" and n["sec"] == 30,
+          f"elle ekle: statik 2 × 30 sn, bölge detayda seçilir ({n})")
     check(pg.is_visible("#mobDetail") and pg.inner_text("#mobDtTitle").strip() == "Kendi esnemem", "elle eklenen hareketin detayı açılıyor")
     pg.click("#mobDtBack"); pg.click("#mobAddBtn"); pg.wait_for_timeout(50); pg.click("#mobAddClose"); pg.wait_for_timeout(50)
     check(pg.locator("#mobList").count() == 1, "Kapat → liste")

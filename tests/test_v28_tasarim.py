@@ -68,12 +68,15 @@ try:
       check(ov(pg), tag + "Antrenman yatay taşma yok")
 
       # ---- Mobilite: Alacakaranlık zeminleri, onay kutusu çerçevesi
-      pg.evaluate("state.mobilityRoutine.routines[0].items[0].done = true; switchTab('mobility')"); pg.wait_for_timeout(150)
+      # v39: mobilite ana ekranla açılır; kart/onay kutusu rutinin içinde, tutamaç Düzenle'de
+      pg.evaluate("state.mobilityRoutine.routines[0].items[0].done = true; switchTab('mobility'); mobOpenRoutine(mobRoutines()[0].id)"); pg.wait_for_timeout(150)
       check(css(pg, "body", "backgroundColor") == "rgb(7, 6, 13)", tag + "Mobilite zemini indigo-siyah #07060D")
       check(css(pg, "#mobList .m-card:not(.done)", "backgroundColor") == "rgb(19, 17, 28)", tag + "Mobilite kartı #13111C")
       check(css(pg, "#mobList .m-card:not(.done) .m-chk", "borderTopColor") == "rgb(107, 102, 128)", tag + "boş onay kutusu çerçevesi #6B6680 (≥ 3:1)")
-      check(css(pg, "#mobList .m-grip", "color") == "rgb(125, 120, 148)", tag + "sürükleme tutamacı #7D7894 (≥ 3:1)")
       check(css(pg, "#mobList .m-card.done .m-chk", "backgroundColor") == "rgb(179, 166, 255)", tag + "vurgu lavanta #B3A6FF (parlaklık korunuyor)")
+      pg.evaluate("mobEdit(true)"); pg.wait_for_timeout(80)
+      check(css(pg, "#mobList .m-grip", "color") == "rgb(125, 120, 148)", tag + "sürükleme tutamacı #7D7894 (≥ 3:1)")
+      pg.evaluate("mobEdit(false)")
       check(css(pg, ".bottom-nav", "backgroundColor") == "rgba(13, 12, 20, 0.97)", tag + "alt menü indigo tonunda")
       # Antrenman'a dönünce zemin yine saf siyah
       pg.evaluate("switchTab('gym')"); pg.wait_for_timeout(100)
@@ -81,7 +84,7 @@ try:
 
       if W == 390:
         # Hareket ekle: rutinde olan → çerçeveli ✓ + onay
-        pg.evaluate("switchTab('mobility'); mobAddOpen()"); pg.wait_for_timeout(150)
+        pg.evaluate("switchTab('mobility'); mobOpenRoutine(mobRoutines()[0].id); mobEdit(true); mobAddOpen()"); pg.wait_for_timeout(150)
         n0 = len(st(pg)["mobilityRoutine"]["routines"][0]["items"])
         row_in = pg.locator("#mobAddList [data-mob-lib]", has_text="Rutinde").first
         btn_in = row_in.locator("[data-mob-add]")

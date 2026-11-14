@@ -120,6 +120,70 @@ try:
     p3.screenshot(path=os.path.join(SHOTS, "v39_ana.png"), full_page=True)
     ctx3.close()
 
+    # ================= 4) RUTİNİN İÇİ + DÜZENLE =================
+    dialogs = []; pg.on("dialog", lambda d: (dialogs.append(d.message), d.dismiss()))
+    four = json.loads(json.dumps(V38)); del four["mobilityRoutine"]["items"]
+    four["mobilityRoutine"]["routines"] = [{"id": "mr_main", "name": "Sabah", "items": [it("A1", done=True), it("A2", mode="time", sec=45, sides=2, sets=2), it("A3")]},
+                                           {"id": "b", "name": "B", "items": [it("B1")]}]
+    seed(pg, four)
+    def names(i=0): return [x["name"] for x in mr(pg)["routines"][i]["items"]]
+    pg.click('[data-mob-routine="mr_main"] [data-mob-openr]'); pg.wait_for_timeout(120)
+    check(pg.is_visible("#mobRoutine") and pg.locator("#mobRoutine [data-mob-row]").count() == 3, "Aç → rutinin içi, 3 hareket")
+    eb = pg.locator("#mobEditBtn").bounding_box()
+    check(eb and eb["height"] >= 44 and eb["width"] >= 44, "Düzenle düğmesi görünür ve ≥ 44 px")
+    stx = pg.inner_text("#mobRoutine [data-mob-start]")
+    check("Başlat" in stx and "3 hareket" in stx and "dk" in stx, f"altta Başlat · 3 hareket · ~dk ({stx!r})")
+    check(pg.locator("#mobRoutine .drag-handle").count() == 0 and pg.locator("#mobRoutine [data-mob-del]").count() == 0, "Düzenle kapalıyken tutamaç/çöp yok")
+    pg.locator("#mobRoutine [data-mob-row]").nth(2).locator("[data-mob-check]").click(); pg.wait_for_timeout(80)
+    check(mr(pg)["routines"][0]["items"][2]["done"], "rutinin içinde tik çalışıyor")
+    pg.locator("#mobRoutine [data-mob-row]").nth(1).locator("[data-mob-open]").click(); pg.wait_for_timeout(80)
+    check(pg.is_visible("#mobDetail"), "satıra dokununca detay"); pg.click("#mobDtBack"); pg.wait_for_timeout(80)
+    check(pg.is_visible("#mobRoutine"), "detaydan geri → rutinin içi")
+    # Düzenle
+    pg.click("#mobEditBtn"); pg.wait_for_timeout(80)
+    check(pg.evaluate("mobUI.edit") and pg.locator("#mobRoutine .drag-handle").count() == 3 and pg.locator("#mobRoutine [data-mob-del]").count() == 3, "Düzenle: tutamaç + çöp")
+    XSS = "<img src=x onerror=alert(1)>"
+    pg.fill("#mobRName", XSS); pg.press("#mobRName", "Enter"); pg.locator("#mobRName").blur(); pg.wait_for_timeout(120)
+    check(mr(pg)["routines"][0]["name"] == XSS, "rutin adı değişti")
+    pg.locator("#mobRoutine [data-mob-del]").nth(1).click(); pg.wait_for_timeout(80)
+    check(names() == ["A1", "A3"], f"çöp: hareket silindi ({names()})")
+    pg.locator("#toastWrap button", has_text="Geri al").click(); pg.wait_for_timeout(100)
+    check(names() == ["A1", "A2", "A3"] and pg.evaluate("mobUI.view === 'routine'"), "Geri al: yerine geldi")
+    if not pg.evaluate("mobUI.edit"): pg.click("#mobEditBtn"); pg.wait_for_timeout(80)
+    pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(50)
+    h = pg.locator('#mobRoutine .drag-handle[data-mobidx="0"]').bounding_box(); t = pg.locator('#mobRoutine [data-mob-row]').nth(2).bounding_box()
+    x, y = h["x"] + h["width"] / 2, h["y"] + h["height"] / 2; ty = t["y"] + t["height"] / 2
+    pg.mouse.move(x, y); pg.mouse.down()
+    for i in range(1, 9): pg.mouse.move(x, y + (ty - y) * i / 8); pg.wait_for_timeout(16)
+    pg.mouse.up(); pg.wait_for_timeout(150)
+    check(names() == ["A2", "A3", "A1"], f"Düzenle'de sürükle-bırak ({names()})")
+    pg.click("#mobEditDone"); pg.wait_for_timeout(80)
+    check(not pg.evaluate("mobUI.edit") and pg.evaluate("document.getElementById('mobListTitle').textContent") == XSS and not dialogs, "Bitti: ad düz metin olarak görünüyor, betik çalışmadı")
+    # Hareket ekle → açık rutine
+    pg.click("#mobEditBtn"); pg.click("#mobAddBtn"); pg.wait_for_timeout(80)
+    pg.locator('[data-mob-lib] [data-mob-add]').first.click(); pg.wait_for_timeout(120)
+    check(len(names(0)) == 4 and names(1) == ["B1"], "hareket açık rutine eklendi, diğer rutin değişmedi")
+    pg.click("#mobAddClose"); pg.wait_for_timeout(80)
+    check(pg.is_visible("#mobRoutine") and pg.evaluate("mobUI.edit"), "ekle ekranından Düzenle'ye dönüldü")
+    # Kopyala
+    pg.click("#mobCopyRoutine"); pg.wait_for_timeout(120)
+    rs = mr(pg)["routines"]; cp = rs[1] if len(rs) == 3 else {"name": "", "items": []}
+    check(len(rs) == 3 and cp["name"].endswith("(kopya)") and len(cp["items"]) == 4 and not any(x["done"] for x in cp["items"])
+          and not set(x["id"] for x in cp["items"]) & set(x["id"] for x in rs[0]["items"]), "Kopyala: aslının altında, tiksiz, yeni kimlikli kopya")
+    # Rutini sil + Geri al
+    pg.evaluate("mobOpenRoutine('b'); mobEdit(true)"); pg.wait_for_timeout(80)
+    pg.click("#mobDeleteRoutine"); pg.wait_for_timeout(120); pg.click("#uiDlgOk"); pg.wait_for_timeout(150)
+    check([r["id"] for r in mr(pg)["routines"]].count("b") == 0 and pg.evaluate("mobUI.view") == "home", "Rutini sil: onaydan sonra silindi, ana ekrana dönüldü")
+    pg.locator("#toastWrap button", has_text="Geri al").click(); pg.wait_for_timeout(120)
+    check(any(r["id"] == "b" and r["items"][0]["name"] == "B1" for r in mr(pg)["routines"]), "Rutini sil → Geri al")
+    pg.evaluate("mobOpenRoutine('mr_main')"); pg.wait_for_timeout(80)
+    pg.click("#mobBackBtn"); pg.wait_for_timeout(80)
+    check(pg.evaluate("mobUI.view") == "home", "rutinden geri → ana ekran")
+    pg.evaluate("mobOpenRoutine('mr_main'); mobEdit(true)"); pg.wait_for_timeout(80)
+    pg.screenshot(path=os.path.join(SHOTS, "v39_duzenle.png"), full_page=True)
+    pg.evaluate("mobEdit(false)"); pg.wait_for_timeout(80)
+    pg.screenshot(path=os.path.join(SHOTS, "v39_rutin.png"), full_page=True)
+
     check(not errs, f"sayfa hatası yok ({errs[:3]})")
     b.close()
 finally:

@@ -2,7 +2,7 @@
 // MOBİLİTE (v27): bölge ızgarası + tek sıralı liste, hareket detayı, hareket ekle, nefes daireli sayaç.
 // Görünüm durumu kaydedilmez (mobUI). Veri: state.mobilityRoutine.routines[].items (v39; bkz. normMobItem).
 // ---------------------------------------------------------------------------
-let mobUI = { view: "home", rid: null, edit: false, region: "", id: null, q: "", filter: "all" };
+let mobUI = { view: "home", rid: null, edit: false, id: null, q: "", filter: "all" };
 const MOB_REGION_LABEL = Object.fromEntries(MOB_REGIONS);
 const MOB_TYPE_LABEL = Object.fromEntries(MOB_TYPES);
 // v39: rutinler (state.mobilityRoutine.routines = [{ id, name, items }]); mobUI.rid = açık rutin
@@ -32,74 +32,96 @@ function mobSummary(it) {
   const amt = it.mode === "time" ? it.sec + " sn" : it.reps + " tekrar";
   return (it.sides === 2 ? "Sağ/sol · " : "") + it.sets + " set × " + amt;
 }
-// Ana bölge 1 puan, ikincil 0,5 puan; "x / y" sayısı yalnızca ana bölgesi o bölge olanları sayar.
-function mobRegionStats() {
-  const st = {};
-  MOB_REGIONS.forEach(([k]) => { st[k] = { n: 0, nDone: 0, pts: 0, ptsDone: 0 }; });
-  mobItems().forEach(it => {
-    const a = st[it.region], b = st[it.region2];
-    if (a) { a.n++; a.pts += 1; if (it.done) { a.nDone++; a.ptsDone += 1; } }
-    if (b) { b.pts += 0.5; if (it.done) b.ptsDone += 0.5; }
-  });
-  return st;
-}
-function mobVisible() {
-  const all = mobItems();
-  if (!mobUI.region) return all.map(it => ({ it, sec: false }));
-  return [...all.filter(i => i.region === mobUI.region).map(it => ({ it, sec: false })),
-    ...all.filter(i => i.region2 === mobUI.region).map(it => ({ it, sec: true }))];
-}
-function mobCardHtml({ it, sec }, idx, drag) {
-  const id = mobArg(it.id);
-  const timeBtn = it.mode === "time"
-    ? `<button data-mob-timer onclick="mobTimerStart(${id})" class="m-tbtn" aria-label="${it.sec} saniyelik sayacı başlat">${svgI("clock", 18, 2.2)}<span>${it.sec} sn</span></button>` : "";
-  return `<div data-mob-row="${esc(it.id)}" class="m-card ${it.done ? "done" : ""}">
-    <button data-mob-check onclick="mobToggle(${id})" class="m-chk" aria-pressed="${it.done}" aria-label="${it.done ? "Yapıldı işaretini kaldır" : "Yapıldı olarak işaretle"}">${svgI("check", 20, 3)}</button>
+// v39: rutinin içi. Düzenle kapalıyken: tik, tek hareket sayacı, dokununca detay. Düzenle açıkken: tutamaç (sürükle-bırak)
+// ve çöp kutusu; tik ve sayaç yok.
+function mobCardHtml(it, idx) {
+  const id = mobArg(it.id), ed = mobUI.edit;
+  const left = ed
+    ? `<span class="drag-handle m-grip" data-mobidx="${idx}" role="img" aria-label="Sürükleyerek sırala">${svgI("grip", 18)}</span>`
+    : `<button data-mob-check onclick="mobToggle(${id})" class="m-chk" aria-pressed="${it.done}" aria-label="${it.done ? "Yapıldı işaretini kaldır" : "Yapıldı olarak işaretle"}">${svgI("check", 20, 3)}</button>`;
+  const right = ed
+    ? `<button data-mob-del onclick="mobRemoveItem(${id})" class="m-del" aria-label="${esc(it.name)} hareketini kaldır">${svgI("trash", 19)}</button>`
+    : it.mode === "time" ? `<button data-mob-timer onclick="mobTimerStart(${id})" class="m-tbtn" aria-label="${it.sec} saniyelik sayacı başlat">${svgI("clock", 18, 2.2)}<span>${it.sec} sn</span></button>` : "";
+  return `<div data-mob-row="${esc(it.id)}" class="m-card ${!ed && it.done ? "done" : ""}">
+    ${left}
     <button data-mob-open onclick="mobOpen(${id})" class="flex-1 min-w-0 min-h-[44px] text-left">
-      <span class="m-kind ${it.type === "dynamic" ? "" : "s"}">${MOB_TYPE_LABEL[it.type]}${sec ? " · ikincil" : ""}</span>
+      <span class="m-kind ${it.type === "dynamic" ? "" : "s"}">${MOB_TYPE_LABEL[it.type]}</span>
       <span class="m-name block">${esc(it.name)}</span>
       <span class="m-rx block">${esc(mobSummary(it))}</span>
     </button>
-    ${timeBtn}
-    ${drag ? `<span class="drag-handle m-grip" data-mobidx="${idx}" role="img" aria-label="Sürükleyerek sırala">${svgI("grip", 18)}</span>` : ""}
+    ${right}
   </div>`;
 }
-function mobListHtml() {
-  const stats = mobRegionStats();
-  const all = mobItems();
-  const regs = MOB_REGIONS.map(([k, label]) => {
-    const r = stats[k];
-    const pct = r.pts ? Math.round(r.ptsDone / r.pts * 100) : 0;
-    const full = r.n > 0 && r.nDone === r.n;
-    const txt = r.n === 0 ? "—" : full ? "Tamam" : `${r.nDone} / ${r.n}`;
-    return `<button data-mob-region="${k}" onclick="mobRegion('${k}')" class="m-reg ${mobUI.region === k ? "on" : ""} ${full ? "full" : ""}" aria-pressed="${mobUI.region === k}">
-      <div data-mob-lvl data-pct="${pct}" class="m-lvl ${pct ? "" : "zero"}" style="height:${pct ? `calc(30px + (100% - 30px) * ${pct / 100})` : "0"}"></div>
-      <b class="t-display">${mobUpper(label)}</b><span>${txt}</span></button>`;
-  }).join("");
-  const vis = mobVisible();
-  const drag = !mobUI.region && vis.length > 1;
-  const title = mobUI.region ? MOB_REGION_LABEL[mobUI.region] : "Rutin";
-  const empty = mobUI.region ? "Bu bölgede hareket yok. Aşağıdan ekleyebilirsin." : "Rutin boş. Aşağıdan hareket ekle.";
-  return `<div class="m-regs">${regs}</div>
-    <div class="flex items-center justify-between gap-2 mt-4 mb-2.5 px-0.5">
-      <h3 id="mobListTitle" class="t-display text-[22px] text-[var(--t-text)] truncate">${mobUpper(title)}</h3>
-      <button id="mobAllBtn" onclick="mobRegion('')" class="m-pill shrink-0 ${mobUI.region ? "" : "!text-[var(--t-text)] !border-[var(--t-acc-text)]"}">Tümü (${all.filter(i => i.done).length} / ${all.length})</button>
-    </div>
-    <div id="mobList" class="space-y-2">${vis.map((v, i) => mobCardHtml(v, i, drag)).join("") || `<div class="text-[14px] text-[var(--t-dim)] py-6 text-center">${empty}</div>`}</div>
-    <div class="grid grid-cols-[1fr_auto] gap-2.5 mt-3">
-      <button id="mobAddBtn" onclick="mobAddOpen()" class="m-btn pri">${svgI("plus", 20, 2.4)}Hareket ekle</button>
-      <button id="mobResetBtn" onclick="mobReset()" class="m-btn ghost" aria-label="Tikleri sıfırla">${svgI("undo", 19)}Sıfırla</button>
-    </div>`;
+function mobRoutineHtml() {
+  const r = mobRoutine(mobUI.rid), ed = mobUI.edit, items = r.items, id = mobArg(r.id);
+  const head = ed
+    ? `<div class="flex items-center gap-2.5">
+        <input id="mobRName" data-fk="mob-rname" type="text" value="${esc(r.name)}" maxlength="40" aria-label="Rutinin adı" placeholder="Rutinin adı"
+          onchange="mobRenameRoutine(this.value)" onkeydown="if(event.key==='Enter')this.blur()" class="m-in flex-1 min-w-0 !h-[52px] !text-[17px] font-semibold" />
+        <button id="mobEditDone" onclick="mobEdit(false)" class="m-btn pri shrink-0">Bitti</button>
+      </div>
+      <p class="text-[12.5px] text-[var(--t-dim)] mt-2 mb-2.5 px-0.5">Sıralamak için tutamaçtan sürükle. Ayarlar için harekete dokun.</p>`
+    : `<div class="flex items-center gap-2.5 mb-3">
+        <button id="mobBackBtn" onclick="mobBack()" class="m-round" aria-label="Rutinlere dön">${svgI("chevL", 20, 2.2)}</button>
+        <h3 id="mobListTitle" class="t-display text-[28px] leading-[1.02] text-[var(--t-text)] flex-1 min-w-0 uppercase break-words">${esc(r.name)}</h3>
+        <button id="mobEditBtn" onclick="mobEdit(true)" class="m-pill shrink-0 flex items-center gap-1.5 !text-[var(--t-text)] !border-[var(--t-acc-text)]">${svgI("edit", 16)}Düzenle</button>
+      </div>`;
+  const list = items.map((it, i) => mobCardHtml(it, i)).join("")
+    || `<div class="text-[14px] text-[var(--t-dim)] py-6 text-center">Bu rutinde hareket yok. ${ed ? "Aşağıdan" : "Düzenle'den"} hareket ekle.</div>`;
+  const foot = ed
+    ? `<button id="mobAddBtn" onclick="mobAddOpen()" class="m-btn pri w-full mt-3">${svgI("plus", 20, 2.4)}Hareket ekle</button>
+      <div class="grid grid-cols-2 gap-2.5 mt-2.5">
+        <button id="mobCopyRoutine" onclick="mobCopyRoutine()" class="m-btn ghost">${svgI("copy", 18)}Kopyala</button>
+        <button id="mobResetBtn" onclick="mobReset()" class="m-btn ghost">${svgI("undo", 18)}Tikleri sıfırla</button>
+      </div>
+      <button id="mobDeleteRoutine" onclick="mobDeleteRoutine()" class="m-btn del w-full mt-2.5">${svgI("trash", 18)}Rutini sil</button>`
+    : items.length ? `<div class="m-startbar"><button data-mob-start onclick="mobSesStart(${id})" class="m-btn pri w-full !min-h-[58px] !text-[17px]">${svgI("play", 18, 2.4)}Başlat · ${items.length} hareket · ~${mobRoutineMin(r)} dk</button></div>` : "";
+  return `<div id="mobRoutine">${head}<div id="mobList" class="space-y-2">${list}</div>${foot}</div>`;
+}
+function mobEdit(on) { mobUI.edit = !!on; mobUI.view = "routine"; renderMobility(); }
+function mobRenameRoutine(v) {
+  const r = mobRoutine(mobUI.rid); if (!r) return;
+  const n = String(v || "").trim().slice(0, 40);
+  if (n && n !== r.name) { r.name = n; renderAll(); } else if (!n) renderMobility();
+}
+function mobRemoveItem(id) {
+  const r = mobRoutine(mobUI.rid); if (!r) return;
+  const i = r.items.findIndex(x => x.id === id); if (i < 0) return;
+  if (mobT && mobT.id === id) mobTimerClose();
+  snapshot();
+  const [it] = r.items.splice(i, 1);
+  mobUI.view = "routine"; mobUI.id = null;
+  renderAll();
+  offerUndo(`${it.name} kaldırıldı`);
+}
+function mobCopyRoutine() {
+  const r = mobRoutine(mobUI.rid); if (!r) return;
+  const c = { id: mobNewRoutineId(), name: (r.name + " (kopya)").slice(0, 40), items: r.items.map(x => ({ ...clone(x), id: mobNewId(), done: false })) };
+  mobRoutines().splice(mobRoutines().indexOf(r) + 1, 0, c);
+  mobUI.rid = c.id; mobUI.view = "routine"; mobUI.edit = true;
+  window.scrollTo(0, 0);
+  renderAll();
+  toast("Rutin kopyalandı");
+}
+async function mobDeleteRoutine() {
+  const r = mobRoutine(mobUI.rid); if (!r) return;
+  if (!(await askConfirm("Rutin silinsin mi?", `${r.name} ve içindeki ${r.items.length} hareket silinecek.`, "Sil", true))) return;
+  const i = mobRoutines().findIndex(x => x.id === r.id); if (i < 0) return;
+  snapshot();
+  mobRoutines().splice(i, 1);
+  mobUI.view = "home"; mobUI.rid = null; mobUI.edit = false;
+  window.scrollTo(0, 0);
+  renderAll();
+  offerUndo(`${r.name} silindi`);
 }
 function renderMobility() {
   const root = $("mobRoot");
   if (!root || state.activeTab !== "mobility") return;
   if (mobUI.view !== "home" && !mobRoutine(mobUI.rid)) { mobUI.view = "home"; mobUI.rid = null; mobUI.edit = false; }
   if (mobUI.view === "detail" && !mobFind(mobUI.id)) mobUI.view = "routine";
-  root.innerHTML = mobUI.view === "detail" ? mobDetailHtml() : mobUI.view === "add" ? mobAddHtml() : mobUI.view === "routine" ? mobListHtml() : mobHomeHtml();
+  root.innerHTML = mobUI.view === "detail" ? mobDetailHtml() : mobUI.view === "add" ? mobAddHtml() : mobUI.view === "routine" ? mobRoutineHtml() : mobHomeHtml();
   if (mobUI.view === "add") mobRenderAddList();
 }
-function mobRegion(k) { mobUI.region = mobUI.region === k ? "" : k; renderMobility(); }
 function mobToggle(id) { const it = mobFind(id); if (!it) return; it.done = !it.done; renderAll(); }
 function mobReset() {
   if (!mobItems().some(i => i.done)) { toast("Tikli hareket yok"); return; }
@@ -303,17 +325,7 @@ async function mobRename(id) {
   cur.name = String(v).trim().slice(0, 80);
   renderAll();
 }
-function mobRemove(id) {
-  const i = mobItems().findIndex(x => x.id === id);
-  if (i < 0) return;
-  if (typeof mobT !== "undefined" && mobT && mobT.id === id) mobTimerClose();
-  snapshot();
-  const [it] = mobItems().splice(i, 1);
-  mobUI.view = "list"; mobUI.id = null;
-  window.scrollTo(0, 0);
-  renderAll();
-  offerUndo(`${it.name} kaldırıldı`);
-}
+function mobRemove(id) { mobRemoveItem(id); }
 // --- Hareket ekle (kütüphane; arama yazılırken yalnızca liste kısmı yeniden çizilir, klavye kapanmaz) ---
 function mobLibAll() {
   const out = [];
@@ -345,7 +357,7 @@ function mobRenderAddList() {
   const inRoutine = new Set(mobItems().map(i => i.name));
   const list = mobLibAll().filter(x => (mobUI.filter === "all" || x.type === mobUI.filter)
     && q.every(w => mobNorm(x.m.name + " " + x.m.note).includes(w)));
-  const order = [...(mobUI.region ? [mobUI.region] : []), ...MOB_REGION_KEYS.filter(k => k !== mobUI.region), ""];
+  const order = [...MOB_REGION_KEYS, ""];
   box.innerHTML = order.map(rk => {
     const rows = list.filter(x => x.region === rk);
     if (!rows.length) return "";
@@ -379,7 +391,7 @@ async function mobAddCustom() {
   if (v == null || !String(v).trim()) return;
   const type = mobUI.filter === "all" ? "static" : mobUI.filter;
   const dyn = type === "dynamic";
-  const it = normMobItem({ name: String(v).trim(), type, region: mobUI.region || "", sets: dyn ? 1 : 2, mode: dyn ? "reps" : "time", reps: 10, sec: 30, sides: 1 });
+  const it = normMobItem({ name: String(v).trim(), type, region: "", sets: dyn ? 1 : 2, mode: dyn ? "reps" : "time", reps: 10, sec: 30, sides: 1 });
   mobItems().push(it);
   mobUI.view = "detail"; mobUI.id = it.id;
   window.scrollTo(0, 0);
