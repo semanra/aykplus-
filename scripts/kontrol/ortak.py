@@ -54,6 +54,8 @@ SEED = r"""() => {
 }"""
 
 # (ad, js) — sırayla çalışır; her adım bir öncekinin üstüne. Pencereler dahil 36 ekran.
+# Profil tam ekran bir pencere; kendi içinde kayar (sayfa görüntüsüne alt kısmı girmez) — orta ve alt bölümler ayrıca çekilir
+PF_SCROLL = "const sc = [...document.querySelectorAll('#profilePage *')].find(e => e.scrollHeight > e.clientHeight + 10 && getComputedStyle(e).overflowY !== 'visible'); if (sc) sc.scrollTop = (sc.scrollHeight - sc.clientHeight) * %s"
 SCREENS = [
   ("n-bugun", "switchTab('nutrition'); setNutriView('today')"),
   ("n-menu", "setNutriView('menus')"),
@@ -91,8 +93,10 @@ SCREENS = [
   ("p-beslenme", "setProgressView('beslenme')"),
   ("p-olcu-modal", "setProgressView('kilo'); openMeasureModal()"),
   ("profil", "closeModal('chartModal'); openProfile()"),
+  ("profil-orta", PF_SCROLL % 0.45),
+  ("profil-alt", PF_SCROLL % 1),
 ]
-SCREEN_ROOT = {"profil": "#profilePage", "m-sayac": "#mobTimer"}
+SCREEN_ROOT = {"profil": "#profilePage", "profil-orta": "#profilePage", "profil-alt": "#profilePage", "m-sayac": "#mobTimer"}
 
 # Ölçüm: okunurluk (WCAG 4,5:1 / büyük yazı 3:1), 44 px altı dokunma alanı, 12 px altı yazı, yatay taşma
 AUDIT_JS = r"""(rootSel) => {

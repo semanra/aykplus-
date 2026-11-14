@@ -161,6 +161,21 @@ async function updateWakeLock() {
 // SAYAÇ (Zaman damgası tabanlı: uygulama arka plana geçse de doğru kalır)
 // ---------------------------------------------------------------------------
 const timer = { endAt: 0, label: "Dinlenme", running: false, iv: null, finishedAt: 0 };
+// v36: çalışan sayaç ayrı bir küçük kayıtta tutulur; iOS arka plandaki uygulamayı kapatırsa açılışta kaldığı yerden sürer
+const TIMER_KEY = "ayk_timer";
+function timerPersist() {
+  try { if (timer.running) localStorage.setItem(TIMER_KEY, JSON.stringify({ endAt: timer.endAt, label: timer.label })); else localStorage.removeItem(TIMER_KEY); } catch (e) { /* yok sayılır */ }
+}
+function resumeTimer() {
+  let t = null;
+  try { t = JSON.parse(localStorage.getItem(TIMER_KEY) || "null"); } catch (e) { t = null; }
+  const left = t ? num(t.endAt, 0) - Date.now() : 0;
+  if (left <= 0 || left > 3600000) { timer.running = false; timerPersist(); return; }
+  timer.endAt = num(t.endAt, 0); timer.label = typeof t.label === "string" ? t.label.slice(0, 40) : "Dinlenme";
+  timer.running = true; timer.finishedAt = 0;
+  clearInterval(timer.iv); timer.iv = setInterval(tickTimer, 250);
+  tickTimer();
+}
 
 function startTimer(sec, label = "Dinlenme") {
   sec = Math.round(num(sec, 0));
@@ -172,6 +187,7 @@ function startTimer(sec, label = "Dinlenme") {
   timer.finishedAt = 0;
   clearInterval(timer.iv);
   timer.iv = setInterval(tickTimer, 250);
+  timerPersist();
   $("restPillInner").classList.remove("timer-flash");
   tickTimer();
 }
@@ -187,6 +203,7 @@ function finishTimer() {
   timer.running = false;
   clearInterval(timer.iv);
   timer.finishedAt = Date.now();
+  timerPersist();
   beep();
   try { if (navigator.vibrate) navigator.vibrate([300, 150, 300]); } catch (e) { /* yoksay */ }
   $("restPillTime").textContent = "BİTTİ!";
@@ -199,12 +216,14 @@ function finishTimer() {
 function adjustTimer(delta) {
   if (!timer.running) return;
   timer.endAt += delta * 1000;
+  timerPersist();
   tickTimer();
 }
 
 function stopTimer() {
   timer.running = false;
   clearInterval(timer.iv);
+  timerPersist();
   resetTimerUI();
 }
 
@@ -234,12 +253,13 @@ function archiveDay(dateKey) {
   if (!dateKey) return;
   // v27: o gün yapılan mobilite hareketleri sessizce saklanır (boş gün yazılmaz, kayıt silinmez)
   const mobDone = state.mobilityRoutine.items.filter(i => i.done).map(i => i.name);
-  if (mobDone.length) state.mobilityLog[dateKey] = mobDone;
+  const prevMob = Array.isArray(state.mobilityLog[dateKey]) ? state.mobilityLog[dateKey] : [];
+  if (mobDone.length) state.mobilityLog[dateKey] = [...new Set([...prevMob, ...mobDone])];
   const t = nutritionTotals();
   const e = eatenTotals();
   const sup = state.supplements || {};
   const dm = dayMeals();
-  state.dailyLogs[dateKey] = {
+  const log = {
     kcal: Math.round(t.cal), p: Math.round(t.p), c: Math.round(t.c), f: Math.round(t.f),
     eatenKcal: Math.round(e.cal), eatenP: Math.round(e.p),
     water: state.waterLiters || 0,
@@ -249,6 +269,14 @@ function archiveDay(dateKey) {
     // v15: "Dünkü öğünü tekrarla" için öğünlerin içeriği (yalnızca son 7 gün saklanır)
     meals: dm.map(m => ({ id: m.id, title: m.title, items: clone(m.items) }))
   };
+  // v36: aynı gün "Yeni gün" düğmesiyle daha önce arşivlendiyse (manual) yeni özet eskisini EZMEZ: her sayaçta büyük olan
+  // tutulur (çift sayım yok, kayıp yok). Eskiden gün içinde düğmeye basınca gece yarısı günün özeti sıfırlarla eziliyordu.
+  const old = state.dailyLogs[dateKey], cur = state.dailyLogs[dateKey] = log;
+  if (old && old.manual) {
+    ["eatenKcal", "eatenP", "water", "mealsDone", "supps"].forEach(k => { cur[k] = Math.max(num(old[k], 0), num(cur[k], 0)); });
+    if (num(old.mealsDone, 0) > dm.filter(m => m.done).length && Array.isArray(old.meals)) cur.meals = old.meals;
+    cur.manual = true;
+  }
   const keys = Object.keys(state.dailyLogs).sort();
   // v25: günlük özetler hiç silinmez (eskiden 180 günden eskiler siliniyordu)
   keys.slice(0, Math.max(0, keys.length - 7)).forEach(k => { if (state.dailyLogs[k]) delete state.dailyLogs[k].meals; });
@@ -269,7 +297,11 @@ function checkNewDay() {
   // v35: telefonun saati ileri alınmışken kaydedilen tarih bugünden en az 2 gün ilerideyse bugüne çekilir (tikler silinmez,
   // arşiv yazılmaz); eskiden gün geçişi o tarihe kadar hiç çalışmıyordu. 1 günlük geri gidiş meşrudur (Gün geçişi saati
   // ileri alınınca mantıksal gün bir gün geri gider) — o durumda dokunulmaz, yoksa dünün arşivi bugünün verisiyle ezilirdi.
-  if (state.today > t && (Date.parse(state.today) - Date.parse(t)) / DAY_MS >= 2) { state.today = t; return false; }
+  if (state.today > t && (Date.parse(state.today) - Date.parse(t)) / DAY_MS >= 2) {
+    state.today = t;
+    if (state.dailyLogs[t]) state.dailyLogs[t].manual = true;   // v36: saat ileriyken bugün zaten arşivlendiyse o özet ezilmesin
+    return true;   // v36: çağıran yeniden çizip kaydetsin (eskiden düzeltme bir sonraki dokunuşa kadar kaydedilmiyordu)
+  }
   if (t > state.today) {   // yalnızca ileri gidince (gün geçişi saati ileri alınınca aynı gün tekrar arşivlenmez)
     archiveDay(state.today);
     resetDaily();
@@ -282,7 +314,9 @@ function checkNewDay() {
 
 async function manualNewDay() {
   if (!(await askConfirm("Yeni güne geçilsin mi?", "Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir.", "Yeni güne geç"))) return;
-  archiveDay(state.today || logicalToday());
+  const key = state.today || logicalToday();
+  archiveDay(key);
+  if (state.dailyLogs[key]) state.dailyLogs[key].manual = true;   // v36: gece yarısı bu özet ezilmesin (archiveDay)
   resetDaily();
   state.today = logicalToday();
   renderAll();

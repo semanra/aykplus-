@@ -52,6 +52,7 @@ function closeSettings() { hideProfile(); }
 
 function renderProfile() {
   $("pfRescue").classList.toggle("hidden", !rescueText());   // v35
+  renderStorageMeter();   // v36
   document.querySelectorAll("[data-theme-opt]").forEach(b => { const on = b.dataset.themeOpt === state.settings.theme; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
   // Kilo kayıtları
@@ -187,6 +188,29 @@ async function exportBackupFile() {
   if (r === "shared") { markBackup(); toast("Yedek paylaşıldı. 'Dosyalar'a Kaydet'i seçtiysen güvende."); }
   else if (r === "downloaded") { markBackup(); toast("Yedek dosyası indirildi"); }
   else if (r === "failed") toast("Dosya oluşturulamadı. Ayarlar > Yedek kodu ile kopyala.", "error");
+}
+
+// v36: KAYIT ALANI — bütün veri tek localStorage kaydında. iPhone Safari'nin sınırı kesin bilinmiyor; temkinli tahmin
+// ~2,5 milyon karakter (5 MB). Ölçüm: yoğun kullanımla 5 yılda ~2,1 milyon. %70'te uyarı (açılışta en fazla haftada bir).
+const STORAGE_LIMIT_CHARS = 2500000;
+function storagePct() {
+  let n = 0;
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); n += k.length + (localStorage.getItem(k) || "").length; } } catch (e) { return 0; }
+  return Math.min(100, Math.round(n / STORAGE_LIMIT_CHARS * 100));
+}
+function renderStorageMeter() {
+  const pct = storagePct(), hi = pct >= 70;
+  $("pfStorageTxt").textContent = `%${pct} dolu`;
+  $("pfStorageBar").style.width = Math.max(2, pct) + "%";
+  $("pfStorageBar").style.background = hi ? "var(--t-warn-icon)" : "";
+  $("pfStorageWarn").classList.toggle("hidden", !hi);
+  if (hi) $("pfStorageWarn").textContent = "Alan dolmak üzere. Hemen yedek dosyası kaydet; kayıt dolarsa yeni bilgiler kaydedilemez.";
+}
+function checkStorageWarn() {
+  const pct = storagePct();
+  if (pct < 70 || Date.now() - num(state.storageWarnAt, 0) < 7 * DAY_MS) return;
+  state.storageWarnAt = Date.now(); saveState();
+  toast(`Telefondaki kayıt alanının %${pct}'i dolu. Yedek dosyası kaydet (Profil → Yedekleme).`, "error");
 }
 
 // v35: KURTARMA KOPYASI — açılışta okunamayan kaydın ham hâli (RESCUE_KEY). Önceden yalnızca saklanıyordu,

@@ -48,9 +48,11 @@ checkNewDay();
 autoSelectNextDay();
 if (workoutInProgress()) { state.gymActive = true; state.gymView = "today"; }
 resetTimerUI();
+resumeTimer();   // v36
 renderAll();
 updateWakeLock();
 setTimeout(checkFoodHealth, 1500);
+setTimeout(checkStorageWarn, 2500);   // v36
 if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);
 
 document.addEventListener("visibilitychange", () => {
@@ -61,6 +63,10 @@ document.addEventListener("visibilitychange", () => {
     updateWakeLock();
   }
 });
+
+// v36: uygulama gece yarısı ekranda açık kalırsa da gün değişsin (eskiden yalnızca açılışta / uygulamaya dönüşte bakılıyordu;
+// 00:05'te içilen su önceki güne yazılıyordu). Yarım dakikada bir, yalnızca ekran görünürken.
+setInterval(() => { if (document.visibilityState === "visible" && checkNewDay()) { autoSelectNextDay(); renderAll(); } }, 30000);
 
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* yoksay */ }
 if ("serviceWorker" in navigator) {

@@ -440,8 +440,7 @@ async function finishAndLogWorkout() {
     const sess = { ts, logId, kind: ex.kind, name: ex.name, sets };
     const mg = muscleOf(ex);
     if (mg) sess.muscle = mg;
-    arr.push(sess);
-    if (arr.length > 60) arr.splice(0, arr.length - 60);
+    arr.push(sess);   // v36: eskiden hareket başına son 60 seans tutuluyordu (eskiler siliniyordu); artık hiç silinmez
   });
 
   const startedAt = num(state.workoutStartedAt, 0);
@@ -452,7 +451,7 @@ async function finishAndLogWorkout() {
     volume: Math.round(vol), cardioMin: round1(cMin), cardioKm: Math.round(cKm * 100) / 100, prs,
     summary: `${day.exercises.length} Hareket`
   });
-  if (state.workoutLogs.length > 400) state.workoutLogs.splice(0, state.workoutLogs.length - 400);
+  // v36: eskiden son 400 antrenman tutuluyordu; artık hiç silinmez (Profil → Yedekleme'de kayıt alanı göstergesi)
 
   day.exercises.forEach(ex => ex.sets.forEach(s => { s.done = false; s.pr = false; delete s.e; }));
   if (!workoutInProgress()) state.workoutStartedAt = 0;

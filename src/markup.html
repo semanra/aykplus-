@@ -1253,6 +1253,11 @@
           <div id="pfH6" class="t-label">YEDEKLEME</div>
           <div class="t-card rounded-[22px] p-4 space-y-3">
             <p id="lastBackupText" class="text-[13px] text-[var(--t-muted)]">Henüz yedek alınmadı.</p>
+            <div id="pfStorage">
+              <div class="flex items-baseline justify-between text-[13px]"><span class="text-[var(--t-muted)]">Telefondaki kayıt alanı</span><span id="pfStorageTxt" class="font-semibold tabular-nums">%0 dolu</span></div>
+              <div class="h-1.5 rounded-full bg-[var(--t-elev)] mt-1.5 overflow-hidden" aria-hidden="true"><i id="pfStorageBar" class="block h-full rounded-full bg-[var(--t-text2)]" style="width:0%"></i></div>
+              <p id="pfStorageWarn" class="hidden text-[12px] text-[var(--t-warn-text)] mt-1.5"></p>
+            </div>
             <div class="grid grid-cols-2 gap-2">
               <button onclick="exportBackupFile()" class="t-btn h-12 rounded-xl text-[14px]">Yedek dosyası kaydet</button>
               <label class="t-btn-ghost h-12 rounded-xl text-[14px] flex items-center justify-center text-center cursor-pointer">
@@ -1289,7 +1294,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v35</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v36</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

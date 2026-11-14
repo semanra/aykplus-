@@ -38,14 +38,14 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 28 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 29 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 pip install pillow   # ilk seferde (kontrol aracı için)
 npm run kontrol      # son commit ile karşılaştırma: 36 ekran × 2 tema piksel farkı + okunurluk/44 px/taşma + hız (`-- --hizli` hızsız)
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
 - Testler `tests/shots/` klasörüne ekran görüntüsü kaydeder (git'e girmez). Görsel değişikliklerde bu görüntülere bakıp kontrol et.
-- **Kontrol araçları (v35, `scripts/kontrol/`):** `kontrol.py` (= `npm run kontrol`; rapor `build/kontrol/RAPOR.md`, fark görselleri `build/kontrol/fark/`; ekran listesi ve ölçüm betiği `ortak.py` içinde, yeni ekran eklenince oraya da ekle), `bozuk_veri.py [N] [tohum]` (kaydın rastgele alanlarını bozar; açılışta kurtarma kopyasına düşme ve sayfa hatası sayar, hedef 0), `html_enjeksiyon.py` (20 kullanıcı alanına HTML/JS parçası yazıp 34 ekranı açar). Veri yapısı veya normalizeState değişince `bozuk_veri.py` ve `html_enjeksiyon.py`'yi de çalıştır.
+- **Kontrol araçları (v35, `scripts/kontrol/`):** `kontrol.py` (= `npm run kontrol`; 38 ekran, Profil kendi içinde kaydığı için orta/alt ayrıca çekilir; rapor `build/kontrol/RAPOR.md`, fark görselleri `build/kontrol/fark/`; ekran listesi ve ölçüm betiği `ortak.py` içinde, yeni ekran eklenince oraya da ekle), `bozuk_veri.py [N] [tohum]` (kaydın rastgele alanlarını bozar; açılışta kurtarma kopyasına düşme ve sayfa hatası sayar, hedef 0), `html_enjeksiyon.py` (20 kullanıcı alanına HTML/JS parçası yazıp 34 ekranı açar). Veri yapısı veya normalizeState değişince `bozuk_veri.py` ve `html_enjeksiyon.py`'yi de çalıştır.
 - Testler açılış animasyonunu (splash) bir başlangıç betiğiyle atlar; yeni testlerde de aynı `add_init_script` satırını kullan.
 
 ## 4. Sürüm çıkarma kontrol listesi (her değişiklikte)
@@ -62,6 +62,7 @@ npm run kontrol      # son commit ile karşılaştırma: 36 ekran × 2 tema piks
 
 - **Depolama anahtarı `ayk_plus_v5_state` asla değişmez.** Yeni alanlar `normalizeState()` içinde varsayılan değerle eklenir; eski kullanıcı verisi her zaman göç ettirilir, asla silinmez.
 - **Kullanıcı verisi kutsaldır.** Veri yapısını değiştiren her işte, eski formatla kaydedilmiş veriyle test yaz (bkz. `test_v6_temel.py` içindeki "legacy" tohum verisi, `test_v25_guvenlik.py` içindeki bozuk kayıt). `dailyLogs` özetleri hiç silinmez (v25'te 180 gün sınırı kaldırıldı; yalnızca öğün içerikleri son 7 günde tutulur). `normalizeState` öğün/kalem/özel besin/günlük kayıtları `normItems` / `normMealList` / `isObj` ile temizler (boş kayıt atılır, metin miktar sayıya çevrilir, okunamayan miktar 0 olur; değer uydurulmaz). Kayıt yine de okunamazsa `loadState` ham veriyi `ayk_plus_v5_state_kurtarma` anahtarına kopyalar (varsa üzerine yazmaz) ve açılışta uyarır; bozuk yedek geri yüklenirken mevcut veri değişmez. v35: kurtarma kopyası Profil → Yedekleme'de `#pfRescue` kartında görünür (İndir `downloadRescue` / Geri yükle `restoreRescue` / Sil `deleteRescue`; dosya kaydı `saveTextFile` ile yedekle ortak). Tek bir bozuk kayıt (nesne olmayan hareket/set/oturum/kayıt, sayı olan ad) artık bütün kaydı okunamaz yapmaz: `normalizeState` yalnızca o kaydı atar, adı metne çevirir (`test_v35_veri.py`). Bozuk `state.today` silinir; kayıttaki gün bugünden ≥ 2 gün ilerideyse (telefon saati ileri alınmış) arşivlenmeden bugüne çekilir — 1 gün geri olması gün geçiş saati değişiminde normaldir, dokunulmaz (`checkNewDay`).
+- **Gün dönümü (v36):** `archiveDay` aynı tarihe ikinci kez yazarken eski özet `manual` işaretliyse ("Yeni gün" düğmesi `manualNewDay` veya saat düzeltmesi) EZMEZ: yenen/su/öğün/takviye sayaçlarında büyük olan tutulur, mobilite günlüğü birleşir. Uygulama ekranda açıkken de 30 sn'de bir `checkNewDay` çalışır. Antrenman geçmişi artık hiç kırpılmaz (eskiden hareket başına 60 seans, toplam 400 antrenman). Kayıt alanı: Profil → Yedekleme `#pfStorage` (`storagePct`, temkinli sınır `STORAGE_LIMIT_CHARS` = 2,5 milyon karakter; %70'te uyarı, açılışta haftada en fazla bir `checkStorageWarn`, `state.storageWarnAt`). Ölçüm: yoğun kullanımla 5 yılda ~2,15 milyon karakter; her dokunuşta kayıt (saveState) ~40 ms — asıl çözüm (IndexedDB / parçalı kayıt) yol haritasında. Dinlenme sayacı ayrı anahtarda (`ayk_timer`, `timerPersist`/`resumeTimer`): iOS uygulamayı kapatırsa açılışta sürer.
 - **Kullanıcı metni HTML'e eklenirken her zaman `esc()`** kullan. `onclick` içine metin geçirirken `esc(JSON.stringify(metin))` kalıbını kullan.
 - **Sayılar:** Kullanıcı Türkçe ondalık virgül yazar. Okurken `num()`, gösterirken `fmtNum()` (1 ondalık) veya `fmtKg()` (2 ondalık; 1,25 kg plakalar için) kullan. Sayı girişleri `type="text" inputmode="decimal"`.
 - **Dokunma alanı en az 44 px.** Buton ve ikonlar küçük olmamalı; kullanıcı bunu açıkça istedi.
@@ -168,6 +169,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 **v34 (hız + düzen, 14 Kasım 2026):** yalnızca açık sekme/alt ekran çiziliyor (her dokunuş ~19 ms → ~5 ms; 4× yavaş işlemcide ~180 ms → ~30 ms); `src/app.js` 13 dosyaya bölündü (`src/app/`, derleme sırasında birleşir, içerik aynı).
 
 **v35 (veri güvenliği + kontrol araçları, 14 Kasım 2026):** `npm run kontrol`, bozuk veri ve HTML deneme araçları; tek bozuk kayıt yüzünden tüm verinin okunamaz sayılması düzeltildi; kurtarma kopyasına Profil'den erişim; bozuk/ileri tarihli `today`; en küçük yazılar 11 px.
+
+**v36 (gün dönümü + uzun dönem, 14 Kasım 2026):** "Yeni gün" düğmesine gün içinde basılınca gece yarısı günün özetinin sıfırlarla ezilmesi düzeltildi; açık uygulamada gece yarısı; antrenman geçmişi artık silinmiyor; kayıt alanı göstergesi; kapanıp açılan uygulamada dinlenme sayacı sürüyor. Test: `tests/test_v36_gun_uzun.py`.
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 
