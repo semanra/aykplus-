@@ -466,7 +466,7 @@ function toast(msg, type = "ok", action = null) {
   if ((tm || nm) && type !== "error") { msg = String(msg).replace(EMOJI_LEAD, ""); if (action) action = { ...action, label: String(action.label).replace(EMOJI_LEAD, "") }; }
   const color = type === "error" ? "bg-rose-950 border-rose-700 text-rose-100"
     : type === "pr" ? "bg-amber-950 border-amber-500 text-amber-100"
-    : tm ? "bg-[#141416] border-[#1B5E58] text-white"
+    : tm ? "bg-[var(--t-surface)] border-[var(--t-panel-line)] text-[var(--t-text)]"
     : nm ? "n-toast" : "bg-slate-900 border-emerald-600/70 text-slate-100";
   el.className = "toast max-w-sm w-full text-center text-sm font-semibold border px-4 py-2.5 shadow-2xl " + (tm || nm ? "rounded-2xl " : "rounded-xl ") + color;
   el.textContent = msg;
@@ -538,7 +538,7 @@ function uiAsk({ title, message = "", input = null, ok = "Tamam", cancel = "Vazg
     inp.className = (nd ? "n-in" : "t-in") + (input ? "" : " hidden");
     $("uiDlgCancel").className = nd ? "n-btn-ghost h-[52px] rounded-full text-[15px]" : "t-btn-ghost h-[52px] rounded-2xl text-[15px]";
     $("uiDlgOk").className = danger
-      ? (nd ? "h-[52px] rounded-full text-[15px] font-extrabold n-danger-btn" : "h-[52px] rounded-2xl text-[15px] font-extrabold bg-[#FF5A5F] text-white")
+      ? (nd ? "h-[52px] rounded-full text-[15px] font-extrabold n-danger-btn" : "h-[52px] rounded-2xl text-[15px] font-extrabold bg-[var(--t-danger)] text-white")
       : (nd ? "n-btn h-[52px] rounded-full text-[15px]" : "t-btn h-[52px] rounded-2xl text-[15px]");
     $("uiDlgCancel").textContent = cancel || "";
     $("uiDlgCancel").classList.toggle("hidden", !cancel);
@@ -674,7 +674,7 @@ function renderTimerUI(rem) {
   $("restPill").classList.remove("hidden");
   $("restPillLabel").textContent = timer.label;
   $("restPillTime").textContent = fmtClock(rem);
-  $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums " + (rem <= 10 ? "text-rose-400" : "text-[#1FD1C1]");
+  $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums " + (rem <= 10 ? "text-rose-400" : "text-[var(--t-acc-text)]");
 }
 
 function resetTimerUI() {
@@ -767,8 +767,8 @@ function applyTabVisibility() {
     mobility: ["tabMobility", null, "navBtnMobility", "grid"],
     progress: ["tabProgress", "progressHeaderBar", "navBtnProgress", "block"]
   };
-  const activeCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-bold text-[11px] " + (state.activeTab === "gym" ? "text-[#1FD1C1]" : state.activeTab === "nutrition" ? "text-[#22C55E]" : state.activeTab === "mobility" ? "text-[#B3A6FF]" : "text-[#F4F4F5]");
-  const idleCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-semibold text-[11px] text-[#8B8B93]";
+  const activeCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-bold text-[11px] " + (state.activeTab === "gym" ? "text-[var(--t-acc-text)]" : state.activeTab === "nutrition" ? "text-[#22C55E]" : state.activeTab === "mobility" ? "text-[var(--t-acc-text)]" : "text-[var(--t-text1)]");
+  const idleCls = "nav-btn flex flex-col items-center justify-center gap-1 h-14 font-semibold text-[11px] text-[var(--t-dim)]";
   document.body.classList.toggle("theme-train", state.activeTab === "gym");
   document.body.classList.toggle("theme-mob", state.activeTab === "mobility");
   document.body.classList.toggle("theme-prog", state.activeTab === "progress");
@@ -1142,7 +1142,7 @@ function updateMacroCard(prefix, consumed, target, unit) {
   const st = $(`${prefix}Status`);
   if (prefix === "cal") {
     st.innerHTML = `<div class="text-[12px] font-semibold ${over ? "text-[#FB7185]" : "text-white/70"}">${over ? "Aşım" : "Kalan"}</div>
-      <div class="flex items-baseline gap-1 whitespace-nowrap"><span class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-white"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
+      <div class="flex items-baseline gap-1 whitespace-nowrap"><span class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-[var(--t-text)]"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
     const ring = $("calRing");
     const C = 301.59;
     ring.style.strokeDashoffset = String(C - (C * pct) / 100);
@@ -2989,10 +2989,10 @@ function mobListHtml() {
   const empty = mobUI.region ? "Bu bölgede hareket yok. Aşağıdan ekleyebilirsin." : "Rutin boş. Aşağıdan hareket ekle.";
   return `<div class="m-regs">${regs}</div>
     <div class="flex items-center justify-between gap-2 mt-4 mb-2.5 px-0.5">
-      <h3 id="mobListTitle" class="t-display text-[22px] text-white truncate">${mobUpper(title)}</h3>
-      <button id="mobAllBtn" onclick="mobRegion('')" class="m-pill shrink-0 ${mobUI.region ? "" : "!text-white !border-[#B3A6FF]"}">Tümü (${all.filter(i => i.done).length} / ${all.length})</button>
+      <h3 id="mobListTitle" class="t-display text-[22px] text-[var(--t-text)] truncate">${mobUpper(title)}</h3>
+      <button id="mobAllBtn" onclick="mobRegion('')" class="m-pill shrink-0 ${mobUI.region ? "" : "!text-[var(--t-text)] !border-[var(--t-acc-text)]"}">Tümü (${all.filter(i => i.done).length} / ${all.length})</button>
     </div>
-    <div id="mobList" class="space-y-2">${vis.map((v, i) => mobCardHtml(v, i, drag)).join("") || `<div class="text-[14px] text-[#8B8B93] py-6 text-center">${empty}</div>`}</div>
+    <div id="mobList" class="space-y-2">${vis.map((v, i) => mobCardHtml(v, i, drag)).join("") || `<div class="text-[14px] text-[var(--t-dim)] py-6 text-center">${empty}</div>`}</div>
     <div class="grid grid-cols-[1fr_auto] gap-2.5 mt-3">
       <button id="mobAddBtn" onclick="mobAddOpen()" class="m-btn pri">${svgI("plus", 20, 2.4)}Hareket ekle</button>
       <button id="mobResetBtn" onclick="mobReset()" class="m-btn ghost" aria-label="Tikleri sıfırla">${svgI("undo", 19)}Sıfırla</button>
@@ -3043,12 +3043,12 @@ function mobDetailHtml() {
   return `<div id="mobDetail">
     <div class="flex items-center justify-between gap-2 -mx-1">
       <button id="mobDtBack" onclick="mobBack()" class="m-round" aria-label="Geri">${svgI("chevL", 20, 2.2)}</button>
-      <span id="mobDtCrumb" class="text-[15px] text-[#A1A1AA] truncate">${esc(crumb)}</span>
+      <span id="mobDtCrumb" class="text-[15px] text-[var(--t-muted)] truncate">${esc(crumb)}</span>
       <span class="w-11 shrink-0"></span>
     </div>
-    <button id="mobDtTitle" onclick="mobRename(${id})" class="t-display text-[32px] leading-[1.02] text-white text-left mt-3 min-h-[44px] w-full break-words" aria-label="Adı değiştir">${esc(it.name)}</button>
-    <div class="text-[13px] font-semibold ${it.type === "dynamic" ? "text-[#8B8B93]" : "text-[#B3A6FF]"} mt-1">${MOB_TYPE_LABEL[it.type]}</div>
-    ${it.rxOk ? "" : `<div id="mobDtRx" class="mt-3 text-[13.5px] text-[#E5B85B] bg-[#1E1E21] rounded-2xl px-3.5 py-2.5">Eski yazım: ${esc(it.rx)}<br><span class="text-[#A1A1AA]">Okunamadı; değerleri kontrol et.</span></div>`}
+    <button id="mobDtTitle" onclick="mobRename(${id})" class="t-display text-[32px] leading-[1.02] text-[var(--t-text)] text-left mt-3 min-h-[44px] w-full break-words" aria-label="Adı değiştir">${esc(it.name)}</button>
+    <div class="text-[13px] font-semibold ${it.type === "dynamic" ? "text-[var(--t-dim)]" : "text-[var(--t-acc-text)]"} mt-1">${MOB_TYPE_LABEL[it.type]}</div>
+    ${it.rxOk ? "" : `<div id="mobDtRx" class="mt-3 text-[13.5px] text-[var(--t-warn-text)] bg-[var(--t-elev)] rounded-2xl px-3.5 py-2.5">Eski yazım: ${esc(it.rx)}<br><span class="text-[var(--t-muted)]">Okunamadı; değerleri kontrol et.</span></div>`}
     <div class="m-lbl">Uygulama</div>
     ${seg("mode", "mode", [["reps", "Tekrar"], ["time", "Süre"]], it.mode)}
     <div class="grid grid-cols-2 gap-2.5 mt-2.5">
@@ -3062,7 +3062,7 @@ function mobDetailHtml() {
     ${seg("type", "type", MOB_TYPES, it.type)}
     <div class="m-lbl">Ana bölge</div>
     ${chips("r1", "region", MOB_REGIONS, it.region)}
-    <div class="m-lbl">İkincil bölge <span class="font-normal text-[#8B8B93]">(isteğe bağlı, yarım sayılır)</span></div>
+    <div class="m-lbl">İkincil bölge <span class="font-normal text-[var(--t-dim)]">(isteğe bağlı, yarım sayılır)</span></div>
     ${chips("r2", "region2", [["", "Yok"], ...MOB_REGIONS.filter(r => r[0] !== it.region)], it.region2)}
     <div class="m-lbl">Not</div>
     <textarea id="mobDtNote" data-fk="mob-note" rows="2" class="m-in" placeholder="Not ekle…" onchange="mobSet(${id}, 'note', this.value)">${esc(it.note)}</textarea>
@@ -3127,10 +3127,10 @@ function mobAddHtml() {
   const f = mobUI.filter;
   return `<div id="mobAdd">
     <div class="flex items-center justify-between gap-2">
-      <h3 class="t-display text-[30px] text-white">HAREKET EKLE</h3>
+      <h3 class="t-display text-[30px] text-[var(--t-text)]">HAREKET EKLE</h3>
       <button id="mobAddClose" onclick="mobBack()" class="m-round" aria-label="Kapat">${svgI("x", 20, 2.2)}</button>
     </div>
-    <label class="flex items-center gap-2.5 h-[50px] rounded-2xl bg-[#141416] px-3.5 mt-3 text-[#8B8B93]">${svgI("search", 20)}
+    <label class="flex items-center gap-2.5 h-[50px] rounded-2xl bg-[var(--t-surface)] px-3.5 mt-3 text-[var(--t-dim)]">${svgI("search", 20)}
       <input id="mobSearch" type="search" value="${esc(mobUI.q)}" placeholder="Hareket ara" autocomplete="off" oninput="mobAddSearch(this.value)" class="t-search flex-1 min-w-0 h-full !text-[16px]" /></label>
     <div class="flex gap-2 mt-3 overflow-x-auto no-scrollbar -mx-4 px-4">${[["all", "Tümü"], ...MOB_TYPES].map(([k, l]) =>
       `<button data-mob-filter="${k}" onclick="mobAddFilter('${k}')" class="m-chip ${f === k ? "on" : ""}" aria-pressed="${f === k}">${l}</button>`).join("")}</div>
@@ -3148,17 +3148,17 @@ function mobRenderAddList() {
   box.innerHTML = order.map(rk => {
     const rows = list.filter(x => x.region === rk);
     if (!rows.length) return "";
-    return `<div data-mob-group class="text-[13px] font-semibold text-[#A1A1AA] mt-4 mb-2 px-0.5">${esc(MOB_REGION_LABEL[rk] || "Bölgesiz")}</div>
+    return `<div data-mob-group class="text-[13px] font-semibold text-[var(--t-muted)] mt-4 mb-2 px-0.5">${esc(MOB_REGION_LABEL[rk] || "Bölgesiz")}</div>
       <div class="space-y-2">${rows.map(x => {
         const sum = mobSummary(normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription }, x.type)));
         const has = inRoutine.has(x.m.name);
         return `<div data-mob-lib="${x.key}" class="m-card">
-          <div class="flex-1 min-w-0"><span class="m-kind ${x.type === "dynamic" ? "" : "s"}">${MOB_TYPE_LABEL[x.type]}${has ? ` · <span class="text-white">Rutinde</span>` : ""}</span>
+          <div class="flex-1 min-w-0"><span class="m-kind ${x.type === "dynamic" ? "" : "s"}">${MOB_TYPE_LABEL[x.type]}${has ? ` · <span class="text-[var(--t-text)]">Rutinde</span>` : ""}</span>
             <span class="m-name block">${esc(x.m.name)}</span><span class="m-rx block">${esc(sum)}</span></div>
           <button data-mob-add onclick="mobAddLib('${x.key}')" class="m-add mr-1.5 ${has ? "in" : ""}" aria-label="${esc(x.m.name)} ${has ? "zaten rutinde, yine de ekle" : "ekle"}">${svgI(has ? "check" : "plus", 20, 2.6)}</button>
         </div>`;
       }).join("")}</div>`;
-  }).join("") || `<div class="text-[14px] text-[#8B8B93] py-6 text-center">Hareket bulunamadı. Aşağıdan elle ekleyebilirsin.</div>`;
+  }).join("") || `<div class="text-[14px] text-[var(--t-dim)] py-6 text-center">Hareket bulunamadı. Aşağıdan elle ekleyebilirsin.</div>`;
 }
 function mobAddOpen() { mobUI.view = "add"; mobUI.q = ""; window.scrollTo(0, 0); renderMobility(); }
 function mobAddSearch(v) { mobUI.q = String(v || ""); mobRenderAddList(); }
@@ -3260,23 +3260,23 @@ function mobTimerRender() {
   $("mobTimer").innerHTML = `
     <div class="w-full max-w-lg flex items-center justify-between pt-3">
       <button id="mobTClose" onclick="mobTimerClose()" class="m-round" aria-label="Sayacı kapat">${svgI("x", 20, 2.2)}</button>
-      <span id="mobTRegion" class="text-[15px] text-[#A1A1AA]">${esc(T.region)}</span>
+      <span id="mobTRegion" class="text-[15px] text-[var(--t-muted)]">${esc(T.region)}</span>
       <button id="mobTSound" onclick="mobTimerSound()" class="m-round" aria-label="${snd ? "Sesi kapat" : "Sesi aç"}">${svgI(snd ? "vol" : "volOff", 20)}</button>
     </div>
     <div class="text-center mt-4 px-2 w-full max-w-lg">
       <h3 id="mobTTitle" class="t-display text-[30px] leading-[1.05]">${esc(T.name)}</h3>
-      <p id="mobTSub" class="text-[15px] ${work ? "text-[#A1A1AA]" : "text-[#B3A6FF] font-semibold"} mt-1.5">${sub}</p>
+      <p id="mobTSub" class="text-[15px] ${work ? "text-[var(--t-muted)]" : "text-[var(--t-acc-text)] font-semibold"} mt-1.5">${sub}</p>
     </div>
     <div id="mobTCircle" class="m-breath mt-4 ${work ? "" : "pause"}">
       <span class="o o1"></span><span class="o o2"></span>
       <div class="core" style="animation-delay:-${(Date.now() - T.t0) % 10000}ms"><b id="mobTTime" class="t-display">${mobFmt((T.endAt - Date.now()) / 1000)}</b><span id="mobTBreath">${work ? mobBreathLabel() : "Hazırlan"}</span></div>
     </div>
-    <div class="text-[13.5px] text-[#8B8B93] mt-1 text-center">${work ? "4 sn al, 6 sn ver. Her verişte biraz daha derine." : "Sıradaki tur birazdan kendiliğinden başlar."}</div>
+    <div class="text-[13.5px] text-[var(--t-dim)] mt-1 text-center">${work ? "4 sn al, 6 sn ver. Her verişte biraz daha derine." : "Sıradaki tur birazdan kendiliğinden başlar."}</div>
     <div class="w-full max-w-lg mt-auto pt-5">
       <div class="grid grid-cols-[1fr_1fr_1.3fr] gap-2.5">
-        <button id="mobTMinus" onclick="mobTimerAdjust(-15)" class="h-[60px] rounded-[18px] bg-[#1E1E21] text-[17px] font-bold">−15</button>
-        <button id="mobTPlus" onclick="mobTimerAdjust(15)" class="h-[60px] rounded-[18px] bg-[#1E1E21] text-[17px] font-bold">+15</button>
-        <button id="mobTSkip" onclick="mobTimerSkip()" class="h-[60px] rounded-[18px] bg-white text-black text-[17px] font-bold">Atla</button>
+        <button id="mobTMinus" onclick="mobTimerAdjust(-15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">−15</button>
+        <button id="mobTPlus" onclick="mobTimerAdjust(15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">+15</button>
+        <button id="mobTSkip" onclick="mobTimerSkip()" class="h-[60px] rounded-[18px] bg-[var(--t-text)] text-[var(--t-bg)] text-[17px] font-bold">Atla</button>
       </div>
       <div id="mobTRounds" class="m-rounds mt-3">${boxes}</div>
     </div>`;
@@ -3306,14 +3306,14 @@ function lineChart(points, color, unit) {
   }).join("");
   const showIdx = new Set([0, points.length - 1, Math.floor((points.length - 1) / 2)]);
   const labels = points.map((p, i) => showIdx.has(i) ? `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? "start" : i === points.length - 1 ? "end" : "middle"}" font-size="9" fill="#94a3b8">${esc(p.label)}</text>` : "").join("");
-  const dots = points.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.y).toFixed(1)}" r="${points.length > 30 ? 1.5 : 3}" fill="${color}"/>`).join("");
+  const dots = points.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.y).toFixed(1)}" r="${points.length > 30 ? 1.5 : 3}" style="fill:${color}"/>`).join("");
   const lastP = points[points.length - 1];
   return `<svg viewBox="0 0 ${W} ${H}" class="w-full h-auto" role="img">
     ${grid}
-    <path d="${area}" fill="${color}" opacity="0.12"/>
-    <path d="${path}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${area}" style="fill:${color}" opacity="0.12"/>
+    <path d="${path}" fill="none" style="stroke:${color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
     ${dots}${labels}
-    <text x="${Math.min(x(points.length - 1), W - pr)}" y="${Math.max(10, y(lastP.y) - 7)}" text-anchor="end" font-size="10" font-weight="700" fill="${color}">${fmtNum(lastP.y)} ${esc(unit)}</text>
+    <text x="${Math.min(x(points.length - 1), W - pr)}" y="${Math.max(10, y(lastP.y) - 7)}" text-anchor="end" font-size="10" font-weight="700" style="fill:${color}">${fmtNum(lastP.y)} ${esc(unit)}</text>
   </svg>`;
 }
 
@@ -3342,7 +3342,7 @@ function exerciseChartHtml(name, accent) {
   if (!hist.length) return `<div class="text-xs text-slate-500 text-center py-8">Bu hareket için henüz kayıt yok. Antrenmanı bitirip kaydettikçe grafik oluşur.</div>`;
   const rows = hist.slice().reverse().slice(0, 8).map(h => `
     <div class="flex justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5">
-      <span class="text-slate-400 shrink-0">${fmtDate(h.ts)}</span><span class="text-slate-200 text-right truncate">${esc(sessionSummary(h))}</span>
+      <span class="text-slate-400 shrink-0">${fmtDate(h.ts)}</span><span class="text-[var(--t-text2)] text-right truncate">${esc(sessionSummary(h))}</span>
     </div>`).join("");
   return `<div class="text-[11px] text-slate-400 mb-1">${ser.metric}</div>${lineChart(ser.points.slice(-30), ser.color, ser.unit)}
     <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-3 mb-1.5">Son kayıtlar</div><div class="space-y-1">${rows}</div>`;
@@ -3351,7 +3351,7 @@ function exerciseChartHtml(name, accent) {
 function openExerciseChart(exIdx) {
   const ex = activeDay().exercises[exIdx];
   $("chartTitle").textContent = ex.name;
-  $("chartBody").innerHTML = exerciseChartHtml(ex.name, "#1FD1C1");
+  $("chartBody").innerHTML = exerciseChartHtml(ex.name, "var(--t-acc-text)");
   openModal("chartModal");
 }
 function openChartByKey(key) {
@@ -3374,7 +3374,7 @@ function openChartByKey(key) {
 // Yalnızca açık alt sekme çizilir. Tasarım: tasarimlar/ilerleme-B.html + ilerleme-ozet.md.
 // ============================================================================
 const PROG_VIEWS = [["genel", "Genel"], ["kilo", "Kilo"], ["guc", "Güç"], ["beslenme", "Beslenme"]];
-const PC = { tq: "#1FD1C1", gr: "#22C55E", lv: "#B3A6FF", wa: "#4EA8DE", kg: "#F4F4F5", over: "#FB7185" };
+const PC = { tq: "var(--d-tq)", gr: "var(--d-gr)", lv: "var(--d-lv)", wa: "var(--d-wa)", kg: "var(--d-kg)", over: "var(--d-over)", dot: "var(--d-dot)" };
 const progUI = { wRange: 30 };   // kilo grafiği aralığı (gün; 0 = tümü) — kaydedilmez
 const P_ICON = {
   up: "M12 19V5M6 11l6-6 6 6", down: "M12 5v14M6 13l6 6 6-6", check: "M5 12.5l4.5 4.5L19 7.5",
@@ -3425,18 +3425,18 @@ function pLine(series, o = {}) {
   let s = "";
   for (let k = 0; k < 4; k++) {
     const v = lo + (hi - lo) * k / 3, y = Y(v);
-    s += `<line x1="${L}" x2="${W - R + 4}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#232326"/><text x="${L - 6}" y="${(y + 4).toFixed(1)}" text-anchor="end" class="p-ax">${hi - lo > 12 ? Math.round(v) : fmtNum(v)}</text>`;
+    s += `<line x1="${L}" x2="${W - R + 4}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" style="stroke:var(--t-grid)"/><text x="${L - 6}" y="${(y + 4).toFixed(1)}" text-anchor="end" class="p-ax">${hi - lo > 12 ? Math.round(v) : fmtNum(v)}</text>`;
   }
   const xf = o.xFmt || (t => fmtDate(t));
   [t0, (t0 + t1) / 2, t1].forEach((t, i) => {
     s += `<text x="${X(t).toFixed(1)}" y="${H - 7}" text-anchor="${i === 0 ? "start" : i === 2 ? "end" : "middle"}" class="p-ax">${esc(xf(t))}</text>`;
   });
   series.forEach(se => {
-    if (se.dots) se.pts.forEach(p => { s += `<circle cx="${X(p.t).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="2.6" fill="${se.color}"/>`; });
-    else s += `<polyline points="${se.pts.map(p => X(p.t).toFixed(1) + "," + Y(p.y).toFixed(1)).join(" ")}" fill="none" stroke="${se.color}" stroke-width="${se.w || 2.5}" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if (se.dots) se.pts.forEach(p => { s += `<circle cx="${X(p.t).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="2.6" style="fill:${se.color}"/>`; });
+    else s += `<polyline points="${se.pts.map(p => X(p.t).toFixed(1) + "," + Y(p.y).toFixed(1)).join(" ")}" fill="none" style="stroke:${se.color}" stroke-width="${se.w || 2.5}" stroke-linejoin="round" stroke-linecap="round"/>`;
     if (se.name) {
       const p = se.pts[se.pts.length - 1], x = X(p.t), y = Y(p.y);
-      if (!se.dots) s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${se.color}" stroke="#141416" stroke-width="2"/>`;
+      if (!se.dots) s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" style="fill:${se.color};stroke:var(--t-surface)" stroke-width="2"/>`;
       s += `<text x="${(x + 9).toFixed(1)}" y="${(y - 1).toFixed(1)}" class="p-vl">${fmtNum(p.y)}${o.unit ? " " + esc(o.unit) : ""}</text><text x="${(x + 9).toFixed(1)}" y="${(y + 13).toFixed(1)}" class="p-ax">${esc(se.name)}</text>`;
     }
   });
@@ -3455,28 +3455,28 @@ function pBars(items, o) {
   let bars = "", vl = "", lb = "";
   items.forEach((it, i) => {
     const x = L + i * (bw + gap), cx = (x + bw / 2).toFixed(1);
-    if (it.v == null) bars += `<line x1="${x.toFixed(1)}" x2="${(x + bw).toFixed(1)}" y1="${base - 1}" y2="${base - 1}" stroke="#3F3F46" stroke-width="2"/>`;
+    if (it.v == null) bars += `<line x1="${x.toFixed(1)}" x2="${(x + bw).toFixed(1)}" y1="${base - 1}" y2="${base - 1}" style="stroke:var(--t-line3)" stroke-width="2"/>`;
     else {
       const y = Math.min(base - 2, Y(Math.max(0, it.v))), r = Math.min(5, bw / 3);
       const d = `M${x.toFixed(1)},${base} V${(y + r).toFixed(1)} Q${x.toFixed(1)},${y.toFixed(1)} ${(x + r).toFixed(1)},${y.toFixed(1)} H${(x + bw - r).toFixed(1)} Q${(x + bw).toFixed(1)},${y.toFixed(1)} ${(x + bw).toFixed(1)},${(y + r).toFixed(1)} V${base} Z`;
-      bars += it.flag === "over" ? `<path d="${d}" fill="url(#ph${id})"/>`
-        : it.flag === "plan" ? `<path d="${d}" fill="none" stroke="${o.color}" stroke-width="1.6" stroke-dasharray="3 3"/>`
-        : it.flag === "now" ? `<path d="${d}" fill="${o.color}" fill-opacity=".35" stroke="${o.color}" stroke-width="1.4"/>`
-        : `<path d="${d}" fill="${o.color}"/>`;
+      bars += it.flag === "over" ? `<path d="${d}" style="fill:url(#ph${id})"/>`
+        : it.flag === "plan" ? `<path d="${d}" fill="none" style="stroke:${o.color}" stroke-width="1.6" stroke-dasharray="3 3"/>`
+        : it.flag === "now" ? `<path d="${d}" style="fill:${o.color};stroke:${o.color}" fill-opacity=".35" stroke-width="1.4"/>`
+        : `<path d="${d}" style="fill:${o.color}"/>`;
       const mark = it.flag === "over" ? " ↑" : it.flag === "plan" ? " *" : "";
       if (n <= 8) vl += `<text x="${cx}" y="${(y - 6).toFixed(1)}" text-anchor="middle" class="p-bv">${esc(o.fmt ? o.fmt(it.v) : fmtNum(it.v))}${mark}</text>`;
       else if (mark) vl += `<text x="${cx}" y="${(y - 5).toFixed(1)}" text-anchor="middle" class="p-bv">${mark.trim()}</text>`;
     }
     if ((n - 1 - i) % step === 0) lb += `<text x="${cx}" y="${H - 8}" text-anchor="middle" class="p-ax${it.flag === "now" ? " p-axb" : ""}">${esc(it.label)}</text>`;
   });
-  const tl = o.target > 0 ? `<line x1="${L}" x2="${W - R}" y1="${Y(o.target).toFixed(1)}" y2="${Y(o.target).toFixed(1)}" stroke="#E4E4E7" stroke-width="1.5" stroke-dasharray="5 4"/>` : "";
-  return `<svg viewBox="0 0 ${W} ${H}" class="p-chart" role="img" aria-label="${esc(o.label || "")}"><defs><pattern id="ph${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="${o.color}"/><line x1="0" y1="0" x2="0" y2="6" stroke="#141416" stroke-width="2.5"/></pattern></defs><line x1="${L}" x2="${W - R}" y1="${base}" y2="${base}" stroke="#2A2A2E"/>${bars}${tl}${vl}${lb}</svg>`;
+  const tl = o.target > 0 ? `<line x1="${L}" x2="${W - R}" y1="${Y(o.target).toFixed(1)}" y2="${Y(o.target).toFixed(1)}" style="stroke:var(--t-text2)" stroke-width="1.5" stroke-dasharray="5 4"/>` : "";
+  return `<svg viewBox="0 0 ${W} ${H}" class="p-chart" role="img" aria-label="${esc(o.label || "")}"><defs><pattern id="ph${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" style="fill:${o.color}"/><line x1="0" y1="0" x2="0" y2="6" style="stroke:var(--t-surface)" stroke-width="2.5"/></pattern></defs><line x1="${L}" x2="${W - R}" y1="${base}" y2="${base}" style="stroke:var(--t-line)"/>${bars}${tl}${vl}${lb}</svg>`;
 }
 function pSpark(vals, color) {
   if (vals.length < 2) return "";
   const w = 84, h = 30, lo = Math.min(...vals), hi = Math.max(...vals);
   const X = i => 2 + (w - 8) * i / (vals.length - 1), Y = v => 4 + (h - 8) * (hi - v) / (hi - lo || 1);
-  return `<svg class="p-spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><polyline points="${vals.map((v, i) => X(i).toFixed(1) + "," + Y(v).toFixed(1)).join(" ")}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${X(vals.length - 1).toFixed(1)}" cy="${Y(vals[vals.length - 1]).toFixed(1)}" r="3" fill="${color}"/></svg>`;
+  return `<svg class="p-spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true"><polyline points="${vals.map((v, i) => X(i).toFixed(1) + "," + Y(v).toFixed(1)).join(" ")}" fill="none" style="stroke:${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${X(vals.length - 1).toFixed(1)}" cy="${Y(vals[vals.length - 1]).toFixed(1)}" r="3" style="fill:${color}"/></svg>`;
 }
 
 // --- Veri yardımcıları
@@ -3608,7 +3608,7 @@ function progKiloHtml() {
   const tgt = num(state.settings.targetWeight, 82);
   const chips = [[30, "30 gün"], [90, "90 gün"], [0, "Tümü"]].map(([n, l]) => `<button onclick="setProgWRange(${n})" class="p-chip ${rng === n ? "on" : ""}" aria-pressed="${rng === n}">${l}</button>`).join("");
   const chart = pts.length >= 4
-    ? pLine([{ pts, color: "#6B6B73", dots: true }, { pts: avg, color: PC.kg, w: 3, name: "7 gün ort." }], { unit: "kg", label: "Tartılar ve 7 günlük ortalama" })
+    ? pLine([{ pts, color: PC.dot, dots: true }, { pts: avg, color: PC.kg, w: 3, name: "7 gün ort." }], { unit: "kg", label: "Tartılar ve 7 günlük ortalama" })
       + pLegend([[`<i class="p-lg-dot"></i>`, "Günlük tartı"], [`<i class="p-lg-line"></i>`, "7 gün ortalaması"]])
     : `<div class="p-low">Bu aralıkta ${pts.length} tartı var. Grafik için en az 4 tartı gerekir; o zamana kadar değerler aşağıdaki listede.</div>`;
   const big = w7 ? `<div class="p-k">7 günlük ortalama</div><div class="p-big"><b class="t-display">${fmtNum(w7.avg)}</b><span>kg</span>${prev != null ? pDelta(w7.avg - prev, "geçen haftaya göre", progWeightGood(w7.avg - prev)) : ""}</div>`
@@ -3851,11 +3851,11 @@ function renderProfile() {
   if (wl.length) {
     const d = round1(num(lastW.weight) - num(firstW.weight));
     wh += `<div class="grid grid-cols-3 gap-2">
-      <div class="bg-[#1E1E21] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Son tartı</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : lastW.date || "")}</div></div>
-      <div class="bg-[#1E1E21] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Değişim</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${wl.length} kayıt</div></div>
-      <div class="bg-[#1E1E21] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Hedefe</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${!tW ? "hedef yok" : left > 0 ? "verilecek" : left < 0 ? "alınacak" : "hedeftesin"}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Son tartı</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : lastW.date || "")}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Değişim</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${wl.length} kayıt</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Hedefe</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[11px] t-dim">${!tW ? "hedef yok" : left > 0 ? "verilecek" : left < 0 ? "alınacak" : "hedeftesin"}</div></div>
     </div>`;
-    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[#2A2A2E] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date || "")}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">· %${fmtNum(validBf(l.bf))} yağ</span>` : ""}</span></div>`).join("");
+    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date || "")}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">· %${fmtNum(validBf(l.bf))} yağ</span>` : ""}</span></div>`).join("");
     wh += `<div class="mt-2">${rows}</div>`;
   } else {
     wh = `<p class="text-[13px] t-dim">Henüz tartı kaydın yok. Kilonu yazıp "Tartıyı kaydet"e dokun; ilerlemen İlerleme sekmesinde grafiğe dönüşür.</p>`;
@@ -3864,7 +3864,7 @@ function renderProfile() {
   // Günlük hedefler (hesaplanan)
   const t = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
-    ${[["Kalori", Math.round(t.calTarget), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[#1E1E21] rounded-2xl px-1 py-2.5"><div class="text-[11px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[10px] t-dim">${u}</div></div>`).join("")}
+    ${[["Kalori", Math.round(t.calTarget), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[11px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[10px] t-dim">${u}</div></div>`).join("")}
   </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme) ve Beslenme sekmesindeki açık ayarından hesaplanır.</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
@@ -3875,10 +3875,10 @@ function renderProfile() {
     if (!l) return "";
     const d = round1(l[k] - firstOf(k)[k]);
     const good = d === 0 ? null : (lowerBetter ? d < 0 : d > 0);
-    return `<div class="bg-[#141416] border border-[#2A2A2E] rounded-2xl px-3 py-2.5 min-w-0">
+    return `<div class="bg-[var(--t-surface)] border border-[var(--t-line)] rounded-2xl px-3 py-2.5 min-w-0">
       <div class="text-[12px] t-muted truncate">${n}</div>
       <div class="t-display text-[22px]">${fmtNum(l[k])}<span class="t-dim text-sm"> cm</span></div>
-      <div class="text-[11px] ${good == null ? "t-dim" : good ? "t-accent" : "text-[#FF8A8A]"}">${d === 0 ? "değişim yok" : (d > 0 ? "+" : "") + fmtNum(d) + " cm"}</div>
+      <div class="text-[11px] ${good == null ? "t-dim" : good ? "t-accent" : "text-[var(--t-danger-text)]"}">${d === 0 ? "değişim yok" : (d > 0 ? "+" : "") + fmtNum(d) + " cm"}</div>
     </div>`;
   }).join("");
   const lastM = ms[ms.length - 1];
@@ -4192,8 +4192,8 @@ function deloadHtml(ex, exIdx) {
   if (ex.sets.some(s => s.done)) return "";
   const d = deloadInfo(ex);
   if (!d) return "";
-  return `<div class="bg-[#2A1F0B] border border-[#6B4E16] rounded-2xl pl-3 pr-2 py-2 space-y-1.5" data-deload="${exIdx}">
-      <div class="flex items-start gap-2.5"><span style="color:#FBBF24" class="pt-0.5">${svgI("down", 20, 2.2)}</span>
+  return `<div class="bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)] rounded-2xl pl-3 pr-2 py-2 space-y-1.5" data-deload="${exIdx}">
+      <div class="flex items-start gap-2.5"><span style="color:var(--t-warn-icon)" class="pt-0.5">${svgI("down", 20, 2.2)}</span>
         <span class="text-[13px] leading-snug text-amber-100">Son 3 haftada ${d.sessions} seansta tahmini 1RM'in ~${d.best} kg'ı geçmedi ve setler çoğunlukla zor geçti. Bu hareket için bir hafta kiloyu ~%10 hafifletmeyi (dinlenme haftası) düşünebilirsin.</span></div>
       <div class="flex justify-end"><button onclick="dismissDeload(${exIdx})" class="text-[12px] t-muted h-11 px-3">Anladım</button></div>
     </div>`;
@@ -4210,17 +4210,17 @@ function suggestionHtml(ex, exIdx) {
   if (!sg) return deloadHtml(ex, exIdx);
   if (sg.type === "hold") return `${deloadHtml(ex, exIdx)}
     <div class="t-panel rounded-2xl pl-3 pr-2 py-2 space-y-1.5" data-hold="${exIdx}">
-      <div class="flex items-start gap-2.5"><span style="color:#1FD1C1" class="pt-0.5">${svgI("check", 20, 2.2)}</span><span class="text-[13px] leading-snug text-[#CCF5F0]">${esc(sg.text)}</span></div>
+      <div class="flex items-start gap-2.5"><span style="color:#1FD1C1" class="pt-0.5">${svgI("check", 20, 2.2)}</span><span class="text-[13px] leading-snug text-[var(--t-panel-text)]">${esc(sg.text)}</span></div>
       <div class="flex justify-end"><button onclick="dismissSuggestion(${exIdx})" class="text-[12px] t-muted h-11 px-3">Anladım</button></div>
     </div>`;
   const up = sg.type === "up";
   const noLv = usesLevels(ex) && !ex.levels && !inferLevels(ex);
   return `
-    <div class="${up ? "t-panel" : "bg-[#2A1F0B] border border-[#6B4E16]"} rounded-2xl pl-3 pr-2 py-2 space-y-2">
+    <div class="${up ? "t-panel" : "bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)]"} rounded-2xl pl-3 pr-2 py-2 space-y-2">
       <div class="flex items-center justify-between gap-2.5">
         <span class="flex items-center gap-2.5 min-w-0">
-          <span style="color:${up ? "#1FD1C1" : "#FBBF24"}">${svgI(up ? "up" : "down", 20, 2.2)}</span>
-          <span class="text-[13px] leading-snug ${up ? "text-[#CCF5F0]" : "text-amber-100"}">${esc(sg.text)}</span>
+          <span style="color:${up ? "var(--t-acc-text)" : "var(--t-warn-icon)"}">${svgI(up ? "up" : "down", 20, 2.2)}</span>
+          <span class="text-[13px] leading-snug ${up ? "text-[var(--t-panel-text)]" : "text-amber-100"}">${esc(sg.text)}</span>
         </span>
         <span class="flex flex-col gap-1.5 shrink-0">
           <button onclick="applySuggestion(${exIdx})" class="${up ? "t-btn" : "bg-amber-500 text-black font-extrabold"} h-11 px-3.5 rounded-xl text-[13px]">${fmtKg(sg.kg)} kg</button>
@@ -4338,7 +4338,7 @@ function renderLevelTool() {
   if (W <= 0) {
     out.innerHTML = `<div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
       <div class="text-[11px] text-slate-400 mb-1.5">Bu makinenin kademeleri:</div>
-      <div class="flex flex-wrap gap-1.5">${list.slice(0, 12).map(v => `<span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1.5 rounded-lg text-[12px] font-bold bg-slate-800 text-slate-200">${fmtKg(v)}</span>`).join("")}${list.length > 12 ? '<span class="text-slate-500 text-xs self-center">…</span>' : ""}</div>
+      <div class="flex flex-wrap gap-1.5">${list.slice(0, 12).map(v => `<span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1.5 rounded-lg text-[12px] font-bold bg-slate-800 text-[var(--t-text2)]">${fmtKg(v)}</span>`).join("")}${list.length > 12 ? '<span class="text-slate-500 text-xs self-center">…</span>' : ""}</div>
       <div class="text-[11px] text-slate-500 mt-2">Isınma setlerini görmek için çalışma kilonu yaz.</div></div>`;
     return;
   }
@@ -5103,7 +5103,7 @@ function levelsAskHtml(ex, exIdx) {
   const around = list.filter(v => v >= num(ex.sets[0] && ex.sets[0].kg) - inf.step * 2).slice(0, 5).map(fmtKg).join(" · ");
   return `
     <div class="t-panel rounded-2xl px-3 py-2.5 text-[13px] space-y-2">
-      <div class="text-slate-200">Bu ${equipOf(ex) === "dumbbell" ? "dambılların" : "makinenin"} kademeleri <b class="text-white">${fmtKg(inf.step)} kg</b> arayla mı gidiyor? <span class="t-dim">(${around} …)</span></div>
+      <div class="text-[var(--t-text2)]">Bu ${equipOf(ex) === "dumbbell" ? "dambılların" : "makinenin"} kademeleri <b class="text-[var(--t-text)]">${fmtKg(inf.step)} kg</b> arayla mı gidiyor? <span class="t-dim">(${around} …)</span></div>
       <div class="flex gap-2">
         <button onclick="confirmInferredLevels(${exIdx})" class="t-btn h-11 px-4 rounded-xl text-[13px]">Evet, kaydet</button>
         <button onclick="openEditExercise(${exIdx})" class="t-btn-ghost h-11 px-4 rounded-xl text-[13px]">Düzenle</button>
@@ -5217,8 +5217,8 @@ function startWorkout() {
 function exitActiveWorkout() { state.gymActive = false; window.scrollTo(0, 0); renderAll(); }
 
 function gymSubNav() {
-  return `<nav class="gym-subnav flex gap-5 border-b border-[#2A2A2E] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="Antrenman bölümleri">
-    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 text-[15px] ${state.gymView === k ? "font-bold text-white border-b-2 border-[#1FD1C1] -mb-px" : "font-medium t-muted"}">${l}</button>`).join("")}
+  return `<nav class="gym-subnav flex gap-5 border-b border-[var(--t-line)] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="Antrenman bölümleri">
+    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${l}</button>`).join("")}
   </nav>`;
 }
 
@@ -5242,10 +5242,10 @@ function gymTodayHtml() {
   const strip = names.map((n, i) => {
     const d = new Date(ws + i * DAY_MS + 12 * 3600000);
     const k = todayStr(d), today = k === tKey, done = doneDays[k];
-    return `<div class="h-16 rounded-2xl flex flex-col items-center justify-center gap-0.5 ${today ? "bg-[#1FD1C1] text-[#00201D]" : "bg-[#141416] " + (done ? "text-white" : "t-muted")}">
+    return `<div class="h-16 rounded-2xl flex flex-col items-center justify-center gap-0.5 ${today ? "bg-[var(--t-acc)] text-[var(--t-on-acc)]" : "bg-[var(--t-surface)] " + (done ? "text-[var(--t-text)]" : "t-muted")}">
       <span class="text-[11px] font-semibold tracking-wide">${n}</span>
       <span class="t-display text-xl leading-none">${d.getDate()}</span>
-      <span class="w-1.5 h-1.5 rounded-full ${today ? (done ? "bg-[#00201D]" : "") : (done ? "bg-[#1FD1C1]" : "")}"></span>
+      <span class="w-1.5 h-1.5 rounded-full ${today ? (done ? "bg-[var(--t-on-acc)]" : "") : (done ? "bg-[var(--t-acc)]" : "")}"></span>
     </div>`;
   }).join("");
 
@@ -5256,15 +5256,15 @@ function gymTodayHtml() {
   const wVol = weekLogs.reduce((a, l) => a + num(l.volume), 0);
   const wMin = weekLogs.reduce((a, l) => a + num(l.durationMin), 0);
   const last = state.workoutLogs[state.workoutLogs.length - 1];
-  const dayChips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-3.5 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-white text-black font-bold" : "bg-[#1E1E21] text-slate-200 font-semibold"}">${esc(d.name.split(":")[0])}${i === nIdx ? ' <span class="t-accent">•</span>' : ""}</button>`).join("");
+  const dayChips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-3.5 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "bg-[var(--t-elev)] text-[var(--t-text2)] font-semibold"}">${esc(d.name.split(":")[0])}${i === nIdx ? ' <span class="t-accent">•</span>' : ""}</button>`).join("");
 
   return `
     <div class="grid grid-cols-7 gap-1.5">${strip}</div>
     <div class="t-card rounded-[22px] p-5 space-y-3.5">
-      <div class="t-label ${inProg ? "" : "t-accent"}" style="${inProg ? "" : "color:#1FD1C1"}">${inProg ? "DEVAM EDEN ANTRENMAN" : state.activeWorkoutDayIdx === nIdx ? "SIRADAKİ ANTRENMAN" : "SEÇİLİ ANTRENMAN"}</div>
+      <div class="t-label ${inProg ? "" : "t-accent"}" style="${inProg ? "" : "color:var(--t-acc-text)"}">${inProg ? "DEVAM EDEN ANTRENMAN" : state.activeWorkoutDayIdx === nIdx ? "SIRADAKİ ANTRENMAN" : "SEÇİLİ ANTRENMAN"}</div>
       <div class="t-display text-[34px] leading-none uppercase">${esc(day.name)}</div>
       <div class="flex gap-4 t-muted text-sm">
-        <span><b class="text-white">${day.exercises.length}</b> hareket</span><span><b class="text-white">${sets}</b> set</span><span>~<b class="text-white">${estimateMinutes(day)}</b> dk</span>
+        <span><b class="text-[var(--t-text)]">${day.exercises.length}</b> hareket</span><span><b class="text-[var(--t-text)]">${sets}</b> set</span><span>~<b class="text-[var(--t-text)]">${estimateMinutes(day)}</b> dk</span>
       </div>
       ${muscles.length ? `<div class="flex flex-wrap gap-1.5">${muscles.map(m => `<span class="t-chip">${esc(m)}</span>`).join("")}</div>` : ""}
       ${state.workoutDays.length > 1 && !inProg ? `<div class="flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1">${dayChips}</div>` : ""}
@@ -5298,15 +5298,15 @@ function effortRowHtml(exIdx, s, i) {
   return `<div class="px-1 pt-1 pb-1.5 space-y-1.5" data-effort-row="${exIdx}-${i}">
       <div class="text-[12px] t-muted">${i + 1}. set nasıl geçti? <span class="t-dim">(isteğe bağlı)</span></div>
       <div class="grid grid-cols-4 gap-1.5" role="group" aria-label="${i + 1}. set zorluğu">
-        ${[1, 2, 3, 4].map(v => `<button onclick="setEffort(${exIdx}, ${i}, ${v})" aria-pressed="${s.e === v}" class="h-11 rounded-xl text-[13px] ${s.e === v ? "font-extrabold text-black" : "font-semibold bg-[#1E1E21] text-slate-200"}" ${s.e === v ? `style="background:${EFFORT_COLORS[v]}"` : ""}>${EFFORT_LABELS[v]}</button>`).join("")}
+        ${[1, 2, 3, 4].map(v => `<button onclick="setEffort(${exIdx}, ${i}, ${v})" aria-pressed="${s.e === v}" class="h-11 rounded-xl text-[13px] ${s.e === v ? "font-extrabold text-black" : "font-semibold bg-[var(--t-elev)] text-[var(--t-text2)]"}" ${s.e === v ? `style="background:${EFFORT_COLORS[v]}"` : ""}>${EFFORT_LABELS[v]}</button>`).join("")}
       </div>
     </div>`;
 }
 // Set satırları
 function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   const isNext = ptr && ptr.e === exIdx && ptr.s === i;
-  const rowCls = s.done ? "bg-[#0B2624]" : isNext ? "bg-[#1A1A1D] ring-[1.5px] ring-[#1FD1C1] ring-inset" : "";
-  const check = `<button onclick="toggleSetDone(${exIdx}, ${i})" aria-label="Seti tamamla" class="w-11 h-11 rounded-xl flex items-center justify-center ${s.done ? "bg-[#1FD1C1] text-[#00201D]" : "border-[1.5px] border-[#3A3A40] t-muted"}">${svgI("check", 22, 2.6)}</button>`;
+  const rowCls = s.done ? "bg-[var(--t-panel)]" : isNext ? "bg-[var(--t-elev0)] ring-[1.5px] ring-[var(--t-acc-text)] ring-inset" : "";
+  const check = `<button onclick="toggleSetDone(${exIdx}, ${i})" aria-label="Seti tamamla" class="w-11 h-11 rounded-xl flex items-center justify-center ${s.done ? "bg-[var(--t-acc)] text-[var(--t-on-acc)]" : "border-[1.5px] border-[var(--t-line2)] t-muted"}">${svgI("check", 22, 2.6)}</button>`;
   if (ex.kind === "cardio") {
     return `<div class="rounded-2xl p-2.5 space-y-2 ${rowCls}">
       <div class="flex items-center justify-between"><span class="text-xs font-bold t-muted">${ex.sets.length > 1 ? (i + 1) + ". BÖLÜM" : "KARDİYO"}</span>${check}</div>
@@ -5319,7 +5319,7 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   }
   if (ex.kind === "time") {
     return `<div class="grid items-center gap-2 h-14 px-1 rounded-2xl ${rowCls}" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px">
-      <span class="t-display text-[22px] text-center ${s.done || isNext ? "text-white" : "t-dim"}">${i + 1}</span>
+      <span class="t-display text-[22px] text-center ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}</span>
       <span class="flex items-center gap-1.5"><input type="text" inputmode="numeric" data-fk="t-${exIdx}-${i}" value="${num(s.sec)}" onchange="updateSetData(${exIdx}, ${i}, 'sec', this.value)" class="t-input w-20" /><span class="text-xs t-muted">sn</span></span>
       <button onclick="startTimer(${num(s.sec)}, ${esc(JSON.stringify(ex.name.slice(0, 40)))})" class="t-btn-ghost h-11 rounded-xl text-[13px] flex items-center justify-center gap-1">${svgI("play", 14)}Başlat</button>
       ${check}
@@ -5329,7 +5329,7 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   ex.sets.forEach((x, j) => { if (x.done) lastDone = j; });
   const effLbl = s.done && EFFORT_LABELS[s.e] ? `<span class="block font-sans text-[10px] font-bold leading-none mt-0.5" style="color:${EFFORT_COLORS[s.e]}">${EFFORT_LABELS[s.e]}</span>` : "";
   return `<div class="rounded-2xl ${rowCls}"><div class="grid items-center gap-2 h-14 px-1" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px">
-    <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-white" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-amber-400 text-sm">★</span>' : ""}${effLbl}</span>
+    <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-amber-400 text-sm">★</span>' : ""}${effLbl}</span>
     <span class="text-[13px] t-dim truncate">${prev}</span>
     <input type="text" inputmode="decimal" aria-label="${i + 1}. set kilo" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtKg(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
     <input type="text" inputmode="numeric" aria-label="${i + 1}. set tekrar" data-fk="w-${exIdx}-${i}-reps" value="${num(s.reps)}" onchange="updateSetData(${exIdx}, ${i}, 'reps', this.value)" class="t-input w-full" />
@@ -5357,7 +5357,7 @@ function gymActiveHtml() {
       <div id="exCard_${exIdx}" class="t-card rounded-[22px] p-4 space-y-3" style="scroll-margin-top: 9rem;">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0 space-y-1.5">
-            <div class="t-label">HAREKET ${exIdx + 1} / ${total}${allDone ? ' <span class="t-accent" style="color:#1FD1C1">· TAMAMLANDI</span>' : ""}</div>
+            <div class="t-label">HAREKET ${exIdx + 1} / ${total}${allDone ? ' <span class="t-accent">· TAMAMLANDI</span>' : ""}</div>
             <div class="text-[21px] font-bold leading-tight">${esc(ex.name)}</div>
             <div class="flex flex-wrap gap-1.5">
               ${ex.targetInfo ? `<span class="t-chip-accent">${esc(ex.targetInfo)}</span>` : ""}
@@ -5366,31 +5366,31 @@ function gymActiveHtml() {
               ${ex.kind !== "weight" ? `<span class="t-chip">${ex.kind === "cardio" ? "Kardiyo" : "Süreli"}</span>` : ""}
             </div>
           </div>
-          <button onclick="openExSheet(${exIdx})" aria-label="Hareket seçenekleri" class="w-11 h-11 shrink-0 rounded-[14px] bg-[#1E1E21] flex items-center justify-center">
+          <button onclick="openExSheet(${exIdx})" aria-label="Hareket seçenekleri" class="w-11 h-11 shrink-0 rounded-[14px] bg-[var(--t-elev)] flex items-center justify-center">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
           </button>
         </div>
-        ${last ? `<div class="text-[13px] t-muted">Geçen sefer (${fmtDate(last.ts)}): <span class="text-slate-200 font-semibold">${esc(sessionSummary(last))}</span></div>` : ""}
+        ${last ? `<div class="text-[13px] t-muted">Geçen sefer (${fmtDate(last.ts)}): <span class="text-[var(--t-text2)] font-semibold">${esc(sessionSummary(last))}</span></div>` : ""}
         <div id="exRight_${exIdx}" class="text-[12px] t-dim">${exRightText(ex)}</div>
         ${levelsAskHtml(ex, exIdx)}
         ${suggestionHtml(ex, exIdx)}
         <input type="text" value="${esc(ex.note || "")}" placeholder="Not ekle (koltuk ayarı, tutuş...)" onchange="updateExerciseNote(${exIdx}, this.value)" class="t-note w-full text-[13px]" />
         ${head}
         <div class="space-y-1.5">${ex.sets.map((s, i) => setRowHtml(ex, exIdx, s, i, ptr, prevOf(i))).join("")}</div>
-        <button onclick="addSetToExercise(${exIdx})" class="w-full h-11 rounded-[14px] border-[1.5px] border-dashed border-[#2A2A2E] t-muted text-sm font-semibold">+ ${ex.kind === "cardio" ? "Bölüm" : "Set"} ekle</button>
+        <button onclick="addSetToExercise(${exIdx})" class="w-full h-11 rounded-[14px] border-[1.5px] border-dashed border-[var(--t-line)] t-muted text-sm font-semibold">+ ${ex.kind === "cardio" ? "Bölüm" : "Set"} ekle</button>
       </div>`;
   }).join("");
 
   return `
     <div class="flex items-center justify-between gap-2">
-      <button onclick="exitActiveWorkout()" aria-label="Antrenman özetine dön" class="w-11 h-11 rounded-full bg-[#141416] flex items-center justify-center">${svgI("chevL", 22)}</button>
+      <button onclick="exitActiveWorkout()" aria-label="Antrenman özetine dön" class="w-11 h-11 rounded-full bg-[var(--t-surface)] flex items-center justify-center">${svgI("chevL", 22)}</button>
       <div class="flex flex-col items-center min-w-0">
         <div class="t-display text-xl leading-none uppercase truncate max-w-[220px]">${esc(day.name)}</div>
         <div class="text-xs t-muted tabular-nums mt-1"><span id="gymElapsed">00:00</span> · <span id="gymProgText">0/0 set</span></div>
       </div>
       <button onclick="finishAndLogWorkout()" class="t-btn-outline h-11 px-4 rounded-full text-sm">Bitir</button>
     </div>
-    <div class="h-1 rounded-full bg-[#1E1E21] overflow-hidden"><div id="gymProgBar" class="h-full bg-[#1FD1C1] transition-all duration-300" style="width:0%"></div></div>
+    <div class="h-1 rounded-full bg-[var(--t-elev)] overflow-hidden"><div id="gymProgBar" class="h-full bg-[var(--t-acc)] transition-all duration-300" style="width:0%"></div></div>
     ${cards || `<div class="t-card rounded-[22px] p-6 text-center text-sm t-muted">Bu günde hareket yok. <button onclick="exitActiveWorkout(); setGymView('program')" class="t-accent font-semibold underline" style="color:#1FD1C1">Programım</button> sekmesinden ekleyebilirsin.</div>`}
     <button onclick="finishAndLogWorkout()" class="t-btn w-full h-14 rounded-2xl text-[16px]">✓ Antrenmanı Bitir ve Kaydet</button>
     <button onclick="uncheckAllSets()" class="t-btn-ghost w-full h-11 rounded-xl text-sm">Tikleri sıfırla</button>`;
@@ -5411,7 +5411,7 @@ function exRightText(ex) {
 function gymProgramHtml() {
   const day = activeDay();
   const nIdx = nextDayIdx();
-  const chips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-4 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-white text-black font-bold" : "bg-[#141416] border border-[#2A2A2E] text-slate-200 font-semibold"}">${esc(d.name)}${i === nIdx ? ' <span class="text-[10px] font-bold" style="color:#1FD1C1">SIRADA</span>' : ""}</button>`).join("");
+  const chips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-4 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "bg-[var(--t-surface)] border border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${esc(d.name)}${i === nIdx ? ' <span class="text-[10px] font-bold" style="color:#1FD1C1">SIRADA</span>' : ""}</button>`).join("");
   const rows = day.exercises.map((ex, i) => {
     const eq = equipOf(ex);
     const meta = [ex.targetInfo, muscleOf(ex), eq ? EQUIP_SHORT[eq] : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
@@ -5430,7 +5430,7 @@ function gymProgramHtml() {
     <div class="grid grid-cols-3 gap-2">
       <button onclick="addWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]">+ Yeni gün</button>
       <button onclick="renameWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]">Adlandır</button>
-      <button onclick="deleteWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]" style="color:#FF8A8A">Günü sil</button>
+      <button onclick="deleteWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]" style="color:var(--t-danger-text)">Günü sil</button>
     </div>
     <div class="space-y-2">
       <div class="flex items-baseline justify-between"><span class="t-label">HAREKETLER</span><span class="text-xs t-dim">${day.exercises.length} hareket · ~${estimateMinutes(day)} dk</span></div>
@@ -5514,7 +5514,7 @@ function libListHtml() {
       <span class="flex-1 min-w-0 flex flex-col gap-1">
         <span class="text-[15px] font-bold">${esc(n)}</span>
         <span class="text-xs t-muted truncate">${esc(meta)}</span>
-        ${inDay.has(exKey(n)) ? `<span class="self-start text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#1B5E58] bg-[#0B2624]" style="color:#1FD1C1">PROGRAMDA</span>` : ""}
+        ${inDay.has(exKey(n)) ? `<span class="self-start text-[10px] font-bold px-2 py-0.5 rounded-full border border-[var(--t-panel-line)] bg-[var(--t-panel)]" style="color:#1FD1C1">PROGRAMDA</span>` : ""}
       </span>
       <button onclick="openExerciseModal({ name: ${esc(JSON.stringify(n))}, kind: detectKind(${esc(JSON.stringify(n))}) })" aria-label="${esc(n)} hareketini ${esc(activeDay().name)} gününe ekle" class="t-btn-outline w-11 h-11 rounded-xl flex items-center justify-center">${svgI("plus", 20, 2.4)}</button>
     </div>`;
@@ -5536,7 +5536,7 @@ function gymLibraryHtml() {
   });
   const n = sel ? counts[sel] || 0 : 0;
   const tag = n === 0 ? "henüz çalışılmadı" : n < 10 ? "az" : n <= 20 ? "ideal aralıkta" : "yüksek hacim";
-  const rangeBtn = (k, l) => `<button onclick="setLibRange('${k}')" aria-pressed="${range === k}" class="h-11 rounded-[11px] text-[13px] ${range === k ? "bg-white text-black font-bold" : "t-muted font-semibold"}">${l}</button>`;
+  const rangeBtn = (k, l) => `<button onclick="setLibRange('${k}')" aria-pressed="${range === k}" class="h-11 rounded-[11px] text-[13px] ${range === k ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "t-muted font-semibold"}">${l}</button>`;
   const rangeTxt = range === "today" ? "Bugünkü set sayısına göre" : range === "program" ? "Programının bir haftada verdiği set sayısı" : "Bu haftaki set sayısına göre";
   const rangeWord = range === "today" ? "Bugün" : range === "program" ? "Programında haftada" : "Bu hafta";
   const pTotal = range !== "today" ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
@@ -5545,16 +5545,16 @@ function gymLibraryHtml() {
     const tg = c === 0 ? "yok" : c < 10 ? "az" : c <= 20 ? "ideal" : "yüksek";
     const col = c === 0 ? "#3A3A40" : c < 10 ? "#3E8F88" : c <= 20 ? "#14D9C6" : "#00FFE5";
     return `<button onclick="selectMuscle(${esc(JSON.stringify(m))})" class="w-full min-h-[44px] flex items-center gap-2.5 text-left">
-      <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-white font-bold" : "text-slate-200"} truncate">${esc(m)}</span>
-      <span class="relative flex-1 h-2.5 rounded-full bg-[#1E1E21] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / 24 * 100)}%;background:${col}"></span></span>
-      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-white">${c}</b> <span class="t-dim text-[11px]">${tg}</span></span>
+      <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} truncate">${esc(m)}</span>
+      <span class="relative flex-1 h-2.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / 24 * 100)}%;background:${col}"></span></span>
+      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b> <span class="t-dim text-[11px]">${tg}</span></span>
     </button>`;
   }).join("") : "";
   return `
     <div class="flex items-center justify-between">
-      <div class="flex flex-col"><span class="t-label">KAS YÜKÜ</span><span class="text-[13px] text-slate-200">${rangeTxt}</span></div>
+      <div class="flex flex-col"><span class="t-label">KAS YÜKÜ</span><span class="text-[13px] text-[var(--t-text2)]">${rangeTxt}</span></div>
     </div>
-    <div class="grid grid-cols-3 gap-0.5 bg-[#141416] border border-[#2A2A2E] rounded-[14px] p-0.5">${rangeBtn("week", "Bu hafta")}${rangeBtn("today", "Bugün")}${rangeBtn("program", "Programım")}</div>
+    <div class="grid grid-cols-3 gap-0.5 bg-[var(--t-surface)] border border-[var(--t-line)] rounded-[14px] p-0.5">${rangeBtn("week", "Bu hafta")}${rangeBtn("today", "Bugün")}${rangeBtn("program", "Programım")}</div>
     <div class="flex justify-center">
       <div class="relative" style="width: min(100%, 340px); aspect-ratio: 765 / 1024;">
         <img src="anatomy.jpg" alt="Önden ve arkadan kas anatomisi" class="absolute inset-0 w-full h-full select-none" draggable="false" />
@@ -5582,10 +5582,10 @@ function gymLibraryHtml() {
       <p class="text-[12px] t-dim pt-1.5">Pazartesiden bu yana kaydedilen setler. Kas gelişimi için genel öneri haftada 10–20 set.</p>
     </div>` : ""}
     ${sel ? `<div class="t-card rounded-[18px] min-h-[64px] px-4 flex items-center justify-between gap-2">
-      <span class="flex flex-col gap-0.5"><span class="text-base font-bold">${esc(sel)}</span><span class="text-[13px] t-muted">${rangeWord} <b class="text-white">${n} set</b> · ${range === "program" && n === 0 ? "programında yok" : tag}</span></span>
+      <span class="flex flex-col gap-0.5"><span class="text-base font-bold">${esc(sel)}</span><span class="text-[13px] t-muted">${rangeWord} <b class="text-[var(--t-text)]">${n} set</b> · ${range === "program" && n === 0 ? "programında yok" : tag}</span></span>
       <button onclick="selectMuscle(null)" class="t-btn-ghost h-11 px-3 rounded-xl text-[13px]">Temizle</button>
     </div>` : ""}
-    <label class="flex items-center gap-2.5 h-12 rounded-[14px] bg-[#141416] border border-[#2A2A2E] px-3.5 t-muted">
+    <label class="flex items-center gap-2.5 h-12 rounded-[14px] bg-[var(--t-surface)] border border-[var(--t-line)] px-3.5 t-muted">
       ${svgI("search", 18)}
       <span class="sr-only">Hareket ara</span>
       <input type="text" value="${esc(libSearchQ)}" oninput="onLibSearch(this.value)" placeholder="135+ hareket içinde ara" class="t-search flex-1 min-w-0" />
@@ -5653,8 +5653,8 @@ function openExSheet(exIdx) {
     const r = platesFor(W, num(state.settings.barKg, 20));
     plateSub = r.ok && r.list.length ? `${fmtKg(W)} kg: her tarafa ${r.list.map(fmtKg).join(" + ")}` : "Isınma setleri ve plaka dağılımı";
   } else if (ex.kind === "weight" && usesLevels(ex)) plateSub = levelListOf(ex) ? "Isınma setleri ve makine kademeleri" : "Önce kademeleri tanımla";
-  const item = (fn, icon, label, sub, extra = "") => `<button onclick="closeModal('exSheet'); ${fn}" class="w-full min-h-[60px] rounded-2xl px-2.5 flex items-center gap-3.5 bg-[#1A1A1D] text-left ${extra}">
-      <span class="w-10 h-10 shrink-0 rounded-xl bg-[#26262A] flex items-center justify-center" style="color:#1FD1C1">${svgI(icon, 20, 1.9)}</span>
+  const item = (fn, icon, label, sub, extra = "") => `<button onclick="closeModal('exSheet'); ${fn}" class="w-full min-h-[60px] rounded-2xl px-2.5 flex items-center gap-3.5 bg-[var(--t-elev0)] text-left ${extra}">
+      <span class="w-10 h-10 shrink-0 rounded-xl bg-[var(--t-elev2)] flex items-center justify-center" style="color:#1FD1C1">${svgI(icon, 20, 1.9)}</span>
       <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold">${label}</span>${sub ? `<span class="text-xs t-muted truncate">${esc(sub)}</span>` : ""}</span>
       <span class="t-dim">${svgI("chevR", 18)}</span></button>`;
   $("exSheetBody").innerHTML = `
@@ -5664,14 +5664,14 @@ function openExSheet(exIdx) {
     ${ex.kind === "weight" && eq !== "bodyweight" ? item(`openPlateTool(${exIdx})`, "calc", eq === "plates" ? "Plaka ve ısınma" : "Kademe ve ısınma", plateSub) : ""}
     ${item(`openEditExercise(${exIdx})`, "edit", "Hareketi düzenle", ex.kind === "weight" ? "Set, tekrar, ekipman, kademeler, kas grubu" : "Set, süre, dinlenme")}
     <div class="grid grid-cols-2 gap-1.5">
-      <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, -1)" ${exIdx === 0 ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[#1A1A1D] flex items-center justify-center gap-2 text-[14px] font-semibold ${exIdx === 0 ? "opacity-30" : ""}">${svgI("up", 18)} Yukarı taşı</button>
-      <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, 1)" ${last ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[#1A1A1D] flex items-center justify-center gap-2 text-[14px] font-semibold ${last ? "opacity-30" : ""}">${svgI("down", 18)} Aşağı taşı</button>
+      <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, -1)" ${exIdx === 0 ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[var(--t-elev0)] flex items-center justify-center gap-2 text-[14px] font-semibold ${exIdx === 0 ? "opacity-30" : ""}">${svgI("up", 18)} Yukarı taşı</button>
+      <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, 1)" ${last ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[var(--t-elev0)] flex items-center justify-center gap-2 text-[14px] font-semibold ${last ? "opacity-30" : ""}">${svgI("down", 18)} Aşağı taşı</button>
     </div>
     ${ex.sets.length > 1 ? item(`removeLastSetFromExercise(${exIdx})`, "minus", ex.kind === "cardio" ? "Son bölümü sil" : "Son seti sil", `${ex.sets.length} → ${ex.sets.length - 1}`) : ""}
-    <button onclick="closeModal('exSheet'); removeExercise(${exIdx})" class="w-full min-h-[60px] rounded-2xl px-2.5 flex items-center gap-3.5 bg-[#1A1A1D] text-left mt-1" style="color:#FF8A8A">
-      <span class="w-10 h-10 shrink-0 rounded-xl bg-[#2A1517] flex items-center justify-center">${svgI("trash", 20, 1.9)}</span>
+    <button onclick="closeModal('exSheet'); removeExercise(${exIdx})" class="w-full min-h-[60px] rounded-2xl px-2.5 flex items-center gap-3.5 bg-[var(--t-elev0)] text-left mt-1" style="color:#FF8A8A">
+      <span class="w-10 h-10 shrink-0 rounded-xl bg-[var(--t-danger-bg)] flex items-center justify-center">${svgI("trash", 20, 1.9)}</span>
       <span class="flex-1 flex flex-col gap-0.5"><span class="text-[15px] font-semibold">Hareketi kaldır</span><span class="text-xs t-muted">6 saniye içinde geri alınabilir</span></span></button>
-    <button onclick="closeModal('exSheet')" class="w-full h-[52px] rounded-2xl bg-[#26262A] font-bold text-[15px] mt-2">Kapat</button>`;
+    <button onclick="closeModal('exSheet')" class="w-full h-[52px] rounded-2xl bg-[var(--t-elev2)] font-bold text-[15px] mt-2">Kapat</button>`;
   openModal("exSheet");
 }
 
@@ -5762,7 +5762,7 @@ document.addEventListener("pointermove", e => {
   if (best !== mealDrag.to) {
     if (mealDrag.cards[mealDrag.to] && mealDrag.to !== mealDrag.from) mealDrag.cards[mealDrag.to].style.outline = "";
     mealDrag.to = best;
-    if (best !== mealDrag.from) mealDrag.cards[best].style.outline = mealDrag.kind === "mob" ? "2px dashed #B3A6FF" : isEx ? "2px dashed #1FD1C1" : "2px dashed #22C55E";
+    if (best !== mealDrag.from) mealDrag.cards[best].style.outline = mealDrag.kind === "mob" ? "2px dashed var(--t-acc-text)" : isEx ? "2px dashed var(--t-acc-text)" : "2px dashed #22C55E";
   }
 });
 function endMealDrag() {
@@ -6607,8 +6607,8 @@ function renderMissList() {
   if (!el) return;
   const l = state.missSearches || [];
   el.innerHTML = l.length
-    ? l.map(x => `<span class="px-3 py-2 rounded-full bg-[#1E1E21] text-[13px]" data-miss="${esc(x.q)}">${esc(x.q)}${num(x.n, 1) > 1 ? ` <span class="text-[#8B8B93]">×${num(x.n, 1)}</span>` : ""}</span>`).join("")
-    : `<span class="text-[13px] text-[#8B8B93]">Henüz yok.</span>`;
+    ? l.map(x => `<span class="px-3 py-2 rounded-full bg-[var(--t-elev)] text-[13px]" data-miss="${esc(x.q)}">${esc(x.q)}${num(x.n, 1) > 1 ? ` <span class="text-[var(--t-dim)]">×${num(x.n, 1)}</span>` : ""}</span>`).join("")
+    : `<span class="text-[13px] text-[var(--t-dim)]">Henüz yok.</span>`;
   $("missClear").classList.toggle("hidden", !l.length);
 }
 // Besin kartındaki kaynak satırı
