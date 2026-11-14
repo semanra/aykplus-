@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "python3 tests/run_all.py"
+    "test": "python3 tests/run_all.py",
+    "kontrol": "python3 scripts/kontrol/kontrol.py"
   },
   "devDependencies": {
     "@zxing/library": "^0.21.3",

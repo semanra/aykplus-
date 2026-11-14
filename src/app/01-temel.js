@@ -98,6 +98,9 @@ function makeCardioRow(min = 30, km = "", lvl = "") { return { min, km, lvl, don
 const EFFORT_LABELS = { 1: "Kolay", 2: "Orta", 3: "Zor", 4: "Tükeniş" };
 const EFFORT_COLORS = { 1: "#4ADE80", 2: "#1FD1C1", 3: "#FBBF24", 4: "#FF5A5F" };
 function normalizeExercise(ex) {
+  // v35: adı okunamayan hareket silinmez, "Adsız hareket" olur; boş/bozuk set kayıtları atılır
+  if (typeof ex.name !== "string" || !ex.name.trim()) ex.name = String(ex.name == null || typeof ex.name === "object" ? "" : ex.name).trim() || "Adsız hareket";
+  if (Array.isArray(ex.sets)) ex.sets = ex.sets.filter(isObj);
   if (!ex.kind) {
     ex.kind = detectKind(ex.name);
     if (ex.kind === "cardio") {
@@ -139,7 +142,14 @@ function normItems(items) {
 }
 function normMealList(list) {
   if (!Array.isArray(list)) return [];
-  return list.filter(isObj).map(m => { m.items = normItems(m.items); return m; });
+  return list.filter(isObj).map((m, i) => {
+    m.items = normItems(m.items);
+    // v35: metin alanları metin olsun (sayı/boş değer ekranları bozmasın); değer uydurulmaz, yalnızca yer tutucu
+    if (typeof m.title !== "string" || !m.title.trim()) m.title = (m.title != null && typeof m.title !== "object" ? String(m.title) : "").trim() || `${i + 1}. Öğün`;
+    if (m.targetNote != null && typeof m.targetNote !== "string") m.targetNote = typeof m.targetNote === "object" ? "" : String(m.targetNote);
+    if (m.time != null && (typeof m.time !== "string" || !/^\d{1,2}:\d{2}$/.test(m.time))) delete m.time;
+    return m;
+  });
 }
 
 // v27: MOBİLİTE VERİSİ — eski "uygulama" yazısını (örn. "Sağ ve Sol için 2'şer Set x 30 sn") alanlara çevirir.
@@ -206,6 +216,8 @@ function normalizeState(raw) {
   if (!Array.isArray(s.workoutDays) || s.workoutDays.length === 0) s.workoutDays = clone(DEFAULT_STATE.workoutDays);
   s.workoutDays.forEach(day => {
     if (!Array.isArray(day.exercises)) day.exercises = [];
+    day.exercises = day.exercises.filter(isObj);   // v35: boş/bozuk hareket kaydı bütün veriyi okunamaz yapmasın
+    if (typeof day.name !== "string" || !day.name.trim()) day.name = (day.name != null && typeof day.name !== "object" ? String(day.name) : "").trim() || "Antrenman günü";
     day.exercises.forEach(normalizeExercise);
   });
   if (!isObj(s.mobilityRoutine)) s.mobilityRoutine = clone(DEFAULT_STATE.mobilityRoutine);
@@ -218,7 +230,18 @@ function normalizeState(raw) {
   if (!isObj(s.mobilityLog)) s.mobilityLog = {};
   if (!Array.isArray(s.workoutLogs)) s.workoutLogs = [];
   if (!Array.isArray(s.weightLogs)) s.weightLogs = [];
-  if (!s.exerciseHistory || typeof s.exerciseHistory !== "object") s.exerciseHistory = {};
+  // v35: boş (null) / bozuk kayıtlar atılır; geçerli kayıtlar ve alanları olduğu gibi kalır
+  s.workoutLogs = s.workoutLogs.filter(isObj);
+  s.workoutLogs.forEach(l => { if (l.dayName != null && typeof l.dayName !== "string") l.dayName = typeof l.dayName === "object" ? "" : String(l.dayName); });
+  s.weightLogs = s.weightLogs.filter(isObj);
+  if (!isObj(s.exerciseHistory)) s.exerciseHistory = {};
+  Object.keys(s.exerciseHistory).forEach(k => {
+    const arr = s.exerciseHistory[k];
+    if (!Array.isArray(arr)) { delete s.exerciseHistory[k]; return; }
+    const ok = arr.filter(h => isObj(h) && num(h.ts, 0) > 0);
+    ok.forEach(h => { h.sets = Array.isArray(h.sets) ? h.sets.filter(isObj) : []; });
+    if (ok.length) s.exerciseHistory[k] = ok; else delete s.exerciseHistory[k];
+  });
   if (!isObj(s.dailyLogs)) s.dailyLogs = {};
   // v25: boş günlük kayıtlar atılır, içlerindeki öğünler temizlenir
   Object.keys(s.dailyLogs).forEach(k => {
@@ -227,6 +250,7 @@ function normalizeState(raw) {
     if (d.meals != null) { if (Array.isArray(d.meals)) d.meals = normMealList(d.meals); else delete d.meals; }
   });
   if (!Array.isArray(s.recentFoods)) s.recentFoods = [];
+  s.recentFoods = s.recentFoods.filter(x => typeof x === "string" && x);   // v35
   if (!isObj(s.customFoods)) s.customFoods = {};
   // v25: özel besin kayıtları: boşlar atılır, değerler sayıya çevrilir, tarif malzemeleri temizlenir
   Object.keys(s.customFoods).forEach(id => {
@@ -244,7 +268,8 @@ function normalizeState(raw) {
   if (!s.supplements || typeof s.supplements !== "object") s.supplements = {};
   if (!Array.isArray(s.supplementList)) s.supplementList = clone(DEFAULT_SUPPS);
   // v17: zamanlama etiketi doğrulaması
-  s.supplementList = s.supplementList.filter(x => x && typeof x === "object" && x.id && x.name);
+  s.supplementList = s.supplementList.filter(x => x && typeof x === "object" && x.id && x.name && typeof x.name !== "object");
+  s.supplementList.forEach(x => { x.id = String(x.id); x.name = String(x.name); });   // v35
   s.supplementList.forEach(x => {
     if (!["morning", "pre", "post", "bed", "custom"].includes(x.time)) delete x.time;
     if (x.time === "custom") x.timeLabel = String(x.timeLabel || "Özel").slice(0, 24); else delete x.timeLabel;
@@ -252,6 +277,7 @@ function normalizeState(raw) {
   });
   s.restMeals = normMealList(s.restMeals);   // v25
   if (!Array.isArray(s.measurements)) s.measurements = [];
+  s.measurements = s.measurements.filter(isObj);   // v35
   if (!num(s.workoutStartedAt, 0)) s.workoutStartedAt = 0;
   // v10: antrenman ve dinlenme menüleri her zaman ayrı
   if (!s.restMeals.length) s.restMeals = clone(s.meals).map(mm => ({ ...mm, id: (mm.id || "meal") + "_rest", done: false }));
@@ -318,6 +344,8 @@ function normalizeState(raw) {
   s.deficit = num(s.deficit, 700);
   s.waterLiters = num(s.waterLiters, 0);
   if (!s.createdAt) s.createdAt = Date.now();
+  // v35: bozuk "bugün" tarihi gün geçişini sessizce durdurmasın (checkNewDay bugünün tarihini yazar; arşivlenecek gün uydurulmaz)
+  if (typeof s.today !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s.today)) delete s.today;
   return s;
 }
 

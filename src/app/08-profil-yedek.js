@@ -51,6 +51,7 @@ async function closeProfile() {
 function closeSettings() { hideProfile(); }
 
 function renderProfile() {
+  $("pfRescue").classList.toggle("hidden", !rescueText());   // v35
   document.querySelectorAll("[data-theme-opt]").forEach(b => { const on = b.dataset.themeOpt === state.settings.theme; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
   // Kilo kayıtları
@@ -75,7 +76,7 @@ function renderProfile() {
   // Günlük hedefler (hesaplanan)
   const t = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
-    ${[["Kalori", Math.round(t.calTarget).toLocaleString("tr-TR"), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[10px] t-dim">${u}</div></div>`).join("")}
+    ${[["Kalori", Math.round(t.calTarget).toLocaleString("tr-TR"), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
   </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme) ve Beslenme sekmesindeki açık ayarından hesaplanır.</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
@@ -164,33 +165,45 @@ async function askConfirm(title, message, ok = "Devam et", danger = false) {
 // ---------------------------------------------------------------------------
 function markBackup() { state.lastBackupAt = Date.now(); state.backupSnoozeUntil = 0; saveState(); renderBanner(); }
 
-async function exportBackupFile() {
-  const json = JSON.stringify(state);
-  const name = `AYK-yedek-${todayStr()}.json`;
+// v35: metni dosya olarak paylaş (iPhone: Dosyalar'a Kaydet) veya indir — yedek ve kurtarma kopyası ortak
+async function saveTextFile(text, name, title) {
   let file = null;
-  try { file = new File([json], name, { type: "application/json" }); } catch (e) { file = null; }
+  try { file = new File([text], name, { type: "application/json" }); } catch (e) { file = null; }
   if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], title: "AYK+ Yedek" });
-      markBackup();
-      toast("Yedek paylaşıldı. 'Dosyalar'a Kaydet'i seçtiysen güvende.");
-      return;
-    } catch (e) {
-      if (e && e.name === "AbortError") return;
-    }
+    try { await navigator.share({ files: [file], title }); return "shared"; }
+    catch (e) { if (e && e.name === "AbortError") return "aborted"; }
   }
   try {
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
-    markBackup();
-    toast("Yedek dosyası indirildi");
-  } catch (e) {
-    toast("Dosya oluşturulamadı. Ayarlar > Yedek kodu ile kopyala.", "error");
-  }
+    return "downloaded";
+  } catch (e) { return "failed"; }
+}
+async function exportBackupFile() {
+  const r = await saveTextFile(JSON.stringify(state), `AYK-yedek-${todayStr()}.json`, "AYK+ Yedek");
+  if (r === "shared") { markBackup(); toast("Yedek paylaşıldı. 'Dosyalar'a Kaydet'i seçtiysen güvende."); }
+  else if (r === "downloaded") { markBackup(); toast("Yedek dosyası indirildi"); }
+  else if (r === "failed") toast("Dosya oluşturulamadı. Ayarlar > Yedek kodu ile kopyala.", "error");
+}
+
+// v35: KURTARMA KOPYASI — açılışta okunamayan kaydın ham hâli (RESCUE_KEY). Önceden yalnızca saklanıyordu,
+// telefondan ulaşılamıyordu; artık Profil → Yedekleme'den indirilebilir, geri yüklenmeye çalışılabilir, silinebilir.
+function rescueText() { try { return localStorage.getItem(RESCUE_KEY) || ""; } catch (e) { return ""; } }
+async function downloadRescue() {
+  const t = rescueText(); if (!t) return;
+  const r = await saveTextFile(t, `AYK-kurtarma-${todayStr()}.json`, "AYK+ kurtarma kopyası");
+  if (r === "shared" || r === "downloaded") toast("Kurtarma kopyası kaydedildi");
+  else if (r === "failed") toast("Dosya oluşturulamadı.", "error");
+}
+async function restoreRescue() { const t = rescueText(); if (t) await restoreFromText(t); }
+async function deleteRescue() {
+  if (!(await askConfirm("Kurtarma kopyası silinsin mi?", "Okunamayan eski verinin kopyası telefondan silinir. Önce indirdiysen dosyan güvende.", "Sil", true))) return;
+  try { localStorage.removeItem(RESCUE_KEY); } catch (e) { /* yok sayılır */ }
+  renderProfile();
+  toast("Kurtarma kopyası silindi");
 }
 
 async function restoreFromText(text) {

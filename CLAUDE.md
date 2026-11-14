@@ -38,11 +38,14 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 27 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 28 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+pip install pillow   # ilk seferde (kontrol aracı için)
+npm run kontrol      # son commit ile karşılaştırma: 36 ekran × 2 tema piksel farkı + okunurluk/44 px/taşma + hız (`-- --hizli` hızsız)
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
 - Testler `tests/shots/` klasörüne ekran görüntüsü kaydeder (git'e girmez). Görsel değişikliklerde bu görüntülere bakıp kontrol et.
+- **Kontrol araçları (v35, `scripts/kontrol/`):** `kontrol.py` (= `npm run kontrol`; rapor `build/kontrol/RAPOR.md`, fark görselleri `build/kontrol/fark/`; ekran listesi ve ölçüm betiği `ortak.py` içinde, yeni ekran eklenince oraya da ekle), `bozuk_veri.py [N] [tohum]` (kaydın rastgele alanlarını bozar; açılışta kurtarma kopyasına düşme ve sayfa hatası sayar, hedef 0), `html_enjeksiyon.py` (20 kullanıcı alanına HTML/JS parçası yazıp 34 ekranı açar). Veri yapısı veya normalizeState değişince `bozuk_veri.py` ve `html_enjeksiyon.py`'yi de çalıştır.
 - Testler açılış animasyonunu (splash) bir başlangıç betiğiyle atlar; yeni testlerde de aynı `add_init_script` satırını kullan.
 
 ## 4. Sürüm çıkarma kontrol listesi (her değişiklikte)
@@ -51,14 +54,14 @@ npm test             # 27 test paketi, gerçek Chromium'da iPhone boyutunda; hep
 2. Yeni özellik için `tests/` altına test ekle veya mevcut testi güncelle.
 3. `src/markup.html` içindeki sürüm etiketini artır: `AYK+ vN` (Ayarlar'ın en altında görünür).
 4. `sw.js` içindeki `const CACHE = 'aykplus-vN'` değerini artır (artırılmazsa telefon eski sürümü göstermeye devam edebilir). Yeni statik dosya eklediysen `FILES` listesine ekle.
-5. `npm run build` → `npm test` (hepsi geçmeli). Derleme çıktısında "✓ index.html oluşturuldu" yazdığını kontrol et (sözdizimi hatasında derleme durur ve eski index.html kalır).
+5. `npm run build` → `npm test` (hepsi geçmeli) → `npm run kontrol -- --hizli` (yalnızca bilinçli görsel farklar, ölçüm temiz). Derleme çıktısında "✓ index.html oluşturuldu" yazdığını kontrol et (sözdizimi hatasında derleme durur ve eski index.html kalır).
 6. Açıklayıcı Türkçe mesajla commit et ve `main`'e gönder.
 7. Kullanıcıya kısa Türkçe özet yaz: ne değişti, telefonda ne yapması gerekiyor (genelde: "uygulamayı iki kez tamamen kapatıp aç").
 
 ## 5. Kesin kurallar
 
 - **Depolama anahtarı `ayk_plus_v5_state` asla değişmez.** Yeni alanlar `normalizeState()` içinde varsayılan değerle eklenir; eski kullanıcı verisi her zaman göç ettirilir, asla silinmez.
-- **Kullanıcı verisi kutsaldır.** Veri yapısını değiştiren her işte, eski formatla kaydedilmiş veriyle test yaz (bkz. `test_v6_temel.py` içindeki "legacy" tohum verisi, `test_v25_guvenlik.py` içindeki bozuk kayıt). `dailyLogs` özetleri hiç silinmez (v25'te 180 gün sınırı kaldırıldı; yalnızca öğün içerikleri son 7 günde tutulur). `normalizeState` öğün/kalem/özel besin/günlük kayıtları `normItems` / `normMealList` / `isObj` ile temizler (boş kayıt atılır, metin miktar sayıya çevrilir, okunamayan miktar 0 olur; değer uydurulmaz). Kayıt yine de okunamazsa `loadState` ham veriyi `ayk_plus_v5_state_kurtarma` anahtarına kopyalar (varsa üzerine yazmaz) ve açılışta uyarır; bozuk yedek geri yüklenirken mevcut veri değişmez.
+- **Kullanıcı verisi kutsaldır.** Veri yapısını değiştiren her işte, eski formatla kaydedilmiş veriyle test yaz (bkz. `test_v6_temel.py` içindeki "legacy" tohum verisi, `test_v25_guvenlik.py` içindeki bozuk kayıt). `dailyLogs` özetleri hiç silinmez (v25'te 180 gün sınırı kaldırıldı; yalnızca öğün içerikleri son 7 günde tutulur). `normalizeState` öğün/kalem/özel besin/günlük kayıtları `normItems` / `normMealList` / `isObj` ile temizler (boş kayıt atılır, metin miktar sayıya çevrilir, okunamayan miktar 0 olur; değer uydurulmaz). Kayıt yine de okunamazsa `loadState` ham veriyi `ayk_plus_v5_state_kurtarma` anahtarına kopyalar (varsa üzerine yazmaz) ve açılışta uyarır; bozuk yedek geri yüklenirken mevcut veri değişmez. v35: kurtarma kopyası Profil → Yedekleme'de `#pfRescue` kartında görünür (İndir `downloadRescue` / Geri yükle `restoreRescue` / Sil `deleteRescue`; dosya kaydı `saveTextFile` ile yedekle ortak). Tek bir bozuk kayıt (nesne olmayan hareket/set/oturum/kayıt, sayı olan ad) artık bütün kaydı okunamaz yapmaz: `normalizeState` yalnızca o kaydı atar, adı metne çevirir (`test_v35_veri.py`). Bozuk `state.today` silinir; kayıttaki gün bugünden ≥ 2 gün ilerideyse (telefon saati ileri alınmış) arşivlenmeden bugüne çekilir — 1 gün geri olması gün geçiş saati değişiminde normaldir, dokunulmaz (`checkNewDay`).
 - **Kullanıcı metni HTML'e eklenirken her zaman `esc()`** kullan. `onclick` içine metin geçirirken `esc(JSON.stringify(metin))` kalıbını kullan.
 - **Sayılar:** Kullanıcı Türkçe ondalık virgül yazar. Okurken `num()`, gösterirken `fmtNum()` (1 ondalık) veya `fmtKg()` (2 ondalık; 1,25 kg plakalar için) kullan. Sayı girişleri `type="text" inputmode="decimal"`.
 - **Dokunma alanı en az 44 px.** Buton ve ikonlar küçük olmamalı; kullanıcı bunu açıkça istedi.
@@ -163,6 +166,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 **v33 (temizlik, 14 Kasım 2026):** kullanılmayan 9 işlev (eski besin seçici, eski öğün düzenleme/taşıma, eski grafik açıcı vb.), her zaman gizli olan antrenman özet kutusu ve her saniye boşuna çalışan süresi, eski renk çeviri katmanları (`.tm`/`.nm` → `--w-*` değişkenleri), kullanılmayan CSS sınıfları ve var olmayan pencereye gönderme silindi; bildirim/başlık emojileri kaynaktan kaldırıldı (çalışma anında silen kod da kalktı). Yedek uyarı bandı yeni tasarımda (44 px düğmeler, aydınlıkta okunur), sayaç bitiş uyarısı ve paylaşım kartı yeni temada, açılış ekranı turkuaz. Doğrulama: v32 ile 36 ekran × 2 tema piksel karşılaştırması (yalnızca bilinçli farklar), iki temada okunurluk ölçümü temiz.
 
 **v34 (hız + düzen, 14 Kasım 2026):** yalnızca açık sekme/alt ekran çiziliyor (her dokunuş ~19 ms → ~5 ms; 4× yavaş işlemcide ~180 ms → ~30 ms); `src/app.js` 13 dosyaya bölündü (`src/app/`, derleme sırasında birleşir, içerik aynı).
+
+**v35 (veri güvenliği + kontrol araçları, 14 Kasım 2026):** `npm run kontrol`, bozuk veri ve HTML deneme araçları; tek bozuk kayıt yüzünden tüm verinin okunamaz sayılması düzeltildi; kurtarma kopyasına Profil'den erişim; bozuk/ileri tarihli `today`; en küçük yazılar 11 px.
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 

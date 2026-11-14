@@ -296,7 +296,7 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   }
   let lastDone = -1;
   ex.sets.forEach((x, j) => { if (x.done) lastDone = j; });
-  const effLbl = s.done && EFFORT_LABELS[s.e] ? `<span class="block font-sans text-[10px] font-bold leading-none mt-0.5" style="color:${EFFORT_COLORS[s.e]}">${EFFORT_LABELS[s.e]}</span>` : "";
+  const effLbl = s.done && EFFORT_LABELS[s.e] ? `<span class="block font-sans text-[11px] font-bold leading-none mt-0.5" style="color:${EFFORT_COLORS[s.e]}">${EFFORT_LABELS[s.e]}</span>` : "";
   return `<div class="rounded-2xl ${rowCls}"><div class="grid items-center gap-2 h-14 px-1" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px">
     <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-[var(--t-warn-icon)] text-sm">★</span>' : ""}${effLbl}</span>
     <span class="text-[13px] t-dim truncate">${prev}</span>
@@ -381,7 +381,7 @@ function exRightText(ex) {
 function gymProgramHtml() {
   const day = activeDay();
   const nIdx = nextDayIdx();
-  const chips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-4 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "bg-[var(--t-surface)] border border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${esc(d.name)}${i === nIdx ? ' <span class="text-[10px] font-bold" style="color:#1FD1C1">SIRADA</span>' : ""}</button>`).join("");
+  const chips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-4 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "bg-[var(--t-surface)] border border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${esc(d.name)}${i === nIdx ? ' <span class="text-[11px] font-bold" style="color:#1FD1C1">SIRADA</span>' : ""}</button>`).join("");
   const rows = day.exercises.map((ex, i) => {
     const eq = equipOf(ex);
     const meta = [ex.targetInfo, muscleOf(ex), eq ? EQUIP_SHORT[eq] : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
@@ -484,7 +484,7 @@ function libListHtml() {
       <span class="flex-1 min-w-0 flex flex-col gap-1">
         <span class="text-[15px] font-bold">${esc(n)}</span>
         <span class="text-xs t-muted truncate">${esc(meta)}</span>
-        ${inDay.has(exKey(n)) ? `<span class="self-start text-[10px] font-bold px-2 py-0.5 rounded-full border border-[var(--t-panel-line)] bg-[var(--t-panel)]" style="color:#1FD1C1">PROGRAMDA</span>` : ""}
+        ${inDay.has(exKey(n)) ? `<span class="self-start text-[11px] font-bold px-2 py-0.5 rounded-full border border-[var(--t-panel-line)] bg-[var(--t-panel)]" style="color:#1FD1C1">PROGRAMDA</span>` : ""}
       </span>
       <button onclick="openExerciseModal({ name: ${esc(JSON.stringify(n))}, kind: detectKind(${esc(JSON.stringify(n))}) })" aria-label="${esc(n)} hareketini ${esc(activeDay().name)} gününe ekle" class="t-btn-outline w-11 h-11 rounded-xl flex items-center justify-center">${svgI("plus", 20, 2.4)}</button>
     </div>`;

@@ -347,7 +347,7 @@ function renderPlateTool() {
       return `<div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-lg px-2.5 py-1.5">
         <span class="text-[var(--w-muted)] w-14 shrink-0">${w.label}</span>
         <span class="font-bold text-[var(--w-text1)]">${fmtKg(w.kg)} kg × ${w.reps}</span>
-        <span class="text-[10px] text-[var(--w-dim)] text-right truncate">${pr && pr.ok && pr.list.length ? "taraf: " + pr.list.map(fmtKg).join("+") : ""}</span>
+        <span class="text-[11px] text-[var(--w-dim)] text-right truncate">${pr && pr.ok && pr.list.length ? "taraf: " + pr.list.map(fmtKg).join("+") : ""}</span>
       </div>`;
     }).join("")}
     <div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-panel)] border border-[var(--w-panel-line)] rounded-lg px-2.5 py-1.5">

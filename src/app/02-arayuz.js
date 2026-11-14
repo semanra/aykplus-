@@ -266,6 +266,10 @@ function resetDaily() {
 function checkNewDay() {
   const t = logicalToday();
   if (!state.today) { state.today = t; return false; }
+  // v35: telefonun saati ileri alınmışken kaydedilen tarih bugünden en az 2 gün ilerideyse bugüne çekilir (tikler silinmez,
+  // arşiv yazılmaz); eskiden gün geçişi o tarihe kadar hiç çalışmıyordu. 1 günlük geri gidiş meşrudur (Gün geçişi saati
+  // ileri alınınca mantıksal gün bir gün geri gider) — o durumda dokunulmaz, yoksa dünün arşivi bugünün verisiyle ezilirdi.
+  if (state.today > t && (Date.parse(state.today) - Date.parse(t)) / DAY_MS >= 2) { state.today = t; return false; }
   if (t > state.today) {   // yalnızca ileri gidince (gün geçişi saati ileri alınınca aynı gün tekrar arşivlenmez)
     archiveDay(state.today);
     resetDaily();

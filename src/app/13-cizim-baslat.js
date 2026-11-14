@@ -51,7 +51,7 @@ resetTimerUI();
 renderAll();
 updateWakeLock();
 setTimeout(checkFoodHealth, 1500);
-if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Eski verilerin bir kopyası telefonda saklandı; yeni veri girmeden önce yedeğini geri yükle veya yardım iste.", "error"), 300);
+if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
