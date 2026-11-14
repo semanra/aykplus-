@@ -1294,7 +1294,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v36</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v37</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -2200,7 +2200,7 @@ function normalizeState(raw) {
 function loadState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return normalizeState(JSON.parse(saved));
+    if (saved) { const st = normalizeState(JSON.parse(saved)); hadV5State = true; return st; }
     const oldV4 = localStorage.getItem("ayk_plus_v4_state");
     if (oldV4) {
       const o = JSON.parse(oldV4);
@@ -2224,6 +2224,7 @@ function loadState() {
 }
 const RESCUE_KEY = "ayk_plus_v5_state_kurtarma";
 var loadFailed = false;
+var hadV5State = false;   // v37: açılışta bugünkü kayıt vardı ve okundu (eski v4 kaydı ancak o zaman silinir)
 
 let saveFailNotified = false;
 function saveState() {
@@ -2730,9 +2731,12 @@ function applyCustomIcon() {
 }
 // Telefondan seçilen fotoğraf (birkaç MB olabilir) ortadan kare kırpılıp 320×320 JPEG'e küçültülür;
 // böylece telefondaki kayıt alanı dolmaz.
+// v37: dosya yerine kayıtlı fotoğrafın metni (data:image...) de verilebilir.
 function shrinkPhoto(file) {
   return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
+    const isUrl = typeof file === "string";
+    const url = isUrl ? file : URL.createObjectURL(file);
+    const done = () => { if (!isUrl) URL.revokeObjectURL(url); };
     const img = new Image();
     img.onload = () => {
       try {
@@ -2744,9 +2748,9 @@ function shrinkPhoto(file) {
         ctx.fillStyle = "#141416"; ctx.fillRect(0, 0, S, S);
         ctx.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, S, S);
         resolve(cv.toDataURL("image/jpeg", 0.85));
-      } catch (e) { reject(e); } finally { URL.revokeObjectURL(url); }
+      } catch (e) { reject(e); } finally { done(); }
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("okunamadı")); };
+    img.onerror = () => { done(); reject(new Error("okunamadı")); };
     img.src = url;
   });
 }
@@ -2761,6 +2765,23 @@ async function handleIconUpload(event) {
   } catch (e) {
     sayAlert("Fotoğraf yüklenemedi", "Bu fotoğraf açılamadı. Başka bir fotoğraf seçmeyi dene.");
   }
+}
+// v37: v12'den önce (logo alanıyken) fotoğraf küçültülmeden kaydediliyordu; telefondan seçilen tek fotoğraf
+// kayıt alanının neredeyse tamamını tutabiliyordu. Açılışta ve yedek geri yüklenince büyük fotoğraf sessizce
+// 320×320'ye küçültülür. Açılamazsa fotoğrafa dokunulmaz (silinmez).
+const PHOTO_MAX_CHARS = 150000;
+async function slimOldPhoto() {
+  const src = state.customIconDataUrl;
+  if (typeof src !== "string" || src.length <= PHOTO_MAX_CHARS || !src.startsWith("data:image")) return false;
+  try {
+    const small = await shrinkPhoto(src);
+    if (state.customIconDataUrl !== src || !small || small.length >= src.length) return false;
+    state.customIconDataUrl = small;
+    saveState();
+    applyCustomIcon();
+    if ($("pfStorageTxt")) renderStorageMeter();
+    return true;
+  } catch (e) { return false; }
 }
 function removeCustomIcon() {
   if (!state.customIconDataUrl) return;
@@ -5906,6 +5927,7 @@ async function restoreFromText(text) {
   checkNewDay();
   closeSettings();
   renderAll();
+  slimOldPhoto();   // v37: eski yedekteki küçültülmemiş fotoğraf
   toast("Yedek başarıyla geri yüklendi");
   return true;
 }
@@ -8527,6 +8549,11 @@ resetTimerUI();
 resumeTimer();   // v36
 renderAll();
 updateWakeLock();
+// v37: eski sürümlerden kalan yük. (1) Küçültülmemiş eski fotoğraf. (2) Bu uygulamanın ilk sürümlerinin kaydı
+// (ayk_plus_v4_state): içindekiler ilk açılışta bugünkü kayda taşındı, sonra hiç okunmadı ama yer tutmaya devam ediyordu.
+// Yalnızca açılışta bugünkü kayıt zaten vardı ve sorunsuz okunduysa silinir (ilk taşıma açılışında dokunulmaz).
+slimOldPhoto();
+try { if (hadV5State && !loadFailed && localStorage.getItem("ayk_plus_v4_state") != null) localStorage.removeItem("ayk_plus_v4_state"); } catch (e) { /* yok sayılır */ }
 setTimeout(checkFoodHealth, 1500);
 setTimeout(checkStorageWarn, 2500);   // v36
 if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);

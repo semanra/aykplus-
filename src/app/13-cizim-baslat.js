@@ -51,6 +51,11 @@ resetTimerUI();
 resumeTimer();   // v36
 renderAll();
 updateWakeLock();
+// v37: eski sürümlerden kalan yük. (1) Küçültülmemiş eski fotoğraf. (2) Bu uygulamanın ilk sürümlerinin kaydı
+// (ayk_plus_v4_state): içindekiler ilk açılışta bugünkü kayda taşındı, sonra hiç okunmadı ama yer tutmaya devam ediyordu.
+// Yalnızca açılışta bugünkü kayıt zaten vardı ve sorunsuz okunduysa silinir (ilk taşıma açılışında dokunulmaz).
+slimOldPhoto();
+try { if (hadV5State && !loadFailed && localStorage.getItem("ayk_plus_v4_state") != null) localStorage.removeItem("ayk_plus_v4_state"); } catch (e) { /* yok sayılır */ }
 setTimeout(checkFoodHealth, 1500);
 setTimeout(checkStorageWarn, 2500);   // v36
 if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);

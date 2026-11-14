@@ -243,6 +243,7 @@ async function restoreFromText(text) {
   checkNewDay();
   closeSettings();
   renderAll();
+  slimOldPhoto();   // v37: eski yedekteki küçültülmemiş fotoğraf
   toast("Yedek başarıyla geri yüklendi");
   return true;
 }

@@ -395,9 +395,12 @@ function applyCustomIcon() {
 }
 // Telefondan seçilen fotoğraf (birkaç MB olabilir) ortadan kare kırpılıp 320×320 JPEG'e küçültülür;
 // böylece telefondaki kayıt alanı dolmaz.
+// v37: dosya yerine kayıtlı fotoğrafın metni (data:image...) de verilebilir.
 function shrinkPhoto(file) {
   return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
+    const isUrl = typeof file === "string";
+    const url = isUrl ? file : URL.createObjectURL(file);
+    const done = () => { if (!isUrl) URL.revokeObjectURL(url); };
     const img = new Image();
     img.onload = () => {
       try {
@@ -409,9 +412,9 @@ function shrinkPhoto(file) {
         ctx.fillStyle = "#141416"; ctx.fillRect(0, 0, S, S);
         ctx.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, S, S);
         resolve(cv.toDataURL("image/jpeg", 0.85));
-      } catch (e) { reject(e); } finally { URL.revokeObjectURL(url); }
+      } catch (e) { reject(e); } finally { done(); }
     };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("okunamadı")); };
+    img.onerror = () => { done(); reject(new Error("okunamadı")); };
     img.src = url;
   });
 }
@@ -426,6 +429,23 @@ async function handleIconUpload(event) {
   } catch (e) {
     sayAlert("Fotoğraf yüklenemedi", "Bu fotoğraf açılamadı. Başka bir fotoğraf seçmeyi dene.");
   }
+}
+// v37: v12'den önce (logo alanıyken) fotoğraf küçültülmeden kaydediliyordu; telefondan seçilen tek fotoğraf
+// kayıt alanının neredeyse tamamını tutabiliyordu. Açılışta ve yedek geri yüklenince büyük fotoğraf sessizce
+// 320×320'ye küçültülür. Açılamazsa fotoğrafa dokunulmaz (silinmez).
+const PHOTO_MAX_CHARS = 150000;
+async function slimOldPhoto() {
+  const src = state.customIconDataUrl;
+  if (typeof src !== "string" || src.length <= PHOTO_MAX_CHARS || !src.startsWith("data:image")) return false;
+  try {
+    const small = await shrinkPhoto(src);
+    if (state.customIconDataUrl !== src || !small || small.length >= src.length) return false;
+    state.customIconDataUrl = small;
+    saveState();
+    applyCustomIcon();
+    if ($("pfStorageTxt")) renderStorageMeter();
+    return true;
+  } catch (e) { return false; }
 }
 function removeCustomIcon() {
   if (!state.customIconDataUrl) return;

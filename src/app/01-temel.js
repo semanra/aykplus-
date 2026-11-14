@@ -352,7 +352,7 @@ function normalizeState(raw) {
 function loadState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return normalizeState(JSON.parse(saved));
+    if (saved) { const st = normalizeState(JSON.parse(saved)); hadV5State = true; return st; }
     const oldV4 = localStorage.getItem("ayk_plus_v4_state");
     if (oldV4) {
       const o = JSON.parse(oldV4);
@@ -376,6 +376,7 @@ function loadState() {
 }
 const RESCUE_KEY = "ayk_plus_v5_state_kurtarma";
 var loadFailed = false;
+var hadV5State = false;   // v37: açılışta bugünkü kayıt vardı ve okundu (eski v4 kaydı ancak o zaman silinir)
 
 let saveFailNotified = false;
 function saveState() {
