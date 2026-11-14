@@ -255,6 +255,8 @@ function archiveDay(dateKey) {
   const mobDone = [...new Set(mobAllItems().filter(i => i.done).map(i => i.name))];
   const prevMob = Array.isArray(state.mobilityLog[dateKey]) ? state.mobilityLog[dateKey] : [];
   if (mobDone.length) state.mobilityLog[dateKey] = [...new Set([...prevMob, ...mobDone])];
+  const rDone = mobRoutines().filter(r => r.items.some(i => i.done)).map(r => r.id);   // v40
+  if (rDone.length) state.mobilityRoutineLog[dateKey] = [...new Set([...(state.mobilityRoutineLog[dateKey] || []), ...rDone])];
   const t = nutritionTotals();
   const e = eatenTotals();
   const sup = state.supplements || {};

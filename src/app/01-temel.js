@@ -4,7 +4,7 @@
 
 const DEFAULT_SETTINGS = {
   sex: "male", height: 180, age: 26, targetWeight: 82,
-  waterTarget: 3.5, restSec: 90, sound: true, mobSound: true, keepAwake: true,
+  waterTarget: 3.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
   macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
   nutriLight: false, scaleOn: false, scaleBase: 0,
@@ -237,6 +237,20 @@ function normalizeState(raw) {
     name: (r.name != null && typeof r.name !== "object" ? String(r.name) : "").trim().slice(0, 40) || "Rutin",
     items: Array.isArray(r.items) ? r.items.map(normMobItem).filter(Boolean) : []
   }));
+  // v40: yinelenen rutin/hareket kimlikleri (elle düzenlenmiş yedek) ayrıştırılır; işlemler kimlikle çalışır
+  { const rIds = new Set(), iIds = new Set();
+    mr.routines.forEach(r => {
+      if (rIds.has(r.id)) r.id = "mr_" + Math.random().toString(36).slice(2, 10);
+      rIds.add(r.id);
+      r.items.forEach(it => { if (iIds.has(it.id)) it.id = mobNewId(); iIds.add(it.id); });
+    }); }
+  // v40: gün başına yapılan rutinlerin kimlikleri (rutin kartındaki "son yapılma" için; mobilityLog biçimi değişmedi)
+  { const rl = {};
+    if (isObj(s.mobilityRoutineLog)) Object.keys(s.mobilityRoutineLog).forEach(k => {
+      const v = s.mobilityRoutineLog[k];
+      if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Array.isArray(v)) rl[k] = v.filter(x => typeof x === "string" && x);
+    });
+    s.mobilityRoutineLog = rl; }
   if (!isObj(s.mobilityLog)) s.mobilityLog = {};
   if (!Array.isArray(s.workoutLogs)) s.workoutLogs = [];
   if (!Array.isArray(s.weightLogs)) s.weightLogs = [];
@@ -342,6 +356,8 @@ function normalizeState(raw) {
   if (s.settings.macroView !== "plan") s.settings.macroView = "eaten";
   { const h = parseInt(s.settings.dayStartHour, 10); s.settings.dayStartHour = h >= 0 && h <= 5 ? h : 0; }   // v21
   s.settings.waterAuto = s.settings.waterAuto !== false;   // v24: su hedefi kiloya göre (varsayılan açık)
+  s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
+  s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
   s.settings.scaleOn = !!s.settings.scaleOn;
   s.settings.scaleBase = num(s.settings.scaleBase, 0);
   if (s.settings.scaleOn && !(s.settings.scaleBase > 0)) s.settings.scaleOn = false;

@@ -148,6 +148,7 @@ function fillExLevels(v) {
 // ---------------------------------------------------------------------------
 const GYM_VIEWS = [["today", "Bugün"], ["program", "Programım"], ["library", "Hareketler"], ["history", "Geçmiş"]];
 const ICON = {
+  talk: "M4 5h16v11H9l-5 4V5zM8 9.5h8M8 12.5h5",
   undo: "M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5", vol: "M11 5L6 9H3v6h3l5 4V5zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13",
   volOff: "M11 5L6 9H3v6h3l5 4V5zM16 9.5l5 5M21 9.5l-5 5",
   chevL: "M15 6l-6 6 6 6", chevR: "M9 6l6 6-6 6", check: "M5 12.5l4.5 4.5L19 7.5", plus: "M12 5v14M5 12h14",
@@ -242,6 +243,7 @@ function gymTodayHtml() {
       </button>
       ${day.exercises.length ? "" : `<button onclick="setGymView('program')" class="t-btn-ghost w-full h-11 rounded-xl text-sm">Bu güne hareket ekle</button>`}
     </div>
+    ${warmupCardHtml(day, inProg)}
     <div class="space-y-2.5">
       <div class="t-label">BU HAFTA</div>
       <div class="grid grid-cols-3 gap-2">

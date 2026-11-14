@@ -47,7 +47,7 @@
       --t-acc: #1FD1C1; --t-acc-rgb: 31, 209, 193; --t-on-acc: #00201D; --t-acc-text: #1FD1C1; --t-knob-on: #FFFFFF;
       --t-panel: #0B2624; --t-panel-line: #1B5E58; --t-panel-text: #CCF5F0; --t-well: #0E0E10;
       --t-danger: #FF5A5F; --t-danger-text: #FF8A8A; --t-danger-bg: #2A1517; --t-warn-bg: #2A1F0B; --t-warn-line: #6B4E16; --t-warn-text: #E5B85B; --t-warn-icon: #FBBF24; --t-warn-mid: #FCD34D; --t-warn-hi: #FEF3C7; --t-info: #38BDF8;
-      --d-tq: #1FD1C1; --d-on-tq: #00201D; --d-gr: #22C55E; --d-on-gr: #04130A; --d-gr-soft: #16241B; --d-lv: #B3A6FF; --d-on-lv: #1B1446;
+      --d-tq: #1FD1C1; --d-on-tq: #00201D; --d-gr: #22C55E; --d-on-gr: #04130A; --d-gr-soft: #16241B; --d-lv: #B3A6FF; --d-lv-btn: #B3A6FF; --d-on-lv: #1B1446;
       --d-wa: #4EA8DE; --d-kg: #F4F4F5; --d-over: #FB7185; --d-dot: #6B6B73;
     }
     /* v31 AYDINLIK TEMA (html.light). Aynı aile: nötr açık yüzeyler, tek vurgu; vurgu yazı/çizgi olarak koyulaşır (beyazda ≥ 4,5:1).
@@ -60,7 +60,7 @@
       --t-acc: #1FD1C1; --t-acc-rgb: 31, 209, 193; --t-on-acc: #00201D; --t-acc-text: #0E7C72; --t-knob-on: #FFFFFF;
       --t-panel: #E3F7F5; --t-panel-line: #9ADDD6; --t-panel-text: #0B4F49; --t-well: #F6F6F8;
       --t-danger: #DC2626; --t-danger-text: #C81E1E; --t-danger-bg: #FDECEC; --t-warn-bg: #FFF4DB; --t-warn-line: #F0CF85; --t-warn-text: #8A5A00; --t-warn-icon: #B7791F; --t-warn-mid: #8A5A00; --t-warn-hi: #713F12; --t-info: #0369A1;
-      --d-tq: #0F766E; --d-on-tq: #FFFFFF; --d-gr: #15803D; --d-on-gr: #FFFFFF; --d-gr-soft: #E7F6EC; --d-lv: #7C6BE0; --d-on-lv: #FFFFFF;
+      --d-tq: #0F766E; --d-on-tq: #FFFFFF; --d-gr: #15803D; --d-on-gr: #FFFFFF; --d-gr-soft: #E7F6EC; --d-lv: #7C6BE0; --d-lv-btn: #5B47C9; --d-on-lv: #FFFFFF;
       --d-wa: #0284C7; --d-kg: #18181B; --d-over: #BE123C; --d-dot: #A1A1AA;
       color-scheme: light;
     }
@@ -247,7 +247,10 @@
     html.light .m-rt, html.light .m-wk, html.light .m-rg { box-shadow: 0 1px 2px rgba(9, 9, 11, 0.06); }
     /* v39: rutinin içi + Düzenle */
     .m-del { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex: none; color: var(--d-over); background: var(--t-danger-bg); margin-right: 6px; }
-    .m-startbar { position: sticky; bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px)); margin-top: 14px; padding-top: 8px; z-index: 5; }
+    .m-startbar { position: sticky; bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px)); margin-top: 14px; padding-top: 14px; z-index: 5; background: linear-gradient(to bottom, rgba(var(--t-acc-rgb), 0) 0, var(--t-bg) 12px); }
+    /* v40: antrenmandaki ısınma kartı (mobilite lavantası, veri rengi değişkeni) */
+    .m-warm { background: var(--t-surface); border: 1px solid var(--d-lv); border-radius: 22px; padding: 14px 16px; }
+    .m-warm-go { min-height: 48px; padding: 0 16px; border-radius: 15px; background: var(--d-lv-btn); color: var(--d-on-lv); font-weight: 800; display: flex; align-items: center; gap: 6px; flex: none; }
     /* v39: nasıl yapılır kutusu (detay + seans) */
     .m-guide { background: var(--t-surface); border-radius: 18px; padding: 12px 14px; margin-top: 18px; }
     .m-guide-h { font-size: 13.5px; font-weight: 700; color: var(--t-acc-text); }
@@ -262,7 +265,7 @@
     .m-breath .o { position: absolute; border-radius: 50%; border: 1.5px solid rgba(var(--t-acc-rgb), 0.25); }
     .m-breath .o1 { width: 94%; height: 94%; } .m-breath .o2 { width: 75%; height: 75%; border-color: rgba(var(--t-acc-rgb), 0.35); }
     .m-breath .core { width: 66%; height: 66%; border-radius: 50%; background: radial-gradient(circle at 50% 40%, rgba(var(--t-acc-rgb), 0.30), rgba(var(--t-acc-rgb), 0.08) 70%); border: 2px solid var(--t-acc-text); display: flex; flex-direction: column; align-items: center; justify-content: center; animation: mBreathe 10s ease-in-out infinite; }
-    .m-breath.pause .core { animation: none; border-color: var(--m-chk); background: var(--t-surface); }
+    .m-breath.pause .core { animation: none; border-color: var(--m-chk, var(--t-line2)); background: var(--t-surface); }
     .m-breath .core b { font-size: 76px; line-height: 0.85; }
     .m-breath.ses { width: min(236px, 62vw, 30vh); height: min(236px, 62vw, 30vh); }
     .m-breath.ses .core b { font-size: 60px; }
@@ -1267,6 +1270,14 @@
           <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]">Antrenmanda ekranı açık tut</span><span class="block text-[13px] text-[var(--t-dim)]">Antrenman sekmesindeyken ekran kararmaz.</span></span>
           <input id="setAwake" type="checkbox" class="t-sw" />
         </label>
+        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
+          <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]">Antrenmanda ısınma kartı</span><span class="block text-[13px] text-[var(--t-dim)]">O günün kaslarına uygun, mobilite rutinlerindeki dinamik hareketlerden kısa ısınma önerir.</span></span>
+          <input id="setWarmup" type="checkbox" class="t-sw" />
+        </label>
+        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
+          <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]">Mobilitede sesli yönlendirme</span><span class="block text-[13px] text-[var(--t-dim)]">Seansta hareketin adını, tarafı ve süreyi söyler. iPhone'da yalnızca uygulama açıkken ve telefon sessizde değilken konuşur.</span></span>
+          <input id="setMobVoice" type="checkbox" class="t-sw" />
+        </label>
         <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
           <label for="setDayStart" class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]">Gün geçişi</span><span class="block text-[13px] text-[var(--t-dim)]">Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.</span></label>
           <select id="setDayStart" class="t-in font-bold shrink-0" style="width: 96px;">
@@ -1325,7 +1336,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v39</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v40</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

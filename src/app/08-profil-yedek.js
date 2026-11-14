@@ -2,7 +2,7 @@
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setSplash", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
 let pfSnap = "";
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 function pfValues() { return JSON.stringify(PF_FIELDS.map(id => { const el = $(id); return el.type === "checkbox" ? el.checked : el.value; })); }
@@ -21,6 +21,8 @@ function fillProfileFields() {
   $("setRest").value = st.restSec;
   $("setSound").checked = !!st.sound;
   $("setAwake").checked = !!st.keepAwake;
+  $("setWarmup").checked = st.warmupCard !== false;
+  $("setMobVoice").checked = st.mobVoice === true;
   $("setSplash").checked = st.splash !== false;
   $("setDayStart").value = String(dayStartHour());
   updateBfHint();
@@ -144,6 +146,8 @@ function saveSettings() {
   st.targetBodyFat = tbfRaw ? round1(validBf(tbfRaw)) : "";
   st.sound = $("setSound").checked;
   st.keepAwake = $("setAwake").checked;
+  st.warmupCard = $("setWarmup").checked;
+  st.mobVoice = $("setMobVoice").checked;
   st.splash = $("setSplash").checked;
   st.dayStartHour = Math.max(0, Math.min(5, parseInt($("setDayStart").value, 10) || 0));
   if (w) state.weight = w;
