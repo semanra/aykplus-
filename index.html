@@ -1281,7 +1281,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v33</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v34</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -2926,7 +2926,21 @@ function renderNutrition() {
   $("nutriNav").innerHTML = NUTRI_VIEWS.map(([k, l]) => `<button onclick="setNutriView('${k}')" class="n-tab ${view === k ? "on" : ""}" ${view === k ? 'aria-current="page"' : ""}>${l}</button>`).join("");
   [["today", "nvToday"], ["menus", "nvMenus"], ["foods", "nvFoods"], ["history", "nvHistory"]].forEach(([k, id]) => $(id).classList.toggle("hidden", k !== view));
 
-  // Kilo / açık
+  // v34: yalnızca açık alt ekran çizilir (gizli ekranlar açıldıklarında setNutriView → renderAll ile güncellenir)
+  if (view === "menus") renderWeightBlock(st);
+
+  const isRest = state.dayType === "rest";
+  ["btnTrain", "mnTrain"].forEach(id => { $(id).className = isRest ? "" : "on"; });
+  ["btnRest", "mnRest"].forEach(id => { $(id).className = isRest ? "on" : ""; });
+  $("planSub").textContent = `${isRest ? "Dinlenme" : "Antrenman"} menüsü · hedef ${fmtInt(getTargets().calTarget)} kcal`;
+
+  if (view === "today") { renderWater(); renderSupps(); renderHero(); renderTodayMeals(); }
+  else if (view === "menus") renderMenus();
+  else if (view === "foods") renderFoods();
+  else renderNutriHistory();
+}
+// Menülerim: güncel kilo, kalori açığı, koç ipucu
+function renderWeightBlock(st) {
   const logged = state.weightLogs.map(l => num(l.weight, 0)).filter(w => w > 0);
   const minW = Math.floor(Math.min(num(st.targetWeight, 82) - 5, ...logged.map(w => w - 5), state.weight));
   const maxW = Math.ceil(Math.max(...logged.map(w => w + 10), state.weight + 10, num(st.targetWeight, 82) + 10));
@@ -2950,19 +2964,6 @@ function renderNutrition() {
   const hint = coachHintText();
   $("coachHint").classList.toggle("hidden", !hint);
   $("coachHint").textContent = hint;
-
-  const isRest = state.dayType === "rest";
-  ["btnTrain", "mnTrain"].forEach(id => { $(id).className = isRest ? "" : "on"; });
-  ["btnRest", "mnRest"].forEach(id => { $(id).className = isRest ? "on" : ""; });
-  $("planSub").textContent = `${isRest ? "Dinlenme" : "Antrenman"} menüsü · hedef ${fmtInt(getTargets().calTarget)} kcal`;
-
-  renderWater();
-  renderSupps();
-  renderHero();
-  renderTodayMeals();
-  renderMenus();
-  renderFoods();
-  renderNutriHistory();
 }
 
 function renderHero() {
@@ -8383,10 +8384,12 @@ function renderAll() {
   refreshFoodSnaps();
   applyCustomIcon();
   applyTabVisibility();
-  renderNutrition();
-  renderGym();
-  renderMobility();
-  if (state.activeTab === "progress") renderProgress();
+  // v34: yalnızca açık sekme çizilir (sekme değişimi switchTab → renderAll ile yeni sekmeyi çizer)
+  const tab = state.activeTab;
+  if (tab === "nutrition") renderNutrition();
+  else if (tab === "gym") renderGym();
+  else if (tab === "mobility") renderMobility();
+  else if (tab === "progress") renderProgress();
   if (profileIsOpen()) renderProfile();
   renderBanner();
   saveState();

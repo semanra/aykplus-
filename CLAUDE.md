@@ -19,7 +19,11 @@ index.html          ← DERLENMİŞ ÇIKTI. ASLA ELLE DÜZENLEME.
 sw.js               ← Service worker (önbellek sürümü burada)
 manifest.json, icon*.png, anatomy.jpg   ← Statik dosyalar
 src/markup.html     ← HTML iskeleti + özel CSS + gömülü yazı tipi (AYKDisplay = Barlow Condensed 800 italik, OFL)
-src/app.js          ← Tüm uygulama mantığı (~3.600 satır)
+src/app/            ← Uygulama mantığı, bölümlere ayrılmış (v34). Derlemede AD SIRASIYLA birleştirilir:
+                      01-temel (yardımcılar, durum) · 02-arayuz (bildirim, pencere, ses, sayaç, gün dönümü, sekmeler, tema)
+                      03-beslenme · 04-besinler-barkod · 05-secici-hareket · 06-mobilite · 07-grafik-ilerleme
+                      08-profil-yedek · 09-kas-plaka-koc-takviye · 10-antrenman-arayuzu · 11-mutfak-akilli
+                      12-besin-veritabani · 13-cizim-baslat (renderAll + başlat)
 src/data.js         ← Uygulamanın kendi besin listesi (BASE_FOOD_DB), hareket ve mobilite kütüphaneleri, varsayılan durum
 foods.js            ← v18 USDA besin veritabanı (~1.800 besin + 124 Türk yemeği tarifi). ÜRETİLİR, elle düzenleme (scripts/usda/)
 scripts/usda/       ← foods.js üreticisi: extract.py, build_foods.py, tr/*.json (Türkçe adlar, tarifler), README.md
@@ -104,7 +108,8 @@ npm test             # 27 test paketi, gerçek Chromium'da iPhone boyutunda; hep
 - **Öğün menüleri:** `state.meals` (antrenman günü) ve `state.restMeals` (dinlenme günü); her zaman `curMeals()` ile eriş. Öğünlerin isteğe bağlı `time` alanı var (`placeByTime`).
 - **Hareket modeli:** `ex.kind` = `weight | cardio | time`; `ex.sets[]`; isteğe bağlı `ex.muscle`, `ex.equip` (`plates | stack | dumbbell | bodyweight`), `ex.levels` (`{mode:"step",start,step,addon}` veya `{mode:"list",list,addon}`), `ex.inc`, `ex.rest`.
 - **Geçmiş:** `state.exerciseHistory[exKey(ad)]` = oturum listesi; `state.workoutLogs`; `state.dailyLogs[YYYY-AA-GG]` (gece yarısı arşivi).
-- **`app.js` bölümleri** (yorum başlıklarıyla): yardımcılar → durum → toast/modal → ses/ekran → sayaç → gün dönümü → sekmeler → beslenme → aramalı seçici → hareket modalı → geçmiş/rekor → (eski antrenman yardımcıları) → mobilite → SVG grafik → İlerleme → ayarlar → yedek → **v7** (kas grubu, kilo önerisi, plaka/ısınma, kalori koçu) → **v8** (geri al, sıradaki gün, öğün planları, takviyeler, ölçüler, paylaşım kartı) → **v9** (su/beslenme grafikleri) → **v10** (ekipman/kademeler, yeni antrenman arayüzü, öğün sıralama, özel besin düzenleme) → genel render → başlat.
+- **Kod bölümleri (`src/app/`, v34):** dosyalar sürüm geçmişi sırasını korur (en üst düzey komutların sırası önemli: `const`, `let`, `setInterval`); yeni kodu ilgili dosyaya ekle, yeni dosya gerekiyorsa numarayı sıraya göre ver. Bölme sırasında içerik değişmedi (birleşik çıktı satır sonları dışında birebir aynı). Eski yorum başlıkları dosyaların içinde duruyor.
+- **Çizim (v34):** `renderAll()` yalnızca AÇIK sekmeyi çizer; Beslenme de yalnızca açık alt ekranı (`renderNutrition` → bugün: su/takviye/özet/öğünler · menülerim: `renderWeightBlock` + `renderMenus` · besinler · geçmiş). Gizli ekranlar `switchTab` / `setNutriView` → `renderAll` ile açıldıkları anda güncellenir; gizli bir ekranın DOM'una başka sekmeden güvenme. Ölçüm (1 yıllık veri): her dokunuş ~19 ms → ~5 ms.
 - Not: "ANTRENMAN RENDER" bölümündeki `exRightHtml` gibi bazı eski yardımcılar artık kullanılmıyor; temizlik yaparken testlerle doğrula.
 
 ## 7. Tasarım
@@ -156,6 +161,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 **v32 (ortak kurallar, 14 Kasım 2026):** bölüm etiketleri (`.t-label`, `.n-label`) cümle düzeninde, tek CSS kuralıyla (`text-transform: lowercase` + `::first-letter`; kaynak metinler büyük harf kalır, geri almak için `src/markup.html` "v32 ORTAK KURALLAR" bloğundaki iki satır silinir; testlerde etiket metnini `.lower()` ile karşılaştır). Beslenme → Geçmiş hedef takviminde ✓ ~ ! simgeleri (`.n-heat-sym`). Dar ekranda İkame yalnız simge (`.swap-txt`). Mobilite bölge dolumu sayı yazısının üstünden başlar (`data-pct` = yüzde). Antrenman Geçmiş boşken "Bugünün antrenmanına git"; kilo girilmeden "~0 kg" satırı yok. Profil kalori binlik ayırıcılı. Yazılar en az 12 px (grafik ekseni 11 px). Klavye odak çerçevesi (`:focus-visible`), "Hareketi azalt" her yerde, yatay tutuşta yan kenar boşluğu, Mobilite sayaç dairesi kısa ekranda küçülür (`42vh`). Kart köşeleri 20–22 px, ana düğme 52 px.
 
 **v33 (temizlik, 14 Kasım 2026):** kullanılmayan 9 işlev (eski besin seçici, eski öğün düzenleme/taşıma, eski grafik açıcı vb.), her zaman gizli olan antrenman özet kutusu ve her saniye boşuna çalışan süresi, eski renk çeviri katmanları (`.tm`/`.nm` → `--w-*` değişkenleri), kullanılmayan CSS sınıfları ve var olmayan pencereye gönderme silindi; bildirim/başlık emojileri kaynaktan kaldırıldı (çalışma anında silen kod da kalktı). Yedek uyarı bandı yeni tasarımda (44 px düğmeler, aydınlıkta okunur), sayaç bitiş uyarısı ve paylaşım kartı yeni temada, açılış ekranı turkuaz. Doğrulama: v32 ile 36 ekran × 2 tema piksel karşılaştırması (yalnızca bilinçli farklar), iki temada okunurluk ölçümü temiz.
+
+**v34 (hız + düzen, 14 Kasım 2026):** yalnızca açık sekme/alt ekran çiziliyor (her dokunuş ~19 ms → ~5 ms; 4× yavaş işlemcide ~180 ms → ~30 ms); `src/app.js` 13 dosyaya bölündü (`src/app/`, derleme sırasında birleşir, içerik aynı).
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 

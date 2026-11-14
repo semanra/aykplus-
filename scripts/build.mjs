@@ -1,5 +1,5 @@
 // AYK+ derleme betiği
-// src/markup.html + src/data.js + src/app.js  →  build/pre.html  →  Tailwind CSS  →  index.html
+// src/markup.html + src/data.js + src/app/*.js (ad sırasıyla birleştirilir)  →  build/pre.html  →  Tailwind CSS  →  index.html
 // index.html'i ASLA elle düzenleme; her zaman src/ altındaki dosyaları değiştirip `npm run build` çalıştır.
 import fs from "node:fs";
 import path from "node:path";
@@ -9,7 +9,15 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const p = (...x) => path.join(root, ...x);
 
-execSync(`node --check "${p("src", "app.js")}"`, { stdio: "inherit" });
+// v34: uygulama kodu src/app/ altında bölümlere ayrıldı (01-temel.js … 13-cizim-baslat.js). Dosyalar ADI SIRASIYLA
+// birleştirilir; en üst düzeydeki komutların sırası önemli olduğu için yeni dosyayı doğru numarayla ekle.
+const appDir = p("src", "app");
+const appFiles = fs.readdirSync(appDir).filter(f => /^\d{2}-[\w-]+\.js$/.test(f)).sort();
+if (!appFiles.length) throw new Error("src/app/ içinde .js dosyası yok.");
+const app = appFiles.map(f => fs.readFileSync(path.join(appDir, f), "utf8")).join("");
+fs.mkdirSync(p("build"), { recursive: true });
+fs.writeFileSync(p("build", "app.js"), app);
+execSync(`node --check "${p("build", "app.js")}"`, { stdio: "inherit" });
 execSync(`node --check "${p("src", "data.js")}"`, { stdio: "inherit" });
 // v18: besin veritabanı ayrı dosyada (scripts/usda/build_foods.py üretir)
 if (!fs.existsSync(p("foods.js"))) throw new Error("foods.js yok; scripts/usda/build_foods.py ile üret.");
@@ -17,8 +25,7 @@ execSync(`node --check "${p("foods.js")}"`, { stdio: "inherit" });
 
 const markup = fs.readFileSync(p("src", "markup.html"), "utf8");
 const data = fs.readFileSync(p("src", "data.js"), "utf8");
-const app = fs.readFileSync(p("src", "app.js"), "utf8");
-for (const [name, txt] of [["data.js", data], ["app.js", app]]) {
+for (const [name, txt] of [["data.js", data], ["src/app/*.js", app]]) {
   if (txt.includes("</script")) throw new Error(`${name} içinde "</script" geçiyor; HTML'i bozar.`);
 }
 for (const ph of ["/*__TAILWIND__*/", "/*__DATA__*/", "/*__APP__*/"]) {
