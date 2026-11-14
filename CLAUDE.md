@@ -174,6 +174,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 
+**App Store (14 Kasım 2026 kararı):** uygulama herkese açık App Store'a çıkacak (TR + EN, önce ücretsiz, abonelik sonra, geliştirici hesabı alındı). Sıra ve kararlar: `docs/YOL-HARITASI-appstore.md` (Aşama 1: depolama temeli). Durum raporu: `docs/ANALIZ-appstore.md`.
+
 Sıradaki adaylar (kullanıcı onayı gerekir):
 - Pişmiş / çiğ dönüştürücü (v14–v18 planında madde 6; kullanıcı "şimdilik olmasın" dedi).
 - Antrenman saatine göre öğün kaydırma (planda madde 9; kullanıcı "bu özellik olmasın" dedi).
