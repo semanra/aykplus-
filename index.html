@@ -225,6 +225,11 @@
     .m-seg > button.on { background: var(--t-elev); color: var(--t-text); box-shadow: inset 0 0 0 1.5px var(--t-acc-text); }
     .m-preview { margin-top: 8px; font-size: 13.5px; color: var(--t-dim); }
     .m-preview b { color: var(--t-text); font-weight: 600; }
+    /* v39: nasıl yapılır kutusu (detay + seans) */
+    .m-guide { background: var(--t-surface); border-radius: 18px; padding: 12px 14px; margin-top: 18px; }
+    .m-guide-h { font-size: 13.5px; font-weight: 700; color: var(--t-acc-text); }
+    .m-guide ol { margin: 6px 0 0 18px; list-style: decimal; font-size: 14px; color: var(--t-text1); line-height: 1.5; }
+    .m-guide-w { font-size: 13px; color: var(--t-warn-text); margin-top: 6px; line-height: 1.45; }
     input.m-in, textarea.m-in { width: 100%; background: var(--t-surface); border: 0; color: var(--t-text); border-radius: 14px; min-height: 50px; padding: 14px; font-size: 16px; }
     input.m-in:focus, textarea.m-in:focus { outline: 2px solid var(--t-acc-text); outline-offset: 0; }
     input.m-in::placeholder, textarea.m-in::placeholder { color: var(--t-faint); }
@@ -1689,6 +1694,48 @@ const MOB_LIB_REGIONS = {
   "Dead Hang (Barfikste Pasif Asılma)": ["shoulder", "spine"],
   "Thoracic Spine Foam Roll": ["spine"], "Latissimus Dorsi Foam Roll": ["shoulder"], "Quadriceps & Hip Flexor Foam Roll": ["hip"],
   "Glute / Piriformis Lacrosse Ball Release": ["hip"], "Plantar Fascia (Ayak Tabanı) Top Masajı": ["ankle"]
+};
+
+// v39: NASIL YAPILIR — kütüphanedeki her hareket için 3–4 kısa adım + bir "Dikkat" notu (anahtar: hareketin adı).
+// Kullanıcının rutinindeki hareket adıyla eşleşirse detayda ve seansta gösterilir (mobGuide; kesme işareti/büyük harf farkı yok sayılır).
+const MOB_GUIDE = {
+  "World’s Greatest Stretch": { steps: ["Uzun bir hamle adımı at, arka dizin düz ve yerden yukarıda kalsın.", "Öndeki ayağın iç yanına aynı taraftaki elini koy, dirseğini ayağa doğru indir.", "Aynı kolu tavana doğru aç, göğsünü çevir; gözlerin elini izlesin.", "Eli yere geri koy, diğer tarafa geç."], warn: "Arka dizini yere çarpma; dönüşü zorlamadan, nefesle yap." },
+  "90/90 Hip Switch": { steps: ["Yere otur, iki dizin de 90 derece bükülü olsun: biri önde, biri yanda.", "Ellerini arkaya koy, gövdeni dik tut.", "Dizlerini yavaşça diğer tarafa devir, yeni 90/90 pozisyonuna geç.", "Her geçişte bir an dur, gövdeni dik tutmaya çalış."], warn: "Dizde ağrı olursa açıyı küçült; dizleri zorla yere bastırma." },
+  "Kneeling Ankle Dorsiflexion": { steps: ["Bir dizin yerde, diğer ayağın önde yere basık olsun.", "Topuğunu yerden kaldırmadan dizini ayak parmaklarının üzerinden ileri sür.", "En ileri noktada 1–2 saniye bekle, geri dön.", "Dizini hafifçe içe ve dışa yönlendirerek de tekrarla."], warn: "Topuk yerden kalkıyorsa fazla ilerledin; ayak bileğinin önünde sıkışma ağrısı olursa dur." },
+  "Quadruped Cat-Cow": { steps: ["Eller omuz, dizler kalça hizasında dört ayak üstüne gel.", "Nefes alırken göğsünü öne it, belini çukurlaştır, başını hafifçe kaldır.", "Nefes verirken sırtını tavana doğru yuvarla, çeneni göğsüne getir.", "Hareketi omurganın her bölümüne yayarak yavaşça tekrarla."], warn: "Belde ağrı varsa hareketi küçült; hızlı yapma." },
+  "Towel/Band Shoulder Dislocates": { steps: ["Havluyu ya da bandı geniş tutuşla iki elinle önde tut.", "Dirseklerini bükmeden kollarını başının üstünden arkaya doğru götür.", "Aynı yoldan öne geri getir.", "Rahat geliyorsa tutuşu her sette biraz daralt."], warn: "Omuzda batma ya da sıkışma olursa tutuşu genişlet; asla zorla geçirme." },
+  "Quadruped Thoracic Rotation (T-Spine)": { steps: ["Dört ayak üstüne gel, kalçanı topuklarına doğru biraz geri it.", "Bir elini ensene koy.", "Dirseğini önce diğer koltuk altına doğru indir, sonra tavana doğru aç.", "Dönüşü göğüsten yap, belini sabit tut."], warn: "Hareket belden değil üst sırttan gelmeli; kalçanı geride tutmak bunu sağlar." },
+  "Deep Squat Hold with Pry & Thoracic Reach": { steps: ["Ayaklar omuz genişliğinde, en derin rahat çömelmeye in.", "Dirseklerinle dizlerini hafifçe dışa it, kalçanı sağa sola salla.", "Bir kolunu tavana doğru uzat, gövdeni o tarafa çevir; sonra diğer kol.", "Topukların yerde, sırtın dik kalsın."], warn: "Topuklar kalkıyorsa altına ince bir şey koy; dizde ağrı olursa derinliği azalt." },
+  "Scapular Push-Up & Wall Slides": { steps: ["Şınav pozisyonunda kollar düz: kürek kemiklerini birbirine yaklaştır, sonra açarak sırtı yukarı it.", "Ardından sırtını duvara yasla, kollarını 'W' şeklinde duvara koy.", "Kollarını duvardan ayırmadan yukarı 'Y' şekline kaydır, yavaşça geri indir."], warn: "Belini duvardan ayırma, omuzlarını kulaklarına doğru kaldırma." },
+  "Cossack Squat (Dinamik Yan Lunge)": { steps: ["Ayaklarını geniş aç, parmak uçları hafifçe dışa baksın.", "Ağırlığını bir bacağa ver, o dizi bükerek yana doğru çömel; diğer bacak düz kalsın.", "Düz bacağın parmakları tavana dönebilir, topuk yerde kalır.", "Ortadan geçerek diğer tarafa in."], warn: "Bükülen dizin içe çökmesin; ağrısız inebildiğin kadar in." },
+  "Leg Swings (Öne-Arkaya & Yana)": { steps: ["Bir elinle duvara ya da direğe tutun, tek ayak üstünde dur.", "Serbest bacağını öne ve arkaya kontrollü sallayarak aç.", "Sonra karşına dönüp bacağını vücudunun önünden sağa sola salla.", "Her salınımda açıklığı biraz artır."], warn: "Bacağı fırlatma; belin sabit kalsın, hareket kalçadan gelsin." },
+  "Inchworm to Cobra Flow": { steps: ["Ayakta dur, dizlerini olabildiğince düz tutarak ellerini yere koy.", "Ellerinle öne yürü, şınav pozisyonuna gel.", "Kalçanı yere indir, göğsünü kaldırıp kobra pozisyonuna geç.", "Kalçanı kaldır, ellerinle geri yürüyerek ayağa kalk."], warn: "Arka bacak çok gerginse dizlerini biraz bük; kobrada omuzlarını kulaktan uzak tut." },
+  "Quadruped Hip CARs (Controlled Articular Rotations)": { steps: ["Dört ayak üstüne gel, karnını hafifçe sık.", "Bir dizini göğsüne doğru çek.", "Dizini yana aç, sonra arkaya doğru geniş ve yavaş bir daire çiz.", "Daireyi tersine de çiz; gövden kıpırdamasın."], warn: "Hareketi yavaş yap; beli döndürerek değil kalçadan çevir." },
+  "Shoulder CARs (Ayakta Tam Daire)": { steps: ["Ayakta dik dur, karnını ve kalçanı hafifçe sık.", "Bir kolunu düz tutarak öne ve yukarı kaldır.", "Kolunu başının yanından geçirip arkaya ve aşağı doğru en geniş daireyi çiz.", "Daireyi yavaşça tersine de çiz."], warn: "Gövdeni eğip bükerek daireyi büyütme; omuzda batma olursa daireyi küçült." },
+  "Thread the Needle (Dinamik)": { steps: ["Dört ayak üstüne gel.", "Bir kolunu diğer kolunun altından karşı tarafa uzat, omzunu ve şakağını yere yaklaştır.", "Aynı kolu geri çekip tavana doğru aç, gözlerin elini izlesin.", "Nefesle, yavaş bir akışla tekrarla."], warn: "Boynuna yük bindirme; başının ağırlığını yere verme." },
+  "Banded Pull-Apart & External Rotation": { steps: ["Bandı omuz hizasında, kollar düz önde tut.", "Kürek kemiklerini birbirine yaklaştırarak bandı göğsüne doğru iki yana aç, yavaşça geri gel.", "Sonra dirsekler belinin yanında 90 derece bükülü, ön kolları dışa çevirerek bandı aç."], warn: "Omuzlarını kulaklarına doğru kaldırma; bandı geri gelirken kontrol et." },
+  "Glute Bridge March": { steps: ["Sırt üstü yat, dizler bükülü, ayaklar yere basık.", "Kalçanı sıkarak omuzdan dizlere düz bir çizgi oluşana kadar kaldır.", "Kalçayı düşürmeden bir dizini göğsüne doğru kaldır, indir; diğerine geç.", "Kalçanın iki yanı aynı yükseklikte kalsın."], warn: "Belini aşırı çukurlaştırma; yükü kalça kasları taşısın." },
+  "Doorway Pec & Biceps Stretch": { steps: ["Kapı eşiğinde dur, ön kolunu ya da avucunu omuz hizasında kasaya yasla.", "Aynı taraftaki ayakla öne adım at, göğsünü kapıdan geçiriyormuş gibi öne it.", "Göğsün ve omzunun önünde gerilme hissedince nefes alarak bekle.", "Kolu biraz yukarı ya da aşağı alarak farklı bölgeleri esnet."], warn: "Omzun önünde batma ya da uyuşma olursa geri çık." },
+  "Child’s Pose with Lat Reach": { steps: ["Dizlerinin üstüne otur, kalçanı topuklarına bırak.", "Kollarını öne uzatıp alnını yere indir.", "Ellerini bir tarafa kaydır; karşı yan gövdende gerilme hissedeceksin.", "Nefes vererek biraz daha uzan, sonra diğer tarafa geç."], warn: "Dizde ağrı olursa dizlerinin arasını aç ya da altına yastık koy." },
+  "Couch Stretch": { steps: ["Arka dizini duvar dibine koy, ayağın duvara yaslansın.", "Öndeki ayağını yere bas, gövdeni yavaşça dik kaldır.", "Kalçanı sık, leğeni hafifçe öne it.", "Nefes vererek gerilmeyi kalçanın önünde tut."], warn: "Belini çukurlaştırma; dizinin altına mutlaka yumuşak bir şey koy." },
+  "Supine Figure-4 Glute Stretch": { steps: ["Sırt üstü yat, dizlerini bük.", "Bir ayak bileğini diğer dizinin üstüne koy (4 şekli).", "Alttaki bacağın arkasından tutup göğsüne doğru çek.", "Kalçanın arkasında gerilme hissedince nefesle bekle."], warn: "Dizde ağrı olursa çekişi azalt; başını ve omuzlarını yerde bırak." },
+  "Single-Leg Seated Hamstring Stretch": { steps: ["Yere otur; bir bacağın düz, diğer ayağının tabanı düz bacağın iç yanında.", "Sırtını dik tut, göğsünü öne uzatarak kalçadan eğil.", "Düz bacağın arkasında gerilme hissedince dur, nefesle bekle."], warn: "Sırtını yuvarlayıp ayağa ulaşmaya çalışma; dizin arkasında keskin ağrı olursa dur." },
+  "Pigeon Pose (Güvercin Pozu)": { steps: ["Dört ayaktan bir dizini öne, aynı eline doğru getir; ayağın diğer kalçana doğru dursun.", "Arka bacağını düz şekilde geriye uzat.", "Kalçanı yere doğru bırak, ellerinle destekle.", "Rahat geliyorsa gövdeni öne eğ."], warn: "Öndeki dizde ağrı olursa ayağını kalçana yaklaştır ya da sırt üstü 4 esnemesini yap." },
+  "Frog Stretch (Kurbağa Esnemesi)": { steps: ["Dört ayak üstüne gel, dizlerini rahat edebildiğin kadar iki yana aç.", "Ayak bileklerin dizlerinle aynı hizada, ayakların dışa baksın.", "Ön kollarına inip kalçanı yavaşça geriye doğru it.", "İç bacakta gerilme hissedince nefesle bekle."], warn: "Dizlerinin altına yumuşak bir şey koy; kasıkta keskin ağrı olursa dizleri yaklaştır." },
+  "Half-Kneeling Hip Flexor Stretch": { steps: ["Bir dizin yerde, diğer ayağın önde basık olsun.", "Karnını sık, kuyruk sokumunu hafifçe aşağı çek.", "Arka taraftaki kalçayı sıkarak gövdeni hafifçe öne kaydır.", "Kolunu tavana uzatıp karşı tarafa hafifçe eğilebilirsin."], warn: "Belini çukurlaştırarak öne gitme; gerilme kalçanın önünde olmalı." },
+  "Butterfly Groin Stretch": { steps: ["Yere otur, ayak tabanlarını birleştir, topukları kendine çek.", "Ayak bileklerinden tut, sırtını dik tut.", "Dizlerini yavaşça yere doğru bırak; dirseklerinle hafifçe bastırabilirsin.", "Göğsünü öne uzatarak gerilmeyi artır."], warn: "Dizlere sert bastırma; kasıkta keskin ağrı olursa geri gel." },
+  "Standing Wall Calf & Soleus Stretch": { steps: ["Ellerini duvara koy, bir ayağın geride, topuğu yerde olsun.", "Arka dizin düzken kalçanı duvara doğru it; baldırın üstünde gerilme hissedeceksin.", "Sonra arka dizini hafifçe bük; gerilme aşağıya, aşil tarafına kayar.", "Her pozisyonda nefesle bekle."], warn: "Arka topuk yerden kalkmasın, ayak parmakların öne baksın." },
+  "Overhead Triceps & Lat Side Lean Stretch": { steps: ["Ayakta dur, bir kolunu başının üstünden arkaya bük, elini sırtına indir.", "Diğer elinle dirseğini başının arkasına doğru çek.", "Gövdeni dirseği çektiğin tarafa doğru yana eğ.", "Kolun arkasında ve yan gövdende gerilme hissedince bekle."], warn: "Boynunu öne itme; yana eğilirken öne ya da arkaya dönme." },
+  "Cross-Body Posterior Shoulder Stretch": { steps: ["Bir kolunu göğsünün önünden karşı tarafa uzat.", "Diğer kolunla dirseğinin üstünden kendine doğru bastır.", "Omzunu kulağından uzak, aşağıda tut.", "Omzunun arkasında gerilme hissedince bekle."], warn: "Omuz eklemine bastırma; baskıyı dirseğin üstünden ver." },
+  "Upper Trap & Levator Scapulae Neck Stretch": { steps: ["Dik otur, bir elinle sandalyenin kenarından tut.", "Başını karşı tarafa doğru yana eğ (üst trapez).", "Sonra burnunu karşı koltuk altına doğru çevirip başını öne eğ (levator).", "Diğer elinle başına çok hafif ağırlık verebilirsin."], warn: "Boynunu asla çekiştirerek bastırma; uyuşma ya da baş dönmesi olursa dur." },
+  "Cobra / Sphinx Abdominal Stretch": { steps: ["Yüz üstü yat, ellerini omuzlarının altına koy.", "Sfenks: ön kolların yerde, göğsünü yavaşça kaldır.", "Kobra: kollarını düzelterek göğsünü daha yukarı kaldır; kalçan yerde kalsın.", "Omuzlarını kulaklarından uzak tutup nefesle bekle."], warn: "Belde sıkışma ağrısı olursa sfenks pozisyonunda kal ya da hiç yapma." },
+  "Supine Spinal Twist (Yatarak Omurga Rotasyonu)": { steps: ["Sırt üstü yat, kollarını iki yana aç.", "Dizlerini bükerek ikisini birlikte bir tarafa, yere doğru bırak.", "Başını karşı tarafa çevir, omuzların yerde kalsın.", "Nefes vererek gevşe, sonra diğer tarafa geç."], warn: "Dizleri yere zorla bastırma; bel fıtığı ya da sinir ağrısı varsa küçük ve dikkatli yap." },
+  "Dead Hang (Barfikste Pasif Asılma)": { steps: ["Barfiks barını omuz genişliğinde, avuçlar öne bakacak şekilde tut.", "Ayaklarını yerden kesip kollarını düz bırak, gövdeni sarkıt.", "Omuzlarını gevşet, nefesini düzenli tut.", "Bırakırken ayaklarının üstüne kontrollü in."], warn: "Omuzda batma ya da elde kayma olursa bırak; omuz sakatlığın varsa omuzları hafif aktif tut." },
+  "Thoracic Spine Foam Roll": { steps: ["Silindiri sırtına, kürek kemiklerinin altına yatay koy.", "Ellerini ensende birleştir, kalçanı yerde tut.", "Üst sırtını silindirin üzerinden geriye doğru esnet, sonra geri gel.", "Silindiri birkaç santim kaydırarak üst sırt boyunca tekrarla."], warn: "Silindiri bel bölgesine indirme; boynunu ellerinle destekle, çekme." },
+  "Latissimus Dorsi Foam Roll": { steps: ["Yan yat, silindiri koltuk altının hemen altına koy.", "Alttaki kolunu başının üstüne uzat, başparmağın tavana baksın.", "Gövdeni hafifçe öne ve arkaya döndürerek yan sırt boyunca yuvarlan.", "Hassas noktada birkaç nefes bekle."], warn: "Doğrudan koltuk altının içine ve kaburgalara bastırma." },
+  "Quadriceps & Hip Flexor Foam Roll": { steps: ["Yüz üstü ön kollarına dayan, silindiri uyluklarının önüne koy.", "Kalçanın hemen altından dizinin üstüne kadar yavaşça yuvarlan.", "Bir bacağa ağırlık vererek daha derin çalış; hassas noktada bekle.", "Dizini bükerek gerginliği artırabilirsin."], warn: "Dizkapağının ve kalça kemiğinin üstüne yuvarlanma; karnını sık, belini çukurlaştırma." },
+  "Glute / Piriformis Lacrosse Ball Release": { steps: ["Yere otur, topu bir kalçanın altına, yan arka tarafa koy.", "Aynı taraftaki ayak bileğini diğer dizinin üstüne koy.", "Ağırlığını yavaşça topa vererek küçük daireler çiz.", "Hassas bir noktada 20–30 saniye bekle, nefes ver."], warn: "Bacağa yayılan elektriklenme ya da uyuşma olursa topu başka yere kaydır." },
+  "Plantar Fascia (Ayak Tabanı) Top Masajı": { steps: ["Ayakta ya da oturarak topu ayak tabanının altına koy.", "Ağırlığını kontrollü vererek topuktan parmaklara doğru yuvarla.", "Kemerin ortasında ve hassas noktalarda birkaç saniye bekle."], warn: "Topuğun ortasında keskin ağrı varsa baskıyı hafiflet; çıplak ayakla ya da ince çorapla yap." }
 };
 
 const STORAGE_KEY = "ayk_plus_v5_state";
@@ -4853,6 +4900,20 @@ function mobItems() { const r = mobRoutine(mobUI.rid) || mobRoutines()[0]; retur
 function mobFind(id) { return mobItems().find(i => i.id === id) || null; }
 function mobUpper(t) { return String(t).toLocaleUpperCase("tr-TR"); }
 function mobArg(id) { return esc(JSON.stringify(String(id))); }
+function mobNorm(t) { return String(t || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
+// v39: nasıl yapılır (MOB_GUIDE, data.js). Anahtar karşılaştırması büyük/küçük harf ve kesme işaretinden bağımsız.
+let _mobGuideIdx = null;
+function mobGuide(name) {
+  if (!_mobGuideIdx) { _mobGuideIdx = {}; Object.keys(MOB_GUIDE).forEach(k => { _mobGuideIdx[mobNorm(k).trim()] = MOB_GUIDE[k]; }); }
+  return _mobGuideIdx[mobNorm(name).trim()] || null;
+}
+function mobGuideHtml(name, open = true, id = "") {
+  const g = mobGuide(name); if (!g) return "";
+  return `<div ${id ? `id="${id}"` : ""} class="m-guide">
+    <div class="m-guide-h">Nasıl yapılır</div>
+    ${open ? `<ol>${g.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="m-guide-w">Dikkat: ${esc(g.warn)}</p>` : ""}
+  </div>`;
+}
 function mobSummary(it) {
   const amt = it.mode === "time" ? it.sec + " sn" : it.reps + " tekrar";
   return (it.sides === 2 ? "Sağ/sol · " : "") + it.sets + " set × " + amt;
@@ -4982,6 +5043,7 @@ function mobDetailHtml() {
     ${chips("r1", "region", MOB_REGIONS, it.region)}
     <div class="m-lbl">İkincil bölge <span class="font-normal text-[var(--t-dim)]">(isteğe bağlı, yarım sayılır)</span></div>
     ${chips("r2", "region2", [["", "Yok"], ...MOB_REGIONS.filter(r => r[0] !== it.region)], it.region2)}
+    ${mobGuideHtml(it.name, true, "mobDtGuide")}
     <div class="m-lbl">Not</div>
     <textarea id="mobDtNote" data-fk="mob-note" rows="2" class="m-in" placeholder="Not ekle…" onchange="mobSet(${id}, 'note', this.value)">${esc(it.note)}</textarea>
     <div class="grid grid-cols-[1fr_1.6fr] gap-2.5 mt-5">
@@ -5040,7 +5102,7 @@ function mobLibAll() {
   }));
   return out;
 }
-function mobNorm(t) { return String(t || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
+
 function mobAddHtml() {
   const f = mobUI.filter;
   return `<div id="mobAdd">

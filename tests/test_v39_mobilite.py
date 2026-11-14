@@ -69,6 +69,18 @@ try:
     pg.evaluate("localStorage.clear()"); pg.reload(); pg.wait_for_timeout(300); r = mr(pg)["routines"]
     check(len(r) == 1 and r[0]["name"] == "Rutinim" and len(r[0]["items"]) == 10, "yeni kullanıcı: varsayılan 10 hareket 'Rutinim' içinde")
 
+    # ================= 2) NASIL YAPILIR =================
+    seed(pg, V38)
+    g = pg.evaluate("""(() => { const names = Object.values(MOBILITY_LIBRARY).flat().map(m => m.name);
+      const bad = names.filter(n => { const x = typeof mobGuide === 'function' && mobGuide(n); return !x || x.steps.length < 3 || x.steps.length > 4 || !x.warn; });
+      return { n: names.length, bad }; })()""")
+    check(g["n"] >= 37 and not g["bad"], f"kütüphanedeki her harekette 3–4 adım + dikkat notu ({g['n']} hareket, eksik: {g['bad'][:5]})")
+    check(pg.evaluate("!!(typeof mobGuide === 'function' && mobGuide('Worlds Greatest Stretch'))"), "kesme işareti farkı yok sayılıyor")
+    pg.evaluate("mobOpen(mobRoutines()[0].items[1].id)"); pg.wait_for_timeout(150)
+    check(pg.is_visible("#mobDtGuide") and "Dikkat" in pg.inner_text("#mobDtGuide"), "detay sayfasında 'Nasıl yapılır' görünüyor")
+    pg.evaluate("mobOpen(mobRoutines()[0].items[2].id)"); pg.wait_for_timeout(150)
+    check(pg.query_selector("#mobDtGuide") is None, "elle eklenmiş harekette kılavuz yok")
+
     check(not errs, f"sayfa hatası yok ({errs[:3]})")
     b.close()
 finally:

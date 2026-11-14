@@ -14,6 +14,20 @@ function mobItems() { const r = mobRoutine(mobUI.rid) || mobRoutines()[0]; retur
 function mobFind(id) { return mobItems().find(i => i.id === id) || null; }
 function mobUpper(t) { return String(t).toLocaleUpperCase("tr-TR"); }
 function mobArg(id) { return esc(JSON.stringify(String(id))); }
+function mobNorm(t) { return String(t || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
+// v39: nasıl yapılır (MOB_GUIDE, data.js). Anahtar karşılaştırması büyük/küçük harf ve kesme işaretinden bağımsız.
+let _mobGuideIdx = null;
+function mobGuide(name) {
+  if (!_mobGuideIdx) { _mobGuideIdx = {}; Object.keys(MOB_GUIDE).forEach(k => { _mobGuideIdx[mobNorm(k).trim()] = MOB_GUIDE[k]; }); }
+  return _mobGuideIdx[mobNorm(name).trim()] || null;
+}
+function mobGuideHtml(name, open = true, id = "") {
+  const g = mobGuide(name); if (!g) return "";
+  return `<div ${id ? `id="${id}"` : ""} class="m-guide">
+    <div class="m-guide-h">Nasıl yapılır</div>
+    ${open ? `<ol>${g.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="m-guide-w">Dikkat: ${esc(g.warn)}</p>` : ""}
+  </div>`;
+}
 function mobSummary(it) {
   const amt = it.mode === "time" ? it.sec + " sn" : it.reps + " tekrar";
   return (it.sides === 2 ? "Sağ/sol · " : "") + it.sets + " set × " + amt;
@@ -143,6 +157,7 @@ function mobDetailHtml() {
     ${chips("r1", "region", MOB_REGIONS, it.region)}
     <div class="m-lbl">İkincil bölge <span class="font-normal text-[var(--t-dim)]">(isteğe bağlı, yarım sayılır)</span></div>
     ${chips("r2", "region2", [["", "Yok"], ...MOB_REGIONS.filter(r => r[0] !== it.region)], it.region2)}
+    ${mobGuideHtml(it.name, true, "mobDtGuide")}
     <div class="m-lbl">Not</div>
     <textarea id="mobDtNote" data-fk="mob-note" rows="2" class="m-in" placeholder="Not ekle…" onchange="mobSet(${id}, 'note', this.value)">${esc(it.note)}</textarea>
     <div class="grid grid-cols-[1fr_1.6fr] gap-2.5 mt-5">
@@ -201,7 +216,7 @@ function mobLibAll() {
   }));
   return out;
 }
-function mobNorm(t) { return String(t || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
+
 function mobAddHtml() {
   const f = mobUI.filter;
   return `<div id="mobAdd">
