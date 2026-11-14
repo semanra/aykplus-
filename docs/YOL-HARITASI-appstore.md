@@ -21,6 +21,14 @@ Her aşama ayrı sürüm(ler)dir. Her aşamanın başında plan sunulur ve onay 
 - Kural: `ayk_plus_v5_state` asla silinmez. Göç tek seferlik, geri dönüşlü ve testli yapılır (eski formatla test).
 - Neden önce: sonraki her şey (kurulum, dil, paket) bunun üstüne kurulur; kullanıcının verisi en değerli şey.
 
+- **Eski sürüm yükünü bitirme (kullanıcı kararı, 14 Kasım 2026: "eski sürümler ayağımıza bağ olmasın"):**
+  - Kayda veri sürümü numarası (örn. `state.dataVer`). Bütün eski biçim çevirileri tek dosyada, sırayla; her kayıt her çeviriden bir kez geçer, numara güncellenir. Kodun geri kalanı yalnızca bugünkü biçimi bilir (bugün `normalizeState` içinde 15'ten fazla dağınık eski biçim kontrolü var: v4 taşıma, mobilitenin eski iki listesi `mobFromLegacy`/`parseMobRx`, `nutriLight`, `macroViewV26`, `separatePlans` …).
+  - Eski yedek geri yüklenince aynı çeviri zincirinden geçer (eski yedekler açılmaya devam eder; eski formatla test).
+  - Kullanılmayan eski yardımcılar (`exRightHtml` vb.) testlerle doğrulanarak silinir.
+  - Kalır: `data.js` içindeki 23 gizli eski besin (menüde kullanılıyorsa hesap için gerekli). Mobilitenin eski `dynamic`/`static` yedek dizilerini silmek ayrıca sorulur.
+  - Depolama göçüyle aynı anda yapılır (ikisi de açılışta kaydı okuyan kodu değiştirir).
+  - Yapıldı (v37): küçültülmemiş eski profil fotoğrafı küçültülüyor, okunmayan `ayk_plus_v4_state` siliniyor.
+
 ### Aşama 2 — Herkes için uygulama
 - İlk açılış kurulumu: cinsiyet, yaş, boy, kilo, hedef (ver / koru / al), etkinlik düzeyi, birim.
 - Genel varsayılanlar: kişisel menü ve program yerine boş veya örnek başlangıç. **Mevcut kullanıcının verisine dokunulmaz.** Kurulum yalnızca yeni kurulumda çıkar.
