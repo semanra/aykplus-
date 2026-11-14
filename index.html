@@ -1763,6 +1763,159 @@ const MOB_GUIDE = {
   "Plantar Fascia (Ayak Tabanı) Top Masajı": { steps: ["Ayakta ya da oturarak topu ayak tabanının altına koy.", "Ağırlığını kontrollü vererek topuktan parmaklara doğru yuvarla.", "Kemerin ortasında ve hassas noktalarda birkaç saniye bekle."], warn: "Topuğun ortasında keskin ağrı varsa baskıyı hafiflet; çıplak ayakla ya da ince çorapla yap." }
 };
 
+// v39: GENİŞLETİLMİŞ KÜTÜPHANE (kullanıcı isteği: "insanlar yapmak istedikleri hareketi bulabilsin"). Her hareket tek yerde:
+// c = kategori (0 dinamik, 1 statik, 2 foam roller/top), ad, uygulama, not, bölgeler (ana, ikincil), adımlar, dikkat.
+// Açılışta MOBILITY_LIBRARY / MOB_LIB_REGIONS / MOB_GUIDE'a eklenir. Bölge karşılığı olmayan (bilek) hareketler bölgesizdir.
+const MOB_LIB_V39 = [
+  // ---- Dinamik ----
+  { c: 0, name: "Arm Circles (Kol Çevirme)", rx: "1 Set x 10 Tekrar (Her Yön)", note: "Omuz ısınması", reg: ["shoulder"],
+    steps: ["Ayakta dur, kollarını yana omuz hizasında aç.", "Küçük dairelerle başla, her turda daireyi büyüt.", "10 tur öne, sonra 10 tur geriye çevir."], warn: "Omuzlarını kulaklarına doğru kaldırma; batma olursa daireyi küçült." },
+  { c: 0, name: "Hip Circles (Kalça Çevirme)", rx: "1 Set x 10 Tekrar (Her Yön)", note: "Kalça ve bel ısınması", reg: ["hip", "spine"],
+    steps: ["Ayaklar omuz genişliğinde, ellerin belinde dur.", "Kalçanı yavaşça geniş daireler çizerek çevir.", "Bir yöne 10 tur, sonra diğer yöne 10 tur yap."], warn: "Dizlerini kilitleme; hareket kalçadan gelsin, baş sabit kalsın." },
+  { c: 0, name: "Walking Knee Hugs (Yürüyerek Diz Çekme)", rx: "1 Set x 10 Tekrar (Sağ/Sol)", note: "Kalça ve arka bacak ısınması", reg: ["hip", "hamstring"],
+    steps: ["Bir adım at, arka bacağın dizini iki elinle tutup göğsüne çek.", "Destek bacağında parmak ucuna yüksel, 1 saniye bekle.", "Bırak, adım at ve diğer bacakla tekrarla."], warn: "Gövdeni dik tut; dengen kayarsa duvara yakın yap." },
+  { c: 0, name: "Walking Quad Pull (Yürüyerek Ön Bacak Çekme)", rx: "1 Set x 10 Tekrar (Sağ/Sol)", note: "Ön bacak ve kalça önü", reg: ["hip"],
+    steps: ["Bir adım at, arka ayağını aynı taraftaki elinle tutup kalçana doğru çek.", "Dizlerini yan yana tut, kalçanı hafifçe sık.", "Diğer kolunu yukarı uzatıp 1–2 saniye bekle, sonra diğer bacağa geç."], warn: "Belini çukurlaştırma; dizde ağrı olursa çekişi azalt." },
+  { c: 0, name: "Spiderman Lunge with Rotation", rx: "1 Set x 6-8 Tekrar (Sağ/Sol)", note: "Kalça ve üst sırt akışı", reg: ["hip", "spine"],
+    steps: ["Şınav pozisyonundan bir ayağını aynı taraftaki elinin dışına getir.", "Kalçanı aşağı bırak, arka bacağın düz kalsın.", "İçteki kolunu tavana doğru aç, göğsünü çevir.", "Eli yere koy, ayağını geri al ve diğer tarafa geç."], warn: "Öndeki diz içe çökmesin; dönüşü zorlamadan yap." },
+  { c: 0, name: "Hip Airplane (Kalça Uçağı)", rx: "1 Set x 5 Tekrar (Sağ/Sol)", note: "Kalça rotasyon kontrolü ve denge", reg: ["hip"],
+    steps: ["Tek ayak üstünde dur, gövdeni öne eğ, diğer bacağını geriye uzat.", "Gövdeni ve leğenini yavaşça yere doğru aç (döndür).", "Sonra kalçadan geri kapatarak başa dön."], warn: "Dengeni kaybedersen bir eliyle duvardan destek al; destek dizini kilitleme." },
+  { c: 0, name: "Ankle Circles (Ayak Bileği Çevirme)", rx: "1 Set x 10 Tekrar (Her Ayak)", note: "Ayak bileği ısınması", reg: ["ankle"],
+    steps: ["Otur ya da bir ayak üstünde dur, diğer ayağını yerden kaldır.", "Ayak bileğinle mümkün olan en geniş daireleri çiz.", "10 tur bir yöne, 10 tur diğer yöne çevir."], warn: "Hareketi yalnızca ayak bileğinden yap; dizini kıpırdatma." },
+  { c: 0, name: "Calf Raises (Topuk Kaldırma)", rx: "1 Set x 15 Tekrar", note: "Baldır ve ayak bileği aktivasyonu", reg: ["ankle"],
+    steps: ["Ayaklar kalça genişliğinde, gerekirse duvara tutun.", "Topuklarını yavaşça kaldır, parmak uçlarında 1 saniye bekle.", "Kontrollü şekilde indir, topuklarını tam yere bas."], warn: "Ayak bileğini dışa yatırma; ağırlık başparmak tarafında kalsın." },
+  { c: 0, name: "Bird Dog (Kuş-Köpek)", rx: "1 Set x 8 Tekrar (Sağ/Sol)", note: "Gövde ve bel stabilitesi", reg: ["spine", "hip"],
+    steps: ["Dört ayak üstüne gel, karnını hafifçe sık.", "Bir kolunu öne, karşı bacağını geriye düz uzat.", "2 saniye bekle, kontrollü indir ve diğer tarafa geç."], warn: "Belin çukurlaşmasın ya da kalçan yana dönmesin; bacağı gereğinden yükseğe kaldırma." },
+  { c: 0, name: "Dead Bug (Ölü Böcek)", rx: "1 Set x 8 Tekrar (Sağ/Sol)", note: "Karın ve bel kontrolü", reg: ["spine"],
+    steps: ["Sırt üstü yat, kollar tavana, dizler 90 derece havada.", "Belini yere bastır, karnını sık.", "Bir kolu başının üstüne, karşı bacağı öne doğru uzatarak indir.", "Başa dön, diğer tarafla tekrarla."], warn: "Belin yerden kalkıyorsa bacağı daha az indir." },
+  { c: 0, name: "Prone Y-T-W Raises", rx: "1 Set x 8 Tekrar", note: "Kürek kemiği ve arka omuz aktivasyonu", reg: ["shoulder", "spine"],
+    steps: ["Yüz üstü yat, alnını havluya koy.", "Kollarını 'Y' şeklinde öne uzatıp hafifçe kaldır, indir.", "Sonra 'T' (yana) ve 'W' (dirsekler bükülü) şekillerinde tekrarla.", "Her kaldırışta kürek kemiklerini geriye ve aşağı çek."], warn: "Boynunu kaldırma, bakışın yerde kalsın; omuzlarını kulaklarına doğru sıkma." },
+  { c: 0, name: "Open Book (Yan Yatarak Göğüs Açma)", rx: "1 Set x 8 Tekrar (Sağ/Sol)", note: "Üst sırt rotasyonu ve göğüs açılımı", reg: ["spine", "chest"],
+    steps: ["Yan yat, dizlerini 90 derece bük, kollarını önde üst üste koy.", "Üstteki kolunu kitap açar gibi tavana ve karşı tarafa aç.", "Gözlerin elini izlesin, dizlerin yerden kalkmasın.", "Yavaşça geri kapat."], warn: "Dönüşü zorlama; omzunda batma olursa kolunu biraz daha aşağıdan aç." },
+  { c: 0, name: "Bodyweight Good Morning", rx: "1 Set x 10 Tekrar", note: "Kalça menteşesi ve arka bacak", reg: ["hamstring", "hip"],
+    steps: ["Ayaklar kalça genişliğinde, ellerini ensende birleştir.", "Dizlerini hafif bük, sırtını düz tutarak kalçanı geriye it.", "Arka bacakta gerilme hissedince kalçanı sıkarak dik dur."], warn: "Sırtını yuvarlama; hareket belden değil kalçadan gelsin." },
+  { c: 0, name: "Jefferson Curl (Hafif)", rx: "1 Set x 5 Tekrar", note: "Omurga ve arka bacak esnekliği (ağırlıksız ya da çok hafif)", reg: ["hamstring", "spine"],
+    steps: ["Bir basamağın kenarında, dizler düz dur.", "Çeneni göğsüne getir, omurganı yukarıdan aşağı omur omur yuvarlayarak in.", "En alt noktada nefes al, aynı şekilde omur omur yukarı kalk."], warn: "Bel sorunun varsa yapma; ağırlık eklemeden önce aylarca ağırlıksız çalış, yavaş yap." },
+  { c: 0, name: "Walking Lunge with Overhead Reach", rx: "1 Set x 8 Tekrar (Sağ/Sol)", note: "Kalça önü ve yan gövde açılımı", reg: ["hip", "spine"],
+    steps: ["Uzun bir hamle adımı at, arka dizini yere yaklaştır.", "Arka bacağın tarafındaki kolunu yukarı uzat, hafifçe karşı tarafa eğil.", "Ayağa kalk, diğer bacakla adım at."], warn: "Öndeki diz ayak parmaklarının çok önüne geçmesin, içe çökmesin." },
+  { c: 0, name: "Scorpion Stretch (Akrep)", rx: "1 Set x 6 Tekrar (Sağ/Sol)", note: "Kalça önü ve omurga rotasyonu", reg: ["spine", "hip"],
+    steps: ["Yüz üstü yat, kollarını yana T şeklinde aç.", "Bir bacağını dizden bükerek karşı elinin tarafına doğru çevir.", "Göğsün ve karşı omzun yerde kalsın, yavaşça başa dön."], warn: "Bele zorlama hissi olursa açıklığı küçült; ayağı yere ulaştırmaya çalışma." },
+  { c: 0, name: "Sumo Squat to Stand", rx: "1 Set x 8 Tekrar", note: "İç bacak, arka bacak ve kalça", reg: ["hamstring", "hip"],
+    steps: ["Ayaklar geniş, öne eğilip ayak parmaklarını tut.", "Kalçanı aşağı indirerek derin çömel, göğsünü kaldır.", "Kalçanı yukarı kaldırıp dizlerini düzleştir, parmaklarını bırakma.", "Ayağa kalk, tekrarla."], warn: "Dizlerin içe çökmesin; arka bacak çok gerginse dizlerini tam düzleştirme." },
+  { c: 0, name: "Fire Hydrants", rx: "1 Set x 10 Tekrar (Sağ/Sol)", note: "Kalça dış rotasyonu ve yan kalça", reg: ["hip"],
+    steps: ["Dört ayak üstüne gel.", "Bir dizini 90 derece bükülü hâlde yana doğru kaldır.", "Gövdeni sabit tutarak yavaşça indir."], warn: "Kalçanı yana yatırarak yüksekliği artırma; bel sabit kalsın." },
+  { c: 0, name: "Clamshells (İstiridye)", rx: "1 Set x 12 Tekrar (Sağ/Sol)", note: "Yan kalça aktivasyonu", reg: ["hip"],
+    steps: ["Yan yat, dizler bükülü, topukların kalçanla aynı hizada.", "Ayaklarını birbirinden ayırmadan üstteki dizini aç.", "Yavaşça kapat; leğenin geriye devrilmesin."], warn: "Hareketi bel dönerek değil kalçadan yap." },
+  { c: 0, name: "Seated Thoracic Rotation", rx: "1 Set x 8 Tekrar (Sağ/Sol)", note: "Üst sırt rotasyonu (oturarak)", reg: ["spine"],
+    steps: ["Sandalyede dik otur, kollarını göğsünde çapraz koy.", "Kalçan sabitken gövdeni bir tarafa çevir.", "En son noktada nefes ver, ortaya dön ve diğer tarafa çevir."], warn: "Dönüşü boyundan değil göğüsten yap; zorlama." },
+  { c: 0, name: "Neck CARs (Boyun Çevirme)", rx: "1 Set x 5 Tekrar (Her Yön)", note: "Boyun eklem hareketliliği", reg: ["spine", "shoulder"],
+    steps: ["Dik otur ya da dur, omuzlarını gevşet.", "Çeneni göğsüne getir, başını yavaşça bir yana ve arkaya doğru çevir.", "Yavaş ve kontrollü tam bir daire tamamla, sonra ters yöne."], warn: "Baş dönmesi, uyuşma ya da ağrı olursa dur; başını geriye atma." },
+  { c: 0, name: "Wrist Circles & Rocks (Bilek Mobilitesi)", rx: "1 Set x 10 Tekrar", note: "Bilek ve ön kol (şınav, press öncesi)", reg: [],
+    steps: ["Parmaklarını birleştirip bileklerini iki yönde daire çizerek çevir.", "Dört ayak üstünde avuçlarını yere koy.", "Ağırlığını yavaşça öne-arkaya ve yanlara aktar.", "Elleri ters çevirip (parmaklar dizlere) hafifçe tekrarla."], warn: "Bilekte batma olursa ağırlığı azalt." },
+  { c: 0, name: "Heel & Toe Walks (Topuk ve Parmak Ucu Yürüyüşü)", rx: "1 Set x 20 Tekrar", note: "Ayak bileği ve kaval önü", reg: ["ankle"],
+    steps: ["20 adım parmak uçlarında yürü, topukların yere değmesin.", "Ardından 20 adım topuklarının üstünde yürü, parmakların havada.", "Adımları kısa ve kontrollü tut."], warn: "Dengeni kaybedersen duvar boyunca yürü." },
+  { c: 0, name: "Kneeling Adductor Rock-Back", rx: "1 Set x 10 Tekrar (Sağ/Sol)", note: "İç bacak ve kalça", reg: ["hip"],
+    steps: ["Dört ayak üstünden bir bacağını yana düz uzat, ayak tabanın yerde.", "Sırtını düz tutarak kalçanı topuklarına doğru geri it.", "İç bacakta gerilme hissedince öne dön, tekrarla."], warn: "Uzattığın bacağın dizini kilitleme; kasıkta keskin ağrı olursa açıyı küçült." },
+  { c: 0, name: "Gate Openers (Kalça Kapı Açma)", rx: "1 Set x 8 Tekrar (Sağ/Sol)", note: "Kalça dış rotasyonu ısınması", reg: ["hip"],
+    steps: ["Ayakta dur, bir dizini öne ve yukarı kaldır.", "Dizini yana doğru açıp aşağı indir (kapıyı açar gibi).", "8 kez dışa açtıktan sonra 8 kez içe kapatarak çevir."], warn: "Gövdeni dik tut; dengen için duvara tutunabilirsin." },
+  { c: 0, name: "Pelvic Tilts (Leğen Devirme)", rx: "1 Set x 12 Tekrar", note: "Bel ve leğen kontrolü", reg: ["spine"],
+    steps: ["Sırt üstü yat, dizler bükülü, ayaklar yere basık.", "Karnını sıkarak belini yere bastır (leğeni arkaya devir).", "Sonra belini hafifçe yerden kaldır (leğeni öne devir).", "Yavaş ve nefesle tekrarla."], warn: "Hareket küçük olmalı; kalçanı yerden kaldırma." },
+  { c: 0, name: "Prone Back Extension (Süpermen)", rx: "1 Set x 10 Tekrar", note: "Sırt ekstansörleri ve kalça", reg: ["spine"],
+    steps: ["Yüz üstü yat, kolların önde uzansın.", "Kalçanı sıkarak göğsünü ve bacaklarını yerden birkaç santim kaldır.", "1–2 saniye bekle, kontrollü indir."], warn: "Boynunu geriye atma; belde sıkışma olursa yalnızca göğsü kaldır." },
+  { c: 0, name: "Leg Cradle Walk", rx: "1 Set x 8 Tekrar (Sağ/Sol)", note: "Kalça dış rotasyonu ve kalça arkası", reg: ["hip"],
+    steps: ["Bir adım at, arka bacağını kaldırıp dizini ve ayak bileğini kollarınla tut.", "Bacağı beşik gibi göğsüne doğru yatay çek.", "Destek bacağında dik dur, 1–2 saniye bekle, sonra diğer bacak."], warn: "Dizini yana zorlama; kucaklayış ayak bileğinden destek alsın." },
+  { c: 0, name: "Shoulder Taps & Scap Circles", rx: "1 Set x 10 Tekrar", note: "Omuz stabilitesi ve kürek kemiği kontrolü", reg: ["shoulder"],
+    steps: ["Şınav pozisyonuna gel, kalçanı sabit tut.", "Bir elinle karşı omzuna dokun, yerine koy; diğer elle tekrarla.", "Ardından kollar düz, kürek kemiklerini daire çizer gibi çevir."], warn: "Kalçan sağa sola sallanmasın; zor gelirse dizlerin üstünde yap." },
+
+  // ---- Statik ----
+  { c: 1, name: "Lizard Pose (Kertenkele)", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Kalça önü ve iç kalça", reg: ["hip"],
+    steps: ["Hamle pozisyonundan arka dizini yere koy.", "Öndeki ayağını biraz dışa al, iki elini ayağın iç tarafına koy.", "Kalçanı yere doğru bırak; rahatsa ön kollarına in."], warn: "Öndeki diz dışa düşmesin; kasıkta keskin ağrı olursa elleri yükselt." },
+  { c: 1, name: "Standing Quad Stretch (Ayakta Ön Bacak)", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Ön bacak", reg: ["hip"],
+    steps: ["Bir eliyle duvara tutun, diğer elinle aynı taraftaki ayağını tut.", "Topuğunu kalçana doğru çek, dizlerin yan yana olsun.", "Kalçanı hafifçe öne it, bekle."], warn: "Belini çukurlaştırma; dizde ağrı olursa çekişi azalt ya da bir havluyla tut." },
+  { c: 1, name: "Seated Forward Fold (Oturarak Öne Eğilme)", rx: "2 Set x 30 sn", note: "Arka bacak ve sırt", reg: ["hamstring", "spine"],
+    steps: ["Yere otur, bacaklarını önde düz uzat.", "Sırtını dik tutarak kalçadan öne eğil.", "Ellerini ulaşabildiğin yere koy, her nefes verişte biraz daha uzan."], warn: "Dizlerini zorla bastırma; arka bacakta keskin ağrı olursa dizlerini biraz bük." },
+  { c: 1, name: "Standing Forward Fold (Ayakta Öne Eğilme)", rx: "2 Set x 30 sn", note: "Arka bacak ve bel gevşetme", reg: ["hamstring"],
+    steps: ["Ayaklar kalça genişliğinde, dizler hafif bükülü dur.", "Kalçadan öne eğil, gövdeni bacaklarına doğru bırak.", "Kollarını sarkıt ya da dirseklerini tut, başını gevşet."], warn: "Yüksek tansiyon ya da baş dönmesi varsa dikkatli ol; kalkarken yavaşça doğrul." },
+  { c: 1, name: "Supine Hamstring Strap Stretch", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Arka bacak (sırt üstü, bantla)", reg: ["hamstring"],
+    steps: ["Sırt üstü yat, bir bandı ya da havluyu ayak tabanına geçir.", "Bacağını düz tutarak yukarı kaldır, diğer bacak yerde kalsın.", "Gerilme hissedince bekle, nefes verdikçe biraz daha çek."], warn: "Belini yerden kaldırma; dizinin arkasında sinir çekmesi olursa açıyı azalt." },
+  { c: 1, name: "Wide-Leg Seated Straddle (Pancake)", rx: "2 Set x 45 sn", note: "İç bacak ve arka bacak", reg: ["hip", "hamstring"],
+    steps: ["Yere otur, bacaklarını rahat edebildiğin kadar iki yana aç.", "Ayak parmakların tavana baksın, sırtını dik tut.", "Kalçadan öne eğilerek ellerini önde yere yürüt."], warn: "Sırtını yuvarlayarak öne gitme; altına yastık koymak eğilmeyi kolaylaştırır." },
+  { c: 1, name: "Happy Baby (Mutlu Bebek)", rx: "2 Set x 30 sn", note: "Kalça ve bel gevşetme", reg: ["hip", "spine"],
+    steps: ["Sırt üstü yat, dizlerini göğsüne çek.", "Ayak tabanlarını tavana çevir, ayaklarının dışından tut.", "Dizlerini koltuk altlarına doğru indir, hafifçe sağa sola sallan."], warn: "Başını ve sırtını yerde tut; zorlanırsan ayak bileklerinden tut." },
+  { c: 1, name: "Knees to Chest (Dizleri Göğse Çekme)", rx: "2 Set x 30 sn", note: "Bel gevşetme", reg: ["spine"],
+    steps: ["Sırt üstü yat, iki dizini göğsüne çek.", "Kollarınla dizlerine sarıl, başını yerde bırak.", "Nefes verirken hafifçe sağa sola sallan."], warn: "Dizlerde ağrı olursa dizlerin arkasından tut." },
+  { c: 1, name: "Seated Spinal Twist (Oturarak Omurga Rotasyonu)", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Omurga rotasyonu ve kalça dışı", reg: ["spine", "hip"],
+    steps: ["Yere otur, bir bacağın düz; diğer ayağını düz bacağın dış tarafına bas.", "Karşı dirseğini bükülü dizin dışına koy.", "Diğer elini arkana koyup dik dur ve gövdeni çevir."], warn: "Önce dikleş sonra dön; dönüşü boyundan zorlama." },
+  { c: 1, name: "Puppy Pose (Yavru Köpek)", rx: "2 Set x 30 sn", note: "Omuz, kanat ve göğüs açılımı", reg: ["shoulder", "chest"],
+    steps: ["Dört ayak üstünden ellerini öne yürüt, kalçan dizlerinin üstünde kalsın.", "Göğsünü yere doğru bırak, alnını yere koy.", "Kollarını uzun tut, nefesle göğsünü biraz daha indir."], warn: "Omuzda batma olursa ellerini daha geniş koy; belini aşırı çukurlaştırma." },
+  { c: 1, name: "Sleeper Stretch (Uyku Esnemesi)", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Arka omuz kapsülü (iç rotasyon)", reg: ["shoulder"],
+    steps: ["Yan yat, alttaki kolunu omuz hizasında öne uzat, dirseğini 90 derece bük.", "Diğer elinle alttaki ön kolu yavaşça yere doğru bastır.", "Omzunun arkasında hafif gerilme hissedince bekle."], warn: "Çok hafif bastır; omzun önünde batma olursa hemen bırak." },
+  { c: 1, name: "Towel Behind Back Shoulder Stretch", rx: "2 Set x 30 sn", note: "Omuz iç rotasyonu ve göğüs önü", reg: ["shoulder", "chest"],
+    steps: ["Bir havluyu bir elinle başının üstünden sırtına sarkıt.", "Diğer elinle havlunun alt ucunu bel hizasında tut.", "Üstteki elinle havluyu yukarı çekerek alttaki eli yükselt; sonra ters yöne."], warn: "Omuzda batma olursa çekişi azalt; ani çekme." },
+  { c: 1, name: "Bench Prayer Stretch (Kanat Esnetme)", rx: "2 Set x 30 sn", note: "Latissimus ve üst sırt", reg: ["shoulder", "spine"],
+    steps: ["Bir sehpanın önünde diz çök, dirseklerini sehpaya koy, avuçlarını birleştir.", "Kalçanı geriye it, başını kollarının arasından aşağı bırak.", "Ellerini ensene doğru bükerek gerilmeyi artırabilirsin."], warn: "Belini aşırı çukurlaştırma; omuzda sıkışma olursa dirsekleri biraz aç." },
+  { c: 1, name: "Chin Tucks & Neck Flexion", rx: "2 Set x 30 sn", note: "Boyun arkası ve duruş", reg: ["spine"],
+    steps: ["Dik otur, çeneni geriye doğru çek (çift çene yap).", "Bu pozisyonda başını hafifçe öne eğ.", "Ensende gerilme hissedince bekle, elinle çok hafif destek verebilirsin."], warn: "Boynunu bastırarak çekme; uyuşma ya da baş dönmesi olursa dur." },
+  { c: 1, name: "Wrist Flexor & Extensor Stretch", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Ön kol ve bilek", reg: [],
+    steps: ["Kolunu önde düz uzat, avucun yukarı baksın.", "Diğer elinle parmaklarını aşağı ve kendine doğru çek, bekle.", "Sonra avucunu aşağı çevir, elinin sırtını kendine doğru çekerek bekle."], warn: "Bilekte batma ya da uyuşma olursa çekişi azalt." },
+  { c: 1, name: "Kneeling Shin Stretch (Kaval Önü)", rx: "2 Set x 30 sn", note: "Ayak sırtı ve kaval önü", reg: ["ankle"],
+    steps: ["Dizlerinin üstüne otur, ayak sırtların yerde, parmaklar arkaya baksın.", "Ellerini arkaya koyup dizlerini yavaşça yerden kaldırmaya çalış.", "Ayak sırtında ve kaval önünde gerilme hissedince bekle."], warn: "Dizde ağrı varsa altına yastık koy; ayak bileğini zorlama." },
+  { c: 1, name: "Toe Sit (Parmak Esnetme)", rx: "2 Set x 30 sn", note: "Ayak parmakları ve ayak tabanı", reg: ["ankle"],
+    steps: ["Diz çök, ayak parmaklarını yere bas (parmaklar bükülü).", "Kalçanı yavaşça topuklarının üstüne bırak.", "Ayak tabanında gerilme hissedince bekle, elinle yerden destek al."], warn: "Çok yoğun gelir; birkaç saniyeyle başla, süreyi yavaş artır." },
+  { c: 1, name: "Reclined Butterfly (Yatarak Kelebek)", rx: "2 Set x 45 sn", note: "İç bacak ve kalça gevşetme", reg: ["hip"],
+    steps: ["Sırt üstü yat, ayak tabanlarını birleştir, dizlerini yana bırak.", "Kollarını yanında gevşet, belini yere yerleştir.", "Nefes vererek dizlerin kendi ağırlığıyla insin."], warn: "Kasıkta çekme olursa dizlerin altına yastık koy." },
+  { c: 1, name: "Standing Side Bend (Yana Eğilme)", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Yan gövde ve kanat", reg: ["spine", "shoulder"],
+    steps: ["Ayaklar kalça genişliğinde dur, bir kolunu başının üstüne uzat.", "Gövdeni karşı tarafa doğru yana eğ.", "Kalçanı hafifçe aksi yöne it, yan gövdende gerilmeyi hisset."], warn: "Öne ya da arkaya dönme; yalnızca yana eğil." },
+  { c: 1, name: "Low Lunge (Alçak Hamle)", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Kalça önü (psoas)", reg: ["hip"],
+    steps: ["Hamle pozisyonunda arka dizini yere koy.", "Ellerini öndeki dizine koy, gövdeni dik kaldır.", "Kalçanı yavaşça öne ve aşağı bırak, kollarını yukarı uzatabilirsin."], warn: "Belini çukurlaştırma; arka dizinin altına yumuşak bir şey koy." },
+  { c: 1, name: "Seated Figure-4 (Sandalyede Kalça)", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Kalça arkası (oturarak, iş yerinde)", reg: ["hip"],
+    steps: ["Sandalyede dik otur, bir ayak bileğini diğer dizinin üstüne koy.", "Sırtını dik tutarak kalçadan öne eğil.", "Kalçanın arkasında gerilme hissedince bekle."], warn: "Dizde ağrı olursa üstteki dizi zorla aşağı bastırma." },
+  { c: 1, name: "Downward Dog (Aşağı Bakan Köpek)", rx: "2 Set x 30 sn", note: "Arka bacak, baldır ve omuz", reg: ["hamstring", "ankle"],
+    steps: ["Dört ayak üstünden kalçanı yukarı ve geriye kaldır, ters V oluştur.", "Ellerini yere it, kollarının arasından bak.", "Topuklarını yere doğru bırak, gerekirse dizlerini hafif bük."], warn: "Sırtını yuvarlama; omuzda ya da bilekte ağrı olursa ön kollarına in." },
+  { c: 1, name: "Camel Pose (Deve, Hafif)", rx: "2 Set x 20 sn", note: "Göğüs ve kalça önü açılımı", reg: ["chest", "spine"],
+    steps: ["Dizlerinin üstünde dik dur, ellerini belinin arkasına koy.", "Kalçanı öne it, göğsünü yukarı kaldırarak hafifçe geriye eğil.", "Rahatsan ellerini topuklarına indir; başın omurganın devamı olsun."], warn: "Bel sorunun varsa yapma; geriye eğilmeyi belden değil göğüsten yap, yavaş çık." },
+  { c: 1, name: "Bear Hug Upper Back Stretch", rx: "2 Set x 30 sn", note: "Kürek kemikleri arası ve üst sırt", reg: ["shoulder", "spine"],
+    steps: ["Kollarını göğsünün önünde çaprazlayıp kendine sarıl.", "Ellerinle kürek kemiklerini tutup öne çek.", "Sırtını yuvarla, çeneni hafifçe indir, nefes al."], warn: "Boynunu öne itme; omuzlarını gevşek tut." },
+  { c: 1, name: "Doorway Hamstring Stretch (Kapı Eşiğinde)", rx: "Sağ ve Sol 2'şer Set x 45 sn", note: "Arka bacak (pasif, uzun süreli)", reg: ["hamstring"],
+    steps: ["Bir kapı eşiğinde sırt üstü yat.", "Bir bacağını kapı kasasına dayayarak yukarı uzat, diğeri eşikten geçip yerde dursun.", "Kalçanı kasaya yaklaştırarak gerilmeyi ayarla, gevşe."], warn: "Belin yerde kalmalı; dizin arkasında keskin ağrı olursa uzaklaş." },
+  { c: 1, name: "Pec Stretch on Foam Roller (Göğüs Açma)", rx: "2 Set x 45 sn", note: "Göğüs ve omuz önü (pasif)", reg: ["chest", "shoulder"],
+    steps: ["Silindiri omurga boyunca uzunlamasına koyup üstüne sırt üstü yat.", "Başın ve kalçan silindirin üstünde olsun, dizlerin bükülü.", "Kollarını avuçlar yukarı bakacak şekilde yana aç, yerçekimine bırak."], warn: "Elinde karıncalanma olursa kollarını biraz aşağı indir." },
+  { c: 1, name: "Calf Stretch on Step (Basamakta Baldır)", rx: "Sağ ve Sol 2'şer Set x 30 sn", note: "Baldır ve aşil", reg: ["ankle"],
+    steps: ["Bir basamağın kenarına ayak ön tarafınla bas, tırabzandan tutun.", "Bir topuğunu yavaşça basamağın altına bırak.", "Dizin düzken bekle, sonra hafif bükerek tekrarla."], warn: "Topuğu bir anda düşürme; aşil ağrın varsa derinliği azalt." },
+
+  // ---- Foam roller / top ----
+  { c: 2, name: "Calf Foam Roll (Baldır)", rx: "Sağ/Sol 60 sn", note: "Baldır miyofasyal gevşetme", reg: ["ankle"],
+    steps: ["Yere otur, silindiri baldırının altına koy, ellerinle kalçanı kaldır.", "Ayak bileğinden dizin altına kadar yavaşça yuvarlan.", "Ayağını içe ve dışa çevirerek baldırın kenarlarını da çalış."], warn: "Dizin arkasına yuvarlanma." },
+  { c: 2, name: "Hamstring Foam Roll (Arka Bacak)", rx: "Sağ/Sol 60 sn", note: "Arka bacak gevşetme", reg: ["hamstring"],
+    steps: ["Yere otur, silindiri uyluğunun arkasına koy, ellerinle destek al.", "Kalçanın altından dizin üstüne kadar yavaşça yuvarlan.", "Bacağı içe-dışa çevirerek farklı bölgeleri çalış."], warn: "Dizin arkasına ve oturma kemiğinin üstüne bastırma." },
+  { c: 2, name: "Adductor Foam Roll (İç Bacak)", rx: "Sağ/Sol 60 sn", note: "İç bacak gevşetme", reg: ["hip"],
+    steps: ["Yüz üstü ön kollarına dayan, bir bacağını yana kurbağa gibi aç.", "Silindiri iç uyluğunun altına, yere paralel koy.", "Dizin yanından kasığa doğru yavaşça yuvarlan."], warn: "Kasığa çok yaklaşma; baskıyı ön kollarınla ayarla." },
+  { c: 2, name: "TFL & Outer Thigh Foam Roll (Dış Bacak)", rx: "Sağ/Sol 60 sn", note: "Kalça yanı ve dış uyluk", reg: ["hip"],
+    steps: ["Yan yat, silindiri kalça kemiğinin hemen altına ve önüne koy.", "Üstteki bacağını öne basarak ağırlığı ayarla.", "Kalça yanından uyluğun ortasına kadar yavaşça yuvarlan."], warn: "Dış bacak çok hassastır; baskıyı üstteki ayağınla azalt, dizin üstüne yuvarlanma." },
+  { c: 2, name: "Glute Foam Roll (Kalça)", rx: "Sağ/Sol 60 sn", note: "Kalça kasları gevşetme", reg: ["hip"],
+    steps: ["Silindirin üstüne otur, bir ayak bileğini diğer dizinin üstüne koy.", "Ağırlığını çalıştığın kalça tarafına ver.", "Kalçanın üst ve yan kısmında küçük hareketlerle yuvarlan."], warn: "Bacağa yayılan uyuşma olursa pozisyonu değiştir." },
+  { c: 2, name: "Pec Ball Release (Göğüs Topla)", rx: "Sağ/Sol 45 sn", note: "Göğüs ve omuz önü gevşetme", reg: ["chest", "shoulder"],
+    steps: ["Topu köprücük kemiğinin altına, omzunun önüne koy.", "Duvara dönük durup topu duvarla göğsün arasına sıkıştır.", "Küçük daireler çiz; kolunu yavaşça yukarı-aşağı hareket ettirebilirsin."], warn: "Köprücük kemiğinin ve koltuk altının üstüne bastırma." },
+  { c: 2, name: "Upper Trap Ball Release (Trapez Topla)", rx: "Sağ/Sol 45 sn", note: "Üst trapez ve boyun-omuz arası", reg: ["shoulder"],
+    steps: ["Sırtını duvara ver, topu boynunla omzunun arasındaki kasa koy.", "Dizlerini hafif bükerek topu yukarı-aşağı yuvarla.", "Hassas noktada bekle, başını karşı tarafa hafifçe eğ."], warn: "Omurganın ve boynun üstüne bastırma." },
+  { c: 2, name: "Thoracic Two-Ball Release (Sırt İki Top)", rx: "1 Set x 60 sn", note: "Omurga yanı (üst sırt) gevşetme", reg: ["spine"],
+    steps: ["İki topu bir çorabın içine koy ya da yan yana tut.", "Sırt üstü yat, topları omurganın iki yanına, kürek kemikleri hizasına koy.", "Kollarını göğsünde çaprazlayıp kalçanı kaldırarak yavaşça yukarı-aşağı yuvarlan."], warn: "Topları bel bölgesine indirme; omurganın tam üstüne koyma." },
+  { c: 2, name: "Infraspinatus Ball Release (Kürek Kemiği)", rx: "Sağ/Sol 45 sn", note: "Arka omuz ve kürek kemiği üstü", reg: ["shoulder"],
+    steps: ["Topu kürek kemiğinin düz kısmına koyup sırtını duvara yasla.", "Kolunu göğsünün önünden karşıya uzat.", "Küçük daireler çiz, hassas noktada bekle."], warn: "Omurganın üstüne kaydırma; kolda uyuşma olursa topu yer değiştir." },
+  { c: 2, name: "Tibialis Foam Roll (Kaval Önü)", rx: "Sağ/Sol 45 sn", note: "Kaval kemiği yanı kaslar", reg: ["ankle"],
+    steps: ["Dört ayak üstünde bir bacağının kaval önünü silindirin üstüne koy.", "Silindiri kaval kemiğinin dış yanına (kas tarafına) yerleştir.", "Ayak bileğinden dizin altına doğru yavaşça yuvarlan."], warn: "Doğrudan kaval kemiğinin üstüne bastırma." },
+  { c: 2, name: "Forearm Ball Release (Ön Kol)", rx: "Sağ/Sol 45 sn", note: "Ön kol ve kavrama kasları", reg: [],
+    steps: ["Ön kolunu masaya koy, topu altına yerleştir.", "Diğer elinle ön kola hafifçe bastırarak bilekten dirseğe doğru yuvarla.", "Hassas noktada bekleyip parmaklarını açıp kapat."], warn: "Bilek iç yüzündeki hassas bölgeye ve dirsek kemiğine bastırma." }
+];
+(() => {
+  const cats = Object.keys(MOBILITY_LIBRARY);
+  MOB_LIB_V39.forEach(x => {
+    MOBILITY_LIBRARY[cats[x.c]].push({ name: x.name, prescription: x.rx, note: x.note });
+    MOB_LIB_REGIONS[x.name] = x.reg;
+    MOB_GUIDE[x.name] = { steps: x.steps, warn: x.warn };
+  });
+})();
+
 const STORAGE_KEY = "ayk_plus_v5_state";
 
 // Yardımcı fonksiyon: Belirtilen set sayısı ve hedef tekrar aralığıyla set dizisi üretir
@@ -5273,7 +5426,7 @@ function mobRenderAddList() {
   box.innerHTML = order.map(rk => {
     const rows = list.filter(x => x.region === rk);
     if (!rows.length) return "";
-    return `<div data-mob-group class="text-[13px] font-semibold text-[var(--t-muted)] mt-4 mb-2 px-0.5">${esc(MOB_REGION_LABEL[rk] || "Bölgesiz")}</div>
+    return `<div data-mob-group class="text-[13px] font-semibold text-[var(--t-muted)] mt-4 mb-2 px-0.5">${esc(MOB_REGION_LABEL[rk] || "Diğer (bilek, ön kol)")}</div>
       <div class="space-y-2">${rows.map(x => {
         const sum = mobSummary(normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription }, x.type)));
         const has = inRoutine.has(x.m.name);

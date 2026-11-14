@@ -191,10 +191,10 @@ try:
     pg.evaluate("mobEdit(true)"); pg.click("#mobAddBtn"); pg.wait_for_timeout(80)
     def libnames(): return [t.split("\n") for t in pg.locator("#mobAddList [data-mob-lib]").all_inner_texts()]
     groups = pg.locator("#mobAddList [data-mob-group]").all_inner_texts()
-    check(pg.is_visible("#mobAdd") and groups[0] == "Kalça" and len(groups) == 6, f"ekleme ekranı; bölgelere göre gruplu ({groups})")
-    check(pg.locator("#mobAddList [data-mob-lib]").count() == 37, "kütüphanedeki 37 hareket")
+    check(pg.is_visible("#mobAdd") and groups[0] == "Kalça" and len(groups) == 7 and groups[-1].startswith("Diğer"), f"ekleme ekranı; bölgelere göre gruplu, bölgesizler Diğer'de ({groups})")
+    nlib = pg.evaluate("Object.values(MOBILITY_LIBRARY).flat().length"); check(pg.locator("#mobAddList [data-mob-lib]").count() == nlib and nlib >= 100, f"kütüphanedeki bütün hareketler listede ({nlib})")
     pg.click('[data-mob-filter="release"]'); pg.wait_for_timeout(50)
-    check(pg.locator("#mobAddList [data-mob-lib]").count() == 5, "Foam roller süzgeci: 5 hareket")
+    nrel = pg.evaluate("Object.values(MOBILITY_LIBRARY)[2].length"); check(pg.locator("#mobAddList [data-mob-lib]").count() == nrel, f"Foam roller süzgeci: {nrel} hareket")
     pg.click('[data-mob-filter="all"]'); pg.wait_for_timeout(50)
     pg.locator("#mobSearch").click(); pg.keyboard.type("couch"); pg.wait_for_timeout(80)
     rows = pg.locator("#mobAddList [data-mob-lib]").all_inner_texts()

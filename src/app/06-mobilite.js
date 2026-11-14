@@ -361,7 +361,7 @@ function mobRenderAddList() {
   box.innerHTML = order.map(rk => {
     const rows = list.filter(x => x.region === rk);
     if (!rows.length) return "";
-    return `<div data-mob-group class="text-[13px] font-semibold text-[var(--t-muted)] mt-4 mb-2 px-0.5">${esc(MOB_REGION_LABEL[rk] || "Bölgesiz")}</div>
+    return `<div data-mob-group class="text-[13px] font-semibold text-[var(--t-muted)] mt-4 mb-2 px-0.5">${esc(MOB_REGION_LABEL[rk] || "Diğer (bilek, ön kol)")}</div>
       <div class="space-y-2">${rows.map(x => {
         const sum = mobSummary(normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription }, x.type)));
         const has = inRoutine.has(x.m.name);

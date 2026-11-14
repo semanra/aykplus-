@@ -80,6 +80,14 @@ try:
     check(pg.is_visible("#mobDtGuide") and "Dikkat" in pg.inner_text("#mobDtGuide"), "detay sayfasında 'Nasıl yapılır' görünüyor")
     pg.evaluate("mobOpen(mobRoutines()[0].items[2].id)"); pg.wait_for_timeout(150)
     check(pg.query_selector("#mobDtGuide") is None, "elle eklenmiş harekette kılavuz yok")
+    # Genişletilmiş kütüphane (kullanıcı isteği): ≥ 100 hareket, adlar tekil, uygulama yazısı okunuyor, bölgeler geçerli
+    lib = pg.evaluate("""(() => { const all = Object.values(MOBILITY_LIBRARY).flat();
+      const names = all.map(m => m.name), keys = MOB_REGIONS.map(r => r[0]);
+      return { n: all.length, per: Object.values(MOBILITY_LIBRARY).map(a => a.length), dup: names.filter((x, i) => names.indexOf(x) !== i),
+        badRx: all.filter(m => !parseMobRx(m.prescription).ok).map(m => m.name),
+        badReg: all.filter(m => !(m.name in MOB_LIB_REGIONS) || MOB_LIB_REGIONS[m.name].some(r => !keys.includes(r))).map(m => m.name) }; })()""")
+    check(lib["n"] >= 100 and not lib["dup"], f"kütüphane ≥ 100 hareket, tekil ad ({lib['n']}, kategori {lib['per']}, çift: {lib['dup'][:3]})")
+    check(not lib["badRx"] and not lib["badReg"], f"her hareketin uygulaması okunuyor ve bölgesi tanımlı (okunamayan {lib['badRx'][:3]}, bölgesi hatalı {lib['badReg'][:3]})")
 
     # ================= 3) ANA EKRAN =================
     ctx3 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
