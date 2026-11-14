@@ -83,10 +83,15 @@ SCREENS = [
   ("g-dialog", "closeModal('pickerModal'); void uiAsk({title:'Deneme', message:'Antrenman penceresi', input:{value:'12'}, ok:'Kaydet'})"),
   ("g-toast", "uiDialogDone(false); toast('Deneme bildirimi', 'ok', { label: 'Geri al', fn: () => {} })"),
   ("g-paylas", "document.getElementById('toastWrap').innerHTML=''; state.gymActive = false; stopTimer(); setGymView('history'); openShareCard(0)"),
-  ("m-liste", "closeModal('chartModal'); switchTab('mobility')"),
-  ("m-detay", "mobOpen(state.mobilityRoutine.routines[0].items[0].id)"),
-  ("m-ekle", "mobAddOpen()"),
+  ("m-liste", "closeModal('chartModal'); switchTab('mobility')"),   # v39: mobilite ana ekranı
+  ("m-rutin", "mobOpenRoutine(mobRoutines()[0].id)"),
+  ("m-duzenle", "mobEdit(true)"),
+  ("m-detay", "mobEdit(false); mobOpen(state.mobilityRoutine.routines[0].items[0].id)"),
+  ("m-ekle", "mobBack(); mobEdit(true); mobAddOpen()"),
   ("m-sayac", "mobBack(); const t = state.mobilityRoutine.routines[0].items.find(i => i.mode === 'time'); mobTimerStart(t.id)"),
+  ("m-seans-tekrar", "mobTimerClose(); mobSesStart(mobRoutines()[0].id)"),
+  ("m-seans-sure", "const r = mobRoutines()[0]; mobSesLoad(r.items.findIndex(i => i.mode === 'time'))"),
+  ("m-bitis", "mobSesFinish()"),
   ("p-genel", "mobTimerClose(); switchTab('progress'); setProgressView('genel')"),
   ("p-kilo", "setProgressView('kilo')"),
   ("p-guc", "setProgressView('guc')"),
@@ -96,7 +101,8 @@ SCREENS = [
   ("profil-orta", PF_SCROLL % 0.45),
   ("profil-alt", PF_SCROLL % 1),
 ]
-SCREEN_ROOT = {"profil": "#profilePage", "profil-orta": "#profilePage", "profil-alt": "#profilePage", "m-sayac": "#mobTimer"}
+SCREEN_ROOT = {"profil": "#profilePage", "profil-orta": "#profilePage", "profil-alt": "#profilePage", "m-sayac": "#mobTimer",
+               "m-seans-tekrar": "#mobTimer", "m-seans-sure": "#mobTimer", "m-bitis": "#mobTimer"}
 
 # Ölçüm: okunurluk (WCAG 4,5:1 / büyük yazı 3:1), 44 px altı dokunma alanı, 12 px altı yazı, yatay taşma
 AUDIT_JS = r"""(rootSel) => {

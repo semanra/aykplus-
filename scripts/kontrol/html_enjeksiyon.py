@@ -23,6 +23,7 @@ SETUP = r"""(P) => {
   state.workoutLogs.push({ id: "x1", ts, date: fmtDate(ts), dayName: P.logday, sets: 3, volume: 1000, cardioMin: 0, cardioKm: 0, prs: 0 });
   state.supplementList.push({ id: "sx", name: P.supp, time: "custom", timeLabel: P.suppTime, dose: 1, unit: P.suppUnit, note: P.suppNote });
   state.mobilityRoutine.routines[0].items.unshift(normMobItem({ name: P.mob, note: P.mobnote, type: "static", region: "hip", mode: "time", sec: 30, sets: 1 }));
+  state.mobilityRoutine.routines[0].name = P.mobroutine;   // v39: rutin adı
   state.missSearches = [{ q: P.miss, n: 1, ts: now }];
   state.weightLogs.push({ date: P.wdate, weight: 97, ts: now - D });
   state.foodSnap["kayip_besin"] = { n: P.snap, u: "g", p: 0.1, c: 0.1, f: 0.1, k: 1, d: 100 };
@@ -37,12 +38,14 @@ STEPS = [
   "closeModal('customFoodModal'); switchTab('gym'); setGymView('today')", "setGymView('program')", "setGymView('library')", "setGymView('history')",
   "startWorkout()", "openEditExercise(0)", "closeModal('exerciseModal'); openExerciseChart(0)", "closeModal('chartModal'); openExercisePicker()",
   "closeModal('pickerModal'); state.gymActive = false; setGymView('history'); openShareCard(state.workoutLogs.length - 1)",
-  "closeModal('chartModal'); switchTab('mobility')", "mobOpen(state.mobilityRoutine.routines[0].items[0].id)", "mobAddOpen()",
-  "mobBack(); mobTimerStart(state.mobilityRoutine.routines[0].items[0].id)", "mobTimerClose(); switchTab('progress'); setProgressView('genel')",
+  "closeModal('chartModal'); switchTab('mobility')", "mobOpenRoutine(mobRoutines()[0].id)", "mobEdit(true)",
+  "mobEdit(false); mobOpen(state.mobilityRoutine.routines[0].items[0].id)", "mobBack(); mobEdit(true); mobAddOpen()",
+  "mobBack(); mobTimerStart(state.mobilityRoutine.routines[0].items[0].id)", "mobTimerClose(); mobSesStart(mobRoutines()[0].id)", "mobSesFinish()",
+  "mobTimerClose(); switchTab('progress'); setProgressView('genel')",
   "setProgressView('kilo')", "setProgressView('guc')", "setProgressView('beslenme')", "openProfile()",
   "hideProfile(); offerUndo(state.meals[0].title + ' silindi')", "void uiAsk({ title: state.meals[0].title, message: state.workoutDays[0].name, ok: 'Tamam' })",
 ]
-FIELDS = ["food", "cat", "recipe", "meal", "note", "est", "combo", "day", "ex", "exnote", "logday", "supp", "suppTime", "suppUnit", "suppNote", "mob", "mobnote", "miss", "wdate", "snap"]
+FIELDS = ["food", "cat", "recipe", "meal", "note", "est", "combo", "day", "ex", "exnote", "logday", "supp", "suppTime", "suppUnit", "suppNote", "mob", "mobnote", "mobroutine", "miss", "wdate", "snap"]
 
 def main():
     from playwright.sync_api import sync_playwright
