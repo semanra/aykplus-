@@ -531,6 +531,7 @@ function mobTimerClose() {
   if (mobT) clearInterval(mobT.iv);
   const hadSes = !!(mobT && mobT.ses);
   mobT = null;
+  try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) { /* ses yok */ }   // v40: kapatınca konuşma susar
   const m = $("mobTimer"); m.classList.add("hidden"); m.classList.remove("flex"); m.innerHTML = "";
   document.body.classList.remove("pf-open");
   updateWakeLock();

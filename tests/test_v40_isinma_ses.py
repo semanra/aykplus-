@@ -18,7 +18,7 @@ def it(name, **kw):
 def base(**kw):
     d = {"activeTab": "mobility", "today": "2026-11-13", "settings": {"splash": False}, "mobilityRoutine": {"dynamic": [], "static": [], "routines": []}}
     d.update(kw); return d
-SPEECH = """window.__said = []; try { Object.defineProperty(window, 'speechSynthesis', { value: { speak: u => window.__said.push(u.text), cancel: () => {}, getVoices: () => [] }, configurable: true }); } catch (e) {}"""
+SPEECH = """window.__said = []; window.__cancel = 0; try { Object.defineProperty(window, 'speechSynthesis', { value: { speak: u => window.__said.push(u.text), cancel: () => { window.__cancel++; }, getVoices: () => [] }, configurable: true }); } catch (e) {}"""
 
 try:
   with sync_playwright() as p:
@@ -136,6 +136,9 @@ try:
     tick(pg, 5000); tick(pg, 30000)
     check(pg.is_visible("#mobTFin") and any("bitti" in x.lower() for x in said()[-2:]), f"seans sonu anonsu ({said()[-2:]})")
     pg.click("#mobTFinOk"); pg.wait_for_timeout(60)
+    pg.click("[data-mob-start]"); pg.wait_for_timeout(60); c0 = pg.evaluate("window.__cancel")
+    pg.click("#mobTClose"); pg.wait_for_timeout(60)
+    check(pg.evaluate("window.__cancel") > c0, "seans kapatılınca konuşma susuyor")
     pg.evaluate("openProfile()"); pg.wait_for_timeout(100)
     check(pg.is_checked("#setMobVoice"), "Profil'de sesli yönlendirme anahtarı ayarla aynı")
     pg.uncheck("#setMobVoice"); pg.click("#profileSave"); pg.wait_for_timeout(150)
