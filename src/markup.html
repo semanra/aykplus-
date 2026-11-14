@@ -22,16 +22,14 @@
   <style>/*__TAILWIND__*/</style>
   <style>
     html { -webkit-text-size-adjust: 100%; }
-    body { background-color: #0b1120; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: clip; touch-action: manipulation; }
-    .card { background-color: #1e293b; border: 1px solid #334155; border-radius: 1rem; }
-    .card-done { background-color: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.45); }
-    .set-done { background-color: rgba(16, 185, 129, 0.16) !important; border-color: rgba(16, 185, 129, 0.55) !important; }
-    input[type="range"] { accent-color: #10b981; }
-    select, input[type="number"], input[type="text"], input[inputmode], textarea { background-color: #0f172a; border: 1px solid #475569; color: #f8fafc; }
+    body { background-color: var(--t-bg); color: var(--t-text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: clip; touch-action: manipulation; }
+    .card { background-color: var(--t-surface); border: 1px solid var(--t-line); border-radius: 1rem; }
+    input[type="range"] { accent-color: var(--t-acc-text); }
+    select, input[type="number"], input[type="text"], input[inputmode], textarea { background-color: var(--t-elev2); border: 1px solid var(--t-line); color: var(--t-text); }
     select { min-width: 0; max-width: 100%; text-overflow: ellipsis; }
-    input::placeholder, textarea::placeholder { color: #64748b; }
-    .sticky-bar { position: sticky; top: 0; z-index: 40; background-color: #0b1120; border-bottom: 1px solid #334155; padding-top: calc(0.5rem + env(safe-area-inset-top, 0px)) !important; }
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 45; -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); background-color: rgba(15, 23, 42, 0.96); border-top: 1px solid #334155; padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px)) !important; }
+    input::placeholder, textarea::placeholder { color: var(--t-faint); }
+    .sticky-bar { position: sticky; top: 0; z-index: 40; background-color: var(--t-bg); border-bottom: 1px solid var(--t-line); padding-top: calc(0.5rem + env(safe-area-inset-top, 0px)) !important; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 45; -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); background-color: var(--t-nav); border-top: 1px solid var(--t-line); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px)) !important; }
     .rest-pill { position: fixed; left: 0; right: 0; bottom: calc(4.9rem + env(safe-area-inset-bottom, 0px)); z-index: 46; padding: 0 12px; }
     .toast-wrap { position: fixed; left: 0; right: 0; top: calc(0.75rem + env(safe-area-inset-top, 0px)); z-index: 80; pointer-events: none; }
     .sheet { padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -48,7 +46,7 @@
       --t-nav: rgba(14, 14, 16, 0.97); --t-scrim: rgba(0, 0, 0, 0.78);
       --t-acc: #1FD1C1; --t-acc-rgb: 31, 209, 193; --t-on-acc: #00201D; --t-acc-text: #1FD1C1; --t-knob-on: #FFFFFF;
       --t-panel: #0B2624; --t-panel-line: #1B5E58; --t-panel-text: #CCF5F0; --t-well: #0E0E10;
-      --t-danger: #FF5A5F; --t-danger-text: #FF8A8A; --t-danger-bg: #2A1517; --t-warn-bg: #2A1F0B; --t-warn-line: #6B4E16; --t-warn-text: #E5B85B; --t-warn-icon: #FBBF24;
+      --t-danger: #FF5A5F; --t-danger-text: #FF8A8A; --t-danger-bg: #2A1517; --t-warn-bg: #2A1F0B; --t-warn-line: #6B4E16; --t-warn-text: #E5B85B; --t-warn-icon: #FBBF24; --t-warn-mid: #FCD34D; --t-warn-hi: #FEF3C7; --t-info: #38BDF8;
       --d-tq: #1FD1C1; --d-on-tq: #00201D; --d-gr: #22C55E; --d-on-gr: #04130A; --d-gr-soft: #16241B; --d-lv: #B3A6FF; --d-on-lv: #1B1446;
       --d-wa: #4EA8DE; --d-kg: #F4F4F5; --d-over: #FB7185; --d-dot: #6B6B73;
     }
@@ -61,7 +59,7 @@
       --t-nav: rgba(255, 255, 255, 0.96); --t-scrim: rgba(9, 9, 11, 0.45);
       --t-acc: #1FD1C1; --t-acc-rgb: 31, 209, 193; --t-on-acc: #00201D; --t-acc-text: #0E7C72; --t-knob-on: #FFFFFF;
       --t-panel: #E3F7F5; --t-panel-line: #9ADDD6; --t-panel-text: #0B4F49; --t-well: #F6F6F8;
-      --t-danger: #DC2626; --t-danger-text: #C81E1E; --t-danger-bg: #FDECEC; --t-warn-bg: #FFF4DB; --t-warn-line: #F0CF85; --t-warn-text: #8A5A00; --t-warn-icon: #B7791F;
+      --t-danger: #DC2626; --t-danger-text: #C81E1E; --t-danger-bg: #FDECEC; --t-warn-bg: #FFF4DB; --t-warn-line: #F0CF85; --t-warn-text: #8A5A00; --t-warn-icon: #B7791F; --t-warn-mid: #8A5A00; --t-warn-hi: #713F12; --t-info: #0369A1;
       --d-tq: #0F766E; --d-on-tq: #FFFFFF; --d-gr: #15803D; --d-on-gr: #FFFFFF; --d-gr-soft: #E7F6EC; --d-lv: #7C6BE0; --d-on-lv: #FFFFFF;
       --d-wa: #0284C7; --d-kg: #18181B; --d-over: #BE123C; --d-dot: #A1A1AA;
       color-scheme: light;
@@ -87,18 +85,9 @@
     /* Vücut haritası: çizim siyah zeminli → aydınlıkta koyu "sahne" kartında (Beslenme özet kartı gibi her temada koyu) */
     html.light .t-bodymap { background: #0B0B0D; border-radius: 22px; overflow: hidden; box-shadow: 0 1px 3px rgba(9, 9, 11, 0.12); }
     html.light .t-bodymap > span { color: #A1A1AA !important; }
-    /* Eski renkli uyarı/hata sınıflarının aydınlık karşılıkları (plaka/kademe araçları, bildirimler) */
-    html.light .bg-amber-950, html.light .bg-amber-950\/50 { background-color: var(--t-warn-bg); }
-    html.light .border-amber-800\/60, html.light .border-amber-500 { border-color: var(--t-warn-line); }
-    html.light .text-amber-100, html.light .text-amber-200, html.light .text-amber-300, html.light .text-amber-400 { color: var(--t-warn-text); }
-    html.light .bg-rose-950 { background-color: var(--t-danger-bg); }
-    html.light .border-rose-700 { border-color: #F3A6A6; }
-    html.light .text-rose-100, html.light .text-rose-300, html.light .text-rose-400 { color: var(--t-danger-text); }
-    html.light .text-sky-300 { color: #0369A1; }
     body.theme-train { background-color: var(--t-bg); padding-bottom: calc(11rem + env(safe-area-inset-bottom, 0px)); }
     body.theme-train .sticky-bar { background-color: var(--t-bg); border-bottom-color: var(--t-elev); }
     body.theme-train .bottom-nav { background-color: var(--t-nav); border-top-color: var(--t-elev); }
-    #gymHeaderBar { display: none !important; }
     .t-card { background: var(--t-surface); border: 1px solid var(--t-line); }
     .t-card-flat { background: var(--t-surface); }
     .t-panel { background: var(--t-panel); border: 1px solid var(--t-panel-line); }
@@ -115,29 +104,33 @@
     input.t-search { background: transparent; border: 0; color: var(--t-text); font-size: 15px; outline: none; }
     .drag-handle:active { cursor: grabbing; }
     /* YENİ TEMA PENCERELERİ: antrenman veya profil ekranından açılan ortak pencerelere .tm eklenir */
-    .tm { background-color: var(--t-scrim) !important; }
-    .tm .card, .tm .sheet, .tm .sheet.bg-slate-900 { background: var(--t-surface) !important; border: 1px solid var(--t-line) !important; border-radius: 24px !important; color: var(--t-text); }
-    .tm .sheet { border-bottom: 0 !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
-    @media (min-width: 768px) { .tm .sheet { border-radius: 24px !important; border-bottom: 1px solid var(--t-line) !important; } }
-    .tm h3, .tm h3.text-emerald-400 { color: var(--t-text) !important; font-size: 19px !important; font-weight: 800 !important; }
-    .tm .justify-end > button { flex: 1 1 0; min-height: 52px; font-size: 15px !important; border-radius: 16px !important; }
-    .tm .bg-slate-900, .tm .bg-slate-900\/80, .tm .bg-slate-950 { background-color: var(--t-elev0) !important; }
-    .tm .bg-slate-800, .tm .bg-slate-800\/80, .tm .bg-slate-800\/95 { background-color: var(--t-elev) !important; }
-    .tm .bg-slate-700, .tm .active\:bg-slate-700:active { background-color: var(--t-elev2) !important; }
-    .tm .border-slate-800, .tm .border-slate-700, .tm .border-slate-600 { border-color: var(--t-line) !important; }
-    .tm .text-slate-100 { color: var(--t-text1) !important; } .tm .text-slate-200 { color: var(--t-text2) !important; }
-    .tm .text-slate-300, .tm .text-slate-400 { color: var(--t-muted) !important; } .tm .text-slate-500 { color: var(--t-dim) !important; }
-    .tm .text-emerald-400, .tm .text-emerald-300, .tm .text-emerald-200 { color: var(--t-acc-text) !important; }
-    .tm .bg-emerald-950\/60, .tm .bg-emerald-950\/40 { background-color: var(--t-panel) !important; }
-    .tm .border-emerald-700\/60, .tm .border-emerald-800, .tm .border-emerald-500 { border-color: var(--t-panel-line) !important; }
-    .tm .bg-emerald-600, .tm .bg-emerald-700, .tm .bg-emerald-500, .tm .bg-indigo-600 { background-color: var(--t-acc) !important; color: var(--t-on-acc) !important; font-weight: 800 !important; border-color: var(--t-acc-text) !important; }
-    .tm button, .tm label.cursor-pointer { min-height: 44px; }
-    .tm .text-xs { font-size: 13px; }
-    .tm select, .tm input[type="text"], .tm input[inputmode], .tm input[type="time"], .tm textarea { background-color: var(--t-elev2) !important; border: 0 !important; color: var(--t-text) !important; border-radius: 12px !important; min-height: 44px; }
-    .tm select:focus, .tm input:focus, .tm textarea:focus { outline: 2px solid var(--t-acc-text); outline-offset: 0; }
-    .tm input::placeholder { color: var(--t-faint); }
-    .tm .modal-x { width: 44px; height: 44px; border-radius: 14px; background: var(--t-elev); color: var(--t-muted) !important; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
-    .tm svg line[stroke="#334155"] { stroke: var(--t-line); } .tm svg text[fill="#94a3b8"] { fill: var(--t-dim); }
+    /* v33 PENCERELER: .tm (Antrenman ailesi) ve .nm (Beslenme) yalnızca pencere değişkenlerini (--w-*) verir;
+       pencere içi sınıflar doğrudan bu değişkenleri kullanır (bg-[var(--w-elev)], w-btn ...). Eski renk çeviri katmanı kaldırıldı. */
+    .tm { --w-scrim: var(--t-scrim); --w-sheet: var(--t-surface); --w-line: var(--t-line); --w-text: var(--t-text); --w-text1: var(--t-text1); --w-text2: var(--t-text2);
+      --w-muted: var(--t-muted); --w-dim: var(--t-dim); --w-faint: var(--t-faint); --w-elev0: var(--t-elev0); --w-elev: var(--t-elev); --w-elev2: var(--t-elev2);
+      --w-acc: var(--t-acc-text); --w-focus: var(--t-acc-text); --w-btn: var(--t-acc); --w-btn-text: var(--t-on-acc); --w-btn-line: var(--t-acc-text);
+      --w-panel: var(--t-panel); --w-panel-line: var(--t-panel-line); --w-p: var(--t-info); --w-k: var(--t-warn-icon); --w-over: var(--d-over);
+      --w-warn-text: var(--t-warn-mid); --w-warn-bg: var(--t-warn-bg); --w-warn-line: var(--t-warn-line); --w-r-btn: 16px; --w-r-x: 14px; }
+    .nm { --w-scrim: rgba(0, 0, 0, 0.72); --w-sheet: var(--n-card); --w-line: var(--n-line); --w-text: var(--n-text); --w-text1: var(--n-text); --w-text2: var(--n-text);
+      --w-muted: var(--n-muted); --w-dim: var(--n-dim); --w-faint: var(--n-dim); --w-elev0: var(--n-elev); --w-elev: var(--n-elev); --w-elev2: var(--n-elev2);
+      --w-acc: var(--n-accent-text); --w-focus: var(--n-accent); --w-btn: var(--n-btn); --w-btn-text: var(--n-btn-text); --w-btn-line: var(--n-btn);
+      --w-panel: var(--n-accent-soft); --w-panel-line: var(--n-accent); --w-p: var(--n-p); --w-k: var(--n-k); --w-over: var(--n-over);
+      --w-warn-text: var(--n-k); --w-warn-bg: var(--n-k-soft); --w-warn-line: var(--n-k); --w-r-btn: 999px; --w-r-x: 999px; }
+    html.light .nm { --w-scrim: rgba(9, 9, 11, 0.45); }
+    html.light .tm { --w-k: var(--t-warn-text); }
+    .tm, .nm { background-color: var(--w-scrim) !important; }
+    :is(.tm, .nm) :is(.card, .sheet) { background: var(--w-sheet) !important; border: 1px solid var(--w-line) !important; border-radius: 24px !important; color: var(--w-text); }
+    :is(.tm, .nm) .sheet { border-bottom: 0 !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
+    @media (min-width: 768px) { :is(.tm, .nm) .sheet { border-radius: 24px !important; border-bottom: 1px solid var(--w-line) !important; } }
+    :is(.tm, .nm) h3 { color: var(--w-text) !important; font-size: 19px !important; font-weight: 800 !important; }
+    :is(.tm, .nm) .justify-end > button { flex: 1 1 0; min-height: 52px; font-size: 15px !important; border-radius: var(--w-r-btn) !important; }
+    :is(.tm, .nm) button, :is(.tm, .nm) label.cursor-pointer { min-height: 44px; }
+    :is(.tm, .nm) .text-xs { font-size: 13px; }
+    :is(.tm, .nm) :is(select, input[type="text"], input[inputmode], input[type="time"], textarea) { background-color: var(--w-elev2) !important; border: 0 !important; color: var(--w-text) !important; border-radius: 12px !important; min-height: 44px; }
+    :is(.tm, .nm) :is(select, input, textarea):focus { outline: 2px solid var(--w-focus); outline-offset: 0; }
+    :is(.tm, .nm) input::placeholder { color: var(--w-faint); }
+    :is(.tm, .nm) .modal-x { width: 44px; height: 44px; border-radius: var(--w-r-x); background: var(--w-elev); color: var(--w-muted) !important; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
+    .w-btn { background-color: var(--w-btn) !important; color: var(--w-btn-text) !important; font-weight: 800 !important; border-color: var(--w-btn-line) !important; }
     #profilePage.tm { background-color: var(--t-bg) !important; }
     #profilePage .pf-top { padding-top: calc(0.5rem + env(safe-area-inset-top, 0px)); }
     #profilePage .pf-save { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); }
@@ -156,18 +149,18 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { scrollbar-width: none; }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--t-line3); border-radius: 4px; }
     @keyframes popIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
     .toast { animation: popIn .2s ease-out; }
-    @keyframes flashEnd { 0%,100% { background-color: #0f172a; } 50% { background-color: #9f1239; } }
+    @keyframes flashEnd { 0%,100% { background-color: var(--t-well); } 50% { background-color: var(--t-danger); } }
     .timer-flash { animation: flashEnd .5s ease-in-out 4; }
     /* AÇILIŞ EKRANI */
     #splash { position: fixed; inset: 0; z-index: 100; background: var(--t-bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; animation: splashOut .35s ease-in .8s forwards; }
     #splash .logo-wrap { position: relative; width: 104px; height: 104px; }
-    #splash .logo-wrap::before { content: ""; position: absolute; inset: -28px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,.35), rgba(16,185,129,0) 70%); animation: glowIn .8s ease-out both; }
+    #splash .logo-wrap::before { content: ""; position: absolute; inset: -28px; border-radius: 50%; background: radial-gradient(circle, rgba(31,209,193,.35), rgba(31,209,193,0) 70%); animation: glowIn .8s ease-out both; }
     #splash img { position: relative; width: 104px; height: 104px; border-radius: 24px; animation: logoIn .55s cubic-bezier(.2,.9,.25,1.15) both; }
     #splash .t { font-weight: 800; font-size: 26px; letter-spacing: -.02em; color: var(--t-text); animation: textIn .45s ease-out .18s both; }
-    #splash .t span { color: #34d399; }
+    #splash .t span { color: var(--t-acc-text); }
     @keyframes logoIn { from { opacity: 0; transform: scale(.72); } to { opacity: 1; transform: scale(1); } }
     @keyframes glowIn { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
     @keyframes textIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -405,7 +398,7 @@
       --n-text: #0F172A; --n-text2: #1E293B; --n-muted: #475569; --n-dim: #5B6B80;
       --n-accent: #059669; --n-accent-text: #047857; --n-accent-soft: rgba(16, 185, 129, 0.14);
       --n-btn: #047857; --n-btn-text: #FFFFFF; --n-on-bg: #0F172A; --n-on-text: #FFFFFF; --n-tick: #FFFFFF;
-      --n-p: #0369A1; --n-k: #A16207; --n-y: #C2410C; --n-over: #BE123C; --n-over-soft: rgba(225, 29, 72, 0.10);
+      --n-p: #0369A1; --n-k: #8A5300; --n-y: #B23A0A; --n-over: #BE123C; --n-over-soft: rgba(225, 29, 72, 0.10);
       --n-p-soft: rgba(3, 105, 161, 0.12); --n-k-soft: rgba(161, 98, 7, 0.12); --n-y-soft: rgba(194, 65, 12, 0.12);
       --n-water: #0284C7; --n-water-soft: rgba(2, 132, 199, 0.12); --n-water-text: #075985; --n-cup-line: #94A3B8;
       --n-nav: rgba(255, 255, 255, 0.95);
@@ -525,28 +518,7 @@
     body.nutri-light .n-heat.ok, body.nutri-light .n-heat.near, body.nutri-light .n-heat.far { color: #fff; }
     /* v31: aydınlıkta "hedefte" kutusu koyu yeşil (beyaz rakam 5,5:1) */
     body.nutri-light .n-heat.ok, body.nutri-light .n-heat-dot.ok { background: var(--n-btn); }
-    /* Beslenmeden açılan ortak pencereler (.nm): eski lacivert renkleri beslenme temasına çevirir */
-    .nm { background-color: rgba(0,0,0,.72) !important; }
-    .nm .card, .nm .sheet, .nm .sheet.bg-slate-900 { background: var(--n-card) !important; border: 1px solid var(--n-line) !important; border-radius: 24px !important; color: var(--n-text); }
-    .nm .sheet { border-bottom: 0 !important; border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; }
-    @media (min-width: 768px) { .nm .sheet { border-radius: 24px !important; border-bottom: 1px solid var(--n-line) !important; } }
-    .nm h3, .nm h3.text-emerald-400 { color: var(--n-text) !important; font-size: 19px !important; font-weight: 800 !important; }
-    .nm .justify-end > button { flex: 1 1 0; min-height: 52px; font-size: 15px !important; border-radius: 999px !important; }
-    .nm .bg-slate-900, .nm .bg-slate-900\/80, .nm .bg-slate-950, .nm .bg-slate-800, .nm .bg-slate-800\/80, .nm .bg-slate-800\/95 { background-color: var(--n-elev) !important; }
-    .nm .bg-slate-700, .nm .active\:bg-slate-700:active { background-color: var(--n-elev2) !important; }
-    .nm .border-slate-800, .nm .border-slate-700, .nm .border-slate-600 { border-color: var(--n-line) !important; }
-    .nm .text-slate-100, .nm .text-slate-200 { color: var(--n-text) !important; }
-    .nm .text-slate-300, .nm .text-slate-400 { color: var(--n-muted) !important; } .nm .text-slate-500 { color: var(--n-dim) !important; }
-    .nm .text-emerald-400, .nm .text-emerald-300, .nm .text-emerald-200 { color: var(--n-accent-text) !important; }
-    .nm .text-sky-400 { color: var(--n-p) !important; } .nm .text-amber-400 { color: var(--n-k) !important; } .nm .text-rose-400, .nm .text-rose-300 { color: var(--n-over) !important; }
-    .nm .bg-emerald-600, .nm .bg-emerald-700, .nm .bg-emerald-500, .nm .bg-indigo-600 { background-color: var(--n-btn) !important; color: var(--n-btn-text) !important; font-weight: 800 !important; border-color: var(--n-btn) !important; }
-    .nm button, .nm label.cursor-pointer { min-height: 44px; }
     .nm #pickerChips button { padding-left: 14px; padding-right: 14px; font-size: 13px; }
-    .nm .text-xs { font-size: 13px; }
-    .nm select, .nm input[type="text"], .nm input[inputmode], .nm input[type="time"], .nm textarea { background-color: var(--n-elev2) !important; border: 0 !important; color: var(--n-text) !important; border-radius: 12px !important; min-height: 44px; }
-    .nm select:focus, .nm input:focus, .nm textarea:focus { outline: 2px solid var(--n-accent); outline-offset: 0; }
-    .nm input::placeholder { color: var(--n-dim); }
-    .nm .modal-x { width: 44px; height: 44px; border-radius: 999px; background: var(--n-elev); color: var(--n-muted) !important; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
     /* v32 ORTAK KURALLAR (docs/PLAN-tema-v30-v32.md) */
     /* Başlık kuralı: bölüm etiketleri cümle düzeninde (Türkçe küçültme lang="tr" ile doğru: İ→i, I→ı). Geri almak için bu iki satırı silmek yeter. */
     .t-label, .n-label { text-transform: lowercase; letter-spacing: 0; font-size: 13px; font-weight: 650; }
@@ -596,14 +568,14 @@
       <div class="flex items-center justify-between gap-2 mb-2">
         <div class="flex items-center min-w-0 overflow-hidden h-11">
           <h1 id="tabTitle" class="t-display text-[28px] leading-none uppercase text-[var(--t-text)] truncate">Beslenme</h1>
-          <span id="brandTag" class="t-display text-[28px] leading-none text-[var(--t-text)] shrink-0" aria-hidden="true"><span class="brand-sep"></span>AYK<span id="brandPlus" class="text-emerald-400">+</span></span>
+          <span id="brandTag" class="t-display text-[28px] leading-none text-[var(--t-text)] shrink-0" aria-hidden="true"><span class="brand-sep"></span>AYK<span id="brandPlus" class="text-[var(--t-acc-text)]">+</span></span>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
           <button id="nutriThemeBtn" onclick="toggleNutriLight()" class="hidden w-11 h-11 items-center justify-center rounded-full" aria-label="Gündüz temasına geç"></button>
-          <button id="profileBtn" onclick="openProfile()" class="relative w-11 h-11 flex items-center justify-center bg-slate-900 border border-slate-700 rounded-full text-[var(--t-text2)]" aria-label="Profil">
+          <button id="profileBtn" onclick="openProfile()" class="relative w-11 h-11 flex items-center justify-center bg-[var(--t-surface)] border border-[var(--t-line)] rounded-full text-[var(--t-text2)]" aria-label="Profil">
             <img id="profileAvatar" alt="" class="hidden w-full h-full rounded-full object-cover" />
             <svg id="profileIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>
-            <span id="backupDot" class="hidden absolute top-0 right-0 w-3 h-3 bg-rose-500 rounded-full border-2 border-black"></span>
+            <span id="backupDot" class="hidden absolute top-0 right-0 w-3 h-3 bg-[var(--t-danger)] rounded-full border-2 border-[var(--t-bg)]"></span>
           </button>
         </div>
       </div>
@@ -611,23 +583,6 @@
       <!-- BESLENME: v13'te özet, sayfanın içindeki kalori halkası kartına taşındı -->
       <div id="nutritionHeaderBar"></div>
 
-      <!-- GYM ÖZET BARI -->
-      <div id="gymHeaderBar" class="hidden grid-cols-3 gap-1.5">
-        <div class="bg-slate-800/95 border border-slate-700 rounded-xl px-2 py-1.5 min-w-0">
-          <div class="text-[10px] text-slate-400 truncate">🏋️ Aktif Gün</div>
-          <div id="gymActiveDayTitle" class="text-xs font-bold text-emerald-400 truncate">-</div>
-          <div id="gymDuration" class="hidden text-[10px] font-mono font-semibold text-slate-300">⏱ 00:00</div>
-        </div>
-        <div class="bg-slate-800/95 border border-slate-700 rounded-xl px-2 py-1.5 min-w-0">
-          <div class="text-[10px] text-slate-400 truncate">✅ Biten Set</div>
-          <div class="text-sm font-bold text-sky-400"><span id="gymDoneSets">0</span> / <span id="gymTotalSets">0</span></div>
-        </div>
-        <div class="bg-slate-800/95 border border-slate-700 rounded-xl px-2 py-1.5 min-w-0">
-          <div class="text-[10px] text-slate-400 truncate">⚡ Tonaj</div>
-          <div class="text-sm font-bold text-amber-400 truncate"><span id="gymTotalVolume">0</span> kg</div>
-          <div id="gymCardioSummary" class="hidden text-[10px] text-sky-300 truncate"></div>
-        </div>
-      </div>
 
       <!-- İLERLEME ÖZET BARI -->
       <div id="progressHeaderBar" class="hidden">
@@ -637,11 +592,11 @@
 
   <!-- YEDEK HATIRLATMA BANDI -->
   <div id="backupBanner" class="hidden max-w-5xl mx-auto px-3.5 mt-3">
-    <div class="flex items-center justify-between gap-2 bg-amber-950/60 border border-amber-700/60 rounded-xl px-3 py-2">
-      <div id="backupBannerText" class="text-xs text-amber-200">💾 Uzun süredir yedek almadın.</div>
-      <div class="flex items-center gap-1.5 shrink-0">
-        <button onclick="exportBackupFile()" class="text-xs bg-amber-600 text-white font-semibold px-2.5 py-1 rounded-lg">Yedekle</button>
-        <button onclick="snoozeBackup()" class="text-amber-300 text-lg leading-none px-1" aria-label="Kapat">&times;</button>
+    <div class="flex items-center justify-between gap-2 bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)] rounded-2xl pl-3.5 pr-1 py-1">
+      <div id="backupBannerText" class="text-[13px] leading-snug text-[var(--t-warn-hi)]">Uzun süredir yedek almadın.</div>
+      <div class="flex items-center gap-0.5 shrink-0">
+        <button onclick="exportBackupFile()" class="h-11 px-4 rounded-xl text-[14px] font-bold bg-[var(--t-warn-icon)] text-[#1F1503]">Yedekle</button>
+        <button onclick="snoozeBackup()" class="w-11 h-11 rounded-xl flex items-center justify-center text-[var(--t-warn-mid)]" aria-label="Uyarıyı 3 gün gizle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
     </div>
   </div>
@@ -881,18 +836,18 @@
   <div id="customFoodModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
     <div class="card p-5 max-w-md w-full space-y-3.5">
       <div class="flex justify-between items-center">
-        <h3 id="cfTitle" class="font-bold text-base text-emerald-400">➕ Kendi Özel Besinini Tanımla</h3>
-        <button onclick="closeModal('customFoodModal')" class="modal-x text-slate-400 text-2xl leading-none px-1">&times;</button>
+        <h3 id="cfTitle" class="font-bold text-base text-[var(--w-acc)]">Kendi özel besinini tanımla</h3>
+        <button onclick="closeModal('customFoodModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1">&times;</button>
       </div>
       <div class="space-y-2.5 text-xs">
-        <p id="cfHint" class="hidden text-[13px] text-slate-300"></p>
+        <p id="cfHint" class="hidden text-[13px] text-[var(--w-muted)]"></p>
         <div>
-          <label for="cfName" class="block text-slate-300 mb-1">Besin Adı:</label>
+          <label for="cfName" class="block text-[var(--w-muted)] mb-1">Besin Adı:</label>
           <input id="cfName" type="text" placeholder="Örn: Proteinli Süt / Ev Yapımı Köfte" class="w-full p-2 rounded-lg text-base" />
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="cfUnit" class="block text-slate-300 mb-1">Değerler neye göre?</label>
+            <label for="cfUnit" class="block text-[var(--w-muted)] mb-1">Değerler neye göre?</label>
             <select id="cfUnit" onchange="cfUnitChanged()" class="w-full p-2 rounded-lg">
               <option value="100g">100 g (veya 100 ml)</option>
               <option value="serv">1 porsiyon</option>
@@ -900,50 +855,50 @@
             </select>
           </div>
           <div>
-            <label id="cfDefLabel" for="cfDef" class="block text-slate-300 mb-1">Varsayılan Miktar (g):</label>
+            <label id="cfDefLabel" for="cfDef" class="block text-[var(--w-muted)] mb-1">Varsayılan Miktar (g):</label>
             <input id="cfDef" type="text" inputmode="decimal" value="100" class="w-full p-2 rounded-lg text-base" />
           </div>
         </div>
         <div>
-          <label for="cfK" class="block text-slate-300 mb-1">Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:</label>
+          <label for="cfK" class="block text-[var(--w-muted)] mb-1">Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:</label>
           <input id="cfK" type="text" inputmode="decimal" placeholder="Boş bırakırsan makrolardan hesaplanır" class="w-full p-2 rounded-lg text-base" />
         </div>
         <div class="grid grid-cols-3 gap-2">
           <div>
-            <label class="block text-sky-400 mb-1">Protein (g):</label>
+            <label class="block text-[var(--w-p)] mb-1">Protein (g):</label>
             <input id="cfP" type="text" inputmode="decimal" value="20" class="w-full p-2 rounded-lg text-base" />
           </div>
           <div>
-            <label class="block text-amber-400 mb-1">Karb (g):</label>
+            <label class="block text-[var(--w-k)] mb-1">Karb (g):</label>
             <input id="cfC" type="text" inputmode="decimal" value="10" class="w-full p-2 rounded-lg text-base" />
           </div>
           <div>
-            <label class="block text-rose-400 mb-1">Yağ (g):</label>
+            <label class="block text-[var(--w-over)] mb-1">Yağ (g):</label>
             <input id="cfF" type="text" inputmode="decimal" value="5" class="w-full p-2 rounded-lg text-base" />
           </div>
         </div>
       </div>
       <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeModal('customFoodModal')" class="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-lg">İptal</button>
-        <button onclick="saveCustomFood()" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+        <button onclick="closeModal('customFoodModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">İptal</button>
+        <button onclick="saveCustomFood()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
       </div>
     </div>
   </div>
 
   <!-- ARAMALI SEÇİCİ (BESİN / HAREKET / MOBİLİTE) -->
   <div id="pickerModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
-    <div class="sheet bg-slate-900 border border-slate-700 w-full md:max-w-lg rounded-t-2xl md:rounded-2xl flex flex-col" style="max-height: 88vh;">
+    <div class="sheet bg-[var(--w-elev0)] border border-[var(--w-line)] w-full md:max-w-lg rounded-t-2xl md:rounded-2xl flex flex-col" style="max-height: 88vh;">
       <div class="p-4 pb-2 space-y-2.5">
         <div class="flex justify-between items-center">
-          <h3 id="pickerTitle" class="font-bold text-base text-emerald-400">Seç</h3>
-          <button onclick="closeModal('pickerModal')" class="modal-x text-slate-400 text-2xl leading-none px-1">&times;</button>
+          <h3 id="pickerTitle" class="font-bold text-base text-[var(--w-acc)]">Seç</h3>
+          <button onclick="closeModal('pickerModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1">&times;</button>
         </div>
-        <input id="pickerSearch" type="text" placeholder="🔍 Ara..." oninput="renderPickerList()" autocomplete="off" class="w-full px-3 py-2.5 rounded-xl text-base" />
+        <input id="pickerSearch" type="text" placeholder="Ara..." oninput="renderPickerList()" autocomplete="off" class="w-full px-3 py-2.5 rounded-xl text-base" />
         <div id="pickerChips" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
       </div>
       <div id="pickerList" class="flex-1 overflow-y-auto px-4 pb-3 space-y-1.5"></div>
-      <div id="pickerExtraWrap" class="hidden p-3 border-t border-slate-800">
-        <button id="pickerExtraBtn" onclick="pickerExtra()" class="w-full bg-indigo-600 text-white text-xs font-semibold py-2.5 rounded-lg">✍️ Listede yok mu? Özel ekle</button>
+      <div id="pickerExtraWrap" class="hidden p-3 border-t border-[var(--w-line)]">
+        <button id="pickerExtraBtn" onclick="pickerExtra()" class="w-full w-btn text-xs font-semibold py-2.5 rounded-lg">Listede yok mu? Özel ekle</button>
       </div>
     </div>
   </div>
@@ -1023,7 +978,7 @@
           <input id="exRest" type="text" inputmode="numeric" value="90" class="t-in" />
           <p class="text-[12px] text-[var(--t-dim)] mt-1.5">Bir seti tamamladığında alttaki sayaç bu süreyle otomatik başlar.</p>
         </div>
-        <p id="exEditHint" class="hidden text-[12px] text-amber-300">Tipi değiştirirsen bu hareketin setleri yeni değerlerle baştan oluşturulur.</p>
+        <p id="exEditHint" class="hidden text-[12px] text-[var(--t-warn-mid)]">Tipi değiştirirsen bu hareketin setleri yeni değerlerle baştan oluşturulur.</p>
       </div>
       <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 border-t border-[var(--t-line)]">
         <button onclick="closeModal('exerciseModal')" class="t-btn-ghost h-[52px] rounded-2xl text-[15px]">İptal</button>
@@ -1156,20 +1111,20 @@
   <div id="mealModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
     <div class="card p-5 max-w-md w-full space-y-3.5">
       <div class="flex justify-between items-center gap-2">
-        <h3 id="mealModalTitle" class="font-bold text-base text-emerald-400">Öğün Ekle</h3>
-        <button onclick="closeModal('mealModal')" class="modal-x text-slate-400 text-2xl leading-none px-1" aria-label="Kapat">&times;</button>
+        <h3 id="mealModalTitle" class="font-bold text-base text-[var(--w-acc)]">Öğün Ekle</h3>
+        <button onclick="closeModal('mealModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1" aria-label="Kapat">&times;</button>
       </div>
       <div class="space-y-3 text-xs">
-        <div><label for="mmName" class="block text-slate-300 mb-1">Öğün adı</label><input id="mmName" type="text" class="w-full p-2 rounded-lg text-base" /></div>
+        <div><label for="mmName" class="block text-[var(--w-muted)] mb-1">Öğün adı</label><input id="mmName" type="text" class="w-full p-2 rounded-lg text-base" /></div>
         <div class="grid grid-cols-2 gap-2">
-          <div><label for="mmTime" class="block text-slate-300 mb-1">Saat (isteğe bağlı)</label><input id="mmTime" type="time" class="w-full p-2 rounded-lg text-base bg-[#0f172a] border border-[#475569] text-white" /></div>
-          <div><label for="mmNote" class="block text-slate-300 mb-1">Kısa not</label><input id="mmNote" type="text" placeholder="örn: 50g protein" class="w-full p-2 rounded-lg text-base" /></div>
+          <div><label for="mmTime" class="block text-[var(--w-muted)] mb-1">Saat (isteğe bağlı)</label><input id="mmTime" type="time" class="w-full p-2 rounded-lg text-base" /></div>
+          <div><label for="mmNote" class="block text-[var(--w-muted)] mb-1">Kısa not</label><input id="mmNote" type="text" placeholder="örn: 50g protein" class="w-full p-2 rounded-lg text-base" /></div>
         </div>
-        <p class="text-[12px] text-slate-500">Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.</p>
+        <p class="text-[12px] text-[var(--w-dim)]">Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.</p>
       </div>
       <div class="flex justify-end gap-2 pt-1">
-        <button onclick="closeModal('mealModal')" class="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-lg">İptal</button>
-        <button onclick="saveMealModal()" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+        <button onclick="closeModal('mealModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">İptal</button>
+        <button onclick="saveMealModal()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
       </div>
     </div>
   </div>
@@ -1178,8 +1133,8 @@
   <div id="chartModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
     <div class="card p-5 max-w-lg w-full space-y-3 overflow-y-auto" style="max-height: 90vh;">
       <div class="flex justify-between items-center gap-2">
-        <h3 id="chartTitle" class="font-bold text-base text-emerald-400 truncate">İlerleme</h3>
-        <button onclick="closeModal('chartModal')" class="modal-x text-slate-400 text-2xl leading-none px-1">&times;</button>
+        <h3 id="chartTitle" class="font-bold text-base text-[var(--w-acc)] truncate">İlerleme</h3>
+        <button onclick="closeModal('chartModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1">&times;</button>
       </div>
       <div id="chartBody"></div>
     </div>
@@ -1247,7 +1202,7 @@
               <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]">Su hedefi kiloya göre</span><span id="setWaterHint" class="block text-[13px] text-[var(--t-dim)]">Kilo × 35 ml; listende kreatin varsa +0,5 L.</span></span>
               <input id="setWaterAuto" type="checkbox" class="t-sw" onchange="updateWaterAutoHint()" />
             </label>
-            <div id="setBfHint" class="hidden bg-[var(--t-well)] border border-[var(--t-line)] rounded-2xl px-3.5 py-3 text-[13px] text-slate-300"></div>
+            <div id="setBfHint" class="hidden bg-[var(--t-well)] border border-[var(--t-line)] rounded-2xl px-3.5 py-3 text-[13px] text-[var(--t-muted)]"></div>
             <div id="pfTargetsBox"></div>
           </div>
         </section>
@@ -1326,7 +1281,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v32</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v33</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

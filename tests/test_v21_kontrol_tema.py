@@ -64,7 +64,7 @@ try:
     pg.fill("#uiDlgInput", "Magnezyum"); pg.click("#uiDlgOk"); pg.wait_for_timeout(100)
     check(any(x["name"] == "Magnezyum" for x in st(pg)["supplementList"]), "takviye temalı pencereden eklendi")
     # gündüz teması
-    pg.evaluate("state.settings.theme = 'light'; renderAll(); void addMeal()"); pg.wait_for_timeout(120)
+    pg.evaluate("state.settings.theme = 'light'; renderAll(); void askText('Yeni öğünün adı', '')"); pg.wait_for_timeout(120)
     bg = pg.evaluate("getComputedStyle(document.querySelector('#uiDialog [role=dialog]')).backgroundColor")
     col = pg.evaluate("getComputedStyle(document.querySelector('#uiDlgTitle')).color")
     check(bg == "rgb(255, 255, 255)" and col == "rgb(15, 23, 42)", f"gündüz temasında beyaz kart, koyu yazı ({bg}, {col})")

@@ -101,14 +101,14 @@ with sync_playwright() as p:
     pg.evaluate("openCustomFoodModal()"); pg.fill("#cfName","Proteinli Süt"); pg.fill("#cfP","10"); pg.click("#customFoodModal >> text=Kaydet"); pg.wait_for_timeout(100)
     cid=[k for k in st(pg)["customFoods"]][0]
     pg.evaluate(f"quickAdd(0, '{cid}', 200)"); pg.wait_for_timeout(100)
-    pg.evaluate("openFoodPicker(0)"); pg.fill("#pickerSearch","proteinli"); pg.wait_for_timeout(100)
+    pg.evaluate(f"goAddFood(0, 'menu'); selectFood('{cid}')"); pg.wait_for_timeout(150)   # v33: düzenle/sil Besinler'deki seçili besin kartında
     pg.screenshot(path=""+SHOTS+"/v10_customfood.png")
-    pg.locator('#pickerList button[aria-label$="düzenle"]').first.click(); pg.wait_for_timeout(100)
+    pg.locator('#foodSelCard button', has_text="Düzenle").first.click(); pg.wait_for_timeout(100)
     print("edit prefill:", pg.input_value("#cfName"), pg.input_value("#cfP"), pg.inner_text("#cfTitle"))
     pg.fill("#cfP","12"); pg.click("#customFoodModal >> text=Kaydet"); pg.wait_for_timeout(100)
     cf=st(pg)["customFoods"]; print("after edit:", list(cf.keys())==[cid], cf[cid]["p"], cf[cid]["name"])
-    pg.evaluate("openFoodPicker(0)"); pg.fill("#pickerSearch","proteinli"); pg.wait_for_timeout(100)
-    pg.locator('#pickerList button[aria-label$=" sil"]').first.click(); pg.wait_for_timeout(150)
+    pg.evaluate(f"goAddFood(0, 'menu'); selectFood('{cid}')"); pg.wait_for_timeout(150)
+    pg.locator('#foodSelCard button', has_text="Sil").first.click(); pg.wait_for_timeout(150)
     if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(150)   # v21: temalı onay
     s=st(pg); print("deleted:", cid not in s["customFoods"], "still in meal:", any(i["foodId"]==cid for i in s["meals"][0]["items"]))
     pg.locator("#toastWrap button", has_text="Geri al").first.click(); pg.wait_for_timeout(150)

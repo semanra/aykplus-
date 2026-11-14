@@ -57,7 +57,7 @@ with sync_playwright() as p:
     pg.locator('[onclick="toggleSetDone(0, 1)"]').tap()
     pg.locator('[onclick="toggleSetDone(1, 0)"]').tap()
     pg.wait_for_timeout(200)
-    print("header:", pg.inner_text("#gymHeaderBar").replace("\n"," | "))
+    print("progress:", pg.inner_text("#gymProgText"))  # v33: gizli eski özet kutusu kaldırıldı
     pg.screenshot(path=""+SHOTS+"/2_gym_ticked.png")
     pg.on("dialog", lambda d: d.accept())
     pg.locator("button", has_text="Antrenmanı Bitir ve Kaydet").first.click(); pg.click("#uiDlgOk"); pg.wait_for_timeout(300)
@@ -87,9 +87,9 @@ with sync_playwright() as p:
     # nutrition
     pg.click("#navBtnNutrition"); pg.wait_for_timeout(300)
     pg.screenshot(path=""+SHOTS+"/6_nutrition.png", full_page=True); overflow("nutrition")
-    pg.evaluate("openFoodPicker(0)"); pg.fill("#pickerSearch","tavuk gogsu"); pg.wait_for_timeout(100)
+    pg.evaluate("goAddFood(0, 'menu')"); pg.fill("#foodSearch","tavuk gogsu"); pg.wait_for_timeout(300)   # v33: Besinler ekranı (eski seçici kaldırıldı)
     pg.screenshot(path=""+SHOTS+"/7_foodpicker.png")
-    pg.locator("#pickerList button").first.tap(); pg.wait_for_timeout(200)
+    pg.evaluate("quickAdd(0, 'tavuk_gogsu', 100)"); pg.wait_for_timeout(200)
     st=pg.evaluate("JSON.parse(localStorage.getItem('ayk_plus_v5_state'))")
     print("meal0 items:", [i["foodId"] for i in st["meals"][0]["items"]])
     # amount focus test (gramaj kutuları Menülerim'de, öğün açıkken)

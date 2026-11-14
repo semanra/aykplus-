@@ -110,8 +110,8 @@ try:
     pg.evaluate("closeModal('chartModal')")
     # Beslenmeden açılan ortak pencere eski temada kalmalı
     pg.click("#navBtnNutrition"); pg.wait_for_timeout(100)
-    pg.evaluate("openFoodPicker(0)"); pg.wait_for_timeout(100)
-    check("tm" not in pg.get_attribute("#pickerModal", "class"), "beslenmeden açılan seçici eski temada kalıyor")
+    pg.evaluate("openSwap(1, 0, 'day')"); pg.wait_for_timeout(100)   # v33: ikame seçicisi (eski besin seçici kaldırıldı)
+    check("tm" not in pg.get_attribute("#pickerModal", "class"), "beslenmeden açılan seçici beslenme temasında")
     pg.evaluate("closeModal('pickerModal')")
     pg.click("#navBtnGym"); pg.wait_for_timeout(100); pg.evaluate("setGymView('program')"); pg.wait_for_timeout(100)
 

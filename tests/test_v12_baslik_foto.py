@@ -30,7 +30,9 @@ try:
     bb = brand(pg)
     check(bb["disp"] != "none" and bb["op"] > 0.9 and bb["w"] > 40, "açılışta yanında AYK+ görünüyor")
     pg.screenshot(path=SHOTS + "/v12_launch.png", clip={"x": 0, "y": 0, "width": 375, "height": 120})
-    pg.wait_for_timeout(2300)
+    # v33: sabit bekleme yerine en fazla 6 sn içinde kaybolmasını bekle (açılış yükünde animasyon ~1 sn geç başlayabiliyor)
+    try: pg.wait_for_function("(() => { const b = document.getElementById('brandTag'); return +getComputedStyle(b).opacity < 0.05 && b.getBoundingClientRect().width < 1; })()", timeout=6000)
+    except Exception: pass
     bb = brand(pg)
     check(bb["op"] < 0.05 and bb["w"] < 1, "birkaç saniye sonra AYK+ kayarak kayboldu")
     pg.screenshot(path=SHOTS + "/v12_after.png", clip={"x": 0, "y": 0, "width": 375, "height": 120})

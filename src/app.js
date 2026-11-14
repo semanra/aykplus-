@@ -1,5 +1,5 @@
 // ============================================================================
-// AYK+ v10 — UYGULAMA MANTIĞI
+// AYK+ — UYGULAMA MANTIĞI (sürüm: src/markup.html Ayarlar etiketi ve sw.js CACHE)
 // ============================================================================
 
 const DEFAULT_SETTINGS = {
@@ -356,7 +356,7 @@ function saveState() {
     saveFailNotified = false;
   } catch (e) {
     console.error(e);
-    if (!saveFailNotified) { toast("⚠️ Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
+    if (!saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
   }
 }
 
@@ -451,9 +451,9 @@ function lostFoodIds() {
 }
 // Açılışta bir kez: veritabanı yüklenemediyse veya bulunamayan besin varsa söyle
 function checkFoodHealth() {
-  if (typeof USDA_FOODS === "undefined") { toast("⚠️ Besin veritabanı yüklenemedi. Uygulamayı tamamen kapatıp yeniden aç.", "error"); return; }
+  if (typeof USDA_FOODS === "undefined") { toast("Besin veritabanı yüklenemedi. Uygulamayı tamamen kapatıp yeniden aç.", "error"); return; }
   const n = lostFoodIds().length;
-  if (n) toast(`⚠️ ${n} besin veritabanında bulunamadı; "⚠" işaretliler son kayıtlı değerleriyle hesaplanıyor.`, "error");
+  if (n) toast(`${n} besin veritabanında bulunamadı; "⚠" işaretliler son kayıtlı değerleriyle hesaplanıyor.`, "error");
 }
 function activeDay() { return state.workoutDays[state.activeWorkoutDayIdx]; }
 
@@ -463,14 +463,12 @@ function activeDay() { return state.workoutDays[state.activeWorkoutDayIdx]; }
 function toast(msg, type = "ok", action = null) {
   const wrap = $("toastWrap");
   const el = document.createElement("div");
-  const tm = trainCtx();
-  const nm = !tm && nutriCtx();
-  if ((tm || nm) && type !== "error") { msg = String(msg).replace(EMOJI_LEAD, ""); if (action) action = { ...action, label: String(action.label).replace(EMOJI_LEAD, "") }; }
-  const color = type === "error" ? "bg-rose-950 border-rose-700 text-rose-100"
-    : type === "pr" ? "bg-amber-950 border-amber-500 text-amber-100"
-    : tm ? "bg-[var(--t-surface)] border-[var(--t-panel-line)] text-[var(--t-text)]"
-    : nm ? "n-toast" : "bg-slate-900 border-emerald-600/70 text-slate-100";
-  el.className = "toast max-w-sm w-full text-center text-sm font-semibold border px-4 py-2.5 shadow-2xl " + (tm || nm ? "rounded-2xl " : "rounded-xl ") + color;
+  // v33: bildirim metinleri kaynakta emojisiz; renkler tema değişkenleriyle (Beslenme'de .n-toast)
+  const nm = !trainCtx() && nutriCtx();
+  const color = type === "error" ? "bg-[var(--t-danger-bg)] border-[var(--t-danger)] text-[var(--t-danger-text)]"
+    : type === "pr" ? "bg-[var(--t-warn-bg)] border-[var(--t-warn-icon)] text-[var(--t-warn-hi)]"
+    : nm ? "n-toast" : "bg-[var(--t-surface)] border-[var(--t-panel-line)] text-[var(--t-text)]";
+  el.className = "toast max-w-sm w-full text-center text-sm font-semibold border px-4 py-2.5 shadow-2xl rounded-2xl " + color;
   el.textContent = msg;
   if (action) {
     el.textContent = "";
@@ -480,9 +478,7 @@ function toast(msg, type = "ok", action = null) {
     sp.textContent = msg;
     const b = document.createElement("button");
     b.textContent = action.label;
-    b.className = tm ? "t-btn shrink-0 h-11 px-4 rounded-xl text-[13px]"
-      : nm ? "n-btn shrink-0 h-11 px-4 rounded-full text-[13px]"
-      : "shrink-0 bg-emerald-600 text-white text-xs font-bold px-3 min-h-11 rounded-lg";
+    b.className = nm ? "n-btn shrink-0 h-11 px-4 rounded-full text-[13px]" : "t-btn shrink-0 h-11 px-4 rounded-xl text-[13px]";
     b.onclick = () => { el.remove(); action.fn(); };
     el.append(sp, b);
   }
@@ -495,7 +491,7 @@ function toast(msg, type = "ok", action = null) {
   setTimeout(() => el.remove(), life + 400);
 }
 
-window.addEventListener("error", e => { toast("⚠️ Hata: " + (e.message || "bilinmeyen"), "error"); });
+window.addEventListener("error", e => { toast("Hata: " + (e.message || "bilinmeyen"), "error"); });
 
 // ---------------------------------------------------------------------------
 // MODAL YÖNETİMİ
@@ -511,13 +507,12 @@ function openModal(id) {
   const nm = !tm && nutriCtx();
   m.classList.toggle("tm", tm);
   m.classList.toggle("nm", nm);
-  if (tm || nm) m.querySelectorAll("h3").forEach(h => { const t = h.textContent; const c = t.replace(EMOJI_LEAD, ""); if (c !== t) h.textContent = c; });
   m.classList.remove("hidden"); m.classList.add("flex");
 }
 function closeModal(id) { const m = $(id); m.classList.add("hidden"); m.classList.remove("flex"); }
 document.addEventListener("click", e => {
   const t = e.target;
-  if (t && t.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "settingsModal", "exSheet", "mealModal", "shopModal"].includes(t.id)) closeModal(t.id);
+  if (t && t.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "exSheet", "mealModal", "shopModal"].includes(t.id)) closeModal(t.id);
 });
 
 // Temalı onay / metin penceresi. Sonuç: onay → true (veya yazılan metin), vazgeç → null.
@@ -654,9 +649,9 @@ function finishTimer() {
   beep();
   try { if (navigator.vibrate) navigator.vibrate([300, 150, 300]); } catch (e) { /* yoksay */ }
   $("restPillTime").textContent = "BİTTİ!";
-  $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums text-rose-400";
+  $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums text-[var(--d-over)]";
   $("restPillInner").classList.add("timer-flash");
-  toast("⏰ " + timer.label + " bitti!");
+  toast("" + timer.label + " bitti!");
   setTimeout(() => { if (!timer.running) resetTimerUI(); }, 4500);
 }
 
@@ -676,7 +671,7 @@ function renderTimerUI(rem) {
   $("restPill").classList.remove("hidden");
   $("restPillLabel").textContent = timer.label;
   $("restPillTime").textContent = fmtClock(rem);
-  $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums " + (rem <= 10 ? "text-rose-400" : "text-[var(--t-acc-text)]");
+  $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums " + (rem <= 10 ? "text-[var(--d-over)]" : "text-[var(--t-acc-text)]");
 }
 
 function resetTimerUI() {
@@ -734,7 +729,7 @@ function checkNewDay() {
     archiveDay(state.today);
     resetDaily();
     state.today = t;
-    toast("🌅 Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.");
+    toast("Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.");
     return true;
   }
   return false;
@@ -765,7 +760,7 @@ function switchTab(tab) {
 function applyTabVisibility() {
   const map = {
     nutrition: ["tabNutrition", "nutritionHeaderBar", "navBtnNutrition", "block"],
-    gym: ["tabGym", "gymHeaderBar", "navBtnGym", "grid"],
+    gym: ["tabGym", null, "navBtnGym", "grid"],
     mobility: ["tabMobility", null, "navBtnMobility", "grid"],
     progress: ["tabProgress", "progressHeaderBar", "navBtnProgress", "block"]
   };
@@ -897,13 +892,13 @@ function updateBfHint() {
   const el = $("setBfHint");
   if (!bf) { el.classList.add("hidden"); return; }
   const c = bodyComp(state.weight, bf);
-  let html = `Yağsız kütlen: <b class="text-emerald-400">${fmtNum(c.leanKg)} kg</b> • Yağ kütlen: <b class="text-rose-400">${fmtNum(c.fatKg)} kg</b>`;
+  let html = `Yağsız kütlen: <b class="text-[var(--w-acc)]">${fmtNum(c.leanKg)} kg</b> • Yağ kütlen: <b class="text-[var(--w-over)]">${fmtNum(c.fatKg)} kg</b>`;
   if (tbf && tbf < bf) {
     const suggest = round1(c.leanKg / (1 - tbf / 100));
-    html += `<div class="mt-1.5">Kas kütleni koruyarak %${fmtNum(tbf)} yağ oranına inersen tahmini kilon: <b class="text-amber-400">${fmtNum(suggest)} kg</b></div>
+    html += `<div class="mt-1.5">Kas kütleni koruyarak %${fmtNum(tbf)} yağ oranına inersen tahmini kilon: <b class="text-[var(--w-k)]">${fmtNum(suggest)} kg</b></div>
       <button onclick="$('setTarget').value='${fmtNum(suggest)}'; toast('Hedef kilo ${fmtNum(suggest)} kg olarak dolduruldu, kaydetmeyi unutma');" class="t-btn-outline mt-2.5 w-full h-11 rounded-xl text-[14px]">Bunu hedef kilom yap</button>`;
   }
-  html += `<div class="mt-1.5 text-slate-500">Yağ oranı girildiği için kalori hesabı yağsız kütleye göre yapılıyor. Ölçüm değiştikçe (ayda bir gibi) güncelle.</div>`;
+  html += `<div class="mt-1.5 text-[var(--w-dim)]">Yağ oranı girildiği için kalori hesabı yağsız kütleye göre yapılıyor. Ölçüm değiştikçe (ayda bir gibi) güncelle.</div>`;
   el.innerHTML = html;
   el.classList.remove("hidden");
 }
@@ -1058,7 +1053,7 @@ function openSwap(mIdx, iIdx, dest) {
     cur.foodId = it.id;
     cur.amount = rawFromEff(nf, it.eff);
     renderAll();
-    offerUndo(`⇄ ${f0.name} → ${nf.name} (${fmtNum(it.eff)} ${nf.unit})${dest === "day" ? " · yalnızca bugün" : ""}`);
+    offerUndo(`${f0.name} → ${nf.name} (${fmtNum(it.eff)} ${nf.unit})${dest === "day" ? " · yalnızca bugün" : ""}`);
   });
 }
 
@@ -1399,7 +1394,7 @@ function dayRemoveItem(mIdx, iIdx) {
   const it = c[mIdx].items.splice(iIdx, 1)[0];
   const f = it.est ? null : getFoodDB()[it.foodId];
   renderAll();
-  offerUndo(`🗑️ ${it.est ? it.est.name : f ? f.name : "Besin"} bugünden çıkarıldı`);
+  offerUndo(`${it.est ? it.est.name : f ? f.name : "Besin"} bugünden çıkarıldı`);
 }
 // Öğünün yarısı yendi: bugünkü miktarlar yarıya iner, öğün yendi işaretlenir
 function halfMeal(mIdx) {
@@ -1436,7 +1431,7 @@ function saveDayToMenu() {
     n++;
   });
   renderAll();
-  offerUndo(`✓ ${n} öğün menüye kaydedildi${skipped ? ` · dışarıda yenen ${skipped} öğün menüye yazılmadı` : ""}`);
+  offerUndo(`${n} öğün menüye kaydedildi${skipped ? ` · dışarıda yenen ${skipped} öğün menüye yazılmadı` : ""}`);
 }
 function revertDayToMenu() {
   const c = dayCopy();
@@ -1447,7 +1442,7 @@ function revertDayToMenu() {
   state.dayPlan[dayKind()] = null;
   openEditMeals.clear();
   renderAll();
-  offerUndo("↺ Bugün menüdeki hâline döndü");
+  offerUndo("Bugün menüdeki hâline döndü");
 }
 
 // ---------------------------------------------------------------------------
@@ -1484,7 +1479,7 @@ function updateFreeMealHint() {
   const can = pv.over > tol;
   $("fmBalance").disabled = !can;
   if (!can) $("fmBalance").checked = false;
-  $("fmBalanceWrap").classList.toggle("opacity-50", !can);
+  $("fmBalance").classList.toggle("opacity-40", !can);   // v33: açıklama okunur kalsın, yalnız anahtar soluk
 }
 function saveFreeMeal() {
   const kcal = num($("fmKcal").value, NaN);
@@ -1513,7 +1508,7 @@ function balanceDayNow() {
   snapshot();
   const r = balanceDay(-1);
   renderAll();
-  if (r.parts.length) offerUndo("⚖️ " + r.msg.replace(/^ · /, "")); else toast(r.msg.replace(/^ · /, ""), "error");
+  if (r.parts.length) offerUndo("" + r.msg.replace(/^ · /, "")); else toast(r.msg.replace(/^ · /, ""), "error");
 }
 // Kalan (yenmemiş) öğünlerde karb/yağ ağırlıklı besinleri orantılı kısar; protein kaynakları
 // (kalorisinin %40+'ı proteinden gelen besinler) değişmez. Hedef aşımını kapatmaya çalışır.
@@ -2006,13 +2001,13 @@ function addSelectedFood() {
   if (foodUI.dest === "menu") {
     const mealTitle = curMeals()[tIdx].title;
     quickAdd(tIdx, fid, amt, curMeals());
-    toast(`✓ ${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${mealTitle} (menüne, her gün)`);
+    toast(`${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${mealTitle} (menüne, her gün)`);
   } else {
     const list = ensureDayCopy();
     const meal = list[tIdx];
     quickAdd(tIdx, fid, amt, list);
     const mid = meal.id;
-    toast(`✓ ${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${meal.title} (yalnızca bugün)`, "ok", { label: "Menüye de kaydet", fn: () => addToMenuById(mid, fid, amt) });
+    toast(`${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${meal.title} (yalnızca bugün)`, "ok", { label: "Menüye de kaydet", fn: () => addToMenuById(mid, fid, amt) });
   }
   foodUI.sel = null;
   renderFoods();
@@ -2022,7 +2017,7 @@ function addToMenuById(mealId, foodId, amount) {
   const mi = curMeals().findIndex(m => m.id === mealId);
   if (mi < 0) { toast("Bu öğün menüde bulunamadı", "error"); return; }
   quickAdd(mi, foodId, amount, curMeals());
-  toast(`✓ Menüdeki "${curMeals()[mi].title}" öğününe de eklendi`);
+  toast(`Menüdeki "${curMeals()[mi].title}" öğününe de eklendi`);
 }
 
 // ---------------------------------------------------------------------------
@@ -2153,7 +2148,7 @@ async function onBarcode(raw) {
   if (local) {
     closeBarcode();
     pickFoodInFoods(local);
-    toast(`✓ ${state.customFoods[local].name} listende vardı; miktarı seçip öğüne ekle`);
+    toast(`${state.customFoods[local].name} listende vardı; miktarı seçip öğüne ekle`);
     return;
   }
   if (navigator.onLine === false) {
@@ -2244,7 +2239,7 @@ function addBarcodeFood() {
   invalidateFoodDB();
   closeBarcode();
   pickFoodInFoods(id);
-  toast(`✓ ${nm} listene eklendi; miktarı seçip öğüne ekle`);
+  toast(`${nm} listene eklendi; miktarı seçip öğüne ekle`);
 }
 // Tutarsız barkod ürünü: etiket formu bulunan değerlerle dolu açılır, kullanıcı paketteki tabloyla düzeltir
 function barcodeFixFood() {
@@ -2290,7 +2285,7 @@ function logCurrentWeight() {
   if (validBf(state.settings.bodyFat)) entry.bf = validBf(state.settings.bodyFat);
   if (last && last.ts && todayStr(new Date(last.ts)) === todayStr()) state.weightLogs[state.weightLogs.length - 1] = entry;
   else state.weightLogs.push(entry);
-  toast(`📌 ${fmtNum(state.weight)} kg kaydedildi`);
+  toast(`${fmtNum(state.weight)} kg kaydedildi`);
   renderAll();
 }
 function deleteWeightLog(idx) {
@@ -2298,7 +2293,7 @@ function deleteWeightLog(idx) {
   snapshot();
   state.weightLogs.splice(idx, 1);
   renderAll();
-  offerUndo("🗑️ Tartı kaydı silindi");
+  offerUndo("Tartı kaydı silindi");
 }
 
 function addWater(delta) { state.waterLiters = Math.max(0, Math.round(((state.waterLiters || 0) + delta) * 100) / 100); renderAll(); }
@@ -2311,12 +2306,6 @@ function toggleMealDone(mIdx) {
   renderAll();
 }
 function setDayType(type) { state.dayType = type; renderAll(); }
-async function renameMeal(mIdx) {
-  const m = curMeals()[mIdx];
-  if (!m) return;
-  const t = await askText("Öğün adı", m.title);
-  if (t && t.trim()) { m.title = t.trim(); renderAll(); }
-}
 
 // Ekranda görünen miktar (kiloya göre gramaj açıksa ölçeklenmiş hâli) üzerinden çalışır
 function changeAmount(mIdx, iIdx, dir) {
@@ -2343,7 +2332,7 @@ function removeItem(mIdx, iIdx) {
   const it = curMeals()[mIdx].items.splice(iIdx, 1)[0];
   const f = it ? getFoodDB()[it.foodId] : null;
   renderAll();
-  offerUndo(`🗑️ ${f ? f.name : "Besin"} çıkarıldı`);
+  offerUndo(`${f ? f.name : "Besin"} çıkarıldı`);
 }
 
 // amount: ekranda görünen miktar (ölçek açıksa saklanacak miktara çevrilir)
@@ -2363,7 +2352,7 @@ function quickAdd(mIdx, foodId, amount, meals) {
 function openCustomFoodModal() {
   cfEditId = null;
   cfPendingBarcode = null;
-  $("cfTitle").textContent = "➕ Kendi Özel Besinini Tanımla";
+  $("cfTitle").textContent = "Kendi özel besinini tanımla";
   $("cfHint").classList.add("hidden");
   $("cfName").value = ""; $("cfUnit").value = "100g"; $("cfDef").value = "100";
   $("cfK").value = "";
@@ -2385,7 +2374,6 @@ function cfUnitChanged() {
   const m = $("cfUnit").value;
   $("cfDefLabel").textContent = m === "serv" ? "1 porsiyon kaç gram?" : m === "1adet" ? "Varsayılan miktar (adet):" : "Varsayılan miktar (g):";
 }
-function openFoodModalFromPicker() { closeModal("pickerModal"); openCustomFoodModal(); }
 async function saveCustomFood() {
   const name = $("cfName").value.trim();
   if (!name) { sayAlert("Ad eksik", "Lütfen besin adını gir."); return; }
@@ -2416,7 +2404,7 @@ async function saveCustomFood() {
   state.customFoods[id] = food;
   invalidateFoodDB();
   closeModal("customFoodModal");
-  toast(editing ? "✓ " + name + " güncellendi" : "⭐ " + name + " besin listene eklendi");
+  toast(editing ? "" + name + " güncellendi" : "" + name + " besin listene eklendi");
   renderAll();
   if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") selectFood(id);
 }
@@ -2430,9 +2418,9 @@ function openPicker(title, groups, onPick, extra) {
   picker = { groups, onPick, extra: extra || null, cat: "all", flat: [] };
   $("pickerTitle").textContent = title;
   $("pickerSearch").value = "";
-  $("pickerSearch").placeholder = trainCtx() || nutriCtx() ? "Ara..." : "🔍 Ara...";
+  $("pickerSearch").placeholder = "Ara...";
   $("pickerExtraWrap").classList.toggle("hidden", !extra);
-  if (extra) $("pickerExtraBtn").textContent = trainCtx() || nutriCtx() ? String(extra.label).replace(EMOJI_LEAD, "") : extra.label;
+  if (extra) $("pickerExtraBtn").textContent = extra.label;
   renderPickerChips();
   renderPickerList();
   openModal("pickerModal");
@@ -2442,7 +2430,7 @@ function openPicker(title, groups, onPick, extra) {
 function renderPickerChips() {
   const chip = (key, label) => {
     const on = picker.cat === key;
-    return `<button onclick="setPickerCat('${key}')" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${on ? "bg-emerald-600 border-emerald-500 text-white font-semibold" : "bg-slate-800 border-slate-700 text-slate-300"}">${esc(label)}</button>`;
+    return `<button onclick="setPickerCat('${key}')" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${on ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
   };
   $("pickerChips").innerHTML = chip("all", "Tümü") + picker.groups.map((g, i) => chip(String(i), g.short || g.label)).join("");
 }
@@ -2466,24 +2454,20 @@ function renderPickerList() {
     if (!items.length) return;
     // v18: çok uzun listede (binlerce besin) ilk 150 sonuç; gerisi için arama daraltılır
     if (shown >= 150) { hidden += items.length; return; }
-    html += `<div class="text-[12px] font-bold text-slate-500 tracking-wide pt-2">${esc(g.label)}</div>`;
+    html += `<div class="text-[12px] font-bold text-[var(--w-dim)] tracking-wide pt-2">${esc(g.label)}</div>`;
     items.forEach(it => {
       if (shown >= 150) { hidden++; return; }
       shown++;
       const idx = picker.flat.push(it) - 1;
       const main = `<button onclick="pickerChoose(${idx})" class="flex-1 min-w-0 text-left px-3 py-2.5">
-        <div class="text-sm font-medium text-slate-100">${esc(it.label)}</div>
-        ${it.sub ? `<div class="text-[12px] text-slate-400 mt-0.5">${esc(it.sub)}</div>` : ""}
+        <div class="text-sm font-medium text-[var(--w-text1)]">${esc(it.label)}</div>
+        ${it.sub ? `<div class="text-[12px] text-[var(--w-muted)] mt-0.5">${esc(it.sub)}</div>` : ""}
       </button>`;
-      html += it.customId
-        ? `<div class="flex items-center bg-slate-800/80 border border-slate-700 rounded-xl pr-1">${main}
-            <button onclick="editCustomFood(${esc(JSON.stringify(it.customId))})" class="w-11 h-11 shrink-0 rounded-lg text-slate-300" aria-label="${esc(it.label)} düzenle">✎</button>
-            <button onclick="deleteCustomFood(${esc(JSON.stringify(it.customId))})" class="w-11 h-11 shrink-0 rounded-lg text-rose-300" aria-label="${esc(it.label)} sil">🗑️</button></div>`
-        : `<div class="bg-slate-800/80 border border-slate-700 rounded-xl active:bg-slate-700 flex">${main}</div>`;
+      html += `<div class="bg-[var(--w-elev)] border border-[var(--w-line)] rounded-xl active:bg-[var(--w-elev2)] flex">${main}</div>`;
     });
   });
-  if (hidden) html += `<div class="text-[12px] text-slate-500 text-center py-3">${hidden} sonuç daha var; aramayı daralt.</div>`;
-  $("pickerList").innerHTML = html || `<div class="text-sm text-slate-500 text-center py-8">Sonuç bulunamadı.</div>`;
+  if (hidden) html += `<div class="text-[12px] text-[var(--w-dim)] text-center py-3">${hidden} sonuç daha var; aramayı daralt.</div>`;
+  $("pickerList").innerHTML = html || `<div class="text-sm text-[var(--w-dim)] text-center py-8">Sonuç bulunamadı.</div>`;
 }
 
 function pickerChoose(idx) {
@@ -2499,29 +2483,6 @@ function pickerExtra() {
   if (ex) ex.onClick();
 }
 
-function openFoodPicker(mIdx) {
-  const db = getFoodDB();
-  const sub = f => {
-    const p = f.p * f.def, c = f.c * f.def, fat = f.f * f.def;
-    return `${fmtNum(f.def)} ${f.unit} • ${Math.round(kcalPerUnit(f) * f.def)} kcal • ${Math.round(p)}P ${Math.round(c)}K ${Math.round(fat)}Y`;
-  };
-  const cats = {};
-  Object.keys(db).forEach(id => {
-    const f = db[id];
-    if (isHiddenFood(f)) return;
-    const cat = f.cat || "Diğer";
-    (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: sub(f), customId: id.startsWith("custom_") ? id : null });
-  });
-  const groups = [];
-  const recent = state.recentFoods.filter(id => db[id]).map(id => ({ id, label: db[id].name, sub: sub(db[id]) }));
-  if (recent.length) groups.push({ label: "🕘 Son Kullanılanlar", short: "🕘 Son", items: recent });
-  Object.keys(cats).forEach(c => groups.push({ label: c, short: c.replace(/\s*[&/].*$/, ""), items: cats[c] }));
-  openPicker(`🍽️ ${curMeals()[mIdx].title}`, groups, it => {
-    const f = getFoodDB()[it.id];
-    quickAdd(mIdx, it.id, f.def);
-    toast(`✓ ${f.name} (${fmtNum(f.def)} ${f.unit}) eklendi`);
-  }, { label: "➕ Listede yok mu? Özel besin tanımla", onClick: openCustomFoodModal });
-}
 
 function openExercisePicker() {
   const groups = Object.keys(EXERCISE_LIBRARY).map(g => ({
@@ -2605,6 +2566,22 @@ function openEditExercise(exIdx) {
   openModal("exerciseModal");
 }
 
+function readExLevels() {
+  const sel = $("exEquip").value;
+  const equip = EQUIP_LABEL[sel] ? sel : "";
+  const addon = Math.max(0, round2(num($("exLvAddon").value, 0)));
+  let levels = null;
+  if (exLevelsMode === "step") {
+    const step = round2(num($("exLvStep").value, 0));
+    const start = round2(num($("exLvStart").value, 0));
+    if (step > 0) levels = { mode: "step", start: start > 0 ? start : step, step, addon };
+  } else {
+    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(t => round2(num(t.trim(), -1))).filter(v => v >= 0);
+    const uniq = [...new Set(list)].sort((a, b) => a - b);
+    if (uniq.length >= 2) levels = { mode: "list", list: uniq, addon };
+  }
+  return { equip, levels };
+}
 function readExModal() {
   return {
     name: $("exName").value.trim(),
@@ -2660,7 +2637,7 @@ function saveExerciseModal() {
     ex.targetInfo = targetInfoFor(kind, v, null);
     activeDay().exercises.push(ex);
     closeModal("exerciseModal");
-    toast("✓ " + v.name + " eklendi");
+    toast("" + v.name + " eklendi");
     renderAll();
     if (state.gymActive) setTimeout(() => { const el = $("exCard_" + (activeDay().exercises.length - 1)); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
     return;
@@ -2688,7 +2665,7 @@ function saveExerciseModal() {
   applyExExtras(ex, v);
   ex.targetInfo = targetInfoFor(kind, v, kind === "cardio" ? null : ex);
   closeModal("exerciseModal");
-  toast("✓ Hareket güncellendi");
+  toast("Hareket güncellendi");
   renderAll();
 }
 
@@ -2731,39 +2708,7 @@ function sessionSummary(sess) {
 // ---------------------------------------------------------------------------
 // ANTRENMAN RENDER
 // ---------------------------------------------------------------------------
-function exRightHtml(ex) {
-  if (ex.kind === "cardio") {
-    const t = cardioTotals(ex.sets, false);
-    const pace = paceText(t.min, t.km);
-    return `<div class="text-xs font-semibold text-sky-300">${fmtNum(t.min)} dk${t.km > 0 ? " • " + fmtNum(t.km) + " km" : ""}</div>${pace ? `<div class="text-[12px] text-slate-400">${pace}</div>` : ""}`;
-  }
-  if (ex.kind === "time") {
-    const total = ex.sets.reduce((a, s) => a + num(s.sec), 0);
-    return `<div class="text-xs font-semibold text-sky-300">Toplam: ${total} sn</div>${ex.rest ? `<div class="text-[12px] text-slate-400">Dinlenme: ${ex.rest} sn</div>` : ""}`;
-  }
-  let vol = 0, best = 0;
-  ex.sets.forEach(s => { vol += num(s.kg) * num(s.reps); best = Math.max(best, e1rm(s.kg, s.reps)); });
-  return `<div class="text-xs font-semibold text-amber-400">1RM: ~${Math.round(best)} kg</div><div class="text-[12px] text-slate-400">Tonaj: ${Math.round(vol)} kg</div>`;
-}
 
-function updateGymHeader() {
-  let doneSets = 0, totalSets = 0, vol = 0, cMin = 0, cKm = 0, hasCardio = false;
-  activeDay().exercises.forEach(ex => ex.sets.forEach(s => {
-    totalSets++;
-    if (ex.kind === "cardio") hasCardio = true;
-    if (!s.done) return;
-    doneSets++;
-    if (ex.kind === "weight") vol += num(s.kg) * num(s.reps);
-    if (ex.kind === "cardio") { cMin += num(s.min); cKm += num(s.km); }
-  }));
-  $("gymDoneSets").textContent = doneSets;
-  $("gymTotalSets").textContent = totalSets;
-  $("gymTotalVolume").textContent = Math.round(vol).toLocaleString("tr-TR");
-  const cs = $("gymCardioSummary");
-  cs.classList.toggle("hidden", !hasCardio);
-  cs.textContent = hasCardio ? `🏃 ${fmtNum(cMin)} dk${cKm > 0 ? " • " + fmtNum(cKm) + " km" : ""}` : "";
-  updateActiveProgress();
-}
 
 function selectWorkoutDay(idx) { state.activeWorkoutDayIdx = idx; renderAll(); }
 
@@ -2777,7 +2722,7 @@ function updateSetData(exIdx, sIdx, field, val) {
   const ex = activeDay().exercises[exIdx];
   const rEl = $("exRight_" + exIdx);
   if (rEl) rEl.textContent = exRightText(ex);
-  updateGymHeader();
+  updateActiveProgress();
   saveState();
 }
 
@@ -2798,7 +2743,7 @@ function toggleSetDone(exIdx, sIdx) {
         ex.sets.forEach((o, i) => { if (i !== sIdx && o.done) best = Math.max(best, e1rm(o.kg, o.reps)); });
         if (cur > best + 0.01) {
           s.pr = true;
-          toast(`🏆 YENİ REKOR! ${ex.name}: ${fmtKg(num(s.kg))} kg × ${num(s.reps)} (1RM ~${Math.round(cur)} kg)`, "pr");
+          toast(`YENİ REKOR! ${ex.name}: ${fmtKg(num(s.kg))} kg × ${num(s.reps)} (1RM ~${Math.round(cur)} kg)`, "pr");
         }
       }
     }
@@ -2849,7 +2794,7 @@ function removeExercise(exIdx) {
   activeDay().exercises.splice(exIdx, 1);
   if (!workoutInProgress()) state.workoutStartedAt = 0;
   renderAll();
-  offerUndo(`🗑️ "${ex.name}" kaldırıldı`);
+  offerUndo(`"${ex.name}" kaldırıldı`);
 }
 
 async function addWorkoutDay() {
@@ -2873,7 +2818,7 @@ async function deleteWorkoutDay() {
   state.workoutDays.splice(state.activeWorkoutDayIdx, 1);
   state.activeWorkoutDayIdx = Math.max(0, state.activeWorkoutDayIdx - 1);
   renderAll();
-  offerUndo(`🗑️ "${d.name}" silindi`);
+  offerUndo(`"${d.name}" silindi`);
 }
 function uncheckAllSets() {
   activeDay().exercises.forEach(ex => ex.sets.forEach(s => { s.done = false; s.pr = false; }));
@@ -2928,7 +2873,7 @@ async function finishAndLogWorkout() {
   renderAll();
   const li = state.workoutLogs.length - 1;
   const dTxt = state.workoutLogs[li].durationMin ? `${fmtMinutes(state.workoutLogs[li].durationMin)}, ` : "";
-  toast(`🎉 Tebrikler! ${dTxt}${Math.round(vol).toLocaleString("tr-TR")} kg tonaj${cMin > 0 ? `, ${fmtNum(cMin)} dk kardiyo` : ""}${prs ? `, ${prs} rekor` : ""} kaydedildi`, prs ? "pr" : "ok", { label: "📤 Paylaş", fn: () => openShareCard(li) });
+  toast(`Tebrikler! ${dTxt}${Math.round(vol).toLocaleString("tr-TR")} kg tonaj${cMin > 0 ? `, ${fmtNum(cMin)} dk kardiyo` : ""}${prs ? `, ${prs} rekor` : ""} kaydedildi`, prs ? "pr" : "ok", { label: "Paylaş", fn: () => openShareCard(li) });
 }
 
 function deleteWorkoutLog(idx) {
@@ -2943,7 +2888,7 @@ function deleteWorkoutLog(idx) {
   }
   state.workoutLogs.splice(idx, 1);
   renderAll();
-  offerUndo("🗑️ Antrenman kaydı silindi");
+  offerUndo("Antrenman kaydı silindi");
 }
 
 // ---------------------------------------------------------------------------
@@ -3309,7 +3254,7 @@ function mobTimerRender() {
 // ---------------------------------------------------------------------------
 function lineChart(points, color, unit) {
   if (points.length < 2) {
-    return `<div class="text-xs text-slate-500 text-center py-8 bg-slate-900/60 rounded-xl border border-slate-800">Grafik için en az 2 kayıt gerekli.${points.length === 1 ? ` (Şu an: ${fmtNum(points[0].y)} ${unit})` : ""}</div>`;
+    return `<div class="text-xs text-[var(--w-dim)] text-center py-8 bg-[var(--w-elev0)] rounded-xl border border-[var(--w-line)]">Grafik için en az 2 kayıt gerekli.${points.length === 1 ? ` (Şu an: ${fmtNum(points[0].y)} ${unit})` : ""}</div>`;
   }
   const W = 340, H = 150, pl = 34, pr = 10, pt = 14, pb = 24;
   const ys = points.map(p => p.y);
@@ -3324,10 +3269,10 @@ function lineChart(points, color, unit) {
   const grid = [0, 0.5, 1].map(f => {
     const v = min + (max - min) * (1 - f);
     const yy = pt + (H - pt - pb) * f;
-    return `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" stroke="#334155" stroke-dasharray="3 3"/><text x="${pl - 4}" y="${yy + 3}" text-anchor="end" font-size="9" fill="#94a3b8">${(max - min) < 8 ? fmtNum(v) : Math.round(v)}</text>`;
+    return `<line x1="${pl}" x2="${W - pr}" y1="${yy}" y2="${yy}" style="stroke:var(--w-line)" stroke-dasharray="3 3"/><text x="${pl - 4}" y="${yy + 3}" text-anchor="end" font-size="9" style="fill:var(--w-dim)">${(max - min) < 8 ? fmtNum(v) : Math.round(v)}</text>`;
   }).join("");
   const showIdx = new Set([0, points.length - 1, Math.floor((points.length - 1) / 2)]);
-  const labels = points.map((p, i) => showIdx.has(i) ? `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? "start" : i === points.length - 1 ? "end" : "middle"}" font-size="9" fill="#94a3b8">${esc(p.label)}</text>` : "").join("");
+  const labels = points.map((p, i) => showIdx.has(i) ? `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? "start" : i === points.length - 1 ? "end" : "middle"}" font-size="9" style="fill:var(--w-dim)">${esc(p.label)}</text>` : "").join("");
   const dots = points.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.y).toFixed(1)}" r="${points.length > 30 ? 1.5 : 3}" style="fill:${color}"/>`).join("");
   const lastP = points[points.length - 1];
   return `<svg viewBox="0 0 ${W} ${H}" class="w-full h-auto" role="img">
@@ -3361,27 +3306,19 @@ function exerciseChartHtml(name, accent) {
   const ser = exerciseSeries(name);
   if (accent) ser.color = accent;
   const hist = historyFor(name);
-  if (!hist.length) return `<div class="text-xs text-slate-500 text-center py-8">Bu hareket için henüz kayıt yok. Antrenmanı bitirip kaydettikçe grafik oluşur.</div>`;
+  if (!hist.length) return `<div class="text-xs text-[var(--w-dim)] text-center py-8">Bu hareket için henüz kayıt yok. Antrenmanı bitirip kaydettikçe grafik oluşur.</div>`;
   const rows = hist.slice().reverse().slice(0, 8).map(h => `
-    <div class="flex justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5">
-      <span class="text-slate-400 shrink-0">${fmtDate(h.ts)}</span><span class="text-[var(--t-text2)] text-right truncate">${esc(sessionSummary(h))}</span>
+    <div class="flex justify-between gap-2 text-xs bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-lg px-2.5 py-1.5">
+      <span class="text-[var(--w-muted)] shrink-0">${fmtDate(h.ts)}</span><span class="text-[var(--t-text2)] text-right truncate">${esc(sessionSummary(h))}</span>
     </div>`).join("");
-  return `<div class="text-[12px] text-slate-400 mb-1">${ser.metric}</div>${lineChart(ser.points.slice(-30), ser.color, ser.unit)}
-    <div class="text-[12px] font-bold text-slate-500 uppercase tracking-wide mt-3 mb-1.5">Son kayıtlar</div><div class="space-y-1">${rows}</div>`;
+  return `<div class="text-[12px] text-[var(--w-muted)] mb-1">${ser.metric}</div>${lineChart(ser.points.slice(-30), ser.color, ser.unit)}
+    <div class="text-[12px] font-bold text-[var(--w-dim)] uppercase tracking-wide mt-3 mb-1.5">Son kayıtlar</div><div class="space-y-1">${rows}</div>`;
 }
 
 function openExerciseChart(exIdx) {
   const ex = activeDay().exercises[exIdx];
   $("chartTitle").textContent = ex.name;
   $("chartBody").innerHTML = exerciseChartHtml(ex.name, "var(--t-acc-text)");
-  openModal("chartModal");
-}
-function openChartByKey(key) {
-  const h = state.exerciseHistory[key];
-  if (!h || !h.length) return;
-  const name = h[h.length - 1].name || key;
-  $("chartTitle").textContent = "📈 " + name;
-  $("chartBody").innerHTML = exerciseChartHtml(name);
   openModal("chartModal");
 }
 
@@ -3960,7 +3897,7 @@ function saveSettings() {
   if (!timer.running) resetTimerUI();
   pfSnap = pfValues();
   hideProfile();
-  toast("✓ Profil kaydedildi");
+  toast("Profil kaydedildi");
   renderAll();
   updateWakeLock();
 }
@@ -3985,7 +3922,7 @@ async function exportBackupFile() {
     try {
       await navigator.share({ files: [file], title: "AYK+ Yedek" });
       markBackup();
-      toast("💾 Yedek paylaşıldı. 'Dosyalar'a Kaydet'i seçtiysen güvende.");
+      toast("Yedek paylaşıldı. 'Dosyalar'a Kaydet'i seçtiysen güvende.");
       return;
     } catch (e) {
       if (e && e.name === "AbortError") return;
@@ -3999,7 +3936,7 @@ async function exportBackupFile() {
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
     markBackup();
-    toast("💾 Yedek dosyası indirildi");
+    toast("Yedek dosyası indirildi");
   } catch (e) {
     toast("Dosya oluşturulamadı. Ayarlar > Yedek kodu ile kopyala.", "error");
   }
@@ -4018,7 +3955,7 @@ async function restoreFromText(text) {
   checkNewDay();
   closeSettings();
   renderAll();
-  toast("✓ Yedek başarıyla geri yüklendi");
+  toast("Yedek başarıyla geri yüklendi");
   return true;
 }
 
@@ -4039,7 +3976,7 @@ async function copyBackup() {
   try { await navigator.clipboard.writeText(txt.value); ok = true; } catch (e) {
     try { txt.focus(); txt.select(); ok = document.execCommand("copy"); } catch (e2) { ok = false; }
   }
-  if (ok) { markBackup(); toast("📋 Yedek kodu kopyalandı. Notlar'a yapıştırıp sakla."); }
+  if (ok) { markBackup(); toast("Yedek kodu kopyalandı. Notlar'a yapıştırıp sakla."); }
   else toast("Kopyalanamadı. Kutudaki metni elle seçip kopyala.", "error");
 }
 
@@ -4053,7 +3990,7 @@ async function resetToDefaults() {
   closeSettings();
   stopTimer();
   renderAll();
-  toast("↺ Uygulama sıfırlandı");
+  toast("Uygulama sıfırlandı");
 }
 
 function hasMeaningfulData() {
@@ -4065,7 +4002,7 @@ function renderBanner() {
   const need = hasMeaningfulData() && days >= 7 && Date.now() > (state.backupSnoozeUntil || 0);
   $("backupBanner").classList.toggle("hidden", !need);
   $("backupDot").classList.toggle("hidden", !(hasMeaningfulData() && days >= 7));
-  if (need) $("backupBannerText").textContent = state.lastBackupAt ? `💾 Son yedeğin ${days} gün önce. Verilerini korumak için yedekle.` : "💾 Henüz hiç yedek almadın. Verilerin sadece bu telefonda.";
+  if (need) $("backupBannerText").textContent = state.lastBackupAt ? `Son yedeğin ${days} gün önce. Verilerini korumak için yedekle.` : "Henüz hiç yedek almadın. Verilerin sadece bu telefonda.";
 }
 function snoozeBackup() { state.backupSnoozeUntil = Date.now() + 3 * DAY_MS; saveState(); renderBanner(); }
 
@@ -4217,7 +4154,7 @@ function deloadHtml(ex, exIdx) {
   if (!d) return "";
   return `<div class="bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)] rounded-2xl pl-3 pr-2 py-2 space-y-1.5" data-deload="${exIdx}">
       <div class="flex items-start gap-2.5"><span style="color:var(--t-warn-icon)" class="pt-0.5">${svgI("down", 20, 2.2)}</span>
-        <span class="text-[13px] leading-snug text-amber-100">Son 3 haftada ${d.sessions} seansta tahmini 1RM'in ~${d.best} kg'ı geçmedi ve setler çoğunlukla zor geçti. Bu hareket için bir hafta kiloyu ~%10 hafifletmeyi (dinlenme haftası) düşünebilirsin.</span></div>
+        <span class="text-[13px] leading-snug text-[var(--t-warn-hi)]">Son 3 haftada ${d.sessions} seansta tahmini 1RM'in ~${d.best} kg'ı geçmedi ve setler çoğunlukla zor geçti. Bu hareket için bir hafta kiloyu ~%10 hafifletmeyi (dinlenme haftası) düşünebilirsin.</span></div>
       <div class="flex justify-end"><button onclick="dismissDeload(${exIdx})" class="text-[12px] t-muted h-11 px-3">Anladım</button></div>
     </div>`;
 }
@@ -4243,14 +4180,14 @@ function suggestionHtml(ex, exIdx) {
       <div class="flex items-center justify-between gap-2.5">
         <span class="flex items-center gap-2.5 min-w-0">
           <span style="color:${up ? "var(--t-acc-text)" : "var(--t-warn-icon)"}">${svgI(up ? "up" : "down", 20, 2.2)}</span>
-          <span class="text-[13px] leading-snug ${up ? "text-[var(--t-panel-text)]" : "text-amber-100"}">${esc(sg.text)}</span>
+          <span class="text-[13px] leading-snug ${up ? "text-[var(--t-panel-text)]" : "text-[var(--t-warn-hi)]"}">${esc(sg.text)}</span>
         </span>
         <span class="flex flex-col gap-1.5 shrink-0">
           <button onclick="applySuggestion(${exIdx})" class="${up ? "t-btn" : "bg-amber-500 text-black font-extrabold"} h-11 px-3.5 rounded-xl text-[13px]">${fmtKg(sg.kg)} kg</button>
         </span>
       </div>
       <div class="flex items-center justify-between gap-2">
-        ${noLv ? `<button onclick="openEditExercise(${exIdx})" class="text-[12px] text-amber-200 underline text-left">Makine kademelerini tanımla, doğru kiloyu önereyim</button>` : "<span></span>"}
+        ${noLv ? `<button onclick="openEditExercise(${exIdx})" class="text-[12px] text-[var(--t-warn-hi)] underline text-left">Makine kademelerini tanımla, doğru kiloyu önereyim</button>` : "<span></span>"}
         <button onclick="dismissSuggestion(${exIdx})" class="text-[12px] t-muted h-9 px-2">Şimdi değil</button>
       </div>
     </div>`;
@@ -4262,7 +4199,7 @@ function applySuggestion(exIdx) {
   if (!s) return;
   ex.sets.forEach(x => { x.kg = s.kg; x.reps = s.reps; x.pr = false; });
   ex.sugDismiss = s.ts;
-  toast(`✓ ${ex.name}: ${fmtKg(s.kg)} kg × ${s.reps}`);
+  toast(`${ex.name}: ${fmtKg(s.kg)} kg × ${s.reps}`);
   renderAll();
 }
 function dismissSuggestion(exIdx) {
@@ -4306,7 +4243,7 @@ function platesFor(total, bar) {
 }
 
 function plateChips(list) {
-  if (!list.length) return `<span class="text-slate-500">Plaka yok (sadece bar)</span>`;
+  if (!list.length) return `<span class="text-[var(--w-dim)]">Plaka yok (sadece bar)</span>`;
   return list.map(p => `<span class="inline-flex items-center justify-center min-w-[2.25rem] px-1.5 py-1 rounded-md text-[12px] font-bold ${PLATE_CLS[p]}">${fmtKg(p)}</span>`).join("");
 }
 
@@ -4334,17 +4271,17 @@ function openPlateTool(exIdx) {
   $("chartTitle").textContent = ex.name;
   const bar = num(state.settings.barKg, 20);
   if (lv && !plateCtx.levels) {
-    $("chartBody").innerHTML = `<div class="text-sm text-slate-300 space-y-3">
+    $("chartBody").innerHTML = `<div class="text-sm text-[var(--w-muted)] space-y-3">
       <p>Bu hareket için ${equipOf(ex) === "dumbbell" ? "dambıl" : "makine"} kademeleri tanımlı değil. Kademeleri girersen ısınma setlerini ve kilo artırma önerilerini makinede gerçekten seçebileceğin kilolara göre hesaplarım.</p>
-      <button onclick="closeModal('chartModal'); openEditExercise(${exIdx})" class="w-full bg-emerald-600 text-white text-sm font-semibold py-2.5 rounded-lg">Kademeleri tanımla</button></div>`;
+      <button onclick="closeModal('chartModal'); openEditExercise(${exIdx})" class="w-full w-btn text-sm font-semibold py-2.5 rounded-lg">Kademeleri tanımla</button></div>`;
     openModal("chartModal");
     return;
   }
   $("chartBody").innerHTML = `
     <div class="grid ${lv ? "grid-cols-1" : "grid-cols-2"} gap-2 text-xs">
-      <div><label class="block text-slate-400 mb-1">Çalışma kilosu (kg)</label>
+      <div><label class="block text-[var(--w-muted)] mb-1">Çalışma kilosu (kg)</label>
         <input id="ptKg" type="text" inputmode="decimal" value="${esc(fmtKg(W))}" oninput="renderPlateTool()" class="w-full p-2 rounded-lg text-base text-center font-bold" /></div>
-      ${lv ? "" : `<div><label class="block text-slate-400 mb-1">Bar ağırlığı</label>
+      ${lv ? "" : `<div><label class="block text-[var(--w-muted)] mb-1">Bar ağırlığı</label>
         <select id="ptBar" onchange="state.settings.barKg = num(this.value, 20); saveState(); renderPlateTool();" class="w-full p-2 rounded-lg text-sm">
           ${[[20, "20 kg Olimpik bar"], [15, "15 kg Bar"], [10, "10 kg EZ / kısa bar"], [0, "Bar yok / plakalı makine"]].map(([v, l]) => `<option value="${v}" ${v === bar ? "selected" : ""}>${l}</option>`).join("")}
         </select></div>`}
@@ -4359,16 +4296,16 @@ function renderLevelTool() {
   const list = plateCtx.levels;
   const W = Math.max(0, num($("ptKg").value, 0));
   if (W <= 0) {
-    out.innerHTML = `<div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-      <div class="text-[12px] text-slate-400 mb-1.5">Bu makinenin kademeleri:</div>
-      <div class="flex flex-wrap gap-1.5">${list.slice(0, 12).map(v => `<span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1.5 rounded-lg text-[12px] font-bold bg-slate-800 text-[var(--t-text2)]">${fmtKg(v)}</span>`).join("")}${list.length > 12 ? '<span class="text-slate-500 text-xs self-center">…</span>' : ""}</div>
-      <div class="text-[12px] text-slate-500 mt-2">Isınma setlerini görmek için çalışma kilonu yaz.</div></div>`;
+    out.innerHTML = `<div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
+      <div class="text-[12px] text-[var(--w-muted)] mb-1.5">Bu makinenin kademeleri:</div>
+      <div class="flex flex-wrap gap-1.5">${list.slice(0, 12).map(v => `<span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1.5 rounded-lg text-[12px] font-bold bg-[var(--w-elev)] text-[var(--t-text2)]">${fmtKg(v)}</span>`).join("")}${list.length > 12 ? '<span class="text-[var(--w-dim)] text-xs self-center">…</span>' : ""}</div>
+      <div class="text-[12px] text-[var(--w-dim)] mt-2">Isınma setlerini görmek için çalışma kilonu yaz.</div></div>`;
     return;
   }
   const near = nearestLevelBelow(list, W);
   const idx = list.indexOf(near);
   const around = list.slice(Math.max(0, idx - 3), idx + 4);
-  const chips = around.map(v => `<span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1.5 rounded-lg text-[12px] font-bold ${Math.abs(v - W) < 0.01 ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-200"}">${fmtKg(v)}</span>`).join("");
+  const chips = around.map(v => `<span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1.5 rounded-lg text-[12px] font-bold ${Math.abs(v - W) < 0.01 ? "w-btn" : "bg-[var(--w-elev)] text-[var(--w-text2)]"}">${fmtKg(v)}</span>`).join("");
   const exact = list.some(v => Math.abs(v - W) < 0.01);
   const steps = [[0.5, 10], [0.7, 6], [0.85, 3]];
   const wu = [];
@@ -4377,17 +4314,17 @@ function renderLevelTool() {
     if (kg < W - 0.01 && (!wu.length || kg > wu[wu.length - 1].kg)) wu.push({ kg, reps: r, label: "%" + Math.round(p * 100) });
   });
   out.innerHTML = `
-    <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-      <div class="text-[12px] text-slate-400 mb-1.5">Bu kiloya yakın kademeler:</div>
+    <div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
+      <div class="text-[12px] text-[var(--w-muted)] mb-1.5">Bu kiloya yakın kademeler:</div>
       <div class="flex flex-wrap gap-1.5">${chips}</div>
-      ${exact ? "" : `<div class="text-[12px] text-amber-300 mt-2">${fmtKg(W)} kg bu makinede yok; en yakın alt kademe <b>${fmtKg(near)} kg</b>.</div>`}
+      ${exact ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">${fmtKg(W)} kg bu makinede yok; en yakın alt kademe <b>${fmtKg(near)} kg</b>.</div>`}
     </div>
     <div>
-      <div class="text-[12px] font-bold text-slate-500 tracking-wide mb-1.5">ISINMA SETLERİ</div>
-      ${wu.length ? `<div class="space-y-1">${wu.map(w => `<div class="flex items-center justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5"><span class="text-slate-400 w-14">${w.label}</span><span class="font-bold text-slate-100">${fmtKg(w.kg)} kg × ${w.reps}</span><span></span></div>`).join("")}
-        <div class="flex items-center justify-between gap-2 text-xs bg-emerald-950/60 border border-emerald-700/60 rounded-lg px-2.5 py-1.5"><span class="text-emerald-300 w-14">Çalışma</span><span class="font-bold text-emerald-200">${fmtKg(W)} kg</span><span></span></div></div>
-        <p class="text-[12px] text-slate-500 mt-1.5">Isınma kiloları makinede var olan kademelere yuvarlandı. Tonaja ve set sayısına dahil edilmez.</p>`
-      : `<div class="text-xs text-slate-500">Bu kiloda ayrı ısınma setine gerek yok.</div>`}
+      <div class="text-[12px] font-bold text-[var(--w-dim)] tracking-wide mb-1.5">ISINMA SETLERİ</div>
+      ${wu.length ? `<div class="space-y-1">${wu.map(w => `<div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-lg px-2.5 py-1.5"><span class="text-[var(--w-muted)] w-14">${w.label}</span><span class="font-bold text-[var(--w-text1)]">${fmtKg(w.kg)} kg × ${w.reps}</span><span></span></div>`).join("")}
+        <div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-panel)] border border-[var(--w-panel-line)] rounded-lg px-2.5 py-1.5"><span class="text-[var(--w-acc)] w-14">Çalışma</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} kg</span><span></span></div></div>
+        <p class="text-[12px] text-[var(--w-dim)] mt-1.5">Isınma kiloları makinede var olan kademelere yuvarlandı. Tonaja ve set sayısına dahil edilmez.</p>`
+      : `<div class="text-xs text-[var(--w-dim)]">Bu kiloda ayrı ısınma setine gerek yok.</div>`}
     </div>`;
 }
 
@@ -4401,31 +4338,31 @@ function renderPlateTool() {
   if (bar > 0) {
     const r = platesFor(W, bar);
     if (!r.ok && r.reason === "light") {
-      html += `<div class="text-xs text-amber-300 bg-amber-950/50 border border-amber-800/60 rounded-lg px-3 py-2">Bu kilo ${fmtKg(bar)} kg'lık bardan hafif.</div>`;
+      html += `<div class="text-xs text-[var(--w-warn-text)] bg-[var(--w-warn-bg)] border border-[var(--w-warn-line)] rounded-lg px-3 py-2">Bu kilo ${fmtKg(bar)} kg'lık bardan hafif.</div>`;
     } else {
-      html += `<div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3">
-        <div class="text-[12px] text-slate-400 mb-1.5">Barın HER İKİ tarafına takılacak plakalar (${fmtKg(r.perSide)} kg / taraf):</div>
+      html += `<div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
+        <div class="text-[12px] text-[var(--w-muted)] mb-1.5">Barın HER İKİ tarafına takılacak plakalar (${fmtKg(r.perSide)} kg / taraf):</div>
         <div class="flex flex-wrap gap-1.5">${plateChips(r.list)}</div>
-        ${r.ok ? "" : `<div class="text-[12px] text-amber-300 mt-2">Elindeki plakalarla tam ${fmtKg(W)} kg yapılamıyor; en yakın: <b>${fmtKg(r.achieved)} kg</b></div>`}
+        ${r.ok ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">Elindeki plakalarla tam ${fmtKg(W)} kg yapılamıyor; en yakın: <b>${fmtKg(r.achieved)} kg</b></div>`}
       </div>`;
     }
   }
   const wu = warmupSets(W, bar);
   html += `<div>
-    <div class="text-[12px] font-bold text-slate-500 tracking-wide mb-1.5">ISINMA SETLERİ</div>
+    <div class="text-[12px] font-bold text-[var(--w-dim)] tracking-wide mb-1.5">ISINMA SETLERİ</div>
     ${wu.length ? `<div class="space-y-1">${wu.map(w => {
       const pr = bar > 0 ? platesFor(w.kg, bar) : null;
-      return `<div class="flex items-center justify-between gap-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1.5">
-        <span class="text-slate-400 w-14 shrink-0">${w.label}</span>
-        <span class="font-bold text-slate-100">${fmtKg(w.kg)} kg × ${w.reps}</span>
-        <span class="text-[10px] text-slate-500 text-right truncate">${pr && pr.ok && pr.list.length ? "taraf: " + pr.list.map(fmtKg).join("+") : ""}</span>
+      return `<div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-lg px-2.5 py-1.5">
+        <span class="text-[var(--w-muted)] w-14 shrink-0">${w.label}</span>
+        <span class="font-bold text-[var(--w-text1)]">${fmtKg(w.kg)} kg × ${w.reps}</span>
+        <span class="text-[10px] text-[var(--w-dim)] text-right truncate">${pr && pr.ok && pr.list.length ? "taraf: " + pr.list.map(fmtKg).join("+") : ""}</span>
       </div>`;
     }).join("")}
-    <div class="flex items-center justify-between gap-2 text-xs bg-emerald-950/60 border border-emerald-700/60 rounded-lg px-2.5 py-1.5">
-      <span class="text-emerald-300 w-14 shrink-0">Çalışma</span><span class="font-bold text-emerald-200">${fmtKg(W)} kg</span><span></span>
+    <div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-panel)] border border-[var(--w-panel-line)] rounded-lg px-2.5 py-1.5">
+      <span class="text-[var(--w-acc)] w-14 shrink-0">Çalışma</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} kg</span><span></span>
     </div></div>
-    <p class="text-[12px] text-slate-500 mt-1.5">Isınma setleri yorulmadan yapılır, aralarında 1–2 dk dinlen. Tonaja ve set sayısına dahil edilmez.</p>`
-    : `<div class="text-xs text-slate-500">Isınma önerisi için çalışma kilosu gir (hafif kilolarda ayrı ısınma gerekmez).</div>`}
+    <p class="text-[12px] text-[var(--w-dim)] mt-1.5">Isınma setleri yorulmadan yapılır, aralarında 1–2 dk dinlen. Tonaja ve set sayısına dahil edilmez.</p>`
+    : `<div class="text-xs text-[var(--w-dim)]">Isınma önerisi için çalışma kilosu gir (hafif kilolarda ayrı ısınma gerekmez).</div>`}
   </div>`;
   out.innerHTML = html;
 }
@@ -4502,7 +4439,7 @@ function applyCoach() {
   if (!a.ready || a.delta === 0) return;
   state.settings.calAdjust = num(state.settings.calAdjust, 0) + a.delta;
   state.settings.coachAppliedAt = Date.now();
-  toast(`🧠 Hedef kalori ${a.delta > 0 ? "+" : ""}${a.delta} kcal ayarlandı`);
+  toast(`Hedef kalori ${a.delta > 0 ? "+" : ""}${a.delta} kcal ayarlandı`);
   renderAll();
 }
 async function resetCoachAdjust() {
@@ -4529,13 +4466,13 @@ function coachHintText() {
 // ---------------------------------------------------------------------------
 let undoSnap = null;
 function snapshot() { undoSnap = JSON.stringify(state); }
-function offerUndo(msg) { toast(msg, "ok", { label: "↶ Geri al", fn: doUndo }); }
+function offerUndo(msg) { toast(msg, "ok", { label: "Geri al", fn: doUndo }); }
 function doUndo() {
   if (!undoSnap) return;
   state = normalizeState(JSON.parse(undoSnap));
   undoSnap = null;
   renderAll();
-  toast("↶ Geri alındı");
+  toast("Geri alındı");
 }
 
 // ---------------------------------------------------------------------------
@@ -4587,14 +4524,6 @@ function fmtMinutes(min) {
   min = Math.round(min);
   return min >= 60 ? `${Math.floor(min / 60)} sa ${min % 60} dk` : `${min} dk`;
 }
-function updateDurationUI() {
-  const el = $("gymDuration");
-  if (!el) return;
-  const st = state.workoutStartedAt;
-  el.classList.toggle("hidden", !st);
-  if (st) el.textContent = "⏱ " + fmtDuration(Date.now() - st);
-}
-setInterval(() => { if (state.workoutStartedAt && state.activeTab === "gym" && document.visibilityState === "visible") updateDurationUI(); }, 1000);
 
 // ---------------------------------------------------------------------------
 // ÖĞÜN PLANLARI (Antrenman / Dinlenme günü ayrı menü)
@@ -4605,46 +4534,13 @@ function curMeals() {
 function otherMeals() {
   return curMeals() === state.meals ? state.restMeals : state.meals;
 }
-function toggleSeparatePlans(on) {
-  if (on && (!Array.isArray(state.restMeals) || !state.restMeals.length)) {
-    state.restMeals = clone(state.meals).map(m => ({ ...m, id: (m.id || "meal") + "_rest", done: false }));
-    toast("🛋️ Dinlenme günü menüsü, mevcut menünün kopyası olarak oluşturuldu. Artık ayrı düzenleyebilirsin.");
-  }
-  state.settings.separatePlans = !!on;
-  renderAll();
-}
-async function addMeal() {
-  const meals = curMeals();
-  const t = await askText("Yeni öğünün adı", `${meals.length + 1}. Öğün: `);
-  if (!t || !t.trim()) return;
-  meals.push({ id: "meal_" + Date.now(), title: t.trim(), targetNote: "", done: false, items: [] });
-  renderAll();
-  setTimeout(() => { const c = $("mealsContainer"); if (c.lastElementChild) c.lastElementChild.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
-}
-async function editMeal(mIdx) {
-  const m = curMeals()[mIdx];
-  if (!m) return;
-  const t = await askText("Öğün adı", m.title);
-  if (t === null) return;
-  if (t.trim()) m.title = t.trim();
-  const n = await askText("Kısa not", m.targetNote || "", "örn: Hedef 50 g protein", "Boş bırakabilirsin.");
-  if (n !== null) m.targetNote = n.trim();
-  renderAll();
-}
 function deleteMeal(mIdx) {
   const meals = curMeals();
   snapshot();
   const t = meals[mIdx].title;
   meals.splice(mIdx, 1);
   renderAll();
-  offerUndo(`🗑️ "${t}" silindi`);
-}
-function moveMeal(mIdx, dir) {
-  const meals = curMeals();
-  const j = mIdx + dir;
-  if (j < 0 || j >= meals.length) return;
-  [meals[mIdx], meals[j]] = [meals[j], meals[mIdx]];
-  renderAll();
+  offerUndo(`"${t}" silindi`);
 }
 function copyMeal(mIdx) {
   const src = curMeals()[mIdx];
@@ -4806,7 +4702,7 @@ function removeSupp(i) {
   const s = state.supplementList.splice(i, 1)[0];
   if (s) delete state.supplements[s.id];
   renderAll();
-  offerUndo(`🗑️ ${s ? s.name : "Takviye"} kaldırıldı`);
+  offerUndo(`${s ? s.name : "Takviye"} kaldırıldı`);
 }
 
 // ---------------------------------------------------------------------------
@@ -4818,16 +4714,16 @@ let measureSel = "bel";
 
 function openMeasureModal() {
   const last = state.measurements[state.measurements.length - 1] || {};
-  $("chartTitle").textContent = "📏 Ölçü Ekle (cm)";
+  $("chartTitle").textContent = "Ölçü ekle (cm)";
   $("chartBody").innerHTML = `
     <div class="grid grid-cols-2 gap-2 text-xs">
-      ${MEASURES.map(([k, n]) => `<div><label class="block text-slate-400 mb-1">${n}</label>
+      ${MEASURES.map(([k, n]) => `<div><label class="block text-[var(--w-muted)] mb-1">${n}</label>
         <input id="ms_${k}" type="text" inputmode="decimal" placeholder="—" value="${last[k] ? esc(fmtNum(last[k])) : ""}" class="w-full p-2 rounded-lg text-base text-center" /></div>`).join("")}
     </div>
-    <p class="text-[12px] text-slate-500 mt-2">İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.</p>
+    <p class="text-[12px] text-[var(--w-dim)] mt-2">İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.</p>
     <div class="flex justify-end gap-2 mt-3">
-      <button onclick="closeModal('chartModal')" class="bg-slate-800 text-slate-300 text-xs px-3 py-2 rounded-lg">İptal</button>
-      <button onclick="saveMeasurement()" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+      <button onclick="closeModal('chartModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">İptal</button>
+      <button onclick="saveMeasurement()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
     </div>`;
   openModal("chartModal");
 }
@@ -4846,14 +4742,14 @@ function saveMeasurement() {
   if (last && todayStr(new Date(last.ts)) === todayStr()) state.measurements[state.measurements.length - 1] = entry;
   else state.measurements.push(entry);
   closeModal("chartModal");
-  toast("📏 Ölçüler kaydedildi");
+  toast("Ölçüler kaydedildi");
   renderAll();
 }
 function deleteMeasurement(i) {
   snapshot();
   state.measurements.splice(i, 1);
   renderAll();
-  offerUndo("🗑️ Ölçü kaydı silindi");
+  offerUndo("Ölçü kaydı silindi");
 }
 
 
@@ -4892,69 +4788,71 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 async function buildShareCanvas(log) {
-  const W = 1080, H = 1350;
+  // v33: uygulamanın Antrenman temasıyla aynı dil (siyah zemin, turkuaz vurgu, AYKDisplay başlık, emojisiz). Paylaşılan görsel her zaman koyu.
+  const W = 1080, H = 1350, ACC = "#1FD1C1";
   const cv = document.createElement("canvas");
   cv.width = W; cv.height = H;
   const ctx = cv.getContext("2d");
   const F = '-apple-system, "SF Pro Display", "Segoe UI", Roboto, sans-serif';
+  const D = 'italic 800 {s}px AYKDisplay, "Barlow Condensed", ' + F;
+  const disp = s => D.replace("{s}", s);
+  try { await document.fonts.load(disp(64)); } catch (e) { /* yazı tipi yüklenemezse yedek yazı tipi */ }
 
-  const g = ctx.createLinearGradient(0, 0, W, H);
-  g.addColorStop(0, "#0b1120"); g.addColorStop(1, "#14223d");
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  const glow = ctx.createRadialGradient(W - 120, 120, 10, W - 120, 120, 520);
-  glow.addColorStop(0, "rgba(16,185,129,0.28)"); glow.addColorStop(1, "rgba(16,185,129,0)");
+  ctx.fillStyle = "#000000"; ctx.fillRect(0, 0, W, H);
+  const glow = ctx.createRadialGradient(W - 140, 140, 10, W - 140, 140, 560);
+  glow.addColorStop(0, "rgba(31,209,193,0.22)"); glow.addColorStop(1, "rgba(31,209,193,0)");
   ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
 
   try {
     const img = new Image();
     img.src = "icon.png";
     await img.decode();
-    ctx.save(); roundRect(ctx, 72, 72, 120, 120, 28); ctx.clip(); ctx.drawImage(img, 72, 72, 120, 120); ctx.restore();
+    ctx.save(); roundRect(ctx, 72, 72, 112, 112, 28); ctx.clip(); ctx.drawImage(img, 72, 72, 112, 112); ctx.restore();
   } catch (e) { /* logo yüklenemezse atla */ }
-  ctx.fillStyle = "#f8fafc"; ctx.font = `800 64px ${F}`; ctx.textBaseline = "middle";
-  ctx.fillText("AYK", 220, 132);
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(72); ctx.fillText("AYK", 212, 130);
   const aw = ctx.measureText("AYK").width;
-  ctx.fillStyle = "#34d399"; ctx.fillText("+", 220 + aw, 132);
-  ctx.fillStyle = "#94a3b8"; ctx.font = `500 32px ${F}`; ctx.textAlign = "right";
-  ctx.fillText(log.ts ? new Date(log.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 132);
+  ctx.fillStyle = ACC; ctx.fillText("+", 212 + aw + 2, 130);
+  ctx.fillStyle = "#A1A1AA"; ctx.font = `500 32px ${F}`; ctx.textAlign = "right";
+  ctx.fillText(log.ts ? new Date(log.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 130);
   ctx.textAlign = "left";
 
-  ctx.fillStyle = "#34d399"; ctx.font = `700 30px ${F}`; ctx.fillText("ANTRENMAN TAMAMLANDI 💪", 72, 290);
-  ctx.fillStyle = "#ffffff"; ctx.font = `800 64px ${F}`; ctx.fillText(fitText(ctx, log.dayName || "Antrenman", W - 144), 72, 360);
+  ctx.fillStyle = ACC; ctx.font = `700 32px ${F}`; ctx.fillText("Antrenman tamamlandı", 72, 286);
+  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, (log.dayName || "Antrenman").toLocaleUpperCase("tr-TR"), W - 144), 68, 372);
 
   const stats = [];
-  if (num(log.durationMin) > 0) stats.push(["⏱ SÜRE", fmtMinutes(num(log.durationMin)), "#f8fafc"]);
-  stats.push(["⚡ TONAJ", Math.round(num(log.volume)).toLocaleString("tr-TR") + " kg", "#fbbf24"]);
-  if (num(log.prs) > 0) stats.push(["🏆 REKOR", String(num(log.prs)), "#fbbf24"]);
-  if (num(log.cardioMin) > 0) stats.push(["🏃 KARDİYO", fmtNum(num(log.cardioMin)) + " dk" + (num(log.cardioKm) > 0 ? " • " + fmtNum(num(log.cardioKm)) + " km" : ""), "#7dd3fc"]);
-  stats.push(["✅ SET", String(num(log.sets)), "#38bdf8"]);
+  if (num(log.durationMin) > 0) stats.push(["Süre", fmtMinutes(num(log.durationMin)), "#FFFFFF"]);
+  stats.push(["Tonaj", Math.round(num(log.volume)).toLocaleString("tr-TR") + " kg", "#FFFFFF"]);
+  if (num(log.prs) > 0) stats.push(["Rekor", String(num(log.prs)), ACC]);
+  if (num(log.cardioMin) > 0) stats.push(["Kardiyo", fmtNum(num(log.cardioMin)) + " dk" + (num(log.cardioKm) > 0 ? " · " + fmtNum(num(log.cardioKm)) + " km" : ""), "#FFFFFF"]);
+  stats.push(["Set", String(num(log.sets)), "#FFFFFF"]);
   const exLines = logExerciseLines(log);
-  if (exLines.length) stats.push(["🏋️ HAREKET", String(exLines.length), "#a78bfa"]);
+  if (exLines.length) stats.push(["Hareket", String(exLines.length), "#FFFFFF"]);
   const shown = stats.slice(0, 4);
-  const cardW = (W - 144 - 24) / 2, cardH = 180;
+  const cardW = (W - 144 - 24) / 2, cardH = 184;
   shown.forEach((s, i) => {
-    const x = 72 + (i % 2) * (cardW + 24), y = 430 + Math.floor(i / 2) * (cardH + 24);
+    const x = 72 + (i % 2) * (cardW + 24), y = 452 + Math.floor(i / 2) * (cardH + 24);
     const w = (i === shown.length - 1 && shown.length % 2 === 1) ? W - 144 : cardW;
-    ctx.fillStyle = "rgba(30,41,59,0.92)"; roundRect(ctx, x, y, w, cardH, 32); ctx.fill();
-    ctx.strokeStyle = "#334155"; ctx.lineWidth = 2; ctx.stroke();
-    ctx.fillStyle = "#94a3b8"; ctx.font = `600 28px ${F}`; ctx.fillText(s[0], x + 32, y + 52);
-    ctx.fillStyle = s[2]; ctx.font = `800 58px ${F}`; ctx.fillText(fitText(ctx, s[1], w - 64), x + 32, y + 122);
+    ctx.fillStyle = "#141416"; roundRect(ctx, x, y, w, cardH, 36); ctx.fill();
+    ctx.strokeStyle = "#2A2A2E"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = "#A1A1AA"; ctx.font = `600 30px ${F}`; ctx.fillText(s[0], x + 36, y + 54);
+    ctx.fillStyle = s[2]; ctx.font = disp(76); ctx.fillText(fitText(ctx, s[1], w - 72), x + 32, y + 126);
   });
 
   const lines = exLines.slice(0, 7);
-  let y = 430 + Math.ceil(shown.length / 2) * (cardH + 24) + 40;
+  let y = 452 + Math.ceil(shown.length / 2) * (cardH + 24) + 44;
   if (lines.length) {
-    ctx.fillStyle = "#64748b"; ctx.font = `700 26px ${F}`; ctx.fillText("HAREKETLER", 72, y); y += 52;
+    ctx.fillStyle = "#8B8B93"; ctx.font = `700 28px ${F}`; ctx.fillText("Hareketler", 72, y); y += 56;
     lines.forEach(l => {
-      ctx.fillStyle = "#e2e8f0"; ctx.font = `600 32px ${F}`;
+      ctx.fillStyle = "#E4E4E7"; ctx.font = `600 32px ${F}`;
       ctx.fillText(fitText(ctx, l.name, 560), 72, y);
-      ctx.fillStyle = "#34d399"; ctx.font = `600 28px ${F}`; ctx.textAlign = "right";
+      ctx.fillStyle = ACC; ctx.font = `600 28px ${F}`; ctx.textAlign = "right";
       ctx.fillText(fitText(ctx, l.txt, 380), W - 72, y);
       ctx.textAlign = "left";
-      y += 50;
+      y += 52;
     });
   }
-  ctx.fillStyle = "#475569"; ctx.font = `500 26px ${F}`; ctx.textAlign = "center";
+  ctx.fillStyle = "#52525B"; ctx.font = `500 26px ${F}`; ctx.textAlign = "center";
   ctx.fillText("AYK+ ile kaydedildi", W / 2, H - 56);
   ctx.textAlign = "left";
   return cv;
@@ -4964,7 +4862,7 @@ async function openShareCard(logIdx) {
   const log = state.workoutLogs[logIdx];
   if (!log) return;
   $("chartTitle").textContent = "Antrenman Özeti";
-  $("chartBody").innerHTML = `<div class="text-xs text-slate-400 text-center py-10">Kart hazırlanıyor...</div>`;
+  $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-muted)] text-center py-10">Kart hazırlanıyor...</div>`;
   openModal("chartModal");
   try {
     const cv = await buildShareCanvas(log);
@@ -4974,11 +4872,11 @@ async function openShareCard(logIdx) {
     try { shareFile = new File([blob], name, { type: "image/png" }); } catch (e) { shareFile = blob; shareFile.name = name; }
     const url = URL.createObjectURL(blob);
     $("chartBody").innerHTML = `
-      <img src="${url}" alt="Antrenman özeti" class="w-full rounded-xl border border-slate-700" />
-      <button onclick="shareWorkoutCard()" class="w-full mt-3 bg-emerald-600 text-white text-sm font-semibold py-2.5 rounded-lg">Paylaş / Fotoğraflara Kaydet</button>
-      <p class="text-[12px] text-slate-500 mt-2 text-center">Paylaş menüsünden Instagram, WhatsApp veya "Görüntüyü Kaydet"i seçebilirsin.</p>`;
+      <img src="${url}" alt="Antrenman özeti" class="w-full rounded-xl border border-[var(--w-line)]" />
+      <button onclick="shareWorkoutCard()" class="w-full mt-3 w-btn text-sm font-semibold py-2.5 rounded-lg">Paylaş / Fotoğraflara Kaydet</button>
+      <p class="text-[12px] text-[var(--w-dim)] mt-2 text-center">Paylaş menüsünden Instagram, WhatsApp veya "Görüntüyü Kaydet"i seçebilirsin.</p>`;
   } catch (e) {
-    $("chartBody").innerHTML = `<div class="text-xs text-rose-300 text-center py-8">Kart oluşturulamadı.</div>`;
+    $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-over)] text-center py-8">Kart oluşturulamadı.</div>`;
   }
 }
 
@@ -4995,7 +4893,7 @@ async function shareWorkoutCard() {
     a.href = url; a.download = file.name || "AYK-antrenman.png";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
-    toast("🖼️ Görsel indirildi");
+    toast("Görsel indirildi");
   } catch (e) { toast("Paylaşılamadı. Görsele basılı tutup kaydedebilirsin.", "error"); }
 }
 
@@ -5139,7 +5037,7 @@ function confirmInferredLevels(exIdx) {
   const inf = inferLevels(ex);
   if (!inf) return;
   ex.levels = inf;
-  toast(`✓ Kademeler kaydedildi: ${fmtKg(inf.step)} kg arayla`);
+  toast(`Kademeler kaydedildi: ${fmtKg(inf.step)} kg arayla`);
   renderAll();
 }
 function dismissLevelsAsk(exIdx) { activeDay().exercises[exIdx].levelsAskDismiss = true; renderAll(); }
@@ -5179,22 +5077,6 @@ function fillExLevels(v) {
   $("exLvAddon").value = L && num(L.addon) > 0 ? fmtKg(num(L.addon)) : "";
   setExLevelsMode(L && L.mode === "list" ? "list" : "step");
   updateExEquipUI();
-}
-function readExLevels() {
-  const sel = $("exEquip").value;
-  const equip = EQUIP_LABEL[sel] ? sel : "";
-  const addon = Math.max(0, round2(num($("exLvAddon").value, 0)));
-  let levels = null;
-  if (exLevelsMode === "step") {
-    const step = round2(num($("exLvStep").value, 0));
-    const start = round2(num($("exLvStart").value, 0));
-    if (step > 0) levels = { mode: "step", start: start > 0 ? start : step, step, addon };
-  } else {
-    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(t => round2(num(t.trim(), -1))).filter(v => v >= 0);
-    const uniq = [...new Set(list)].sort((a, b) => a - b);
-    if (uniq.length >= 2) levels = { mode: "list", list: uniq, addon };
-  }
-  return { equip, levels };
 }
 
 // ---------------------------------------------------------------------------
@@ -5352,7 +5234,7 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   ex.sets.forEach((x, j) => { if (x.done) lastDone = j; });
   const effLbl = s.done && EFFORT_LABELS[s.e] ? `<span class="block font-sans text-[10px] font-bold leading-none mt-0.5" style="color:${EFFORT_COLORS[s.e]}">${EFFORT_LABELS[s.e]}</span>` : "";
   return `<div class="rounded-2xl ${rowCls}"><div class="grid items-center gap-2 h-14 px-1" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px">
-    <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-amber-400 text-sm">★</span>' : ""}${effLbl}</span>
+    <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-[var(--t-warn-icon)] text-sm">★</span>' : ""}${effLbl}</span>
     <span class="text-[13px] t-dim truncate">${prev}</span>
     <input type="text" inputmode="decimal" aria-label="${i + 1}. set kilo" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtKg(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
     <input type="text" inputmode="numeric" aria-label="${i + 1}. set tekrar" data-fk="w-${exIdx}-${i}-reps" value="${num(s.reps)}" onchange="updateSetData(${exIdx}, ${i}, 'reps', this.value)" class="t-input w-full" />
@@ -5439,7 +5321,7 @@ function gymProgramHtml() {
   const rows = day.exercises.map((ex, i) => {
     const eq = equipOf(ex);
     const meta = [ex.targetInfo, muscleOf(ex), eq ? EQUIP_SHORT[eq] : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
-    const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[12px] text-amber-300">Kademe tanımlı değil</span>` : usesLevels(ex) ? `<span class="text-[12px] t-dim">Kademe: ${esc(levelsSummary(ex))}</span>` : "";
+    const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[12px] text-[var(--t-warn-mid)]">Kademe tanımlı değil</span>` : usesLevels(ex) ? `<span class="text-[12px] t-dim">Kademe: ${esc(levelsSummary(ex))}</span>` : "";
     return `<div data-ex-row="${i}" class="t-card-flat rounded-2xl min-h-[64px] pl-1 pr-1.5 py-2 flex items-center gap-2">
       ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${esc(ex.name)} hareketini sürükleyerek taşı" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
       <span class="t-display text-xl t-dim w-6 text-center">${i + 1}</span>
@@ -5626,7 +5508,7 @@ function gymHistoryHtml() {
       <div class="flex-1 min-w-0">
         <div class="text-xs t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date)}</div>
         <div class="text-[15px] font-semibold truncate">${esc(l.dayName)}</div>
-        <div class="text-xs t-muted mt-0.5">${num(l.sets)} set · ${num(l.volume).toLocaleString("tr-TR")} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + fmtNum(num(l.cardioMin)) + " dk kardiyo" : ""}${num(l.prs) ? ` · <span class="text-amber-300">${l.prs} rekor</span>` : ""}</div>
+        <div class="text-xs t-muted mt-0.5">${num(l.sets)} set · ${num(l.volume).toLocaleString("tr-TR")} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + fmtNum(num(l.cardioMin)) + " dk kardiyo" : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${l.prs} rekor</span>` : ""}</div>
       </div>
       <button onclick="openShareCard(${i})" aria-label="Paylaş" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("share", 20)}</button>
       <button onclick="deleteWorkoutLog(${i})" aria-label="Kaydı sil" class="w-11 h-11 rounded-xl flex items-center justify-center t-dim">${svgI("trash", 19)}</button>
@@ -5647,8 +5529,6 @@ function renderGym() {
   let html = active ? gymActiveHtml()
     : gymSubNav() + (state.gymView === "program" ? gymProgramHtml() : state.gymView === "library" ? gymLibraryHtml() : state.gymView === "history" ? gymHistoryHtml() : gymTodayHtml());
   $("gymRoot").innerHTML = html;
-  updateGymHeader();
-  updateDurationUI();
   updateActiveProgress();
 }
 function updateActiveProgress() {
@@ -5745,7 +5625,7 @@ function saveMealModal() {
   renderAll();
   const idx = curMeals().indexOf(target);
   if (mealEditIdx < 0) setTimeout(() => { const el = document.querySelector(`[data-meal-card="${idx}"]`); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
-  toast(mealEditIdx >= 0 ? "✓ Öğün güncellendi" : `✓ "${title}" eklendi${time ? " (" + time + ")" : ""}`);
+  toast(mealEditIdx >= 0 ? "Öğün güncellendi" : `"${title}" eklendi${time ? " (" + time + ")" : ""}`);
 }
 
 let mealDrag = null;
@@ -5811,14 +5691,14 @@ function endMealDrag() {
     const [x] = day.exercises.splice(from, 1);
     day.exercises.splice(to, 0, x);
     renderAll();
-    toast("↕ Hareket taşındı");
+    toast("Hareket taşındı");
     return;
   }
   const meals = curMeals();
   const [m] = meals.splice(from, 1);
   meals.splice(to, 0, m);
   renderAll();
-  toast("↕ Öğün taşındı");
+  toast("Öğün taşındı");
 }
 document.addEventListener("pointerup", endMealDrag);
 document.addEventListener("pointercancel", endMealDrag);
@@ -5833,7 +5713,7 @@ function editCustomFood(id) {
   if (f.recipe) { openRecipeModal(id); return; }
   closeModal("pickerModal");
   cfEditId = id;
-  $("cfTitle").textContent = "✎ Özel Besini Düzenle";
+  $("cfTitle").textContent = "Özel besini düzenle";
   $("cfName").value = String(f.name || "").replace(/^⭐\s*/, "");
   $("cfHint").classList.add("hidden");
   const gram = f.unit === "g" || f.unit === "ml";
@@ -5868,7 +5748,7 @@ async function deleteCustomFood(id) {
   state.recentFoods = state.recentFoods.filter(x => x !== id);
   closeModal("pickerModal");
   renderAll();
-  offerUndo(`🗑️ ${f.name} silindi`);
+  offerUndo(`${f.name} silindi`);
 }
 
 // ============================================================================
@@ -5913,7 +5793,7 @@ async function saveMealAsCombo(mIdx, dest) {
   const nm = name.trim().slice(0, 40) || "Kombo";
   state.combos.push({ id: "combo_" + Date.now().toString(36), name: nm, items });
   renderAll();
-  toast(`★ "${nm}" kombo olarak kaydedildi (Besinler → Komboların)`);
+  toast(`"${nm}" kombo olarak kaydedildi (Besinler → Komboların)`);
 }
 function selectCombo(id) {
   foodUI.sel = "combo:" + id;
@@ -5933,12 +5813,12 @@ function addComboToMeal(id) {
   foodUI.sel = null;
   renderAll();
   const mid = meal.id;
-  toast(`✓ ${c.name} → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+  toast(`${c.name} → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
     const mm = curMeals().find(x => x.id === mid);
     if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
     mergeItems(mm, c.items);
     renderAll();
-    toast(`✓ Menüdeki "${mm.title}" öğününe de eklendi`);
+    toast(`Menüdeki "${mm.title}" öğününe de eklendi`);
   } } : null);
 }
 function deleteCombo(id) {
@@ -5948,7 +5828,7 @@ function deleteCombo(id) {
   const c = state.combos.splice(i, 1)[0];
   foodUI.sel = null;
   renderAll();
-  offerUndo(`🗑️ "${c.name}" kombosu silindi`);
+  offerUndo(`"${c.name}" kombosu silindi`);
 }
 function comboRowHtml(c) {
   const db = getFoodDB();
@@ -6077,7 +5957,7 @@ function saveRecipe() {
   };
   invalidateFoodDB();
   closeModal("recipeModal");
-  toast(editing ? `✓ ${name} tarifi güncellendi` : `🍲 ${name} tarifi besin listene eklendi`);
+  toast(editing ? `${name} tarifi güncellendi` : `${name} tarifi besin listene eklendi`);
   renderAll();
   if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") { foodUI.cat = "recipes"; renderFoods(); selectFood(id); }
 }
@@ -6112,7 +5992,7 @@ function repeatLastMeal(mIdx) {
   m.items = clone(r.items);
   openEditMeals.delete(m.id);
   renderAll();
-  offerUndo(`↻ ${shortMealTitle(m)}: ${dayLabelShort(r.key).toLocaleLowerCase("tr")} öğün tekrarlandı (yalnızca bugün)`);
+  offerUndo(`${shortMealTitle(m)}: ${dayLabelShort(r.key).toLocaleLowerCase("tr")} öğün tekrarlandı (yalnızca bugün)`);
 }
 
 // ---------------------------------------------------------------------------
@@ -6164,7 +6044,7 @@ function toggleShop(id) {
 }
 function clearShopChecks() {   // v26: Geri al
   snapshot(); state.shopChecked = {}; saveState(); renderShopList();
-  toast("İşaretler temizlendi", "ok", { label: "↶ Geri al", fn: () => { doUndo(); renderShopList(); } });
+  toast("İşaretler temizlendi", "ok", { label: "Geri al", fn: () => { doUndo(); renderShopList(); } });
 }
 function renderShopList() {
   const list = shopList();
@@ -6213,7 +6093,7 @@ async function copyText(t) {
 }
 async function copyShopList() {
   const ok = await copyText(shopText());
-  toast(ok ? "📋 Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin." : "Kopyalanamadı; Paylaş düğmesini dene.", ok ? "ok" : "error");
+  toast(ok ? "Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin." : "Kopyalanamadı; Paylaş düğmesini dene.", ok ? "ok" : "error");
 }
 async function shareShopList() {
   try { await navigator.share({ title: "Alışveriş listesi", text: shopText() }); }
@@ -6354,12 +6234,12 @@ function addSuggestion(i) {
   o.parts.forEach(p => { state.recentFoods = [p.id, ...state.recentFoods.filter(x => x !== p.id)].slice(0, 8); });
   renderAll();
   const mid = meal.id;
-  toast(`✓ ${o.parts.length} besin → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+  toast(`${o.parts.length} besin → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
     const mm = curMeals().find(x => x.id === mid);
     if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
     mergeItems(mm, items);
     renderAll();
-    toast(`✓ Menüdeki "${mm.title}" öğününe de eklendi`);
+    toast(`Menüdeki "${mm.title}" öğününe de eklendi`);
   } } : null);
 }
 
@@ -6625,7 +6505,7 @@ function noteMissSearch(raw) {
 function cancelMissSearch() { clearTimeout(missTimer); }
 function clearMissSearches() {   // v26: Geri al
   snapshot(); state.missSearches = []; saveState(); renderMissList();
-  toast("Bulunamayan aramalar temizlendi", "ok", { label: "↶ Geri al", fn: () => { doUndo(); renderMissList(); } });
+  toast("Bulunamayan aramalar temizlendi", "ok", { label: "Geri al", fn: () => { doUndo(); renderMissList(); } });
 }
 function renderMissList() {
   const el = $("missList");
@@ -6694,7 +6574,7 @@ resetTimerUI();
 renderAll();
 updateWakeLock();
 setTimeout(checkFoodHealth, 1500);
-if (loadFailed) setTimeout(() => toast("⚠️ Kayıtlı veriler okunamadı. Eski verilerin bir kopyası telefonda saklandı; yeni veri girmeden önce yedeğini geri yükle veya yardım iste.", "error"), 300);
+if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Eski verilerin bir kopyası telefonda saklandı; yeni veri girmeden önce yedeğini geri yükle veya yardım iste.", "error"), 300);
 
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") {
