@@ -212,7 +212,7 @@ try:
         check(pg.evaluate("state.weight") == 81 + i, f"R2-I1: açılış {i + 1}: veri doğru")
     check(len([x for x in snaps(pg) if x["kind"] == "import"]) == 0, "R2-I1: hızlı dokunuş + arka plan içe almaya yol açmıyor")
     # I3: içe alma iki kez tutmadıysa eski modda kalır
-    pg.evaluate("localStorage.setItem('ayk_plus_v5_idb_hata', '2')"); reload(pg)
+    pg.evaluate("localStorage.setItem('ayk_plus_v5_idb_hata', '2:' + Date.now())"); reload(pg)
     check(pg.evaluate("storeMode") == "ls" and pg.evaluate("state.weight") == 83, "I3: doğrulama tutmayan cihazda eski modda kalıyor, veri yerinde")
     pg.evaluate("localStorage.removeItem('ayk_plus_v5_idb_hata')")
     # M1: Profil'de yazarken ana ekrana geçilirse değer kaydedilir
@@ -220,6 +220,17 @@ try:
     pg.fill("#setAge", "52")
     pg.evaluate("Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true }); document.dispatchEvent(new Event('visibilitychange'))"); pg.wait_for_timeout(100)
     check(stored(pg)["settings"]["age"] == 52, "M1: yazarken arka plana geçince Profil değeri kaydedildi")
+    ctx.close()
+    # R3-I1: localStorage kopyası okunamaz hâle geldi → sağlam IndexedDB verisi açılır, varsayılana dönülmez
+    ctx, pg = page(); go(pg)
+    pg.evaluate("state.weight = 77; state.customFoods['custom_x'] = { name: 'Ev yoğurdu', p: 0.04, c: 0.05, f: 0.03, unit: 'g' }; renderAll()")
+    pg.clock.run_for(2600); pg.wait_for_timeout(80)
+    pg.evaluate("localStorage.setItem('ayk_plus_v5_state', '{bozuk')"); reload(pg)
+    s = stored(pg)
+    check(pg.evaluate("state.weight") == 77 and "custom_x" in s["customFoods"] and s["weight"] == 77, f"R3-I1: okunamayan localStorage sağlam veriyi ezmedi ({pg.evaluate('state.weight')})")
+    check("{bozuk" in (pg.evaluate("localStorage.getItem('ayk_plus_v5_state_kurtarma')") or ""), "okunamayan kopya kurtarma kopyasına alındı")
+    pg.clock.run_for(2600); pg.evaluate("addWater(0.25)"); pg.evaluate("() => { writeMirror(true); }")
+    check(json.loads(ls(pg))["weight"] == 77, "ayna sağlam veriyle yeniden yazıldı")
     ctx.close()
     # R2-I2: depo açılamıyor + ayna kapalı → salt okunur, "Bu verilerle devam" ile yazma açılır
     ctx, pg = page(init="localStorage.setItem('ayk_plus_v5_ayna_kapali', '1'); try { Object.defineProperty(window, 'indexedDB', { value: undefined, configurable: true }); } catch (e) {}")

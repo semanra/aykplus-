@@ -2106,7 +2106,8 @@ const MIRROR_DELAY_MS = 2000;
 const LS_SIG_KEY = "ayk_plus_v5_imza";          // localStorage'a bizim son yazdığımız metnin imzası
 const LS_GEN_KEY = "ayk_plus_v5_sira";          // localStorage aynasının sıra numarası
 const MIRROR_OFF_KEY = "ayk_plus_v5_ayna_kapali"; // localStorage doldu, ayna eski kalmış olabilir
-const IDB_FAIL_KEY = "ayk_plus_v5_idb_hata";    // içe alma doğrulaması kaç kez tutmadı (2 → eski modda kal)
+const IDB_FAIL_KEY = "ayk_plus_v5_idb_hata";    // "adet:zaman": içe alma doğrulaması tutmadı (2 kez → 7 gün eski modda kal)
+const IDB_USED_KEY = "ayk_plus_v5_idb";         // bu cihazda IndexedDB kullanıldı (açılamazsa daha uzun dene)
 var storeMode = "boot";          // boot | idb | ls
 var storeReady = false;          // açılış bitmeden hiçbir şey yazılmaz
 var storeReadOnly = false;       // depo açılamadı ve localStorage eski olabilir: kullanıcı onaylayana dek yazma yok
@@ -2191,8 +2192,13 @@ function lsGen() { const n = parseInt(lsGet(LS_GEN_KEY), 10); return n > 0 ? n :
 
 // --- Açılış ---
 async function storageInit() {
-  if (parseInt(lsGet(IDB_FAIL_KEY), 10) >= 2) return storageUseLegacy();   // bu cihazda içe alma tutmuyor: eski mod
+  { const [n, t] = String(lsGet(IDB_FAIL_KEY) || "0:0").split(":").map(Number);   // içe alma tutmuyor: 7 gün eski mod
+    if (n >= 2 && Date.now() - t < 7 * DAY_MS) return storageUseLegacy(); }
   try { aykDB = await idbOpen(); } catch (e) { aykDB = null; }
+  if (!aykDB && lsGet(IDB_USED_KEY) === "1" && lsGet(MIRROR_OFF_KEY) !== "1") {   // R3-I2: kullanılan depo geç açılıyor olabilir
+    try { aykDB = await idbOpen(10000); } catch (e) { aykDB = null; }
+    if (!aykDB) { storageUseLegacy(); storeGen += 1e6; return; }   // bu oturumun değişiklikleri sonra kazanır (ayna ≤ 2 sn geride olabilir)
+  }
   if (!aykDB && lsGet(MIRROR_OFF_KEY) === "1") {   // localStorage eski kalmış olabilir: bir kez daha, daha uzun dene
     try { aykDB = await idbOpen(10000); } catch (e) { aykDB = null; }
     if (!aykDB) { storageUseLegacy(); storeReadOnly = true; return; }
@@ -2203,7 +2209,16 @@ async function storageInit() {
     const lsStr = lsGet(STORAGE_KEY), lg = lsGen();
     const outside = lsStr != null && strSig(lsStr) !== lsGet(LS_SIG_KEY);
     lastWrittenSig = lsStr != null ? strSig(lsStr) : "";
-    if (!storeMeta.migratedAt || outside || (lsStr != null && lg > (storeMeta.gen || 0))) {
+    let wantImport = !storeMeta.migratedAt || outside || (lsStr != null && lg > (storeMeta.gen || 0));
+    if (wantImport && storeMeta.migratedAt && lsStr != null) {
+      let ok = false; try { ok = isObj(JSON.parse(lsStr)); } catch (e) {}
+      if (!ok) {   // kopya okunamıyor: IndexedDB'deki sağlam veri açılır, ham metin kurtarma kopyasına
+        try { if (!localStorage.getItem(RESCUE_KEY)) localStorage.setItem(RESCUE_KEY, lsStr); } catch (e) {}
+        loadFailed = true;
+        wantImport = false;
+      }
+    }
+    if (wantImport) {
       await storageImportFromLocal(lsStr, lg);
       if (storeMode !== "idb") return;
     } else {
@@ -2261,7 +2276,7 @@ async function storageImportFromLocal(lsStr, lg) {
   const back = partsToRaw(await idbGetAll("parts"));
   if (back.bad.length || stableStr(normalizeState(back.raw)) !== stableStr(normalizeState(JSON.parse(JSON.stringify(state))))) {
     console.error("depolama doğrulaması tutmadı; eski moda geçiliyor");
-    try { localStorage.setItem(IDB_FAIL_KEY, String((parseInt(lsGet(IDB_FAIL_KEY), 10) || 0) + 1)); } catch (e) {}
+    try { localStorage.setItem(IDB_FAIL_KEY, ((parseInt(String(lsGet(IDB_FAIL_KEY) || "0").split(":")[0], 10) || 0) + 1) + ":" + Date.now()); } catch (e) {}
     return storageUseLegacy();
   }
   storeMeta = meta;
@@ -2269,6 +2284,7 @@ async function storageImportFromLocal(lsStr, lg) {
   try {
     if (lsStr != null) { localStorage.setItem(LS_SIG_KEY, strSig(lsStr)); localStorage.setItem(LS_GEN_KEY, String(storeGen)); }
     localStorage.removeItem(IDB_FAIL_KEY);
+    localStorage.setItem(IDB_USED_KEY, "1");
   } catch (e) {}
   await storagePruneSnapKind("import", 3);
   storeMode = "idb";
@@ -2318,6 +2334,7 @@ function saveStateLegacy() {
 function storageSaveFailed(e) {
   console.error(e);
   idbBroken = true;
+  storeGen++;       // localStorage kopyası, IndexedDB'nin onayladığı her numaradan büyük olsun
   storeLast = {};   // bağlantı geri gelince her şey baştan yazılır
   mirrorDirty = true;
   writeMirror(true);   // localStorage'a, IndexedDB'dekinden büyük numarayla (sonraki açılış buradan açar)
