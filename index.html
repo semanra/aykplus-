@@ -246,7 +246,7 @@
     .m-rg.warn span { color: var(--t-warn-text); font-weight: 650; }
     html.light .m-rt, html.light .m-wk, html.light .m-rg { box-shadow: 0 1px 2px rgba(9, 9, 11, 0.06); }
     /* v39: rutinin içi + Düzenle */
-    .m-del { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex: none; color: var(--d-over); background: rgba(251, 113, 133, 0.12); margin-right: 6px; }
+    .m-del { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex: none; color: var(--d-over); background: var(--t-danger-bg); margin-right: 6px; }
     .m-startbar { position: sticky; bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px)); margin-top: 14px; padding-top: 8px; z-index: 5; }
     /* v39: nasıl yapılır kutusu (detay + seans) */
     .m-guide { background: var(--t-surface); border-radius: 18px; padding: 12px 14px; margin-top: 18px; }
@@ -5573,7 +5573,7 @@ function mobTimerTick() {
 function mobTimerFinish() {
   const id = mobT.id, name = mobT.name;
   mobTimerClose();
-  const it = mobFind(id);
+  const it = mobFindAny(id);   // kimlikle bütün rutinlerde (açık rutin değişmiş olabilir)
   if (it) it.done = true;
   renderAll();
   toast(name + " tamamlandı");

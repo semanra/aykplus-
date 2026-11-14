@@ -253,6 +253,16 @@ try:
     check("3 / 3" in prog() and S()[1] is True, f"arka plandan dönünce kaçırılan süre işlendi ({prog()!r}, {S()})")
     p5.screenshot(path=os.path.join(SHOTS, "v39_seans_tekrar.png"))
     p5.click("#mobTClose")
+    # Final inceleme 1: tek hareket sayacı, açık rutin değişse de doğru hareketi tikler (kimlikle)
+    p5.evaluate("""mobRoutines().push({ id: 'z', name: 'Z', items: [normMobItem({ id: 'zz', name: 'Zt', type: 'static', mode: 'time', sec: 10, sets: 1 })] });
+      mobOpenRoutine('z'); mobTimerStart('zz'); mobUI.rid = null; mobUI.view = 'home'""")
+    tick(10500)
+    check(p5.evaluate("mobRoutine('z').items[0].done") is True, "tek hareket sayacı açık rutin değişse de doğru hareketi tikledi")
+    # Final inceleme 5: çöp düğmesi rengi değişkenden (sabit renk yok)
+    p5.evaluate("mobOpenRoutine('s'); mobEdit(true)"); p5.wait_for_timeout(60)
+    bgs = p5.evaluate("[getComputedStyle(document.querySelector('[data-mob-del]')).backgroundColor, getComputedStyle(document.body).getPropertyValue('--t-danger-bg').trim()]")
+    check(bgs[0] == p5.evaluate("(v => { const d = document.createElement('i'); d.style.background = v; document.body.appendChild(d); const c = getComputedStyle(d).backgroundColor; d.remove(); return c; })(getComputedStyle(document.body).getPropertyValue('--t-danger-bg'))"),
+          f"çöp düğmesi zemini --t-danger-bg ({bgs})")
     ctx5.close()
 
     check(not errs, f"sayfa hatası yok ({errs[:3]})")

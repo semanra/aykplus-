@@ -508,7 +508,7 @@ function mobTimerTick() {
 function mobTimerFinish() {
   const id = mobT.id, name = mobT.name;
   mobTimerClose();
-  const it = mobFind(id);
+  const it = mobFindAny(id);   // kimlikle bütün rutinlerde (açık rutin değişmiş olabilir)
   if (it) it.done = true;
   renderAll();
   toast(name + " tamamlandı");
