@@ -70,12 +70,14 @@ try:
     pg.evaluate("() => { window.__put = IDBObjectStore.prototype.put; IDBObjectStore.prototype.put = function () { throw new DOMException('dolu', 'QuotaExceededError'); }; }")
     pg.evaluate("addWater(0.5)"); pg.wait_for_timeout(150)
     m = json.loads(ls(pg))
-    check(pg.evaluate("state.waterLiters") == 2 and m["waterLiters"] == 2 and pg.evaluate("localStorage.getItem('ayk_plus_v5_imza')") is None,
-          "IndexedDB yazamayınca veri hemen localStorage'a (imzasız), ekrandaki veri duruyor")
+    g = pg.evaluate("aykDB ? idbGet('meta', 'main').then(m => [m.gen, +localStorage.getItem('ayk_plus_v5_sira')]) : [0, +localStorage.getItem('ayk_plus_v5_sira')]")
+    check(pg.evaluate("state.waterLiters") == 2 and m["waterLiters"] == 2 and g[1] > g[0],
+          f"IndexedDB yazamayınca veri hemen localStorage'a, daha büyük sıra numarasıyla ({g})")
     pg.evaluate("() => { IDBObjectStore.prototype.put = window.__put; addWater(0.5); }"); pg.wait_for_timeout(300)
     check(stored(pg)["waterLiters"] == 2.5, "hata geçince yeniden bağlanıp her şeyi yazıyor")
     pg.clock.run_for(2600); pg.wait_for_timeout(80)
-    check(pg.evaluate("localStorage.getItem('ayk_plus_v5_imza')") is not None, "IndexedDB yeniden onaylayınca ayna imzalandı")
+    g = pg.evaluate("idbGet('meta', 'main').then(m => [m.gen, +localStorage.getItem('ayk_plus_v5_sira')])")
+    check(g[0] == g[1], f"IndexedDB yeniden yazınca numaralar eşitlendi ({g})")
     # ===== 5) Bozuk parça → en yeni iç yedek + kurtarma kopyası =====
     pg.evaluate("aykRawPut('parts', 'dailyLogs', '{bozuk')"); reload(pg)
     s = stored(pg)
@@ -179,10 +181,56 @@ try:
     pg.evaluate("state._okunamayanBolumler = { core: 'x'.repeat(1000) }; state = normalizeState(JSON.parse(JSON.stringify(state))); renderAll()")
     check(pg.evaluate("'_okunamayanBolumler' in state") is False, "I6: kurtarma alanı kayıttan ayıklanıyor")
     # M1: fabrika ayarlarından önce iç yedek
-    n = len([x for x in snaps(pg) if x["kind"] == "import"])
+    n = len([x for x in snaps(pg) if x["kind"] == "safe"])
     pg.evaluate("openProfile(); void resetToDefaults()"); pg.wait_for_timeout(150); pg.click("#uiDlgOk"); pg.wait_for_timeout(150); pg.click("#uiDlgOk"); pg.wait_for_timeout(250)
-    imp = [x for x in snaps(pg) if x["kind"] == "import"]
+    imp = [x for x in snaps(pg) if x["kind"] == "safe"]
     check(len(imp) == n + 1 and json.loads(pg.evaluate("aykSnapJson(%s)" % json.dumps(sorted(imp, key=lambda x: -x["ts"])[0]["key"])))["weight"] == 95, "M1: sıfırlamadan önceki hâl iç yedekte")
+    ctx.close()
+
+    # ===== 11) İkinci inceleme senaryoları =====
+    ctx, pg = page(); go(pg)
+    # R2-C1: localStorage dolu (ayna eski kalır) + tek IndexedDB hatası + yeniden bağlanma → yeniden açılış en yeni (IndexedDB)
+    pg.evaluate("state.weight = 70; renderAll()"); pg.clock.run_for(2600); pg.wait_for_timeout(80)
+    pg.evaluate("localStorage.setItem('__dolgu', 'x'.repeat(4500000))")
+    pg.evaluate("for (let i = 0; i < 4; i++) state.dailyLogs['2025-02-0' + (i + 1)] = { eatenKcal: 1, pad: 'y'.repeat(250000) }; renderAll()")
+    pg.clock.run_for(2600); pg.wait_for_timeout(80)
+    check(pg.evaluate("localStorage.getItem('ayk_plus_v5_ayna_kapali')") == "1", "localStorage doldu: ayna kapalı işaretlendi")
+    pg.evaluate("() => { window.__put = IDBObjectStore.prototype.put; IDBObjectStore.prototype.put = function () { throw new DOMException('kayıp', 'UnknownError'); }; }")
+    pg.evaluate("state.weight = 80; renderAll()"); pg.wait_for_timeout(50)
+    pg.evaluate("() => { IDBObjectStore.prototype.put = window.__put; }")
+    pg.clock.run_for(11000); pg.evaluate("state.weight = 95; renderAll()"); pg.wait_for_timeout(400)
+    pg.evaluate("() => { writeMirror(); }"); pg.wait_for_timeout(50)
+    reload(pg)
+    check(pg.evaluate("state.weight") == 95, f"R2-C1: ayna dolu + yazma hatası sonrası en yeni veri açıldı ({pg.evaluate('state.weight')})")
+    pg.evaluate("localStorage.removeItem('__dolgu')")
+    ctx.close()
+    # R2-I1: hızlı dokunuş + hemen arka plan → sonraki açılış içe alma yapmaz, veri doğru
+    ctx, pg = page(); go(pg)
+    for i in range(3):
+        pg.evaluate("w => { state.weight = w; renderAll(); document.dispatchEvent(new Event('visibilitychange')); writeMirror(); }", 81 + i)
+        reload(pg)
+        check(pg.evaluate("state.weight") == 81 + i, f"R2-I1: açılış {i + 1}: veri doğru")
+    check(len([x for x in snaps(pg) if x["kind"] == "import"]) == 0, "R2-I1: hızlı dokunuş + arka plan içe almaya yol açmıyor")
+    # I3: içe alma iki kez tutmadıysa eski modda kalır
+    pg.evaluate("localStorage.setItem('ayk_plus_v5_idb_hata', '2')"); reload(pg)
+    check(pg.evaluate("storeMode") == "ls" and pg.evaluate("state.weight") == 83, "I3: doğrulama tutmayan cihazda eski modda kalıyor, veri yerinde")
+    pg.evaluate("localStorage.removeItem('ayk_plus_v5_idb_hata')")
+    # M1: Profil'de yazarken ana ekrana geçilirse değer kaydedilir
+    reload(pg); pg.evaluate("openProfile()"); pg.wait_for_timeout(100)
+    pg.fill("#setAge", "52")
+    pg.evaluate("Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true }); document.dispatchEvent(new Event('visibilitychange'))"); pg.wait_for_timeout(100)
+    check(stored(pg)["settings"]["age"] == 52, "M1: yazarken arka plana geçince Profil değeri kaydedildi")
+    ctx.close()
+    # R2-I2: depo açılamıyor + ayna kapalı → salt okunur, "Bu verilerle devam" ile yazma açılır
+    ctx, pg = page(init="localStorage.setItem('ayk_plus_v5_ayna_kapali', '1'); try { Object.defineProperty(window, 'indexedDB', { value: undefined, configurable: true }); } catch (e) {}")
+    pg.goto(URL); pg.wait_for_function("window.aykBooted === true", timeout=15000)
+    pg.clock.run_for(500); pg.wait_for_timeout(80)
+    check(pg.evaluate("storeReadOnly") is True and "açılamadı" in pg.inner_text("#toastWrap"), "R2-I2: salt okunur açılış + uyarı")
+    pg.evaluate("addWater(1)")
+    check((json.loads(ls(pg) or "{}").get("waterLiters") or 0) != 1, "salt okunurken yazılmıyor")
+    pg.locator("#toastWrap button", has_text="Bu verilerle devam").click(); pg.wait_for_timeout(100)
+    pg.evaluate("addWater(1)")
+    check(pg.evaluate("storeReadOnly") is False and json.loads(ls(pg))["waterLiters"] == 2, "R2-I2: 'Bu verilerle devam' sonrası kayıt yapılıyor")
     ctx.close()
     check(not errs, f"sayfa hatası yok ({errs[:3]})")
     b.close()

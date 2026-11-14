@@ -60,7 +60,7 @@ function bootApp() {
   try { if (hadV5State && !loadFailed && localStorage.getItem("ayk_plus_v4_state") != null) localStorage.removeItem("ayk_plus_v4_state"); } catch (e) { /* yok sayılır */ }
   setTimeout(checkFoodHealth, 1500);
   setTimeout(checkStorageWarn, 2500);   // v36
-  if (storeReadOnly) setTimeout(() => toast("Kayıt deposu açılamadı. Verilerin güvende; uygulamayı tamamen kapatıp yeniden aç. Bu açılışta yapılan değişiklikler kaydedilmez.", "error"), 300);
+  if (storeReadOnly) setTimeout(() => toast("Kayıt deposu açılamadı. Verilerin güvende; uygulamayı tamamen kapatıp yeniden aç. Bu açılışta yapılan değişiklikler kaydedilmez.", "error", { label: "Bu verilerle devam", fn: storageContinueReadOnly }), 300);
   if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);
 
   document.addEventListener("visibilitychange", () => {
@@ -78,7 +78,13 @@ function bootApp() {
   autoSnapshot();   // v41: günün iç yedeği (yoksa)
   profileAutoSaveInit();   // v42
   // v41: arka plana geçerken / sayfa kapanırken localStorage aynası güncellenir
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") writeMirror(); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "hidden") return;
+    // v42: iOS'ta yazarken ana ekrana geçilirse alan kutudan çıkmayabilir → Profil'de yazılmakta olan değer önce kaydedilsin
+    const a = document.activeElement;
+    if (profileIsOpen() && a && a.blur && $("profilePage").contains(a)) a.blur();
+    writeMirror();
+  });
   window.addEventListener("pagehide", () => writeMirror());
   window.aykBooted = true;
 }

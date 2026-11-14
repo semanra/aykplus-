@@ -250,7 +250,7 @@ async function checkStorageWarn() {
 }
 
 // v41: OTOMATİK İÇ YEDEKLER — her gün ilk açılışta bütün verinin kopyası (son 7 gece + son 4 hafta + "Geçiş öncesi").
-const SNAP_KIND_LABEL = { day: "Gece yedeği", week: "Haftalık yedek", pre: "Geçiş öncesi", import: "Değişiklik öncesi" };
+const SNAP_KIND_LABEL = { day: "Gece yedeği", week: "Haftalık yedek", pre: "Geçiş öncesi", import: "İçe alma öncesi", safe: "Değişiklik öncesi" };
 function renderSnapList() {
   const box = $("pfSnaps"); if (!box) return;
   if (storeMode !== "idb") { box.innerHTML = `<p class="text-[13px] text-[var(--t-dim)]">Otomatik iç yedek bu cihazda kullanılamıyor; yedek dosyası kaydet.</p>`; return; }
