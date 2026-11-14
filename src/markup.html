@@ -264,6 +264,8 @@
     .m-breath .core { width: 66%; height: 66%; border-radius: 50%; background: radial-gradient(circle at 50% 40%, rgba(var(--t-acc-rgb), 0.30), rgba(var(--t-acc-rgb), 0.08) 70%); border: 2px solid var(--t-acc-text); display: flex; flex-direction: column; align-items: center; justify-content: center; animation: mBreathe 10s ease-in-out infinite; }
     .m-breath.pause .core { animation: none; border-color: var(--m-chk); background: var(--t-surface); }
     .m-breath .core b { font-size: 76px; line-height: 0.85; }
+    .m-breath.ses { width: min(236px, 62vw, 30vh); height: min(236px, 62vw, 30vh); }
+    .m-breath.ses .core b { font-size: 60px; }
     .m-breath .core span { font-size: 15px; color: var(--t-acc-text); font-weight: 650; margin-top: 6px; }
     @keyframes mBreathe { 0%, 100% { transform: scale(0.86); } 40% { transform: scale(1.08); } }
     @media (prefers-reduced-motion: reduce) { .m-breath .core { animation: none; } }

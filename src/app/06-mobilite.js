@@ -398,33 +398,103 @@ async function mobAddCustom() {
   renderAll();
 }
 // --- Sayaç (tam ekran, nefes dairesi). Bitiş zamanına göre çalışır; arka plandan dönünce kaçırılan aşamalar ilerletilir.
-// Akış: tur → ses → 5 sn ara → sonraki tur; son tur bitince hareket tiklenir. iOS: uygulama kapalıyken/sessizde ses yok.
+// Tek hareket: tur → ses → 5 sn ara → sonraki tur; son tur bitince hareket tiklenir ve kapanır.
+// v39 seans (mobT.ses): rutinin BÜTÜN hareketleri baştan sırayla (kullanıcı kararı). Süreli harekette önce 5 sn hazırlık
+// (phase "prep"), sonra turlar; tekrarlı harekette sayaç yok (phase "reps"), her tur "Bitti" ile geçilir. Biten hareket o anda
+// tiklenir ve kaydedilir; Atla tiklemez; kapatınca yapılanlar kalır. iOS: uygulama kapalıyken/sessizde ses yok.
 let mobT = null;
 function mobFmt(sec) { sec = Math.max(0, Math.ceil(sec)); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
 function mobBeep() { if (state.settings.mobSound !== false) beep(true); }
+function mobRoundsOf(it) {
+  const rounds = [];
+  for (let s = 1; s <= it.sets; s++) (it.sides === 2 ? ["Sağ", "Sol"] : [null]).forEach(side => rounds.push({ side, set: s }));
+  return rounds;
+}
+function mobFindAny(id) { for (const r of mobRoutines()) { const it = r.items.find(i => i.id === id); if (it) return it; } return null; }
+function mobTimerOpen() {
+  const m = $("mobTimer"); m.classList.remove("hidden"); m.classList.add("flex");
+  document.body.classList.add("pf-open");
+  if (!mobT.iv) mobT.iv = setInterval(mobTimerTick, 250);
+  mobTimerRender();
+  updateWakeLock();
+}
 function mobTimerStart(id) {
   const it = mobFind(id);
   if (!it || it.mode !== "time") return;
   unlockAudio();
   if (mobT) clearInterval(mobT.iv);
-  const rounds = [];
-  for (let s = 1; s <= it.sets; s++) (it.sides === 2 ? ["Sağ", "Sol"] : [null]).forEach(side => rounds.push({ side, set: s }));
   const now = Date.now();
-  mobT = { id: it.id, name: it.name, region: MOB_REGION_LABEL[it.region] || "", sec: it.sec, sets: it.sets, rounds, idx: 0, phase: "work", endAt: now + it.sec * 1000, t0: now, iv: 0, quiet: false };
-  mobT.iv = setInterval(mobTimerTick, 250);
-  const m = $("mobTimer"); m.classList.remove("hidden"); m.classList.add("flex");
-  document.body.classList.add("pf-open");
+  mobT = { ses: null, id: it.id, name: it.name, region: MOB_REGION_LABEL[it.region] || "", sec: it.sec, sets: it.sets, rounds: mobRoundsOf(it), idx: 0, phase: "work", endAt: now + it.sec * 1000, t0: now, iv: 0, quiet: false };
+  mobTimerOpen();
+}
+// Seans
+function mobSesStart(rid) {
+  const r = mobRoutine(rid);
+  if (!r || !r.items.length) { toast("Rutinde hareket yok"); return; }
+  unlockAudio();
+  if (mobT) clearInterval(mobT.iv);
+  mobT = { ses: { rid: r.id, title: r.name, ids: r.items.map(i => i.id), pos: 0, skipped: [], doneIds: [], t0: Date.now(), guideOpen: true }, iv: 0, t0: Date.now() };
+  mobSesLoad(0);
+  mobTimerOpen();
+}
+function mobSesLoad(pos) {
+  const S = mobT.ses;
+  S.pos = pos;
+  const it = mobFindAny(S.ids[pos]);
+  if (!it) { if (pos + 1 < S.ids.length) return mobSesLoad(pos + 1); return mobSesFinish(); }
+  const time = it.mode === "time";
+  Object.assign(mobT, { id: it.id, name: it.name, region: MOB_REGION_LABEL[it.region] || "", sec: it.sec, sets: it.sets, reps: it.reps, rounds: mobRoundsOf(it), idx: 0,
+    phase: time ? "prep" : "reps", endAt: time ? Date.now() + MOB_SWITCH_SEC * 1000 : 0, quiet: false });
+  if (!mobT.iv) mobT.iv = setInterval(mobTimerTick, 250);
   mobTimerRender();
-  updateWakeLock();
+}
+function mobSesItemDone() {
+  const S = mobT.ses, it = mobFindAny(mobT.id);
+  if (it) { it.done = true; saveState(); }
+  if (!S.doneIds.includes(mobT.id)) S.doneIds.push(mobT.id);
+  S.skipped = S.skipped.filter(x => x !== mobT.id);
+  mobSesAdvance();
+}
+function mobSesAdvance() {
+  const S = mobT.ses;
+  if (S.pos + 1 >= S.ids.length) mobSesFinish(); else mobSesLoad(S.pos + 1);
+}
+function mobSesNext() {   // tekrarlı harekette "Bitti"
+  if (!mobT || mobT.phase !== "reps") return;
+  if (mobT.idx < mobT.rounds.length - 1) { mobT.idx++; mobTimerRender(); } else mobSesItemDone();
+}
+function mobSesPrev() { if (!mobT || !mobT.ses) return; mobSesLoad(Math.max(0, mobT.ses.pos - 1)); }
+function mobSesSkip() {
+  if (!mobT || !mobT.ses) return;
+  const S = mobT.ses;
+  if (!S.doneIds.includes(mobT.id) && !S.skipped.includes(mobT.id)) S.skipped.push(mobT.id);
+  mobSesAdvance();
+}
+function mobSesGuide() { if (!mobT || !mobT.ses) return; mobT.ses.guideOpen = !mobT.ses.guideOpen; mobTimerRender(); }
+function mobSesFinish() {
+  clearInterval(mobT.iv); mobT.iv = 0;
+  mobT.phase = "fin";
+  renderAll();
+  mobTimerRender();
+}
+function mobSesFinishClose() {
+  const rid = mobT && mobT.ses ? mobT.ses.rid : null;
+  mobTimerClose();
+  if (rid && mobRoutine(rid) && state.activeTab === "mobility") { mobUI.view = "routine"; mobUI.rid = rid; mobUI.edit = false; }
+  renderAll();
 }
 function mobTimerTick() {
-  if (!mobT) return;
+  if (!mobT || mobT.phase === "reps" || mobT.phase === "fin") return;
   let changed = false;
-  while (mobT && Date.now() >= mobT.endAt) {
+  while (mobT && mobT.phase !== "reps" && mobT.phase !== "fin" && Date.now() >= mobT.endAt) {
     const late = Date.now() - mobT.endAt;
-    if (mobT.phase === "work") {
+    if (mobT.phase === "prep") { mobT.phase = "work"; mobT.endAt += mobT.sec * 1000; }
+    else if (mobT.phase === "work") {
       if (!mobT.quiet && late < 2000) mobBeep();
-      if (mobT.idx >= mobT.rounds.length - 1) { mobTimerFinish(); return; }
+      if (mobT.idx >= mobT.rounds.length - 1) {
+        if (mobT.ses) { const at = mobT.endAt; mobSesItemDone(); if (mobT && mobT.phase === "prep") mobT.endAt = at + MOB_SWITCH_SEC * 1000; changed = false; continue; }
+        mobTimerFinish(); return;
+      }
       mobT.phase = "switch"; mobT.endAt += MOB_SWITCH_SEC * 1000;
     } else {
       mobT.idx++; mobT.phase = "work"; mobT.endAt += mobT.sec * 1000;
@@ -432,6 +502,7 @@ function mobTimerTick() {
     mobT.quiet = false;
     changed = true;
   }
+  if (!mobT) return;
   if (changed) mobTimerRender(); else mobTimerUpdate();
 }
 function mobTimerFinish() {
@@ -444,12 +515,14 @@ function mobTimerFinish() {
 }
 function mobTimerClose() {
   if (mobT) clearInterval(mobT.iv);
+  const hadSes = !!(mobT && mobT.ses);
   mobT = null;
   const m = $("mobTimer"); m.classList.add("hidden"); m.classList.remove("flex"); m.innerHTML = "";
   document.body.classList.remove("pf-open");
   updateWakeLock();
+  if (hadSes) renderAll();
 }
-function mobTimerAdjust(d) { if (!mobT) return; mobT.endAt += d * 1000; if (mobT.endAt <= Date.now()) mobT.quiet = true; mobTimerTick(); }
+function mobTimerAdjust(d) { if (!mobT || mobT.phase === "reps") return; mobT.endAt += d * 1000; if (mobT.endAt <= Date.now()) mobT.quiet = true; mobTimerTick(); }
 function mobTimerSkip() { if (!mobT) return; mobT.endAt = Date.now(); mobT.quiet = true; mobTimerTick(); }
 function mobTimerSound() { state.settings.mobSound = state.settings.mobSound === false; saveState(); mobTimerRender(); }
 function mobBreathLabel() { return ((Date.now() - mobT.t0) % 10000) < 4000 ? "Nefes al" : "Nefes ver"; }
@@ -458,40 +531,97 @@ function mobTimerUpdate() {
   const t = $("mobTTime"); if (t) t.textContent = mobFmt((mobT.endAt - Date.now()) / 1000);
   const b = $("mobTBreath"); if (b && mobT.phase === "work") b.textContent = mobBreathLabel();
 }
+function mobRoundLabel(x) { return x.side ? x.side + " " + x.set : "Set " + x.set; }
+function mobSesFinHtml() {
+  const S = mobT.ses, w = mobWeekStats();
+  const min = Math.max(1, Math.round((Date.now() - S.t0) / 60000));
+  const rows = S.ids.map(id => { const it = mobFindAny(id); return it ? { name: it.name, ok: S.doneIds.includes(id), sk: S.skipped.includes(id) } : null; }).filter(Boolean);
+  const shown = rows.slice(0, 5), more = rows.length - shown.length;
+  return `<div id="mobTFin" class="w-full max-w-lg flex flex-col items-center text-center pt-14 pb-4">
+    <div class="w-[110px] h-[110px] rounded-full grid place-items-center border-[3px] border-[var(--t-acc-text)] bg-[rgba(var(--t-acc-rgb),0.15)] text-[var(--t-acc-text)]">${svgI("check", 50, 2.6)}</div>
+    <h3 class="t-display text-[36px] leading-[1.02] mt-5 uppercase break-words">${esc(S.title)} bitti</h3>
+    <p class="text-[15px] text-[var(--t-muted)] mt-1.5">Bu hafta ${w.count}. gün · ${w.streak} gün üst üste</p>
+    <div class="grid grid-cols-3 gap-2 w-full mt-5">
+      <div class="m-wk"><b class="t-display" data-fin="hareket">${S.doneIds.length}</b><span>hareket</span></div>
+      <div class="m-wk"><b class="t-display" data-fin="dakika">${min}</b><span>dakika</span></div>
+      <div class="m-wk"><b class="t-display" data-fin="atlandi">${S.skipped.length}</b><span>atlandı</span></div>
+    </div>
+    <div class="w-full mt-4 bg-[var(--t-surface)] rounded-[18px] px-3.5 py-1 text-left">${shown.map(x =>
+      `<div class="flex justify-between gap-3 py-2.5 border-b border-[var(--t-line)] last:border-0 text-[14px] ${x.ok ? "text-[var(--t-text)]" : "text-[var(--t-muted)]"}"><span class="min-w-0 truncate">${esc(x.name)}</span><span class="shrink-0">${x.ok ? "Yapıldı" : x.sk ? "Atlandı" : "Yapılmadı"}</span></div>`).join("")}
+      ${more > 0 ? `<div class="py-2.5 text-[13.5px] text-[var(--t-muted)]">… ${more} hareket daha</div>` : ""}</div>
+    <button id="mobTFinOk" onclick="mobSesFinishClose()" class="m-btn pri w-full mt-5">Tamam</button>
+  </div>`;
+}
 function mobTimerRender() {
   if (!mobT) return;
-  const T = mobT, r = T.rounds[T.idx], work = T.phase === "work";
-  const next = T.rounds[T.idx + 1];
-  const sub = work
-    ? (r.side ? `${r.side} taraf · ${r.set}. tur / ${T.sets}` : `Set ${r.set} / ${T.sets}`)
-    : (next && next.side === "Sol" ? "Sola geç" : next && next.side === "Sağ" ? "Sağa geç" : "Sıradaki set") + ` · ${next ? (next.side ? next.side + " " + next.set : "Set " + next.set) : ""}`;
-  const snd = state.settings.mobSound !== false;
+  const T = mobT, S = T.ses, snd = state.settings.mobSound !== false;
+  if (T.phase === "fin") { $("mobTimer").innerHTML = mobSesFinHtml(); return; }
+  const r = T.rounds[T.idx], next = T.rounds[T.idx + 1];
+  const reps = T.phase === "reps", prep = T.phase === "prep", work = T.phase === "work";
+  const it = mobFindAny(T.id);
+  let sub;
+  if (reps) sub = (r.side ? `${r.side} taraf · ` : "") + `Set ${r.set} / ${T.sets}`;
+  else if (prep) sub = "Hazırlan · " + (r.side ? r.side + " taraf, " : "") + `${T.sets} set × ${T.sec} sn`;
+  else if (work) sub = r.side ? `${r.side} taraf · ${r.set}. tur / ${T.sets}` : `Set ${r.set} / ${T.sets}`;
+  else sub = (next && next.side === "Sol" ? "Sola geç" : next && next.side === "Sağ" ? "Sağa geç" : "Sıradaki set") + ` · ${next ? mobRoundLabel(next) : ""}`;
   const boxes = T.rounds.map((x, i) => {
-    const cls = i < T.idx || (i === T.idx && !work) ? "d" : i === T.idx ? "n" : "";
-    return `<i class="${cls}">${x.side ? x.side + " " + x.set : "Set " + x.set}</i>`;
+    const cls = i < T.idx || (i === T.idx && T.phase === "switch") ? "d" : i === T.idx ? "n" : "";
+    return `<i class="${cls}">${mobRoundLabel(x)}</i>`;
   }).join("");
-  $("mobTimer").innerHTML = `
-    <div class="w-full max-w-lg flex items-center justify-between pt-3">
-      <button id="mobTClose" onclick="mobTimerClose()" class="m-round" aria-label="Sayacı kapat">${svgI("x", 20, 2.2)}</button>
-      <span id="mobTRegion" class="text-[15px] text-[var(--t-muted)]">${esc(T.region)}</span>
-      <button id="mobTSound" onclick="mobTimerSound()" class="m-round" aria-label="${snd ? "Sesi kapat" : "Sesi aç"}">${svgI(snd ? "vol" : "volOff", 20)}</button>
-    </div>
-    <div class="text-center mt-4 px-2 w-full max-w-lg">
-      <h3 id="mobTTitle" class="t-display text-[30px] leading-[1.05]">${esc(T.name)}</h3>
-      <p id="mobTSub" class="text-[15px] ${work ? "text-[var(--t-muted)]" : "text-[var(--t-acc-text)] font-semibold"} mt-1.5">${sub}</p>
-    </div>
-    <div id="mobTCircle" class="m-breath mt-4 ${work ? "" : "pause"}">
-      <span class="o o1"></span><span class="o o2"></span>
-      <div class="core" style="animation-delay:-${(Date.now() - T.t0) % 10000}ms"><b id="mobTTime" class="t-display">${mobFmt((T.endAt - Date.now()) / 1000)}</b><span id="mobTBreath">${work ? mobBreathLabel() : "Hazırlan"}</span></div>
-    </div>
-    <div class="text-[13.5px] text-[var(--t-dim)] mt-1 text-center">${work ? "4 sn al, 6 sn ver. Her verişte biraz daha derine." : "Sıradaki tur birazdan kendiliğinden başlar."}</div>
-    <div class="w-full max-w-lg mt-auto pt-5">
-      <div class="grid grid-cols-[1fr_1fr_1.3fr] gap-2.5">
+  const n = S ? S.ids.length : 0;
+  const top = S
+    ? `<div class="flex-1 min-w-0 flex flex-col items-center gap-1.5"><span id="mobTProg" class="text-[13px] font-semibold text-[var(--t-muted)] truncate max-w-full">${esc(S.title)} · ${S.pos + 1} / ${n}</span>
+        <span class="block w-full max-w-[200px] h-1.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><i class="block h-full bg-[var(--t-acc)]" style="width:${Math.round(S.pos / n * 100)}%"></i></span></div>`
+    : `<span id="mobTRegion" class="text-[15px] text-[var(--t-muted)]">${esc(T.region)}</span>`;
+  const g = S && it ? mobGuide(it.name) : null;
+  const guide = g
+    ? `<div id="mobTGuide" class="m-guide w-full max-w-lg !mt-3 text-left">
+        <button id="mobTGuideBtn" onclick="mobSesGuide()" class="w-full min-h-[44px] flex items-center justify-between m-guide-h" aria-expanded="${S.guideOpen}">Nasıl yapılır<span class="text-[var(--t-dim)]">${svgI(S.guideOpen ? "up" : "down", 18)}</span></button>
+        ${S.guideOpen ? `<ol>${g.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="m-guide-w">Dikkat: ${esc(g.warn)}</p>` : ""}
+      </div>`
+    : S && it && it.note ? `<div class="m-guide w-full max-w-lg !mt-3 text-left text-[14px] text-[var(--t-text1)]">${esc(it.note)}</div>` : "";
+  const nextName = S && S.pos + 1 < n ? (mobFindAny(S.ids[S.pos + 1]) || {}).name : "";
+  const center = reps
+    ? `<div class="text-center mt-6"><b id="mobTReps" class="t-display text-[104px] leading-[0.85]">${T.reps}</b>
+        <span class="block text-[16px] font-bold text-[var(--t-acc-text)] mt-2">TEKRAR${r.side ? " · " + mobUpper(r.side) + " TARAF" : ""}</span></div>`
+    : `<div id="mobTCircle" class="m-breath ${S ? "ses" : ""} mt-4 ${work ? "" : "pause"}">
+        <span class="o o1"></span><span class="o o2"></span>
+        <div class="core" style="animation-delay:-${(Date.now() - T.t0) % 10000}ms"><b id="mobTTime" class="t-display">${mobFmt((T.endAt - Date.now()) / 1000)}</b><span id="mobTBreath">${work ? mobBreathLabel() : "Hazırlan"}</span></div>
+      </div>
+      ${S ? "" : `<div class="text-[13.5px] text-[var(--t-dim)] mt-1 text-center">${work ? "4 sn al, 6 sn ver. Her verişte biraz daha derine." : "Sıradaki tur birazdan kendiliğinden başlar."}</div>`}`;
+  const ctl = !S
+    ? `<div class="grid grid-cols-[1fr_1fr_1.3fr] gap-2.5">
         <button id="mobTMinus" onclick="mobTimerAdjust(-15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">−15</button>
         <button id="mobTPlus" onclick="mobTimerAdjust(15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">+15</button>
         <button id="mobTSkip" onclick="mobTimerSkip()" class="h-[60px] rounded-[18px] bg-[var(--t-text)] text-[var(--t-bg)] text-[17px] font-bold">Atla</button>
-      </div>
+      </div>`
+    : reps
+    ? `<div class="grid grid-cols-[1fr_1fr_1.8fr] gap-2.5">
+        <button id="mobTPrev" onclick="mobSesPrev()" ${S.pos ? "" : "disabled"} class="h-[62px] rounded-[18px] border border-[var(--t-line)] text-[16px] font-bold text-[var(--t-muted)] disabled:opacity-40" aria-label="Önceki hareket">‹ Önceki</button>
+        <button id="mobTSkip" onclick="mobSesSkip()" class="h-[62px] rounded-[18px] bg-[var(--t-elev)] text-[16px] font-bold" aria-label="Bu hareketi atla">Atla</button>
+        <button id="mobTDone" onclick="mobSesNext()" class="h-[62px] rounded-[18px] bg-[var(--t-acc)] text-[var(--t-on-acc)] text-[18px] font-extrabold">Bitti</button>
+      </div>`
+    : `<div class="grid grid-cols-4 gap-2">
+        <button id="mobTPrev" onclick="mobSesPrev()" ${S.pos ? "" : "disabled"} class="h-[60px] rounded-[18px] border border-[var(--t-line)] text-[17px] font-bold text-[var(--t-muted)] disabled:opacity-40" aria-label="Önceki hareket">‹</button>
+        <button id="mobTMinus" onclick="mobTimerAdjust(-15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">−15</button>
+        <button id="mobTPlus" onclick="mobTimerAdjust(15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">+15</button>
+        <button id="mobTSkip" onclick="mobSesSkip()" class="h-[60px] rounded-[18px] bg-[var(--t-text)] text-[var(--t-bg)] text-[16px] font-bold" aria-label="Bu hareketi atla">Atla ›</button>
+      </div>`;
+  $("mobTimer").innerHTML = `
+    <div class="w-full max-w-lg flex items-center justify-between gap-2 pt-3">
+      <button id="mobTClose" onclick="mobTimerClose()" class="m-round" aria-label="${S ? "Seansı bitir" : "Sayacı kapat"}">${svgI("x", 20, 2.2)}</button>
+      ${top}
+      <button id="mobTSound" onclick="mobTimerSound()" class="m-round" aria-label="${snd ? "Sesi kapat" : "Sesi aç"}">${svgI(snd ? "vol" : "volOff", 20)}</button>
+    </div>
+    <div class="text-center mt-4 px-2 w-full max-w-lg">
+      <h3 id="mobTTitle" class="t-display text-[30px] leading-[1.05] break-words">${esc(T.name)}</h3>
+      <p id="mobTSub" class="text-[15px] ${work || reps ? "text-[var(--t-muted)]" : "text-[var(--t-acc-text)] font-semibold"} mt-1.5">${sub}</p>
+    </div>
+    ${center}
+    ${guide}
+    <div class="w-full max-w-lg mt-auto pt-5">
+      ${nextName ? `<div class="text-[13px] text-[var(--t-dim)] text-center mb-2.5 truncate">Sıradaki: <b class="text-[var(--t-muted)] font-semibold">${esc(nextName)}</b></div>` : ""}
+      ${ctl}
       <div id="mobTRounds" class="m-rounds mt-3">${boxes}</div>
     </div>`;
 }
-
