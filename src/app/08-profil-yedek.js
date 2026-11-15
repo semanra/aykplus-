@@ -27,8 +27,29 @@ function fillProfileFields() {
   $("setDayStart").value = String(dayStartHour());
   updateBfHint();
 }
+const PRIVACY_NOTE = "Verilerin yalnızca bu telefonda. Barkod okuttuğunda yalnızca barkod numarası Open Food Facts'e gönderilir.";
+const LICENSES = ["Barlow Condensed (SIL OFL 1.1)", "@zxing/library (Apache-2.0)", "Open Food Facts verisi (ODbL; ürün verisi katkıcılara ait)", "USDA FoodData Central (kamu malı / CC0)", "Tailwind CSS (MIT)", "Vücut haritası görseli (uygulama sahibinin kendi görseli)"];
+const METHOD_SOURCES = ["Mifflin ve ark. (1990), Mifflin-St Jeor denklemi", "Katch-McArdle denklemi (yağsız kütleye dayalı)", "Morton ve ark. 2018, Br J Sports Med (protein ve kas)", "Nunes ve ark. 2022, J Cachexia Sarcopenia Muscle (protein ve kas)", "ISSN Pozisyon Bildirisi 2017 (Jäger ve ark.)", "Helms ve ark. 2014 (kilo verirken protein)", "Iraki ve ark. 2019 (kilo alırken beslenme)", "Joslin Klinik Beslenme Rehberi", "AMDR: yağ kalorinin %20–35'i", "Whittaker ve Wu 2021 (bazal metabolizma denklemleri)"];
+function renderAbout() {
+  const tr = n => n.toFixed(2).replace(".", ",");
+  const A = ACTIVITY_MULT, G = GAIN_PACE;
+  $("pfAboutHealth").textContent = HEALTH_NOTE;
+  $("pfAboutPrivacy").textContent = PRIVACY_NOTE;
+  $("pfMethodBody").innerHTML = [
+    "<p><b>Günlük harcama.</b> Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.</p>",
+    `<p><b>Hareketlilik çarpanları</b> (antrenman günü · dinlenme günü): az hareketli ${tr(A.low[0])} · ${tr(A.low[1])}, orta ${tr(A.mid[0])} · ${tr(A.mid[1])}, çok hareketli ${tr(A.high[0])} · ${tr(A.high[1])}.</p>`,
+    `<p><b>Hedef kalori.</b> Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %${Math.round(G.slow * 100)} (yavaş), %${Math.round(G.mid * 100)} (orta) ya da %${Math.round(G.fast * 100)} (hızlı) kadarı eklenir. Korurken harcamana eşittir.</p>`,
+    "<p><b>Protein.</b> Kilo verirken yağ oranı biliniyorsa yağsız kütle × 2,5 g, bilinmiyorsa referans kilo × 2,2 g. Korurken 1,6 g, alırken 1,8 g (kilo başına). Referans kilo, mevcut ile hedef kilonun küçüğüdür. Üst sınır kilo × 2,2 g; \"Yüksek\" seçeneği en az kilo × 2,0 g verir.</p>",
+    "<p><b>Yağ ve karbonhidrat.</b> Yağ kalorinin %25'i, karbonhidrat kalan kaloridir.</p>",
+    "<p>Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.</p>",
+    "<p class=\"font-semibold text-[var(--t-text)]\">Kaynaklar</p>",
+    "<ul class=\"list-disc pl-4 space-y-1\">" + METHOD_SOURCES.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul>"
+  ].join("");
+  $("pfLicList").innerHTML = LICENSES.map(x => "<li>" + esc(x) + "</li>").join("");
+}
 function openProfile() {
   fillProfileFields();
+  renderAbout();
   $("backupText").value = JSON.stringify(state);
   renderProfile();
   const el = $("profilePage");
