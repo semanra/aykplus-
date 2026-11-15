@@ -227,7 +227,7 @@ Bu belge, AYK+ İngilizce arayüzünde kullanılacak **tek ve bağlayıcı** ter
 | Kilo (vücut ağırlığı) | **Weight** (gerekirse **body weight**) | Kilo sekmesi | Doğrudan karşılık. |
 | Tartı / Tartıyı kaydet | **Weigh-in / Log weigh-in** | `#pWeighBtn`, kurulum | MacroFactor tek tartı kaydına "weigh-in" diyor **[K2]**. |
 | Son tartılar | **Recent weigh-ins** | Kilo | Aynı **[K2]**. |
-| 7 günlük ortalama | **7-day average** | Kilo grafiği, Menülerim | MacroFactor yeni tartılara daha çok ağırlık veren bir eğilim kullanıyor ve buna "trend weight" diyor **[K2]**. Bizimki basit ortalama olduğu için dürüstçe "average" denir. |
+| 7 günlük ortalama | **7-day average** | Kilo grafiği, Menülerim | MacroFactor yeni tartılara daha çok ağırlık veren bir eğilim kullanıyor ve buna "weight trend" diyor **[K2]**. Bizimki basit ortalama olduğu için dürüstçe "average" denir. |
 | Ölçüler | **Measurements** | `#pMeasure`, Profil | Doğrudan karşılık (body measurements). |
 | Koç / Kalori koçu | **Coach / Calorie coach** | `#pCoach`, `coachAnalysis` | MacroFactor kendini "nutrition coach" olarak tanıtıyor ve haftalık "coaching" güncellemeleri yapıyor **[K2]**. Bizimki kalori önerisi verdiği için "calorie coach". |
 | Koç düzeltmesi | **Coach adjustment** | `applyCoach/resetCoachAdjust` | Aynı. |
