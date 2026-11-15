@@ -711,7 +711,7 @@ function warmupCardHtml(day, inProg) {
     <button id="gymWarmupStart" onclick="mobWarmupStart()" class="m-warm-go w-full justify-center mt-3">${svgI("play", 16, 2.4)}${t("Isınmayı başlat")}</button>
   </div>`;
 }
-function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds("Isınma", items.map(i => i.id), null); }
+function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds(t("Isınma"), items.map(i => i.id), null); }
 function mobWarmupHide() {
   snapshot();
   state.settings.warmupCard = false;

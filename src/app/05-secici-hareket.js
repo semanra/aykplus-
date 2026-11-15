@@ -75,12 +75,12 @@ function pickerExtra() {
 
 function openExercisePicker() {
   const groups = Object.keys(EXERCISE_LIBRARY).map(g => ({
-    label: g,
-    short: g.replace(/^\d+\.\s*/, "").replace(/\s*\(.*$/, ""),
-    items: EXERCISE_LIBRARY[g].map(n => n.trim()).map(n => ({ id: n, label: n, sub: detectKind(n) !== "weight" ? KIND_LABEL[detectKind(n)] : "" }))
+    label: libCatL(g),
+    short: t(g.replace(/^\d+\.\s*/, "").replace(/\s*\(.*$/, "") + "|kategori"),   // v48: kısa çip adı (Türkçede bağlam atılır, metin aynı)
+    items: EXERCISE_LIBRARY[g].map(n => n.trim()).map(n => ({ id: n, label: n, sub: detectKind(n) !== "weight" ? kindL(detectKind(n)) : "" }))
   }));
-  openPicker("Hareket Kütüphanesi", groups, it => openExerciseModal({ name: it.id, kind: detectKind(it.id) }),
-    { label: "Listede yok mu? Özel hareket yaz", onClick: () => openExerciseModal({ name: "", kind: "weight" }) });
+  openPicker(t("Hareket Kütüphanesi"), groups, it => openExerciseModal({ name: it.id, kind: detectKind(it.id) }),
+    { label: t("Listede yok mu? Özel hareket yaz"), onClick: () => openExerciseModal({ name: "", kind: "weight" }) });
 }
 
 // ---------------------------------------------------------------------------
@@ -125,14 +125,14 @@ function fillExModalFields(v) {
 function updateExMuscleAuto() {
   const name = $("exName").value;
   const g = autoMuscle(name);
-  $("exMuscle").options[0].textContent = "Otomatik" + (g ? ` (${muscleL(g)})` : " (belirlenemedi)");
+  $("exMuscle").options[0].textContent = g ? t("Otomatik ({e})", { e: muscleL(g) }) : t("Otomatik (belirlenemedi)");
   for (let i = 1; i < $("exMuscle").options.length; i++) $("exMuscle").options[i].textContent = muscleL($("exMuscle").options[i].value);   // v48: değer Türkçe kalır
-  $("exInc").placeholder = fmtNum(autoInc(name)) + " (otomatik)";
+  $("exInc").placeholder = t("{n} (otomatik)", { n: fmtNum(autoInc(name)) });
 }
 
 function openExerciseModal(opts) {
   exModal = { mode: "add", idx: -1, kind: opts.kind || "weight", orig: null };
-  $("exModalTitle").textContent = "Hareket Ekle";
+  $("exModalTitle").textContent = t("Hareket Ekle");
   fillExModalFields({ name: opts.name || "" });
   setExModalKind(exModal.kind);
   openModal("exerciseModal");
@@ -150,7 +150,7 @@ function openEditExercise(exIdx) {
     equip: ex.equip || "", levels: ex.levels ? clone(ex.levels) : null
   };
   exModal = { mode: "edit", idx: exIdx, kind: ex.kind, orig: { ...vals, kind: ex.kind } };
-  $("exModalTitle").textContent = "Hareketi Düzenle";
+  $("exModalTitle").textContent = t("Hareketi Düzenle");
   fillExModalFields(vals);
   setExModalKind(ex.kind);
   openModal("exerciseModal");
@@ -217,7 +217,7 @@ function resize(arr, n, makeNew) {
 
 function saveExerciseModal() {
   const v = readExModal();
-  if (!v.name) { uiAlert("Hareket adı eksik", "Lütfen hareket adını yaz."); return; }
+  if (!v.name) { uiAlert(t("Hareket adı eksik"), t("Lütfen hareket adını yaz.")); return; }
   const kind = exModal.kind;
 
   if (exModal.mode === "add") {
@@ -227,7 +227,7 @@ function saveExerciseModal() {
     ex.targetInfo = targetInfoFor(kind, v, null);
     activeDay().exercises.push(ex);
     closeModal("exerciseModal");
-    toast("" + v.name + " eklendi");
+    toast(t("{name} eklendi", { name: v.name }));
     renderAll();
     if (state.gymActive) setTimeout(() => { const el = $("exCard_" + (activeDay().exercises.length - 1)); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
     return;
@@ -255,7 +255,7 @@ function saveExerciseModal() {
   applyExExtras(ex, v);
   ex.targetInfo = targetInfoFor(kind, v, kind === "cardio" ? null : ex);
   closeModal("exerciseModal");
-  toast("Hareket güncellendi");
+  toast(t("Hareket güncellendi"));
   renderAll();
 }
 
@@ -333,7 +333,7 @@ function toggleSetDone(exIdx, sIdx) {
         ex.sets.forEach((o, i) => { if (i !== sIdx && o.done) best = Math.max(best, e1rm(o.kg, o.reps)); });
         if (cur > best + 0.01) {
           s.pr = true;
-          toast(`YENİ REKOR! ${ex.name}: ${fmtKg(num(s.kg))} kg × ${num(s.reps)} (1RM ~${Math.round(cur)} kg)`, "pr");
+          toast(t("YENİ REKOR! {name}: {kg} kg × {reps} (1RM ~{rm} kg)", { name: ex.name, kg: fmtKg(num(s.kg)), reps: String(num(s.reps)), rm: String(Math.round(cur)) }), "pr");
         }
       }
     }
@@ -384,11 +384,11 @@ function removeExercise(exIdx) {
   activeDay().exercises.splice(exIdx, 1);
   if (!workoutInProgress()) state.workoutStartedAt = 0;
   renderAll();
-  offerUndo(`"${ex.name}" kaldırıldı`);
+  offerUndo(t("\"{name}\" kaldırıldı", { name: ex.name }));
 }
 
 async function addWorkoutDay() {
-  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: curLang() === "en" ? `DAY ${state.workoutDays.length + 1}: ` : `${state.workoutDays.length + 1}. GÜN: `, placeholder: t("Örn: 5. GÜN: Kol") }, ok: "Ekle" });
+  const name = await uiAsk({ title: t("Yeni antrenman günü"), message: t("Günün adını yaz."), input: { value: curLang() === "en" ? `DAY ${state.workoutDays.length + 1}: ` : `${state.workoutDays.length + 1}. GÜN: `, placeholder: t("Örn: 5. GÜN: Kol") }, ok: t("Ekle") });
   if (!name || !name.trim()) return;
   state.workoutDays.push({ id: "day_" + Date.now(), name: name.trim(), exercises: [] });
   state.activeWorkoutDayIdx = state.workoutDays.length - 1;
@@ -396,19 +396,19 @@ async function addWorkoutDay() {
 }
 async function renameWorkoutDay() {
   const d = activeDay();
-  const n = await uiAsk({ title: "Günü adlandır", message: "Günün yeni adını yaz.", input: { value: d.name }, ok: "Kaydet" });
+  const n = await uiAsk({ title: t("Günü adlandır"), message: t("Günün yeni adını yaz."), input: { value: d.name }, ok: t("Kaydet") });
   if (n && n.trim()) { d.name = n.trim(); renderAll(); }
 }
 async function deleteWorkoutDay() {
-  if (state.workoutDays.length <= 1) { uiAlert("Gün silinemiyor", "En az bir antrenman günü kalmalı."); return; }
+  if (state.workoutDays.length <= 1) { uiAlert(t("Gün silinemiyor"), t("En az bir antrenman günü kalmalı.")); return; }
   const d = activeDay();
-  if (!(await uiAsk({ title: "Gün silinsin mi?", message: `"${d.name}" ve içindeki tüm hareketler silinecek. 6 saniye içinde geri alabilirsin.`, ok: "Sil", danger: true }))) return;
+  if (!(await uiAsk({ title: t("Gün silinsin mi?"), message: t("\"{name}\" ve içindeki tüm hareketler silinecek. 6 saniye içinde geri alabilirsin.", { name: d.name }), ok: t("Sil"), danger: true }))) return;
   if (activeDay() !== d) return;
   snapshot();
   state.workoutDays.splice(state.activeWorkoutDayIdx, 1);
   state.activeWorkoutDayIdx = Math.max(0, state.activeWorkoutDayIdx - 1);
   renderAll();
-  offerUndo(`"${d.name}" silindi`);
+  offerUndo(t("\"{name}\" silindi", { name: d.name }));
 }
 function uncheckAllSets() {
   activeDay().exercises.forEach(ex => ex.sets.forEach(s => { s.done = false; s.pr = false; }));
@@ -425,8 +425,8 @@ async function finishAndLogWorkout() {
     if (ex.kind === "weight") { vol += num(s.kg) * num(s.reps); if (s.pr) prs++; }
     if (ex.kind === "cardio") { cMin += num(s.min); cKm += num(s.km); }
   }));
-  if (doneSets === 0) { uiAlert("Henüz tamamlanan set yok", "Kaydetmek için en az 1 setin yanındaki onay kutusunu işaretlemelisin."); return; }
-  if (!(await uiAsk({ title: "Antrenman kaydedilsin mi?", message: `${day.name} · ${doneSets} set tamamlandı`, ok: "Kaydet" }))) return;
+  if (doneSets === 0) { uiAlert(t("Henüz tamamlanan set yok"), t("Kaydetmek için en az 1 setin yanındaki onay kutusunu işaretlemelisin.")); return; }
+  if (!(await uiAsk({ title: t("Antrenman kaydedilsin mi?"), message: tn(doneSets, "{name} · {n} set tamamlandı", { name: day.name }), ok: t("Kaydet") }))) return;
   if (activeDay() !== day) return;
 
   const ts = Date.now();
@@ -461,8 +461,18 @@ async function finishAndLogWorkout() {
   window.scrollTo(0, 0);
   renderAll();
   const li = state.workoutLogs.length - 1;
-  const dTxt = state.workoutLogs[li].durationMin ? `${fmtMinutes(state.workoutLogs[li].durationMin)}, ` : "";
-  toast(`Tebrikler! ${dTxt}${Math.round(vol).toLocaleString(locale())} kg tonaj${cMin > 0 ? `, ${fmtNum(cMin)} dk kardiyo` : ""}${prs ? `, ${prs} rekor` : ""} kaydedildi`, prs ? "pr" : "ok", { label: "Paylaş", fn: () => openShareCard(li) });
+  toast(finishToastText(state.workoutLogs[li].durationMin, vol, cMin, prs), prs ? "pr" : "ok", { label: t("Paylaş"), fn: () => openShareCard(li) });
+}
+
+// v48: bitiş bildirimi tek cümle kalıplarıyla (süre / kardiyo / rekor var-yok birleşimleri; rekor sayısı tn)
+function finishToastText(durMin, vol, cMin, prs) {
+  const v = { dur: durMin ? fmtMinutes(durMin) : "", vol: Math.round(vol).toLocaleString(locale()), cmin: cMin };
+  if (durMin) {
+    if (cMin > 0) return prs ? tn(prs, "Tebrikler! {dur}, {vol} kg tonaj, {cmin} dk kardiyo, {n} rekor kaydedildi", v) : t("Tebrikler! {dur}, {vol} kg tonaj, {cmin} dk kardiyo kaydedildi", v);
+    return prs ? tn(prs, "Tebrikler! {dur}, {vol} kg tonaj, {n} rekor kaydedildi", v) : t("Tebrikler! {dur}, {vol} kg tonaj kaydedildi", v);
+  }
+  if (cMin > 0) return prs ? tn(prs, "Tebrikler! {vol} kg tonaj, {cmin} dk kardiyo, {n} rekor kaydedildi", v) : t("Tebrikler! {vol} kg tonaj, {cmin} dk kardiyo kaydedildi", v);
+  return prs ? tn(prs, "Tebrikler! {vol} kg tonaj, {n} rekor kaydedildi", v) : t("Tebrikler! {vol} kg tonaj kaydedildi", v);
 }
 
 function deleteWorkoutLog(idx) {
@@ -477,6 +487,6 @@ function deleteWorkoutLog(idx) {
   }
   state.workoutLogs.splice(idx, 1);
   renderAll();
-  offerUndo("Antrenman kaydı silindi");
+  offerUndo(t("Antrenman kaydı silindi"));
 }
 

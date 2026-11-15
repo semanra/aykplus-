@@ -1039,88 +1039,88 @@
     <div role="dialog" aria-labelledby="exModalTitle" class="sheet w-full md:max-w-lg bg-[var(--t-surface)] border-t border-[var(--t-line)] md:border rounded-t-[28px] md:rounded-[28px] text-[var(--t-text)] flex flex-col" style="max-height: 92vh;">
       <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-3">
         <h3 id="exModalTitle" class="text-[20px] font-extrabold">Hareket Ekle</h3>
-        <button onclick="closeModal('exerciseModal')" aria-label="Kapat" class="w-11 h-11 rounded-[14px] bg-[var(--t-elev)] flex items-center justify-center text-[var(--t-muted)]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        <button onclick="closeModal('exerciseModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 rounded-[14px] bg-[var(--t-elev)] flex items-center justify-center text-[var(--t-muted)]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-4">
         <div>
-          <label for="exName" class="t-field">Hareket adı</label>
-          <input id="exName" type="text" placeholder="Örn: Incline Bench Press" oninput="updateExMuscleAuto(); updateExEquipUI();" class="t-in" />
+          <label for="exName" class="t-field" data-t="Hareket adı">Hareket adı</label>
+          <input id="exName" type="text" placeholder="Örn: Incline Bench Press" data-t-ph="Örn: Incline Bench Press" oninput="updateExMuscleAuto(); updateExEquipUI();" class="t-in" />
         </div>
         <div>
-          <span class="t-field">Hareket tipi</span>
+          <span class="t-field" data-t="Hareket tipi">Hareket tipi</span>
           <div class="t-seg grid-cols-3">
-            <button id="exKind_weight" onclick="setExModalKind('weight')">Ağırlık</button>
-            <button id="exKind_cardio" onclick="setExModalKind('cardio')">Kardiyo</button>
-            <button id="exKind_time" onclick="setExModalKind('time')">Süreli</button>
+            <button id="exKind_weight" onclick="setExModalKind('weight')" data-t="Ağırlık">Ağırlık</button>
+            <button id="exKind_cardio" onclick="setExModalKind('cardio')" data-t="Kardiyo">Kardiyo</button>
+            <button id="exKind_time" onclick="setExModalKind('time')" data-t="Süreli">Süreli</button>
           </div>
         </div>
         <div id="exSec_weight" class="grid grid-cols-3 gap-2">
-          <div><label for="exSetCount" class="t-field">Set sayısı</label><input id="exSetCount" type="text" inputmode="numeric" value="3" class="t-in text-center font-bold" /></div>
-          <div><label for="exRepRange" class="t-field">Hedef tekrar</label><input id="exRepRange" type="text" value="8–12" class="t-in text-center font-bold" /></div>
-          <div><label for="exStartKg" class="t-field">Başlangıç kg</label><input id="exStartKg" type="text" inputmode="decimal" value="0" class="t-in text-center font-bold" /></div>
+          <div><label for="exSetCount" class="t-field" data-t="Set sayısı">Set sayısı</label><input id="exSetCount" type="text" inputmode="numeric" value="3" class="t-in text-center font-bold" /></div>
+          <div><label for="exRepRange" class="t-field" data-t="Hedef tekrar">Hedef tekrar</label><input id="exRepRange" type="text" value="8–12" class="t-in text-center font-bold" /></div>
+          <div><label for="exStartKg" class="t-field" data-t="Başlangıç kg">Başlangıç kg</label><input id="exStartKg" type="text" inputmode="decimal" value="0" class="t-in text-center font-bold" /></div>
         </div>
         <div id="exSec_time" class="hidden grid-cols-2 gap-2">
-          <div><label for="exTimeSetCount" class="t-field">Set sayısı</label><input id="exTimeSetCount" type="text" inputmode="numeric" value="3" class="t-in text-center font-bold" /></div>
-          <div><label for="exTimeSec" class="t-field">Süre (saniye)</label><input id="exTimeSec" type="text" inputmode="numeric" value="45" class="t-in text-center font-bold" /></div>
+          <div><label for="exTimeSetCount" class="t-field" data-t="Set sayısı">Set sayısı</label><input id="exTimeSetCount" type="text" inputmode="numeric" value="3" class="t-in text-center font-bold" /></div>
+          <div><label for="exTimeSec" class="t-field" data-t="Süre (saniye)">Süre (saniye)</label><input id="exTimeSec" type="text" inputmode="numeric" value="45" class="t-in text-center font-bold" /></div>
         </div>
         <div id="exSec_cardio" class="hidden grid-cols-3 gap-2">
-          <div><label for="exCardioMin" class="t-field">Süre (dk)</label><input id="exCardioMin" type="text" inputmode="decimal" value="30" class="t-in text-center font-bold" /></div>
-          <div><label for="exCardioKm" class="t-field">Mesafe (km)</label><input id="exCardioKm" type="text" inputmode="decimal" placeholder="—" class="t-in text-center font-bold" /></div>
-          <div><label for="exCardioLvl" class="t-field">Eğim/Seviye</label><input id="exCardioLvl" type="text" placeholder="—" class="t-in text-center font-bold" /></div>
+          <div><label for="exCardioMin" class="t-field" data-t="Süre (dk)">Süre (dk)</label><input id="exCardioMin" type="text" inputmode="decimal" value="30" class="t-in text-center font-bold" /></div>
+          <div><label for="exCardioKm" class="t-field" data-t="Mesafe (km)">Mesafe (km)</label><input id="exCardioKm" type="text" inputmode="decimal" placeholder="—" class="t-in text-center font-bold" /></div>
+          <div><label for="exCardioLvl" class="t-field" data-t="Eğim/Seviye">Eğim/Seviye</label><input id="exCardioLvl" type="text" placeholder="—" class="t-in text-center font-bold" /></div>
         </div>
         <div id="exExtraWrap" class="grid grid-cols-2 gap-2">
-          <div><label for="exMuscle" class="t-field">Kas grubu</label>
+          <div><label for="exMuscle" class="t-field" data-t="Kas grubu">Kas grubu</label>
             <select id="exMuscle" class="t-in">
               <option value="auto">Otomatik</option>
               <option value="Göğüs">Göğüs</option><option value="Sırt">Sırt</option><option value="Omuz">Omuz</option><option value="Ön Bacak">Ön Bacak</option><option value="Arka Bacak & Kalça">Arka Bacak & Kalça</option><option value="Kalf">Kalf</option><option value="Biceps">Biceps</option><option value="Triceps">Triceps</option><option value="Karın">Karın</option>
             </select></div>
-          <div id="exIncWrap"><label for="exInc" class="t-field">Kilo artış adımı (kg)</label>
+          <div id="exIncWrap"><label for="exInc" class="t-field" data-t="Kilo artış adımı (kg)">Kilo artış adımı (kg)</label>
             <input id="exInc" type="text" inputmode="decimal" placeholder="2,5 (otomatik)" class="t-in" /></div>
         </div>
         <div id="exEquipWrap">
-          <label for="exEquip" class="t-field">Ekipman</label>
+          <label for="exEquip" class="t-field" data-t="Ekipman">Ekipman</label>
           <select id="exEquip" onchange="updateExEquipUI()" class="t-in">
             <option value="auto">Otomatik</option>
-            <option value="plates">Plakalı (bar / plaka)</option>
-            <option value="stack">Ağırlık yığını (makine / kablo)</option>
-            <option value="dumbbell">Dambıl</option>
-            <option value="bodyweight">Vücut ağırlığı</option>
+            <option value="plates" data-t="Plakalı (bar / plaka)">Plakalı (bar / plaka)</option>
+            <option value="stack" data-t="Ağırlık yığını (makine / kablo)">Ağırlık yığını (makine / kablo)</option>
+            <option value="dumbbell" data-t="Dambıl">Dambıl</option>
+            <option value="bodyweight" data-t="Vücut ağırlığı">Vücut ağırlığı</option>
           </select>
         </div>
         <div id="exLevelsWrap" class="hidden space-y-3 bg-[var(--t-well)] border border-[var(--t-line)] rounded-[18px] p-3.5">
           <div id="exLvTitle" class="text-[15px] font-bold">Makinenin kilo kademeleri</div>
           <div class="t-seg grid-cols-2">
-            <button id="exLvModeStep" onclick="setExLevelsMode('step')">Düzenli artış</button>
-            <button id="exLvModeList" onclick="setExLevelsMode('list')">Kendi listem</button>
+            <button id="exLvModeStep" onclick="setExLevelsMode('step')" data-t="Düzenli artış">Düzenli artış</button>
+            <button id="exLvModeList" onclick="setExLevelsMode('list')" data-t="Kendi listem">Kendi listem</button>
           </div>
           <div id="exLvStepWrap" class="grid grid-cols-2 gap-2">
-            <div><label for="exLvStart" class="t-field">En düşük kademe (kg)</label><input id="exLvStart" type="text" inputmode="decimal" placeholder="örn: 5" class="t-in text-center font-bold" /></div>
-            <div><label for="exLvStep" class="t-field">Artış aralığı (kg)</label><input id="exLvStep" type="text" inputmode="decimal" placeholder="örn: 7,5" class="t-in text-center font-bold" /></div>
+            <div><label for="exLvStart" class="t-field" data-t="En düşük kademe (kg)">En düşük kademe (kg)</label><input id="exLvStart" type="text" inputmode="decimal" placeholder="örn: 5" data-t-ph="örn: 5" class="t-in text-center font-bold" /></div>
+            <div><label for="exLvStep" class="t-field" data-t="Artış aralığı (kg)">Artış aralığı (kg)</label><input id="exLvStep" type="text" inputmode="decimal" placeholder="örn: 7,5" data-t-ph="örn: 7,5" class="t-in text-center font-bold" /></div>
           </div>
           <div id="exLvListWrap" class="hidden">
-            <label for="exLvList" class="t-field">Kademeler (noktalı virgül veya boşlukla ayır)</label>
-            <input id="exLvList" type="text" inputmode="decimal" placeholder="20; 27,5; 35; 40; 47,5" class="t-in" />
+            <label for="exLvList" class="t-field" data-t="Kademeler (noktalı virgül veya boşlukla ayır)">Kademeler (noktalı virgül veya boşlukla ayır)</label>
+            <input id="exLvList" type="text" inputmode="decimal" placeholder="20; 27,5; 35; 40; 47,5" data-t-ph="20; 27,5; 35; 40; 47,5" class="t-in" />
           </div>
-          <div><label for="exLvAddon" class="t-field">Ek ara plaka (kg, varsa)</label><input id="exLvAddon" type="text" inputmode="decimal" placeholder="örn: 2,5 — yoksa boş bırak" class="t-in" /></div>
-          <p class="text-[12px] text-[var(--t-dim)]">Kilo artırma önerisi sadece bu kademelerden birini söyler. Boş bırakırsan geçmişte girdiğin kilolardan tahmin etmeye çalışırım.</p>
+          <div><label for="exLvAddon" class="t-field" data-t="Ek ara plaka (kg, varsa)">Ek ara plaka (kg, varsa)</label><input id="exLvAddon" type="text" inputmode="decimal" placeholder="örn: 2,5 — yoksa boş bırak" data-t-ph="örn: 2,5 — yoksa boş bırak" class="t-in" /></div>
+          <p class="text-[12px] text-[var(--t-dim)]" data-t="Kilo artırma önerisi sadece bu kademelerden birini söyler. Boş bırakırsan geçmişte girdiğin kilolardan tahmin etmeye çalışırım.">Kilo artırma önerisi sadece bu kademelerden birini söyler. Boş bırakırsan geçmişte girdiğin kilolardan tahmin etmeye çalışırım.</p>
         </div>
         <div id="exRestWrap">
-          <label for="exRest" class="t-field">Setler arası dinlenme (saniye)</label>
+          <label for="exRest" class="t-field" data-t="Setler arası dinlenme (saniye)">Setler arası dinlenme (saniye)</label>
           <input id="exRest" type="text" inputmode="numeric" value="90" class="t-in" />
-          <p class="text-[12px] text-[var(--t-dim)] mt-1.5">Bir seti tamamladığında alttaki sayaç bu süreyle otomatik başlar.</p>
+          <p class="text-[12px] text-[var(--t-dim)] mt-1.5" data-t="Bir seti tamamladığında alttaki sayaç bu süreyle otomatik başlar.">Bir seti tamamladığında alttaki sayaç bu süreyle otomatik başlar.</p>
         </div>
-        <p id="exEditHint" class="hidden text-[12px] text-[var(--t-warn-mid)]">Tipi değiştirirsen bu hareketin setleri yeni değerlerle baştan oluşturulur.</p>
+        <p id="exEditHint" class="hidden text-[12px] text-[var(--t-warn-mid)]" data-t="Tipi değiştirirsen bu hareketin setleri yeni değerlerle baştan oluşturulur.">Tipi değiştirirsen bu hareketin setleri yeni değerlerle baştan oluşturulur.</p>
       </div>
       <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 border-t border-[var(--t-line)]">
-        <button onclick="closeModal('exerciseModal')" class="t-btn-ghost h-[52px] rounded-2xl text-[15px]">İptal</button>
-        <button onclick="saveExerciseModal()" class="t-btn h-[52px] rounded-2xl text-[15px]">Kaydet</button>
+        <button onclick="closeModal('exerciseModal')" class="t-btn-ghost h-[52px] rounded-2xl text-[15px]" data-t="İptal">İptal</button>
+        <button onclick="saveExerciseModal()" class="t-btn h-[52px] rounded-2xl text-[15px]" data-t="Kaydet">Kaydet</button>
       </div>
     </div>
   </div>
 
   <!-- HAREKET MENÜSÜ (ALTTAN AÇILAN) -->
   <div id="exSheet" class="fixed inset-0 bg-black/70 hidden items-end justify-center z-50">
-    <div role="dialog" aria-label="Hareket seçenekleri" class="sheet w-full max-w-lg bg-[var(--t-surface)] border-t border-[var(--t-line)] rounded-t-[28px] px-4 pt-2.5 pb-6 text-[var(--t-text)] overflow-y-auto" style="max-height: 88vh;">
+    <div role="dialog" aria-label="Hareket seçenekleri" data-t-aria="Hareket seçenekleri" class="sheet w-full max-w-lg bg-[var(--t-surface)] border-t border-[var(--t-line)] rounded-t-[28px] px-4 pt-2.5 pb-6 text-[var(--t-text)] overflow-y-auto" style="max-height: 88vh;">
       <div class="w-10 h-1.5 rounded-full bg-[var(--t-line2)] mx-auto mb-3"></div>
       <div id="exSheetBody" class="space-y-1.5"></div>
     </div>

@@ -1,4 +1,4 @@
-# v48 bölüm 1-2: Antrenman terimleri, Antrenman ekranları, gösterim yardımcıları, kayıtlı metin kuralları (kas adı, targetInfo, gün adı).
+# v48 bölüm 1-3 (3: hareket penceresi, plaka/kademe aracı, öneriler, program işlemleri, bitiş bildirimi): Antrenman terimleri, Antrenman ekranları, gösterim yardımcıları, kayıtlı metin kuralları (kas adı, targetInfo, gün adı).
 import os, sys, re, subprocess, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ortak_tohum import TEST_INIT
@@ -194,6 +194,197 @@ try:
     setlang('tr')
     lv = pg.evaluate("[levelsSummary({levels:{mode:'step',start:5,step:5,addon:2.5}}), levelsSummary({levels:{mode:'list',list:[1,2,3],addon:0}})].join('|')")
     check(lv == "5 kg arayla (+2,5 ek plaka)|3 kademe", "tr: levelsSummary aynı: " + lv)
+    # ===== Bölüm 3: hareket penceresi (3 tür + kademe), plaka/kademe aracı, öneri/deload, program işlemleri, bitiş bildirimi =====
+    MON_TR = r"(Oca|Şub|Mar|Nis|May|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara)"
+    setlang('en')
+    pg.evaluate("() => { closeModal('exerciseModal'); state.activeTab = 'gym'; state.gymView = 'today'; state.gymActive = false; renderAll(); }")
+    # hareket penceresi: ağırlık / süreli / kardiyo ve kademe bölümü açıkken
+    pg.evaluate("openExerciseModal({ kind: 'weight', name: 'Zz Machine Row' })")
+    x = tr_free2("hareket penceresi (ağırlık)", ids=("exerciseModal",), must=("Add exercise", "Exercise name", "Exercise type", "Weights", "Cardio", "Timed", "Number of sets", "Target reps", "Starting weight (kg)", "Muscle group", "Equipment", "Weight step (kg)", "Rest between sets (seconds)", "Cancel", "Save", "Barbell and plates", "Dumbbell", "Bodyweight"))
+    check(pg.evaluate("$('exName').placeholder") == "E.g. Incline Bench Press" and pg.evaluate("$('exInc').placeholder").endswith("(auto)"), "en: hareket penceresi placeholder'ları")
+    check(pg.evaluate("$('exerciseModal').querySelector('[aria-label]').getAttribute('aria-label')") == "Close", "en: Kapat aria-label")
+    pg.evaluate("() => { setExModalKind('time'); }")
+    tr_free2("hareket penceresi (süreli)", ids=("exerciseModal",), must=("Time (seconds)",))
+    pg.evaluate("() => { setExModalKind('cardio'); }")
+    tr_free2("hareket penceresi (kardiyo)", ids=("exerciseModal",), must=("Time (min)", "Distance (km)", "Incline / level"))
+    pg.evaluate("() => { setExModalKind('weight'); $('exEquip').value = 'stack'; updateExEquipUI(); }")
+    tr_free2("hareket penceresi (kademe bölümü, düzenli artış)", ids=("exerciseModal",), must=("Machine weight increments", "Regular steps", "My own list", "Lowest weight (kg)", "Step size (kg)", "Extra small plate (kg, if any)", "Progression suggestions will only use"))
+    check(pg.evaluate("[$('exLvStart').placeholder, $('exLvStep').placeholder, $('exLvAddon').placeholder, $('exLvList').placeholder].join('|')") == "e.g. 5|e.g. 7.5|e.g. 2.5 — leave empty if none|20; 27.5; 35; 40; 47.5", "en: kademe placeholder'ları")
+    pg.evaluate("() => { setExLevelsMode('list'); }")
+    tr_free2("hareket penceresi (kademe, kendi listem)", ids=("exerciseModal",), must=("Weights (separate with semicolons or spaces)",))
+    pg.evaluate("() => { $('exEquip').value = 'dumbbell'; updateExEquipUI(); }")
+    check(pg.evaluate("$('exLvTitle').textContent") == "Dumbbell weights at your gym", "en: dambıl kademe başlığı")
+    pg.evaluate("closeModal('exerciseModal')")
+    # düzenle: ipucu metni
+    pg.evaluate("() => { const d = activeDay(); d.exercises.push({ name: 'Zz Edit', kind: 'weight', targetInfo: '3x8–12', sets: makeWeightSets(3, '8–12', 20, 8) }); renderAll(); openEditExercise(d.exercises.length - 1); setExModalKind('cardio'); }")
+    tr_free2("hareket penceresi (düzenle)", ids=("exerciseModal",), must=("Edit exercise", "If you change the type"))
+    pg.evaluate("closeModal('exerciseModal')")
+    # hareket kütüphanesi seçicisi
+    pg.evaluate("openExercisePicker()")
+    x = tr_free2("hareket kütüphanesi seçici", ids=("pickerModal",), must=("Exercise library", "Core and abs", "Back: vertical pulls", "Not in the list? Add a custom exercise"))
+    chips = pg.evaluate("[...document.querySelectorAll('#pickerChips button')].map(b => b.textContent)")
+    check(len(chips) == 12 and chips[0] == "All" and chips[1] == "Chest", "en: seçici çipleri: %s" % chips)
+    pg.evaluate("closeModal('pickerModal')")
+    # plaka aracı
+    SETUP3 = """() => { const d = activeDay();
+      d.exercises.push({ name: 'Zz Bar', kind: 'weight', equip: 'plates', targetInfo: '3x8–12', sets: makeWeightSets(3, '8–12', 100, 8) });
+      d.exercises.push({ name: 'Zz Lv', kind: 'weight', equip: 'stack', levels: { mode: 'step', start: 5, step: 5, addon: 2.5 }, targetInfo: '3x8–12', sets: makeWeightSets(3, '8–12', 40, 8) });
+      d.exercises.push({ name: 'Zz NoLv', kind: 'weight', equip: 'stack', targetInfo: '3x8–12', sets: makeWeightSets(3, '8–12', 40, 8) });
+      d.exercises.push({ name: 'Zz DbNoLv', kind: 'weight', equip: 'dumbbell', targetInfo: '3x8–12', sets: makeWeightSets(3, '8–12', 12, 8) });
+      renderAll(); return d.exercises.length; }"""
+    nEx = pg.evaluate(SETUP3)
+    iBar, iLv, iNo, iDb = nEx - 4, nEx - 3, nEx - 2, nEx - 1
+    pg.evaluate("openPlateTool(%d)" % iBar)
+    tr_free2("plaka aracı (100 kg)", ids=("chartModal",), must=("Working weight (kg)", "Bar weight", "Plates for EACH side of the bar", "WARM-UP SETS", "Empty bar", "Working", "per side:", "Warm-up sets should not tire you out"))
+    check(pg.evaluate("[...$('ptBar').options].map(o => o.textContent).join('|')") == "20 kg Olympic bar|15 kg bar|10 kg EZ / short bar|No bar / plate-loaded machine", "en: bar seçenekleri")
+    for w, must in (("10", ("lighter than the 20 kg bar",)), ("61", ("exactly 61 kg",)), ("0", ("Enter a working weight",))):
+        pg.fill("#ptKg", w); pg.wait_for_timeout(30)
+        tr_free2("plaka aracı (%s kg)" % w, ids=("chartModal",), must=must)
+    pg.fill("#ptKg", "100"); pg.select_option("#ptBar", "0"); pg.wait_for_timeout(30)
+    tr_free2("plaka aracı (barsız)", ids=("chartModal",))
+    pg.evaluate("closeModal('chartModal')")
+    pg.evaluate("openPlateTool(%d)" % iLv)
+    tr_free2("kademe aracı (kilo yok)", ids=("chartModal",))
+    pg.fill("#ptKg", "0"); pg.wait_for_timeout(30)
+    tr_free2("kademe aracı (0 kg)", ids=("chartModal",), must=("This machine's weight increments:", "Enter your working weight to see warm-up sets."))
+    pg.fill("#ptKg", "47"); pg.wait_for_timeout(30)
+    tr_free2("kademe aracı (47 kg)", ids=("chartModal",), must=("Weight increments near this weight:", "isn't available on this machine", "WARM-UP SETS", "Working", "rounded to the increments"))
+    pg.fill("#ptKg", "40"); pg.wait_for_timeout(30)
+    tr_free2("kademe aracı (40 kg)", ids=("chartModal",))
+    pg.fill("#ptKg", "5"); pg.wait_for_timeout(30)
+    tr_free2("kademe aracı (5 kg)", ids=("chartModal",), must=("No separate warm-up sets needed",))
+    pg.evaluate("closeModal('chartModal')")
+    pg.evaluate("openPlateTool(%d)" % iNo)
+    tr_free2("kademe aracı (kademe yok, makine)", ids=("chartModal",), must=("machine", "Set weight increments"))
+    pg.evaluate("closeModal('chartModal')")
+    pg.evaluate("openPlateTool(%d)" % iDb)
+    tr_free2("kademe aracı (kademe yok, dambıl)", ids=("chartModal",), must=("dumbbells", "Set weight increments"))
+    pg.evaluate("closeModal('chartModal')")
+    # öneriler ve dinlenme haftası
+    SUG = """() => { const now = Date.now(); const d = activeDay();
+      const mk = (name, hist) => { d.exercises.push({ name, kind: 'weight', targetInfo: '3x8–12', sets: makeWeightSets(3, '8–12', 50, 8) });
+        state.exerciseHistory[exKey(name)] = hist; return d.exercises.length - 1; };
+      const S = (reps, e) => ({ kg: 50, reps, e });
+      const o = {};
+      o.up = mk('Zz Up', [{ ts: now - 86400000, kind: 'weight', sets: [S(12), S(12), S(12)] }]);
+      o.upBw = mk('Zz UpBw', [{ ts: now - 86400000, kind: 'weight', sets: [{ kg: 0, reps: 12 }, { kg: 0, reps: 12 }, { kg: 0, reps: 12 }] }]);
+      d.exercises[o.upBw].sets.forEach(x => { x.kg = 0; });
+      o.hold = mk('Zz Hold', [{ ts: now - 86400000, kind: 'weight', sets: [S(12, 3), S(12, 3), S(12, 4)] }]);
+      o.hold2 = mk('Zz Hold2', [{ ts: now - 86400000, kind: 'weight', sets: [S(12, 3), S(12, 4), S(12, 3)] }]);
+      o.easy = mk('Zz Easy', [{ ts: now - 86400000, kind: 'weight', sets: [S(9, 1), S(9, 1), S(9, 1)] }]);
+      o.down = mk('Zz Down', [{ ts: now - 86400000, kind: 'weight', sets: [S(5), S(5), S(5)] }]);
+      const dl = [{ ts: now - 30 * 86400000, kind: 'weight', sets: [{ kg: 100, reps: 10, e: 2 }] }];
+      for (let i = 1; i <= 3; i++) dl.push({ ts: now - i * 86400000 * 3, kind: 'weight', sets: [{ kg: 60, reps: 8, e: 3 }, { kg: 60, reps: 8, e: 4 }, { kg: 60, reps: 8, e: 3 }] });
+      o.dl = mk('Zz Deload', dl.reverse());
+      renderAll(); return o; }"""
+    O = pg.evaluate(SUG)
+    texts = {}
+    for k in ("up", "upBw", "hold", "hold2", "easy", "down", "dl"):
+        h = pg.evaluate("(i => { const ex = activeDay().exercises[i]; const div = document.createElement('div'); div.innerHTML = suggestionHtml(ex, i); return div.textContent; })(%d)" % O[k])
+        texts[k] = re.sub(r"\s+", " ", h).strip()
+        check(texts[k] and not TR_CH.search(texts[k]), "en: öneri '%s': %s" % (k, texts[k][:110]))
+    check("Increase the weight from 50 to" in texts["up"] and "Got it" not in texts["up"] and "Not now" in texts["up"], "en: artırma önerisi metni")
+    check("Try adding" in texts["upBw"] or "harder variation" in texts["upBw"], "en: vücut ağırlığı önerisi")
+    check("Stay at 50 kg" in texts["hold"] and "reached failure" in texts["hold"] and "Got it" in texts["hold"], "en: aynı kiloda kal (tükeniş)")
+    check("reached failure" not in texts["hold2"] and "Stay at 50 kg" in texts["hold2"], "en: aynı kiloda kal (tükenişsiz)")
+    check('rated every set "Easy"' in texts["easy"], "en: hepsi Kolay önerisi")
+    check("fell short of 8 reps" in texts["down"], "en: azaltma önerisi")
+    check("deload week" in texts["dl"] and "a lighter week to recover" in texts["dl"] and "Got it" in texts["dl"], "en: dinlenme haftası notu")
+    # Türkçe aynılık (öneri ve plaka aracı metinleri)
+    setlang('tr')
+    ttr = pg.evaluate("(o => ['up', 'hold', 'hold2', 'easy', 'down'].map(k => overloadSuggestion(activeDay().exercises[o[k]]).text))(%s)" % __import__('json').dumps(O))
+    check(ttr[0] == "Geçen sefer tüm setlerde 12+ tekrar yaptın. Kiloyu 50 → 52,5 kg'a çıkar, 8 tekrardan başla." or ttr[0].startswith("Geçen sefer tüm setlerde 12+ tekrar yaptın. Kiloyu 50 →"), "tr: artırma metni aynı: " + ttr[0])
+    check(ttr[1] == "Geçen sefer tüm setlerde 12+ tekrar yaptın ama setler çok zor geçti (son sette tükeniş). 50 kg'da bir seans daha kal; rahatlayınca artır.", "tr: aynı kiloda kal (tükeniş) aynı")
+    check(ttr[2] == "Geçen sefer tüm setlerde 12+ tekrar yaptın ama setler çok zor geçti. 50 kg'da bir seans daha kal; rahatlayınca artır.", "tr: aynı kiloda kal aynı")
+    check(ttr[3].startswith('Geçen sefer tüm setleri "Kolay" işaretledin. Kiloyu 50 → ') and ttr[3].endswith("tekrardan başla."), "tr: Kolay metni aynı: " + ttr[3])
+    check(ttr[4].startswith("Geçen sefer setlerin çoğunda 8 tekrarın altında kaldın. Aynı kiloyla devam edebilir ya da "), "tr: azaltma metni aynı")
+    dtr = pg.evaluate("(i => { const div = document.createElement('div'); div.innerHTML = deloadHtml(activeDay().exercises[i], i); return div.textContent.replace(/\\s+/g, ' ').trim(); })(%d)" % O["dl"])
+    check(dtr.startswith("Son 3 haftada 3 seansta tahmini 1RM'in ~133 kg'ı geçmedi ve setler çoğunlukla zor geçti.") and dtr.endswith("Anladım"), "tr: deload metni aynı: " + dtr[:90])
+    pg.evaluate("state.settings.barKg = 20")
+    pg.evaluate("openPlateTool(%d)" % iBar)
+    x = pg.evaluate("$('chartBody').textContent.replace(/\\s+/g, ' ')")
+    check("Çalışma kilosu (kg)" in x and "taraf" in x and "ISINMA SETLERİ" in x and "Boş bar" in x and "Çalışma" in x and "Barın HER İKİ tarafına takılacak plakalar (40 kg / taraf):" in x, "tr: plaka aracı metinleri aynı")
+    pg.evaluate("closeModal('chartModal')")
+    pg.evaluate("openExercisePicker()")
+    chips = pg.evaluate("[...document.querySelectorAll('#pickerChips button')].map(b => b.textContent)")
+    check(chips[0] == "Tümü" and chips[2] == "Sırt - Dikey Çekiş" and chips[5] == "Bacak - Ön Bacak" and chips[9] == "Kol - Triceps", "tr: seçici çipleri aynı: %s" % chips)
+    pg.evaluate("closeModal('pickerModal')")
+    # program işlemleri: onay pencereleri ve geri al bildirimleri
+    setlang('en')
+    pg.evaluate("void addWorkoutDay()"); pg.wait_for_selector("#uiDialog:not(.hidden)")
+    x = pg.evaluate("[$('uiDlgTitle').textContent, $('uiDlgMsg').textContent, $('uiDlgOk').textContent, $('uiDlgInput').placeholder].join('|')")
+    check(x == "New workout day|Enter a name for the day.|Add|E.g. DAY 5: Arms", "en: Yeni gün penceresi: " + x)
+    pg.click("#uiDlgCancel")
+    pg.evaluate("void renameWorkoutDay()"); pg.wait_for_selector("#uiDialog:not(.hidden)")
+    x = pg.evaluate("[$('uiDlgTitle').textContent, $('uiDlgMsg').textContent, $('uiDlgOk').textContent].join('|')")
+    check(x == "Rename day|Enter a new name for this day.|Save", "en: Günü adlandır penceresi: " + x)
+    pg.click("#uiDlgCancel")
+    pg.evaluate("void deleteWorkoutDay()"); pg.wait_for_selector("#uiDialog:not(.hidden)")
+    x = pg.evaluate("[$('uiDlgTitle').textContent, $('uiDlgMsg').textContent, $('uiDlgOk').textContent].join('|')")
+    check(x.startswith("Delete this day?|") and "and all its exercises will be deleted. You can undo this within 6 seconds." in x and x.endswith("|Delete"), "en: Günü sil penceresi: " + x)
+    pg.click("#uiDlgOk"); pg.wait_for_timeout(120)
+    x = pg.evaluate("$('toastWrap').textContent")
+    check(x.rstrip().endswith("Undo") and "deleted" in x and not TR_CH.search(re.sub("|".join(re.escape(u) for u in USERS), " ", x)), "en: gün silindi bildirimi: " + x)
+    pg.click("#toastWrap button"); pg.wait_for_timeout(120)
+    pg.evaluate("() => { const d = activeDay(); d.exercises.push({ name: 'Zz Del', kind: 'weight', targetInfo: '3x8', sets: makeWeightSets(3, '8', 10, 8) }); renderAll(); removeExercise(d.exercises.length - 1); }")
+    x = pg.evaluate("$('toastWrap').textContent")
+    check('"Zz Del" removed' in x and x.rstrip().endswith("Undo"), "en: hareket kaldırıldı bildirimi: " + x)
+    pg.evaluate("() => { state.workoutLogs.push({ ts: Date.now(), date: '1 Kas', dayName: 'X', sets: 1, volume: 1, prs: 0 }); deleteWorkoutLog(state.workoutLogs.length - 1); }")
+    x = pg.evaluate("$('toastWrap').textContent")
+    check("Workout entry deleted" in x, "en: antrenman kaydı silindi bildirimi: " + x)
+    pg.evaluate("() => { try { doUndo(); } catch (e) {} }")
+    # rekor bildirimi (set tamamlayınca) ve eklenti/güncelleme bildirimleri
+    pg.evaluate("() => { const d = activeDay(); d.exercises.push({ name: 'Zz Pr', kind: 'weight', targetInfo: '3x8', sets: makeWeightSets(3, '8', 100, 8) }); state.exerciseHistory[exKey('Zz Pr')] = [{ ts: Date.now() - 86400000, kind: 'weight', sets: [{ kg: 50, reps: 8 }] }]; renderAll(); toggleSetDone(d.exercises.length - 1, 0); }")
+    x = pg.evaluate("$('toastWrap').textContent")
+    check("NEW PR! Zz Pr: 100 kg × 8 (estimated 1RM ~127 kg)" in x, "en: yeni rekor bildirimi: " + x)
+    pg.evaluate("() => { const d = activeDay(); d.exercises.pop(); state.workoutStartedAt = 0; renderAll(); }")
+    pg.evaluate("openExerciseModal({ kind: 'weight', name: 'Zz Added' }); saveExerciseModal();")
+    x = pg.evaluate("$('toastWrap').textContent")
+    check("Zz Added added" in x, "en: hareket eklendi bildirimi: " + x)
+    pg.evaluate("() => { const d = activeDay(); openEditExercise(d.exercises.length - 1); saveExerciseModal(); }")
+    check("Exercise updated" in pg.evaluate("$('toastWrap').textContent"), "en: hareket güncellendi bildirimi")
+    pg.evaluate("openExerciseModal({ kind: 'weight', name: '' }); void 0; saveExerciseModal();")
+    pg.wait_for_selector("#uiDialog:not(.hidden)")
+    check(pg.evaluate("[$('uiDlgTitle').textContent, $('uiDlgMsg').textContent].join('|')") == "Exercise name missing|Please enter an exercise name.", "en: hareket adı eksik penceresi")
+    pg.evaluate("uiDialogDone(true); closeModal('exerciseModal')")
+    # antrenmanı bitirme: onay + bildirim + kayıtlı tarih Türkçe aylı
+    FIN = """(prs) => { const d = activeDay(); d.exercises.splice(0);
+      d.exercises.push({ name: 'Zz Fin', kind: 'weight', targetInfo: '3x8', sets: makeWeightSets(3, '8', 60, 8) });
+      d.exercises.push({ name: 'Zz FinC', kind: 'cardio', targetInfo: '20 dk', sets: [{ min: 20, km: 3, lvl: '', done: false }] });
+      d.exercises.forEach(e => e.sets.forEach(s => { s.done = true; }));
+      d.exercises[0].sets.forEach((s, i) => { s.pr = i < prs; });
+      state.workoutStartedAt = Date.now() - 45 * 60000; renderAll(); void finishAndLogWorkout(); }"""
+    for lang, prs in (('en', 2), ('en', 1), ('en', 0), ('tr', 2)):
+        setlang(lang)
+        pg.evaluate("() => { document.querySelectorAll('#toastWrap > *').forEach(e => e.remove()); }")
+        pg.evaluate(FIN, prs)
+        pg.wait_for_selector("#uiDialog:not(.hidden)")
+        m = pg.evaluate("[$('uiDlgTitle').textContent, $('uiDlgMsg').textContent, $('uiDlgOk').textContent].join('|')")
+        if lang == 'en': check(m.endswith(" · 4 sets completed|Save") and m.startswith("Save this workout?|"), "en: bitir onayı: " + m)
+        else: check(m.endswith(" · 4 set tamamlandı|Kaydet") and m.startswith("Antrenman kaydedilsin mi?|"), "tr: bitir onayı: " + m)
+        pg.click("#uiDlgOk"); pg.wait_for_timeout(150)
+        x = re.sub(r"\s+", " ", pg.evaluate("$('toastWrap').textContent")).strip()
+        if lang == 'en':
+            want = {2: "Well done! Workout saved: 45 min, 1,440 kg volume, 20 min cardio, 2 PRs", 1: "Well done! Workout saved: 45 min, 1,440 kg volume, 20 min cardio, 1 PR", 0: "Well done! Workout saved: 45 min, 1,440 kg volume, 20 min cardio"}[prs]
+            check(x == want + "Share" and "1 PRs" not in x, "en: bitiş bildirimi (%d rekor): %s" % (prs, x))
+        else:
+            check(x.startswith("Tebrikler! 45 dk, 1.440 kg tonaj, 20 dk kardiyo, 2 rekor kaydedildi") and x.endswith("Paylaş"), "tr: bitiş bildirimi aynı: " + x)
+        dt = pg.evaluate("state.workoutLogs[state.workoutLogs.length - 1].date")
+        check(re.match(r"^\d{1,2} " + MON_TR, dt) is not None, "%s: kayıtlı workoutLogs.date Türkçe ay kısaltmalı: %r" % (lang, dt))
+        if lang == 'en':
+            r = pg.evaluate("[finishToastText(0, 5400, 0, 0), finishToastText(0, 5400, 12.5, 1), finishToastText(75, 5400, 0, 3)].join('|')")
+            check(r == "Well done! Workout saved: 5,400 kg volume|Well done! Workout saved: 5,400 kg volume, 12.5 min cardio, 1 PR|Well done! Workout saved: 1 h 15 min, 5,400 kg volume, 3 PRs", "en: bitiş bildirimi kalıpları: " + r)
+        else:
+            r = pg.evaluate("[finishToastText(0, 5400, 0, 0), finishToastText(0, 5400, 12.5, 1), finishToastText(75, 5400, 0, 3)].join('|')")
+            check(r == "Tebrikler! 5.400 kg tonaj kaydedildi|Tebrikler! 5.400 kg tonaj, 12,5 dk kardiyo, 1 rekor kaydedildi|Tebrikler! 1 sa 15 dk, 5.400 kg tonaj, 3 rekor kaydedildi", "tr: bitiş bildirimi kalıpları aynı: " + r)
+    # ısınma oturumu başlığı
+    setlang('en')
+    pg.evaluate("() => { state.gymActive = false; state.gymView = 'today'; renderAll(); }")
+    ok = pg.evaluate("(() => { if (!mobWarmupItems(activeDay()).length) return 'yok'; mobWarmupStart(); const ti = mobT && mobT.ses ? mobT.ses.title : null; mobTimerClose(); return ti; })()")
+    check(ok in ("Warm-up", "yok"), "en: ısınma oturumu başlığı: %s" % ok)
+    setlang('tr')
+    ok = pg.evaluate("(() => { if (!mobWarmupItems(activeDay()).length) return 'yok'; mobWarmupStart(); const ti = mobT && mobT.ses ? mobT.ses.title : null; mobTimerClose(); return ti; })()")
+    check(ok in ("Isınma", "yok"), "tr: ısınma oturumu başlığı: %s" % ok)
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

@@ -99,14 +99,16 @@ function overloadSuggestion(ex) {
     if (curMax !== maxKg) return null;
     return {
       type: "hold", ts: last.ts, kg: maxKg, reps: range.hi,
-      text: `Geçen sefer tüm setlerde ${range.hi}+ tekrar yaptın ama setler çok zor geçti${lastE === 4 ? " (son sette tükeniş)" : ""}. ${fmtKg(maxKg)} kg'da bir seans daha kal; rahatlayınca artır.`
+      text: lastE === 4
+        ? t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın ama setler çok zor geçti (son sette tükeniş). {kg} kg'da bir seans daha kal; rahatlayınca artır.", { hi: String(range.hi), kg: fmtKg(maxKg) })
+        : t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın ama setler çok zor geçti. {kg} kg'da bir seans daha kal; rahatlayınca artır.", { hi: String(range.hi), kg: fmtKg(maxKg) })
     };
   }
   if (!allHit && allEasy && maxKg > 0 && curMax <= maxKg) {
     const next = nextLevel(ex, maxKg);
     return {
       type: "up", ts: last.ts, kg: next, reps: range.lo,
-      text: `Geçen sefer tüm setleri "Kolay" işaretledin. Kiloyu ${fmtKg(maxKg)} → ${fmtKg(next)} kg'a çıkarmayı dene, ${range.lo} tekrardan başla.`
+      text: t("Geçen sefer tüm setleri \"Kolay\" işaretledin. Kiloyu {from} → {to} kg'a çıkarmayı dene, {lo} tekrardan başla.", { from: fmtKg(maxKg), to: fmtKg(next), lo: String(range.lo) })
     };
   }
   if (allHit) {
@@ -115,8 +117,8 @@ function overloadSuggestion(ex) {
     return {
       type: "up", ts: last.ts, kg: next, reps: range.lo,
       text: maxKg > 0
-        ? `Geçen sefer tüm setlerde ${range.hi}+ tekrar yaptın. Kiloyu ${fmtKg(maxKg)} → ${fmtKg(next)} kg'a çıkar, ${range.lo} tekrardan başla.`
-        : `Geçen sefer tüm setlerde ${range.hi}+ tekrar yaptın. ${fmtKg(next)} kg ek ağırlık dene veya daha zor bir varyasyona geç.`
+        ? t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın. Kiloyu {from} → {to} kg'a çıkar, {lo} tekrardan başla.", { hi: String(range.hi), from: fmtKg(maxKg), to: fmtKg(next), lo: String(range.lo) })
+        : t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın. {to} kg ek ağırlık dene veya daha zor bir varyasyona geç.", { hi: String(range.hi), to: fmtKg(next) })
     };
   }
   if (maxKg > 0 && misses * 2 >= sets.length) {
@@ -124,7 +126,7 @@ function overloadSuggestion(ex) {
     const next = prevLevel(ex, maxKg);
     return {
       type: "down", ts: last.ts, kg: next, reps: range.lo,
-      text: `Geçen sefer setlerin çoğunda ${range.lo} tekrarın altında kaldın. Aynı kiloyla devam edebilir ya da ${fmtKg(next)} kg'a düşüp formu sağlamlaştırabilirsin.`
+      text: t("Geçen sefer setlerin çoğunda {lo} tekrarın altında kaldın. Aynı kiloyla devam edebilir ya da {to} kg'a düşüp formu sağlamlaştırabilirsin.", { lo: String(range.lo), to: fmtKg(next) })
     };
   }
   return null;
@@ -155,8 +157,8 @@ function deloadHtml(ex, exIdx) {
   if (!d) return "";
   return `<div class="bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)] rounded-2xl pl-3 pr-2 py-2 space-y-1.5" data-deload="${exIdx}">
       <div class="flex items-start gap-2.5"><span style="color:var(--t-warn-icon)" class="pt-0.5">${svgI("down", 20, 2.2)}</span>
-        <span class="text-[13px] leading-snug text-[var(--t-warn-hi)]">Son 3 haftada ${d.sessions} seansta tahmini 1RM'in ~${d.best} kg'ı geçmedi ve setler çoğunlukla zor geçti. Bu hareket için bir hafta kiloyu ~%10 hafifletmeyi (dinlenme haftası) düşünebilirsin.</span></div>
-      <div class="flex justify-end"><button onclick="dismissDeload(${exIdx})" class="text-[12px] t-muted h-11 px-3">Anladım</button></div>
+        <span class="text-[13px] leading-snug text-[var(--t-warn-hi)]">${esc(t("Son 3 haftada {sessions} seansta tahmini 1RM'in ~{best} kg'ı geçmedi ve setler çoğunlukla zor geçti. Bu hareket için bir hafta kiloyu ~%10 hafifletmeyi (dinlenme haftası) düşünebilirsin.", { sessions: String(d.sessions), best: String(d.best) }))}</span></div>
+      <div class="flex justify-end"><button onclick="dismissDeload(${exIdx})" class="text-[12px] t-muted h-11 px-3">${t("Anladım")}</button></div>
     </div>`;
 }
 function dismissDeload(exIdx) {
@@ -172,7 +174,7 @@ function suggestionHtml(ex, exIdx) {
   if (sg.type === "hold") return `${deloadHtml(ex, exIdx)}
     <div class="t-panel rounded-2xl pl-3 pr-2 py-2 space-y-1.5" data-hold="${exIdx}">
       <div class="flex items-start gap-2.5"><span style="color:#1FD1C1" class="pt-0.5">${svgI("check", 20, 2.2)}</span><span class="text-[13px] leading-snug text-[var(--t-panel-text)]">${esc(sg.text)}</span></div>
-      <div class="flex justify-end"><button onclick="dismissSuggestion(${exIdx})" class="text-[12px] t-muted h-11 px-3">Anladım</button></div>
+      <div class="flex justify-end"><button onclick="dismissSuggestion(${exIdx})" class="text-[12px] t-muted h-11 px-3">${t("Anladım")}</button></div>
     </div>`;
   const up = sg.type === "up";
   const noLv = usesLevels(ex) && !ex.levels && !inferLevels(ex);
@@ -188,8 +190,8 @@ function suggestionHtml(ex, exIdx) {
         </span>
       </div>
       <div class="flex items-center justify-between gap-2">
-        ${noLv ? `<button onclick="openEditExercise(${exIdx})" class="text-[12px] text-[var(--t-warn-hi)] underline text-left">Makine kademelerini tanımla, doğru kiloyu önereyim</button>` : "<span></span>"}
-        <button onclick="dismissSuggestion(${exIdx})" class="text-[12px] t-muted h-9 px-2">Şimdi değil</button>
+        ${noLv ? `<button onclick="openEditExercise(${exIdx})" class="text-[12px] text-[var(--t-warn-hi)] underline text-left">${t("Makine kademelerini tanımla, doğru kiloyu önereyim")}</button>` : "<span></span>"}
+        <button onclick="dismissSuggestion(${exIdx})" class="text-[12px] t-muted h-9 px-2">${t("Şimdi değil")}</button>
       </div>
     </div>`;
 }
@@ -244,7 +246,7 @@ function platesFor(total, bar) {
 }
 
 function plateChips(list) {
-  if (!list.length) return `<span class="text-[var(--w-dim)]">Plaka yok (sadece bar)</span>`;
+  if (!list.length) return `<span class="text-[var(--w-dim)]">${t("Plaka yok (sadece bar)")}</span>`;
   return list.map(p => `<span class="inline-flex items-center justify-center min-w-[2.25rem] px-1.5 py-1 rounded-md text-[12px] font-bold ${PLATE_CLS[p]}">${fmtKg(p)}</span>`).join("");
 }
 
@@ -252,7 +254,7 @@ function warmupSets(W, bar) {
   if (!(W > 0)) return [];
   const step = bar > 0 ? 2.5 : 1;
   const out = [];
-  if (bar > 0 && W >= bar + 20) out.push({ kg: bar, reps: 10, label: "Boş bar" });
+  if (bar > 0 && W >= bar + 20) out.push({ kg: bar, reps: 10, label: t("Boş bar") });
   const steps = [[0.4, 8], [0.6, 5], [0.8, 3]];
   if (W >= 100) steps.push([0.9, 1]);
   steps.forEach(([pct, reps]) => {
@@ -273,18 +275,18 @@ function openPlateTool(exIdx) {
   const bar = num(state.settings.barKg, 20);
   if (lv && !plateCtx.levels) {
     $("chartBody").innerHTML = `<div class="text-sm text-[var(--w-muted)] space-y-3">
-      <p>Bu hareket için ${equipOf(ex) === "dumbbell" ? "dambıl" : "makine"} kademeleri tanımlı değil. Kademeleri girersen ısınma setlerini ve kilo artırma önerilerini makinede gerçekten seçebileceğin kilolara göre hesaplarım.</p>
-      <button onclick="closeModal('chartModal'); openEditExercise(${exIdx})" class="w-full w-btn text-sm font-semibold py-2.5 rounded-lg">Kademeleri tanımla</button></div>`;
+      <p>${equipOf(ex) === "dumbbell" ? t("Bu hareket için dambıl kademeleri tanımlı değil. Kademeleri girersen ısınma setlerini ve kilo artırma önerilerini makinede gerçekten seçebileceğin kilolara göre hesaplarım.") : t("Bu hareket için makine kademeleri tanımlı değil. Kademeleri girersen ısınma setlerini ve kilo artırma önerilerini makinede gerçekten seçebileceğin kilolara göre hesaplarım.")}</p>
+      <button onclick="closeModal('chartModal'); openEditExercise(${exIdx})" class="w-full w-btn text-sm font-semibold py-2.5 rounded-lg">${t("Kademeleri tanımla")}</button></div>`;
     openModal("chartModal");
     return;
   }
   $("chartBody").innerHTML = `
     <div class="grid ${lv ? "grid-cols-1" : "grid-cols-2"} gap-2 text-xs">
-      <div><label class="block text-[var(--w-muted)] mb-1">Çalışma kilosu (kg)</label>
+      <div><label class="block text-[var(--w-muted)] mb-1">${t("Çalışma kilosu (kg)")}</label>
         <input id="ptKg" type="text" inputmode="decimal" value="${esc(fmtKg(W))}" oninput="renderPlateTool()" class="w-full p-2 rounded-lg text-base text-center font-bold" /></div>
-      ${lv ? "" : `<div><label class="block text-[var(--w-muted)] mb-1">Bar ağırlığı</label>
+      ${lv ? "" : `<div><label class="block text-[var(--w-muted)] mb-1">${t("Bar ağırlığı")}</label>
         <select id="ptBar" onchange="state.settings.barKg = num(this.value, 20); saveState(); renderPlateTool();" class="w-full p-2 rounded-lg text-sm">
-          ${[[20, "20 kg Olimpik bar"], [15, "15 kg Bar"], [10, "10 kg EZ / kısa bar"], [0, "Bar yok / plakalı makine"]].map(([v, l]) => `<option value="${v}" ${v === bar ? "selected" : ""}>${l}</option>`).join("")}
+          ${[[20, t("20 kg Olimpik bar")], [15, t("15 kg Bar")], [10, t("10 kg EZ / kısa bar")], [0, t("Bar yok / plakalı makine")]].map(([v, l]) => `<option value="${v}" ${v === bar ? "selected" : ""}>${l}</option>`).join("")}
         </select></div>`}
     </div>
     <div id="ptOut" class="mt-3 space-y-3"></div>`;
@@ -298,9 +300,9 @@ function renderLevelTool() {
   const W = Math.max(0, num($("ptKg").value, 0));
   if (W <= 0) {
     out.innerHTML = `<div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
-      <div class="text-[12px] text-[var(--w-muted)] mb-1.5">Bu makinenin kademeleri:</div>
+      <div class="text-[12px] text-[var(--w-muted)] mb-1.5">${t("Bu makinenin kademeleri:")}</div>
       <div class="flex flex-wrap gap-1.5">${list.slice(0, 12).map(v => `<span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1.5 rounded-lg text-[12px] font-bold bg-[var(--w-elev)] text-[var(--t-text2)]">${fmtKg(v)}</span>`).join("")}${list.length > 12 ? '<span class="text-[var(--w-dim)] text-xs self-center">…</span>' : ""}</div>
-      <div class="text-[12px] text-[var(--w-dim)] mt-2">Isınma setlerini görmek için çalışma kilonu yaz.</div></div>`;
+      <div class="text-[12px] text-[var(--w-dim)] mt-2">${t("Isınma setlerini görmek için çalışma kilonu yaz.")}</div></div>`;
     return;
   }
   const near = nearestLevelBelow(list, W);
@@ -316,16 +318,16 @@ function renderLevelTool() {
   });
   out.innerHTML = `
     <div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
-      <div class="text-[12px] text-[var(--w-muted)] mb-1.5">Bu kiloya yakın kademeler:</div>
+      <div class="text-[12px] text-[var(--w-muted)] mb-1.5">${t("Bu kiloya yakın kademeler:")}</div>
       <div class="flex flex-wrap gap-1.5">${chips}</div>
-      ${exact ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">${fmtKg(W)} kg bu makinede yok; en yakın alt kademe <b>${fmtKg(near)} kg</b>.</div>`}
+      ${exact ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">${t("{kg} kg bu makinede yok; en yakın alt kademe <b>{near} kg</b>.", { kg: fmtKg(W), near: fmtKg(near) })}</div>`}
     </div>
     <div>
-      <div class="text-[12px] font-bold text-[var(--w-dim)] tracking-wide mb-1.5">ISINMA SETLERİ</div>
+      <div class="text-[12px] font-bold text-[var(--w-dim)] tracking-wide mb-1.5">${t("ISINMA SETLERİ")}</div>
       ${wu.length ? `<div class="space-y-1">${wu.map(w => `<div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-lg px-2.5 py-1.5"><span class="text-[var(--w-muted)] w-14">${w.label}</span><span class="font-bold text-[var(--w-text1)]">${fmtKg(w.kg)} kg × ${w.reps}</span><span></span></div>`).join("")}
-        <div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-panel)] border border-[var(--w-panel-line)] rounded-lg px-2.5 py-1.5"><span class="text-[var(--w-acc)] w-14">Çalışma</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} kg</span><span></span></div></div>
-        <p class="text-[12px] text-[var(--w-dim)] mt-1.5">Isınma kiloları makinede var olan kademelere yuvarlandı. Tonaja ve set sayısına dahil edilmez.</p>`
-      : `<div class="text-xs text-[var(--w-dim)]">Bu kiloda ayrı ısınma setine gerek yok.</div>`}
+        <div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-panel)] border border-[var(--w-panel-line)] rounded-lg px-2.5 py-1.5"><span class="text-[var(--w-acc)] w-14">${t("Çalışma")}</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} kg</span><span></span></div></div>
+        <p class="text-[12px] text-[var(--w-dim)] mt-1.5">${t("Isınma kiloları makinede var olan kademelere yuvarlandı. Tonaja ve set sayısına dahil edilmez.")}</p>`
+      : `<div class="text-xs text-[var(--w-dim)]">${t("Bu kiloda ayrı ısınma setine gerek yok.")}</div>`}
     </div>`;
 }
 
@@ -339,31 +341,31 @@ function renderPlateTool() {
   if (bar > 0) {
     const r = platesFor(W, bar);
     if (!r.ok && r.reason === "light") {
-      html += `<div class="text-xs text-[var(--w-warn-text)] bg-[var(--w-warn-bg)] border border-[var(--w-warn-line)] rounded-lg px-3 py-2">Bu kilo ${fmtKg(bar)} kg'lık bardan hafif.</div>`;
+      html += `<div class="text-xs text-[var(--w-warn-text)] bg-[var(--w-warn-bg)] border border-[var(--w-warn-line)] rounded-lg px-3 py-2">${t("Bu kilo {bar} kg'lık bardan hafif.", { bar: fmtKg(bar) })}</div>`;
     } else {
       html += `<div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
-        <div class="text-[12px] text-[var(--w-muted)] mb-1.5">Barın HER İKİ tarafına takılacak plakalar (${fmtKg(r.perSide)} kg / taraf):</div>
+        <div class="text-[12px] text-[var(--w-muted)] mb-1.5">${t("Barın HER İKİ tarafına takılacak plakalar ({n} kg / taraf):", { n: fmtKg(r.perSide) })}</div>
         <div class="flex flex-wrap gap-1.5">${plateChips(r.list)}</div>
-        ${r.ok ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">Elindeki plakalarla tam ${fmtKg(W)} kg yapılamıyor; en yakın: <b>${fmtKg(r.achieved)} kg</b></div>`}
+        ${r.ok ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">${t("Elindeki plakalarla tam {kg} kg yapılamıyor; en yakın: <b>{n} kg</b>", { kg: fmtKg(W), n: fmtKg(r.achieved) })}</div>`}
       </div>`;
     }
   }
   const wu = warmupSets(W, bar);
   html += `<div>
-    <div class="text-[12px] font-bold text-[var(--w-dim)] tracking-wide mb-1.5">ISINMA SETLERİ</div>
+    <div class="text-[12px] font-bold text-[var(--w-dim)] tracking-wide mb-1.5">${t("ISINMA SETLERİ")}</div>
     ${wu.length ? `<div class="space-y-1">${wu.map(w => {
       const pr = bar > 0 ? platesFor(w.kg, bar) : null;
       return `<div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-lg px-2.5 py-1.5">
         <span class="text-[var(--w-muted)] w-14 shrink-0">${w.label}</span>
         <span class="font-bold text-[var(--w-text1)]">${fmtKg(w.kg)} kg × ${w.reps}</span>
-        <span class="text-[11px] text-[var(--w-dim)] text-right truncate">${pr && pr.ok && pr.list.length ? "taraf: " + pr.list.map(fmtKg).join("+") : ""}</span>
+        <span class="text-[11px] text-[var(--w-dim)] text-right truncate">${pr && pr.ok && pr.list.length ? t("taraf: {list}", { list: pr.list.map(fmtKg).join("+") }) : ""}</span>
       </div>`;
     }).join("")}
     <div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-panel)] border border-[var(--w-panel-line)] rounded-lg px-2.5 py-1.5">
-      <span class="text-[var(--w-acc)] w-14 shrink-0">Çalışma</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} kg</span><span></span>
+      <span class="text-[var(--w-acc)] w-14 shrink-0">${t("Çalışma")}</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} kg</span><span></span>
     </div></div>
-    <p class="text-[12px] text-[var(--w-dim)] mt-1.5">Isınma setleri yorulmadan yapılır, aralarında 1–2 dk dinlen. Tonaja ve set sayısına dahil edilmez.</p>`
-    : `<div class="text-xs text-[var(--w-dim)]">Isınma önerisi için çalışma kilosu gir (hafif kilolarda ayrı ısınma gerekmez).</div>`}
+    <p class="text-[12px] text-[var(--w-dim)] mt-1.5">${t("Isınma setleri yorulmadan yapılır, aralarında 1–2 dk dinlen. Tonaja ve set sayısına dahil edilmez.")}</p>`
+    : `<div class="text-xs text-[var(--w-dim)]">${t("Isınma önerisi için çalışma kilosu gir (hafif kilolarda ayrı ısınma gerekmez).")}</div>`}
   </div>`;
   out.innerHTML = html;
 }
