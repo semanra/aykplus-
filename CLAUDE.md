@@ -4,12 +4,13 @@ Bu dosya her oturumda okunur. Projeye başlamadan önce tamamını oku.
 
 ## 1. Proje nedir?
 
-AYK+, kullanıcının kendi kişisel fitness uygulamasıdır: **beslenme (makro takibi), antrenman (set/kilo kaydı), mobilite/esneme ve ilerleme**. Türkçedir.
+AYK+, kişisel fitness uygulamasıdır (önce sahibinin kendisi için; v44'ten beri herkes için ilk açılış kurulumu, genel varsayılanlar ve isteğe bağlı örnek içerikle): **beslenme (makro takibi), antrenman (set/kilo kaydı), mobilite/esneme ve ilerleme**. Türkçedir.
 
 - **Platform:** iPhone'da ana ekrana eklenmiş bir PWA (web uygulaması). App Store uygulaması değildir.
 - **Yayın:** Bu depo GitHub Pages ile yayınlanır. Depodaki `index.html` = canlı uygulama. `main` dalına gönderilen her değişiklik 1–2 dakika içinde kullanıcının telefonuna gelir.
 - **Veri:** Tamamen telefonda. v41'den beri asıl kayıt **IndexedDB** (`aykplus`, parçalı); `localStorage` `ayk_plus_v5_state` silinmez, "ayna" olarak güncel tutulur. Sunucu, hesap, senkronizasyon yok. Kullanıcı Profil → Yedekleme ile JSON yedek alır; uygulama ayrıca otomatik iç yedek tutar (son 7 gece + 4 hafta).
 - **Çevrimdışı:** `sw.js` (service worker) dosyaları önbelleğe alır; spor salonunda internetsiz çalışır. v25'ten beri: önce internet; internet yoksa, sunucu 404/5xx döndürürse veya 3 sn'de yanıt gelmezse önbellekteki kopya açılır (zaman aşımından sonra 30 sn boyunca dosyalar beklemeden önbellekten verilir, yanıt arka planda önbelleği günceller). `index.html` yedeği yalnızca sayfa açılışında (`navigate`) kullanılır. Test: `tests/test_v25_sw.py` (kendi sunucusuyla 404/503/yavaş/çevrimdışı).
+- **Yeni kurulum (v44):** kayıt yoksa `freshState()` genel varsayılanlarla başlar ve `#onboard` kurulumu (7 adım) açılır; dataVer ≤ 3 kaydı olan herkes (sahip dahil) kurulumu HİÇBİR yolda görmez.
 - **Kullanıcının cihazları:** iPhone ve iPad. **Mac yok.** iOS Safari davranışı her zaman öncelikli.
 
 ## 2. Dosya yapısı
@@ -46,7 +47,7 @@ npm run kontrol      # son commit ile karşılaştırma: 36 ekran × 2 tema piks
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
 - Testler `tests/shots/` klasörüne ekran görüntüsü kaydeder (git'e girmez). Görsel değişikliklerde bu görüntülere bakıp kontrol et.
 - **Kontrol araçları (v35, `scripts/kontrol/`):** `kontrol.py` (= `npm run kontrol`; 43 ekran, Profil kendi içinde kaydığı için orta/alt ayrıca çekilir; rapor `build/kontrol/RAPOR.md`, fark görselleri `build/kontrol/fark/`; ekran listesi ve ölçüm betiği `ortak.py` içinde, yeni ekran eklenince oraya da ekle), `bozuk_veri.py [N] [tohum]` (kaydın rastgele alanlarını bozar; açılışta kurtarma kopyasına düşme ve sayfa hatası sayar, hedef 0), `html_enjeksiyon.py` (20 kullanıcı alanına HTML/JS parçası yazıp 34 ekranı açar). Veri yapısı veya normalizeState değişince `bozuk_veri.py` ve `html_enjeksiyon.py`'yi de çalıştır.
-- Testler açılış animasyonunu (splash) bir başlangıç betiğiyle atlar; yeni testlerde de aynı `add_init_script` satırını kullan.
+- Testler açılış animasyonunu (splash) bir başlangıç betiğiyle atlar. **v44:** yeni testler `from ortak_tohum import TEST_INIT` kullanır (`add_init_script(TEST_INIT)`): splash'i kaldırır ve `window.AYK_TEST_SEED` ile sahibin eski varsayılan kaydını (`tests/fixtures/eski_varsayilan.json`) tohum yapar, böylece kurulum ekranı çıkmaz; kısmi tohum `with_defaults(seed)` ile tamamlanır. Gerçek yeni kurulum yolunu denemek için tohumsuz `SEED_ONLY`/boş başlatılır (`localStorage.clear()` + `indexedDB.deleteDatabase('aykplus')`). `kontrol` aracı kurulum 1–7 ve boş başlangıç ekranlarını tohumsuz çeker (`ONBOARD_SCREENS`, `FRESH_SCREENS`).
 
 ## 4. Sürüm çıkarma kontrol listesi (her değişiklikte)
 
@@ -117,7 +118,8 @@ npm run kontrol      # son commit ile karşılaştırma: 36 ekran × 2 tema piks
 - **Geçmiş:** `state.exerciseHistory[exKey(ad)]` = oturum listesi; `state.workoutLogs`; `state.dailyLogs[YYYY-AA-GG]` (gece yarısı arşivi).
 - **Kod bölümleri (`src/app/`, v34):** dosyalar sürüm geçmişi sırasını korur (en üst düzey komutların sırası önemli: `const`, `let`, `setInterval`); yeni kodu ilgili dosyaya ekle, yeni dosya gerekiyorsa numarayı sıraya göre ver. Bölme sırasında içerik değişmedi (birleşik çıktı satır sonları dışında birebir aynı). Eski yorum başlıkları dosyaların içinde duruyor.
 - **Çizim (v34):** `renderAll()` yalnızca AÇIK sekmeyi çizer; Beslenme de yalnızca açık alt ekranı (`renderNutrition` → bugün: su/takviye/özet/öğünler · menülerim: `renderWeightBlock` + `renderMenus` · besinler · geçmiş). Gizli ekranlar `switchTab` / `setNutriView` → `renderAll` ile açıldıkları anda güncellenir; gizli bir ekranın DOM'una başka sekmeden güvenme. Ölçüm (1 yıllık veri): her dokunuş ~19 ms → ~5 ms.
-- **Veri sürümü (v42):** `state.dataVer` (`DATA_VER` = 3). Eski biçim çevirileri yalnızca `migrateState()` içinde, sırayla (1: mobilite eski listeleri → rutinler; 2: kalori halkası bir kerelik "Yenen", `macroViewV26` işareti kalktı; 3: v43 hedef Ver/Koru/Al, eski kayıtta açıktan türetilir); `normalizeState` yalnızca doğrulama/temizlik. Yeni biçim değişikliği = yeni adım + `DATA_VER` + 1 + eski formatla test. v42 taramasında kullanılmayan fonksiyon kalmadı.
+- **Veri sürümü (v42):** `state.dataVer` (`DATA_VER` = 4). Eski biçim çevirileri yalnızca `migrateState()` içinde, sırayla (1: mobilite eski listeleri → rutinler; 2: kalori halkası bir kerelik "Yenen", `macroViewV26` işareti kalktı; 3: v43 hedef Ver/Koru/Al, eski kayıtta açıktan türetilir; 4 (v44): dataVer ≤ 3 kaydı `settings.onboarded = true` alır → kurulum yalnızca gerçekten yeni kayıtta); `normalizeState` yalnızca doğrulama/temizlik. Yeni biçim değişikliği = yeni adım + `DATA_VER` + 1 + eski formatla test. v42 taramasında kullanılmayan fonksiyon kalmadı.
+- **Yeni kurulum ve örnek içerik (v44):** `freshState()` (`01-temel.js`) genel varsayılanlar: kilo 70, boy 170, yaş 30, hedef kilo 70, `goal: "keep"`, `deficit: 0`, su 2,5, boş menü/takviye/tartı, tek boş gün "1. Gün", mobilite rutini yok; sahibin menüsü/programı/rutini uygulama kodunda YOK (yalnızca test fikstüründe). `loadState(allowFresh)`: yalnızca `storageImportFromLocal` (`!migratedAt`) veya `storageUseLegacy` (`!window.indexedDB`) çağırır; `ayk_plus_v5_idb = "1"` ise asla yeni kayıt açılmaz (veri kaybı riski). `settings.onboarded` false iken `syncOnboarding()` (`renderAll` sonu) `#onboard` açar (`src/app/15-kurulum.js`): 7 adım (karşılama, kişisel bilgi, hedef, hareketlilik, deneyim, örnek içerik üç kutu, özet + alt sınır satırı), girilenler `obDraft`'ta tutulur, `finishOnboarding()` hepsini TEK seferde yazar, yarıda kapanırsa baştan; "Yedeğim var" yedek geri yükler; açıkken `trainCtx()` true, `checkNewDay` arşiv yapmaz. Örnekler `src/app/14-ornek-icerik.js`: `buildSampleMenu(cal)` (hedef −%5…+%2, aşmaz), `samplePrograms("new"|"pro")`, `sampleMobility()`; boşsa Beslenme/Antrenman "İlk öğününü ekle" / "İlk hareketini ekle" kartları (`[data-empty-menu]`, `[data-empty-day]`). Profil → Hakkında `#pfAbout` (`renderAbout`): `HEALTH_NOTE`, gizlilik, hesap yöntemi ve kaynaklar, lisanslar.
 - **Profil otomatik kayıt (v42):** "Kaydet" düğmesi ve "kaydedilmedi" uyarısı yok. `profileAutoSaveInit()` her `PF_FIELDS` alanına `change` bağlar → `applyProfileFields()` (sınırlar aynı; geçersiz yağ oranı eski değere döner, geçersiz kilo kutuda kalır ama kaydedilmez; "Kaydedildi · Geri al"). `closeProfile()` önce odaktaki alanı kaydeder. Profil açıkken bildirimler altta (`body.pf-page .toast-wrap`), Geri düğmesinin üstüne binmesin diye. `saveSettings()` yalnızca eski ad (testler).
 
 ## 7. Tasarım
@@ -134,7 +136,7 @@ npm run kontrol      # son commit ile karşılaştırma: 36 ekran × 2 tema piks
 - **Onay olmadan geliştirmeye başlama.** Önce planı/önerileri sun; kullanıcı "yap" dediğinde başla.
 - Kullanıcı **hataya karşı çok hassas** ("hataya yer yok"). Her değişikliği test et; bulduğun hataları açıkça söyle.
 - Kullanıcı özellikleri **gerçek kullanımda test edip** ekran görüntüsüyle geri bildirim verir.
-- Kullanıcının **istemediği** şeyler: ilerleme fotoğrafları, sporcu/PR kartı, vücut istatistik ekranı (Lightweight'teki "Body"), sıralama tablosu (leaderboard), hazır program şablonları.
+- Kullanıcının **istemediği** şeyler: ilerleme fotoğrafları, sporcu/PR kartı, vücut istatistik ekranı (Lightweight'teki "Body"), sıralama tablosu (leaderboard), hazır program şablonları (kişisel kullanım içindi; v44'te yeni kullanıcıya isteğe bağlı örnek program sunulur).
 
 ## 9. Yol haritası
 
@@ -187,6 +189,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 **v42 (14 Kasım 2026):** App Store Aşama 1b — v41 depolamasının bağımsız inceleme düzeltmeleri (imza yalnızca onaylı yazmada, yeniden bağlanma, yarış, bozuk parçada aynadan kurtarma, toplu değişiklik öncesi iç yedek), veri sürümü + göç zinciri, Profil otomatik kayıt. Test: `tests/test_v42_goc_profil.py`, `tests/test_v41_depolama.py` (inceleme senaryoları).
 
 **v43 (15 Kasım 2026):** App Store Aşama 2 başlangıcı — herkes için hesap: hedef Ver/Koru/Al (kilo alma hızı), hareketlilik ve protein tercihi Profil'de, kanıta dayalı protein (yağsız kütle/hedef kilo referanslı) ve kalorinin %25'i yağ, koç kilo alma/koruma için de çalışıyor, `DATA_VER` 3.
+
+**v44 (15 Kasım 2026):** App Store Aşama 2 — herkes için başlangıç: ilk açılış kurulumu (7 adım, örnekle ya da boş başla, yedekten dönüş), genel varsayılanlar (sahip verisi koddan çıktı, fikstürde), örnek menü/program/esneme rutini üreticileri, Profil → Hakkında (sağlık notu, gizlilik, yöntem, lisanslar), veri sürümü 4. Sahibin kaydı etkilenmez (doğrulandı). Test: `tests/test_v44_baslangic.py`, `tests/ortak_tohum.py`.
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 

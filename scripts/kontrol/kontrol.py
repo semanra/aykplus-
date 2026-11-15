@@ -5,7 +5,7 @@
 # Gereksinim: pip install playwright pillow && python -m playwright install chromium
 import os, sys, json, shutil, subprocess, tarfile, io
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
-from ortak import TEST_INIT, server, SEED, SCREENS, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME
+from ortak import TEST_INIT, SPLASH_ANIM, server, SEED, SCREENS, ONBOARD_SCREENS, FRESH_SCREENS, FIXED_NAMES, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(REPO, "build", "kontrol")
 HIZLI = "--hizli" in sys.argv
@@ -40,12 +40,34 @@ def shoot(root, out_dir, scheme):
         b.close()
     return res, errs
 
+def shoot_fresh(root, out_dir, scheme):
+    """v44: gerçek yeni kurulum yolu (TEST_INIT yok, temiz depo): kurulum 1–7 ve boş başlangıç ekranları."""
+    from playwright.sync_api import sync_playwright
+    os.makedirs(out_dir, exist_ok=True); res = {}; errs = []
+    with server(root) as url, sync_playwright() as p:
+        b = p.chromium.launch()
+        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True, color_scheme=scheme)
+        ctx.add_init_script(SPLASH_ANIM)
+        pg = ctx.new_page(); pg.clock.set_fixed_time(FIXED_TIME)
+        pg.on("pageerror", lambda e: errs.append(str(e)))
+        pg.goto(url); pg.wait_for_timeout(400); pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.wait_for_timeout(700)
+        for name, js in ONBOARD_SCREENS + FRESH_SCREENS:
+            try:
+                if js: pg.evaluate("() => { " + js + " }")
+            except Exception as e: errs.append(f"{name}: {str(e)[:160]}")
+            pg.wait_for_timeout(250); pg.evaluate("window.scrollTo(0,0)")
+            pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=True)
+            res[name] = pg.evaluate(AUDIT_JS, "#onboard" if name.startswith("ob-") else None)
+        b.close()
+    return res, errs
+
 def pixdiff(a_dir, b_dir, fark_dir):
     from PIL import Image, ImageChops
     rows = []
-    for name, _ in SCREENS:
+    for name in [n for n, _ in SCREENS] + FIXED_NAMES:
         a, b = os.path.join(a_dir, name + ".png"), os.path.join(b_dir, name + ".png")
-        if not (os.path.exists(a) and os.path.exists(b)): rows.append((name, "eksik", "")); continue
+        if not (os.path.exists(a) and os.path.exists(b)):
+            rows.append((name, "yeni ekran", "karşılaştırma yok (önceki commit'te bu ekran yok)" if name in FIXED_NAMES else "eksik")); continue
         ia, ib = Image.open(a).convert("RGB"), Image.open(b).convert("RGB")
         if ia.size != ib.size:
             rows.append((name, "boyut", f"{ia.size[1]} → {ib.size[1]} px yükseklik")); continue
@@ -113,8 +135,9 @@ def main():
         tr = "koyu" if scheme == "dark" else "aydınlık"
         print(f"• {tr}: ekranlar (önce)…"); _, e0 = shoot(old, os.path.join(OUT, "onceki", scheme), scheme)
         print(f"• {tr}: ekranlar (şimdi)…"); audit, e1 = shoot(REPO, os.path.join(OUT, "simdi", scheme), scheme)
+        fa, f1 = shoot_fresh(REPO, os.path.join(OUT, "simdi", scheme), scheme); audit.update(fa); e1 = e1 + f1
         rows = pixdiff(os.path.join(OUT, "onceki", scheme), os.path.join(OUT, "simdi", scheme), os.path.join(OUT, "fark", scheme))
-        lines += [f"## Tema: {tr}", "", f"### Görsel farklar ({len(rows)} / {len(SCREENS)} ekran)", ""]
+        lines += [f"## Tema: {tr}", "", f"### Görsel farklar ({len(rows)} / {len(SCREENS) + len(FIXED_NAMES)} ekran)", ""]
         lines += [f"- `{n}`: {k} — {d}" for n, k, d in rows] or ["- Fark yok: bütün ekranlar birebir aynı."]
         lines += ["", "### Ölçüm (şimdiki hâl)", ""]
         bad = 0

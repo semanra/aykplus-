@@ -4,10 +4,14 @@ import os, sys, subprocess, time, socket, contextlib, datetime
 
 FIXED_TIME = datetime.datetime(2026, 11, 14, 10, 30, 0)   # ekranlar her çalıştırmada aynı çıksın diye sabit saat
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tests"))
-from ortak_tohum import TEST_INIT   # v44: açılış animasyonu kaldırma + eski varsayılan tohum (kurulum ekranı çıkmasın)
+from ortak_tohum import TEST_INIT, SPLASH_OFF   # v44: açılış animasyonu kaldırma + eski varsayılan tohum (kurulum ekranı çıkmasın)
 NO_ANIM = (TEST_INIT + ";" + "document.addEventListener('DOMContentLoaded',()=>{"
            "const st=document.createElement('style'); st.textContent='*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}';"
            "document.head.appendChild(st);})")
+
+SPLASH_ANIM = (SPLASH_OFF + ";" + "document.addEventListener('DOMContentLoaded',()=>{"
+           "const st=document.createElement('style'); st.textContent='*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}';"
+           "document.head.appendChild(st);})")   # v44: tohumsuz (gerçek yeni kurulum) kontrol ekranları
 
 def free_port():
     with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
@@ -102,9 +106,28 @@ SCREENS = [
   ("profil", "closeModal('chartModal'); openProfile()"),
   ("profil-orta", PF_SCROLL % 0.45),
   ("profil-alt", PF_SCROLL % 1),
+  # v44: Profil → Hakkında (ayrıntı bölümleri açık)
+  ("profil-hakkinda", "document.querySelectorAll('#pfMethod, #pfLicenses').forEach(d => d.open = true); " + PF_SCROLL % 1),
 ]
 SCREEN_ROOT = {"profil": "#profilePage", "profil-orta": "#profilePage", "profil-alt": "#profilePage", "m-sayac": "#mobTimer",
                "m-seans-tekrar": "#mobTimer", "m-seans-sure": "#mobTimer", "m-bitis": "#mobTimer"}
+
+# v44: kurulum ekranları. TEST_INIT OLMADAN, temiz depoda açılır (gerçek yeni kurulum yolu). Sırayla; her adım öncekinin üstüne.
+ONBOARD_SCREENS = [
+  ("ob-1", ""),
+  ("ob-2", "obNext()"),
+  ("ob-3", "obPick('sex','female'); obInput('age','29'); obInput('height','165'); obInput('weight','72'); obNext()"),
+  ("ob-4", "obPick('goal','lose'); obInput('target','65'); obNext()"),
+  ("ob-5", "obPick('act','mid'); obNext()"),
+  ("ob-6", "obPick('exp','new'); obNext()"),
+  ("ob-7", "obNext()"),
+]
+# Kurulum üç örnek kutusu işaretsiz bitirilince: boş başlangıç ekranları
+FRESH_SCREENS = [
+  ("bos-menu", "obDraft.menu = false; obDraft.prog = false; obDraft.mob = false; finishOnboarding(); switchTab('nutrition'); setNutriView('menus')"),
+  ("bos-antrenman", "switchTab('gym'); setGymView('today')"),
+]
+FIXED_NAMES = [n for n, _ in ONBOARD_SCREENS] + [n for n, _ in FRESH_SCREENS]
 
 # Ölçüm: okunurluk (WCAG 4,5:1 / büyük yazı 3:1), 44 px altı dokunma alanı, 12 px altı yazı, yatay taşma
 AUDIT_JS = r"""(rootSel) => {
