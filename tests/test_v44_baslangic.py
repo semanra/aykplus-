@@ -32,11 +32,11 @@ try:
 
     pg = page_fresh()
     s = st(pg)
-    check(s["settings"]["onboarded"] is False and s["dataVer"] == 4, "yeni kurulum: onboarded false, dataVer 4")
+    check(s["settings"]["onboarded"] is False and s["dataVer"] == 5, "yeni kurulum: onboarded false, dataVer 4")
     pg.reload(); boot(pg)
     check(st(pg)["settings"]["onboarded"] is False, "kurulum bitmeden yeniden açılınca yine onboarded false")
     OWNER43 = json.load(open(FIXTURE, encoding="utf-8")); OWNER43["dataVer"] = 3
-    seed(pg, OWNER43); check(st(pg)["settings"]["onboarded"] is True and st(pg)["dataVer"] == 4, "v43 kaydı: onboarded true")
+    seed(pg, OWNER43); check(st(pg)["settings"]["onboarded"] is True and st(pg)["dataVer"] == 5, "v43 kaydı: onboarded true")
     check(st(pg)["weight"] == OWNER43["weight"], "v43 kaydı: veri aynı")
     seed(pg, {**OWNER43, "dataVer": 2}); check(st(pg)["settings"]["onboarded"] is True, "v42 kaydı: onboarded true")
     # v4 kaydı

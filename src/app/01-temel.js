@@ -9,6 +9,7 @@ const GAIN_PACE = { slow: 0.10, mid: 0.15, fast: 0.20 };
 const HEALTH_NOTE = "AYK+ genel bilgi amaçlıdır; tıbbi tavsiye, teşhis ya da tedavi yerine geçmez. Hamileysen, emziriyorsan, bir sağlık sorunun ya da yeme bozukluğu geçmişin varsa, beslenme ve egzersiz planını değiştirmeden önce bir doktora veya diyetisyene danış.";
 
 const DEFAULT_SETTINGS = {
+  lang: "tr",   // v46: arayüz dili "tr" | "en" (İngilizce yayında olana dek curLang() hep "tr")
   onboarded: true,   // v44: yeni kurulumda freshState() false yapar; var olan kayıt hep true
   sex: "male", height: 170, age: 30, targetWeight: 70,
   waterTarget: 2.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
@@ -216,7 +217,7 @@ function normMobItem(x) {
 // çalışmaz. normalizeState yalnızca doğrulama/temizlik yapar. Yeni bir biçim değişikliği = yeni adım + DATA_VER + 1.
 // (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
 // ---------------------------------------------------------------------------
-const DATA_VER = 4;
+const DATA_VER = 5;
 function migrateState(s, rawHadGoal) {
   const v = Number.isInteger(s.dataVer) && s.dataVer >= 0 ? s.dataVer : 0;
   if (v < 1) {   // v27 + v39: mobilitenin eski listeleri (dynamic/static, sonra tek items) → rutinler; eski diziler yedek olarak kalır
@@ -232,6 +233,7 @@ function migrateState(s, rawHadGoal) {
   }
   if (v < 3 && !rawHadGoal) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43: hedef Ver/Koru/Al (açık 0 = eskiden "kilo koruma"; ayarda açıkça başka hedef varsa ona dokunulmaz)
   if (v < 4) s.settings.onboarded = true;   // v44: var olan kayıt kurulum ekranını görmez
+  if (v < 5) s.settings.lang = "tr";   // v46: var olan kayıt Türkçe kalır
   s.dataVer = Math.max(v, DATA_VER);
 }
 
@@ -380,6 +382,7 @@ function normalizeState(raw) {
   if (!["slow", "mid", "fast"].includes(s.settings.gainPace)) s.settings.gainPace = "mid";
   if (!["low", "mid", "high"].includes(s.settings.activity)) s.settings.activity = "mid";
   if (typeof s.settings.onboarded !== "boolean") s.settings.onboarded = true;   // v44
+  if (s.settings.lang !== "tr" && s.settings.lang !== "en") s.settings.lang = "tr";   // v46
   s.settings.proteinHigh = s.settings.proteinHigh === true;
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
@@ -437,6 +440,7 @@ function freshState() {
   }
   const s = normalizeState({});
   s.settings.onboarded = false;   // normalizeState (göç adım 4) true yapar; bilerek sonradan
+  s.settings.lang = langAvailable() && !/^tr\b/i.test(navigator.language || "") ? "en" : "tr";   // v46: telefon dili yalnızca burada, yalnızca İngilizce yayındaysa
   return s;
 }
 const RESCUE_KEY = "ayk_plus_v5_state_kurtarma";
