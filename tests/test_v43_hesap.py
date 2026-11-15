@@ -91,6 +91,27 @@ try:
     pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v43_hedef_ver_acik.png"))
     ctx.close()
 
+    # ================= 3) KOÇ İKİ YÖNLÜ =================
+    ctx, pg = page()
+    DAYMS = 86400000
+    def wl(w0, w1):
+        nowms = int(time.time() * 1000)
+        return [{"date": "x", "weight": round(w0 + (w1 - w0) * d / 21, 2), "ts": nowms - (21 - d) * DAYMS} for d in [0, 4, 8, 12, 17, 21]]
+    def coach(data):
+        seed(pg, data)
+        return pg.evaluate("coachAnalysis()"), pg.evaluate("progCoachHtml()")
+    GS = {"sex": "male", "age": 30, "height": 178, "targetWeight": 76, "goal": "gain", "gainPace": "mid"}
+    a_gain, html = coach({"weight": 71.5, "deficit": 0, "dayType": "train", "weightLogs": wl(70, 71.5), "settings": GS})
+    check(a_gain["ready"] and a_gain["expectedWeekly"] > 0 and a_gain["gainTooFast"] and "fazla yağ" in html, "Al + hızlı alım: uyarı")
+    check(not a_gain["tooFast"] and not a_gain["gaining"], "Al'da kilo verme uyarıları çıkmıyor")
+    a, html = coach({"weight": 70, "deficit": 0, "dayType": "train", "weightLogs": wl(70, 70), "settings": GS})
+    check(a["notGaining"] and "almıyorsun" in html, "Al + alım yok: uyarı")
+    a, html = coach({"weight": 78.5, "deficit": 0, "dayType": "train", "weightLogs": wl(80, 78.5), "settings": {**GS, "goal": "keep", "targetWeight": 80}})
+    check(a["keepDrift"] and a["expectedWeekly"] == 0 and "korunmuyor" in html, "Koru + kayma: uyarı")
+    a, html = coach({"weight": 101, "deficit": 700, "dayType": "train", "weightLogs": wl(105, 101), "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}})
+    check(a["tooFast"] and not a["gainTooFast"] and a["goal"] == "lose", "Ver: eski uyarı aynı")
+
+    ctx.close()
     check(not errs, f"sayfa hatası yok ({errs[:3]})")
     b.close()
 finally:

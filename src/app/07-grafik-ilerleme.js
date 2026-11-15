@@ -255,13 +255,18 @@ function progCoachHtml() {
   const details = `<details class="p-det"><summary>Hesap ayrıntıları · ${a.n} tartı, ${Math.floor(a.spanDays)} gün</summary>${rows}
     <p class="p-fine">${a.intakeAssumed ? "* Yeterli günlük kayıt olmadığı için planladığın kaloriyi yediğin varsayıldı. " : ""}İlk 1–2 hafta su kaybı nedeniyle kilo hızlı düşebilir; öneriler 3–4 hafta veriyle en isabetli hâle gelir.</p></details>`;
   const warns = (a.tooFast ? `<p class="p-warn">${pI("warn", 16, 2)}Haftada vücut ağırlığının %${fmtNum(Math.abs(a.pctPerWeek))}'ini kaybediyorsun; %1'in üstü kas kaybı riskini artırır.</p>` : "")
+    + (a.gainTooFast ? `<p class="p-warn">${pI("warn", 16, 2)}Haftada vücut ağırlığının %${fmtNum(Math.abs(a.pctPerWeek))}'i kadar alıyorsun; %0,5'in üstü fazla yağ birikmesine yol açabilir.</p>` : "")
+    + (a.notGaining ? `<p class="p-warn">${pI("warn", 16, 2)}Kalori fazlası verdiğin hâlde kilo almıyorsun. Porsiyonları tartarak girmeyi ve öğün tiklerini kontrol etmeyi öneririm.</p>` : "")
+    + (a.keepDrift ? `<p class="p-warn">${pI("warn", 16, 2)}Kilon korunmuyor: haftada %${fmtNum(Math.abs(a.pctPerWeek))} değişiyor.</p>` : "")
     + (a.gaining ? `<p class="p-warn">${pI("warn", 16, 2)}Açık verdiğin hâlde kilo alıyorsun. Porsiyonları tartarak girmeyi ve öğün tiklerini kontrol etmeyi öneririm.</p>` : "");
   if (Math.abs(a.delta) < 100) {
     return `<div class="p-card" id="pCoach">${head("Kalori koçu", "Doğru yoldasın; kalorinde değişiklik gerekmiyor.")}${warns}${details}${adjLine}</div>`;
   }
   const sinceApply = state.settings.coachAppliedAt ? Math.floor((Date.now() - state.settings.coachAppliedAt) / DAY_MS) : null;
   const fresh = sinceApply != null && sinceApply < 7;
-  const why = a.delta < 0 ? "Beklediğinden yavaş ilerliyorsun." : "Beklediğinden hızlı veriyorsun; kas kaybını önlemek için.";
+  const why = a.goal === "gain" ? (a.delta > 0 ? "Beklediğinden yavaş alıyorsun." : "Beklediğinden hızlı alıyorsun; fazla yağ birikmesin diye.")
+    : a.goal === "keep" ? (a.delta > 0 ? "Kilo veriyorsun." : "Kilo alıyorsun.")
+    : (a.delta < 0 ? "Beklediğinden yavaş ilerliyorsun." : "Beklediğinden hızlı veriyorsun; kas kaybını önlemek için.");
   const step = Math.abs(a.fullDelta) > Math.abs(a.delta) ? `<p class="p-fine">Tam düzeltme ${a.fullDelta > 0 ? "+" : ""}${a.fullDelta} kcal olurdu; enerjin düşmesin diye kademeli. Bir hafta sonra koç kalanını yeniden değerlendirir.</p>` : "";
   return `<div class="p-card" id="pCoach">${head("Kalori koçu", why)}
     <div class="p-cn"><span>Önerilen hedef</span><b class="t-display">${a.newTarget.toLocaleString("tr-TR")}</b><span>kcal</span>${pDelta(a.delta, "", null, 0)}</div>

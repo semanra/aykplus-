@@ -408,20 +408,24 @@ function coachAnalysis() {
   const tdeeEst = Math.round(avgIntake - (weekly * 7700) / 7);
   const female = state.settings.sex === "female";
   const floor = female ? 1400 : 1750;
-  const desired = Math.max(floor, tdeeEst - state.deficit);
+  const goal = targets.goal;
+  const gainAdd = goal === "gain" ? Math.round(tdeeEst * (GAIN_PACE[state.settings.gainPace] || GAIN_PACE.mid)) : 0;
+  const desired = Math.max(floor, goal === "lose" ? tdeeEst - state.deficit : goal === "gain" ? tdeeEst + gainAdd : tdeeEst);
   const fullDelta = Math.round((desired - targets.calTarget) / 50) * 50;
   let delta = Math.max(-COACH_MAX_STEP, Math.min(COACH_MAX_STEP, fullDelta));
   const adj = num(state.settings.calAdjust, 0);
   if (adj + delta > 1000) delta = 1000 - adj;
   if (adj + delta < -1000) delta = -1000 - adj;
 
-  const expectedWeekly = -(state.deficit * 7) / 7700;
+  const expectedWeekly = targets.goalDelta === 0 ? 0 : (targets.goalDelta * 7) / 7700;
   const pctPerWeek = (weekly / state.weight) * 100;
   return {
-    ready: true, n: pts.length, spanDays: res.spanDays, weekly, expectedWeekly, pctPerWeek,
+    ready: true, goal, n: pts.length, spanDays: res.spanDays, weekly, expectedWeekly, pctPerWeek,
     avgIntake: Math.round(avgIntake), intakeDays: intakes.length, intakeAssumed,
     tdeeEst, tdeeFormula: targets.tdee, desired, delta, fullDelta, newTarget: targets.calTarget + delta, calTarget: targets.calTarget,
-    tooFast: pctPerWeek < -1.0, gaining: weekly > 0.1 && state.deficit > 0
+    tooFast: goal === "lose" && pctPerWeek < -1.0, gaining: goal === "lose" && weekly > 0.1 && state.deficit > 0,
+    gainTooFast: goal === "gain" && pctPerWeek > 0.5, notGaining: goal === "gain" && weekly < 0.05,
+    keepDrift: goal === "keep" && Math.abs(pctPerWeek) > 0.25
   };
 }
 
