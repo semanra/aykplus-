@@ -55,6 +55,5 @@ function setLang(l) {
   i18nTouched = true;
   try { if (typeof uiDlg !== "undefined" && uiDlg) uiDialogDone(false); } catch (e) { /* yoksay */ }
   applyStaticI18n();
-  renderAll();
-  if (!$("profilePage").classList.contains("hidden")) renderProfile();
+  renderAll();   // Profil açıksa renderAll içinde yeniden çizilir
 }

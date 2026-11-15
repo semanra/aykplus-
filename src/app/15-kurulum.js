@@ -105,6 +105,7 @@ function obInput(key, val) {
 }
 function obPickLang(l) {   // v46: ekran hemen yeni dile geçer
   if (!obDraft) return;
+  l = l === "en" && langAvailable() ? "en" : "tr";
   obDraft.lang = l;
   state.settings.lang = l; i18nTouched = true;
   applyStaticI18n();

@@ -950,13 +950,13 @@
   <div class="bottom-nav px-3 pt-2">
     <div class="max-w-lg mx-auto grid grid-cols-4">
       <button id="navBtnNutrition" onclick="switchTab('nutrition')" class="nav-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3.2 2.2-3.2 5.2S15 12 17 12v9"></path></svg><span>Beslenme</span></button>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3.2 2.2-3.2 5.2S15 12 17 12v9"></path></svg><span data-t="Beslenme">Beslenme</span></button>
       <button id="navBtnGym" onclick="switchTab('gym')" class="nav-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg><span>Antrenman</span></button>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg><span data-t="Antrenman">Antrenman</span></button>
       <button id="navBtnMobility" onclick="switchTab('mobility')" class="nav-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2"></circle><path d="M4 9.5l8 2 8-2M12 11.5v4.5M8 21l4-5 4 5"></path></svg><span>Mobilite</span></button>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2"></circle><path d="M4 9.5l8 2 8-2M12 11.5v4.5M8 21l4-5 4 5"></path></svg><span data-t="Mobilite">Mobilite</span></button>
       <button id="navBtnProgress" onclick="switchTab('progress')" class="nav-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"></path></svg><span>İlerleme</span></button>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"></path></svg><span data-t="İlerleme">İlerleme</span></button>
     </div>
   </div>
 
@@ -1358,6 +1358,13 @@
                 <button type="button" data-theme-opt="system" onclick="setTheme('system')">Sistem</button>
                 <button type="button" data-theme-opt="dark" onclick="setTheme('dark')">Koyu</button>
                 <button type="button" data-theme-opt="light" onclick="setTheme('light')">Aydınlık</button>
+              </div>
+            </div>
+            <div class="px-4 py-3 space-y-2.5 border-t border-[var(--t-line)] hidden" id="pfLang">
+              <div><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Dil">Dil</span></div>
+              <div class="t-seg grid-cols-2" role="group" aria-label="Dil" data-t-aria="Dil">
+                <button type="button" data-lang-opt="tr" onclick="setLang('tr')">Türkçe</button>
+                <button type="button" data-lang-opt="en" onclick="setLang('en')">English</button>
               </div>
             </div>
             <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
@@ -3387,7 +3394,7 @@ function applyTabVisibility() {
     tb.setAttribute("aria-label", light ? "Koyu temaya geç" : "Aydınlık temaya geç");
   }
   const tt = $("tabTitle");
-  const title = TAB_TITLES[state.activeTab] || "AYK+";
+  const title = t(TAB_TITLES[state.activeTab] || "AYK+");
   if (tt.textContent !== title) tt.textContent = title;
   Object.keys(map).forEach(k => {
     const [tabId, headId, btnId, disp] = map[k];
@@ -3720,7 +3727,7 @@ function macroLine(p, c, f, dec) {
 function renderNutrition() {
   const st = state.settings;
   const view = NUTRI_VIEWS.some(x => x[0] === state.nutriView) ? state.nutriView : "today";
-  $("nutriNav").innerHTML = NUTRI_VIEWS.map(([k, l]) => `<button onclick="setNutriView('${k}')" class="n-tab ${view === k ? "on" : ""}" ${view === k ? 'aria-current="page"' : ""}>${l}</button>`).join("");
+  $("nutriNav").innerHTML = NUTRI_VIEWS.map(([k, l]) => `<button onclick="setNutriView('${k}')" class="n-tab ${view === k ? "on" : ""}" ${view === k ? 'aria-current="page"' : ""}>${t(l)}</button>`).join("");
   [["today", "nvToday"], ["menus", "nvMenus"], ["foods", "nvFoods"], ["history", "nvHistory"]].forEach(([k, id]) => $(id).classList.toggle("hidden", k !== view));
 
   // v34: yalnızca açık alt ekran çizilir (gizli ekranlar açıldıklarında setNutriView → renderAll ile güncellenir)
@@ -6774,7 +6781,7 @@ function progBeslenmeHtml() {
 
 function renderProgress() {
   const v = PROG_VIEWS.some(x => x[0] === state.progressView) ? state.progressView : "genel";
-  const nav = `<nav id="progNav" class="p-subnav" aria-label="İlerleme bölümleri">${PROG_VIEWS.map(([k, l]) => `<button onclick="setProgressView('${k}')" data-pv="${k}" class="${v === k ? "on" : ""}" ${v === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>`;
+  const nav = `<nav id="progNav" class="p-subnav" aria-label="${t("İlerleme bölümleri")}">${PROG_VIEWS.map(([k, l]) => `<button onclick="setProgressView('${k}')" data-pv="${k}" class="${v === k ? "on" : ""}" ${v === k ? 'aria-current="page"' : ""}>${t(l)}</button>`).join("")}</nav>`;
   const body = v === "kilo" ? progKiloHtml() : v === "guc" ? progGucHtml() : v === "beslenme" ? progBeslenmeHtml() : progGenelHtml();
   $("progressContent").innerHTML = nav + `<div id="pv_${v}">${body}</div>`;
 }
@@ -6858,6 +6865,8 @@ function renderProfile() {
   $("pfRescue").classList.toggle("hidden", !rescueText());   // v35
   renderStorageMeter();   // v36
   document.querySelectorAll("[data-theme-opt]").forEach(b => { const on = b.dataset.themeOpt === state.settings.theme; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  const lr = $("pfLang"); if (lr) lr.classList.toggle("hidden", !langAvailable());   // v46
+  document.querySelectorAll("[data-lang-opt]").forEach(b => { const on = b.dataset.langOpt === curLang(); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
   // Kilo kayıtları
   const wl = state.weightLogs.filter(l => num(l.weight) > 0);
@@ -8294,7 +8303,7 @@ function exitActiveWorkout() { state.gymActive = false; window.scrollTo(0, 0); r
 
 function gymSubNav() {
   return `<nav class="gym-subnav flex gap-5 border-b border-[var(--t-line)] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="Antrenman bölümleri">
-    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${l}</button>`).join("")}
+    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${t(l)}</button>`).join("")}
   </nav>`;
 }
 
@@ -9720,6 +9729,7 @@ function renderAll() {
   invalidateFoodDB();
   refreshFoodSnaps();
   applyCustomIcon();
+  applyStaticI18n();   // v46
   applyTabVisibility();
   // v34: yalnızca açık sekme çizilir (sekme değişimi switchTab → renderAll ile yeni sekmeyi çizer)
   const tab = state.activeTab;
@@ -9913,7 +9923,7 @@ const OB_LOSE_PACE = { slow: 300, mid: 500, fast: 700 };   // kcal açık
 let obDraft = null, obStep = 1;
 
 function obNewDraft() {
-  return { sex: "", age: "", height: "", weight: "", goal: "", target: "", pace: "mid", act: "", exp: "", menu: true, prog: true, mob: true };
+  return { sex: "", age: "", height: "", weight: "", goal: "", target: "", pace: "mid", act: "", exp: "", menu: true, prog: true, mob: true, lang: curLang() };
 }
 function obIsOpen() { const el = $("onboard"); return !!el && !el.classList.contains("hidden"); }
 function openOnboarding() {
@@ -10007,6 +10017,14 @@ function obInput(key, val) {
   obSetErr("");
   if (obStep === 3) obUpdateWeekly();
 }
+function obPickLang(l) {   // v46: ekran hemen yeni dile geçer
+  if (!obDraft) return;
+  l = l === "en" && langAvailable() ? "en" : "tr";
+  obDraft.lang = l;
+  state.settings.lang = l; i18nTouched = true;
+  applyStaticI18n();
+  obRender(true);
+}
 function obPick(key, val) {
   if (!obDraft) return;
   obDraft[key] = val;
@@ -10068,6 +10086,10 @@ function obStepHtml(n) {
     </div>
     <div id="obHealth" class="ob-note" role="note"><span class="ob-note-t">Sağlık notu</span>${esc(HEALTH_NOTE)}</div>
     <p class="ob-small">Verilerin yalnızca bu telefonda kalır; hesap açman gerekmez.</p>
+    ${langAvailable() ? `<div class="t-seg ob-seg2" id="obLang" role="group" aria-label="${esc(t("Dil"))}">
+      <button type="button" data-lang-opt="tr" class="${d.lang === "tr" ? "on" : ""}" aria-pressed="${d.lang === "tr"}" onclick="obPickLang('tr')">Türkçe</button>
+      <button type="button" data-lang-opt="en" class="${d.lang === "en" ? "on" : ""}" aria-pressed="${d.lang === "en"}" onclick="obPickLang('en')">English</button>
+    </div>` : ""}
     <div class="ob-actions">
       <button id="obStart" type="button" class="ob-main t-btn" onclick="obGo(2)">Başlayalım</button>
       <button id="obRestore" type="button" class="ob-second" onclick="document.getElementById('obRestoreFile').click()">Yedeğim var, geri yükle</button>
@@ -10159,6 +10181,7 @@ function finishOnboarding() {
   for (let n = 2; n <= 5; n++) { const e = obCheck(n); if (e) { obGo(n); obSetErr(e); return; } }
   const v = obVals(), tr = obTargets("train"), re = obTargets("rest");
   const st = state.settings;
+  if (d.lang === "tr" || d.lang === "en") st.lang = d.lang;   // v46
   st.sex = d.sex === "female" ? "female" : "male";
   st.age = Math.round(v.age);
   st.height = Math.round(v.height);
@@ -10196,17 +10219,28 @@ function curLang() {
 function locale() { return curLang() === "en" ? "en-GB" : "tr-TR"; }
 function trFill(str, vars) {
   if (!vars) return str;
-  return str.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? (typeof vars[k] === "number" ? fmtNum(vars[k]) : String(vars[k])) : m));
+  return str.replace(/\{(\w+)\}/g, (m, k) => (Object.prototype.hasOwnProperty.call(vars, k) ? (typeof vars[k] === "number" ? fmtNum(vars[k]) : String(vars[k])) : m));
+}
+// İngilizce giriş: yalnızca sözlüğün KENDİ anahtarı (constructor gibi prototip adları sayılmaz)
+function enEntry(key) {
+  if (curLang() !== "en" || typeof EN === "undefined" || !Object.prototype.hasOwnProperty.call(EN, key)) return undefined;
+  return EN[key];
 }
 function t(key, vars) {
-  let s = String(key);
-  if (curLang() === "en" && typeof EN !== "undefined" && typeof EN[key] === "string") s = EN[key];
-  else s = s.split("|")[0];
+  let s = String(key).split("|")[0];
+  const e = enEntry(key);
+  if (typeof e === "string") s = e;
+  else if (e && typeof e === "object" && typeof e.other === "string") s = e.other;
   return trFill(s, vars);
 }
 function tn(n, key, vars) {
   let s = String(key).split("|")[0];
-  if (curLang() === "en" && typeof EN !== "undefined" && EN[key] && typeof EN[key] === "object") s = n === 1 ? EN[key].one : EN[key].other;
+  const e = enEntry(key);
+  if (typeof e === "string") s = e;
+  else if (e && typeof e === "object") {
+    const one = Number(n) === 1, pick = one ? e.one : e.other, alt = one ? e.other : e.one;
+    if (typeof pick === "string") s = pick; else if (typeof alt === "string") s = alt;
+  }
   return trFill(s, { ...(vars || {}), n });
 }
 // v46: dile göre gösterim yardımcıları (veri anahtarları exKey/normSearch/mobNorm hep Türkçe kalır)
@@ -10214,8 +10248,37 @@ function fmtDay(d, opts) { return new Date(d).toLocaleDateString(locale(), opts)
 function dayShort() { return curLang() === "en" ? ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"] : ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"]; }
 function upperL(s) { return String(s).toLocaleUpperCase(locale()); }
 function lowerL(s) { return String(s).toLocaleLowerCase(locale()); }
+
+// v46: statik metinler ([data-t] = Türkçe metin). Türkçede ve dil hiç değişmemişken DOM'a dokunulmaz.
+let i18nTouched = false;
+function applyStaticI18n(root) {
+  root = root || document;
+  if (curLang() === "tr" && !i18nTouched) return;
+  document.documentElement.lang = curLang();
+  root.querySelectorAll("[data-t]").forEach(el => { const v = t(el.dataset.t); if (el.textContent !== v) el.textContent = v; });
+  root.querySelectorAll("[data-t-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.tAria)));
+  root.querySelectorAll("[data-t-ph]").forEach(el => el.setAttribute("placeholder", t(el.dataset.tPh)));
+}
+function setLang(l) {
+  l = l === "en" && langAvailable() ? "en" : "tr";
+  if (state.settings.lang === l && !i18nTouched) return;
+  state.settings.lang = l;
+  i18nTouched = true;
+  try { if (typeof uiDlg !== "undefined" && uiDlg) uiDialogDone(false); } catch (e) { /* yoksay */ }
+  applyStaticI18n();
+  renderAll();   // Profil açıksa renderAll içinde yeniden çizilir
+}
 // v46: İngilizce sözlük (anahtar = Türkçe metin). Terimler docs/i18n-terimler.md'ye uyar.
-const EN = {};
+const EN = {
+  // bölüm 1 / 5 / 8: sekmeler ve alt sekmeler
+  "Beslenme": "Nutrition", "Antrenman": "Training", "Mobilite": "Mobility", "İlerleme": "Progress",
+  "Bugün": "Today", "Geçmiş": "History", "Menülerim": "Plans", "Besinler": "Foods",
+  "Programım": "Program", "Hareketler": "Exercises",
+  "Genel": "Overview", "Kilo": "Weight", "Güç": "Strength",
+  "İlerleme bölümleri": "Progress sections",
+  // bölüm 9: Dil satırı (dil adları çevrilmez)
+  "Dil": "Language",
+};
 
 </script>
 </body>

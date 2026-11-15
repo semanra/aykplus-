@@ -153,9 +153,17 @@ try:
     pg.evaluate("closeProfile()"); pg.wait_for_timeout(100)
     after = st(pg)
     check(pg.inner_text(".bottom-nav") + pg.inner_text("#nutriNav") == tr_nav and pg.evaluate("document.documentElement.lang") == "tr", "geri Türkçe: metinler eski hâlinde")
-    d1 = {k: v for k, v in before.items() if k not in ("lastSaved",)}
     diff = [k for k in set(before) | set(after) if before.get(k) != after.get(k) and k not in ("lastSaved", "today")]
-    check(diff in ([], ["settings"]) and after["settings"]["lang"] == "tr", "tr→en→tr: kayıt aynı kalır (fark: %s)" % diff)
+    sx = lambda d: {k: v for k, v in d["settings"].items() if k != "lang"}
+    check(diff in ([], ["settings"]) and after["settings"]["lang"] == "tr" and sx(before) == sx(after), "tr→en→tr: kayıt yalnızca settings.lang farkıyla aynı (fark: %s)" % diff)
+    # yedek geri yükleme: lang en (bayrakla) korunur; eski sürüm (dataVer 4) yedeği tr olur
+    OWN = json.load(open(FIXTURE, encoding="utf-8"))
+    bk = json.dumps({**OWN, "dataVer": 5, "settings": {**OWN.get("settings", {}), "lang": "en"}})
+    pg.evaluate("t => { void restoreFromText(t, {onboarding: true}); }", bk); pg.wait_for_timeout(500)
+    check(pg.evaluate("curLang()") == "en" and pg.evaluate("document.documentElement.lang") == "en", "dataVer 5 yedeği (lang en) geri yüklenince en kalır")
+    bk4 = json.dumps({**OWN, "dataVer": 4, "settings": {**OWN.get("settings", {}), "lang": "en"}})
+    pg.evaluate("t => { void restoreFromText(t, {onboarding: true}); }", bk4); pg.wait_for_timeout(500)
+    check(pg.evaluate("curLang()") == "tr" and pg.evaluate("document.documentElement.lang") == "tr", "dataVer 4 yedeği geri yüklenince tr (göç adım 5)")
     # sözlük yer tutucu denetimi
     pg.context.close()
     pg = page("en-US", flag=True)

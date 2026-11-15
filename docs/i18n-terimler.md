@@ -224,6 +224,7 @@ Bu belge, AYK+ İngilizce arayüzünde kullanılacak **tek ve bağlayıcı** ter
 | Türkçe | English | Bağlam (ekran) | Neden |
 |---|---|---|---|
 | Genel / Kilo / Güç / Beslenme | **Overview / Weight / Strength / Nutrition** | `PROG_VIEWS` | "Overview", özet sekmesi için yaygın ad. Reddedilen: "General" (kelime kelime). |
+| İlerleme bölümleri (erişilebilirlik etiketi) | **Progress sections** | `#progNav` aria-label | Alt sekme çubuğunun ekran okuyucu adı; "Progress" (§1) + bölümlerin ortak adı "sections". Cümle düzeni (0.2). Reddedilen: "Progress views" (teknik). |
 | Kilo (vücut ağırlığı) | **Weight** (gerekirse **body weight**) | Kilo sekmesi | Doğrudan karşılık. |
 | Tartı / Tartıyı kaydet | **Weigh-in / Log weigh-in** | `#pWeighBtn`, kurulum | MacroFactor tek tartı kaydına "weigh-in" diyor **[K2]**. |
 | Son tartılar | **Recent weigh-ins** | Kilo | Aynı **[K2]**. |
