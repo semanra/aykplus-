@@ -325,14 +325,14 @@ function addToMenuById(mealId, foodId, amount) {
 // GEÇMİŞ
 // ---------------------------------------------------------------------------
 function renderNutriHistory() {
-  const tg = getTargets();
+  const tgs = getTargets();
   const plan = nutritionTotals();
   const eaten = eatenTotals();
   const meals = dayMeals();
   const sup = state.supplements || {};
   const rows = [{
     key: state.today || logicalToday(), live: true, dayType: state.dayType,
-    eatenKcal: eaten.cal, eatenP: eaten.p, kcal: plan.cal, calTarget: tg.calTarget, proTarget: tg.proTarget,
+    eatenKcal: eaten.cal, eatenP: eaten.p, kcal: plan.cal, calTarget: tgs.calTarget, proTarget: tgs.proTarget,
     water: state.waterLiters || 0, mealsDone: meals.filter(m => m.done).length, mealsTotal: meals.length,
     supps: state.supplementList.filter(x => sup[x.id]).length
   }];

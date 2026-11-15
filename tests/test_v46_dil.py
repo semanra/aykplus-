@@ -248,37 +248,43 @@ try:
         return "".join(out)
     KW = r"(?!(?:if|for|while|switch|catch|function|return|typeof|void|await|new|else|do)\b)"
     def t_bindings(code):
-        """code_only çıktısında `t` bağlamalarını (satır no, tür) listeler."""
+        """code_only çıktısında `t` bağlamalarını (satır no, tür) listeler.
+        Bilinen sınır: `)` hemen ardından gelen düzenli ifade (`if (x) /'/.test(y)`) bölme sayılır."""
         found = []
+        NP = r"(?:[^()]|\([^()]*\))*"   # bir düzey iç içe parantezli (varsayılan değerlerde f())
+        TT = r"(?<![\w$.])t\b(?!\s*[(.\[])"
         pats = [
             ("const/let/var t", r"\b(?:const|let|var)\s+t\b"),
             ("const/let/var ... , t", r"\b(?:const|let|var)\s+[^;]*?,\s*t\s*=(?![=>])|\b(?:let|var)\s+(?:[\w$]+\s*,\s*)+t\s*[;,]"),
-            ("yapı bozma", r"\b(?:const|let|var)\s*[\{\[][^}\]]*?\bt\b[^}\]]*[\}\]]\s*="),
-            ("function(t)", r"\bfunction\b\s*[\w$]*\s*\([^)]*(?<![\w$.])t\b(?!\s*[(.\[])[^)]*\)"),
+            ("yapı bozma", r"\b(?:const|let|var)\s*[\{\[][^}\]]*?\bt\b[^}\]]*[\}\]]\s*(?:=(?![=>])|\bof\b|\bin\b)"),
+            ("function(t)", r"\bfunction\b\s*[\w$]*\s*\(" + NP + TT + NP + r"\)"),
             ("t =>", r"(?<![\w$.])t\s*=>"),
-            ("(…t…) =>", r"\([^()]*(?<![\w$.])t\b(?!\s*[(.\[])[^()]*\)\s*=>"),
-            ("catch(t)", r"\bcatch\s*\(\s*t\s*\)"),
-            ("yöntem(t) {", r"(?<![\w$.])" + KW + r"[\w$]+\s*\([^()]*(?<![\w$.])t\b(?!\s*[(.\[])[^()]*\)\s*\{"),
+            ("(…t…) =>", r"\(" + NP + TT + NP + r"\)\s*=>"),
+            ("catch(t)", r"\bcatch\s*\(\s*(?:t\s*\)|[\{\[][^}\]]*\bt\b)"),
+            ("yöntem(t) {", r"(?<![\w$.])" + KW + r"[\w$]+\s*\(" + NP + TT + NP + r"\)\s*\{"),
         ]
         for name, pat in pats:
             for m in re.finditer(pat, code):
                 found.append((code.count("\n", 0, m.start()) + 1, name))
         return found
-    sample = """
-      const t = 1; let a = 2, t = 3; var {x, t} = o = 1; const [t, u] = z;
-      for (const t of xs) {} function f(t) {} function g(a, t, b) {} const h = function(t) {};
-      xs.map(t => t); ys.map((t, i) => i); zs.map((a, t) => a); try {} catch (t) {}
-      const o2 = { m(t) { return 1; } };
-    """
-    sample_hits = {k for _, k in t_bindings(code_only(sample))}
-    want = {"const/let/var t", "const/let/var ... , t", "yapı bozma", "function(t)", "t =>", "(…t…) =>", "catch(t)", "yöntem(t) {"}
-    check(want <= sample_hits, "M2 öz-sınama: yasak biçimlerin hepsi yakalanır, eksik: %s" % sorted(want - sample_hits))
-    clean = """
-      // const t = 1;  /* t => 1 */
-      const s = "t => 1 const t"; const q = 'function(t)'; const r = /t(=>)/g; const z = `a'b ${t("x")} (t) => 1`;
-      const w = `Profil'den ${t("y")}`; if (t) {} while (t("a")) {} items.forEach(it => t("k")); const k = tg.t;
-    """
-    check(t_bindings(code_only(clean)) == [], "M2 öz-sınama: yorum/metin/şablon/global t kullanımı yanlış alarm vermez: %s" % t_bindings(code_only(clean)))
+    bad_lines = [
+        "const t = 1;", "let a = 2, t = 3;", "var {x, t} = o;", "const [t, u] = z;", "let a, t;",
+        "for (const t of xs) {}", "for (const [k, t] of xs) {}", "for (const {t} in o) {}", "for (let [t] of xs) {}",
+        "function f(t) {}", "function g(a, t, b) {}", "const h = function(t) {};", "function k(a, b = f(), t) {}",
+        "xs.map(t => t);", "ys.map((t, i) => i);", "zs.map((a, t) => a);", "ws.map((t, b = f()) => b);", "vs.map((a = g(), t) => a);",
+        "try {} catch (t) {}", "try {} catch ({ t }) {}", "try {} catch ([t]) {}",
+        "const o2 = { m(t) { return 1; } };", "async function q(t) {}", "const r = async t => 1;",
+    ]
+    miss = [ln for ln in bad_lines if not t_bindings(code_only(ln))]
+    check(miss == [], "M2 öz-sınama: her yasak örnek satır yakalanır, kaçan: %s" % miss)
+    clean_lines = [
+        "// const t = 1;", "/* t => 1 */", 'const s = "t => 1 const t";', "const q = 'function(t)';", "const r = /t(=>)/g;",
+        "const z = `a'b ${t(\"x\")} (t) => 1`;", "const w = `Profil'den ${t(\"y\")}`;", "if (t) {}", 'while (t("a")) {}',
+        'items.forEach(it => t("k"));', "const k = tg.t;", "const o = { t: 1, u: 2 };", 'const m = t("x") + t("y");',
+        "const p = { a: x.t, b: y.t };", "xs.map(it => it.t);", "const f = (a, b) => t(a) + b;", "function f(a, b) { return t(a); }",
+    ]
+    fp = [ln for ln in clean_lines if t_bindings(code_only(ln))]
+    check(fp == [], "M2 öz-sınama: yorum/metin/şablon/global t kullanımı/.t/t: anahtarı yanlış alarm vermez, alarm veren: %s" % fp)
     shadow = []; nfiles = 0
     for fn in app_files():
         nfiles += 1
