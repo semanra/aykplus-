@@ -112,7 +112,7 @@ Başarısızlık (çalışsa bile): sahibin verisinden tek bir alanın değişme
 
 ## 7. Doğrulama
 - v43: eski formatlı kayıt (goal/activity/proteinHigh yok) → kalori v42 ile aynı, protein yeni kurala göre; Ver/Koru/Al hesapları; koç iki yön; kilolu kullanıcı (130 kg, hedef 85) protein ≤ 2,2 × kilo ve = 85 × oran.
-- v44: yeni kurulumda kurulum çıkar, kayıt varken çıkmaz (v4 kaydı, localStorage-only, IndexedDB-only, bozuk kayıt + kurtarma); "Yedeğim var"; örnek menünün gramajları hedefe göre; boş başlangıçta bütün sekmeler/alt ekranlar hatasız (`pageerror` = 0); eski varsayılan dondurma testi.
+- v44: yeni kurulumda kurulum çıkar, kayıt varken çıkmaz (v4 kaydı, localStorage-only, IndexedDB-only, bozuk kayıt + kurtarma); "Yedeğim var"; örnek menünün gramajları hedefe göre; boş başlangıçta bütün sekmeler/alt ekranlar hatasız (`pageerror` = 0); alanları/listeleri eksik eski kayıt testi.
 - Her sürümde CLAUDE.md §4 listesi; veri yapısı değiştiği için `bozuk_veri.py` ve `html_enjeksiyon.py` de; `kontrol.py`'ye kurulum ekranları ve boş durum ekranları eklenir.
 
 ## 8. Kurucuya bırakılanlar
