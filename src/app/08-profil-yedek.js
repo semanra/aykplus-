@@ -78,7 +78,7 @@ function renderProfile() {
   const t = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
     ${[["Kalori", Math.round(t.calTarget).toLocaleString("tr-TR"), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
-  </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme) ve Beslenme sekmesindeki açık ayarından hesaplanır.</p>`;
+  </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
   const lastOf = k => { for (let i = ms.length - 1; i >= 0; i--) if (ms[i][k] != null) return ms[i]; return null; };

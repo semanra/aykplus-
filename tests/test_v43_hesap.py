@@ -61,6 +61,12 @@ try:
     seed(pg, {**OWNER, "settings": {**OWNER["settings"], "goal": 5, "activity": "x", "gainPace": None, "proteinHigh": "evet"}})
     s = st(pg)["settings"]
     check(s["goal"] == "lose" and s["activity"] == "mid" and s["gainPace"] == "mid" and s["proteinHigh"] is False, "bozuk ayarlar geçerli değere döndü")
+    for df, want in [(0, "keep"), (700, "lose")]:
+        seed(pg, {"weight": 105, "deficit": df, "dayType": "train", "dataVer": 2, "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}})
+        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 3, f"v42 kaydı (açık {df}) → {want}, dataVer 3")
+        bk = {"weight": 105, "deficit": df, "dayType": "train", "dataVer": 2, "meals": [], "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}}
+        pg.evaluate("t => void restoreFromText(t)", json.dumps(bk)); pg.wait_for_timeout(150); pg.click("#uiDlgOk"); pg.wait_for_timeout(250)
+        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 3, f"v42 yedeği geri yüklendi (açık {df}) → {want}, dataVer 3")
     seed(pg, {**OWNER, "dataVer": 3, "deficit": 0, "settings": {**OWNER["settings"], "goal": "lose"}})
     check(st(pg)["settings"]["goal"] == "lose", "dataVer 3 kayıtta göç tekrar çalışmıyor (kullanıcının seçimi korunur)")
     ctx.close()
@@ -83,6 +89,11 @@ try:
     check("koru" in pg.inner_text("#timelineInfo").lower() and not pg.is_visible("#loseBox") and not pg.is_visible("#gainBox"), "Koru")
     pg.evaluate("state.deficit = 0; renderAll()"); pg.click("#goalLose"); pg.wait_for_timeout(80)
     check(st(pg)["deficit"] == 500, "Ver'e açık 0 iken geçince 500")
+    ctx.close(); ctx, pg = page()
+    seed(pg, OWNER); pg.evaluate("setNutriView('menus')"); pg.wait_for_timeout(80)
+    for sel in ["#goalGain", "#goalKeep", "#goalLose"]:
+        pg.click(sel); pg.wait_for_timeout(80)
+    check(st(pg)["deficit"] == 700 and pg.evaluate("getTargets().calTarget") == 2478, f"Al → Koru → Ver: açık 700 korunur, kalori 2478 ({st(pg)['deficit']}, {pg.evaluate('getTargets()')})")
     for sel in ["#goalLose", "#goalKeep", "#goalGain", "#paceSlow"]:
         pg.click("#goalGain"); bb = pg.locator(sel).bounding_box(); check(bb and bb["height"] >= 44, sel + " ≥ 44 px")
     pg.evaluate("state.settings.theme = 'light'; applyTheme()"); pg.wait_for_timeout(80)
@@ -102,11 +113,15 @@ try:
         return pg.evaluate("coachAnalysis()"), pg.evaluate("progCoachHtml()")
     GS = {"sex": "male", "age": 30, "height": 178, "targetWeight": 76, "goal": "gain", "gainPace": "mid"}
     a_gain, html = coach({"weight": 71.5, "deficit": 0, "dayType": "train", "weightLogs": wl(70, 71.5), "settings": GS})
+    GP = {"slow": 0.10, "mid": 0.15, "fast": 0.20}
+    td = a_gain["tdeeEst"]; check(a_gain["desired"] == max(1750, td + round(td * GP["mid"])), f"Al: istenen = TDEE + %15 ({a_gain['desired']}, tdee {td})")
     check(a_gain["ready"] and a_gain["expectedWeekly"] > 0 and a_gain["gainTooFast"] and "fazla yağ" in html, "Al + hızlı alım: uyarı")
     check(not a_gain["tooFast"] and not a_gain["gaining"], "Al'da kilo verme uyarıları çıkmıyor")
     a, html = coach({"weight": 70, "deficit": 0, "dayType": "train", "weightLogs": wl(70, 70), "settings": GS})
     check(a["notGaining"] and "almıyorsun" in html, "Al + alım yok: uyarı")
     a, html = coach({"weight": 78.5, "deficit": 0, "dayType": "train", "weightLogs": wl(80, 78.5), "settings": {**GS, "goal": "keep", "targetWeight": 80}})
+    check(a["desired"] == max(1750, a["tdeeEst"]), f"Koru: istenen = TDEE ({a['desired']}, tdee {a['tdeeEst']})")
+    check(a["delta"] == max(-300, min(300, a["fullDelta"])) or abs(a["delta"]) <= abs(a["fullDelta"]), "Koru: delta tam farkı aşmaz")
     check(a["keepDrift"] and a["expectedWeekly"] == 0 and "korunmuyor" in html, "Koru + kayma: uyarı")
     a, html = coach({"weight": 101, "deficit": 700, "dayType": "train", "weightLogs": wl(105, 101), "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}})
     check(a["tooFast"] and not a["gainTooFast"] and a["goal"] == "lose", "Ver: eski uyarı aynı")
