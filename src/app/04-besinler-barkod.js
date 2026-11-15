@@ -339,7 +339,7 @@ function renderNutriHistory() {
   Object.keys(state.dailyLogs).sort().reverse().filter(k => k !== rows[0].key).slice(0, 60).forEach(k => rows.push({ key: k, ...state.dailyLogs[k] }));
   const dayLabel = k => {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
-    return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(locale(), { weekday: "short", day: "numeric", month: "short" }) : k;
+    return m ? fmtDay(new Date(+m[1], +m[2] - 1, +m[3]), { weekday: "short", day: "numeric", month: "short" }) : k;
   };
   const card = r => {
     const hasEaten = r.eatenKcal != null;

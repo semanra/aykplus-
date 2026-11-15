@@ -43,6 +43,7 @@ let i18nTouched = false;
 function applyStaticI18n(root) {
   root = root || document;
   if (curLang() === "tr" && !i18nTouched) return;
+  i18nTouched = true;   // DOM çevrildi; Türkçeye dönülünce (yedek, iç yedek, fabrika) eski metin geri yazılmalı
   document.documentElement.lang = curLang();
   root.querySelectorAll("[data-t]").forEach(el => { const v = t(el.dataset.t); if (el.textContent !== v) el.textContent = v; });
   root.querySelectorAll("[data-t-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.tAria)));

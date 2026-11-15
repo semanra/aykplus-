@@ -811,11 +811,11 @@ async function buildShareCanvas(log) {
   const aw = ctx.measureText("AYK").width;
   ctx.fillStyle = ACC; ctx.fillText("+", 212 + aw + 2, 130);
   ctx.fillStyle = "#A1A1AA"; ctx.font = `500 32px ${F}`; ctx.textAlign = "right";
-  ctx.fillText(log.ts ? new Date(log.ts).toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 130);
+  ctx.fillText(log.ts ? fmtDay(new Date(log.ts), { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 130);
   ctx.textAlign = "left";
 
   ctx.fillStyle = ACC; ctx.font = `700 32px ${F}`; ctx.fillText("Antrenman tamamlandı", 72, 286);
-  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, (log.dayName || "Antrenman").toLocaleUpperCase(locale()), W - 144), 68, 372);
+  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, upperL(log.dayName || "Antrenman"), W - 144), 68, 372);
 
   const stats = [];
   if (num(log.durationMin) > 0) stats.push(["Süre", fmtMinutes(num(log.durationMin)), "#FFFFFF"]);
@@ -913,7 +913,7 @@ function historySeries(n) {
   for (let i = n - 1; i >= 0; i--) {
     const dt = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i, 12);
     const key = todayStr(dt);
-    const label = dt.toLocaleDateString(locale(), { day: "numeric", month: "short" });
+    const label = fmtDay(dt, { day: "numeric", month: "short" });
     if (key === tKey) {
       const e = eatenTotals();
       out.push({ key, label, live: true, water: state.waterLiters || 0, kcal: Math.round(e.cal), p: Math.round(e.p), eaten: true, calT: tg.calTarget, proT: tg.proTarget });

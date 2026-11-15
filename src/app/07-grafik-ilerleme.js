@@ -395,7 +395,7 @@ function progGucHtml() {
     const pts = ser.points.filter(p => p.t).slice(-30);
     const best = pts.length ? Math.max(...pts.map(p => p.y)) : 0;
     const chart = pts.length >= 4
-      ? pLine([{ pts, color: PC.tq, name: ser.metric === "Tahmini 1RM" ? "tahmini 1RM" : ser.metric.toLocaleLowerCase(locale()) }], { unit: ser.unit, h: 170, label: name + " " + ser.metric })
+      ? pLine([{ pts, color: PC.tq, name: ser.metric === "Tahmini 1RM" ? "tahmini 1RM" : lowerL(ser.metric) }], { unit: ser.unit, h: 170, label: name + " " + ser.metric })
       : `<div class="p-lowd"><div><b>${esc(name)}</b><span>${pts.length} seans · grafik için en az 4 gerekir</span></div>
           <div class="p-lowd-v"><b class="t-display">${fmtNum(best)}</b><span>${esc(ser.unit)}</span>${pts.length >= 2 ? pDelta(pts[pts.length - 1].y - pts[0].y, "", pts[pts.length - 1].y >= pts[0].y) : ""}</div></div>`;
     const recentRows = hist.slice().reverse().slice(0, 5).map(h => `<div class="p-row"><span class="p-dim">${fmtDate(h.ts)}</span><span class="p-row-r p-trunc">${esc(sessionSummary(h))}</span></div>`).join("");
@@ -438,7 +438,7 @@ function progGucHtml() {
   const ton = Array.from({ length: 8 }, (_, i) => {
     const a = ws - (7 - i) * 7 * DAY_MS, b = a + 7 * DAY_MS;
     const v = state.workoutLogs.filter(l => l.ts && l.ts >= a && l.ts < b).reduce((s, l) => s + num(l.volume), 0) / 1000;
-    return { label: i === 7 ? "Bu h." : i === 0 ? new Date(a).toLocaleDateString(locale(), { day: "numeric", month: "short" }) : String(new Date(a).getDate()), v: round1(v), flag: i === 7 ? "now" : "" };
+    return { label: i === 7 ? "Bu h." : i === 0 ? fmtDay(new Date(a), { day: "numeric", month: "short" }) : String(new Date(a).getDate()), v: round1(v), flag: i === 7 ? "now" : "" };
   });
   const hasTon = ton.some(t => t.v > 0);
   const tonCard = `<div class="p-card" id="pTonnage">${pSec("Haftalık tonaj", PC.tq, `<span class="p-dim p-sm">ton</span>`)}
@@ -451,8 +451,8 @@ function progGucHtml() {
   for (let i = 0; i < 35; i++) {
     const d = new Date(calStart + i * DAY_MS + 12 * 3600000), k = todayStr(d);
     const on = !!wd[k], fut = k > tKey;
-    cal += `<div class="p-cal-d ${on ? "w" : ""} ${fut ? "fut" : ""} ${k === tKey ? "today" : ""}" role="img" aria-label="${d.getDate()} ${d.toLocaleDateString(locale(), { month: "long" })}${on ? ", antrenman" : ""}${mob[k] ? ", mobilite" : ""}">
-      <span>${d.getDate()}${d.getDate() === 1 ? `<small>${d.toLocaleDateString(locale(), { month: "short" })}</small>` : ""}</span>${on ? `<em>${pI("check", 11, 3)}</em>` : ""}${mob[k] ? "<u></u>" : ""}</div>`;
+    cal += `<div class="p-cal-d ${on ? "w" : ""} ${fut ? "fut" : ""} ${k === tKey ? "today" : ""}" role="img" aria-label="${d.getDate()} ${fmtDay(d, { month: "long" })}${on ? ", antrenman" : ""}${mob[k] ? ", mobilite" : ""}">
+      <span>${d.getDate()}${d.getDate() === 1 ? `<small>${fmtDay(d, { month: "short" })}</small>` : ""}</span>${on ? `<em>${pI("check", 11, 3)}</em>` : ""}${mob[k] ? "<u></u>" : ""}</div>`;
   }
   const n28 = Object.keys(wd).filter(k => new Date(k + "T12:00:00").getTime() >= Date.now() - 28 * DAY_MS).length;
   const calCard = `<div class="p-card" id="pCalendar">${pSec("Antrenman takvimi", PC.tq, `<span class="p-dim p-sm">son 4 hafta: ${n28} gün</span>`)}<div class="p-cal">${cal}</div>

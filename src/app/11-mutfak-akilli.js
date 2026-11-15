@@ -227,7 +227,7 @@ function dayLabelShort(k) {
   const y = logicalNow(); y.setDate(y.getDate() - 1);   // v25: gün geçiş saatine göre "dün"
   if (k === todayStr(y)) return "Dünkü";
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
-  return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(locale(), { day: "numeric", month: "short" }) + " günkü" : "Önceki";
+  return m ? fmtDay(new Date(+m[1], +m[2] - 1, +m[3]), { day: "numeric", month: "short" }) + " günkü" : "Önceki";
 }
 function repeatLastMeal(mIdx) {
   const cur = dayMeals()[mIdx];
@@ -239,7 +239,7 @@ function repeatLastMeal(mIdx) {
   m.items = clone(r.items);
   openEditMeals.delete(m.id);
   renderAll();
-  offerUndo(`${shortMealTitle(m)}: ${dayLabelShort(r.key).toLocaleLowerCase(locale())} öğün tekrarlandı (yalnızca bugün)`);
+  offerUndo(`${shortMealTitle(m)}: ${lowerL(dayLabelShort(r.key))} öğün tekrarlandı (yalnızca bugün)`);
 }
 
 // ---------------------------------------------------------------------------
@@ -308,7 +308,7 @@ function renderShopList() {
   $("shopItems").innerHTML = list.length ? list.map(r => {
     const cat = stripEmoji(r.f.cat || "Diğer");
     const on = !!state.shopChecked[r.id];
-    const head = cat !== lastCat ? `<div class="n-label pt-3 pb-1">${esc(cat.toLocaleUpperCase(locale()))}</div>` : "";
+    const head = cat !== lastCat ? `<div class="n-label pt-3 pb-1">${esc(upperL(cat))}</div>` : "";
     lastCat = cat;
     return head + `<label class="flex items-center gap-3 min-h-[48px] py-1 cursor-pointer n-bb" data-shop="${esc(r.id)}">
         <input type="checkbox" class="n-check shrink-0" ${on ? "checked" : ""} onchange='toggleShop(${esc(JSON.stringify(r.id))})' aria-label="${esc(shopName(r.f))} alındı" />
@@ -554,7 +554,7 @@ function heatHtml(n) {
     const x = isToday ? null : logIntake(state.dailyLogs[k]);
     const cls = isToday ? "today" : x ? hitClass(x.k, x.t) : "none";
     const d = keyToDate(k);
-    const lbl = d.toLocaleDateString(locale(), { day: "numeric", month: "short" });
+    const lbl = fmtDay(d, { day: "numeric", month: "short" });
     const tip = isToday ? `${lbl}: bugün (devam ediyor)` : x ? `${lbl}: ${fmtInt(x.k)} / ${fmtInt(x.t)} kcal` : `${lbl}: kayıt yok`;
     const sym = { ok: "✓", near: "~", far: "!" }[cls] || "";   // v32: renk tek başına anlam taşımaz (İlerleme şeridiyle aynı dil)
     cells.push(`<span class="n-heat ${cls}" data-heat="${k}" data-cls="${cls}" role="img" aria-label="${esc(tip)}" title="${esc(tip)}">${d.getDate()}${sym ? `<i class="n-heat-sym" aria-hidden="true">${sym}</i>` : ""}</span>`);

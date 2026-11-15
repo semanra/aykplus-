@@ -182,6 +182,66 @@ try:
     pg.click("#onboard [data-lang-opt='en']"); pg.wait_for_timeout(100)
     check(pg.evaluate("obDraft.lang") == "en" and pg.evaluate("curLang()") == "en" and pg.evaluate("document.documentElement.lang") == "en", "kurulum: seçim hemen İngilizce")
     check(pg.evaluate("state.settings.lang") == "en", "kurulum: dil ayarı en")
+    # I1: kayıtlı en ile açılış (setLang YOK), sonra Türkçe kayda dönüş: statik metin ve html lang Türkçeye döner
+    pg.context.close()
+    pg = page("en-US", flag=True)
+    OWN1 = json.load(open(FIXTURE, encoding="utf-8"))
+    seed(pg, {**OWN1, "dataVer": 5, "settings": {**OWN1.get("settings", {}), "lang": "en"}})
+    check(pg.evaluate("curLang()") == "en" and pg.inner_text("#navBtnGym span") == "Training", "I1: kayıtlı en ile açılış İngilizce")
+    pg.evaluate("() => { state.settings.lang = 'tr'; renderAll(); }"); pg.wait_for_timeout(150)
+    check(pg.inner_text("#navBtnGym span") == "Antrenman" and pg.evaluate("document.documentElement.lang") == "tr", "I1: setLang olmadan Türkçeye dönüşte statik metin ve html lang Türkçe")
+    # M2: yerel değişken/parametre adı `t` olan işlevde t("metin") çağrısı yasak (global t()'i gölgeler)
+    import re, glob
+    def strip_js(src):
+        out = []; i = 0; n = len(src)
+        while i < n:
+            c = src[i]
+            if src.startswith("//", i):
+                while i < n and src[i] != "\n": i += 1
+            elif src.startswith("/*", i):
+                j = src.find("*/", i + 2); i = n if j < 0 else j + 2
+            elif c in "\"'":
+                j = i + 1
+                while j < n and src[j] != c and src[j] != "\n":
+                    j += 2 if src[j] == "\\" else 1
+                out.append(c + c); i = j + 1
+            else:
+                out.append(c); i += 1
+        return "".join(out)
+    def app_files():
+        return [fn for fn in sorted(glob.glob(os.path.join(REPO, "src", "app", "*.js"))) if not fn.endswith(("16-dil.js", "17-sozluk-en.js"))]
+    shadow = []; nfun = 0
+    for fn in app_files():
+        raw = open(fn, encoding="utf-8").read()
+        for m in re.finditer(r"\bfunction\s+(\w+)\s*\(([^)]*)\)\s*\{", raw):
+            nfun += 1
+            body = strip_js(raw[m.end():]); depth = 1; k = 0
+            while k < len(body) and depth:
+                if body[k] == "{": depth += 1
+                elif body[k] == "}": depth -= 1
+                k += 1
+            body = body[:k]; params = m.group(2)
+            has_t = (re.search(r"(^|[,\s])t\s*(=[^>]|,|$)", params) is not None or
+                     re.search(r"\b(const|let|var)\s+t\b", body) is not None or
+                     re.search(r"\bt\s*=>", body) is not None or
+                     re.search(r"\((?:[^()]*,\s*)?t(?:\s*,[^()]*)?\)\s*=>", body) is not None)
+            if has_t and re.search(r"(?<![.\w])t\(\s*[\"'`]", body):
+                shadow.append(os.path.basename(fn) + ":" + m.group(1))
+    check(nfun > 500 and shadow == [], "M2: yerel `t` bağı olan işlevde t(\"…\") çağrısı yok (%d işlev tarandı) %s" % (nfun, shadow))
+    # M8: koddaki t("…")/tn(n,"…") anahtarlarından sözlükte (EN) olmayanlar. v46'da yalnızca UYARI (sayı yazılır);
+    # v49'da (İngilizce herkese açılırken) bu denetim BAŞARISIZLIK olur.
+    enkeys = set(pg.evaluate("Object.keys(EN)"))
+    lit = r'"((?:[^"\\n]|\.)*)"'
+    used = set()
+    for fn in app_files():
+        raw = open(fn, encoding="utf-8").read()
+        for mm in re.finditer(r"(?<![.\w])t\(\s*" + lit, raw): used.add(mm.group(1))
+        for mm in re.finditer(r"(?<![.\w])tn\(\s*[^,()]+,\s*" + lit, raw): used.add(mm.group(1))
+    def unesc(k):
+        try: return json.loads('"' + k + '"')
+        except Exception: return k
+    missing = sorted(k for k in used if unesc(k) not in enkeys)
+    print("UYARI M8: EN sözlüğünde eksik t()/tn() anahtarı: %d / %d" % (len(missing), len(used)))
     pg = page("en-US", flag=True)
     pg.evaluate("state.settings.lang = 'tr'")
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))

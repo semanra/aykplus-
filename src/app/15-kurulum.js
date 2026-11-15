@@ -2,7 +2,7 @@
 // v44: İLK AÇILIŞ KURULUMU (#onboard, 7 adım)
 // ---------------------------------------------------------------------------
 // Yalnızca yeni kurulumda (settings.onboarded === false) açılır. Girilenler obDraft'ta tutulur; state'e HİÇBİR ŞEY
-// yazılmaz. finishOnboarding hepsini tek seferde yazar. Yarıda kapatılırsa onboarded false kalır → sonraki açılışta baştan.
+// yazılmaz (TEK İSTİSNA: obPickLang dil seçilince state.settings.lang'i hemen yazar; yarıda kalan kurulum baştan açıldığı için zararsız). finishOnboarding hepsini tek seferde yazar. Yarıda kapatılırsa onboarded false kalır → sonraki açılışta baştan.
 // Sınırlar Profil'deki ile aynı (applyProfileFields / readProfileWeight): yaş 12–99, boy 120–230, kilo 30–300, hedef 30–250.
 const OB_STEPS = 7;
 const OB_LOSE_PACE = { slow: 300, mid: 500, fast: 700 };   // kcal açık
