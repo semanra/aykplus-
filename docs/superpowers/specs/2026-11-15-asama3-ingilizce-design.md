@@ -19,7 +19,7 @@ Kullanıcının kalite şartı (kelimesi kelimesine): "çeviriyi düzgün yap, k
 - Besin/yemek adları, hareket rehberleri, Hakkında İngilizce (v49).
 
 **Hedef olmayanlar (bu aşamada)**
-- lb ve inç (vücut kilosu ve boy dahil) — kullanıcı kararı: "lb işini sonra getiririz". Bütün birim işi tek seferde, sonra yapılır.
+- lb ve inç (vücut kilosu ve boy dahil) — ilk karar "lb işini sonra getiririz"; 16 Kasım 2026'da Aşama 3'ün son sürümü v53 olarak eklendi (§6, §10).
 - Üçüncü bir dil.
 - Kullanıcının kendi yazdığı/kaydettiği adların (öğün, besin, program günü, rutin) çevrilmesi — bunlar kullanıcı verisidir.
 
@@ -88,8 +88,14 @@ Kullanıcı A'yı seçti ("A yolundan devam et").
 |---|---|
 | **v46** | `t()`/`tn()`/bağlam, `data-t`, `settings.lang` + göç (adım 5, DATA_VER 5), gizli dil seçeneği, sayı/tarih yardımcıları (tüm `tr-TR` gösterimleri), terim sözlüğü belgesi, eksik/yer tutucu/Türkçe karakter testleri. Örnek olarak alt menü ve sekme başlıkları İngilizce. Türkçe ekran piksel olarak aynı (kontrol). |
 | v47 | Beslenme + Profil + ortak pencereler/bildirimler. |
-| v48 | Antrenman + Mobilite + İlerleme + kurulum + örnek içerik üreticileri. |
-| v49 | Besin/yemek adları (USDA İngilizce adları + 124 tarife İngilizce ad), hareket rehberleri ve mobilite adımları, Hakkında/sağlık notu, paylaşım kartı, sesli yönlendirme; İngilizce seçeneği görünür olur; son genel denetim. |
+| v48 | Antrenman (yayınlandı 16 Kasım 2026, `4a89e67`). |
+| v49 | Mobilite: ana ekran, rutin, hareket ekle/detay, rehberli seans ekranı (yazılar; sesli yönlendirme v52), v48'den kalan iki metin (sürükleme bildirimi "move", seans sonu sesli cümlenin yazı kısmı). |
+| v50 | İlerleme (Genel/Kilo/Güç/Beslenme, koç `coachAnalysis`/`progCoachHtml`, grafik penceresi), ilk açılış kurulumu (7 adım), örnek içerik üreticileri (kayıtlı-metinler a3: dile göre üret). |
+| v51 | Besin adları: USDA İngilizce adları (`scripts/usda/` kaynağından), besin kategorileri, `f.kx` notları, porsiyon adları; **124 Türk yemeği tarifinin adı İngilizcede de Türkçe kalır** (kullanıcı kararı 16 Kasım 2026); hareket adlarındaki Türkçe parantezler (geçmiş anahtarı `exKey` korunarak, yalnızca gösterimde). |
+| v52 | Hareket rehberleri ve mobilite adımları (`MOB_GUIDE`, `MOB_LIB_V39`), Hakkında/sağlık notu/gizlilik/lisanslar, paylaşım kartı, sesli yönlendirme (en-GB ses); son genel denetim (Türkçe harfsiz Türkçe kelime taraması dahil: "dk", "sn", "set"…); **İngilizce seçeneği görünür olur** (`EN_PUBLIC = true`). |
+| v53 | **lb / inç** (kullanıcı kararı 16 Kasım 2026: "hazır detaylı girdiysek lb'yi de ekleyelim"): vücut kilosu, set kilosu, plaka/kademe, boy ve ölçüler. Başlamadan önce kısa tasarım kararları (bkz. §10). |
+
+**Bölme kararı (16 Kasım 2026):** kullanıcı, limiti aşmamak için eski v48 ve v49 satırlarını ikiye böldürdü; her sürüm tek oturuma sığacak boyutta. Her sürümün ayrıntılı planı o sürüme başlarken yazılır (önceki sürümün sonuçlarına göre), kullanıcı "devam" deyince.
 
 Her sürüm ayrı spec bölümü değil, ayrı plan (`docs/superpowers/plans/`).
 
@@ -102,13 +108,20 @@ Her sürüm ayrı spec bölümü değil, ayrı plan (`docs/superpowers/plans/`).
 ## 8. Ek kararlar (kurucu okumasından; Claude'un kararları, kullanıcı inceler)
 1. **Sabit Türkçe listeler** (`data.js` kütüphaneleri, `MOB_GUIDE`, `SWAP_GROUPS`, `EFFORT_LABELS`, `SUPP_PRESETS`, `TAB_TITLES`, `MOB_REGIONS` adları…) yerinde Türkçe veri olarak kalır; çeviri **gösterildiği anda** yapılır: `t(TAB_TITLES[k])`. Anahtar Türkçe metin olduğu için ayrıca kod adı gerekmez ve dil açılışta "donmaz". Kullanıcı verisine Türkçe ek yapıştıran cümleler (ör. "…'ı", "…ler") yer tutuculu bütün cümleye çevrilir. Hangi ekranın hangi sürümde sarılacağı §6 tablosundaki ekran bölünmesiyle belirlenir.
 2. **Kayıtta tutulan / karşılaştırılan Türkçe metinler:** v46'nın ilk görevi bunların tam listesini çıkarmak (`ser.metric`, `timeLabel`, `"Eski yazım"`, `m.balanced`, varsayılan adlar vb.). Liste plana eklenir; bu metinler kayıtta Türkçe kalır, yalnızca gösterilirken çevrilir.
-3. **Sahip v46–v48 boyunca İngilizce görmez** (seçenek gizli, yalnızca test bayrağı). Bu yüzden v47–v48 yarım çeviriyle güvenle yayınlanabilir; "yarı Türkçe ekran görünmesin" şartı v49'da İngilizce görünür olduğunda sağlanmış olmalı.
+3. **Sahip v46–v48 boyunca İngilizce görmez** (seçenek gizli, yalnızca test bayrağı). Bu yüzden v47–v48 yarım çeviriyle güvenle yayınlanabilir; "yarı Türkçe ekran görünmesin" şartı v52'de İngilizce görünür olduğunda sağlanmış olmalı.
 4. **Dil değişimi** yalnızca Profil → Dil ve kurulumun ilk adımından yapılır; o anda başka pencere/seans/sayaç ekranı açık olamaz. Değişince `data-t` geçişi + Profil ve `renderAll()` yeniden çizilir; açık bir `uiDialog` varsa kapanır. Dinlenme sayacı hapı bir sonraki saniyede yeni dille çizilir.
 5. **Tarih/kayıt anahtarları** (`YYYY-AA-GG`, `dailyLogs`, `logicalToday`) dile göre değişmez. `num()` iki dilde de tek virgülü ondalık okur (bugünkü davranış); sayı giriş kutularına binlik ayırıcı hiç yazılmaz (yalnızca salt okunur gösterimlerde `fmtInt`), böylece "1,250" belirsizliği oluşmaz.
 6. Test tohumu (`TEST_INIT`, fikstürde `dataVer` yok) göç adım 5'ten geçer ve `lang: "tr"` alır; v46 bunu test eder.
-7. **Bağımsız ikinci okuma** (§5.5.3) her sürümde en yetenekli modelde ayrı bir gözden geçirici ajan tarafından yapılır ve sürümü **durdurabilir** (bulduğu anlam hataları düzeltilmeden yayın yok). İnsan (İngilizce bilen biri) okuması v49 sonunda isteğe bağlı.
+7. **Bağımsız ikinci okuma** (§5.5.3) her sürümde en yetenekli modelde ayrı bir gözden geçirici ajan tarafından yapılır ve sürümü **durdurabilir** (bulduğu anlam hataları düzeltilmeden yayın yok). İnsan (İngilizce bilen biri) okuması v52 sonunda isteğe bağlı.
 
 ## 9. Kurucuya bırakılanlar
 - Sözlük dosyalarının bölünmesi (tek dosya ya da ekran başına) ve `tn()` imzası.
 - `data-t` geçişinin ayrıntısı.
 - Terim sözlüğünün hangi kaynaklara bakılarak hazırlanacağı (gerekçe belgede yazılı olmak şartıyla).
+
+
+## 10. lb / inç (v53) — başlamadan önce konuşulacak kararlar (Claude'un önerileriyle)
+1. **Kayıt birimi:** öneri — kayıt her zaman kg/cm kalır, yalnızca gösterim ve giriş çevrilir; AMA set kilosunda yuvarlama sorunu var (45 lb = 20,41 kg; geri çevrilince 45,0 lb tutmalı). Öneri: sette girilen değer kg'a çevrilip 3 ondalıkla saklanır, gösterimde lb'ye çevrilip en yakın 0,5 lb'ye yuvarlanır; test: 45/95/135/225 lb gidiş-dönüş birebir.
+2. **Plakalar:** lb seçiliyse plaka takımı 45/35/25/10/5/2,5 lb ve boş bar 45 lb; kg'da bugünkü takım. Kademeler ve artış adımı (2,5 kg ↔ 5 lb) birime göre.
+3. **Ayar:** birim dilden bağımsız ayrı ayar (`settings.units = metric | imperial`); İngilizce seçen İngiliz kullanıcı kg'da kalabilir. Varsayılan metrik; Profil ve kurulumda seçilir. Göç adımı + DATA_VER.
+4. **Kapsam:** vücut kilosu, hedef kilo, tartılar, set kilosu, plaka/kademe, tonaj (volume), boy (ft/in), ölçüler (in), su (fl oz mu, L mi — öneri: L kalır). Besin gramajı g kalır (beslenme takibinde yaygın).
