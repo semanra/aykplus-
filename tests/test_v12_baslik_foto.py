@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import SEED_ONLY
 # v12: sol üstte sekme adı + açılışta kayarak kaybolan AYK+, "Kaydedildi" yazısı kaldırıldı,
 # eski "uygulama içi logo" → profil fotoğrafı (sağ üstte yuvarlak), fotoğraf küçültülerek kaydedilir.
 import os, sys, base64
@@ -21,6 +22,7 @@ PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUl
 try:
   with sync_playwright() as p:
     b = p.chromium.launch(); ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    ctx.add_init_script(SEED_ONLY)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
     pg.on("dialog", lambda d: (native.append(d.message), d.accept()))
     # ---------- Açılış: sekme adı + AYK+ (splash açıkken, bu testte splash atlanmıyor)

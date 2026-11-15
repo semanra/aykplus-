@@ -13,7 +13,6 @@ def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
 def st(pg): return pg.evaluate("aykStoredState()")
-SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 
 # Eski kayıt: menüde gizlenecek besinler var (eski liste tavuk göğsü/badem/pişmiş tavuk, USDA ızgara tavuk ve haşlanmış pirinç)
 LEGACY = {

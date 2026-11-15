@@ -14,7 +14,6 @@ def check(cond, label):
     if not cond: fails.append(label)
 def st(pg): return pg.evaluate("aykStoredState()")
 def toasts(pg): return pg.evaluate("[...document.querySelectorAll('#toastWrap > div')].map(e => e.textContent).join(' | ')")
-SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 
 # Eski (v18) biçimde kayıt: foodSnap yok; menüde USDA besini (u171477, fırında tavuk göğsü 1,65 kcal/g) + uygulama besini
 LEGACY = {

@@ -16,7 +16,6 @@ def check(cond, label):
     if not cond: fails.append(label)
 def st(pg): return pg.evaluate(f"aykStoredState()")
 def undo(pg): pg.locator("#toastWrap button", has_text="Geri al").last.click(); pg.wait_for_timeout(120)
-SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 def new_page(b, state=None):
     ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)

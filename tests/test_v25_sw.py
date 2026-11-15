@@ -35,7 +35,6 @@ URL = f"http://localhost:{PORT}/"
 def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
-SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 APP_OK = "!!document.getElementById('tabNutrition') && typeof renderAll === 'function' && typeof USDA_FOODS !== 'undefined'"
 
 def reload_ok(pg, label, max_s=8):

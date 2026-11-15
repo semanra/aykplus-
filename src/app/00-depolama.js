@@ -153,7 +153,7 @@ async function storageInit() {
 }
 function storageUseLegacy() {
   aykDB = null;
-  state = loadState();
+  state = loadState(!window.indexedDB);   // v44: yeni kurulum yalnızca IndexedDB gerçekten yoksa (geçici hata/zaman aşımı kurulumu açmaz)
   storeGen = lsGen();
   storeMode = "ls";
   storeReady = true;
@@ -177,7 +177,7 @@ async function storageImportFromLocal(lsStr, lg) {
   } else if (lsStr != null) {
     puts.push(["snaps", "pre", { kind: "pre", date: todayStr(), ts: now, json: lsStr }]);
   }
-  state = loadState();
+  state = loadState(!storeMeta.migratedAt);   // v44: IndexedDB sorunsuz açıldı ve hiç geçirilmedi → yeni kurulum olabilir
   storeGen = Math.max(storeMeta.gen || 0, lg) + 1;
   const parts = stateParts(state);
   Object.keys(parts).forEach(k => puts.push(["parts", k, parts[k]]));

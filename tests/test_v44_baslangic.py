@@ -12,6 +12,8 @@ def check(cond, label):
 URL = "http://localhost:8803/index.html"
 KEY = "ayk_plus_v5_state"
 def st(pg): return pg.evaluate("aykStoredState()")
+STUB = """(() => { try { const m = sessionStorage.getItem('stub'); if (m === 'hang') indexedDB.open = () => ({}); // hiç yanıt vermez
+  if (m === 'get') IDBObjectStore.prototype.get = function () { throw new Error('gecici hata'); }; } catch (e) {} })()"""
 def boot(pg): pg.wait_for_function("window.aykBooted === true"); pg.wait_for_timeout(80)
 
 try:
@@ -20,6 +22,7 @@ try:
     def page_fresh():   # TEST_INIT YOK: yalnızca açılış animasyonu kaldırılır
         ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
         ctx.add_init_script(SPLASH_OFF)
+        ctx.add_init_script(STUB)
         pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.goto(URL); boot(pg)
         return pg
@@ -48,6 +51,16 @@ try:
     seed(pg, OWNER43); pg.evaluate("() => { localStorage.removeItem('ayk_plus_v5_state'); localStorage.removeItem('ayk_plus_v5_sira'); localStorage.removeItem('ayk_plus_v5_imza'); }")
     pg.reload(); boot(pg)
     check(pg.evaluate("state.settings.onboarded") is True and pg.evaluate("state.weight") == OWNER43["weight"], "yalnızca IndexedDB: kurulum yok, veri aynı")
+    # geçici IndexedDB hatası + localStorage boş: kurulum açılmaz (dataVer <= 3 sahibi hiçbir yolda görmez)
+    for mode, lbl in (("hang", "IndexedDB açılışı zaman aşımı"), ("get", "IndexedDB okuma hatası")):
+        seed(pg, OWNER43)
+        pg.evaluate("m => { sessionStorage.setItem('stub', m); localStorage.clear(); }", mode)
+        pg.reload(); pg.wait_for_function("window.aykBooted === true", timeout=20000); pg.wait_for_timeout(80)
+        check(pg.evaluate("state.settings.onboarded") is True, lbl + " + boş localStorage: kurulum yok")
+        pg.evaluate("sessionStorage.removeItem('stub')")
+    pg.evaluate("sessionStorage.removeItem('stub')")
+    seed(pg, OWNER43); pg.evaluate("() => { localStorage.removeItem('ayk_plus_v5_state'); localStorage.removeItem('ayk_plus_v5_sira'); localStorage.removeItem('ayk_plus_v5_imza'); }")
+    pg.reload(); boot(pg)
     # fabrika ayarları
     pg.evaluate("void resetToDefaults()"); pg.click("#uiDlgOk"); pg.wait_for_timeout(80); pg.click("#uiDlgOk"); pg.wait_for_timeout(300)
     check(pg.evaluate("state.settings.onboarded") is False, "fabrika ayarları: kurulum yeniden açılacak")
@@ -56,6 +69,7 @@ try:
     pg2 = ctx2.new_page(); pg2.on("pageerror", lambda e: errs.append(str(e)))
     pg2.goto(URL); boot(pg2)
     check(pg2.evaluate("state.settings.onboarded") is True and pg2.evaluate("state.weight") == 105, "test kancası: eski varsayılanlarla, kurulumsuz")
+    check(pg2.evaluate("freshInstall") is False, "test kancası: freshInstall false")
     check(pg2.evaluate("state.settings.onboarded") is True and st(pg2)["settings"]["onboarded"] is True, "test kancası: kayıt da onboarded true")
     b.close()
 finally:

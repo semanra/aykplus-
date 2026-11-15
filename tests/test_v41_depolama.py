@@ -13,7 +13,6 @@ def check(cond, label):
 URL = "http://localhost:8800/index.html"
 KEY = "ayk_plus_v5_state"
 T = datetime.datetime.fromisoformat
-SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 V40 = {"activeTab": "nutrition", "today": "2026-11-13", "settings": {"splash": False}, "weight": 88, "waterLiters": 1.5,
        "dailyLogs": {"2026-11-1%d" % i: {"eatenKcal": 2000 + i, "water": 2} for i in range(3)},
        "workoutLogs": [{"id": "w1", "ts": 1763000000000, "dayName": "Bacak", "sets": 12, "volume": 5000}],

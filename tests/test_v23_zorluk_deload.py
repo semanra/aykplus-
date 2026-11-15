@@ -13,7 +13,6 @@ def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
 def st(pg): return pg.evaluate("aykStoredState()")
-SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 NOW = int(time.time() * 1000)
 def ex(name, kg=60, reps=10):
     return {"name": name, "kind": "weight", "targetInfo": "3x8–12", "sets": [{"kg": kg, "reps": reps, "target": "8–12", "done": False} for _ in range(3)]}

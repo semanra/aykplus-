@@ -404,13 +404,13 @@ function normalizeState(raw) {
   return s;
 }
 
-function loadState() {
+function loadState(allowFresh = false) {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) { const st = normalizeState(JSON.parse(saved)); hadV5State = true; return st; }
     const oldV4 = localStorage.getItem("ayk_plus_v4_state");
     // v44: kayıt yok, v4 kaydı yok, okuma hatası yok ve bu cihazda IndexedDB hiç kullanılmadıysa yeni kurulum
-    if (!oldV4 && localStorage.getItem("ayk_plus_v5_idb") !== "1") { freshInstall = true; return freshState(); }
+    if (allowFresh && !oldV4 && localStorage.getItem("ayk_plus_v5_idb") !== "1") { freshInstall = !(typeof window !== "undefined" && isObj(window.AYK_TEST_SEED)); return freshState(); }
     if (oldV4) {
       const o = JSON.parse(oldV4);
       return normalizeState({

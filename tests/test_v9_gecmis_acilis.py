@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import SEED_ONLY
 import os, sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
@@ -16,6 +17,7 @@ for d in range(1,30):
            "mealsDone":4 if eaten else 0,"mealsTotal":4,"water":random.choice([2.0,2.75,3.0,3.5,3.75,4.0]),"calTarget":2478,"proTarget":201}
 with sync_playwright() as p:
     b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True)
+    ctx.add_init_script(SEED_ONLY)
     pg=ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
     pg.goto("http://localhost:8765/index.html")
     print("meta status bar:", pg.get_attribute('meta[name="apple-mobile-web-app-status-bar-style"]','content'))

@@ -7,3 +7,4 @@ SPLASH_OFF = "document.addEventListener('DOMContentLoaded',()=>{const s=document
 with open(FIXTURE, encoding="utf-8") as _f:
     _SEED = json.load(_f)
 TEST_INIT = "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";\n" + SPLASH_OFF
+SEED_ONLY = "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";"   # açılış animasyonu kalır (splash testleri)

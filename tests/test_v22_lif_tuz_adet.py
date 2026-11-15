@@ -13,7 +13,6 @@ def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
 def st(pg): return pg.evaluate("aykStoredState()")
-SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 NOW = int(time.time() * 1000)
 STATE = {
     "weight": 90, "dayType": "train",
