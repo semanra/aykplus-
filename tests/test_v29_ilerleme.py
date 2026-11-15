@@ -27,9 +27,16 @@ def seed(pg, data):
 
 # Bu haftanın Pazartesi'si (uygulamadaki weekStart ile aynı)
 MON = TODAY - datetime.timedelta(days=TODAY.weekday())
-def ts_of(d, h=18): return int(datetime.datetime(d.year, d.month, d.day, h).timestamp() * 1000)
+def ts_of(d, h=18):
+    ms = int(datetime.datetime(d.year, d.month, d.day, h).timestamp() * 1000)
+    if d == TODAY and ms > NOW_MS - 60000:   # bugünün kaydı gelecekte olmasın (gece yarısından hemen sonra da)
+        midnight = int(datetime.datetime(d.year, d.month, d.day).timestamp() * 1000)
+        ms = max(midnight + 1000, NOW_MS - 60000)
+    return ms
 
-def history(name, muscle, n, base, last_days_ago=1):
+def history(name, muscle, n, base, last_days_ago=None):
+    # Pazartesi "dün" geçen haftadır; "bu hafta" sayımları boş kalmasın diye Pazartesi son seans bugün
+    if last_days_ago is None: last_days_ago = 0 if TODAY.weekday() == 0 else 1
     out = []
     for i in range(n):
         d = TODAY - datetime.timedelta(days=last_days_ago + (n - 1 - i) * 7)

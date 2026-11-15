@@ -1,7 +1,7 @@
 import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v22: lif ve tuz (USDA), "adet ile" sayacı (yumurta gibi doğal birimli besinler), proteinin öğünlere dağılımı,
 # antrenman kütüphanesinde "Bu hafta" kas başına set listesi.
-import os, sys, json, subprocess, time
+import os, sys, json, subprocess, time, datetime
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
 os.makedirs(SHOTS, exist_ok=True)
@@ -14,6 +14,8 @@ def check(cond, label):
     if not cond: fails.append(label)
 def st(pg): return pg.evaluate("aykStoredState()")
 NOW = int(time.time() * 1000)
+_md = datetime.datetime.combine(datetime.date.today(), datetime.time()).timestamp() * 1000
+TODAY_TS = int(max(_md + 1000, NOW - 3600000))   # bu hafta (gece yarısından hemen sonra da bugün)
 STATE = {
     "weight": 90, "dayType": "train",
     "meals": [
@@ -21,7 +23,7 @@ STATE = {
         {"id": "m2", "title": "Öğle", "items": [{"foodId": "u171077", "amount": 200}, {"foodId": "u173420", "amount": 50}]},     # tavuk + feta
         {"id": "m3", "title": "Ara", "items": [{"foodId": "tr_simit", "amount": 1}]},                                            # eski liste (lif/tuz verisi yok)
     ],
-    "exerciseHistory": {"bench press": [{"name": "Bench Press", "ts": NOW - 3600000, "kind": "weight", "sets": [{"kg": 60, "reps": 8}] * 4}]},
+    "exerciseHistory": {"bench press": [{"name": "Bench Press", "ts": TODAY_TS, "kind": "weight", "sets": [{"kg": 60, "reps": 8}] * 4}]},
 }
 try:
   with sync_playwright() as p:
