@@ -30,14 +30,14 @@ function renderFoods() {
   $("foodMealChips").innerHTML = meals.map((m, i) => `<button onclick="setFoodMeal(${i})" class="n-chip ${i === tIdx ? "solid" : ""} max-w-[220px]" aria-pressed="${i === tIdx}"><span class="truncate">${esc(m.time ? m.time + " · " + m.title : m.title)}</span></button>`).join("");
   const db = getFoodDB();
   const cats = [];
-  if (state.recentFoods.some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["recent", "Son kullanılanlar"]);
-  if (state.combos.length) cats.push(["combos", "Komboların"]);
-  if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", "Tariflerim"]);
-  if (Object.keys(state.customFoods).length) cats.push(["custom", "Özel eklediklerim"]);
+  if (state.recentFoods.some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["recent", t("Son kullanılanlar")]);
+  if (state.combos.length) cats.push(["combos", t("Komboların")]);
+  if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", t("Tariflerim")]);
+  if (Object.keys(state.customFoods).length) cats.push(["custom", t("Özel eklediklerim")]);
   [...new Set(Object.values(BASE_FOOD_DB).map(f => f.cat || "Diğer"))].forEach(c => cats.push([foodCatKey(c), stripEmoji(c)]));
   [...new Set(Object.values(USDA_DB).map(f => f.cat))].forEach(c => { if (!cats.some(x => x[0] === foodCatKey(c))) cats.push([foodCatKey(c), c]); });
   if (!cats.some(c => c[0] === foodUI.cat)) foodUI.cat = "all";
-  $("foodCats").innerHTML = [["all", "Tümü"], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
+  $("foodCats").innerHTML = [["all", t("Tümü")], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
   renderFoodHead();
   renderFoodSuggest();
   renderFoodList();
@@ -48,30 +48,30 @@ function foodRemainingText(extraCal, extraP) {
   const plan = nutritionTotals(foodMeals());
   const rc = targets.calTarget - Math.round(plan.cal + extraCal);
   const rp = targets.proTarget - Math.round(plan.p + extraP);
-  const c = rc >= 0 ? `<strong class="tabular-nums">${fmtInt(rc)} kcal</strong> kalır` : `<strong class="tabular-nums n-over">${fmtInt(-rc)} kcal</strong> aşar`;
-  const p = rp >= 0 ? `<strong class="n-p tabular-nums">${fmtInt(rp)} g</strong> protein kalır` : `protein hedefi <strong class="n-p">${fmtInt(-rp)} g</strong> aşılır`;
+  const c = rc >= 0 ? `<strong class="tabular-nums">${fmtInt(rc)} kcal</strong> ${t("kalır")}` : `<strong class="tabular-nums n-over">${fmtInt(-rc)} kcal</strong> ${t("aşar")}`;
+  const p = rp >= 0 ? `<strong class="n-p tabular-nums">${fmtInt(rp)} g</strong> ${t("protein kalır")}` : t("protein hedefi {g} aşılır", { g: `<strong class="n-p">${fmtInt(-rp)} g</strong>` });
   return `${c} · ${p}`;
 }
 function foodRemainPrefix(sel) {
-  const where = foodUI.dest === "menu" ? "menüde" : "bugün";
-  return sel ? `Ekledikten sonra ${where} ` : (foodUI.dest === "menu" ? "Menüde " : "Bugün ");
+  const menu = foodUI.dest === "menu";
+  return sel ? (menu ? t("Ekledikten sonra menüde ") : t("Ekledikten sonra bugün ")) : (menu ? t("Menüde ") : t("Bugün "));
 }
 function renderFoodHead() {
   const meals = foodMeals();
   const tIdx = foodTargetIdx();
   const day = foodUI.dest !== "menu";
-  const seg = `<div class="n-seg grid-cols-2 mb-1.5" aria-label="Nereye eklensin?">
-      <button id="fdDay" onclick="setFoodDest('day')" class="${day ? "on" : ""}" aria-pressed="${day}">Sadece bugüne</button>
-      <button id="fdMenu" onclick="setFoodDest('menu')" class="${day ? "" : "on"}" aria-pressed="${!day}">Menüme (her gün)</button>
+  const seg = `<div class="n-seg grid-cols-2 mb-1.5" aria-label="${esc(t("Nereye eklensin?"))}">
+      <button id="fdDay" onclick="setFoodDest('day')" class="${day ? "on" : ""}" aria-pressed="${day}">${t("Sadece bugüne")}</button>
+      <button id="fdMenu" onclick="setFoodDest('menu')" class="${day ? "" : "on"}" aria-pressed="${!day}">${t("Menüme (her gün)")}</button>
     </div>
-    <p id="fdHint" class="text-[12px] n-dim mb-3 px-1">${day ? "Yalnızca bugünkü öğüne eklenir; menün değişmez." : "Menüne eklenir; her gün geçerli olur."}</p>`;
+    <p id="fdHint" class="text-[12px] n-dim mb-3 px-1">${day ? t("Yalnızca bugünkü öğüne eklenir; menün değişmez.") : t("Menüne eklenir; her gün geçerli olur.")}</p>`;
   if (tIdx < 0) {
-    $("foodHead").innerHTML = seg + `<div class="n-card rounded-[20px] p-4 text-[14px] n-muted">Besin eklemek için önce Menülerim'den bir öğün oluştur.</div>`;
+    $("foodHead").innerHTML = seg + `<div class="n-card rounded-[20px] p-4 text-[14px] n-muted">${t("Besin eklemek için önce Menülerim'den bir öğün oluştur.")}</div>`;
     return;
   }
   const sel = foodSelMacros();
   $("foodHead").innerHTML = seg + `<div class="flex items-start justify-between gap-2">
-      <div class="min-w-0"><div class="n-label">${day ? "BUGÜN HANGİ ÖĞÜNE?" : "MENÜDE HANGİ ÖĞÜNE?"}</div>
+      <div class="min-w-0"><div class="n-label">${day ? t("BUGÜN HANGİ ÖĞÜNE?") : t("MENÜDE HANGİ ÖĞÜNE?")}</div>
         <h2 class="text-[20px] font-extrabold leading-tight mt-0.5 break-words">${esc(meals[tIdx].title)}</h2></div>
     </div>
     <p id="foodRemain" class="text-[13px] n-muted mt-1">${foodRemainPrefix(sel)}${foodRemainingText(sel ? sel.cal : 0, sel ? sel.p : 0)}</p>`;
@@ -104,7 +104,7 @@ function foodPresets(f) {
   else vals = [def, 0.5, 1, 2, 3].filter(v => v >= num(f.step, 1) || v === def);
   vals = [...new Set(vals.map(v => round1(v)))].filter(v => v > 0).sort((a, b) => a - b);
   const plus = f.unit === "g" || f.unit === "ml" ? 50 : num(f.step, 1);
-  return { list: vals.map(v => ({ v, label: `${fmtNum(v)} ${f.unit}${v === round1(def) ? " · porsiyon" : ""}` })), plus };
+  return { list: vals.map(v => ({ v, label: `${fmtNum(v)} ${unitL(v, f.unit)}${v === round1(def) ? t(" · porsiyon") : ""}` })), plus };
 }
 
 function renderFoodList() {
@@ -120,7 +120,7 @@ function renderFoodList() {
     comboHtml = state.combos.filter(c => !words.length || words.every(w => normSearch(c.name).includes(w))).map(comboRowHtml).join("");
   }
   if (foodUI.cat === "combos") {
-    $("foodList").innerHTML = comboHtml || `<div class="text-[14px] n-muted text-center py-8">Henüz kombon yok. Bir öğünü açıp ★ Kombo olarak kaydedebilirsin.</div>`;
+    $("foodList").innerHTML = comboHtml || `<div class="text-[14px] n-muted text-center py-8">${t("Henüz kombon yok. Bir öğünü açıp ★ Kombo olarak kaydedebilirsin.")}</div>`;
     updateFoodSelUI();
     return;
   }
@@ -143,7 +143,7 @@ function renderFoodList() {
     if (id !== foodUI.sel) {
       return `<button onclick='selectFood(${esc(JSON.stringify(id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-food="${esc(id)}">
           <span class="min-w-0"><span class="block text-[15px] font-bold leading-snug">${esc(f.name)}</span>
-            <span class="block text-[12px] n-muted mt-0.5 tabular-nums">${fmtNum(def)} ${esc(f.unit)} · ${Math.round(kcalPerUnit(f) * def)} kcal · ${Math.round(f.p * def)} g protein</span></span>
+            <span class="block text-[12px] n-muted mt-0.5 tabular-nums">${esc(t("{n} {u} · {k} kcal · {p} g protein", { n: fmtNum(def), u: unitL(def, f.unit), k: String(Math.round(kcalPerUnit(f) * def)), p: String(Math.round(f.p * def)) }))}</span></span>
           <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
         </button>`;
     }
@@ -152,30 +152,30 @@ function renderFoodList() {
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3.5 my-2" data-food="${esc(id)}" id="foodSelCard">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(f.name)}</h3>
-            <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? " · barkod " + esc(f.barcode) : ""}</div>
+            <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
             ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
             ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">Kalori USDA ölçümüdür (${esc(f.kx)} nedeniyle makrolardan hesaplanandan farklı).</div>` : ""}</div>
           <div class="text-right shrink-0 whitespace-nowrap"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
         </div>
         <div class="flex items-center justify-between px-1">
-          <button onclick="foodStep(-1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Azalt">${svgI("minus", 20, 2.4)}</button>
+          <button onclick="foodStep(-1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Azalt"))}">${svgI("minus", 20, 2.4)}</button>
           <div class="flex items-baseline justify-center gap-1 min-w-0">
-            <input id="foodAmt" type="text" inputmode="decimal" data-fk="food-amt" value="${esc(fmtNum(foodUI.amt))}" oninput="foodAmtInput(this.value)" class="n-amt big t-display" aria-label="${esc(f.name)} miktarı" />
-            <span class="text-[14px] font-semibold n-muted">${esc(f.unit)}</span>
+            <input id="foodAmt" type="text" inputmode="decimal" data-fk="food-amt" value="${esc(fmtNum(foodUI.amt))}" oninput="foodAmtInput(this.value)" class="n-amt big t-display" aria-label="${esc(t("{ad} miktarı", { ad: f.name }))}" />
+            <span class="text-[14px] font-semibold n-muted">${esc(unitL(2, f.unit))}</span>
           </div>
-          <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Artır">${svgI("plus", 20, 2.4)}</button>
+          <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Artır"))}">${svgI("plus", 20, 2.4)}</button>
         </div>
         ${naturalUnit(f) ? `<div class="flex items-center justify-between gap-2 n-card rounded-full pl-4 pr-1 py-1" data-unit-row>
             <span class="min-w-0 text-[13px] n-muted leading-tight"><strong id="foodUnitCount" class="n-text text-[15px]"></strong><span class="block text-[12px]">1 ${esc(naturalUnit(f).label)} = ${fmtNum(naturalUnit(f).g)} g</span></span>
             <div class="flex gap-1 shrink-0">
-              <button onclick="foodUnitStep(-1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="Bir ${esc(naturalUnit(f).label)} azalt">${svgI("minus", 18, 2.4)}</button>
-              <button onclick="foodUnitStep(1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="Bir ${esc(naturalUnit(f).label)} artır">${svgI("plus", 18, 2.4)}</button>
+              <button onclick="foodUnitStep(-1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="${esc(t("Bir {u} azalt", { u: naturalUnit(f).label }))}">${svgI("minus", 18, 2.4)}</button>
+              <button onclick="foodUnitStep(1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="${esc(t("Bir {u} artır", { u: naturalUnit(f).label }))}">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>` : ""}
-        <div class="flex items-center justify-start gap-2 flex-wrap" aria-label="Hazır porsiyonlar">
+        <div class="flex items-center justify-start gap-2 flex-wrap" aria-label="${esc(t("Hazır porsiyonlar"))}">
           ${pr.list.map(x => `<button onclick="foodPreset(${x.v})" class="n-chip ${round1(num(foodUI.amt)) === x.v ? "on" : ""}" data-preset="${x.v}">${esc(x.label)}</button>`).join("")}
-          <button onclick="foodPreset(null, ${pr.plus})" class="n-chip">+${fmtNum(pr.plus)} ${esc(f.unit)}</button>
+          <button onclick="foodPreset(null, ${pr.plus})" class="n-chip">+${fmtNum(pr.plus)} ${esc(unitL(pr.plus, f.unit))}</button>
         </div>
         <div class="grid grid-cols-3 gap-2 text-center text-[13px] font-extrabold">
           <div id="foodSelP" class="py-2 rounded-full n-p" style="background: var(--n-p-soft)"></div>
@@ -185,13 +185,13 @@ function renderFoodList() {
         ${microOf(f, 1) ? `<div id="foodSelMicro" class="text-[12px] n-muted text-center -mt-1"></div>` : ""}
         <button id="foodAddBtn" onclick="addSelectedFood()" class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}></button>
         ${custom ? `<div class="flex justify-end gap-2 pt-1 n-bt">
-            <button onclick='editCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5">${svgI("edit", 16)}Düzenle</button>
-            <button onclick='deleteCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}Sil</button>
+            <button onclick='editCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5">${svgI("edit", 16)}${t("Düzenle")}</button>
+            <button onclick='deleteCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}${t("Sil")}</button>
           </div>` : ""}
       </div>`;
   }).join("");
   const more = total > shownIds.length
-    ? `<button onclick="foodUI.limit = (foodUI.limit || FOOD_PAGE) + 100; renderFoodList()" class="n-btn-ghost w-full h-12 rounded-full text-[14px] mt-2" id="foodMore">${fmtInt(total - shownIds.length)} sonuç daha · göster</button>` : "";
+    ? `<button onclick="foodUI.limit = (foodUI.limit || FOOD_PAGE) + 100; renderFoodList()" class="n-btn-ghost w-full h-12 rounded-full text-[14px] mt-2" id="foodMore">${t("{n} sonuç daha · göster", { n: fmtInt(total - shownIds.length) })}</button>` : "";
   $("foodList").innerHTML = (comboHtml + html) ? comboHtml + html + more : noResultHtml($("foodSearch").value.trim());
   updateFoodSelUI();
 }
@@ -202,17 +202,17 @@ function updateFoodSelUI() {
   if (s && !s.combo && $("foodSelKcal")) {
     const tIdx = foodTargetIdx();
     $("foodSelKcal").textContent = fmtInt(s.cal);
-    $("foodSelP").textContent = `${fmtNum(s.p)} g P`;
-    $("foodSelC").textContent = `${fmtNum(s.c)} g K`;
-    $("foodSelF").textContent = `${fmtNum(s.fat)} g Y`;
-    $("foodAddBtn").textContent = tIdx >= 0 ? `Öğüne ekle · ${fmtInt(s.cal)} kcal` : "Önce bir öğün oluştur";
+    $("foodSelP").textContent = `${fmtNum(s.p)} g ${t("P|makro")}`;
+    $("foodSelC").textContent = `${fmtNum(s.c)} g ${t("K|makro")}`;
+    $("foodSelF").textContent = `${fmtNum(s.fat)} g ${t("Y|makro")}`;
+    $("foodAddBtn").textContent = tIdx >= 0 ? t("Öğüne ekle · {k} kcal", { k: fmtInt(s.cal) }) : t("Önce bir öğün oluştur");
     $("foodAddBtn").disabled = tIdx < 0 || !(s.a > 0);
     document.querySelectorAll("#foodSelCard [data-preset]").forEach(b => b.classList.toggle("on", num(b.dataset.preset) === round1(s.a)));
     const f = getFoodDB()[foodUI.sel];
     const u = naturalUnit(f);
     if (u && $("foodUnitCount")) $("foodUnitCount").textContent = `${fmtNum(round1(s.a / u.g))} × ${u.label}`;
     const mi = microOf(f, s.a);
-    if ($("foodSelMicro")) $("foodSelMicro").textContent = mi ? [mi.fib != null ? `Lif ${fmtNum(mi.fib)} g` : "", mi.salt != null ? `Tuz ${fmtNum(mi.salt)} g` : ""].filter(Boolean).join(" · ") : "";
+    if ($("foodSelMicro")) $("foodSelMicro").textContent = mi ? [mi.fib != null ? t("Lif {n} g", { n: fmtNum(mi.fib) }) : "", mi.salt != null ? t("Tuz {n} g", { n: fmtNum(mi.salt) }) : ""].filter(Boolean).join(" · ") : "";
   }
   const r = $("foodRemain");
   if (r) r.innerHTML = foodRemainPrefix(s) + foodRemainingText(s ? s.cal : 0, s ? s.p : 0);
@@ -277,9 +277,9 @@ function renderMicroLine(view) {
   if (!mc.n) { el.innerHTML = ""; el.classList.add("hidden"); return; }
   el.classList.remove("hidden");
   const over = mc.salt > SALT_LIMIT;
-  el.innerHTML = `<span>Lif <strong class="text-white tabular-nums">${fmtNum(mc.fib)}</strong> / ${fibTarget()} g</span>
-    <span>Tuz <strong class="tabular-nums" style="color:${over ? "#FB7185" : "#fff"}">${fmtNum(mc.salt)}</strong> / ${SALT_LIMIT} g</span>
-    ${mc.miss ? `<span class="text-white/60" data-micro-miss>${mc.miss} besinde lif/tuz verisi yok</span>` : ""}`;
+  el.innerHTML = `<span>${t("Lif")} <strong class="text-white tabular-nums">${fmtNum(mc.fib)}</strong> / ${fibTarget()} g</span>
+    <span>${t("Tuz")} <strong class="tabular-nums" style="color:${over ? "#FB7185" : "#fff"}">${fmtNum(mc.salt)}</strong> / ${SALT_LIMIT} g</span>
+    ${mc.miss ? `<span class="text-white/60" data-micro-miss>${tn(mc.miss, "{n} besinde lif/tuz verisi yok")}</span>` : ""}`;
 }
 function foodAmtInput(v) { foodUI.amt = Math.max(0, num(v, 0)); updateFoodSelUI(); }
 function foodStep(dir) {
@@ -302,13 +302,13 @@ function addSelectedFood() {
   if (foodUI.dest === "menu") {
     const mealTitle = curMeals()[tIdx].title;
     quickAdd(tIdx, fid, amt, curMeals());
-    toast(`${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${mealTitle} (menüne, her gün)`);
+    toast(t("{a} {u} {f} → {m} (menüne, her gün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: s.f.name, m: mealTitle }));
   } else {
     const list = ensureDayCopy();
     const meal = list[tIdx];
     quickAdd(tIdx, fid, amt, list);
     const mid = meal.id;
-    toast(`${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${meal.title} (yalnızca bugün)`, "ok", { label: "Menüye de kaydet", fn: () => addToMenuById(mid, fid, amt) });
+    toast(t("{a} {u} {f} → {m} (yalnızca bugün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: s.f.name, m: meal.title }), "ok", { label: t("Menüye de kaydet"), fn: () => addToMenuById(mid, fid, amt) });
   }
   foodUI.sel = null;
   renderFoods();
@@ -316,9 +316,9 @@ function addSelectedFood() {
 // Bugüne eklenen besini, aynı kimlikli menü öğününe de ekler
 function addToMenuById(mealId, foodId, amount) {
   const mi = curMeals().findIndex(m => m.id === mealId);
-  if (mi < 0) { toast("Bu öğün menüde bulunamadı", "error"); return; }
+  if (mi < 0) { toast(t("Bu öğün menüde bulunamadı"), "error"); return; }
   quickAdd(mi, foodId, amount, curMeals());
-  toast(`Menüdeki "${curMeals()[mi].title}" öğününe de eklendi`);
+  toast(t("Menüdeki \"{m}\" öğününe de eklendi", { m: curMeals()[mi].title }));
 }
 
 // ---------------------------------------------------------------------------
@@ -348,24 +348,24 @@ function renderNutriHistory() {
     const pct = tg > 0 ? Math.min(100, Math.round(kc / tg * 100)) : 0;
     const over = tg > 0 && kc > tg;
     const bits = [];
-    if (r.eatenP != null) bits.push(`Protein <strong>${fmtInt(r.eatenP)}</strong>${r.proTarget ? " / " + fmtInt(r.proTarget) : ""} g`);
-    if (r.water != null) bits.push(`Su <strong>${fmtNum(num(r.water))}</strong> L`);
-    if (r.mealsTotal) bits.push(`Öğün <strong>${num(r.mealsDone)}/${num(r.mealsTotal)}</strong>`);
-    if (r.supps != null) bits.push(`Takviye <strong>${num(r.supps)}</strong>`);
+    if (r.eatenP != null) bits.push(`${t("Protein")} <strong>${fmtInt(r.eatenP)}</strong>${r.proTarget ? " / " + fmtInt(r.proTarget) : ""} g`);
+    if (r.water != null) bits.push(`${t("Su")} <strong>${fmtNum(num(r.water))}</strong> L`);
+    if (r.mealsTotal) bits.push(`${t("Öğün")} <strong>${num(r.mealsDone)}/${num(r.mealsTotal)}</strong>`);
+    if (r.supps != null) bits.push(`${t("Takviye")} <strong>${num(r.supps)}</strong>`);
     return `<div class="n-card rounded-[20px] p-4 space-y-2.5" data-history-day="${esc(r.key)}">
         <div class="flex items-center justify-between gap-2">
-          <div class="text-[15px] font-bold">${r.live ? "Bugün" : esc(dayLabel(r.key))}${r.live ? ' <span class="text-[12px] font-semibold n-accent">· devam ediyor</span>' : ""}</div>
-          ${r.dayType ? `<span class="text-[12px] font-semibold n-muted">${r.dayType === "rest" ? "Dinlenme" : "Antrenman"}</span>` : ""}
+          <div class="text-[15px] font-bold">${r.live ? t("Bugün") : esc(dayLabel(r.key))}${r.live ? ` <span class="text-[12px] font-semibold n-accent">${t("· devam ediyor")}</span>` : ""}</div>
+          ${r.dayType ? `<span class="text-[12px] font-semibold n-muted">${r.dayType === "rest" ? t("Dinlenme") : t("Antrenman")}</span>` : ""}
         </div>
         <div class="flex items-baseline gap-1.5"><span class="t-display text-[26px] leading-none tabular-nums ${over ? "n-over" : ""}">${fmtInt(kc)}</span>
-          <span class="text-[13px] n-muted">${tg ? "/ " + fmtInt(tg) + " " : ""}kcal ${hasEaten ? "yenen" : "planlanan"}</span></div>
+          <span class="text-[13px] n-muted">${tg ? "/ " + fmtInt(tg) + " " : ""}kcal ${hasEaten ? t("yenen") : t("planlanan")}</span></div>
         ${tg ? `<div class="h-1.5 rounded-full n-bar-bg overflow-hidden"><div class="h-full rounded-full" style="width:${pct}%;background:${over ? "var(--n-over)" : "var(--n-accent)"}"></div></div>` : ""}
         ${bits.length ? `<div class="text-[12px] n-muted flex flex-wrap gap-x-3 gap-y-1">${bits.map(b => `<span>${b}</span>`).join("")}</div>` : ""}
       </div>`;
   };
   $("nutriHistory").innerHTML = weekCardHtml() + rows.map(card).join("")
-    + (rows.length === 1 ? `<p class="text-[13px] n-muted text-center py-2">Her gün gece yarısı (ya da "Yeni gün" ile) günün özeti buraya eklenir.</p>` : "")
-    + `<button onclick="switchTab('progress')" class="n-btn-outline w-full h-12 rounded-full text-[14px]">Grafikler için İlerleme sekmesine git</button>`;
+    + (rows.length === 1 ? `<p class="text-[13px] n-muted text-center py-2">${t("Her gün gece yarısı (ya da \"Yeni gün\" ile) günün özeti buraya eklenir.")}</p>` : "")
+    + `<button onclick="switchTab('progress')" class="n-btn-outline w-full h-12 rounded-full text-[14px]">${t("Grafikler için İlerleme sekmesine git")}</button>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -400,10 +400,10 @@ async function startScan() {
   wrap.classList.remove("hidden");
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     wrap.classList.add("hidden");
-    bcStatus("Bu cihazda kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin.");
+    bcStatus(t("Bu cihazda kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin."));
     return;
   }
-  bcStatus("Kamera açılıyor…");
+  bcStatus(t("Kamera açılıyor…"));
   try {
     const Z = await loadZXing();
     if (token !== bc.token) return;
@@ -418,17 +418,17 @@ async function startScan() {
       wrap.classList.add("hidden");
       onBarcode(code);
     });
-    if (token === bc.token) bcStatus("Barkodu çerçevenin içine getir.");
+    if (token === bc.token) bcStatus(t("Barkodu çerçevenin içine getir."));
   } catch (e) {
     if (token !== bc.token) return;
     stopScan();
     wrap.classList.add("hidden");
     const name = e && e.name;
     bcStatus(name === "NotAllowedError" || name === "SecurityError"
-      ? "Kamera izni verilmedi. iPhone'da Ayarlar → Safari → Kamera'dan izin verebilirsin. Numarayı aşağıya elle de yazabilirsin."
+      ? t("Kamera izni verilmedi. iPhone'da Ayarlar → Safari → Kamera'dan izin verebilirsin. Numarayı aşağıya elle de yazabilirsin.")
       : name === "NotFoundError" || name === "OverconstrainedError"
-        ? "Kamera bulunamadı. Barkod numarasını aşağıya elle yazabilirsin."
-        : "Kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin.");
+        ? t("Kamera bulunamadı. Barkod numarasını aşağıya elle yazabilirsin.")
+        : t("Kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin."));
   }
 }
 function stopScan() {
@@ -443,25 +443,25 @@ function barcodeManual() { stopScan(); $("bcCamWrap").classList.add("hidden"); o
 async function onBarcode(raw) {
   const code = String(raw || "").replace(/\D/g, "");
   $("bcResult").innerHTML = "";
-  if (code.length < 8 || code.length > 14) { bcStatus("Geçerli bir barkod numarası değil (8–14 rakam olmalı)."); return; }
+  if (code.length < 8 || code.length > 14) { bcStatus(t("Geçerli bir barkod numarası değil (8–14 rakam olmalı).")); return; }
   $("bcManual").value = code;
   const local = Object.keys(state.customFoods).find(id => state.customFoods[id] && state.customFoods[id].barcode === code);
   if (local) {
     closeBarcode();
     pickFoodInFoods(local);
-    toast(`${state.customFoods[local].name} listende vardı; miktarı seçip öğüne ekle`);
+    toast(t("{f} listende vardı; miktarı seçip öğüne ekle", { f: state.customFoods[local].name }));
     return;
   }
   if (navigator.onLine === false) {
-    bcStatus(`${code} okundu. Ürünü bulmak için internet gerekli. Bağlanınca tekrar dene ya da besini elle ekle.`);
+    bcStatus(t("{code} okundu. Ürünü bulmak için internet gerekli. Bağlanınca tekrar dene ya da besini elle ekle.", { code }));
     bcManualButton(code, "");
     return;
   }
-  bcStatus(`${code} aranıyor…`);
+  bcStatus(t("{code} aranıyor…", { code }));
   let p;
   try { p = await fetchOFF(code); }
   catch (e) {
-    bcStatus("Ürün bilgisine ulaşılamadı. İnternet bağlantını kontrol edip tekrar dene ya da besini elle ekle.");
+    bcStatus(t("Ürün bilgisine ulaşılamadı. İnternet bağlantını kontrol edip tekrar dene ya da besini elle ekle."));
     bcManualButton(code, "");
     return;
   }
@@ -477,30 +477,30 @@ async function onBarcode(raw) {
   const pr = v("proteins_100g"), cb = v("carbohydrates_100g"), ft = v("fat_100g");
   let kcal = v("energy-kcal_100g");
   if (!isFinite(kcal) && isFinite(v("energy_100g"))) kcal = v("energy_100g") / 4.184;
-  const name = String(p.product_name_tr || p.product_name || "").trim() || `Ürün ${code}`;
+  const name = String(p.product_name_tr || p.product_name || "").trim() || t("Ürün {code}", { code });
   const brand = String(p.brands || "").split(",")[0].trim();
   const unit = String(p.product_quantity_unit || "").toLowerCase() === "ml" ? "ml" : "g";
   const serving = num(p.serving_quantity, 0);
   const complete = [pr, cb, ft].every(x => isFinite(x) && x >= 0);
   bc.found = { code, name, brand, unit, p: pr, c: cb, f: ft, kcal: isFinite(kcal) ? kcal : null, def: serving > 0 && serving <= 1000 ? Math.round(serving) : 100 };
   const issues = complete ? labelCheck(isFinite(kcal) ? kcal : null, pr, cb, ft, 100) : [];
-  bcStatus(!complete ? "Ürün bulundu ama besin değerleri eksik." : issues.length ? "Ürün bulundu ama değerleri tutarsız görünüyor." : "Ürün bulundu.");
+  bcStatus(!complete ? t("Ürün bulundu ama besin değerleri eksik.") : issues.length ? t("Ürün bulundu ama değerleri tutarsız görünüyor.") : t("Ürün bulundu."));
   $("bcResult").innerHTML = `<div class="n-elev rounded-[20px] p-4 space-y-2.5">
       <div><div class="text-[16px] font-bold leading-snug break-words">${esc(name)}</div><div class="text-[12px] n-muted">${brand ? esc(brand) + " · " : ""}${code}</div></div>
       ${complete
-        ? `<div class="text-[13px]"><span class="n-muted">100 ${unit}:</span> <strong>${Math.round(isFinite(kcal) ? kcal : pr * 4 + cb * 4 + ft * 9)} kcal</strong> · <span class="n-p">${fmtNum(pr)} g P</span> · <span class="n-k">${fmtNum(cb)} g K</span> · <span class="n-y">${fmtNum(ft)} g Y</span></div>
+        ? `<div class="text-[13px]"><span class="n-muted">100 ${unit}:</span> <strong>${Math.round(isFinite(kcal) ? kcal : pr * 4 + cb * 4 + ft * 9)} kcal</strong> · <span class="n-p">${fmtNum(pr)} g ${t("P|makro")}</span> · <span class="n-k">${fmtNum(cb)} g ${t("K|makro")}</span> · <span class="n-y">${fmtNum(ft)} g ${t("Y|makro")}</span></div>
            ${issues.length
-             ? `<div id="bcWarn" class="rounded-2xl p-3 text-[13px] leading-snug" style="background: var(--n-over-soft); color: var(--n-text)"><strong style="color: var(--n-over)">⚠ Etiketle karşılaştır.</strong> ${esc(issues.join(" "))} Bu veriler gönüllülerce girilir; hata olabilir.</div>
-                <button onclick="barcodeFixFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Etikete bakıp düzelt</button>
-                <button onclick="addBarcodeFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">Yine de ekle</button>`
-             : `<button onclick="addBarcodeFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Listeme ekle ve seç</button>`}`
-        : `<p class="text-[13px] n-muted">Paketin üzerindeki 100 ${unit} değerleriyle elle ekleyebilirsin.</p>
-           <button onclick="barcodeManualFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Elle ekle</button>`}
+             ? `<div id="bcWarn" class="rounded-2xl p-3 text-[13px] leading-snug" style="background: var(--n-over-soft); color: var(--n-text)"><strong style="color: var(--n-over)">${t("⚠ Etiketle karşılaştır.")}</strong> ${esc(issues.join(" "))} ${t("Bu veriler gönüllülerce girilir; hata olabilir.")}</div>
+                <button onclick="barcodeFixFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Etikete bakıp düzelt")}</button>
+                <button onclick="addBarcodeFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">${t("Yine de ekle")}</button>`
+             : `<button onclick="addBarcodeFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Listeme ekle ve seç")}</button>`}`
+        : `<p class="text-[13px] n-muted">${t("Paketin üzerindeki 100 {u} değerleriyle elle ekleyebilirsin.", { u: unit })}</p>
+           <button onclick="barcodeManualFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Elle ekle")}</button>`}
     </div>`;
 }
 function bcManualButton(code, name) {
   bc.found = { code, name };
-  $("bcResult").innerHTML = `<button onclick="barcodeManualFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">Etiketteki değerleri gir</button>`;
+  $("bcResult").innerHTML = `<button onclick="barcodeManualFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">${t("Etiketteki değerleri gir")}</button>`;
 }
 // v21: Etiket değerleri tutarlı mı? (Open Food Facts'te ve elle girişte sık görülen hatalar: kJ/kcal karışıklığı,
 // ondalık hatası, porsiyon ↔ 100 g karışıklığı). base = değerlerin ait olduğu gram (100 ya da porsiyon); 0 = adet (yalnızca kalori sağlaması).
@@ -508,14 +508,14 @@ function bcManualButton(code, name) {
 function labelCheck(kcal, p, c, f, base) {
   const out = [];
   p = num(p, 0); c = num(c, 0); f = num(f, 0);
-  if (base > 0 && p + c + f > base * 1.03) out.push(`Protein + karb + yağ (${fmtNum(p + c + f)} g), ${fmtNum(base)} g'ı aşıyor.`);
+  if (base > 0 && p + c + f > base * 1.03) out.push(t("Protein + karb + yağ ({s} g), {b} g'ı aşıyor.", { s: fmtNum(p + c + f), b: fmtNum(base) }));
   const k = kcal == null || !isFinite(kcal) ? null : num(kcal, 0);
-  if (base > 0 && k != null && k > base * 9.2) out.push(`${fmtNum(base)} g için ${Math.round(k)} kcal olamaz (en fazla ~${Math.round(base * 9)}).`);
+  if (base > 0 && k != null && k > base * 9.2) out.push(t("{b} g için {k} kcal olamaz (en fazla ~{m}).", { b: fmtNum(base), k: String(Math.round(k)), m: String(Math.round(base * 9)) }));
   if (k != null && (p + c + f) > 0) {
     const calc = p * 4 + c * 4 + f * 9;
     if (Math.abs(calc - k) > Math.max(12, 0.2 * Math.max(k, calc))) {
       const kj = Math.abs(calc * 4.184 - k) <= Math.max(25, 0.15 * k);
-      out.push(`Yazan kalori ${Math.round(k)}, makrolardan hesaplanan ${Math.round(calc)}.${kj ? " Kalori yerine kilojoule (kJ) yazılmış olabilir." : ""}`);
+      out.push(t("Yazan kalori {k}, makrolardan hesaplanan {c}.", { k: String(Math.round(k)), c: String(Math.round(calc)) }) + (kj ? " " + t("Kalori yerine kilojoule (kJ) yazılmış olabilir.") : ""));
     }
   }
   return out;
@@ -540,7 +540,7 @@ function addBarcodeFood() {
   invalidateFoodDB();
   closeBarcode();
   pickFoodInFoods(id);
-  toast(`${nm} listene eklendi; miktarı seçip öğüne ekle`);
+  toast(t("{f} listene eklendi; miktarı seçip öğüne ekle", { f: nm }));
 }
 // Tutarsız barkod ürünü: etiket formu bulunan değerlerle dolu açılır, kullanıcı paketteki tabloyla düzeltir
 function barcodeFixFood() {
@@ -548,7 +548,7 @@ function barcodeFixFood() {
   if (!b.code) return;
   closeBarcode();
   openLabelForm(b.code, (b.brand && b.name && !b.name.toLocaleLowerCase("tr").includes(b.brand.toLocaleLowerCase("tr")) ? `${b.name} (${b.brand})` : b.name || "").slice(0, 50));
-  $("cfHint").textContent = `Barkod ${b.code}. Bulunan değerler tutarsızdı; paketin besin tablosuyla karşılaştırıp düzelt (100 g değerleri).`;
+  $("cfHint").textContent = t("Barkod {code}. Bulunan değerler tutarsızdı; paketin besin tablosuyla karşılaştırıp düzelt (100 g değerleri).", { code: b.code });
   if (b.kcal != null) $("cfK").value = fmtNum(b.kcal);
   $("cfP").value = fmtNum(b.p); $("cfC").value = fmtNum(b.c); $("cfF").value = fmtNum(b.f);
 }
@@ -557,7 +557,7 @@ function barcodeManualFood() {
   closeBarcode();
   if (b.code) {
     openLabelForm(b.code, b.name || "");
-    $("cfHint").textContent = `Barkod ${b.code}. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.`;
+    $("cfHint").textContent = t("Barkod {code}. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.", { code: b.code });
     return;
   }
   openCustomFoodModal();
@@ -597,7 +597,7 @@ function logCurrentWeight() {
   if (validBf(state.settings.bodyFat)) entry.bf = validBf(state.settings.bodyFat);
   if (last && last.ts && todayStr(new Date(last.ts)) === todayStr()) state.weightLogs[state.weightLogs.length - 1] = entry;
   else state.weightLogs.push(entry);
-  toast(`${fmtNum(state.weight)} kg kaydedildi`);
+  toast(t("{w} kg kaydedildi", { w: fmtNum(state.weight) }));
   renderAll();
 }
 function deleteWeightLog(idx) {
@@ -605,7 +605,7 @@ function deleteWeightLog(idx) {
   snapshot();
   state.weightLogs.splice(idx, 1);
   renderAll();
-  offerUndo("Tartı kaydı silindi");
+  offerUndo(t("Tartı kaydı silindi"));
 }
 
 function addWater(delta) { state.waterLiters = Math.max(0, Math.round(((state.waterLiters || 0) + delta) * 100) / 100); renderAll(); }
@@ -644,7 +644,7 @@ function removeItem(mIdx, iIdx) {
   const it = curMeals()[mIdx].items.splice(iIdx, 1)[0];
   const f = it ? getFoodDB()[it.foodId] : null;
   renderAll();
-  offerUndo(`${f ? f.name : "Besin"} çıkarıldı`);
+  offerUndo(t("{f} çıkarıldı", { f: f ? f.name : t("Besin") }));
 }
 
 // amount: ekranda görünen miktar (ölçek açıksa saklanacak miktara çevrilir)
@@ -664,7 +664,7 @@ function quickAdd(mIdx, foodId, amount, meals) {
 function openCustomFoodModal() {
   cfEditId = null;
   cfPendingBarcode = null;
-  $("cfTitle").textContent = "Kendi özel besinini tanımla";
+  $("cfTitle").textContent = t("Kendi özel besinini tanımla");
   $("cfHint").classList.add("hidden");
   $("cfName").value = ""; $("cfUnit").value = "100g"; $("cfDef").value = "100";
   $("cfK").value = "";
@@ -676,29 +676,29 @@ function openCustomFoodModal() {
 function openLabelForm(code, name) {
   openCustomFoodModal();
   cfPendingBarcode = code || null;
-  $("cfTitle").textContent = "Etiketteki değerleri gir";
-  $("cfHint").textContent = `Barkod ${code} veritabanında yok. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.`;
+  $("cfTitle").textContent = t("Etiketteki değerleri gir");
+  $("cfHint").textContent = t("Barkod {code} veritabanında yok. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.", { code });
   $("cfHint").classList.remove("hidden");
   $("cfName").value = name || "";
   ["cfK", "cfP", "cfC", "cfF"].forEach(id => { $(id).value = ""; });
 }
 function cfUnitChanged() {
   const m = $("cfUnit").value;
-  $("cfDefLabel").textContent = m === "serv" ? "1 porsiyon kaç gram?" : m === "1adet" ? "Varsayılan miktar (adet):" : "Varsayılan miktar (g):";
+  $("cfDefLabel").textContent = m === "serv" ? t("1 porsiyon kaç gram?") : m === "1adet" ? t("Varsayılan miktar (adet):") : t("Varsayılan miktar (g):");
 }
 async function saveCustomFood() {
   const name = $("cfName").value.trim();
-  if (!name) { sayAlert("Ad eksik", "Lütfen besin adını gir."); return; }
+  if (!name) { sayAlert(t("Ad eksik"), t("Lütfen besin adını gir.")); return; }
   const unitMode = $("cfUnit").value;
   const def = num($("cfDef").value, 100) || 100;
   const p = num($("cfP").value), c = num($("cfC").value), f = num($("cfF").value);
   const kRaw = $("cfK").value.trim();
   const k = kRaw === "" ? null : num(kRaw, NaN);
-  if ([p, c, f].some(x => x < 0) || (k != null && !(k >= 0))) { sayAlert("Değer hatalı", "Değerler negatif olamaz; kaloriyi rakamla yaz."); return; }
-  if (unitMode === "serv" && !(def > 0 && def <= 2000)) { sayAlert("Porsiyon eksik", "Lütfen 1 porsiyonun kaç gram olduğunu yaz (etikette yazar, örn: 30)."); return; }
+  if ([p, c, f].some(x => x < 0) || (k != null && !(k >= 0))) { sayAlert(t("Değer hatalı"), t("Değerler negatif olamaz; kaloriyi rakamla yaz.")); return; }
+  if (unitMode === "serv" && !(def > 0 && def <= 2000)) { sayAlert(t("Porsiyon eksik"), t("Lütfen 1 porsiyonun kaç gram olduğunu yaz (etikette yazar, örn: 30).")); return; }
   // v21: etiket tutarlılık kontrolü (100 g / 1 porsiyon; adet modunda yalnızca kalori sağlaması)
   const lc = labelCheck(k, p, c, f, unitMode === "1adet" ? 0 : unitMode === "serv" ? def : 100);
-  if (lc.length && !(await askConfirm("Değerler tutarsız görünüyor", lc.join(" ") + " Etiketle karşılaştır; doğruysa yine de kaydedebilirsin.", "Yine de kaydet"))) return;
+  if (lc.length && !(await askConfirm(t("Değerler tutarsız görünüyor"), lc.join(" ") + " " + t("Etiketle karşılaştır; doğruysa yine de kaydedebilirsin."), t("Yine de kaydet")))) return;
   const editing = cfEditId && state.customFoods[cfEditId];
   const prev = editing ? state.customFoods[cfEditId] : null;
   const barcode = prev && prev.barcode ? prev.barcode : cfPendingBarcode;
@@ -716,7 +716,7 @@ async function saveCustomFood() {
   state.customFoods[id] = food;
   invalidateFoodDB();
   closeModal("customFoodModal");
-  toast(editing ? "" + name + " güncellendi" : "" + name + " besin listene eklendi");
+  toast(editing ? t("{f} güncellendi", { f: name }) : t("{f} besin listene eklendi", { f: name }));
   renderAll();
   if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") selectFood(id);
 }

@@ -89,11 +89,15 @@ try:
           lists.forEach(ms => ms.forEach(m => { add(m.title); add(String(m.title).split(':')[0]); add(m.targetNote); m.items.forEach(i => { if (i.est) add(i.est.name); else if (db[i.foodId]) add(db[i.foodId].name); }); }));
           state.supplementList.forEach(x => add(x.name));
           Object.values(state.customFoods || {}).forEach(f => add(f.name));
+          // besin veritabanı adları/kategorileri/notları/porsiyon adları veridir (v49); yalnız Türkçe harfliler gerekir
+          const addTr = x => { if (x && /[çğıöşüÇĞİÖŞÜ]/.test(String(x))) { add(x); const y = typeof stripEmoji === 'function' ? stripEmoji(String(x)) : String(x); add(y); add(y.toLocaleUpperCase('en-GB')); } };
+          Object.values(db).forEach(f => { addTr(f.name); addTr(f.cat); addTr(f.note); addTr(f.kx); (f.portions || []).forEach(p => addTr(p[0])); (f.aliases || []).forEach(addTr); });
+          Object.values(state.customFoods || {}).forEach(f => addTr(f.cat));
+          (state.supplementList || []).forEach(x => { add(x.unit); add(x.note); add(x.timeLabel); });
           (state.combos || []).forEach(c => add(c.name));
           let out = '';
           ids.forEach(id => {
             const el = document.getElementById(id).cloneNode(true);
-            ['suppList', 'suppCounter', 'microLine', 'coachHint', 'foodHead', 'foodMealChips', 'foodSuggest', 'foodCats', 'foodList', 'nutriHistory'].forEach(x => { const n = el.querySelector('#' + x); if (n) n.remove(); });
             out += ' ' + el.textContent;
             el.querySelectorAll('[aria-label],[placeholder]').forEach(n => { out += ' ' + (n.getAttribute('aria-label') || '') + ' ' + (n.getAttribute('placeholder') || ''); });
           });
@@ -185,6 +189,161 @@ try:
     # --- Türkçeye dönüş
     pg.evaluate("setLang('tr')"); pg.wait_for_timeout(100); view("today")
     check(pg.evaluate("[$('btnTrain').textContent, $('mmPlan').textContent.replace(/\\s+/g, ' ').trim().slice(0, 6), $('nutriNav').firstChild.textContent]") == ["Antrenman günü", "Menü ·", "Bugün"], "Türkçeye dönüş: Beslenme metinleri geri geldi")
+
+    # ===== bölüm 2b: Besinler, Geçmiş, takviye kartı, pencereler (04, 11, 09 renderSupps/coachHintText)
+    pg.evaluate("""() => {
+      state.settings.lang = 'tr'; applyStaticI18n();
+      const db0 = getFoodDB(); const fid0 = Object.keys(db0).find(i => !isHiddenFood(db0[i]));
+      state.customFoods['custom_t1'] = { name: '⭐ Test besin', cat: '⭐ Özel Eklediklerim', unit: 'adet', step: 1, def: 1, p: 5, c: 5, f: 5 };
+      state.customFoods['custom_recipe_t2'] = { name: '🍲 Test tarif', cat: '🍲 Tariflerim', unit: 'g', step: 10, def: 100, p: .1, c: .1, f: .1, kcal: 1.6, recipe: { items: [{ foodId: fid0, amount: 100 }], cooked: 200 } };
+      invalidateFoodDB();
+      state.combos = [{ id: 'combo_t1', name: 'Test kombo', items: [{ foodId: fid0, amount: 100 }] }];
+      state.recentFoods = [fid0];
+      const k = n => { const d = logicalNow(); d.setDate(d.getDate() - n); return todayStr(d); };
+      [1, 2, 3, 5, 9].forEach((n, i) => { state.dailyLogs[k(n)] = { eatenKcal: 2000 + i * 150, eatenP: 120, kcal: 2100, calTarget: 2200, proTarget: 150, water: 2.5, mealsDone: 3, mealsTotal: 4, supps: 2, dayType: i % 2 ? 'rest' : 'train', meals: [] }; });
+      state.weightLogs.push({ date: '01 Oca', weight: 80, ts: Date.now() - 86400000 });
+      state.supplementList = [
+        { id: 'sa', name: 'Test A', time: 'morning', dose: 5, unit: 'g', step: 1, min: 1, max: 10 },
+        { id: 'sb', name: 'Test B', time: 'pre', note: 'Not B' }, { id: 'sc', name: 'Test C', time: 'bed' },
+        { id: 'sd', name: 'Test D', time: 'custom', timeLabel: 'Etiket D' }, { id: 'se', name: 'Test E' }, { id: 'sf', name: 'Test F', time: 'custom' }];
+      suppEdit = false; state.settings.goal = 'lose'; renderAll();
+    }""")
+    YEST = "todayStr((() => { const y = logicalNow(); y.setDate(y.getDate() - 1); return y; })())"
+    # --- Türkçe: aynı kalanlar
+    check(pg.evaluate("labelCheck(null, 40, 40, 40, 100)[0]") == "Protein + karb + yağ (120 g), 100 g'ı aşıyor.", "tr: labelCheck cümlesi aynı")
+    check(pg.evaluate("labelCheck(100, 10, 10, 10, 100)[0]") == "Yazan kalori 100, makrolardan hesaplanan 170.", "tr: labelCheck kalori cümlesi aynı")
+    check(pg.evaluate("labelCheck(700, 10, 10, 10, 100)[0]").endswith("Kalori yerine kilojoule (kJ) yazılmış olabilir.") or pg.evaluate("labelCheck(700, 10, 10, 10, 100)[0]").startswith("Yazan kalori 700"), "tr: labelCheck kJ cümlesi")
+    rt = pg.evaluate("foodRemainingText(0, 0)")
+    check(re.search(r"kcal</strong> (kalır|aşar) · ", rt) is not None, "tr: kalan metni biçimi: " + rt)
+    check(pg.evaluate("[foodRemainPrefix(null), foodRemainPrefix(1)]") == ["Bugün ", "Ekledikten sonra bugün "], "tr: kalan önekleri aynı")
+    check(pg.evaluate("[tn(2, '{n} besinde lif/tuz verisi yok'), tn(3, '{n} gün kayıt'), tn(2, '{left} / {n} ürün alınacak', { left: 1 })]") == ["2 besinde lif/tuz verisi yok", "3 gün kayıt", "1 / 2 ürün alınacak"], "tr: tn cümleleri aynı")
+    check(pg.evaluate("repeatedMsg({ title: '2. Öğün: Öğle', id: 'x' }, " + YEST + ")") == "2. Öğün: dünkü öğün tekrarlandı (yalnızca bugün)", "tr: dünkü öğün tekrarlandı")
+    check(pg.evaluate("repeatedMsg({ title: 'Kahvaltı', id: 'x' }, '2026-01-05')") == "Kahvaltı: 5 oca günkü öğün tekrarlandı (yalnızca bugün)", "tr: tarihli tekrar mesajı (küçük harf) aynı: " + pg.evaluate("repeatedMsg({ title: 'Kahvaltı', id: 'x' }, '2026-01-05')"))
+    check(pg.evaluate("shopText().split('\\n')[0]").startswith("AYK+ alışveriş listesi (7 gün: "), "tr: alışveriş metni başlığı")
+    view("today")
+    check(pg.evaluate("$('suppCounter').textContent") == "0 / 6 Tamamlandı", "tr: takviye sayacı: " + pg.evaluate("$('suppCounter').textContent"))
+    grp_tr = pg.evaluate("[...document.querySelectorAll('[data-supp-group]')].map(x => x.dataset.suppGroup)")
+    check(grp_tr == ["İlk öğünle", "Antrenman / Gün içi", "Akşam / Uyku öncesi", "Etiket D", "Özel", "Diğer"], "tr: takviye grupları aynı: %s" % grp_tr)
+    check(pg.evaluate("suppTimeLabel({ time: 'pre' })") == "Antrenman öncesi", "tr: takviye zamanı aynı")
+    view("history")
+    wc_tr = pg.evaluate("$('weekCard').textContent.replace(/\\s+/g, ' ')")
+    check("SON 7 GÜN" in wc_tr.upper() and "HEDEF TUTTURMA" in wc_tr.upper() and "Hedefte (±%5)" in wc_tr and "Haftalık hedef" in wc_tr, "tr: hafta kartı metinleri aynı")
+    check("Grafikler için İlerleme sekmesine git" in pg.evaluate("$('nutriHistory').textContent"), "tr: Geçmiş düğmesi aynı")
+    # --- İngilizce
+    pg.evaluate("setLang('en')"); pg.wait_for_timeout(100)
+    view("history"); tr_free("en: Geçmiş (hafta kartı, günler)", ["nvHistory"])
+    wc = pg.evaluate("$('weekCard').textContent.replace(/\\s+/g, ' ')")
+    check("LAST 7 DAYS" in wc.upper() and "DAYS ON TARGET" in wc.upper() and "On target (±5%)" in wc and "Weekly target" in wc and "weigh-in" in wc, "en: hafta kartı metinleri: " + wc[:200])
+    check("See charts in Progress" in pg.evaluate("$('nutriHistory').textContent"), "en: Geçmiş düğmesi")
+    view("today"); tr_free("en: Bugün (takviye kartı, sayaç)", ["nvToday"])
+    check(pg.evaluate("$('suppCounter').textContent") == "0 / 6 completed", "en: takviye sayacı")
+    grp = pg.evaluate("[...document.querySelectorAll('[data-supp-group]')].map(x => x.dataset.suppGroup)")
+    check(grp == ["With first meal", "Workout & daytime", "Evening & bedtime", "Etiket D", "Custom", "Other"], "en: takviye grupları: %s" % grp)
+    check("Pre-workout" in pg.evaluate("$('suppList').textContent") or "Not B" in pg.evaluate("$('suppList').textContent"), "en: takviye satırı alt metni")
+    check("5 g" in pg.evaluate("$('suppList').textContent"), "en: doz metni")
+    pg.evaluate("() => { suppEdit = true; renderAll(); }")
+    tr_free("en: takviye düzenleme modu", ["nvToday"])
+    sl = pg.evaluate("$('suppList').textContent.replace(/\\s+/g, ' ')")
+    check("Common supplements" in sl and "+ Add" in sl and "Done" in sl and "+ Dose" in sl and "Dose: 5 g" in sl, "en: düzenleme modu: " + sl[:240])
+    check("Choose time" in pg.evaluate("$('suppList').innerHTML") and "Pre-workout" in pg.evaluate("$('suppList').innerHTML"), "en: zaman seçici seçenekleri")
+    pg.evaluate("() => { state.supplementList = []; addPresetSupp('magnesium'); addPresetSupp('whey'); addPresetSupp('creatine'); }")
+    pl = pg.evaluate("state.supplementList.map(s => [s.name, s.unit, s.note || '', s.dose])")
+    check(pl == [["Magnesium", "mg", "1 hour before sleep", 200], ["Whey protein", "scoop", "Post-workout", 1], ["Creatine monohydrate", "g", "With plenty of water", 5]], "en: hazır takviye eklenirken o anki dilde yazılır: %s" % pl)
+    check(pg.evaluate("[normSearch('Magnesium'), normSearch('Whey protein')].map((n, i) => SUPP_PRESETS[i === 0 ? 4 : 3].m.test(n))") == [True, True], "en: İngilizce ad hazır takviye düzenli ifadesine uyar")
+    pg.evaluate("() => { state.supplementList = []; suppEdit = false; renderAll(); }")
+    check("Your supplement list is empty" in pg.evaluate("$('suppList').textContent"), "en: boş takviye listesi")
+    check(not TR_CH.search(pg.evaluate("(() => { state.settings.calAdjust = 0; return coachHintText(); })()")), "en: koç ipucu Türkçe harf içermez")
+    # Besinler
+    view("foods")
+    tr_free("en: Besinler (liste, çipler, öneriler)", ["nvFoods"])
+    pg.evaluate("""() => { const db = getFoodDB(); const id = Object.keys(db).find(i => !isHiddenFood(db[i]) && db[i].unit === 'g' && db[i].fib != null && !db[i].kx && Array.isArray(db[i].portions)); window.__fid = id; selectFood(id); }""")
+    pg.wait_for_timeout(80)
+    tr_free("en: Besinler (seçili besin kartı)", ["nvFoods"])
+    fc = pg.evaluate("$('foodSelCard').textContent.replace(/\\s+/g, ' ')")
+    check("kcal" in fc and re.search(r"\d g P", fc) and re.search(r"\d g C", fc) and re.search(r"\d g F", fc) and "Add to meal" in fc, "en: seçili besin kartı: " + fc[:240])
+    check(pg.evaluate("[...document.querySelectorAll('#foodSelCard [aria-label]')].map(x => x.getAttribute('aria-label')).filter(a => /^(Decrease|Increase|Serving sizes)/.test(a)).length") >= 3, "en: besin kartı aria etiketleri")
+    ch = pg.evaluate("$('foodCats').textContent")
+    check("All" in ch and "Recent" in ch and "Your combos" in ch and "Your recipes" in ch and "Your custom foods" in ch, "en: kategori çipleri: " + ch[:120])
+    pg.evaluate("selectFood('custom_t1')"); tr_free("en: özel besin kartı", ["nvFoods"])
+    check(all(x in pg.evaluate("$('foodSelCard').textContent") for x in ("Edit", "Delete")), "en: özel besin Edit/Delete")
+    pg.evaluate("setFoodCat('combos')"); tr_free("en: kombolar", ["nvFoods"])
+    pg.evaluate("selectCombo('combo_t1')"); tr_free("en: seçili kombo", ["nvFoods"])
+    check("Delete combo" in pg.evaluate("$('foodList').textContent") and re.search(r"Combo · 1 food", pg.evaluate("$('foodList').textContent")), "en: kombo kartı")
+    pg.evaluate("() => { state.combos = []; foodUI.sel = null; renderAll(); foodUI.cat = 'combos'; renderFoodList(); }")
+    check("No combos yet." in pg.evaluate("$('foodList').textContent"), "en: kombo yok metni")
+    pg.evaluate("() => { setFoodCat('all'); $('foodSearch').value = 'zzzqqq'; renderFoodList(); }")
+    tr_free("en: arama sonucu yok", ["nvFoods"])
+    pg.evaluate("() => { $('foodSearch').value = ''; renderFoodList(); }")
+    check(not TR_CH.search(pg.evaluate("foodRemainingText(0, 0) + foodRemainPrefix(null) + foodRemainPrefix(1)")), "en: kalan metni")
+    lcs = pg.evaluate("[labelCheck(null, 40, 40, 40, 100)[0], labelCheck(900, 1, 1, 1, 100)[0], labelCheck(100, 10, 10, 10, 100)[0], labelCheck(700, 10, 10, 10, 100).join(' ')]")
+    check(not any(TR_CH.search(x) for x in lcs) and lcs[0] == "Protein + carbs + fat (120 g) is more than 100 g.", "en: labelCheck cümleleri: %s" % lcs)
+    msgs = pg.evaluate("() => [repeatedMsg({ title: 'Meal 2: Lunch', id: 'x' }, " + YEST + "), repeatedMsg({ title: 'Breakfast', id: 'x' }, '2026-01-05'), repeatedMsg({ title: 'Breakfast', id: 'x' }, 'x'), shopText().split('\\n')[0], fmtShopAmt({ unit: 'adet' }, 3), fmtShopAmt({ unit: 'dilim' }, 1), fmtShopAmt({ unit: 'g' }, 1500), tn(1, '{left} / {n} ürün alınacak', { left: 1 })]")
+    check(not any(TR_CH.search(x) for x in msgs) and msgs[0] == "Meal 2: repeated yesterday's meal (today only)" and "5 Jan" in msgs[1] and msgs[4] == "3 pcs" and msgs[5] == "1 slice", "en: bildirim cümleleri: %s" % msgs)
+    # pencereler
+    def modal(js, mid, extra=None):
+        pg.evaluate(js); pg.wait_for_timeout(80)
+        if extra: pg.evaluate(extra); pg.wait_for_timeout(300)
+        return txt_of([mid])
+    def mod_free(label, x, must=()):
+        m = TR_CH.findall(x)
+        check(not m, label + ": Türkçe harf yok" + ("" if not m else " -> " + str(sorted(set(re.findall(r".{0,25}[çğıöşüÇĞİÖŞÜ].{0,25}", x)))[:6])))
+        for w in must: check(w in x, label + ": '" + w + "' var")
+    mod_free("en: özel besin penceresi", modal("openCustomFoodModal()", "customFoodModal"), ("Create your own custom food", "Food name:", "Values are per", "1 serving", "Carbs (g):", "Cancel"))
+    pg.evaluate("closeModal('customFoodModal')")
+    mod_free("en: etiket formu", modal("openLabelForm('8690504012345', '')", "customFoodModal"), ("Enter label values", "isn't in the database"))
+    pg.evaluate("closeModal('customFoodModal')")
+    pg.evaluate("(() => { window.fetch = () => Promise.reject(new Error('offline-test')); })()")
+    mod_free("en: barkod penceresi (geçersiz numara)", modal("openBarcode()", "barcodeModal", "stopScan(); void onBarcode('12345')") + " " + pg.evaluate("$('bcStatus').textContent"), ("Scan barcode", "Type the barcode number", "valid barcode number"))
+    pg.evaluate("closeBarcode()")
+    mod_free("en: barkod penceresi (ürün bulunamadı, elle giriş)", modal("openBarcode()", "barcodeModal", "void onBarcode('8690504012345')") + " " + pg.evaluate("$('bcStatus').textContent"), ("Couldn't reach the product database", "Enter label values"))
+    pg.evaluate("closeBarcode()")
+    pg.evaluate("(() => { window.fetch = () => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ status: 1, product: { product_name: 'Test bar', brands: 'Marka', nutriments: { proteins_100g: 50, carbohydrates_100g: 50, fat_100g: 50, 'energy-kcal_100g': 100 } } }) }); })()")
+    mod_free("en: barkod penceresi (tutarsız ürün)", modal("openBarcode()", "barcodeModal", "void onBarcode('8690504012346')"), ("Compare with the label", "Edit from label", "Add anyway", "50 g P"))
+    pg.evaluate("closeBarcode()")
+    pg.evaluate("(() => { window.fetch = () => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ status: 1, product: { product_name: 'Test bar 2', nutriments: { proteins_100g: 10 } } }) }); })()")
+    mod_free("en: barkod penceresi (eksik değerler)", modal("openBarcode()", "barcodeModal", "void onBarcode('8690504012347')"), ("Product found, but its nutrition values are incomplete", "Add manually"))
+    pg.evaluate("closeBarcode()")
+    mod_free("en: dışarıda yedim penceresi", modal("openFreeMeal(0)", "freeMealModal"), ("Ate out", "What did you eat? (optional)", "Rebalance my day", "Replace the foods in this meal", "Cancel"))
+    pg.evaluate("closeModal('freeMealModal')")
+    mod_free("en: tarif penceresi", modal("openRecipeModal()", "recipeModal", "(() => { rcp.items.push({ foodId: window.__fid, amount: 100 }); renderRecipe(); $('rcCooked').value = '150'; updateRecipeSummary(); })()"), ("New recipe", "Recipe name", "INGREDIENTS (RAW)", "Whole recipe", "Cooked, per 100 g"))
+    pg.evaluate("closeModal('recipeModal')")
+    mod_free("en: alışveriş penceresi", modal("openShopList()", "shopModal"), ("Weekly shopping list", "Copy to Notes", "Clear checkmarks", "Share", "Training day"))
+    pg.evaluate("closeModal('shopModal')")
+    mod_free("en: öğün penceresi", modal("openMealModal()", "mealModal"), ("Meal name", "Time (optional)", "Short note", "Meal "))
+    pg.evaluate("closeModal('mealModal')")
+    pg.evaluate("setNutriView('today')")
+    # Türkçeye dönüş
+    pg.evaluate("setLang('tr')"); pg.wait_for_timeout(100)
+    view("foods")
+    check("Tümü" in pg.evaluate("$('foodCats').textContent") and pg.evaluate("$('foodSearch').placeholder").startswith("Besin ara"), "Türkçeye dönüş: Besinler metinleri geri geldi")
+    x = modal("openCustomFoodModal()", "customFoodModal")
+    check("Kendi özel besinini tanımla" in x and "Besin Adı:" in x, "Türkçeye dönüş: özel besin penceresi")
+    pg.evaluate("closeModal('customFoodModal')")
+    # statik anahtar denetimi: 04/11/09/markup'taki her anahtar EN'de; yer tutucular ve etiketler tutar
+    import json as _json
+    keys = set()
+    lit = r'"((?:[^"\\\n]|\\.)*)"'
+    for fnm in ["04-besinler-barkod.js", "11-mutfak-akilli.js", "09-kas-plaka-koc-takviye.js"]:
+        raw = open(os.path.join(REPO, "src", "app", fnm), encoding="utf-8").read()
+        for mm in re.finditer(r"(?<![.\w])t\(\s*" + lit, raw): keys.add(mm.group(1))
+        for mm in re.finditer(r"(?<![.\w])tn\(\s*[^,()]+,\s*" + lit, raw): keys.add(mm.group(1))
+    mk = open(os.path.join(REPO, "src", "markup.html"), encoding="utf-8").read()
+    for mm in re.finditer(r'data-t(?:-aria|-ph)?="([^"]*)"', mk): keys.add(mm.group(1))
+    def unesc(k):
+        try: return _json.loads('"' + k + '"')
+        except Exception: return k
+    keys = {unesc(k) for k in keys}
+    res = pg.evaluate("""(keys) => { const ph = s => (String(s).match(/\\{\\w+\\}/g) || []).sort().join(); const tg = s => (String(s).match(/<\\/?\\w+/g) || []).join();
+      const out = { missing: [], ph: [], tag: [], stray: [] };
+      keys.forEach(k => { const e = EN[k]; if (e === undefined) { out.missing.push(k); return; }
+        const vs = typeof e === 'string' ? [e] : [e.one, e.other]; const base = k.split('|')[0];
+        vs.forEach(v => { if (typeof v !== 'string') { out.missing.push(k); return; }
+          if (ph(base) !== ph(v)) out.ph.push(k); if (tg(base) !== tg(v)) out.tag.push(k);
+          if (/[<>&]/.test(v.replace(/<[^>]*>/g, '')) && !/^(Workout & daytime|Evening & bedtime)$/.test(v)) out.stray.push(k); }); });
+      const dyn = [...SUPP_TIMES.map(x => x[1]), ...SUPP_GROUPS.map(x => x[0]), ...SUPP_PRESETS.flatMap(p => [p.name, p.unit, p.note].filter(Boolean))];
+      dyn.forEach(k => { if (EN[k] === undefined && !['g', 'mg'].includes(k)) out.missing.push(k); });
+      return out; }""", sorted(keys))
+    check(len(keys) > 250 and all(not v for v in res.values()), "statik denetim (%d anahtar): EN'de eksik, yer tutucu/etiket uyuşmazlığı, başıboş < > &: %s" % (len(keys), res))
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

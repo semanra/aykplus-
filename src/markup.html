@@ -973,45 +973,45 @@
       <div class="space-y-2.5 text-xs">
         <p id="cfHint" class="hidden text-[13px] text-[var(--w-muted)]"></p>
         <div>
-          <label for="cfName" class="block text-[var(--w-muted)] mb-1">Besin Adı:</label>
-          <input id="cfName" type="text" placeholder="Örn: Proteinli Süt / Ev Yapımı Köfte" class="w-full p-2 rounded-lg text-base" />
+          <label for="cfName" class="block text-[var(--w-muted)] mb-1" data-t="Besin Adı:">Besin Adı:</label>
+          <input id="cfName" type="text" placeholder="Örn: Proteinli Süt / Ev Yapımı Köfte" data-t-ph="Örn: Proteinli Süt / Ev Yapımı Köfte" class="w-full p-2 rounded-lg text-base" />
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="cfUnit" class="block text-[var(--w-muted)] mb-1">Değerler neye göre?</label>
+            <label for="cfUnit" class="block text-[var(--w-muted)] mb-1" data-t="Değerler neye göre?">Değerler neye göre?</label>
             <select id="cfUnit" onchange="cfUnitChanged()" class="w-full p-2 rounded-lg">
-              <option value="100g">100 g (veya 100 ml)</option>
-              <option value="serv">1 porsiyon</option>
-              <option value="1adet">1 adet</option>
+              <option value="100g" data-t="100 g (veya 100 ml)">100 g (veya 100 ml)</option>
+              <option value="serv" data-t="1 porsiyon">1 porsiyon</option>
+              <option value="1adet" data-t="1 adet">1 adet</option>
             </select>
           </div>
           <div>
-            <label id="cfDefLabel" for="cfDef" class="block text-[var(--w-muted)] mb-1">Varsayılan Miktar (g):</label>
+            <label id="cfDefLabel" for="cfDef" class="block text-[var(--w-muted)] mb-1" data-t="Varsayılan Miktar (g):">Varsayılan Miktar (g):</label>
             <input id="cfDef" type="text" inputmode="decimal" value="100" class="w-full p-2 rounded-lg text-base" />
           </div>
         </div>
         <div>
-          <label for="cfK" class="block text-[var(--w-muted)] mb-1">Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:</label>
-          <input id="cfK" type="text" inputmode="decimal" placeholder="Boş bırakırsan makrolardan hesaplanır" class="w-full p-2 rounded-lg text-base" />
+          <label for="cfK" class="block text-[var(--w-muted)] mb-1" data-t="Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:">Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:</label>
+          <input id="cfK" type="text" inputmode="decimal" placeholder="Boş bırakırsan makrolardan hesaplanır" data-t-ph="Boş bırakırsan makrolardan hesaplanır" class="w-full p-2 rounded-lg text-base" />
         </div>
         <div class="grid grid-cols-3 gap-2">
           <div>
-            <label class="block text-[var(--w-p)] mb-1">Protein (g):</label>
+            <label class="block text-[var(--w-p)] mb-1" data-t="Protein (g):">Protein (g):</label>
             <input id="cfP" type="text" inputmode="decimal" value="20" class="w-full p-2 rounded-lg text-base" />
           </div>
           <div>
-            <label class="block text-[var(--w-k)] mb-1">Karb (g):</label>
+            <label class="block text-[var(--w-k)] mb-1" data-t="Karb (g):">Karb (g):</label>
             <input id="cfC" type="text" inputmode="decimal" value="10" class="w-full p-2 rounded-lg text-base" />
           </div>
           <div>
-            <label class="block text-[var(--w-over)] mb-1">Yağ (g):</label>
+            <label class="block text-[var(--w-over)] mb-1" data-t="Yağ (g):">Yağ (g):</label>
             <input id="cfF" type="text" inputmode="decimal" value="5" class="w-full p-2 rounded-lg text-base" />
           </div>
         </div>
       </div>
       <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeModal('customFoodModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">İptal</button>
-        <button onclick="saveCustomFood()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+        <button onclick="closeModal('customFoodModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg" data-t="İptal">İptal</button>
+        <button onclick="saveCustomFood()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold" data-t="Kaydet">Kaydet</button>
       </div>
     </div>
   </div>
@@ -1130,8 +1130,8 @@
   <div id="barcodeModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
     <div role="dialog" aria-labelledby="bcTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
       <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-3">
-        <h3 id="bcTitle" class="text-[20px] font-extrabold">Barkod okut</h3>
-        <button onclick="closeBarcode()" aria-label="Kapat" class="w-11 h-11 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        <h3 id="bcTitle" class="text-[20px] font-extrabold" data-t="Barkod okut">Barkod okut</h3>
+        <button onclick="closeBarcode()" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-6 space-y-3.5">
         <div id="bcCamWrap" class="relative rounded-[20px] overflow-hidden bg-black aspect-[4/3]">
@@ -1141,13 +1141,13 @@
         <p id="bcStatus" class="text-[14px] n-muted" role="status" aria-live="polite"></p>
         <div id="bcResult"></div>
         <div>
-          <label for="bcManual" class="block text-[13px] font-semibold n-muted mb-1.5">Barkod numarasını elle yaz</label>
+          <label for="bcManual" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Barkod numarasını elle yaz">Barkod numarasını elle yaz</label>
           <div class="flex gap-2">
-            <input id="bcManual" type="text" inputmode="numeric" autocomplete="off" placeholder="örn: 8690504012345" class="n-in flex-1 min-w-0" onkeydown="if (event.key === 'Enter') barcodeManual()" />
-            <button id="bcSearchBtn" onclick="barcodeManual()" class="n-btn h-12 px-5 rounded-full text-[15px] shrink-0">Ara</button>
+            <input id="bcManual" type="text" inputmode="numeric" autocomplete="off" placeholder="örn: 8690504012345" data-t-ph="örn: 8690504012345" class="n-in flex-1 min-w-0" onkeydown="if (event.key === 'Enter') barcodeManual()" />
+            <button id="bcSearchBtn" onclick="barcodeManual()" class="n-btn h-12 px-5 rounded-full text-[15px] shrink-0" data-t="Ara">Ara</button>
           </div>
         </div>
-        <p class="text-[12px] n-dim">Ürün bilgileri internetten (Open Food Facts) gelir. Bir kez eklediğin ürün listende kalır; aynı barkodu sonra internetsiz de tanırım.</p>
+        <p class="text-[12px] n-dim" data-t="Ürün bilgileri internetten (Open Food Facts) gelir. Bir kez eklediğin ürün listende kalır; aynı barkodu sonra internetsiz de tanırım.">Ürün bilgileri internetten (Open Food Facts) gelir. Bir kez eklediğin ürün listende kalır; aynı barkodu sonra internetsiz de tanırım.</p>
       </div>
     </div>
   </div>
@@ -1156,37 +1156,37 @@
   <div id="freeMealModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
     <div role="dialog" aria-labelledby="fmTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
       <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
-        <div class="min-w-0"><h3 id="fmTitle" class="text-[20px] font-extrabold">Dışarıda yedim</h3><div id="fmMeal" class="text-[13px] n-muted truncate"></div></div>
-        <button onclick="closeModal('freeMealModal')" aria-label="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        <div class="min-w-0"><h3 id="fmTitle" class="text-[20px] font-extrabold" data-t="Dışarıda yedim">Dışarıda yedim</h3><div id="fmMeal" class="text-[13px] n-muted truncate"></div></div>
+        <button onclick="closeModal('freeMealModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
-        <p class="text-[13px] n-muted">Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.</p>
-        <div><label for="fmName" class="block text-[13px] font-semibold n-muted mb-1.5">Ne yedin? (isteğe bağlı)</label>
-          <input id="fmName" type="text" autocomplete="off" placeholder="örn: Döner dürüm + ayran" class="n-in w-full" /></div>
+        <p class="text-[13px] n-muted" data-t="Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.">Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.</p>
+        <div><label for="fmName" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Ne yedin? (isteğe bağlı)">Ne yedin? (isteğe bağlı)</label>
+          <input id="fmName" type="text" autocomplete="off" placeholder="örn: Döner dürüm + ayran" data-t-ph="örn: Döner dürüm + ayran" class="n-in w-full" /></div>
         <div class="grid grid-cols-2 gap-2">
-          <div><label for="fmKcal" class="block text-[13px] font-semibold mb-1.5">Kalori (kcal)</label>
-            <input id="fmKcal" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 850" oninput="updateFreeMealHint()" class="n-in w-full" /></div>
-          <div><label for="fmP" class="block text-[13px] font-semibold n-p mb-1.5">Protein (g)</label>
-            <input id="fmP" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 40" class="n-in w-full" /></div>
-          <div><label for="fmC" class="block text-[13px] font-semibold n-k mb-1.5">Karb (g) · isteğe bağlı</label>
+          <div><label for="fmKcal" class="block text-[13px] font-semibold mb-1.5" data-t="Kalori (kcal)">Kalori (kcal)</label>
+            <input id="fmKcal" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 850" data-t-ph="örn: 850" oninput="updateFreeMealHint()" class="n-in w-full" /></div>
+          <div><label for="fmP" class="block text-[13px] font-semibold n-p mb-1.5" data-t="Protein (g)">Protein (g)</label>
+            <input id="fmP" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 40" data-t-ph="örn: 40" class="n-in w-full" /></div>
+          <div><label for="fmC" class="block text-[13px] font-semibold n-k mb-1.5" data-t="Karb (g) · isteğe bağlı">Karb (g) · isteğe bağlı</label>
             <input id="fmC" type="text" inputmode="decimal" autocomplete="off" placeholder="—" class="n-in w-full" /></div>
-          <div><label for="fmF" class="block text-[13px] font-semibold n-y mb-1.5">Yağ (g) · isteğe bağlı</label>
+          <div><label for="fmF" class="block text-[13px] font-semibold n-y mb-1.5" data-t="Yağ (g) · isteğe bağlı">Yağ (g) · isteğe bağlı</label>
             <input id="fmF" type="text" inputmode="decimal" autocomplete="off" placeholder="—" class="n-in w-full" /></div>
         </div>
         <label class="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
-          <span class="text-[14px] font-semibold">Bu öğündeki besinlerin yerine say</span>
+          <span class="text-[14px] font-semibold" data-t="Bu öğündeki besinlerin yerine say">Bu öğündeki besinlerin yerine say</span>
           <input id="fmReplace" type="checkbox" class="n-sw" checked onchange="updateFreeMealHint()" />
         </label>
         <p id="fmHint" class="text-[13px] n-muted" role="status" aria-live="polite"></p>
         <label id="fmBalanceWrap" class="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
-          <span class="min-w-0"><span class="block text-[14px] font-semibold">Günü dengele</span>
-            <span class="block text-[12px] n-muted">Aşımı kalan öğünlerdeki karb ve yağdan kısarım; protein kaynaklarına dokunmam.</span></span>
+          <span class="min-w-0"><span class="block text-[14px] font-semibold" data-t="Günü dengele">Günü dengele</span>
+            <span class="block text-[12px] n-muted" data-t="Aşımı kalan öğünlerdeki karb ve yağdan kısarım; protein kaynaklarına dokunmam.">Aşımı kalan öğünlerdeki karb ve yağdan kısarım; protein kaynaklarına dokunmam.</span></span>
           <input id="fmBalance" type="checkbox" class="n-sw" />
         </label>
       </div>
       <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 n-bt">
-        <button onclick="closeModal('freeMealModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]">Vazgeç</button>
-        <button onclick="saveFreeMeal()" class="n-btn h-[52px] rounded-full text-[15px]">Kaydet</button>
+        <button onclick="closeModal('freeMealModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]" data-t="Vazgeç">Vazgeç</button>
+        <button onclick="saveFreeMeal()" class="n-btn h-[52px] rounded-full text-[15px]" data-t="Kaydet">Kaydet</button>
       </div>
     </div>
   </div>
@@ -1196,24 +1196,24 @@
     <div role="dialog" aria-labelledby="rcTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
       <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
         <h3 id="rcTitle" class="text-[20px] font-extrabold">Yeni tarif</h3>
-        <button onclick="closeModal('recipeModal')" aria-label="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        <button onclick="closeModal('recipeModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
-        <div><label for="rcName" class="block text-[13px] font-semibold n-muted mb-1.5">Tarifin adı</label>
-          <input id="rcName" type="text" autocomplete="off" placeholder="örn: Annemin mercimek çorbası" class="n-in w-full" /></div>
+        <div><label for="rcName" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Tarifin adı">Tarifin adı</label>
+          <input id="rcName" type="text" autocomplete="off" placeholder="örn: Annemin mercimek çorbası" data-t-ph="örn: Annemin mercimek çorbası" class="n-in w-full" /></div>
         <div>
-          <div class="n-label mb-1">MALZEMELER (ÇİĞ HÂLİYLE)</div>
+          <div class="n-label mb-1" data-t="MALZEMELER (ÇİĞ HÂLİYLE)">MALZEMELER (ÇİĞ HÂLİYLE)</div>
           <div id="rcItems" class="n-div"></div>
-          <button onclick="rcAddIngredient()" class="n-btn-outline w-full h-11 rounded-full text-[14px] mt-2">+ Malzeme ekle</button>
+          <button onclick="rcAddIngredient()" class="n-btn-outline w-full h-11 rounded-full text-[14px] mt-2" data-t="+ Malzeme ekle">+ Malzeme ekle</button>
         </div>
-        <div><label for="rcCooked" class="block text-[13px] font-semibold n-muted mb-1.5">Pişmiş toplam ağırlık (g)</label>
+        <div><label for="rcCooked" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Pişmiş toplam ağırlık (g)">Pişmiş toplam ağırlık (g)</label>
           <input id="rcCooked" type="text" inputmode="decimal" autocomplete="off" oninput="updateRecipeSummary()" class="n-in w-full" />
-          <p class="text-[12px] n-dim mt-1.5">Pişince tencereyi tart, boş tencerenin ağırlığını düş. Sonra yediğin miktarı gram olarak girersin.</p></div>
+          <p class="text-[12px] n-dim mt-1.5" data-t="Pişince tencereyi tart, boş tencerenin ağırlığını düş. Sonra yediğin miktarı gram olarak girersin.">Pişince tencereyi tart, boş tencerenin ağırlığını düş. Sonra yediğin miktarı gram olarak girersin.</p></div>
         <div id="rcSum" class="n-elev rounded-2xl px-3.5 py-3 text-[13px]"></div>
       </div>
       <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 n-bt">
-        <button onclick="closeModal('recipeModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]">Vazgeç</button>
-        <button onclick="saveRecipe()" class="n-btn h-[52px] rounded-full text-[15px]">Kaydet</button>
+        <button onclick="closeModal('recipeModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]" data-t="Vazgeç">Vazgeç</button>
+        <button onclick="saveRecipe()" class="n-btn h-[52px] rounded-full text-[15px]" data-t="Kaydet">Kaydet</button>
       </div>
     </div>
   </div>
@@ -1222,18 +1222,18 @@
   <div id="shopModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-[45]">
     <div role="dialog" aria-labelledby="shopTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
       <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
-        <div class="min-w-0"><h3 id="shopTitle" class="text-[20px] font-extrabold">Haftalık alışveriş listesi</h3><div id="shopCount" class="text-[13px] n-muted"></div></div>
-        <button onclick="closeModal('shopModal')" aria-label="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        <div class="min-w-0"><h3 id="shopTitle" class="text-[20px] font-extrabold" data-t="Haftalık alışveriş listesi">Haftalık alışveriş listesi</h3><div id="shopCount" class="text-[13px] n-muted"></div></div>
+        <button onclick="closeModal('shopModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-2">
         <div id="shopDays" class="n-elev rounded-2xl px-3.5 py-2.5"></div>
-        <p class="text-[12px] n-dim">Menülerindeki gramajlar gün sayısıyla çarpılıp toplandı; tarifler malzemelerine ayrıldı. Aldıklarına dokunup üstünü çiz.</p>
+        <p class="text-[12px] n-dim" data-t="Menülerindeki gramajlar gün sayısıyla çarpılıp toplandı; tarifler malzemelerine ayrıldı. Aldıklarına dokunup üstünü çiz.">Menülerindeki gramajlar gün sayısıyla çarpılıp toplandı; tarifler malzemelerine ayrıldı. Aldıklarına dokunup üstünü çiz.</p>
         <div id="shopItems"></div>
       </div>
       <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 n-bt">
-        <button onclick="copyShopList()" class="n-btn h-[52px] rounded-full text-[15px] col-span-2">Notlar'a kopyala</button>
-        <button onclick="shareShopList()" class="n-btn-outline h-12 rounded-full text-[14px]">Paylaş</button>
-        <button onclick="clearShopChecks()" class="n-btn-ghost h-12 rounded-full text-[14px]">İşaretleri temizle</button>
+        <button onclick="copyShopList()" class="n-btn h-[52px] rounded-full text-[15px] col-span-2" data-t="Notlar'a kopyala">Notlar'a kopyala</button>
+        <button onclick="shareShopList()" class="n-btn-outline h-12 rounded-full text-[14px]" data-t="Paylaş">Paylaş</button>
+        <button onclick="clearShopChecks()" class="n-btn-ghost h-12 rounded-full text-[14px]" data-t="İşaretleri temizle">İşaretleri temizle</button>
       </div>
     </div>
   </div>
@@ -1243,19 +1243,19 @@
     <div class="card p-5 max-w-md w-full space-y-3.5">
       <div class="flex justify-between items-center gap-2">
         <h3 id="mealModalTitle" class="font-bold text-base text-[var(--w-acc)]">Öğün Ekle</h3>
-        <button onclick="closeModal('mealModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1" aria-label="Kapat">&times;</button>
+        <button onclick="closeModal('mealModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1" aria-label="Kapat" data-t-aria="Kapat">&times;</button>
       </div>
       <div class="space-y-3 text-xs">
-        <div><label for="mmName" class="block text-[var(--w-muted)] mb-1">Öğün adı</label><input id="mmName" type="text" class="w-full p-2 rounded-lg text-base" /></div>
+        <div><label for="mmName" class="block text-[var(--w-muted)] mb-1" data-t="Öğün adı">Öğün adı</label><input id="mmName" type="text" class="w-full p-2 rounded-lg text-base" /></div>
         <div class="grid grid-cols-2 gap-2">
-          <div><label for="mmTime" class="block text-[var(--w-muted)] mb-1">Saat (isteğe bağlı)</label><input id="mmTime" type="time" class="w-full p-2 rounded-lg text-base" /></div>
-          <div><label for="mmNote" class="block text-[var(--w-muted)] mb-1">Kısa not</label><input id="mmNote" type="text" placeholder="örn: 50g protein" class="w-full p-2 rounded-lg text-base" /></div>
+          <div><label for="mmTime" class="block text-[var(--w-muted)] mb-1" data-t="Saat (isteğe bağlı)">Saat (isteğe bağlı)</label><input id="mmTime" type="time" class="w-full p-2 rounded-lg text-base" /></div>
+          <div><label for="mmNote" class="block text-[var(--w-muted)] mb-1" data-t="Kısa not">Kısa not</label><input id="mmNote" type="text" placeholder="örn: 50g protein" data-t-ph="örn: 50g protein" class="w-full p-2 rounded-lg text-base" /></div>
         </div>
-        <p class="text-[12px] text-[var(--w-dim)]">Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.</p>
+        <p class="text-[12px] text-[var(--w-dim)]" data-t="Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.">Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.</p>
       </div>
       <div class="flex justify-end gap-2 pt-1">
-        <button onclick="closeModal('mealModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">İptal</button>
-        <button onclick="saveMealModal()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+        <button onclick="closeModal('mealModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg" data-t="İptal">İptal</button>
+        <button onclick="saveMealModal()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold" data-t="Kaydet">Kaydet</button>
       </div>
     </div>
   </div>

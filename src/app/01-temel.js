@@ -26,11 +26,11 @@ const SUPP_PRESETS = [
   { key: "omega3", m: /omega/, name: "Omega-3", dose: 2, step: 1, min: 1, max: 6, unit: "softjel", note: "Tok karnına", time: "morning" },
   { key: "creatine", m: /kreatin|creatine/, name: "Kreatin Monohidrat", dose: 5, step: 1, min: 3, max: 10, unit: "g", note: "Bol su ile", time: "post" },
   { key: "whey", m: /whey|protein tozu/, name: "Whey Protein", dose: 1, step: 0.5, min: 0.5, max: 4, unit: "ölçek", note: "Antrenman sonrası", time: "post" },
-  { key: "magnesium", m: /magnez/, name: "Magnezyum", dose: 200, step: 100, min: 100, max: 600, unit: "mg", note: "Uykudan 1 saat önce", time: "bed" },
+  { key: "magnesium", m: /magnez|magnesium/, name: "Magnezyum", dose: 200, step: 100, min: 100, max: 600, unit: "mg", note: "Uykudan 1 saat önce", time: "bed" },
   { key: "zinc", m: /cinko|zinc/, name: "Çinko", dose: 15, step: 5, min: 5, max: 50, unit: "mg", note: "Akşam", time: "bed" }
 ];
 const r2 = v => Math.round(v * 100) / 100;
-function fmtDose(v) { return String(r2(v)).replace(".", ","); }
+function fmtDose(v) { return String(r2(v)).replace(".", curLang() === "en" ? "." : ","); }
 const SUPP_DOSE_KEYS = ["dose", "unit", "step", "min", "max"];
 const TABS = ["nutrition", "gym", "mobility", "progress"];
 const DAY_MS = 86400000;

@@ -34,13 +34,13 @@ async function saveMealAsCombo(mIdx, dest) {
   if (!m) return;
   const db = getFoodDB();
   const items = m.items.filter(i => !i.est && db[i.foodId]).map(i => ({ foodId: i.foodId, amount: num(i.amount) }));
-  if (!items.length) { sayAlert("Kombo kaydedilemedi", "Bu öğünde kombo olarak kaydedilecek besin yok."); return; }
-  const name = await askText("Kombonun adı", mealTitleBody(m).slice(0, 40), "örn: Favori Kase");
+  if (!items.length) { sayAlert(t("Kombo kaydedilemedi"), t("Bu öğünde kombo olarak kaydedilecek besin yok.")); return; }
+  const name = await askText(t("Kombonun adı"), mealTitleBody(m).slice(0, 40), t("örn: Favori Kase"));
   if (name === null) return;
-  const nm = name.trim().slice(0, 40) || "Kombo";
+  const nm = name.trim().slice(0, 40) || t("Kombo");
   state.combos.push({ id: "combo_" + Date.now().toString(36), name: nm, items });
   renderAll();
-  toast(`"${nm}" kombo olarak kaydedildi (Besinler → Komboların)`);
+  toast(t("\"{n}\" kombo olarak kaydedildi (Besinler → Komboların)", { n: nm }));
 }
 function selectCombo(id) {
   foodUI.sel = "combo:" + id;
@@ -60,12 +60,12 @@ function addComboToMeal(id) {
   foodUI.sel = null;
   renderAll();
   const mid = meal.id;
-  toast(`${c.name} → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+  toast(day ? t("{c} → {m} (yalnızca bugün)", { c: c.name, m: meal.title }) : t("{c} → {m} (menüne, her gün)", { c: c.name, m: meal.title }), "ok", day ? { label: t("Menüye de kaydet"), fn: () => {
     const mm = curMeals().find(x => x.id === mid);
-    if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
+    if (!mm) { toast(t("Bu öğün menüde bulunamadı"), "error"); return; }
     mergeItems(mm, c.items);
     renderAll();
-    toast(`Menüdeki "${mm.title}" öğününe de eklendi`);
+    toast(t("Menüdeki \"{m}\" öğününe de eklendi", { m: mm.title }));
   } } : null);
 }
 function deleteCombo(id) {
@@ -75,7 +75,7 @@ function deleteCombo(id) {
   const c = state.combos.splice(i, 1)[0];
   foodUI.sel = null;
   renderAll();
-  offerUndo(`"${c.name}" kombosu silindi`);
+  offerUndo(t("\"{c}\" kombosu silindi", { c: c.name }));
 }
 function comboRowHtml(c) {
   const db = getFoodDB();
@@ -85,25 +85,25 @@ function comboRowHtml(c) {
     const rows = c.items.map(i => {
       const f = db[i.foodId];
       if (!f) return "";
-      return `<div class="flex items-center justify-between gap-2 py-1.5 text-[14px]"><span class="min-w-0 truncate">${esc(f.name)}</span><span class="n-muted whitespace-nowrap tabular-nums">${fmtNum(effAmount(i))} ${esc(f.unit)} · ${Math.round(calcItemMacros(i).cal)} kcal</span></div>`;
+      return `<div class="flex items-center justify-between gap-2 py-1.5 text-[14px]"><span class="min-w-0 truncate">${esc(f.name)}</span><span class="n-muted whitespace-nowrap tabular-nums">${fmtNum(effAmount(i))} ${esc(unitL(effAmount(i), f.unit))} · ${Math.round(calcItemMacros(i).cal)} kcal</span></div>`;
     }).join("");
     const tIdx = foodTargetIdx();
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3 my-2" id="comboSelCard" data-combo="${esc(c.id)}">
         <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(c.name)}</h3><div class="text-[12px] n-muted">Kombo · ${c.items.length} besin</div></div>
+          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(c.name)}</h3><div class="text-[12px] n-muted">${t("Kombo")} · ${tn(c.items.length, "{n} besin")}</div></div>
           <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[28px] leading-none tabular-nums">${fmtInt(ct.cal)}</span><span class="text-[12px] n-muted ml-1">kcal</span>
             <div class="text-[12px] font-semibold tabular-nums">${macroLine(ct.p, ct.c, ct.f)}</div></div>
         </div>
         <div class="n-div">${rows}</div>
-        <button id="comboAddBtn" onclick='addComboToMeal(${esc(JSON.stringify(c.id))})' class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}>${tIdx < 0 ? "Önce bir öğün oluştur" : `Öğüne ekle · ${fmtInt(ct.cal)} kcal`}</button>
+        <button id="comboAddBtn" onclick='addComboToMeal(${esc(JSON.stringify(c.id))})' class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}>${tIdx < 0 ? t("Önce bir öğün oluştur") : t("Öğüne ekle · {k} kcal", { k: fmtInt(ct.cal) })}</button>
         <div class="flex justify-end pt-1 n-bt">
-          <button onclick='deleteCombo(${esc(JSON.stringify(c.id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}Komboyu sil</button>
+          <button onclick='deleteCombo(${esc(JSON.stringify(c.id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}${t("Komboyu sil")}</button>
         </div>
       </div>`;
   }
   return `<button onclick='selectCombo(${esc(JSON.stringify(c.id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-combo="${esc(c.id)}">
       <span class="min-w-0"><span class="flex items-center gap-1.5 text-[15px] font-bold leading-snug"><span class="n-accent shrink-0">${svgI("star", 16, 2)}</span><span class="truncate">${esc(c.name)}</span></span>
-        <span class="block text-[12px] n-muted mt-0.5 truncate">${fmtInt(ct.cal)} kcal · ${Math.round(ct.p)} g protein · ${esc(names)}</span></span>
+        <span class="block text-[12px] n-muted mt-0.5 truncate">${esc(t("{k} kcal · {p} g protein · {names}", { k: fmtInt(ct.cal), p: String(Math.round(ct.p)), names }))}</span></span>
       <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
     </button>`;
 }
@@ -116,7 +116,7 @@ function openRecipeModal(editId) {
   const f = editId && state.customFoods[editId];
   const isRec = !!(f && f.recipe);
   rcp = { id: isRec ? editId : null, items: isRec ? clone(f.recipe.items) : [] };
-  $("rcTitle").textContent = isRec ? "Tarifi düzenle" : "Yeni tarif";
+  $("rcTitle").textContent = isRec ? t("Tarifi düzenle") : t("Yeni tarif");
   $("rcName").value = isRec ? stripEmoji(f.name) : "";
   $("rcCooked").value = isRec ? fmtNum(f.recipe.cooked) : "";
   closeModal("pickerModal");
@@ -142,11 +142,11 @@ function renderRecipe() {
     if (!fd) return "";
     return `<div class="flex items-center gap-1.5 py-1.5" data-rc-item="${i}">
         <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(fd.name)}</div><div id="rcK${i}" class="text-[12px] n-muted tabular-nums">${Math.round(kcalPerUnit(fd) * num(it.amount))} kcal</div></div>
-        <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(fd.name)} miktarı" />
-        <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(fd.unit)}</span>
-        <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(fd.name)} çıkar">${svgI("x", 18, 2.2)}</button>
+        <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} miktarı", { ad: fd.name }))}" />
+        <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(unitL(2, fd.unit))}</span>
+        <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: fd.name }))}">${svgI("x", 18, 2.2)}</button>
       </div>`;
-  }).join("") || `<p class="text-[13px] n-dim py-2">Henüz malzeme yok. Aşağıdan ekle.</p>`;
+  }).join("") || `<p class="text-[13px] n-dim py-2">${t("Henüz malzeme yok. Aşağıdan ekle.")}</p>`;
   updateRecipeSummary();
 }
 function rcAmount(i, v) {
@@ -161,13 +161,13 @@ function rcRemove(i) { rcp.items.splice(i, 1); renderRecipe(); }
 function updateRecipeSummary() {
   const rt = recipeTotals();
   const cooked = num($("rcCooked").value, 0);
-  $("rcCooked").placeholder = rt.raw > 0 ? `çiğ malzemeler toplam ${fmtInt(rt.raw)} g` : "örn: 1200";
+  $("rcCooked").placeholder = rt.raw > 0 ? t("çiğ malzemeler toplam {n} g", { n: fmtInt(rt.raw) }) : t("örn: 1200");
   const per = cooked > 0 ? 100 / cooked : 0;
-  $("rcSum").innerHTML = `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">Tarifin tamamı</span><strong class="tabular-nums">${fmtInt(rt.cal)} kcal · ${macroLine(rt.p, rt.c, rt.f)}</strong></div>`
+  $("rcSum").innerHTML = `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">${t("Tarifin tamamı")}</span><strong class="tabular-nums">${fmtInt(rt.cal)} kcal · ${macroLine(rt.p, rt.c, rt.f)}</strong></div>`
     + (cooked > 0
-      ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">Pişmiş 100 g</span><strong class="tabular-nums n-accent">${fmtInt(rt.cal * per)} kcal</strong></div>
+      ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">${t("Pişmiş 100 g")}</span><strong class="tabular-nums n-accent">${fmtInt(rt.cal * per)} kcal</strong></div>
          <div class="text-right text-[12px] font-semibold tabular-nums">${macroLine(rt.p * per, rt.c * per, rt.f * per, true)}</div>`
-      : `<div class="text-[12px] n-dim mt-1">100 g değerlerini hesaplamam için pişmiş toplam ağırlığı yaz.</div>`);
+      : `<div class="text-[12px] n-dim mt-1">${t("100 g değerlerini hesaplamam için pişmiş toplam ağırlığı yaz.")}</div>`);
 }
 function rcAddIngredient() {
   const db = getFoodDB();
@@ -177,11 +177,11 @@ function rcAddIngredient() {
     const f = db[id];
     if (isHiddenFood(f)) return;
     const cat = stripEmoji(f.cat || "Diğer");
-    (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: `${fmtNum(f.def)} ${f.unit} · ${Math.round(kcalPerUnit(f) * num(f.def, 1))} kcal` });
+    (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: t("{n} {u} · {k} kcal", { n: fmtNum(f.def), u: unitL(f.def, f.unit), k: String(Math.round(kcalPerUnit(f) * num(f.def, 1))) }) });
   });
   const groups = Object.keys(cats).map(c => ({ label: c, short: c.replace(/\s*[&/].*$/, ""), items: cats[c] }));
   // Seçici, tarif penceresinin üstünde açılır; seçince tarif penceresi yerinde kalır
-  openPicker("Malzeme ekle", groups, it => {
+  openPicker(t("Malzeme ekle"), groups, it => {
     const f = getFoodDB()[it.id];
     const ex = rcp.items.find(x => x.foodId === it.id);
     if (ex) ex.amount = round1(num(ex.amount) + num(f.def, 1)); else rcp.items.push({ foodId: it.id, amount: num(f.def, 1) });
@@ -190,10 +190,10 @@ function rcAddIngredient() {
 }
 function saveRecipe() {
   const name = $("rcName").value.trim().slice(0, 50);
-  if (!name) { sayAlert("Ad eksik", "Lütfen tarifin adını yaz."); return; }
-  if (!rcp.items.length) { sayAlert("Malzeme yok", "En az bir malzeme ekle."); return; }
+  if (!name) { sayAlert(t("Ad eksik"), t("Lütfen tarifin adını yaz.")); return; }
+  if (!rcp.items.length) { sayAlert(t("Malzeme yok"), t("En az bir malzeme ekle.")); return; }
   const cooked = num($("rcCooked").value, 0);
-  if (!(cooked > 0) || cooked > 30000) { sayAlert("Pişmiş ağırlık eksik", "Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş)."); return; }
+  if (!(cooked > 0) || cooked > 30000) { sayAlert(t("Pişmiş ağırlık eksik"), t("Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş).")); return; }
   const rt = recipeTotals();
   const id = rcp.id || "custom_recipe_" + Date.now().toString(36);
   const editing = !!rcp.id;
@@ -204,7 +204,7 @@ function saveRecipe() {
   };
   invalidateFoodDB();
   closeModal("recipeModal");
-  toast(editing ? `${name} tarifi güncellendi` : `${name} tarifi besin listene eklendi`);
+  toast(editing ? t("{n} tarifi güncellendi", { n: name }) : t("{n} tarifi besin listene eklendi", { n: name }));
   renderAll();
   if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") { foodUI.cat = "recipes"; renderFoods(); selectFood(id); }
 }
@@ -223,11 +223,15 @@ function lastDayMealFor(meal) {
   const items = m.items.filter(i => i && (i.est || db[i.foodId]));
   return items.length ? { key: k, items } : null;
 }
-function dayLabelShort(k) {
+// v47: "tekrarlandı" bildirimi; cümle dile göre tek anahtar (Türkçede küçük harf, eski çıktıyla birebir)
+function repeatedMsg(m, k) {
   const y = logicalNow(); y.setDate(y.getDate() - 1);   // v25: gün geçiş saatine göre "dün"
-  if (k === todayStr(y)) return "Dünkü";
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
-  return m ? fmtDay(new Date(+m[1], +m[2] - 1, +m[3]), { day: "numeric", month: "short" }) + " günkü" : "Önceki";
+  const ml = shortMealTitle(m);
+  if (k === todayStr(y)) return t("{m}: dünkü öğün tekrarlandı (yalnızca bugün)", { m: ml });
+  const mt = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
+  if (!mt) return t("{m}: önceki öğün tekrarlandı (yalnızca bugün)", { m: ml });
+  const d = fmtDay(new Date(+mt[1], +mt[2] - 1, +mt[3]), { day: "numeric", month: "short" });
+  return t("{m}: {d} günkü öğün tekrarlandı (yalnızca bugün)", { m: ml, d: curLang() === "tr" ? lowerL(d) : d });
 }
 function repeatLastMeal(mIdx) {
   const cur = dayMeals()[mIdx];
@@ -239,7 +243,7 @@ function repeatLastMeal(mIdx) {
   m.items = clone(r.items);
   openEditMeals.delete(m.id);
   renderAll();
-  offerUndo(`${shortMealTitle(m)}: ${lowerL(dayLabelShort(r.key))} öğün tekrarlandı (yalnızca bugün)`);
+  offerUndo(repeatedMsg(m, r.key));
 }
 
 // ---------------------------------------------------------------------------
@@ -274,8 +278,8 @@ function shopList() {
 function fmtShopAmt(f, a) {
   if (f.unit === "g") return a >= 1000 ? fmtKg(round2(a / 1000)) + " kg" : (Math.ceil(a / 10) * 10) + " g";
   if (f.unit === "ml") return a >= 1000 ? fmtKg(round2(a / 1000)) + " L" : (Math.ceil(a / 10) * 10) + " ml";
-  if (f.unit === "adet") return Math.ceil(a - 1e-9) + " adet";
-  return fmtNum(Math.ceil(a * 2 - 1e-9) / 2) + " " + f.unit;
+  if (f.unit === "adet") { const n = Math.ceil(a - 1e-9); return n + " " + unitL(n, "adet"); }
+  { const n = Math.ceil(a * 2 - 1e-9) / 2; return fmtNum(n) + " " + unitL(n, f.unit); }
 }
 function shopName(f) { return stripEmoji(f.name).replace(/^⭐\s*/, ""); }
 function openShopList() { renderShopList(); openModal("shopModal"); }
@@ -291,17 +295,17 @@ function toggleShop(id) {
 }
 function clearShopChecks() {   // v26: Geri al
   snapshot(); state.shopChecked = {}; saveState(); renderShopList();
-  toast("İşaretler temizlendi", "ok", { label: "Geri al", fn: () => { doUndo(); renderShopList(); } });
+  toast(t("İşaretler temizlendi"), "ok", { label: t("Geri al"), fn: () => { doUndo(); renderShopList(); } });
 }
 function renderShopList() {
   const list = shopList();
   const nT = shopTrainDays();
   $("shopDays").innerHTML = `<div class="flex items-center justify-between gap-2">
-      <div class="min-w-0"><div class="text-[14px] font-bold">Antrenman günü</div><div class="text-[12px] n-muted">Haftanın kalan ${7 - nT} günü dinlenme menüsü</div></div>
+      <div class="min-w-0"><div class="text-[14px] font-bold">${t("Antrenman günü")}</div><div class="text-[12px] n-muted">${tn(7 - nT, "Haftanın kalan {n} günü dinlenme menüsü")}</div></div>
       <div class="flex items-center gap-1 shrink-0">
-        <button onclick="setShopDays(-1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="Antrenman gününü azalt">${svgI("minus", 18, 2.4)}</button>
+        <button onclick="setShopDays(-1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="${esc(t("Antrenman gününü azalt"))}">${svgI("minus", 18, 2.4)}</button>
         <span id="shopDaysVal" class="t-display text-[24px] w-8 text-center tabular-nums">${nT}</span>
-        <button onclick="setShopDays(1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="Antrenman gününü artır">${svgI("plus", 18, 2.4)}</button>
+        <button onclick="setShopDays(1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="${esc(t("Antrenman gününü artır"))}">${svgI("plus", 18, 2.4)}</button>
       </div>
     </div>`;
   let lastCat = null;
@@ -311,20 +315,20 @@ function renderShopList() {
     const head = cat !== lastCat ? `<div class="n-label pt-3 pb-1">${esc(upperL(cat))}</div>` : "";
     lastCat = cat;
     return head + `<label class="flex items-center gap-3 min-h-[48px] py-1 cursor-pointer n-bb" data-shop="${esc(r.id)}">
-        <input type="checkbox" class="n-check shrink-0" ${on ? "checked" : ""} onchange='toggleShop(${esc(JSON.stringify(r.id))})' aria-label="${esc(shopName(r.f))} alındı" />
+        <input type="checkbox" class="n-check shrink-0" ${on ? "checked" : ""} onchange='toggleShop(${esc(JSON.stringify(r.id))})' aria-label="${esc(t("{ad} alındı", { ad: shopName(r.f) }))}" />
         <span class="flex-1 min-w-0 text-[15px] font-semibold ${on ? "line-through n-dim" : ""}">${esc(shopName(r.f))}</span>
         <span class="shrink-0 text-[14px] font-bold tabular-nums ${on ? "line-through n-dim" : ""}">${esc(fmtShopAmt(r.f, r.amt))}</span>
       </label>`;
-  }).join("") : `<p class="text-[14px] n-muted text-center py-6">Menülerinde besin yok.</p>`;
+  }).join("") : `<p class="text-[14px] n-muted text-center py-6">${t("Menülerinde besin yok.")}</p>`;
   const left = list.filter(r => !state.shopChecked[r.id]).length;
-  $("shopCount").textContent = list.length ? `${left} / ${list.length} ürün alınacak` : "";
+  $("shopCount").textContent = list.length ? tn(list.length, "{left} / {n} ürün alınacak", { left }) : "";
 }
 function shopText() {
   const list = shopList();
   const left = list.filter(r => !state.shopChecked[r.id]);
   const rows = (left.length ? left : list).map(r => `• ${shopName(r.f)} — ${fmtShopAmt(r.f, r.amt)}`);
   const nT = shopTrainDays();
-  return `AYK+ alışveriş listesi (7 gün: ${nT} antrenman, ${7 - nT} dinlenme)\n` + rows.join("\n");
+  return t("AYK+ alışveriş listesi (7 gün: {a} antrenman, {b} dinlenme)", { a: nT, b: 7 - nT }) + "\n" + rows.join("\n");
 }
 async function copyText(txt) {
   try { await navigator.clipboard.writeText(txt); return true; }
@@ -340,10 +344,10 @@ async function copyText(txt) {
 }
 async function copyShopList() {
   const ok = await copyText(shopText());
-  toast(ok ? "Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin." : "Kopyalanamadı; Paylaş düğmesini dene.", ok ? "ok" : "error");
+  toast(ok ? t("Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin.") : t("Kopyalanamadı; Paylaş düğmesini dene."), ok ? "ok" : "error");
 }
 async function shareShopList() {
-  try { await navigator.share({ title: "Alışveriş listesi", text: shopText() }); }
+  try { await navigator.share({ title: t("Alışveriş listesi"), text: shopText() }); }
   catch (e) { if (e && e.name !== "AbortError") copyShopList(); }
 }
 
@@ -454,16 +458,16 @@ function renderFoodSuggest() {
   if (!foodSuggestCache.length) { el.innerHTML = ""; el.classList.add("hidden"); return; }
   const db = getFoodDB();
   el.classList.remove("hidden");
-  el.innerHTML = `<div class="n-label mb-2">KALAN HEDEFİNİ KAPATAN SEÇENEKLER</div>
-    <p class="text-[12px] n-muted mb-2">Kalan: <strong class="n-text tabular-nums">${fmtInt(remK)} kcal</strong> · <strong class="n-p tabular-nums">${fmtInt(remP)} g protein</strong>. Sık yediğin besinlerden:</p>
+  el.innerHTML = `<div class="n-label mb-2">${t("KALAN HEDEFİNİ KAPATAN SEÇENEKLER")}</div>
+    <p class="text-[12px] n-muted mb-2">${t("Kalan: {k} · {p}. Sık yediğin besinlerden:", { k: `<strong class="n-text tabular-nums">${fmtInt(remK)} kcal</strong>`, p: `<strong class="n-p tabular-nums">${fmtInt(remP)} g protein</strong>` })}</p>
     <div class="space-y-2">${foodSuggestCache.map((o, i) => {
-      const label = o.parts.map(p => `${fmtNum(p.a)} ${db[p.id].unit} ${stripEmoji(db[p.id].name).replace(/^⭐\s*/, "")}`).join(" + ");
+      const label = o.parts.map(p => `${fmtNum(p.a)} ${unitL(p.a, db[p.id].unit)} ${stripEmoji(db[p.id].name).replace(/^⭐\s*/, "")}`).join(" + ");
       const lk = Math.round(remK - o.K), lp = Math.round(remP - o.P);
-      const kTxt = lk >= 0 ? `${fmtInt(lk)} kcal kalır` : `${fmtInt(-lk)} kcal aşar`;
-      const pTxt = lp > 0 ? `${fmtInt(lp)} g P kalır` : "protein tamam";
+      const kTxt = lk >= 0 ? t("{n} kcal kalır", { n: fmtInt(lk) }) : t("{n} kcal aşar", { n: fmtInt(-lk) });
+      const pTxt = lp > 0 ? t("{n} g P kalır", { n: fmtInt(lp) }) : t("protein tamam");
       return `<button onclick="addSuggestion(${i})" class="w-full min-h-[56px] n-card rounded-2xl px-3.5 py-2.5 text-left flex items-center justify-between gap-3" data-suggest="${i}">
           <span class="min-w-0"><span class="block text-[14px] font-bold leading-snug">${esc(label)}</span>
-            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${fmtInt(o.K)} kcal · ${fmtInt(o.P)} g protein → ${kTxt}, ${pTxt}</span></span>
+            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${esc(t("{k} kcal · {p} g protein → {a}, {b}", { k: fmtInt(o.K), p: fmtInt(o.P), a: kTxt, b: pTxt }))}</span></span>
           <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
         </button>`;
     }).join("")}</div>`;
@@ -481,12 +485,12 @@ function addSuggestion(i) {
   o.parts.forEach(p => { state.recentFoods = [p.id, ...state.recentFoods.filter(x => x !== p.id)].slice(0, 8); });
   renderAll();
   const mid = meal.id;
-  toast(`${o.parts.length} besin → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+  toast(day ? tn(o.parts.length, "{n} besin → {m} (yalnızca bugün)", { m: meal.title }) : tn(o.parts.length, "{n} besin → {m} (menüne, her gün)", { m: meal.title }), "ok", day ? { label: t("Menüye de kaydet"), fn: () => {
     const mm = curMeals().find(x => x.id === mid);
-    if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
+    if (!mm) { toast(t("Bu öğün menüde bulunamadı"), "error"); return; }
     mergeItems(mm, items);
     renderAll();
-    toast(`Menüdeki "${mm.title}" öğününe de eklendi`);
+    toast(t("Menüdeki \"{m}\" öğününe de eklendi", { m: mm.title }));
   } } : null);
 }
 
@@ -555,7 +559,7 @@ function heatHtml(n) {
     const cls = isToday ? "today" : x ? hitClass(x.k, x.t) : "none";
     const d = keyToDate(k);
     const lbl = fmtDay(d, { day: "numeric", month: "short" });
-    const tip = isToday ? `${lbl}: bugün (devam ediyor)` : x ? `${lbl}: ${fmtInt(x.k)} / ${fmtInt(x.t)} kcal` : `${lbl}: kayıt yok`;
+    const tip = isToday ? t("{d}: bugün (devam ediyor)", { d: lbl }) : x ? t("{d}: {k} / {g} kcal", { d: lbl, k: fmtInt(x.k), g: fmtInt(x.t) }) : t("{d}: kayıt yok", { d: lbl });
     const sym = { ok: "✓", near: "~", far: "!" }[cls] || "";   // v32: renk tek başına anlam taşımaz (İlerleme şeridiyle aynı dil)
     cells.push(`<span class="n-heat ${cls}" data-heat="${k}" data-cls="${cls}" role="img" aria-label="${esc(tip)}" title="${esc(tip)}">${d.getDate()}${sym ? `<i class="n-heat-sym" aria-hidden="true">${sym}</i>` : ""}</span>`);
   }
@@ -569,38 +573,38 @@ function weekCardHtml() {
   const last = lastLog ? num(lastLog.weight) : 0;
   const range = state.nutriHistRange === "30" ? "30" : "7";
   const perDay = w.daysLeft > 0 ? Math.round(w.left / w.daysLeft) : 0;
-  return `<section id="weekCard" class="n-card rounded-[22px] p-4 space-y-4" aria-label="Haftalık görünüm">
-      <div class="flex items-baseline justify-between gap-2"><span class="n-label">SON 7 GÜN</span><span class="text-[12px] n-dim">${w.n7} gün kayıt</span></div>
+  return `<section id="weekCard" class="n-card rounded-[22px] p-4 space-y-4" aria-label="${esc(t("Haftalık görünüm"))}">
+      <div class="flex items-baseline justify-between gap-2"><span class="n-label">${t("SON 7 GÜN")}</span><span class="text-[12px] n-dim">${tn(w.n7, "{n} gün kayıt")}</span></div>
       <div class="grid grid-cols-2 gap-3">
-        <div><div class="text-[12px] n-muted">Ortalama kalori</div><div class="t-display text-[26px] leading-none tabular-nums mt-1" id="avgKcal">${w.n7 ? fmtInt(w.avgK) : "—"}</div><div class="text-[12px] n-dim">kcal / gün</div></div>
-        <div><div class="text-[12px] n-muted">Ortalama protein</div><div class="t-display text-[26px] leading-none tabular-nums mt-1 n-p" id="avgPro">${w.n7 ? fmtInt(w.avgP) : "—"}</div><div class="text-[12px] n-dim">g / gün</div></div>
+        <div><div class="text-[12px] n-muted">${t("Ortalama kalori")}</div><div class="t-display text-[26px] leading-none tabular-nums mt-1" id="avgKcal">${w.n7 ? fmtInt(w.avgK) : "—"}</div><div class="text-[12px] n-dim">${t("kcal / gün")}</div></div>
+        <div><div class="text-[12px] n-muted">${t("Ortalama protein")}</div><div class="t-display text-[26px] leading-none tabular-nums mt-1 n-p" id="avgPro">${w.n7 ? fmtInt(w.avgP) : "—"}</div><div class="text-[12px] n-dim">${t("g / gün")}</div></div>
       </div>
       <div class="pt-3 n-bt space-y-2.5">
         <div class="flex items-center justify-between gap-2">
-          <span class="n-label">HEDEF TUTTURMA</span>
-          <div class="n-seg grid-cols-2 w-[150px]" aria-label="Takvim aralığı">
-            <button onclick="setNutriHistRange('7')" class="${range === "7" ? "on" : ""}" aria-pressed="${range === "7"}">7 gün</button>
-            <button onclick="setNutriHistRange('30')" class="${range === "30" ? "on" : ""}" aria-pressed="${range === "30"}">30 gün</button>
+          <span class="n-label">${t("HEDEF TUTTURMA")}</span>
+          <div class="n-seg grid-cols-2 w-[150px]" aria-label="${esc(t("Takvim aralığı"))}">
+            <button onclick="setNutriHistRange('7')" class="${range === "7" ? "on" : ""}" aria-pressed="${range === "7"}">${t("7 gün")}</button>
+            <button onclick="setNutriHistRange('30')" class="${range === "30" ? "on" : ""}" aria-pressed="${range === "30"}">${t("30 gün")}</button>
           </div>
         </div>
         <div id="heatGrid">${heatHtml(range === "30" ? 30 : 7)}</div>
         <div class="flex flex-wrap gap-x-3 gap-y-1 text-[12px] n-muted">
-          <span class="flex items-center gap-1"><i class="n-heat-dot ok">✓</i>Hedefte (±%5)</span>
-          <span class="flex items-center gap-1"><i class="n-heat-dot near">~</i>Yakın (±%15)</span>
-          <span class="flex items-center gap-1"><i class="n-heat-dot far">!</i>Uzak</span>
-          <span class="flex items-center gap-1"><i class="n-heat-dot none"></i>Kayıt yok</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot ok">✓</i>${t("Hedefte (±%5)")}</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot near">~</i>${t("Yakın (±%15)")}</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot far">!</i>${t("Uzak")}</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot none"></i>${t("Kayıt yok")}</span>
         </div>
       </div>
       <div class="pt-3 n-bt space-y-1.5" id="weekBudget">
-        <span class="n-label">BU HAFTANIN KALORİ BÜTÇESİ</span>
-        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">Haftalık hedef</span><strong class="tabular-nums">${fmtInt(w.total)} kcal</strong></div>
-        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">Şu ana kadar alınan</span><strong class="tabular-nums">${fmtInt(w.taken)} kcal</strong></div>
-        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">Kalan</span><strong class="tabular-nums ${w.left < 0 ? "n-over" : "n-accent"}">${fmtInt(w.left)} kcal</strong></div>
-        ${w.daysLeft > 0 ? `<p class="text-[12px] n-dim">Kalan ${w.daysLeft} günde (bugün dahil) günde ortalama ~${fmtInt(perDay)} kcal. Geçmiş günlerde öğün tiki yoksa planlanan kalori sayılır.</p>` : ""}
+        <span class="n-label">${t("BU HAFTANIN KALORİ BÜTÇESİ")}</span>
+        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">${t("Haftalık hedef")}</span><strong class="tabular-nums">${fmtInt(w.total)} kcal</strong></div>
+        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">${t("Şu ana kadar alınan")}</span><strong class="tabular-nums">${fmtInt(w.taken)} kcal</strong></div>
+        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">${t("Kalan")}</span><strong class="tabular-nums ${w.left < 0 ? "n-over" : "n-accent"}">${fmtInt(w.left)} kcal</strong></div>
+        ${w.daysLeft > 0 ? `<p class="text-[12px] n-dim">${tn(w.daysLeft, "Kalan {n} günde (bugün dahil) günde ortalama ~{k} kcal. Geçmiş günlerde öğün tiki yoksa planlanan kalori sayılır.", { k: fmtInt(perDay) })}</p>` : ""}
       </div>
       <div class="pt-3 n-bt flex items-center justify-between gap-2 text-[14px]" id="weightAvgRow">
-        <span class="n-muted">Kilo${last ? ` · son tartı <strong class="n-text">${fmtNum(last)} kg</strong>` : ""}</span>
-        <span>${wa ? `7 günlük ort. <strong class="tabular-nums">${fmtNum(wa.avg)} kg</strong> <span class="text-[12px] n-dim">(${wa.n} tartı)</span>` : `<span class="n-dim text-[12px]">Son 7 günde tartı yok</span>`}</span>
+        <span class="n-muted">${t("Kilo")}${last ? t(" · son tartı {w}", { w: `<strong class="n-text">${fmtNum(last)} kg</strong>` }) : ""}</span>
+        <span>${wa ? `${t("7 günlük ort. {a}", { a: `<strong class="tabular-nums">${fmtNum(wa.avg)} kg</strong>` })} <span class="text-[12px] n-dim">${tn(wa.n, "({n} tartı)")}</span>` : `<span class="n-dim text-[12px]">${t("Son 7 günde tartı yok")}</span>`}</span>
       </div>
     </section>`;
 }

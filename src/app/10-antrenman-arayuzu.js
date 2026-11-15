@@ -653,8 +653,8 @@ let mealEditIdx = -1;
 function openMealModal(mIdx) {
   mealEditIdx = mIdx == null ? -1 : mIdx;
   const m = mealEditIdx >= 0 ? curMeals()[mealEditIdx] : null;
-  $("mealModalTitle").textContent = m ? "Öğünü Düzenle" : (state.dayType === "rest" ? "Dinlenme Günü Menüsüne Öğün Ekle" : "Antrenman Günü Menüsüne Öğün Ekle");
-  $("mmName").value = m ? m.title : `${curMeals().length + 1}. Öğün: `;
+  $("mealModalTitle").textContent = m ? t("Öğünü Düzenle") : (state.dayType === "rest" ? t("Dinlenme Günü Menüsüne Öğün Ekle") : t("Antrenman Günü Menüsüne Öğün Ekle"));
+  $("mmName").value = m ? m.title : t("{n}. Öğün: ", { n: String(curMeals().length + 1) });
   $("mmTime").value = m && m.time ? m.time : "";
   $("mmNote").value = m ? (m.targetNote || "") : "";
   openModal("mealModal");
@@ -673,7 +673,7 @@ function placeByTime(meals, meal) {
 }
 function saveMealModal() {
   const title = $("mmName").value.trim();
-  if (!title) { sayAlert("Ad eksik", "Öğün adını yaz."); return; }
+  if (!title) { sayAlert(t("Ad eksik"), t("Öğün adını yaz.")); return; }
   const time = /^\d{2}:\d{2}$/.test($("mmTime").value) ? $("mmTime").value : "";
   const note = $("mmNote").value.trim();
   const meals = curMeals();
@@ -692,7 +692,7 @@ function saveMealModal() {
   renderAll();
   const idx = curMeals().indexOf(target);
   if (mealEditIdx < 0) setTimeout(() => { const el = document.querySelector(`[data-meal-card="${idx}"]`); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
-  toast(mealEditIdx >= 0 ? "Öğün güncellendi" : `"${title}" eklendi${time ? " (" + time + ")" : ""}`);
+  toast(mealEditIdx >= 0 ? t("Öğün güncellendi") : t("\"{m}\" eklendi", { m: title }) + (time ? " (" + time + ")" : ""));
 }
 
 let mealDrag = null;

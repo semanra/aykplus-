@@ -449,7 +449,7 @@ function coachHintText() {
   if (!a.ready || Math.abs(a.delta) < 100) return "";
   const applied = num(state.settings.coachAppliedAt, 0);
   if (applied && Date.now() - applied < 7 * DAY_MS) return "";
-  return `🧠 Koç önerisi: hedef kalorini ${Math.abs(a.delta)} kcal ${a.delta > 0 ? "artır" : "azalt"} → İlerleme`;
+  return a.delta > 0 ? t("🧠 Koç önerisi: hedef kalorini {n} kcal artır → İlerleme", { n: String(Math.abs(a.delta)) }) : t("🧠 Koç önerisi: hedef kalorini {n} kcal azalt → İlerleme", { n: String(Math.abs(a.delta)) });
 }
 
 // ============================================================================
@@ -581,17 +581,17 @@ function suppDoseDefaults(dose, unit) {
   return { step, min: step, max: r2(Math.max(dose * 4, step * 10)) };
 }
 function suppTimeLabel(s) {
-  if (s.time === "custom") return s.timeLabel || "Özel";
+  if (s.time === "custom") return s.timeLabel || t("Özel");
   const slot = SUPP_TIMES.find(x => x[0] === s.time);
-  return slot ? slot[1] : "";
+  return slot ? t(slot[1]) : "";
 }
 function suppDoseText(s) { return s.dose ? `${fmtDose(s.dose)} ${s.unit || ""}`.trim() : ""; }
 function suppPillHtml(s) {
   const on = !!state.supplements[s.id], sid = esc(JSON.stringify(s.id));
   const sub = [s.dose ? `<b>${esc(suppDoseText(s))}</b>` : "", esc(s.note || (s.time === "pre" || s.time === "post" ? suppTimeLabel(s) : ""))].filter(Boolean).join(" · ");
   const stepper = s.dose ? `<div class="n-step">
-      <button onclick="changeSuppDose(${sid}, -1)" ${s.dose - s.step < s.min - 1e-9 ? "disabled" : ""} aria-label="${esc(s.name)} dozunu azalt">${svgI("minus", 18, 2.5)}</button>
-      <button onclick="changeSuppDose(${sid}, 1)" ${s.dose + s.step > s.max + 1e-9 ? "disabled" : ""} aria-label="${esc(s.name)} dozunu artır">${svgI("plus", 18, 2.5)}</button>
+      <button onclick="changeSuppDose(${sid}, -1)" ${s.dose - s.step < s.min - 1e-9 ? "disabled" : ""} aria-label="${esc(t("{ad} dozunu azalt", { ad: s.name }))}">${svgI("minus", 18, 2.5)}</button>
+      <button onclick="changeSuppDose(${sid}, 1)" ${s.dose + s.step > s.max + 1e-9 ? "disabled" : ""} aria-label="${esc(t("{ad} dozunu artır", { ad: s.name }))}">${svgI("plus", 18, 2.5)}</button>
     </div>` : "";
   return `<div class="n-pill ${on ? "taken" : ""}" data-supp-pill="${esc(s.id)}">
     <button onclick="toggleSupp(${sid})" class="n-pill-main" aria-pressed="${on ? "true" : "false"}">
@@ -603,7 +603,7 @@ function suppPillHtml(s) {
 function renderSupps() {
   const list = state.supplementList;
   const done = list.filter(s => state.supplements[s.id]).length;
-  $("suppCounter").textContent = `${done} / ${list.length} Tamamlandı`;
+  $("suppCounter").textContent = t("{done} / {n} Tamamlandı", { done, n: list.length });
   $("suppCounter").classList.toggle("hidden", !list.length);
   $("suppBarWrap").classList.toggle("hidden", !list.length);
   $("suppBar").style.width = (list.length ? Math.round(done / list.length * 100) : 0) + "%";
@@ -613,33 +613,33 @@ function renderSupps() {
     html = `<div class="w-full space-y-2" id="suppEditList">${list.map((s, i) => `<div class="n-pill-edit space-y-1.5" data-supp-row="${i}">
         <div class="flex items-center gap-2 min-h-[44px]">
           <span class="flex-1 min-w-0 text-[14px] font-semibold pl-1 n-text" style="overflow-wrap:anywhere">${esc(s.name)}</span>
-          <button onclick="removeSupp(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(s.name)} sil">${svgI("trash", 18)}</button>
+          <button onclick="removeSupp(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} sil", { ad: s.name }))}">${svgI("trash", 18)}</button>
         </div>
         <div class="flex items-center gap-2">
-          <select onchange="setSuppTime(${i}, this.value)" class="n-in h-11 flex-1 min-w-0" aria-label="${esc(s.name)} ne zaman alınır?">
-            <option value="" ${!s.time ? "selected" : ""}>Zaman seç</option>
-            ${SUPP_TIMES.map(([k, l]) => `<option value="${k}" ${s.time === k ? "selected" : ""}>${k === "custom" && s.time === "custom" ? esc(suppTimeLabel(s)) : l}</option>`).join("")}
+          <select onchange="setSuppTime(${i}, this.value)" class="n-in h-11 flex-1 min-w-0" aria-label="${esc(t("{ad} ne zaman alınır?", { ad: s.name }))}">
+            <option value="" ${!s.time ? "selected" : ""}>${t("Zaman seç")}</option>
+            ${SUPP_TIMES.map(([k, l]) => `<option value="${k}" ${s.time === k ? "selected" : ""}>${k === "custom" && s.time === "custom" ? esc(suppTimeLabel(s)) : esc(t(l))}</option>`).join("")}
           </select>
-          <button onclick="editSuppDose(${i})" class="n-chip shrink-0" data-supp-dose="${i}" aria-label="${esc(s.name)} dozu">${s.dose ? "Doz: " + esc(suppDoseText(s)) : "+ Doz"}</button>
+          <button onclick="editSuppDose(${i})" class="n-chip shrink-0" data-supp-dose="${i}" aria-label="${esc(t("{ad} dozu", { ad: s.name }))}">${s.dose ? esc(t("Doz: {d}", { d: suppDoseText(s) })) : t("+ Doz")}</button>
         </div>
       </div>`).join("")}</div>`;
     const presets = SUPP_PRESETS.filter(p => !list.some(s => s.preset === p.key || p.m.test(normSearch(s.name))));
-    if (presets.length) html += `<div class="n-sgroup">Hazır takviyeler</div><div class="flex flex-wrap gap-2" id="suppPresets">${presets.map(p =>
-      `<button onclick="addPresetSupp('${p.key}')" class="n-chip add">+ ${esc(p.name)}</button>`).join("")}</div>`;
-    html += `<div class="flex flex-wrap gap-2 pt-1"><button onclick="addSupp()" class="n-chip add">+ Ekle</button>
-      <button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}Bitti</button></div>`;
+    if (presets.length) html += `<div class="n-sgroup">${t("Hazır takviyeler")}</div><div class="flex flex-wrap gap-2" id="suppPresets">${presets.map(p =>
+      `<button onclick="addPresetSupp('${p.key}')" class="n-chip add">+ ${esc(t(p.name))}</button>`).join("")}</div>`;
+    html += `<div class="flex flex-wrap gap-2 pt-1"><button onclick="addSupp()" class="n-chip add">${t("+ Ekle")}</button>
+      <button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}${t("Bitti")}</button></div>`;
   } else {
-    const groups = SUPP_GROUPS.map(([l, ic, times]) => [l, ic, times.flatMap(tm => list.filter(s => s.time === tm))]);
+    const groups = SUPP_GROUPS.map(([l, ic, times]) => [t(l), ic, times.flatMap(tm => list.filter(s => s.time === tm))]);
     [...new Set(list.filter(s => s.time === "custom").map(suppTimeLabel))]
       .forEach(l => groups.push([l, "clock", list.filter(s => s.time === "custom" && suppTimeLabel(s) === l)]));
     const untimed = list.filter(s => !suppTimeLabel(s));
     const anyTimed = groups.some(g => g[2].length);
-    if (untimed.length) groups.push([anyTimed ? "Diğer" : "", "", untimed]);
+    if (untimed.length) groups.push([anyTimed ? t("Diğer") : "", "", untimed]);
     html = groups.filter(g => g[2].length).map(([l, ic, ss]) =>
       (l ? `<div class="n-sgroup" data-supp-group="${esc(l)}">${ic ? svgI(ic, 15) : ""}${esc(l)}</div>` : "")
       + `<div class="n-pills">${ss.map(suppPillHtml).join("")}</div>`).join("");
-    if (!list.length) html = `<p class="text-[13px] n-dim">Takviye listen boş. Düzenle'den ekleyebilirsin.</p>`;
-    html += `<div class="pt-1"><button onclick="suppEdit = true; renderAll();" class="n-chip" aria-label="Takviyeleri düzenle">${svgI("edit", 14)}Düzenle</button></div>`;
+    if (!list.length) html = `<p class="text-[13px] n-dim">${t("Takviye listen boş. Düzenle'den ekleyebilirsin.")}</p>`;
+    html += `<div class="pt-1"><button onclick="suppEdit = true; renderAll();" class="n-chip" aria-label="${esc(t("Takviyeleri düzenle"))}">${svgI("edit", 14)}${t("Düzenle")}</button></div>`;
   }
   $("suppList").innerHTML = html;
 }
@@ -654,16 +654,16 @@ function changeSuppDose(id, dir) {
 async function editSuppDose(i) {
   const s = state.supplementList[i];
   if (!s) return;
-  const v = await askText("Doz ve birim", suppDoseText(s), "örn: 5 g · 2 softjel · 1 ölçek", "Boş bırakırsan doz gösterilmez.", "Kaydet");
+  const v = await askText(t("Doz ve birim"), suppDoseText(s), t("örn: 5 g · 2 softjel · 1 ölçek"), t("Boş bırakırsan doz gösterilmez."), t("Kaydet"));
   if (v === null) return;
   const txt = String(v).trim();
   if (!txt) {   // v26: doz silme Geri al'lı
     if (!SUPP_DOSE_KEYS.some(k => s[k] != null)) return;
-    snapshot(); SUPP_DOSE_KEYS.forEach(k => delete s[k]); renderAll(); offerUndo(`${s.name}: doz kaldırıldı`); return;
+    snapshot(); SUPP_DOSE_KEYS.forEach(k => delete s[k]); renderAll(); offerUndo(t("{ad}: doz kaldırıldı", { ad: s.name })); return;
   }
   const m = txt.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
   const d = m ? r2(num(m[1], 0)) : 0;
-  if (!(d > 0) || d > 100000) { sayAlert("Doz anlaşılamadı", "Önce sayı, sonra birim yaz (örn: 5 g veya 2 softjel)."); return; }
+  if (!(d > 0) || d > 100000) { sayAlert(t("Doz anlaşılamadı"), t("Önce sayı, sonra birim yaz (örn: 5 g veya 2 softjel).")); return; }
   const unit = m[2].trim().slice(0, 16);
   if (s.dose && d >= s.min && d <= s.max && normSearch(unit) === normSearch(s.unit)) s.dose = d;   // aynı birim: adım/sınır korunur
   else Object.assign(s, { dose: d, unit }, suppDoseDefaults(d, unit));
@@ -673,23 +673,26 @@ function addPresetSupp(key) {
   const p = SUPP_PRESETS.find(x => x.key === key);
   if (!p) return;
   const { m, key: k, ...rest } = p;
-  state.supplementList.push({ id: "sup_" + k + "_" + Date.now(), preset: k, ...clone(rest) });
+  // v47: eklenen takviye kullanıcı verisi olur; o anki dilin adı/birimi/notu yazılır (docs/i18n-kayitli-metinler.md)
+  const own = clone(rest);
+  own.name = t(own.name); own.unit = tn(1, own.unit); if (own.note) own.note = t(own.note);
+  state.supplementList.push({ id: "sup_" + k + "_" + Date.now(), preset: k, ...own });
   renderAll();
 }
 async function setSuppTime(i, v) {
   const s = state.supplementList[i];
   if (!s) return;
   if (v === "custom") {
-    const l = await askText("Özel zaman etiketi", s.time === "custom" ? s.timeLabel || "" : "", "örn: Öğle yemeğiyle");
+    const l = await askText(t("Özel zaman etiketi"), s.time === "custom" ? s.timeLabel || "" : "", t("örn: Öğle yemeğiyle"));
     if (l === null) { renderAll(); return; }
     s.time = "custom";
-    s.timeLabel = l.trim().slice(0, 24) || "Özel";
+    s.timeLabel = l.trim().slice(0, 24) || t("Özel");
   } else if (SUPP_TIMES.some(x => x[0] === v)) { s.time = v; delete s.timeLabel; }
   else { delete s.time; delete s.timeLabel; }
   renderAll();
 }
 async function addSupp() {
-  const n = await askText("Takviye adı", "", "örn: D3 Vitamini", "", "Ekle");
+  const n = await askText(t("Takviye adı"), "", t("örn: D3 Vitamini"), "", t("Ekle"));
   if (!n || !n.trim()) return;
   state.supplementList.push({ id: "sup_" + Date.now(), name: n.trim().slice(0, 40) });
   renderAll();
@@ -699,7 +702,7 @@ function removeSupp(i) {
   const s = state.supplementList.splice(i, 1)[0];
   if (s) delete state.supplements[s.id];
   renderAll();
-  offerUndo(`${s ? s.name : "Takviye"} kaldırıldı`);
+  offerUndo(t("{ad} kaldırıldı", { ad: s ? s.name : t("Takviye") }));
 }
 
 // ---------------------------------------------------------------------------

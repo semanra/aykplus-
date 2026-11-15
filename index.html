@@ -973,45 +973,45 @@
       <div class="space-y-2.5 text-xs">
         <p id="cfHint" class="hidden text-[13px] text-[var(--w-muted)]"></p>
         <div>
-          <label for="cfName" class="block text-[var(--w-muted)] mb-1">Besin Adı:</label>
-          <input id="cfName" type="text" placeholder="Örn: Proteinli Süt / Ev Yapımı Köfte" class="w-full p-2 rounded-lg text-base" />
+          <label for="cfName" class="block text-[var(--w-muted)] mb-1" data-t="Besin Adı:">Besin Adı:</label>
+          <input id="cfName" type="text" placeholder="Örn: Proteinli Süt / Ev Yapımı Köfte" data-t-ph="Örn: Proteinli Süt / Ev Yapımı Köfte" class="w-full p-2 rounded-lg text-base" />
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="cfUnit" class="block text-[var(--w-muted)] mb-1">Değerler neye göre?</label>
+            <label for="cfUnit" class="block text-[var(--w-muted)] mb-1" data-t="Değerler neye göre?">Değerler neye göre?</label>
             <select id="cfUnit" onchange="cfUnitChanged()" class="w-full p-2 rounded-lg">
-              <option value="100g">100 g (veya 100 ml)</option>
-              <option value="serv">1 porsiyon</option>
-              <option value="1adet">1 adet</option>
+              <option value="100g" data-t="100 g (veya 100 ml)">100 g (veya 100 ml)</option>
+              <option value="serv" data-t="1 porsiyon">1 porsiyon</option>
+              <option value="1adet" data-t="1 adet">1 adet</option>
             </select>
           </div>
           <div>
-            <label id="cfDefLabel" for="cfDef" class="block text-[var(--w-muted)] mb-1">Varsayılan Miktar (g):</label>
+            <label id="cfDefLabel" for="cfDef" class="block text-[var(--w-muted)] mb-1" data-t="Varsayılan Miktar (g):">Varsayılan Miktar (g):</label>
             <input id="cfDef" type="text" inputmode="decimal" value="100" class="w-full p-2 rounded-lg text-base" />
           </div>
         </div>
         <div>
-          <label for="cfK" class="block text-[var(--w-muted)] mb-1">Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:</label>
-          <input id="cfK" type="text" inputmode="decimal" placeholder="Boş bırakırsan makrolardan hesaplanır" class="w-full p-2 rounded-lg text-base" />
+          <label for="cfK" class="block text-[var(--w-muted)] mb-1" data-t="Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:">Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:</label>
+          <input id="cfK" type="text" inputmode="decimal" placeholder="Boş bırakırsan makrolardan hesaplanır" data-t-ph="Boş bırakırsan makrolardan hesaplanır" class="w-full p-2 rounded-lg text-base" />
         </div>
         <div class="grid grid-cols-3 gap-2">
           <div>
-            <label class="block text-[var(--w-p)] mb-1">Protein (g):</label>
+            <label class="block text-[var(--w-p)] mb-1" data-t="Protein (g):">Protein (g):</label>
             <input id="cfP" type="text" inputmode="decimal" value="20" class="w-full p-2 rounded-lg text-base" />
           </div>
           <div>
-            <label class="block text-[var(--w-k)] mb-1">Karb (g):</label>
+            <label class="block text-[var(--w-k)] mb-1" data-t="Karb (g):">Karb (g):</label>
             <input id="cfC" type="text" inputmode="decimal" value="10" class="w-full p-2 rounded-lg text-base" />
           </div>
           <div>
-            <label class="block text-[var(--w-over)] mb-1">Yağ (g):</label>
+            <label class="block text-[var(--w-over)] mb-1" data-t="Yağ (g):">Yağ (g):</label>
             <input id="cfF" type="text" inputmode="decimal" value="5" class="w-full p-2 rounded-lg text-base" />
           </div>
         </div>
       </div>
       <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeModal('customFoodModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">İptal</button>
-        <button onclick="saveCustomFood()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+        <button onclick="closeModal('customFoodModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg" data-t="İptal">İptal</button>
+        <button onclick="saveCustomFood()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold" data-t="Kaydet">Kaydet</button>
       </div>
     </div>
   </div>
@@ -1130,8 +1130,8 @@
   <div id="barcodeModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
     <div role="dialog" aria-labelledby="bcTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
       <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-3">
-        <h3 id="bcTitle" class="text-[20px] font-extrabold">Barkod okut</h3>
-        <button onclick="closeBarcode()" aria-label="Kapat" class="w-11 h-11 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        <h3 id="bcTitle" class="text-[20px] font-extrabold" data-t="Barkod okut">Barkod okut</h3>
+        <button onclick="closeBarcode()" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-6 space-y-3.5">
         <div id="bcCamWrap" class="relative rounded-[20px] overflow-hidden bg-black aspect-[4/3]">
@@ -1141,13 +1141,13 @@
         <p id="bcStatus" class="text-[14px] n-muted" role="status" aria-live="polite"></p>
         <div id="bcResult"></div>
         <div>
-          <label for="bcManual" class="block text-[13px] font-semibold n-muted mb-1.5">Barkod numarasını elle yaz</label>
+          <label for="bcManual" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Barkod numarasını elle yaz">Barkod numarasını elle yaz</label>
           <div class="flex gap-2">
-            <input id="bcManual" type="text" inputmode="numeric" autocomplete="off" placeholder="örn: 8690504012345" class="n-in flex-1 min-w-0" onkeydown="if (event.key === 'Enter') barcodeManual()" />
-            <button id="bcSearchBtn" onclick="barcodeManual()" class="n-btn h-12 px-5 rounded-full text-[15px] shrink-0">Ara</button>
+            <input id="bcManual" type="text" inputmode="numeric" autocomplete="off" placeholder="örn: 8690504012345" data-t-ph="örn: 8690504012345" class="n-in flex-1 min-w-0" onkeydown="if (event.key === 'Enter') barcodeManual()" />
+            <button id="bcSearchBtn" onclick="barcodeManual()" class="n-btn h-12 px-5 rounded-full text-[15px] shrink-0" data-t="Ara">Ara</button>
           </div>
         </div>
-        <p class="text-[12px] n-dim">Ürün bilgileri internetten (Open Food Facts) gelir. Bir kez eklediğin ürün listende kalır; aynı barkodu sonra internetsiz de tanırım.</p>
+        <p class="text-[12px] n-dim" data-t="Ürün bilgileri internetten (Open Food Facts) gelir. Bir kez eklediğin ürün listende kalır; aynı barkodu sonra internetsiz de tanırım.">Ürün bilgileri internetten (Open Food Facts) gelir. Bir kez eklediğin ürün listende kalır; aynı barkodu sonra internetsiz de tanırım.</p>
       </div>
     </div>
   </div>
@@ -1156,37 +1156,37 @@
   <div id="freeMealModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
     <div role="dialog" aria-labelledby="fmTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
       <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
-        <div class="min-w-0"><h3 id="fmTitle" class="text-[20px] font-extrabold">Dışarıda yedim</h3><div id="fmMeal" class="text-[13px] n-muted truncate"></div></div>
-        <button onclick="closeModal('freeMealModal')" aria-label="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        <div class="min-w-0"><h3 id="fmTitle" class="text-[20px] font-extrabold" data-t="Dışarıda yedim">Dışarıda yedim</h3><div id="fmMeal" class="text-[13px] n-muted truncate"></div></div>
+        <button onclick="closeModal('freeMealModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
-        <p class="text-[13px] n-muted">Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.</p>
-        <div><label for="fmName" class="block text-[13px] font-semibold n-muted mb-1.5">Ne yedin? (isteğe bağlı)</label>
-          <input id="fmName" type="text" autocomplete="off" placeholder="örn: Döner dürüm + ayran" class="n-in w-full" /></div>
+        <p class="text-[13px] n-muted" data-t="Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.">Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.</p>
+        <div><label for="fmName" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Ne yedin? (isteğe bağlı)">Ne yedin? (isteğe bağlı)</label>
+          <input id="fmName" type="text" autocomplete="off" placeholder="örn: Döner dürüm + ayran" data-t-ph="örn: Döner dürüm + ayran" class="n-in w-full" /></div>
         <div class="grid grid-cols-2 gap-2">
-          <div><label for="fmKcal" class="block text-[13px] font-semibold mb-1.5">Kalori (kcal)</label>
-            <input id="fmKcal" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 850" oninput="updateFreeMealHint()" class="n-in w-full" /></div>
-          <div><label for="fmP" class="block text-[13px] font-semibold n-p mb-1.5">Protein (g)</label>
-            <input id="fmP" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 40" class="n-in w-full" /></div>
-          <div><label for="fmC" class="block text-[13px] font-semibold n-k mb-1.5">Karb (g) · isteğe bağlı</label>
+          <div><label for="fmKcal" class="block text-[13px] font-semibold mb-1.5" data-t="Kalori (kcal)">Kalori (kcal)</label>
+            <input id="fmKcal" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 850" data-t-ph="örn: 850" oninput="updateFreeMealHint()" class="n-in w-full" /></div>
+          <div><label for="fmP" class="block text-[13px] font-semibold n-p mb-1.5" data-t="Protein (g)">Protein (g)</label>
+            <input id="fmP" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 40" data-t-ph="örn: 40" class="n-in w-full" /></div>
+          <div><label for="fmC" class="block text-[13px] font-semibold n-k mb-1.5" data-t="Karb (g) · isteğe bağlı">Karb (g) · isteğe bağlı</label>
             <input id="fmC" type="text" inputmode="decimal" autocomplete="off" placeholder="—" class="n-in w-full" /></div>
-          <div><label for="fmF" class="block text-[13px] font-semibold n-y mb-1.5">Yağ (g) · isteğe bağlı</label>
+          <div><label for="fmF" class="block text-[13px] font-semibold n-y mb-1.5" data-t="Yağ (g) · isteğe bağlı">Yağ (g) · isteğe bağlı</label>
             <input id="fmF" type="text" inputmode="decimal" autocomplete="off" placeholder="—" class="n-in w-full" /></div>
         </div>
         <label class="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
-          <span class="text-[14px] font-semibold">Bu öğündeki besinlerin yerine say</span>
+          <span class="text-[14px] font-semibold" data-t="Bu öğündeki besinlerin yerine say">Bu öğündeki besinlerin yerine say</span>
           <input id="fmReplace" type="checkbox" class="n-sw" checked onchange="updateFreeMealHint()" />
         </label>
         <p id="fmHint" class="text-[13px] n-muted" role="status" aria-live="polite"></p>
         <label id="fmBalanceWrap" class="flex items-center justify-between gap-3 min-h-[44px] cursor-pointer">
-          <span class="min-w-0"><span class="block text-[14px] font-semibold">Günü dengele</span>
-            <span class="block text-[12px] n-muted">Aşımı kalan öğünlerdeki karb ve yağdan kısarım; protein kaynaklarına dokunmam.</span></span>
+          <span class="min-w-0"><span class="block text-[14px] font-semibold" data-t="Günü dengele">Günü dengele</span>
+            <span class="block text-[12px] n-muted" data-t="Aşımı kalan öğünlerdeki karb ve yağdan kısarım; protein kaynaklarına dokunmam.">Aşımı kalan öğünlerdeki karb ve yağdan kısarım; protein kaynaklarına dokunmam.</span></span>
           <input id="fmBalance" type="checkbox" class="n-sw" />
         </label>
       </div>
       <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 n-bt">
-        <button onclick="closeModal('freeMealModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]">Vazgeç</button>
-        <button onclick="saveFreeMeal()" class="n-btn h-[52px] rounded-full text-[15px]">Kaydet</button>
+        <button onclick="closeModal('freeMealModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]" data-t="Vazgeç">Vazgeç</button>
+        <button onclick="saveFreeMeal()" class="n-btn h-[52px] rounded-full text-[15px]" data-t="Kaydet">Kaydet</button>
       </div>
     </div>
   </div>
@@ -1196,24 +1196,24 @@
     <div role="dialog" aria-labelledby="rcTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
       <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
         <h3 id="rcTitle" class="text-[20px] font-extrabold">Yeni tarif</h3>
-        <button onclick="closeModal('recipeModal')" aria-label="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        <button onclick="closeModal('recipeModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
-        <div><label for="rcName" class="block text-[13px] font-semibold n-muted mb-1.5">Tarifin adı</label>
-          <input id="rcName" type="text" autocomplete="off" placeholder="örn: Annemin mercimek çorbası" class="n-in w-full" /></div>
+        <div><label for="rcName" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Tarifin adı">Tarifin adı</label>
+          <input id="rcName" type="text" autocomplete="off" placeholder="örn: Annemin mercimek çorbası" data-t-ph="örn: Annemin mercimek çorbası" class="n-in w-full" /></div>
         <div>
-          <div class="n-label mb-1">MALZEMELER (ÇİĞ HÂLİYLE)</div>
+          <div class="n-label mb-1" data-t="MALZEMELER (ÇİĞ HÂLİYLE)">MALZEMELER (ÇİĞ HÂLİYLE)</div>
           <div id="rcItems" class="n-div"></div>
-          <button onclick="rcAddIngredient()" class="n-btn-outline w-full h-11 rounded-full text-[14px] mt-2">+ Malzeme ekle</button>
+          <button onclick="rcAddIngredient()" class="n-btn-outline w-full h-11 rounded-full text-[14px] mt-2" data-t="+ Malzeme ekle">+ Malzeme ekle</button>
         </div>
-        <div><label for="rcCooked" class="block text-[13px] font-semibold n-muted mb-1.5">Pişmiş toplam ağırlık (g)</label>
+        <div><label for="rcCooked" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Pişmiş toplam ağırlık (g)">Pişmiş toplam ağırlık (g)</label>
           <input id="rcCooked" type="text" inputmode="decimal" autocomplete="off" oninput="updateRecipeSummary()" class="n-in w-full" />
-          <p class="text-[12px] n-dim mt-1.5">Pişince tencereyi tart, boş tencerenin ağırlığını düş. Sonra yediğin miktarı gram olarak girersin.</p></div>
+          <p class="text-[12px] n-dim mt-1.5" data-t="Pişince tencereyi tart, boş tencerenin ağırlığını düş. Sonra yediğin miktarı gram olarak girersin.">Pişince tencereyi tart, boş tencerenin ağırlığını düş. Sonra yediğin miktarı gram olarak girersin.</p></div>
         <div id="rcSum" class="n-elev rounded-2xl px-3.5 py-3 text-[13px]"></div>
       </div>
       <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 n-bt">
-        <button onclick="closeModal('recipeModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]">Vazgeç</button>
-        <button onclick="saveRecipe()" class="n-btn h-[52px] rounded-full text-[15px]">Kaydet</button>
+        <button onclick="closeModal('recipeModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]" data-t="Vazgeç">Vazgeç</button>
+        <button onclick="saveRecipe()" class="n-btn h-[52px] rounded-full text-[15px]" data-t="Kaydet">Kaydet</button>
       </div>
     </div>
   </div>
@@ -1222,18 +1222,18 @@
   <div id="shopModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-[45]">
     <div role="dialog" aria-labelledby="shopTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
       <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
-        <div class="min-w-0"><h3 id="shopTitle" class="text-[20px] font-extrabold">Haftalık alışveriş listesi</h3><div id="shopCount" class="text-[13px] n-muted"></div></div>
-        <button onclick="closeModal('shopModal')" aria-label="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        <div class="min-w-0"><h3 id="shopTitle" class="text-[20px] font-extrabold" data-t="Haftalık alışveriş listesi">Haftalık alışveriş listesi</h3><div id="shopCount" class="text-[13px] n-muted"></div></div>
+        <button onclick="closeModal('shopModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-2">
         <div id="shopDays" class="n-elev rounded-2xl px-3.5 py-2.5"></div>
-        <p class="text-[12px] n-dim">Menülerindeki gramajlar gün sayısıyla çarpılıp toplandı; tarifler malzemelerine ayrıldı. Aldıklarına dokunup üstünü çiz.</p>
+        <p class="text-[12px] n-dim" data-t="Menülerindeki gramajlar gün sayısıyla çarpılıp toplandı; tarifler malzemelerine ayrıldı. Aldıklarına dokunup üstünü çiz.">Menülerindeki gramajlar gün sayısıyla çarpılıp toplandı; tarifler malzemelerine ayrıldı. Aldıklarına dokunup üstünü çiz.</p>
         <div id="shopItems"></div>
       </div>
       <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 n-bt">
-        <button onclick="copyShopList()" class="n-btn h-[52px] rounded-full text-[15px] col-span-2">Notlar'a kopyala</button>
-        <button onclick="shareShopList()" class="n-btn-outline h-12 rounded-full text-[14px]">Paylaş</button>
-        <button onclick="clearShopChecks()" class="n-btn-ghost h-12 rounded-full text-[14px]">İşaretleri temizle</button>
+        <button onclick="copyShopList()" class="n-btn h-[52px] rounded-full text-[15px] col-span-2" data-t="Notlar'a kopyala">Notlar'a kopyala</button>
+        <button onclick="shareShopList()" class="n-btn-outline h-12 rounded-full text-[14px]" data-t="Paylaş">Paylaş</button>
+        <button onclick="clearShopChecks()" class="n-btn-ghost h-12 rounded-full text-[14px]" data-t="İşaretleri temizle">İşaretleri temizle</button>
       </div>
     </div>
   </div>
@@ -1243,19 +1243,19 @@
     <div class="card p-5 max-w-md w-full space-y-3.5">
       <div class="flex justify-between items-center gap-2">
         <h3 id="mealModalTitle" class="font-bold text-base text-[var(--w-acc)]">Öğün Ekle</h3>
-        <button onclick="closeModal('mealModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1" aria-label="Kapat">&times;</button>
+        <button onclick="closeModal('mealModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1" aria-label="Kapat" data-t-aria="Kapat">&times;</button>
       </div>
       <div class="space-y-3 text-xs">
-        <div><label for="mmName" class="block text-[var(--w-muted)] mb-1">Öğün adı</label><input id="mmName" type="text" class="w-full p-2 rounded-lg text-base" /></div>
+        <div><label for="mmName" class="block text-[var(--w-muted)] mb-1" data-t="Öğün adı">Öğün adı</label><input id="mmName" type="text" class="w-full p-2 rounded-lg text-base" /></div>
         <div class="grid grid-cols-2 gap-2">
-          <div><label for="mmTime" class="block text-[var(--w-muted)] mb-1">Saat (isteğe bağlı)</label><input id="mmTime" type="time" class="w-full p-2 rounded-lg text-base" /></div>
-          <div><label for="mmNote" class="block text-[var(--w-muted)] mb-1">Kısa not</label><input id="mmNote" type="text" placeholder="örn: 50g protein" class="w-full p-2 rounded-lg text-base" /></div>
+          <div><label for="mmTime" class="block text-[var(--w-muted)] mb-1" data-t="Saat (isteğe bağlı)">Saat (isteğe bağlı)</label><input id="mmTime" type="time" class="w-full p-2 rounded-lg text-base" /></div>
+          <div><label for="mmNote" class="block text-[var(--w-muted)] mb-1" data-t="Kısa not">Kısa not</label><input id="mmNote" type="text" placeholder="örn: 50g protein" data-t-ph="örn: 50g protein" class="w-full p-2 rounded-lg text-base" /></div>
         </div>
-        <p class="text-[12px] text-[var(--w-dim)]">Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.</p>
+        <p class="text-[12px] text-[var(--w-dim)]" data-t="Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.">Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.</p>
       </div>
       <div class="flex justify-end gap-2 pt-1">
-        <button onclick="closeModal('mealModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">İptal</button>
-        <button onclick="saveMealModal()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+        <button onclick="closeModal('mealModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg" data-t="İptal">İptal</button>
+        <button onclick="saveMealModal()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold" data-t="Kaydet">Kaydet</button>
       </div>
     </div>
   </div>
@@ -2499,11 +2499,11 @@ const SUPP_PRESETS = [
   { key: "omega3", m: /omega/, name: "Omega-3", dose: 2, step: 1, min: 1, max: 6, unit: "softjel", note: "Tok karnına", time: "morning" },
   { key: "creatine", m: /kreatin|creatine/, name: "Kreatin Monohidrat", dose: 5, step: 1, min: 3, max: 10, unit: "g", note: "Bol su ile", time: "post" },
   { key: "whey", m: /whey|protein tozu/, name: "Whey Protein", dose: 1, step: 0.5, min: 0.5, max: 4, unit: "ölçek", note: "Antrenman sonrası", time: "post" },
-  { key: "magnesium", m: /magnez/, name: "Magnezyum", dose: 200, step: 100, min: 100, max: 600, unit: "mg", note: "Uykudan 1 saat önce", time: "bed" },
+  { key: "magnesium", m: /magnez|magnesium/, name: "Magnezyum", dose: 200, step: 100, min: 100, max: 600, unit: "mg", note: "Uykudan 1 saat önce", time: "bed" },
   { key: "zinc", m: /cinko|zinc/, name: "Çinko", dose: 15, step: 5, min: 5, max: 50, unit: "mg", note: "Akşam", time: "bed" }
 ];
 const r2 = v => Math.round(v * 100) / 100;
-function fmtDose(v) { return String(r2(v)).replace(".", ","); }
+function fmtDose(v) { return String(r2(v)).replace(".", curLang() === "en" ? "." : ","); }
 const SUPP_DOSE_KEYS = ["dose", "unit", "step", "min", "max"];
 const TABS = ["nutrition", "gym", "mobility", "progress"];
 const DAY_MS = 86400000;
@@ -4413,14 +4413,14 @@ function renderFoods() {
   $("foodMealChips").innerHTML = meals.map((m, i) => `<button onclick="setFoodMeal(${i})" class="n-chip ${i === tIdx ? "solid" : ""} max-w-[220px]" aria-pressed="${i === tIdx}"><span class="truncate">${esc(m.time ? m.time + " · " + m.title : m.title)}</span></button>`).join("");
   const db = getFoodDB();
   const cats = [];
-  if (state.recentFoods.some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["recent", "Son kullanılanlar"]);
-  if (state.combos.length) cats.push(["combos", "Komboların"]);
-  if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", "Tariflerim"]);
-  if (Object.keys(state.customFoods).length) cats.push(["custom", "Özel eklediklerim"]);
+  if (state.recentFoods.some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["recent", t("Son kullanılanlar")]);
+  if (state.combos.length) cats.push(["combos", t("Komboların")]);
+  if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", t("Tariflerim")]);
+  if (Object.keys(state.customFoods).length) cats.push(["custom", t("Özel eklediklerim")]);
   [...new Set(Object.values(BASE_FOOD_DB).map(f => f.cat || "Diğer"))].forEach(c => cats.push([foodCatKey(c), stripEmoji(c)]));
   [...new Set(Object.values(USDA_DB).map(f => f.cat))].forEach(c => { if (!cats.some(x => x[0] === foodCatKey(c))) cats.push([foodCatKey(c), c]); });
   if (!cats.some(c => c[0] === foodUI.cat)) foodUI.cat = "all";
-  $("foodCats").innerHTML = [["all", "Tümü"], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
+  $("foodCats").innerHTML = [["all", t("Tümü")], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
   renderFoodHead();
   renderFoodSuggest();
   renderFoodList();
@@ -4431,30 +4431,30 @@ function foodRemainingText(extraCal, extraP) {
   const plan = nutritionTotals(foodMeals());
   const rc = targets.calTarget - Math.round(plan.cal + extraCal);
   const rp = targets.proTarget - Math.round(plan.p + extraP);
-  const c = rc >= 0 ? `<strong class="tabular-nums">${fmtInt(rc)} kcal</strong> kalır` : `<strong class="tabular-nums n-over">${fmtInt(-rc)} kcal</strong> aşar`;
-  const p = rp >= 0 ? `<strong class="n-p tabular-nums">${fmtInt(rp)} g</strong> protein kalır` : `protein hedefi <strong class="n-p">${fmtInt(-rp)} g</strong> aşılır`;
+  const c = rc >= 0 ? `<strong class="tabular-nums">${fmtInt(rc)} kcal</strong> ${t("kalır")}` : `<strong class="tabular-nums n-over">${fmtInt(-rc)} kcal</strong> ${t("aşar")}`;
+  const p = rp >= 0 ? `<strong class="n-p tabular-nums">${fmtInt(rp)} g</strong> ${t("protein kalır")}` : t("protein hedefi {g} aşılır", { g: `<strong class="n-p">${fmtInt(-rp)} g</strong>` });
   return `${c} · ${p}`;
 }
 function foodRemainPrefix(sel) {
-  const where = foodUI.dest === "menu" ? "menüde" : "bugün";
-  return sel ? `Ekledikten sonra ${where} ` : (foodUI.dest === "menu" ? "Menüde " : "Bugün ");
+  const menu = foodUI.dest === "menu";
+  return sel ? (menu ? t("Ekledikten sonra menüde ") : t("Ekledikten sonra bugün ")) : (menu ? t("Menüde ") : t("Bugün "));
 }
 function renderFoodHead() {
   const meals = foodMeals();
   const tIdx = foodTargetIdx();
   const day = foodUI.dest !== "menu";
-  const seg = `<div class="n-seg grid-cols-2 mb-1.5" aria-label="Nereye eklensin?">
-      <button id="fdDay" onclick="setFoodDest('day')" class="${day ? "on" : ""}" aria-pressed="${day}">Sadece bugüne</button>
-      <button id="fdMenu" onclick="setFoodDest('menu')" class="${day ? "" : "on"}" aria-pressed="${!day}">Menüme (her gün)</button>
+  const seg = `<div class="n-seg grid-cols-2 mb-1.5" aria-label="${esc(t("Nereye eklensin?"))}">
+      <button id="fdDay" onclick="setFoodDest('day')" class="${day ? "on" : ""}" aria-pressed="${day}">${t("Sadece bugüne")}</button>
+      <button id="fdMenu" onclick="setFoodDest('menu')" class="${day ? "" : "on"}" aria-pressed="${!day}">${t("Menüme (her gün)")}</button>
     </div>
-    <p id="fdHint" class="text-[12px] n-dim mb-3 px-1">${day ? "Yalnızca bugünkü öğüne eklenir; menün değişmez." : "Menüne eklenir; her gün geçerli olur."}</p>`;
+    <p id="fdHint" class="text-[12px] n-dim mb-3 px-1">${day ? t("Yalnızca bugünkü öğüne eklenir; menün değişmez.") : t("Menüne eklenir; her gün geçerli olur.")}</p>`;
   if (tIdx < 0) {
-    $("foodHead").innerHTML = seg + `<div class="n-card rounded-[20px] p-4 text-[14px] n-muted">Besin eklemek için önce Menülerim'den bir öğün oluştur.</div>`;
+    $("foodHead").innerHTML = seg + `<div class="n-card rounded-[20px] p-4 text-[14px] n-muted">${t("Besin eklemek için önce Menülerim'den bir öğün oluştur.")}</div>`;
     return;
   }
   const sel = foodSelMacros();
   $("foodHead").innerHTML = seg + `<div class="flex items-start justify-between gap-2">
-      <div class="min-w-0"><div class="n-label">${day ? "BUGÜN HANGİ ÖĞÜNE?" : "MENÜDE HANGİ ÖĞÜNE?"}</div>
+      <div class="min-w-0"><div class="n-label">${day ? t("BUGÜN HANGİ ÖĞÜNE?") : t("MENÜDE HANGİ ÖĞÜNE?")}</div>
         <h2 class="text-[20px] font-extrabold leading-tight mt-0.5 break-words">${esc(meals[tIdx].title)}</h2></div>
     </div>
     <p id="foodRemain" class="text-[13px] n-muted mt-1">${foodRemainPrefix(sel)}${foodRemainingText(sel ? sel.cal : 0, sel ? sel.p : 0)}</p>`;
@@ -4487,7 +4487,7 @@ function foodPresets(f) {
   else vals = [def, 0.5, 1, 2, 3].filter(v => v >= num(f.step, 1) || v === def);
   vals = [...new Set(vals.map(v => round1(v)))].filter(v => v > 0).sort((a, b) => a - b);
   const plus = f.unit === "g" || f.unit === "ml" ? 50 : num(f.step, 1);
-  return { list: vals.map(v => ({ v, label: `${fmtNum(v)} ${f.unit}${v === round1(def) ? " · porsiyon" : ""}` })), plus };
+  return { list: vals.map(v => ({ v, label: `${fmtNum(v)} ${unitL(v, f.unit)}${v === round1(def) ? t(" · porsiyon") : ""}` })), plus };
 }
 
 function renderFoodList() {
@@ -4503,7 +4503,7 @@ function renderFoodList() {
     comboHtml = state.combos.filter(c => !words.length || words.every(w => normSearch(c.name).includes(w))).map(comboRowHtml).join("");
   }
   if (foodUI.cat === "combos") {
-    $("foodList").innerHTML = comboHtml || `<div class="text-[14px] n-muted text-center py-8">Henüz kombon yok. Bir öğünü açıp ★ Kombo olarak kaydedebilirsin.</div>`;
+    $("foodList").innerHTML = comboHtml || `<div class="text-[14px] n-muted text-center py-8">${t("Henüz kombon yok. Bir öğünü açıp ★ Kombo olarak kaydedebilirsin.")}</div>`;
     updateFoodSelUI();
     return;
   }
@@ -4526,7 +4526,7 @@ function renderFoodList() {
     if (id !== foodUI.sel) {
       return `<button onclick='selectFood(${esc(JSON.stringify(id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-food="${esc(id)}">
           <span class="min-w-0"><span class="block text-[15px] font-bold leading-snug">${esc(f.name)}</span>
-            <span class="block text-[12px] n-muted mt-0.5 tabular-nums">${fmtNum(def)} ${esc(f.unit)} · ${Math.round(kcalPerUnit(f) * def)} kcal · ${Math.round(f.p * def)} g protein</span></span>
+            <span class="block text-[12px] n-muted mt-0.5 tabular-nums">${esc(t("{n} {u} · {k} kcal · {p} g protein", { n: fmtNum(def), u: unitL(def, f.unit), k: String(Math.round(kcalPerUnit(f) * def)), p: String(Math.round(f.p * def)) }))}</span></span>
           <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
         </button>`;
     }
@@ -4535,30 +4535,30 @@ function renderFoodList() {
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3.5 my-2" data-food="${esc(id)}" id="foodSelCard">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(f.name)}</h3>
-            <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? " · barkod " + esc(f.barcode) : ""}</div>
+            <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
             ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
             ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">Kalori USDA ölçümüdür (${esc(f.kx)} nedeniyle makrolardan hesaplanandan farklı).</div>` : ""}</div>
           <div class="text-right shrink-0 whitespace-nowrap"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
         </div>
         <div class="flex items-center justify-between px-1">
-          <button onclick="foodStep(-1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Azalt">${svgI("minus", 20, 2.4)}</button>
+          <button onclick="foodStep(-1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Azalt"))}">${svgI("minus", 20, 2.4)}</button>
           <div class="flex items-baseline justify-center gap-1 min-w-0">
-            <input id="foodAmt" type="text" inputmode="decimal" data-fk="food-amt" value="${esc(fmtNum(foodUI.amt))}" oninput="foodAmtInput(this.value)" class="n-amt big t-display" aria-label="${esc(f.name)} miktarı" />
-            <span class="text-[14px] font-semibold n-muted">${esc(f.unit)}</span>
+            <input id="foodAmt" type="text" inputmode="decimal" data-fk="food-amt" value="${esc(fmtNum(foodUI.amt))}" oninput="foodAmtInput(this.value)" class="n-amt big t-display" aria-label="${esc(t("{ad} miktarı", { ad: f.name }))}" />
+            <span class="text-[14px] font-semibold n-muted">${esc(unitL(2, f.unit))}</span>
           </div>
-          <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="Artır">${svgI("plus", 20, 2.4)}</button>
+          <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Artır"))}">${svgI("plus", 20, 2.4)}</button>
         </div>
         ${naturalUnit(f) ? `<div class="flex items-center justify-between gap-2 n-card rounded-full pl-4 pr-1 py-1" data-unit-row>
             <span class="min-w-0 text-[13px] n-muted leading-tight"><strong id="foodUnitCount" class="n-text text-[15px]"></strong><span class="block text-[12px]">1 ${esc(naturalUnit(f).label)} = ${fmtNum(naturalUnit(f).g)} g</span></span>
             <div class="flex gap-1 shrink-0">
-              <button onclick="foodUnitStep(-1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="Bir ${esc(naturalUnit(f).label)} azalt">${svgI("minus", 18, 2.4)}</button>
-              <button onclick="foodUnitStep(1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="Bir ${esc(naturalUnit(f).label)} artır">${svgI("plus", 18, 2.4)}</button>
+              <button onclick="foodUnitStep(-1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="${esc(t("Bir {u} azalt", { u: naturalUnit(f).label }))}">${svgI("minus", 18, 2.4)}</button>
+              <button onclick="foodUnitStep(1)" class="w-11 h-11 rounded-full n-elev flex items-center justify-center" aria-label="${esc(t("Bir {u} artır", { u: naturalUnit(f).label }))}">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>` : ""}
-        <div class="flex items-center justify-start gap-2 flex-wrap" aria-label="Hazır porsiyonlar">
+        <div class="flex items-center justify-start gap-2 flex-wrap" aria-label="${esc(t("Hazır porsiyonlar"))}">
           ${pr.list.map(x => `<button onclick="foodPreset(${x.v})" class="n-chip ${round1(num(foodUI.amt)) === x.v ? "on" : ""}" data-preset="${x.v}">${esc(x.label)}</button>`).join("")}
-          <button onclick="foodPreset(null, ${pr.plus})" class="n-chip">+${fmtNum(pr.plus)} ${esc(f.unit)}</button>
+          <button onclick="foodPreset(null, ${pr.plus})" class="n-chip">+${fmtNum(pr.plus)} ${esc(unitL(pr.plus, f.unit))}</button>
         </div>
         <div class="grid grid-cols-3 gap-2 text-center text-[13px] font-extrabold">
           <div id="foodSelP" class="py-2 rounded-full n-p" style="background: var(--n-p-soft)"></div>
@@ -4568,13 +4568,13 @@ function renderFoodList() {
         ${microOf(f, 1) ? `<div id="foodSelMicro" class="text-[12px] n-muted text-center -mt-1"></div>` : ""}
         <button id="foodAddBtn" onclick="addSelectedFood()" class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}></button>
         ${custom ? `<div class="flex justify-end gap-2 pt-1 n-bt">
-            <button onclick='editCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5">${svgI("edit", 16)}Düzenle</button>
-            <button onclick='deleteCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}Sil</button>
+            <button onclick='editCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5">${svgI("edit", 16)}${t("Düzenle")}</button>
+            <button onclick='deleteCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}${t("Sil")}</button>
           </div>` : ""}
       </div>`;
   }).join("");
   const more = total > shownIds.length
-    ? `<button onclick="foodUI.limit = (foodUI.limit || FOOD_PAGE) + 100; renderFoodList()" class="n-btn-ghost w-full h-12 rounded-full text-[14px] mt-2" id="foodMore">${fmtInt(total - shownIds.length)} sonuç daha · göster</button>` : "";
+    ? `<button onclick="foodUI.limit = (foodUI.limit || FOOD_PAGE) + 100; renderFoodList()" class="n-btn-ghost w-full h-12 rounded-full text-[14px] mt-2" id="foodMore">${t("{n} sonuç daha · göster", { n: fmtInt(total - shownIds.length) })}</button>` : "";
   $("foodList").innerHTML = (comboHtml + html) ? comboHtml + html + more : noResultHtml($("foodSearch").value.trim());
   updateFoodSelUI();
 }
@@ -4585,17 +4585,17 @@ function updateFoodSelUI() {
   if (s && !s.combo && $("foodSelKcal")) {
     const tIdx = foodTargetIdx();
     $("foodSelKcal").textContent = fmtInt(s.cal);
-    $("foodSelP").textContent = `${fmtNum(s.p)} g P`;
-    $("foodSelC").textContent = `${fmtNum(s.c)} g K`;
-    $("foodSelF").textContent = `${fmtNum(s.fat)} g Y`;
-    $("foodAddBtn").textContent = tIdx >= 0 ? `Öğüne ekle · ${fmtInt(s.cal)} kcal` : "Önce bir öğün oluştur";
+    $("foodSelP").textContent = `${fmtNum(s.p)} g ${t("P|makro")}`;
+    $("foodSelC").textContent = `${fmtNum(s.c)} g ${t("K|makro")}`;
+    $("foodSelF").textContent = `${fmtNum(s.fat)} g ${t("Y|makro")}`;
+    $("foodAddBtn").textContent = tIdx >= 0 ? t("Öğüne ekle · {k} kcal", { k: fmtInt(s.cal) }) : t("Önce bir öğün oluştur");
     $("foodAddBtn").disabled = tIdx < 0 || !(s.a > 0);
     document.querySelectorAll("#foodSelCard [data-preset]").forEach(b => b.classList.toggle("on", num(b.dataset.preset) === round1(s.a)));
     const f = getFoodDB()[foodUI.sel];
     const u = naturalUnit(f);
     if (u && $("foodUnitCount")) $("foodUnitCount").textContent = `${fmtNum(round1(s.a / u.g))} × ${u.label}`;
     const mi = microOf(f, s.a);
-    if ($("foodSelMicro")) $("foodSelMicro").textContent = mi ? [mi.fib != null ? `Lif ${fmtNum(mi.fib)} g` : "", mi.salt != null ? `Tuz ${fmtNum(mi.salt)} g` : ""].filter(Boolean).join(" · ") : "";
+    if ($("foodSelMicro")) $("foodSelMicro").textContent = mi ? [mi.fib != null ? t("Lif {n} g", { n: fmtNum(mi.fib) }) : "", mi.salt != null ? t("Tuz {n} g", { n: fmtNum(mi.salt) }) : ""].filter(Boolean).join(" · ") : "";
   }
   const r = $("foodRemain");
   if (r) r.innerHTML = foodRemainPrefix(s) + foodRemainingText(s ? s.cal : 0, s ? s.p : 0);
@@ -4660,9 +4660,9 @@ function renderMicroLine(view) {
   if (!mc.n) { el.innerHTML = ""; el.classList.add("hidden"); return; }
   el.classList.remove("hidden");
   const over = mc.salt > SALT_LIMIT;
-  el.innerHTML = `<span>Lif <strong class="text-white tabular-nums">${fmtNum(mc.fib)}</strong> / ${fibTarget()} g</span>
-    <span>Tuz <strong class="tabular-nums" style="color:${over ? "#FB7185" : "#fff"}">${fmtNum(mc.salt)}</strong> / ${SALT_LIMIT} g</span>
-    ${mc.miss ? `<span class="text-white/60" data-micro-miss>${mc.miss} besinde lif/tuz verisi yok</span>` : ""}`;
+  el.innerHTML = `<span>${t("Lif")} <strong class="text-white tabular-nums">${fmtNum(mc.fib)}</strong> / ${fibTarget()} g</span>
+    <span>${t("Tuz")} <strong class="tabular-nums" style="color:${over ? "#FB7185" : "#fff"}">${fmtNum(mc.salt)}</strong> / ${SALT_LIMIT} g</span>
+    ${mc.miss ? `<span class="text-white/60" data-micro-miss>${tn(mc.miss, "{n} besinde lif/tuz verisi yok")}</span>` : ""}`;
 }
 function foodAmtInput(v) { foodUI.amt = Math.max(0, num(v, 0)); updateFoodSelUI(); }
 function foodStep(dir) {
@@ -4685,13 +4685,13 @@ function addSelectedFood() {
   if (foodUI.dest === "menu") {
     const mealTitle = curMeals()[tIdx].title;
     quickAdd(tIdx, fid, amt, curMeals());
-    toast(`${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${mealTitle} (menüne, her gün)`);
+    toast(t("{a} {u} {f} → {m} (menüne, her gün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: s.f.name, m: mealTitle }));
   } else {
     const list = ensureDayCopy();
     const meal = list[tIdx];
     quickAdd(tIdx, fid, amt, list);
     const mid = meal.id;
-    toast(`${fmtNum(amt)} ${s.f.unit} ${s.f.name} → ${meal.title} (yalnızca bugün)`, "ok", { label: "Menüye de kaydet", fn: () => addToMenuById(mid, fid, amt) });
+    toast(t("{a} {u} {f} → {m} (yalnızca bugün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: s.f.name, m: meal.title }), "ok", { label: t("Menüye de kaydet"), fn: () => addToMenuById(mid, fid, amt) });
   }
   foodUI.sel = null;
   renderFoods();
@@ -4699,9 +4699,9 @@ function addSelectedFood() {
 // Bugüne eklenen besini, aynı kimlikli menü öğününe de ekler
 function addToMenuById(mealId, foodId, amount) {
   const mi = curMeals().findIndex(m => m.id === mealId);
-  if (mi < 0) { toast("Bu öğün menüde bulunamadı", "error"); return; }
+  if (mi < 0) { toast(t("Bu öğün menüde bulunamadı"), "error"); return; }
   quickAdd(mi, foodId, amount, curMeals());
-  toast(`Menüdeki "${curMeals()[mi].title}" öğününe de eklendi`);
+  toast(t("Menüdeki \"{m}\" öğününe de eklendi", { m: curMeals()[mi].title }));
 }
 
 // ---------------------------------------------------------------------------
@@ -4731,24 +4731,24 @@ function renderNutriHistory() {
     const pct = tg > 0 ? Math.min(100, Math.round(kc / tg * 100)) : 0;
     const over = tg > 0 && kc > tg;
     const bits = [];
-    if (r.eatenP != null) bits.push(`Protein <strong>${fmtInt(r.eatenP)}</strong>${r.proTarget ? " / " + fmtInt(r.proTarget) : ""} g`);
-    if (r.water != null) bits.push(`Su <strong>${fmtNum(num(r.water))}</strong> L`);
-    if (r.mealsTotal) bits.push(`Öğün <strong>${num(r.mealsDone)}/${num(r.mealsTotal)}</strong>`);
-    if (r.supps != null) bits.push(`Takviye <strong>${num(r.supps)}</strong>`);
+    if (r.eatenP != null) bits.push(`${t("Protein")} <strong>${fmtInt(r.eatenP)}</strong>${r.proTarget ? " / " + fmtInt(r.proTarget) : ""} g`);
+    if (r.water != null) bits.push(`${t("Su")} <strong>${fmtNum(num(r.water))}</strong> L`);
+    if (r.mealsTotal) bits.push(`${t("Öğün")} <strong>${num(r.mealsDone)}/${num(r.mealsTotal)}</strong>`);
+    if (r.supps != null) bits.push(`${t("Takviye")} <strong>${num(r.supps)}</strong>`);
     return `<div class="n-card rounded-[20px] p-4 space-y-2.5" data-history-day="${esc(r.key)}">
         <div class="flex items-center justify-between gap-2">
-          <div class="text-[15px] font-bold">${r.live ? "Bugün" : esc(dayLabel(r.key))}${r.live ? ' <span class="text-[12px] font-semibold n-accent">· devam ediyor</span>' : ""}</div>
-          ${r.dayType ? `<span class="text-[12px] font-semibold n-muted">${r.dayType === "rest" ? "Dinlenme" : "Antrenman"}</span>` : ""}
+          <div class="text-[15px] font-bold">${r.live ? t("Bugün") : esc(dayLabel(r.key))}${r.live ? ` <span class="text-[12px] font-semibold n-accent">${t("· devam ediyor")}</span>` : ""}</div>
+          ${r.dayType ? `<span class="text-[12px] font-semibold n-muted">${r.dayType === "rest" ? t("Dinlenme") : t("Antrenman")}</span>` : ""}
         </div>
         <div class="flex items-baseline gap-1.5"><span class="t-display text-[26px] leading-none tabular-nums ${over ? "n-over" : ""}">${fmtInt(kc)}</span>
-          <span class="text-[13px] n-muted">${tg ? "/ " + fmtInt(tg) + " " : ""}kcal ${hasEaten ? "yenen" : "planlanan"}</span></div>
+          <span class="text-[13px] n-muted">${tg ? "/ " + fmtInt(tg) + " " : ""}kcal ${hasEaten ? t("yenen") : t("planlanan")}</span></div>
         ${tg ? `<div class="h-1.5 rounded-full n-bar-bg overflow-hidden"><div class="h-full rounded-full" style="width:${pct}%;background:${over ? "var(--n-over)" : "var(--n-accent)"}"></div></div>` : ""}
         ${bits.length ? `<div class="text-[12px] n-muted flex flex-wrap gap-x-3 gap-y-1">${bits.map(b => `<span>${b}</span>`).join("")}</div>` : ""}
       </div>`;
   };
   $("nutriHistory").innerHTML = weekCardHtml() + rows.map(card).join("")
-    + (rows.length === 1 ? `<p class="text-[13px] n-muted text-center py-2">Her gün gece yarısı (ya da "Yeni gün" ile) günün özeti buraya eklenir.</p>` : "")
-    + `<button onclick="switchTab('progress')" class="n-btn-outline w-full h-12 rounded-full text-[14px]">Grafikler için İlerleme sekmesine git</button>`;
+    + (rows.length === 1 ? `<p class="text-[13px] n-muted text-center py-2">${t("Her gün gece yarısı (ya da \"Yeni gün\" ile) günün özeti buraya eklenir.")}</p>` : "")
+    + `<button onclick="switchTab('progress')" class="n-btn-outline w-full h-12 rounded-full text-[14px]">${t("Grafikler için İlerleme sekmesine git")}</button>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -4783,10 +4783,10 @@ async function startScan() {
   wrap.classList.remove("hidden");
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     wrap.classList.add("hidden");
-    bcStatus("Bu cihazda kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin.");
+    bcStatus(t("Bu cihazda kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin."));
     return;
   }
-  bcStatus("Kamera açılıyor…");
+  bcStatus(t("Kamera açılıyor…"));
   try {
     const Z = await loadZXing();
     if (token !== bc.token) return;
@@ -4801,17 +4801,17 @@ async function startScan() {
       wrap.classList.add("hidden");
       onBarcode(code);
     });
-    if (token === bc.token) bcStatus("Barkodu çerçevenin içine getir.");
+    if (token === bc.token) bcStatus(t("Barkodu çerçevenin içine getir."));
   } catch (e) {
     if (token !== bc.token) return;
     stopScan();
     wrap.classList.add("hidden");
     const name = e && e.name;
     bcStatus(name === "NotAllowedError" || name === "SecurityError"
-      ? "Kamera izni verilmedi. iPhone'da Ayarlar → Safari → Kamera'dan izin verebilirsin. Numarayı aşağıya elle de yazabilirsin."
+      ? t("Kamera izni verilmedi. iPhone'da Ayarlar → Safari → Kamera'dan izin verebilirsin. Numarayı aşağıya elle de yazabilirsin.")
       : name === "NotFoundError" || name === "OverconstrainedError"
-        ? "Kamera bulunamadı. Barkod numarasını aşağıya elle yazabilirsin."
-        : "Kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin.");
+        ? t("Kamera bulunamadı. Barkod numarasını aşağıya elle yazabilirsin.")
+        : t("Kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin."));
   }
 }
 function stopScan() {
@@ -4826,25 +4826,25 @@ function barcodeManual() { stopScan(); $("bcCamWrap").classList.add("hidden"); o
 async function onBarcode(raw) {
   const code = String(raw || "").replace(/\D/g, "");
   $("bcResult").innerHTML = "";
-  if (code.length < 8 || code.length > 14) { bcStatus("Geçerli bir barkod numarası değil (8–14 rakam olmalı)."); return; }
+  if (code.length < 8 || code.length > 14) { bcStatus(t("Geçerli bir barkod numarası değil (8–14 rakam olmalı).")); return; }
   $("bcManual").value = code;
   const local = Object.keys(state.customFoods).find(id => state.customFoods[id] && state.customFoods[id].barcode === code);
   if (local) {
     closeBarcode();
     pickFoodInFoods(local);
-    toast(`${state.customFoods[local].name} listende vardı; miktarı seçip öğüne ekle`);
+    toast(t("{f} listende vardı; miktarı seçip öğüne ekle", { f: state.customFoods[local].name }));
     return;
   }
   if (navigator.onLine === false) {
-    bcStatus(`${code} okundu. Ürünü bulmak için internet gerekli. Bağlanınca tekrar dene ya da besini elle ekle.`);
+    bcStatus(t("{code} okundu. Ürünü bulmak için internet gerekli. Bağlanınca tekrar dene ya da besini elle ekle.", { code }));
     bcManualButton(code, "");
     return;
   }
-  bcStatus(`${code} aranıyor…`);
+  bcStatus(t("{code} aranıyor…", { code }));
   let p;
   try { p = await fetchOFF(code); }
   catch (e) {
-    bcStatus("Ürün bilgisine ulaşılamadı. İnternet bağlantını kontrol edip tekrar dene ya da besini elle ekle.");
+    bcStatus(t("Ürün bilgisine ulaşılamadı. İnternet bağlantını kontrol edip tekrar dene ya da besini elle ekle."));
     bcManualButton(code, "");
     return;
   }
@@ -4860,30 +4860,30 @@ async function onBarcode(raw) {
   const pr = v("proteins_100g"), cb = v("carbohydrates_100g"), ft = v("fat_100g");
   let kcal = v("energy-kcal_100g");
   if (!isFinite(kcal) && isFinite(v("energy_100g"))) kcal = v("energy_100g") / 4.184;
-  const name = String(p.product_name_tr || p.product_name || "").trim() || `Ürün ${code}`;
+  const name = String(p.product_name_tr || p.product_name || "").trim() || t("Ürün {code}", { code });
   const brand = String(p.brands || "").split(",")[0].trim();
   const unit = String(p.product_quantity_unit || "").toLowerCase() === "ml" ? "ml" : "g";
   const serving = num(p.serving_quantity, 0);
   const complete = [pr, cb, ft].every(x => isFinite(x) && x >= 0);
   bc.found = { code, name, brand, unit, p: pr, c: cb, f: ft, kcal: isFinite(kcal) ? kcal : null, def: serving > 0 && serving <= 1000 ? Math.round(serving) : 100 };
   const issues = complete ? labelCheck(isFinite(kcal) ? kcal : null, pr, cb, ft, 100) : [];
-  bcStatus(!complete ? "Ürün bulundu ama besin değerleri eksik." : issues.length ? "Ürün bulundu ama değerleri tutarsız görünüyor." : "Ürün bulundu.");
+  bcStatus(!complete ? t("Ürün bulundu ama besin değerleri eksik.") : issues.length ? t("Ürün bulundu ama değerleri tutarsız görünüyor.") : t("Ürün bulundu."));
   $("bcResult").innerHTML = `<div class="n-elev rounded-[20px] p-4 space-y-2.5">
       <div><div class="text-[16px] font-bold leading-snug break-words">${esc(name)}</div><div class="text-[12px] n-muted">${brand ? esc(brand) + " · " : ""}${code}</div></div>
       ${complete
-        ? `<div class="text-[13px]"><span class="n-muted">100 ${unit}:</span> <strong>${Math.round(isFinite(kcal) ? kcal : pr * 4 + cb * 4 + ft * 9)} kcal</strong> · <span class="n-p">${fmtNum(pr)} g P</span> · <span class="n-k">${fmtNum(cb)} g K</span> · <span class="n-y">${fmtNum(ft)} g Y</span></div>
+        ? `<div class="text-[13px]"><span class="n-muted">100 ${unit}:</span> <strong>${Math.round(isFinite(kcal) ? kcal : pr * 4 + cb * 4 + ft * 9)} kcal</strong> · <span class="n-p">${fmtNum(pr)} g ${t("P|makro")}</span> · <span class="n-k">${fmtNum(cb)} g ${t("K|makro")}</span> · <span class="n-y">${fmtNum(ft)} g ${t("Y|makro")}</span></div>
            ${issues.length
-             ? `<div id="bcWarn" class="rounded-2xl p-3 text-[13px] leading-snug" style="background: var(--n-over-soft); color: var(--n-text)"><strong style="color: var(--n-over)">⚠ Etiketle karşılaştır.</strong> ${esc(issues.join(" "))} Bu veriler gönüllülerce girilir; hata olabilir.</div>
-                <button onclick="barcodeFixFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Etikete bakıp düzelt</button>
-                <button onclick="addBarcodeFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">Yine de ekle</button>`
-             : `<button onclick="addBarcodeFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Listeme ekle ve seç</button>`}`
-        : `<p class="text-[13px] n-muted">Paketin üzerindeki 100 ${unit} değerleriyle elle ekleyebilirsin.</p>
-           <button onclick="barcodeManualFood()" class="n-btn w-full h-12 rounded-full text-[15px]">Elle ekle</button>`}
+             ? `<div id="bcWarn" class="rounded-2xl p-3 text-[13px] leading-snug" style="background: var(--n-over-soft); color: var(--n-text)"><strong style="color: var(--n-over)">${t("⚠ Etiketle karşılaştır.")}</strong> ${esc(issues.join(" "))} ${t("Bu veriler gönüllülerce girilir; hata olabilir.")}</div>
+                <button onclick="barcodeFixFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Etikete bakıp düzelt")}</button>
+                <button onclick="addBarcodeFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">${t("Yine de ekle")}</button>`
+             : `<button onclick="addBarcodeFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Listeme ekle ve seç")}</button>`}`
+        : `<p class="text-[13px] n-muted">${t("Paketin üzerindeki 100 {u} değerleriyle elle ekleyebilirsin.", { u: unit })}</p>
+           <button onclick="barcodeManualFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Elle ekle")}</button>`}
     </div>`;
 }
 function bcManualButton(code, name) {
   bc.found = { code, name };
-  $("bcResult").innerHTML = `<button onclick="barcodeManualFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">Etiketteki değerleri gir</button>`;
+  $("bcResult").innerHTML = `<button onclick="barcodeManualFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">${t("Etiketteki değerleri gir")}</button>`;
 }
 // v21: Etiket değerleri tutarlı mı? (Open Food Facts'te ve elle girişte sık görülen hatalar: kJ/kcal karışıklığı,
 // ondalık hatası, porsiyon ↔ 100 g karışıklığı). base = değerlerin ait olduğu gram (100 ya da porsiyon); 0 = adet (yalnızca kalori sağlaması).
@@ -4891,14 +4891,14 @@ function bcManualButton(code, name) {
 function labelCheck(kcal, p, c, f, base) {
   const out = [];
   p = num(p, 0); c = num(c, 0); f = num(f, 0);
-  if (base > 0 && p + c + f > base * 1.03) out.push(`Protein + karb + yağ (${fmtNum(p + c + f)} g), ${fmtNum(base)} g'ı aşıyor.`);
+  if (base > 0 && p + c + f > base * 1.03) out.push(t("Protein + karb + yağ ({s} g), {b} g'ı aşıyor.", { s: fmtNum(p + c + f), b: fmtNum(base) }));
   const k = kcal == null || !isFinite(kcal) ? null : num(kcal, 0);
-  if (base > 0 && k != null && k > base * 9.2) out.push(`${fmtNum(base)} g için ${Math.round(k)} kcal olamaz (en fazla ~${Math.round(base * 9)}).`);
+  if (base > 0 && k != null && k > base * 9.2) out.push(t("{b} g için {k} kcal olamaz (en fazla ~{m}).", { b: fmtNum(base), k: String(Math.round(k)), m: String(Math.round(base * 9)) }));
   if (k != null && (p + c + f) > 0) {
     const calc = p * 4 + c * 4 + f * 9;
     if (Math.abs(calc - k) > Math.max(12, 0.2 * Math.max(k, calc))) {
       const kj = Math.abs(calc * 4.184 - k) <= Math.max(25, 0.15 * k);
-      out.push(`Yazan kalori ${Math.round(k)}, makrolardan hesaplanan ${Math.round(calc)}.${kj ? " Kalori yerine kilojoule (kJ) yazılmış olabilir." : ""}`);
+      out.push(t("Yazan kalori {k}, makrolardan hesaplanan {c}.", { k: String(Math.round(k)), c: String(Math.round(calc)) }) + (kj ? " " + t("Kalori yerine kilojoule (kJ) yazılmış olabilir.") : ""));
     }
   }
   return out;
@@ -4923,7 +4923,7 @@ function addBarcodeFood() {
   invalidateFoodDB();
   closeBarcode();
   pickFoodInFoods(id);
-  toast(`${nm} listene eklendi; miktarı seçip öğüne ekle`);
+  toast(t("{f} listene eklendi; miktarı seçip öğüne ekle", { f: nm }));
 }
 // Tutarsız barkod ürünü: etiket formu bulunan değerlerle dolu açılır, kullanıcı paketteki tabloyla düzeltir
 function barcodeFixFood() {
@@ -4931,7 +4931,7 @@ function barcodeFixFood() {
   if (!b.code) return;
   closeBarcode();
   openLabelForm(b.code, (b.brand && b.name && !b.name.toLocaleLowerCase("tr").includes(b.brand.toLocaleLowerCase("tr")) ? `${b.name} (${b.brand})` : b.name || "").slice(0, 50));
-  $("cfHint").textContent = `Barkod ${b.code}. Bulunan değerler tutarsızdı; paketin besin tablosuyla karşılaştırıp düzelt (100 g değerleri).`;
+  $("cfHint").textContent = t("Barkod {code}. Bulunan değerler tutarsızdı; paketin besin tablosuyla karşılaştırıp düzelt (100 g değerleri).", { code: b.code });
   if (b.kcal != null) $("cfK").value = fmtNum(b.kcal);
   $("cfP").value = fmtNum(b.p); $("cfC").value = fmtNum(b.c); $("cfF").value = fmtNum(b.f);
 }
@@ -4940,7 +4940,7 @@ function barcodeManualFood() {
   closeBarcode();
   if (b.code) {
     openLabelForm(b.code, b.name || "");
-    $("cfHint").textContent = `Barkod ${b.code}. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.`;
+    $("cfHint").textContent = t("Barkod {code}. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.", { code: b.code });
     return;
   }
   openCustomFoodModal();
@@ -4980,7 +4980,7 @@ function logCurrentWeight() {
   if (validBf(state.settings.bodyFat)) entry.bf = validBf(state.settings.bodyFat);
   if (last && last.ts && todayStr(new Date(last.ts)) === todayStr()) state.weightLogs[state.weightLogs.length - 1] = entry;
   else state.weightLogs.push(entry);
-  toast(`${fmtNum(state.weight)} kg kaydedildi`);
+  toast(t("{w} kg kaydedildi", { w: fmtNum(state.weight) }));
   renderAll();
 }
 function deleteWeightLog(idx) {
@@ -4988,7 +4988,7 @@ function deleteWeightLog(idx) {
   snapshot();
   state.weightLogs.splice(idx, 1);
   renderAll();
-  offerUndo("Tartı kaydı silindi");
+  offerUndo(t("Tartı kaydı silindi"));
 }
 
 function addWater(delta) { state.waterLiters = Math.max(0, Math.round(((state.waterLiters || 0) + delta) * 100) / 100); renderAll(); }
@@ -5027,7 +5027,7 @@ function removeItem(mIdx, iIdx) {
   const it = curMeals()[mIdx].items.splice(iIdx, 1)[0];
   const f = it ? getFoodDB()[it.foodId] : null;
   renderAll();
-  offerUndo(`${f ? f.name : "Besin"} çıkarıldı`);
+  offerUndo(t("{f} çıkarıldı", { f: f ? f.name : t("Besin") }));
 }
 
 // amount: ekranda görünen miktar (ölçek açıksa saklanacak miktara çevrilir)
@@ -5047,7 +5047,7 @@ function quickAdd(mIdx, foodId, amount, meals) {
 function openCustomFoodModal() {
   cfEditId = null;
   cfPendingBarcode = null;
-  $("cfTitle").textContent = "Kendi özel besinini tanımla";
+  $("cfTitle").textContent = t("Kendi özel besinini tanımla");
   $("cfHint").classList.add("hidden");
   $("cfName").value = ""; $("cfUnit").value = "100g"; $("cfDef").value = "100";
   $("cfK").value = "";
@@ -5059,29 +5059,29 @@ function openCustomFoodModal() {
 function openLabelForm(code, name) {
   openCustomFoodModal();
   cfPendingBarcode = code || null;
-  $("cfTitle").textContent = "Etiketteki değerleri gir";
-  $("cfHint").textContent = `Barkod ${code} veritabanında yok. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.`;
+  $("cfTitle").textContent = t("Etiketteki değerleri gir");
+  $("cfHint").textContent = t("Barkod {code} veritabanında yok. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.", { code });
   $("cfHint").classList.remove("hidden");
   $("cfName").value = name || "";
   ["cfK", "cfP", "cfC", "cfF"].forEach(id => { $(id).value = ""; });
 }
 function cfUnitChanged() {
   const m = $("cfUnit").value;
-  $("cfDefLabel").textContent = m === "serv" ? "1 porsiyon kaç gram?" : m === "1adet" ? "Varsayılan miktar (adet):" : "Varsayılan miktar (g):";
+  $("cfDefLabel").textContent = m === "serv" ? t("1 porsiyon kaç gram?") : m === "1adet" ? t("Varsayılan miktar (adet):") : t("Varsayılan miktar (g):");
 }
 async function saveCustomFood() {
   const name = $("cfName").value.trim();
-  if (!name) { sayAlert("Ad eksik", "Lütfen besin adını gir."); return; }
+  if (!name) { sayAlert(t("Ad eksik"), t("Lütfen besin adını gir.")); return; }
   const unitMode = $("cfUnit").value;
   const def = num($("cfDef").value, 100) || 100;
   const p = num($("cfP").value), c = num($("cfC").value), f = num($("cfF").value);
   const kRaw = $("cfK").value.trim();
   const k = kRaw === "" ? null : num(kRaw, NaN);
-  if ([p, c, f].some(x => x < 0) || (k != null && !(k >= 0))) { sayAlert("Değer hatalı", "Değerler negatif olamaz; kaloriyi rakamla yaz."); return; }
-  if (unitMode === "serv" && !(def > 0 && def <= 2000)) { sayAlert("Porsiyon eksik", "Lütfen 1 porsiyonun kaç gram olduğunu yaz (etikette yazar, örn: 30)."); return; }
+  if ([p, c, f].some(x => x < 0) || (k != null && !(k >= 0))) { sayAlert(t("Değer hatalı"), t("Değerler negatif olamaz; kaloriyi rakamla yaz.")); return; }
+  if (unitMode === "serv" && !(def > 0 && def <= 2000)) { sayAlert(t("Porsiyon eksik"), t("Lütfen 1 porsiyonun kaç gram olduğunu yaz (etikette yazar, örn: 30).")); return; }
   // v21: etiket tutarlılık kontrolü (100 g / 1 porsiyon; adet modunda yalnızca kalori sağlaması)
   const lc = labelCheck(k, p, c, f, unitMode === "1adet" ? 0 : unitMode === "serv" ? def : 100);
-  if (lc.length && !(await askConfirm("Değerler tutarsız görünüyor", lc.join(" ") + " Etiketle karşılaştır; doğruysa yine de kaydedebilirsin.", "Yine de kaydet"))) return;
+  if (lc.length && !(await askConfirm(t("Değerler tutarsız görünüyor"), lc.join(" ") + " " + t("Etiketle karşılaştır; doğruysa yine de kaydedebilirsin."), t("Yine de kaydet")))) return;
   const editing = cfEditId && state.customFoods[cfEditId];
   const prev = editing ? state.customFoods[cfEditId] : null;
   const barcode = prev && prev.barcode ? prev.barcode : cfPendingBarcode;
@@ -5099,7 +5099,7 @@ async function saveCustomFood() {
   state.customFoods[id] = food;
   invalidateFoodDB();
   closeModal("customFoodModal");
-  toast(editing ? "" + name + " güncellendi" : "" + name + " besin listene eklendi");
+  toast(editing ? t("{f} güncellendi", { f: name }) : t("{f} besin listene eklendi", { f: name }));
   renderAll();
   if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") selectFood(id);
 }
@@ -7653,7 +7653,7 @@ function coachHintText() {
   if (!a.ready || Math.abs(a.delta) < 100) return "";
   const applied = num(state.settings.coachAppliedAt, 0);
   if (applied && Date.now() - applied < 7 * DAY_MS) return "";
-  return `🧠 Koç önerisi: hedef kalorini ${Math.abs(a.delta)} kcal ${a.delta > 0 ? "artır" : "azalt"} → İlerleme`;
+  return a.delta > 0 ? t("🧠 Koç önerisi: hedef kalorini {n} kcal artır → İlerleme", { n: String(Math.abs(a.delta)) }) : t("🧠 Koç önerisi: hedef kalorini {n} kcal azalt → İlerleme", { n: String(Math.abs(a.delta)) });
 }
 
 // ============================================================================
@@ -7785,17 +7785,17 @@ function suppDoseDefaults(dose, unit) {
   return { step, min: step, max: r2(Math.max(dose * 4, step * 10)) };
 }
 function suppTimeLabel(s) {
-  if (s.time === "custom") return s.timeLabel || "Özel";
+  if (s.time === "custom") return s.timeLabel || t("Özel");
   const slot = SUPP_TIMES.find(x => x[0] === s.time);
-  return slot ? slot[1] : "";
+  return slot ? t(slot[1]) : "";
 }
 function suppDoseText(s) { return s.dose ? `${fmtDose(s.dose)} ${s.unit || ""}`.trim() : ""; }
 function suppPillHtml(s) {
   const on = !!state.supplements[s.id], sid = esc(JSON.stringify(s.id));
   const sub = [s.dose ? `<b>${esc(suppDoseText(s))}</b>` : "", esc(s.note || (s.time === "pre" || s.time === "post" ? suppTimeLabel(s) : ""))].filter(Boolean).join(" · ");
   const stepper = s.dose ? `<div class="n-step">
-      <button onclick="changeSuppDose(${sid}, -1)" ${s.dose - s.step < s.min - 1e-9 ? "disabled" : ""} aria-label="${esc(s.name)} dozunu azalt">${svgI("minus", 18, 2.5)}</button>
-      <button onclick="changeSuppDose(${sid}, 1)" ${s.dose + s.step > s.max + 1e-9 ? "disabled" : ""} aria-label="${esc(s.name)} dozunu artır">${svgI("plus", 18, 2.5)}</button>
+      <button onclick="changeSuppDose(${sid}, -1)" ${s.dose - s.step < s.min - 1e-9 ? "disabled" : ""} aria-label="${esc(t("{ad} dozunu azalt", { ad: s.name }))}">${svgI("minus", 18, 2.5)}</button>
+      <button onclick="changeSuppDose(${sid}, 1)" ${s.dose + s.step > s.max + 1e-9 ? "disabled" : ""} aria-label="${esc(t("{ad} dozunu artır", { ad: s.name }))}">${svgI("plus", 18, 2.5)}</button>
     </div>` : "";
   return `<div class="n-pill ${on ? "taken" : ""}" data-supp-pill="${esc(s.id)}">
     <button onclick="toggleSupp(${sid})" class="n-pill-main" aria-pressed="${on ? "true" : "false"}">
@@ -7807,7 +7807,7 @@ function suppPillHtml(s) {
 function renderSupps() {
   const list = state.supplementList;
   const done = list.filter(s => state.supplements[s.id]).length;
-  $("suppCounter").textContent = `${done} / ${list.length} Tamamlandı`;
+  $("suppCounter").textContent = t("{done} / {n} Tamamlandı", { done, n: list.length });
   $("suppCounter").classList.toggle("hidden", !list.length);
   $("suppBarWrap").classList.toggle("hidden", !list.length);
   $("suppBar").style.width = (list.length ? Math.round(done / list.length * 100) : 0) + "%";
@@ -7817,33 +7817,33 @@ function renderSupps() {
     html = `<div class="w-full space-y-2" id="suppEditList">${list.map((s, i) => `<div class="n-pill-edit space-y-1.5" data-supp-row="${i}">
         <div class="flex items-center gap-2 min-h-[44px]">
           <span class="flex-1 min-w-0 text-[14px] font-semibold pl-1 n-text" style="overflow-wrap:anywhere">${esc(s.name)}</span>
-          <button onclick="removeSupp(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(s.name)} sil">${svgI("trash", 18)}</button>
+          <button onclick="removeSupp(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} sil", { ad: s.name }))}">${svgI("trash", 18)}</button>
         </div>
         <div class="flex items-center gap-2">
-          <select onchange="setSuppTime(${i}, this.value)" class="n-in h-11 flex-1 min-w-0" aria-label="${esc(s.name)} ne zaman alınır?">
-            <option value="" ${!s.time ? "selected" : ""}>Zaman seç</option>
-            ${SUPP_TIMES.map(([k, l]) => `<option value="${k}" ${s.time === k ? "selected" : ""}>${k === "custom" && s.time === "custom" ? esc(suppTimeLabel(s)) : l}</option>`).join("")}
+          <select onchange="setSuppTime(${i}, this.value)" class="n-in h-11 flex-1 min-w-0" aria-label="${esc(t("{ad} ne zaman alınır?", { ad: s.name }))}">
+            <option value="" ${!s.time ? "selected" : ""}>${t("Zaman seç")}</option>
+            ${SUPP_TIMES.map(([k, l]) => `<option value="${k}" ${s.time === k ? "selected" : ""}>${k === "custom" && s.time === "custom" ? esc(suppTimeLabel(s)) : esc(t(l))}</option>`).join("")}
           </select>
-          <button onclick="editSuppDose(${i})" class="n-chip shrink-0" data-supp-dose="${i}" aria-label="${esc(s.name)} dozu">${s.dose ? "Doz: " + esc(suppDoseText(s)) : "+ Doz"}</button>
+          <button onclick="editSuppDose(${i})" class="n-chip shrink-0" data-supp-dose="${i}" aria-label="${esc(t("{ad} dozu", { ad: s.name }))}">${s.dose ? esc(t("Doz: {d}", { d: suppDoseText(s) })) : t("+ Doz")}</button>
         </div>
       </div>`).join("")}</div>`;
     const presets = SUPP_PRESETS.filter(p => !list.some(s => s.preset === p.key || p.m.test(normSearch(s.name))));
-    if (presets.length) html += `<div class="n-sgroup">Hazır takviyeler</div><div class="flex flex-wrap gap-2" id="suppPresets">${presets.map(p =>
-      `<button onclick="addPresetSupp('${p.key}')" class="n-chip add">+ ${esc(p.name)}</button>`).join("")}</div>`;
-    html += `<div class="flex flex-wrap gap-2 pt-1"><button onclick="addSupp()" class="n-chip add">+ Ekle</button>
-      <button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}Bitti</button></div>`;
+    if (presets.length) html += `<div class="n-sgroup">${t("Hazır takviyeler")}</div><div class="flex flex-wrap gap-2" id="suppPresets">${presets.map(p =>
+      `<button onclick="addPresetSupp('${p.key}')" class="n-chip add">+ ${esc(t(p.name))}</button>`).join("")}</div>`;
+    html += `<div class="flex flex-wrap gap-2 pt-1"><button onclick="addSupp()" class="n-chip add">${t("+ Ekle")}</button>
+      <button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}${t("Bitti")}</button></div>`;
   } else {
-    const groups = SUPP_GROUPS.map(([l, ic, times]) => [l, ic, times.flatMap(tm => list.filter(s => s.time === tm))]);
+    const groups = SUPP_GROUPS.map(([l, ic, times]) => [t(l), ic, times.flatMap(tm => list.filter(s => s.time === tm))]);
     [...new Set(list.filter(s => s.time === "custom").map(suppTimeLabel))]
       .forEach(l => groups.push([l, "clock", list.filter(s => s.time === "custom" && suppTimeLabel(s) === l)]));
     const untimed = list.filter(s => !suppTimeLabel(s));
     const anyTimed = groups.some(g => g[2].length);
-    if (untimed.length) groups.push([anyTimed ? "Diğer" : "", "", untimed]);
+    if (untimed.length) groups.push([anyTimed ? t("Diğer") : "", "", untimed]);
     html = groups.filter(g => g[2].length).map(([l, ic, ss]) =>
       (l ? `<div class="n-sgroup" data-supp-group="${esc(l)}">${ic ? svgI(ic, 15) : ""}${esc(l)}</div>` : "")
       + `<div class="n-pills">${ss.map(suppPillHtml).join("")}</div>`).join("");
-    if (!list.length) html = `<p class="text-[13px] n-dim">Takviye listen boş. Düzenle'den ekleyebilirsin.</p>`;
-    html += `<div class="pt-1"><button onclick="suppEdit = true; renderAll();" class="n-chip" aria-label="Takviyeleri düzenle">${svgI("edit", 14)}Düzenle</button></div>`;
+    if (!list.length) html = `<p class="text-[13px] n-dim">${t("Takviye listen boş. Düzenle'den ekleyebilirsin.")}</p>`;
+    html += `<div class="pt-1"><button onclick="suppEdit = true; renderAll();" class="n-chip" aria-label="${esc(t("Takviyeleri düzenle"))}">${svgI("edit", 14)}${t("Düzenle")}</button></div>`;
   }
   $("suppList").innerHTML = html;
 }
@@ -7858,16 +7858,16 @@ function changeSuppDose(id, dir) {
 async function editSuppDose(i) {
   const s = state.supplementList[i];
   if (!s) return;
-  const v = await askText("Doz ve birim", suppDoseText(s), "örn: 5 g · 2 softjel · 1 ölçek", "Boş bırakırsan doz gösterilmez.", "Kaydet");
+  const v = await askText(t("Doz ve birim"), suppDoseText(s), t("örn: 5 g · 2 softjel · 1 ölçek"), t("Boş bırakırsan doz gösterilmez."), t("Kaydet"));
   if (v === null) return;
   const txt = String(v).trim();
   if (!txt) {   // v26: doz silme Geri al'lı
     if (!SUPP_DOSE_KEYS.some(k => s[k] != null)) return;
-    snapshot(); SUPP_DOSE_KEYS.forEach(k => delete s[k]); renderAll(); offerUndo(`${s.name}: doz kaldırıldı`); return;
+    snapshot(); SUPP_DOSE_KEYS.forEach(k => delete s[k]); renderAll(); offerUndo(t("{ad}: doz kaldırıldı", { ad: s.name })); return;
   }
   const m = txt.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
   const d = m ? r2(num(m[1], 0)) : 0;
-  if (!(d > 0) || d > 100000) { sayAlert("Doz anlaşılamadı", "Önce sayı, sonra birim yaz (örn: 5 g veya 2 softjel)."); return; }
+  if (!(d > 0) || d > 100000) { sayAlert(t("Doz anlaşılamadı"), t("Önce sayı, sonra birim yaz (örn: 5 g veya 2 softjel).")); return; }
   const unit = m[2].trim().slice(0, 16);
   if (s.dose && d >= s.min && d <= s.max && normSearch(unit) === normSearch(s.unit)) s.dose = d;   // aynı birim: adım/sınır korunur
   else Object.assign(s, { dose: d, unit }, suppDoseDefaults(d, unit));
@@ -7877,23 +7877,26 @@ function addPresetSupp(key) {
   const p = SUPP_PRESETS.find(x => x.key === key);
   if (!p) return;
   const { m, key: k, ...rest } = p;
-  state.supplementList.push({ id: "sup_" + k + "_" + Date.now(), preset: k, ...clone(rest) });
+  // v47: eklenen takviye kullanıcı verisi olur; o anki dilin adı/birimi/notu yazılır (docs/i18n-kayitli-metinler.md)
+  const own = clone(rest);
+  own.name = t(own.name); own.unit = tn(1, own.unit); if (own.note) own.note = t(own.note);
+  state.supplementList.push({ id: "sup_" + k + "_" + Date.now(), preset: k, ...own });
   renderAll();
 }
 async function setSuppTime(i, v) {
   const s = state.supplementList[i];
   if (!s) return;
   if (v === "custom") {
-    const l = await askText("Özel zaman etiketi", s.time === "custom" ? s.timeLabel || "" : "", "örn: Öğle yemeğiyle");
+    const l = await askText(t("Özel zaman etiketi"), s.time === "custom" ? s.timeLabel || "" : "", t("örn: Öğle yemeğiyle"));
     if (l === null) { renderAll(); return; }
     s.time = "custom";
-    s.timeLabel = l.trim().slice(0, 24) || "Özel";
+    s.timeLabel = l.trim().slice(0, 24) || t("Özel");
   } else if (SUPP_TIMES.some(x => x[0] === v)) { s.time = v; delete s.timeLabel; }
   else { delete s.time; delete s.timeLabel; }
   renderAll();
 }
 async function addSupp() {
-  const n = await askText("Takviye adı", "", "örn: D3 Vitamini", "", "Ekle");
+  const n = await askText(t("Takviye adı"), "", t("örn: D3 Vitamini"), "", t("Ekle"));
   if (!n || !n.trim()) return;
   state.supplementList.push({ id: "sup_" + Date.now(), name: n.trim().slice(0, 40) });
   renderAll();
@@ -7903,7 +7906,7 @@ function removeSupp(i) {
   const s = state.supplementList.splice(i, 1)[0];
   if (s) delete state.supplements[s.id];
   renderAll();
-  offerUndo(`${s ? s.name : "Takviye"} kaldırıldı`);
+  offerUndo(t("{ad} kaldırıldı", { ad: s ? s.name : t("Takviye") }));
 }
 
 // ---------------------------------------------------------------------------
@@ -8790,8 +8793,8 @@ let mealEditIdx = -1;
 function openMealModal(mIdx) {
   mealEditIdx = mIdx == null ? -1 : mIdx;
   const m = mealEditIdx >= 0 ? curMeals()[mealEditIdx] : null;
-  $("mealModalTitle").textContent = m ? "Öğünü Düzenle" : (state.dayType === "rest" ? "Dinlenme Günü Menüsüne Öğün Ekle" : "Antrenman Günü Menüsüne Öğün Ekle");
-  $("mmName").value = m ? m.title : `${curMeals().length + 1}. Öğün: `;
+  $("mealModalTitle").textContent = m ? t("Öğünü Düzenle") : (state.dayType === "rest" ? t("Dinlenme Günü Menüsüne Öğün Ekle") : t("Antrenman Günü Menüsüne Öğün Ekle"));
+  $("mmName").value = m ? m.title : t("{n}. Öğün: ", { n: String(curMeals().length + 1) });
   $("mmTime").value = m && m.time ? m.time : "";
   $("mmNote").value = m ? (m.targetNote || "") : "";
   openModal("mealModal");
@@ -8810,7 +8813,7 @@ function placeByTime(meals, meal) {
 }
 function saveMealModal() {
   const title = $("mmName").value.trim();
-  if (!title) { sayAlert("Ad eksik", "Öğün adını yaz."); return; }
+  if (!title) { sayAlert(t("Ad eksik"), t("Öğün adını yaz.")); return; }
   const time = /^\d{2}:\d{2}$/.test($("mmTime").value) ? $("mmTime").value : "";
   const note = $("mmNote").value.trim();
   const meals = curMeals();
@@ -8829,7 +8832,7 @@ function saveMealModal() {
   renderAll();
   const idx = curMeals().indexOf(target);
   if (mealEditIdx < 0) setTimeout(() => { const el = document.querySelector(`[data-meal-card="${idx}"]`); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60);
-  toast(mealEditIdx >= 0 ? "Öğün güncellendi" : `"${title}" eklendi${time ? " (" + time + ")" : ""}`);
+  toast(mealEditIdx >= 0 ? t("Öğün güncellendi") : t("\"{m}\" eklendi", { m: title }) + (time ? " (" + time + ")" : ""));
 }
 
 let mealDrag = null;
@@ -8991,13 +8994,13 @@ async function saveMealAsCombo(mIdx, dest) {
   if (!m) return;
   const db = getFoodDB();
   const items = m.items.filter(i => !i.est && db[i.foodId]).map(i => ({ foodId: i.foodId, amount: num(i.amount) }));
-  if (!items.length) { sayAlert("Kombo kaydedilemedi", "Bu öğünde kombo olarak kaydedilecek besin yok."); return; }
-  const name = await askText("Kombonun adı", mealTitleBody(m).slice(0, 40), "örn: Favori Kase");
+  if (!items.length) { sayAlert(t("Kombo kaydedilemedi"), t("Bu öğünde kombo olarak kaydedilecek besin yok.")); return; }
+  const name = await askText(t("Kombonun adı"), mealTitleBody(m).slice(0, 40), t("örn: Favori Kase"));
   if (name === null) return;
-  const nm = name.trim().slice(0, 40) || "Kombo";
+  const nm = name.trim().slice(0, 40) || t("Kombo");
   state.combos.push({ id: "combo_" + Date.now().toString(36), name: nm, items });
   renderAll();
-  toast(`"${nm}" kombo olarak kaydedildi (Besinler → Komboların)`);
+  toast(t("\"{n}\" kombo olarak kaydedildi (Besinler → Komboların)", { n: nm }));
 }
 function selectCombo(id) {
   foodUI.sel = "combo:" + id;
@@ -9017,12 +9020,12 @@ function addComboToMeal(id) {
   foodUI.sel = null;
   renderAll();
   const mid = meal.id;
-  toast(`${c.name} → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+  toast(day ? t("{c} → {m} (yalnızca bugün)", { c: c.name, m: meal.title }) : t("{c} → {m} (menüne, her gün)", { c: c.name, m: meal.title }), "ok", day ? { label: t("Menüye de kaydet"), fn: () => {
     const mm = curMeals().find(x => x.id === mid);
-    if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
+    if (!mm) { toast(t("Bu öğün menüde bulunamadı"), "error"); return; }
     mergeItems(mm, c.items);
     renderAll();
-    toast(`Menüdeki "${mm.title}" öğününe de eklendi`);
+    toast(t("Menüdeki \"{m}\" öğününe de eklendi", { m: mm.title }));
   } } : null);
 }
 function deleteCombo(id) {
@@ -9032,7 +9035,7 @@ function deleteCombo(id) {
   const c = state.combos.splice(i, 1)[0];
   foodUI.sel = null;
   renderAll();
-  offerUndo(`"${c.name}" kombosu silindi`);
+  offerUndo(t("\"{c}\" kombosu silindi", { c: c.name }));
 }
 function comboRowHtml(c) {
   const db = getFoodDB();
@@ -9042,25 +9045,25 @@ function comboRowHtml(c) {
     const rows = c.items.map(i => {
       const f = db[i.foodId];
       if (!f) return "";
-      return `<div class="flex items-center justify-between gap-2 py-1.5 text-[14px]"><span class="min-w-0 truncate">${esc(f.name)}</span><span class="n-muted whitespace-nowrap tabular-nums">${fmtNum(effAmount(i))} ${esc(f.unit)} · ${Math.round(calcItemMacros(i).cal)} kcal</span></div>`;
+      return `<div class="flex items-center justify-between gap-2 py-1.5 text-[14px]"><span class="min-w-0 truncate">${esc(f.name)}</span><span class="n-muted whitespace-nowrap tabular-nums">${fmtNum(effAmount(i))} ${esc(unitL(effAmount(i), f.unit))} · ${Math.round(calcItemMacros(i).cal)} kcal</span></div>`;
     }).join("");
     const tIdx = foodTargetIdx();
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3 my-2" id="comboSelCard" data-combo="${esc(c.id)}">
         <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(c.name)}</h3><div class="text-[12px] n-muted">Kombo · ${c.items.length} besin</div></div>
+          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(c.name)}</h3><div class="text-[12px] n-muted">${t("Kombo")} · ${tn(c.items.length, "{n} besin")}</div></div>
           <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[28px] leading-none tabular-nums">${fmtInt(ct.cal)}</span><span class="text-[12px] n-muted ml-1">kcal</span>
             <div class="text-[12px] font-semibold tabular-nums">${macroLine(ct.p, ct.c, ct.f)}</div></div>
         </div>
         <div class="n-div">${rows}</div>
-        <button id="comboAddBtn" onclick='addComboToMeal(${esc(JSON.stringify(c.id))})' class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}>${tIdx < 0 ? "Önce bir öğün oluştur" : `Öğüne ekle · ${fmtInt(ct.cal)} kcal`}</button>
+        <button id="comboAddBtn" onclick='addComboToMeal(${esc(JSON.stringify(c.id))})' class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}>${tIdx < 0 ? t("Önce bir öğün oluştur") : t("Öğüne ekle · {k} kcal", { k: fmtInt(ct.cal) })}</button>
         <div class="flex justify-end pt-1 n-bt">
-          <button onclick='deleteCombo(${esc(JSON.stringify(c.id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}Komboyu sil</button>
+          <button onclick='deleteCombo(${esc(JSON.stringify(c.id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}${t("Komboyu sil")}</button>
         </div>
       </div>`;
   }
   return `<button onclick='selectCombo(${esc(JSON.stringify(c.id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-combo="${esc(c.id)}">
       <span class="min-w-0"><span class="flex items-center gap-1.5 text-[15px] font-bold leading-snug"><span class="n-accent shrink-0">${svgI("star", 16, 2)}</span><span class="truncate">${esc(c.name)}</span></span>
-        <span class="block text-[12px] n-muted mt-0.5 truncate">${fmtInt(ct.cal)} kcal · ${Math.round(ct.p)} g protein · ${esc(names)}</span></span>
+        <span class="block text-[12px] n-muted mt-0.5 truncate">${esc(t("{k} kcal · {p} g protein · {names}", { k: fmtInt(ct.cal), p: String(Math.round(ct.p)), names }))}</span></span>
       <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
     </button>`;
 }
@@ -9073,7 +9076,7 @@ function openRecipeModal(editId) {
   const f = editId && state.customFoods[editId];
   const isRec = !!(f && f.recipe);
   rcp = { id: isRec ? editId : null, items: isRec ? clone(f.recipe.items) : [] };
-  $("rcTitle").textContent = isRec ? "Tarifi düzenle" : "Yeni tarif";
+  $("rcTitle").textContent = isRec ? t("Tarifi düzenle") : t("Yeni tarif");
   $("rcName").value = isRec ? stripEmoji(f.name) : "";
   $("rcCooked").value = isRec ? fmtNum(f.recipe.cooked) : "";
   closeModal("pickerModal");
@@ -9099,11 +9102,11 @@ function renderRecipe() {
     if (!fd) return "";
     return `<div class="flex items-center gap-1.5 py-1.5" data-rc-item="${i}">
         <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(fd.name)}</div><div id="rcK${i}" class="text-[12px] n-muted tabular-nums">${Math.round(kcalPerUnit(fd) * num(it.amount))} kcal</div></div>
-        <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(fd.name)} miktarı" />
-        <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(fd.unit)}</span>
-        <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(fd.name)} çıkar">${svgI("x", 18, 2.2)}</button>
+        <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} miktarı", { ad: fd.name }))}" />
+        <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(unitL(2, fd.unit))}</span>
+        <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: fd.name }))}">${svgI("x", 18, 2.2)}</button>
       </div>`;
-  }).join("") || `<p class="text-[13px] n-dim py-2">Henüz malzeme yok. Aşağıdan ekle.</p>`;
+  }).join("") || `<p class="text-[13px] n-dim py-2">${t("Henüz malzeme yok. Aşağıdan ekle.")}</p>`;
   updateRecipeSummary();
 }
 function rcAmount(i, v) {
@@ -9118,13 +9121,13 @@ function rcRemove(i) { rcp.items.splice(i, 1); renderRecipe(); }
 function updateRecipeSummary() {
   const rt = recipeTotals();
   const cooked = num($("rcCooked").value, 0);
-  $("rcCooked").placeholder = rt.raw > 0 ? `çiğ malzemeler toplam ${fmtInt(rt.raw)} g` : "örn: 1200";
+  $("rcCooked").placeholder = rt.raw > 0 ? t("çiğ malzemeler toplam {n} g", { n: fmtInt(rt.raw) }) : t("örn: 1200");
   const per = cooked > 0 ? 100 / cooked : 0;
-  $("rcSum").innerHTML = `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">Tarifin tamamı</span><strong class="tabular-nums">${fmtInt(rt.cal)} kcal · ${macroLine(rt.p, rt.c, rt.f)}</strong></div>`
+  $("rcSum").innerHTML = `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">${t("Tarifin tamamı")}</span><strong class="tabular-nums">${fmtInt(rt.cal)} kcal · ${macroLine(rt.p, rt.c, rt.f)}</strong></div>`
     + (cooked > 0
-      ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">Pişmiş 100 g</span><strong class="tabular-nums n-accent">${fmtInt(rt.cal * per)} kcal</strong></div>
+      ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">${t("Pişmiş 100 g")}</span><strong class="tabular-nums n-accent">${fmtInt(rt.cal * per)} kcal</strong></div>
          <div class="text-right text-[12px] font-semibold tabular-nums">${macroLine(rt.p * per, rt.c * per, rt.f * per, true)}</div>`
-      : `<div class="text-[12px] n-dim mt-1">100 g değerlerini hesaplamam için pişmiş toplam ağırlığı yaz.</div>`);
+      : `<div class="text-[12px] n-dim mt-1">${t("100 g değerlerini hesaplamam için pişmiş toplam ağırlığı yaz.")}</div>`);
 }
 function rcAddIngredient() {
   const db = getFoodDB();
@@ -9134,11 +9137,11 @@ function rcAddIngredient() {
     const f = db[id];
     if (isHiddenFood(f)) return;
     const cat = stripEmoji(f.cat || "Diğer");
-    (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: `${fmtNum(f.def)} ${f.unit} · ${Math.round(kcalPerUnit(f) * num(f.def, 1))} kcal` });
+    (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: t("{n} {u} · {k} kcal", { n: fmtNum(f.def), u: unitL(f.def, f.unit), k: String(Math.round(kcalPerUnit(f) * num(f.def, 1))) }) });
   });
   const groups = Object.keys(cats).map(c => ({ label: c, short: c.replace(/\s*[&/].*$/, ""), items: cats[c] }));
   // Seçici, tarif penceresinin üstünde açılır; seçince tarif penceresi yerinde kalır
-  openPicker("Malzeme ekle", groups, it => {
+  openPicker(t("Malzeme ekle"), groups, it => {
     const f = getFoodDB()[it.id];
     const ex = rcp.items.find(x => x.foodId === it.id);
     if (ex) ex.amount = round1(num(ex.amount) + num(f.def, 1)); else rcp.items.push({ foodId: it.id, amount: num(f.def, 1) });
@@ -9147,10 +9150,10 @@ function rcAddIngredient() {
 }
 function saveRecipe() {
   const name = $("rcName").value.trim().slice(0, 50);
-  if (!name) { sayAlert("Ad eksik", "Lütfen tarifin adını yaz."); return; }
-  if (!rcp.items.length) { sayAlert("Malzeme yok", "En az bir malzeme ekle."); return; }
+  if (!name) { sayAlert(t("Ad eksik"), t("Lütfen tarifin adını yaz.")); return; }
+  if (!rcp.items.length) { sayAlert(t("Malzeme yok"), t("En az bir malzeme ekle.")); return; }
   const cooked = num($("rcCooked").value, 0);
-  if (!(cooked > 0) || cooked > 30000) { sayAlert("Pişmiş ağırlık eksik", "Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş)."); return; }
+  if (!(cooked > 0) || cooked > 30000) { sayAlert(t("Pişmiş ağırlık eksik"), t("Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş).")); return; }
   const rt = recipeTotals();
   const id = rcp.id || "custom_recipe_" + Date.now().toString(36);
   const editing = !!rcp.id;
@@ -9161,7 +9164,7 @@ function saveRecipe() {
   };
   invalidateFoodDB();
   closeModal("recipeModal");
-  toast(editing ? `${name} tarifi güncellendi` : `${name} tarifi besin listene eklendi`);
+  toast(editing ? t("{n} tarifi güncellendi", { n: name }) : t("{n} tarifi besin listene eklendi", { n: name }));
   renderAll();
   if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") { foodUI.cat = "recipes"; renderFoods(); selectFood(id); }
 }
@@ -9180,11 +9183,15 @@ function lastDayMealFor(meal) {
   const items = m.items.filter(i => i && (i.est || db[i.foodId]));
   return items.length ? { key: k, items } : null;
 }
-function dayLabelShort(k) {
+// v47: "tekrarlandı" bildirimi; cümle dile göre tek anahtar (Türkçede küçük harf, eski çıktıyla birebir)
+function repeatedMsg(m, k) {
   const y = logicalNow(); y.setDate(y.getDate() - 1);   // v25: gün geçiş saatine göre "dün"
-  if (k === todayStr(y)) return "Dünkü";
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
-  return m ? fmtDay(new Date(+m[1], +m[2] - 1, +m[3]), { day: "numeric", month: "short" }) + " günkü" : "Önceki";
+  const ml = shortMealTitle(m);
+  if (k === todayStr(y)) return t("{m}: dünkü öğün tekrarlandı (yalnızca bugün)", { m: ml });
+  const mt = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
+  if (!mt) return t("{m}: önceki öğün tekrarlandı (yalnızca bugün)", { m: ml });
+  const d = fmtDay(new Date(+mt[1], +mt[2] - 1, +mt[3]), { day: "numeric", month: "short" });
+  return t("{m}: {d} günkü öğün tekrarlandı (yalnızca bugün)", { m: ml, d: curLang() === "tr" ? lowerL(d) : d });
 }
 function repeatLastMeal(mIdx) {
   const cur = dayMeals()[mIdx];
@@ -9196,7 +9203,7 @@ function repeatLastMeal(mIdx) {
   m.items = clone(r.items);
   openEditMeals.delete(m.id);
   renderAll();
-  offerUndo(`${shortMealTitle(m)}: ${lowerL(dayLabelShort(r.key))} öğün tekrarlandı (yalnızca bugün)`);
+  offerUndo(repeatedMsg(m, r.key));
 }
 
 // ---------------------------------------------------------------------------
@@ -9231,8 +9238,8 @@ function shopList() {
 function fmtShopAmt(f, a) {
   if (f.unit === "g") return a >= 1000 ? fmtKg(round2(a / 1000)) + " kg" : (Math.ceil(a / 10) * 10) + " g";
   if (f.unit === "ml") return a >= 1000 ? fmtKg(round2(a / 1000)) + " L" : (Math.ceil(a / 10) * 10) + " ml";
-  if (f.unit === "adet") return Math.ceil(a - 1e-9) + " adet";
-  return fmtNum(Math.ceil(a * 2 - 1e-9) / 2) + " " + f.unit;
+  if (f.unit === "adet") { const n = Math.ceil(a - 1e-9); return n + " " + unitL(n, "adet"); }
+  { const n = Math.ceil(a * 2 - 1e-9) / 2; return fmtNum(n) + " " + unitL(n, f.unit); }
 }
 function shopName(f) { return stripEmoji(f.name).replace(/^⭐\s*/, ""); }
 function openShopList() { renderShopList(); openModal("shopModal"); }
@@ -9248,17 +9255,17 @@ function toggleShop(id) {
 }
 function clearShopChecks() {   // v26: Geri al
   snapshot(); state.shopChecked = {}; saveState(); renderShopList();
-  toast("İşaretler temizlendi", "ok", { label: "Geri al", fn: () => { doUndo(); renderShopList(); } });
+  toast(t("İşaretler temizlendi"), "ok", { label: t("Geri al"), fn: () => { doUndo(); renderShopList(); } });
 }
 function renderShopList() {
   const list = shopList();
   const nT = shopTrainDays();
   $("shopDays").innerHTML = `<div class="flex items-center justify-between gap-2">
-      <div class="min-w-0"><div class="text-[14px] font-bold">Antrenman günü</div><div class="text-[12px] n-muted">Haftanın kalan ${7 - nT} günü dinlenme menüsü</div></div>
+      <div class="min-w-0"><div class="text-[14px] font-bold">${t("Antrenman günü")}</div><div class="text-[12px] n-muted">${tn(7 - nT, "Haftanın kalan {n} günü dinlenme menüsü")}</div></div>
       <div class="flex items-center gap-1 shrink-0">
-        <button onclick="setShopDays(-1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="Antrenman gününü azalt">${svgI("minus", 18, 2.4)}</button>
+        <button onclick="setShopDays(-1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="${esc(t("Antrenman gününü azalt"))}">${svgI("minus", 18, 2.4)}</button>
         <span id="shopDaysVal" class="t-display text-[24px] w-8 text-center tabular-nums">${nT}</span>
-        <button onclick="setShopDays(1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="Antrenman gününü artır">${svgI("plus", 18, 2.4)}</button>
+        <button onclick="setShopDays(1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="${esc(t("Antrenman gününü artır"))}">${svgI("plus", 18, 2.4)}</button>
       </div>
     </div>`;
   let lastCat = null;
@@ -9268,20 +9275,20 @@ function renderShopList() {
     const head = cat !== lastCat ? `<div class="n-label pt-3 pb-1">${esc(upperL(cat))}</div>` : "";
     lastCat = cat;
     return head + `<label class="flex items-center gap-3 min-h-[48px] py-1 cursor-pointer n-bb" data-shop="${esc(r.id)}">
-        <input type="checkbox" class="n-check shrink-0" ${on ? "checked" : ""} onchange='toggleShop(${esc(JSON.stringify(r.id))})' aria-label="${esc(shopName(r.f))} alındı" />
+        <input type="checkbox" class="n-check shrink-0" ${on ? "checked" : ""} onchange='toggleShop(${esc(JSON.stringify(r.id))})' aria-label="${esc(t("{ad} alındı", { ad: shopName(r.f) }))}" />
         <span class="flex-1 min-w-0 text-[15px] font-semibold ${on ? "line-through n-dim" : ""}">${esc(shopName(r.f))}</span>
         <span class="shrink-0 text-[14px] font-bold tabular-nums ${on ? "line-through n-dim" : ""}">${esc(fmtShopAmt(r.f, r.amt))}</span>
       </label>`;
-  }).join("") : `<p class="text-[14px] n-muted text-center py-6">Menülerinde besin yok.</p>`;
+  }).join("") : `<p class="text-[14px] n-muted text-center py-6">${t("Menülerinde besin yok.")}</p>`;
   const left = list.filter(r => !state.shopChecked[r.id]).length;
-  $("shopCount").textContent = list.length ? `${left} / ${list.length} ürün alınacak` : "";
+  $("shopCount").textContent = list.length ? tn(list.length, "{left} / {n} ürün alınacak", { left }) : "";
 }
 function shopText() {
   const list = shopList();
   const left = list.filter(r => !state.shopChecked[r.id]);
   const rows = (left.length ? left : list).map(r => `• ${shopName(r.f)} — ${fmtShopAmt(r.f, r.amt)}`);
   const nT = shopTrainDays();
-  return `AYK+ alışveriş listesi (7 gün: ${nT} antrenman, ${7 - nT} dinlenme)\n` + rows.join("\n");
+  return t("AYK+ alışveriş listesi (7 gün: {a} antrenman, {b} dinlenme)", { a: nT, b: 7 - nT }) + "\n" + rows.join("\n");
 }
 async function copyText(txt) {
   try { await navigator.clipboard.writeText(txt); return true; }
@@ -9297,10 +9304,10 @@ async function copyText(txt) {
 }
 async function copyShopList() {
   const ok = await copyText(shopText());
-  toast(ok ? "Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin." : "Kopyalanamadı; Paylaş düğmesini dene.", ok ? "ok" : "error");
+  toast(ok ? t("Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin.") : t("Kopyalanamadı; Paylaş düğmesini dene."), ok ? "ok" : "error");
 }
 async function shareShopList() {
-  try { await navigator.share({ title: "Alışveriş listesi", text: shopText() }); }
+  try { await navigator.share({ title: t("Alışveriş listesi"), text: shopText() }); }
   catch (e) { if (e && e.name !== "AbortError") copyShopList(); }
 }
 
@@ -9411,16 +9418,16 @@ function renderFoodSuggest() {
   if (!foodSuggestCache.length) { el.innerHTML = ""; el.classList.add("hidden"); return; }
   const db = getFoodDB();
   el.classList.remove("hidden");
-  el.innerHTML = `<div class="n-label mb-2">KALAN HEDEFİNİ KAPATAN SEÇENEKLER</div>
-    <p class="text-[12px] n-muted mb-2">Kalan: <strong class="n-text tabular-nums">${fmtInt(remK)} kcal</strong> · <strong class="n-p tabular-nums">${fmtInt(remP)} g protein</strong>. Sık yediğin besinlerden:</p>
+  el.innerHTML = `<div class="n-label mb-2">${t("KALAN HEDEFİNİ KAPATAN SEÇENEKLER")}</div>
+    <p class="text-[12px] n-muted mb-2">${t("Kalan: {k} · {p}. Sık yediğin besinlerden:", { k: `<strong class="n-text tabular-nums">${fmtInt(remK)} kcal</strong>`, p: `<strong class="n-p tabular-nums">${fmtInt(remP)} g protein</strong>` })}</p>
     <div class="space-y-2">${foodSuggestCache.map((o, i) => {
-      const label = o.parts.map(p => `${fmtNum(p.a)} ${db[p.id].unit} ${stripEmoji(db[p.id].name).replace(/^⭐\s*/, "")}`).join(" + ");
+      const label = o.parts.map(p => `${fmtNum(p.a)} ${unitL(p.a, db[p.id].unit)} ${stripEmoji(db[p.id].name).replace(/^⭐\s*/, "")}`).join(" + ");
       const lk = Math.round(remK - o.K), lp = Math.round(remP - o.P);
-      const kTxt = lk >= 0 ? `${fmtInt(lk)} kcal kalır` : `${fmtInt(-lk)} kcal aşar`;
-      const pTxt = lp > 0 ? `${fmtInt(lp)} g P kalır` : "protein tamam";
+      const kTxt = lk >= 0 ? t("{n} kcal kalır", { n: fmtInt(lk) }) : t("{n} kcal aşar", { n: fmtInt(-lk) });
+      const pTxt = lp > 0 ? t("{n} g P kalır", { n: fmtInt(lp) }) : t("protein tamam");
       return `<button onclick="addSuggestion(${i})" class="w-full min-h-[56px] n-card rounded-2xl px-3.5 py-2.5 text-left flex items-center justify-between gap-3" data-suggest="${i}">
           <span class="min-w-0"><span class="block text-[14px] font-bold leading-snug">${esc(label)}</span>
-            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${fmtInt(o.K)} kcal · ${fmtInt(o.P)} g protein → ${kTxt}, ${pTxt}</span></span>
+            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${esc(t("{k} kcal · {p} g protein → {a}, {b}", { k: fmtInt(o.K), p: fmtInt(o.P), a: kTxt, b: pTxt }))}</span></span>
           <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
         </button>`;
     }).join("")}</div>`;
@@ -9438,12 +9445,12 @@ function addSuggestion(i) {
   o.parts.forEach(p => { state.recentFoods = [p.id, ...state.recentFoods.filter(x => x !== p.id)].slice(0, 8); });
   renderAll();
   const mid = meal.id;
-  toast(`${o.parts.length} besin → ${meal.title}${day ? " (yalnızca bugün)" : " (menüne, her gün)"}`, "ok", day ? { label: "Menüye de kaydet", fn: () => {
+  toast(day ? tn(o.parts.length, "{n} besin → {m} (yalnızca bugün)", { m: meal.title }) : tn(o.parts.length, "{n} besin → {m} (menüne, her gün)", { m: meal.title }), "ok", day ? { label: t("Menüye de kaydet"), fn: () => {
     const mm = curMeals().find(x => x.id === mid);
-    if (!mm) { toast("Bu öğün menüde bulunamadı", "error"); return; }
+    if (!mm) { toast(t("Bu öğün menüde bulunamadı"), "error"); return; }
     mergeItems(mm, items);
     renderAll();
-    toast(`Menüdeki "${mm.title}" öğününe de eklendi`);
+    toast(t("Menüdeki \"{m}\" öğününe de eklendi", { m: mm.title }));
   } } : null);
 }
 
@@ -9512,7 +9519,7 @@ function heatHtml(n) {
     const cls = isToday ? "today" : x ? hitClass(x.k, x.t) : "none";
     const d = keyToDate(k);
     const lbl = fmtDay(d, { day: "numeric", month: "short" });
-    const tip = isToday ? `${lbl}: bugün (devam ediyor)` : x ? `${lbl}: ${fmtInt(x.k)} / ${fmtInt(x.t)} kcal` : `${lbl}: kayıt yok`;
+    const tip = isToday ? t("{d}: bugün (devam ediyor)", { d: lbl }) : x ? t("{d}: {k} / {g} kcal", { d: lbl, k: fmtInt(x.k), g: fmtInt(x.t) }) : t("{d}: kayıt yok", { d: lbl });
     const sym = { ok: "✓", near: "~", far: "!" }[cls] || "";   // v32: renk tek başına anlam taşımaz (İlerleme şeridiyle aynı dil)
     cells.push(`<span class="n-heat ${cls}" data-heat="${k}" data-cls="${cls}" role="img" aria-label="${esc(tip)}" title="${esc(tip)}">${d.getDate()}${sym ? `<i class="n-heat-sym" aria-hidden="true">${sym}</i>` : ""}</span>`);
   }
@@ -9526,38 +9533,38 @@ function weekCardHtml() {
   const last = lastLog ? num(lastLog.weight) : 0;
   const range = state.nutriHistRange === "30" ? "30" : "7";
   const perDay = w.daysLeft > 0 ? Math.round(w.left / w.daysLeft) : 0;
-  return `<section id="weekCard" class="n-card rounded-[22px] p-4 space-y-4" aria-label="Haftalık görünüm">
-      <div class="flex items-baseline justify-between gap-2"><span class="n-label">SON 7 GÜN</span><span class="text-[12px] n-dim">${w.n7} gün kayıt</span></div>
+  return `<section id="weekCard" class="n-card rounded-[22px] p-4 space-y-4" aria-label="${esc(t("Haftalık görünüm"))}">
+      <div class="flex items-baseline justify-between gap-2"><span class="n-label">${t("SON 7 GÜN")}</span><span class="text-[12px] n-dim">${tn(w.n7, "{n} gün kayıt")}</span></div>
       <div class="grid grid-cols-2 gap-3">
-        <div><div class="text-[12px] n-muted">Ortalama kalori</div><div class="t-display text-[26px] leading-none tabular-nums mt-1" id="avgKcal">${w.n7 ? fmtInt(w.avgK) : "—"}</div><div class="text-[12px] n-dim">kcal / gün</div></div>
-        <div><div class="text-[12px] n-muted">Ortalama protein</div><div class="t-display text-[26px] leading-none tabular-nums mt-1 n-p" id="avgPro">${w.n7 ? fmtInt(w.avgP) : "—"}</div><div class="text-[12px] n-dim">g / gün</div></div>
+        <div><div class="text-[12px] n-muted">${t("Ortalama kalori")}</div><div class="t-display text-[26px] leading-none tabular-nums mt-1" id="avgKcal">${w.n7 ? fmtInt(w.avgK) : "—"}</div><div class="text-[12px] n-dim">${t("kcal / gün")}</div></div>
+        <div><div class="text-[12px] n-muted">${t("Ortalama protein")}</div><div class="t-display text-[26px] leading-none tabular-nums mt-1 n-p" id="avgPro">${w.n7 ? fmtInt(w.avgP) : "—"}</div><div class="text-[12px] n-dim">${t("g / gün")}</div></div>
       </div>
       <div class="pt-3 n-bt space-y-2.5">
         <div class="flex items-center justify-between gap-2">
-          <span class="n-label">HEDEF TUTTURMA</span>
-          <div class="n-seg grid-cols-2 w-[150px]" aria-label="Takvim aralığı">
-            <button onclick="setNutriHistRange('7')" class="${range === "7" ? "on" : ""}" aria-pressed="${range === "7"}">7 gün</button>
-            <button onclick="setNutriHistRange('30')" class="${range === "30" ? "on" : ""}" aria-pressed="${range === "30"}">30 gün</button>
+          <span class="n-label">${t("HEDEF TUTTURMA")}</span>
+          <div class="n-seg grid-cols-2 w-[150px]" aria-label="${esc(t("Takvim aralığı"))}">
+            <button onclick="setNutriHistRange('7')" class="${range === "7" ? "on" : ""}" aria-pressed="${range === "7"}">${t("7 gün")}</button>
+            <button onclick="setNutriHistRange('30')" class="${range === "30" ? "on" : ""}" aria-pressed="${range === "30"}">${t("30 gün")}</button>
           </div>
         </div>
         <div id="heatGrid">${heatHtml(range === "30" ? 30 : 7)}</div>
         <div class="flex flex-wrap gap-x-3 gap-y-1 text-[12px] n-muted">
-          <span class="flex items-center gap-1"><i class="n-heat-dot ok">✓</i>Hedefte (±%5)</span>
-          <span class="flex items-center gap-1"><i class="n-heat-dot near">~</i>Yakın (±%15)</span>
-          <span class="flex items-center gap-1"><i class="n-heat-dot far">!</i>Uzak</span>
-          <span class="flex items-center gap-1"><i class="n-heat-dot none"></i>Kayıt yok</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot ok">✓</i>${t("Hedefte (±%5)")}</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot near">~</i>${t("Yakın (±%15)")}</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot far">!</i>${t("Uzak")}</span>
+          <span class="flex items-center gap-1"><i class="n-heat-dot none"></i>${t("Kayıt yok")}</span>
         </div>
       </div>
       <div class="pt-3 n-bt space-y-1.5" id="weekBudget">
-        <span class="n-label">BU HAFTANIN KALORİ BÜTÇESİ</span>
-        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">Haftalık hedef</span><strong class="tabular-nums">${fmtInt(w.total)} kcal</strong></div>
-        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">Şu ana kadar alınan</span><strong class="tabular-nums">${fmtInt(w.taken)} kcal</strong></div>
-        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">Kalan</span><strong class="tabular-nums ${w.left < 0 ? "n-over" : "n-accent"}">${fmtInt(w.left)} kcal</strong></div>
-        ${w.daysLeft > 0 ? `<p class="text-[12px] n-dim">Kalan ${w.daysLeft} günde (bugün dahil) günde ortalama ~${fmtInt(perDay)} kcal. Geçmiş günlerde öğün tiki yoksa planlanan kalori sayılır.</p>` : ""}
+        <span class="n-label">${t("BU HAFTANIN KALORİ BÜTÇESİ")}</span>
+        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">${t("Haftalık hedef")}</span><strong class="tabular-nums">${fmtInt(w.total)} kcal</strong></div>
+        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">${t("Şu ana kadar alınan")}</span><strong class="tabular-nums">${fmtInt(w.taken)} kcal</strong></div>
+        <div class="flex justify-between gap-2 text-[14px]"><span class="n-muted">${t("Kalan")}</span><strong class="tabular-nums ${w.left < 0 ? "n-over" : "n-accent"}">${fmtInt(w.left)} kcal</strong></div>
+        ${w.daysLeft > 0 ? `<p class="text-[12px] n-dim">${tn(w.daysLeft, "Kalan {n} günde (bugün dahil) günde ortalama ~{k} kcal. Geçmiş günlerde öğün tiki yoksa planlanan kalori sayılır.", { k: fmtInt(perDay) })}</p>` : ""}
       </div>
       <div class="pt-3 n-bt flex items-center justify-between gap-2 text-[14px]" id="weightAvgRow">
-        <span class="n-muted">Kilo${last ? ` · son tartı <strong class="n-text">${fmtNum(last)} kg</strong>` : ""}</span>
-        <span>${wa ? `7 günlük ort. <strong class="tabular-nums">${fmtNum(wa.avg)} kg</strong> <span class="text-[12px] n-dim">(${wa.n} tartı)</span>` : `<span class="n-dim text-[12px]">Son 7 günde tartı yok</span>`}</span>
+        <span class="n-muted">${t("Kilo")}${last ? t(" · son tartı {w}", { w: `<strong class="n-text">${fmtNum(last)} kg</strong>` }) : ""}</span>
+        <span>${wa ? `${t("7 günlük ort. {a}", { a: `<strong class="tabular-nums">${fmtNum(wa.avg)} kg</strong>` })} <span class="text-[12px] n-dim">${tn(wa.n, "({n} tartı)")}</span>` : `<span class="n-dim text-[12px]">${t("Son 7 günde tartı yok")}</span>`}</span>
       </div>
     </section>`;
 }
@@ -10524,6 +10531,238 @@ Object.assign(EN, {
   "Bulunamayan aramalar temizlendi": "Searches with no results cleared",
   "Henüz yok.": "None yet.",
   "Tarif hesaplaması (yaklaşık), USDA malzemeleriyle": "Recipe calculation (approximate), based on USDA ingredients",
+
+  // =====================================================================
+  // v47 2/2: Besinler, Geçmiş, barkod, özel besin, tarif, alışveriş, öneriler, takviye kartı, pencereler
+  // =====================================================================
+  // --- genel kısa sözcükler (Beslenme ve takviye)
+  "Tümü": "All", "Düzenle": "Edit", "Sil": "Delete", "Kapat": "Close", "Diğer": "Other", "Paylaş": "Share",
+  "Ekle": "Add", "Bitti": "Done", "İptal": "Cancel",
+  "Su": "Water", "Öğün": "Meals", "Takviye": "Supplements", "Özel": "Custom",
+  "Azalt": "Decrease", "Artır": "Increase",
+  "kalır": "left", "aşar": "over", "protein kalır": "protein left",
+  "protein hedefi {g} aşılır": "{g} over your protein target",
+
+  // --- Besinler: kategori çipleri, hedef öğün, kalan
+  "Son kullanılanlar": "Recent", "Komboların": "Your combos", "Tariflerim": "Your recipes", "Özel eklediklerim": "Your custom foods",
+  "Ekledikten sonra menüde ": "After adding, in your plan: ", "Ekledikten sonra bugün ": "After adding, today: ",
+  "Menüde ": "In your plan: ", "Bugün ": "Today: ",
+  "Nereye eklensin?": "Add to",
+  "Sadece bugüne": "Today only", "Menüme (her gün)": "My plan (every day)",
+  "Yalnızca bugünkü öğüne eklenir; menün değişmez.": "Added to today's meal only; your plan stays the same.",
+  "Menüne eklenir; her gün geçerli olur.": "Added to your plan; applies every day.",
+  "Besin eklemek için önce Menülerim'den bir öğün oluştur.": "To add food, first create a meal in Plans.",
+  "BUGÜN HANGİ ÖĞÜNE?": "WHICH MEAL TODAY?", "MENÜDE HANGİ ÖĞÜNE?": "WHICH MEAL IN YOUR PLAN?",
+  " · porsiyon": " · serving",
+  "Henüz kombon yok. Bir öğünü açıp ★ Kombo olarak kaydedebilirsin.": "No combos yet. Open a meal and choose Save as combo.",
+  "{n} {u} · {k} kcal · {p} g protein": "{n} {u} · {k} kcal · {p} g protein",
+  " · barkod {b}": " · barcode {b}",
+  "Bir {u} azalt": "Decrease by one {u}", "Bir {u} artır": "Increase by one {u}",
+  "Hazır porsiyonlar": "Serving sizes",
+  "{n} sonuç daha · göster": "Show {n} more",
+  "Öğüne ekle · {k} kcal": "Add to meal · {k} kcal",
+  "Önce bir öğün oluştur": "Create a meal first",
+  "Lif {n} g": "Fibre {n} g", "Tuz {n} g": "Salt {n} g",
+  "Lif": "Fibre", "Tuz": "Salt",
+  "{n} besinde lif/tuz verisi yok": { one: "{n} food has no fibre/salt data", other: "{n} foods have no fibre/salt data" },
+  "{a} {u} {f} → {m} (menüne, her gün)": "{a} {u} {f} → {m} (your plan, every day)",
+  "{a} {u} {f} → {m} (yalnızca bugün)": "{a} {u} {f} → {m} (today only)",
+  "Bu öğün menüde bulunamadı": "That meal wasn't found in your plan",
+  "Menüdeki \"{m}\" öğününe de eklendi": "Also added to \"{m}\" in your plan",
+
+  // --- Geçmiş
+  "· devam ediyor": "· in progress", "yenen": "eaten", "planlanan": "planned",
+  "Her gün gece yarısı (ya da \"Yeni gün\" ile) günün özeti buraya eklenir.": "A summary of each day is added here at midnight (or when you tap \"New day\").",
+  "Grafikler için İlerleme sekmesine git": "See charts in Progress",
+  "Haftalık görünüm": "Weekly overview", "SON 7 GÜN": "LAST 7 DAYS",
+  "{n} gün kayıt": { one: "{n} day logged", other: "{n} days logged" },
+  "Ortalama kalori": "Average calories", "kcal / gün": "kcal / day",
+  "Ortalama protein": "Average protein", "g / gün": "g / day",
+  "HEDEF TUTTURMA": "DAYS ON TARGET", "Takvim aralığı": "Calendar range",
+  "7 gün": "7 days", "30 gün": "30 days",
+  "Hedefte (±%5)": "On target (±5%)", "Yakın (±%15)": "Close (±15%)", "Uzak": "Off target", "Kayıt yok": "No data",
+  "{d}: bugün (devam ediyor)": "{d}: today (in progress)",
+  "{d}: {k} / {g} kcal": "{d}: {k} / {g} kcal",
+  "{d}: kayıt yok": "{d}: no data",
+  "BU HAFTANIN KALORİ BÜTÇESİ": "THIS WEEK'S CALORIE BUDGET",
+  "Haftalık hedef": "Weekly target", "Şu ana kadar alınan": "Eaten so far",
+  "Kalan {n} günde (bugün dahil) günde ortalama ~{k} kcal. Geçmiş günlerde öğün tiki yoksa planlanan kalori sayılır.": {
+    one: "Over the remaining {n} day (including today) that's about {k} kcal a day. Past days with no meals ticked count at their planned calories.",
+    other: "Over the remaining {n} days (including today) that's about {k} kcal a day. Past days with no meals ticked count at their planned calories."
+  },
+  "Kilo": "Weight",
+  " · son tartı {w}": " · last weigh-in {w}",
+  "7 günlük ort. {a}": "7-day avg. {a}",
+  "({n} tartı)": { one: "({n} weigh-in)", other: "({n} weigh-ins)" },
+  "Son 7 günde tartı yok": "No weigh-ins in the last 7 days",
+  "{w} kg kaydedildi": "Logged {w} kg",
+  "Tartı kaydı silindi": "Weigh-in deleted",
+  "{f} çıkarıldı": "{f} removed",
+
+  // --- Barkod
+  "Bu cihazda kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin.": "The camera isn't available on this device. You can type the barcode number below.",
+  "Kamera açılıyor…": "Opening camera…",
+  "Barkodu çerçevenin içine getir.": "Hold the barcode inside the frame.",
+  "Kamera izni verilmedi. iPhone'da Ayarlar → Safari → Kamera'dan izin verebilirsin. Numarayı aşağıya elle de yazabilirsin.": "Camera access was denied. On iPhone, you can allow it in Settings → Safari → Camera. You can also type the number below.",
+  "Kamera bulunamadı. Barkod numarasını aşağıya elle yazabilirsin.": "No camera found. You can type the barcode number below.",
+  "Kamera açılamadı. Barkod numarasını aşağıya elle yazabilirsin.": "Couldn't open the camera. You can type the barcode number below.",
+  "Geçerli bir barkod numarası değil (8–14 rakam olmalı).": "That isn't a valid barcode number (it should be 8–14 digits).",
+  "{f} listende vardı; miktarı seçip öğüne ekle": "{f} is already in your list; choose an amount and add it to a meal",
+  "{code} okundu. Ürünü bulmak için internet gerekli. Bağlanınca tekrar dene ya da besini elle ekle.": "{code} scanned. An internet connection is needed to look up the product. Try again once you're online, or add the food manually.",
+  "{code} aranıyor…": "Looking up {code}…",
+  "Ürün bilgisine ulaşılamadı. İnternet bağlantını kontrol edip tekrar dene ya da besini elle ekle.": "Couldn't reach the product database. Check your internet connection and try again, or add the food manually.",
+  "Ürün {code}": "Product {code}",
+  "Ürün bulundu ama besin değerleri eksik.": "Product found, but its nutrition values are incomplete.",
+  "Ürün bulundu ama değerleri tutarsız görünüyor.": "Product found, but its values look inconsistent.",
+  "Ürün bulundu.": "Product found.",
+  "⚠ Etiketle karşılaştır.": "⚠ Compare with the label.",
+  "Bu veriler gönüllülerce girilir; hata olabilir.": "This data is entered by volunteers and may contain errors.",
+  "Etikete bakıp düzelt": "Edit from label",
+  "Yine de ekle": "Add anyway",
+  "Listeme ekle ve seç": "Add to my foods and select",
+  "Paketin üzerindeki 100 {u} değerleriyle elle ekleyebilirsin.": "You can add it manually using the per-100 {u} values on the pack.",
+  "Elle ekle": "Add manually",
+  "Etiketteki değerleri gir": "Enter label values",
+  "Protein + karb + yağ ({s} g), {b} g'ı aşıyor.": "Protein + carbs + fat ({s} g) is more than {b} g.",
+  "{b} g için {k} kcal olamaz (en fazla ~{m}).": "{k} kcal in {b} g isn't possible (max ~{m}).",
+  "Yazan kalori {k}, makrolardan hesaplanan {c}.": "The listed calories are {k}, but the macros add up to {c}.",
+  "Kalori yerine kilojoule (kJ) yazılmış olabilir.": "The label may list kilojoules (kJ) instead of calories.",
+  "{f} listene eklendi; miktarı seçip öğüne ekle": "{f} added to your foods; choose an amount and add it to a meal",
+  "Barkod {code}. Bulunan değerler tutarsızdı; paketin besin tablosuyla karşılaştırıp düzelt (100 g değerleri).": "Barcode {code}. The values found were inconsistent; compare them with the nutrition label on the pack and correct them (per-100 g values).",
+  "Barkod {code}. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.": "Barcode {code}. Enter the values from the pack's nutrition label (per 100 g or per serving). The food is saved with this barcode, so I'll recognise it offline next time.",
+  "Barkod {code} veritabanında yok. Paketin besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.": "Barcode {code} isn't in the database. Enter the values from the pack's nutrition label (per 100 g or per serving). The food is saved with this barcode, so I'll recognise it offline next time.",
+
+  // --- Özel besin formu
+  "Kendi özel besinini tanımla": "Create your own custom food",
+  "1 porsiyon kaç gram?": "How many grams is 1 serving?",
+  "Varsayılan miktar (adet):": "Default amount (pieces):",
+  "Varsayılan miktar (g):": "Default amount (g):",
+  "Ad eksik": "Name missing", "Lütfen besin adını gir.": "Enter a name for the food.",
+  "Değerler negatif olamaz; kaloriyi rakamla yaz.": "Values can't be negative; enter calories as a number.",
+  "Porsiyon eksik": "Serving size missing",
+  "Lütfen 1 porsiyonun kaç gram olduğunu yaz (etikette yazar, örn: 30).": "Enter how many grams 1 serving is (it's on the label, e.g. 30).",
+  "Değerler tutarsız görünüyor": "These values look inconsistent",
+  "Etiketle karşılaştır; doğruysa yine de kaydedebilirsin.": "Compare them with the label; if they're correct, you can still save.",
+  "Yine de kaydet": "Save anyway",
+  "{f} güncellendi": "{f} updated",
+  "{f} besin listene eklendi": "{f} added to your foods",
+  "Besin Adı:": "Food name:",
+  "Örn: Proteinli Süt / Ev Yapımı Köfte": "e.g. Protein milk / Homemade meatballs",
+  "Değerler neye göre?": "Values are per",
+  "100 g (veya 100 ml)": "100 g (or 100 ml)", "1 porsiyon": "1 serving", "1 adet": "1 piece",
+  "Varsayılan Miktar (g):": "Default amount (g):",
+  "Kalori (kcal) · isteğe bağlı, etikette yazıyorsa:": "Calories (kcal) · optional, if it's on the label:",
+  "Boş bırakırsan makrolardan hesaplanır": "Leave empty to calculate from macros",
+  "Protein (g):": "Protein (g):", "Karb (g):": "Carbs (g):", "Yağ (g):": "Fat (g):",
+
+  // --- Barkod penceresi
+  "Barkod numarasını elle yaz": "Type the barcode number", "örn: 8690504012345": "e.g. 8690504012345", "Ara": "Search",
+  "Ürün bilgileri internetten (Open Food Facts) gelir. Bir kez eklediğin ürün listende kalır; aynı barkodu sonra internetsiz de tanırım.": "Product information comes from the internet (Open Food Facts). A product you add once stays in your list, and I'll recognise the same barcode offline later.",
+
+  // --- Dışarıda yedim penceresi
+  "Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.": "Enter your estimated values. This entry only affects today; your plan stays the same.",
+  "Ne yedin? (isteğe bağlı)": "What did you eat? (optional)", "örn: Döner dürüm + ayran": "e.g. Chicken wrap + ayran",
+  "Kalori (kcal)": "Calories (kcal)", "Protein (g)": "Protein (g)",
+  "Karb (g) · isteğe bağlı": "Carbs (g) · optional", "Yağ (g) · isteğe bağlı": "Fat (g) · optional",
+  "örn: 850": "e.g. 850", "örn: 40": "e.g. 40",
+  "Bu öğündeki besinlerin yerine say": "Replace the foods in this meal",
+  "Günü dengele": "Rebalance my day",
+  "Aşımı kalan öğünlerdeki karb ve yağdan kısarım; protein kaynaklarına dokunmam.": "I'll trim any excess from the carbs and fat in your remaining meals and leave protein sources alone.",
+
+  // --- Kombo
+  "Kombo kaydedilemedi": "Couldn't save combo", "Bu öğünde kombo olarak kaydedilecek besin yok.": "There are no foods in this meal to save as a combo.",
+  "Kombonun adı": "Combo name", "örn: Favori Kase": "e.g. Favourite bowl", "Kombo": "Combo",
+  "\"{n}\" kombo olarak kaydedildi (Besinler → Komboların)": "\"{n}\" saved as a combo (Foods → Your combos)",
+  "{c} → {m} (yalnızca bugün)": "{c} → {m} (today only)", "{c} → {m} (menüne, her gün)": "{c} → {m} (your plan, every day)",
+  "\"{c}\" kombosu silindi": "\"{c}\" combo deleted",
+  "Komboyu sil": "Delete combo",
+  "{k} kcal · {p} g protein · {names}": "{k} kcal · {p} g protein · {names}",
+
+  // --- Tarif
+  "Tarifi düzenle": "Edit recipe", "Yeni tarif": "New recipe",
+  "Henüz malzeme yok. Aşağıdan ekle.": "No ingredients yet. Add some below.",
+  "çiğ malzemeler toplam {n} g": "raw ingredients total {n} g", "örn: 1200": "e.g. 1200",
+  "Tarifin tamamı": "Whole recipe", "Pişmiş 100 g": "Cooked, per 100 g",
+  "100 g değerlerini hesaplamam için pişmiş toplam ağırlığı yaz.": "Enter the total cooked weight so I can work out the per-100 g values.",
+  "{n} {u} · {k} kcal": "{n} {u} · {k} kcal",
+  "Malzeme ekle": "Add ingredient",
+  "Malzeme yok": "No ingredients", "En az bir malzeme ekle.": "Add at least one ingredient.",
+  "Lütfen tarifin adını yaz.": "Enter a name for the recipe.",
+  "Pişmiş ağırlık eksik": "Cooked weight missing",
+  "Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş).": "Enter the total cooked weight in grams (weigh the pot and subtract the empty pot's weight).",
+  "{n} tarifi güncellendi": "{n} recipe updated", "{n} tarifi besin listene eklendi": "{n} recipe added to your foods",
+  "Tarifin adı": "Recipe name", "örn: Annemin mercimek çorbası": "e.g. Homemade lentil soup",
+  "MALZEMELER (ÇİĞ HÂLİYLE)": "INGREDIENTS (RAW)", "+ Malzeme ekle": "+ Add ingredient",
+  "Pişmiş toplam ağırlık (g)": "Total cooked weight (g)",
+  "Pişince tencereyi tart, boş tencerenin ağırlığını düş. Sonra yediğin miktarı gram olarak girersin.": "Weigh the pot once it's cooked and subtract the empty pot's weight. Then you enter the amount you eat in grams.",
+
+  // --- Dünkü öğünü tekrarla
+  "{m}: dünkü öğün tekrarlandı (yalnızca bugün)": "{m}: repeated yesterday's meal (today only)",
+  "{m}: {d} günkü öğün tekrarlandı (yalnızca bugün)": "{m}: repeated the meal from {d} (today only)",
+  "{m}: önceki öğün tekrarlandı (yalnızca bugün)": "{m}: repeated the previous meal (today only)",
+
+  // --- Alışveriş listesi
+  "İşaretler temizlendi": "Checkmarks cleared",
+  "Haftanın kalan {n} günü dinlenme menüsü": { one: "Rest-day plan for the remaining {n} day of the week", other: "Rest-day plan for the remaining {n} days of the week" },
+  "Antrenman gününü azalt": "Decrease training days", "Antrenman gününü artır": "Increase training days",
+  "{ad} alındı": "{ad} bought",
+  "Menülerinde besin yok.": "There are no foods in your plans.",
+  "{left} / {n} ürün alınacak": { one: "{left} / {n} item left to buy", other: "{left} / {n} items left to buy" },
+  "AYK+ alışveriş listesi (7 gün: {a} antrenman, {b} dinlenme)": "AYK+ shopping list (7 days: {a} training, {b} rest)",
+  "Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin.": "List copied. You can paste it into Notes.",
+  "Kopyalanamadı; Paylaş düğmesini dene.": "Couldn't copy; try the Share button.",
+  "Alışveriş listesi": "Shopping list",
+  "Haftalık alışveriş listesi": "Weekly shopping list",
+  "Menülerindeki gramajlar gün sayısıyla çarpılıp toplandı; tarifler malzemelerine ayrıldı. Aldıklarına dokunup üstünü çiz.": "Amounts in your plans are multiplied by the number of days and added up; recipes are broken down into their ingredients. Tap what you've bought to cross it off.",
+  "Notlar'a kopyala": "Copy to Notes", "İşaretleri temizle": "Clear checkmarks",
+
+  // --- Öneriler
+  "KALAN HEDEFİNİ KAPATAN SEÇENEKLER": "SUGGESTIONS TO FILL YOUR REMAINING MACROS",
+  "Kalan: {k} · {p}. Sık yediğin besinlerden:": "Remaining: {k} · {p}. From foods you eat often:",
+  "{n} kcal kalır": "{n} kcal left", "{n} kcal aşar": "{n} kcal over",
+  "{n} g P kalır": "{n} g P left", "protein tamam": "protein covered",
+  "{k} kcal · {p} g protein → {a}, {b}": "{k} kcal · {p} g protein → {a}, {b}",
+  "{n} besin → {m} (yalnızca bugün)": { one: "{n} food → {m} (today only)", other: "{n} foods → {m} (today only)" },
+  "{n} besin → {m} (menüne, her gün)": { one: "{n} food → {m} (your plan, every day)", other: "{n} foods → {m} (your plan, every day)" },
+
+  // --- Takviye kartı
+  "🧠 Koç önerisi: hedef kalorini {n} kcal artır → İlerleme": "🧠 Coach tip: raise your calorie target by {n} kcal → Progress",
+  "🧠 Koç önerisi: hedef kalorini {n} kcal azalt → İlerleme": "🧠 Coach tip: lower your calorie target by {n} kcal → Progress",
+  "{done} / {n} Tamamlandı": "{done} / {n} completed",
+  "Sabah tok": "With first meal", "Antrenman öncesi": "Pre-workout", "Antrenman sonrası": "Post-workout", "Yatmadan önce": "Before bed",
+  "İlk öğünle": "With first meal", "Antrenman / Gün içi": "Workout & daytime", "Akşam / Uyku öncesi": "Evening & bedtime",
+  "Zaman seç": "Choose time",
+  "{ad} ne zaman alınır?": "When to take {ad}?",
+  "{ad} dozunu azalt": "Decrease {ad} dose", "{ad} dozunu artır": "Increase {ad} dose",
+  "{ad} sil": "Delete {ad}", "{ad} dozu": "{ad} dose",
+  "Doz: {d}": "Dose: {d}", "+ Doz": "+ Dose",
+  "Hazır takviyeler": "Common supplements", "+ Ekle": "+ Add",
+  "Takviye listen boş. Düzenle'den ekleyebilirsin.": "Your supplement list is empty. You can add some with Edit.",
+  "Takviyeleri düzenle": "Edit supplements",
+  "Doz ve birim": "Dose and unit", "örn: 5 g · 2 softjel · 1 ölçek": "e.g. 5 g · 2 softgels · 1 scoop",
+  "Boş bırakırsan doz gösterilmez.": "If you leave it empty, no dose is shown.",
+  "{ad}: doz kaldırıldı": "{ad}: dose removed",
+  "Doz anlaşılamadı": "Couldn't read the dose",
+  "Önce sayı, sonra birim yaz (örn: 5 g veya 2 softjel).": "Enter a number first, then a unit (e.g. 5 g or 2 softgels).",
+  "Özel zaman etiketi": "Custom time label", "örn: Öğle yemeğiyle": "e.g. With lunch",
+  "Takviye adı": "Supplement name", "örn: D3 Vitamini": "e.g. Vitamin D3",
+  "{ad} kaldırıldı": "{ad} removed",
+  // hazır takviyeler: eklenirken kullanıcı verisine o anki dilde yazılır
+  "Vitamin D3 + K2": "Vitamin D3 + K2", "Omega-3": "Omega-3", "Kreatin Monohidrat": "Creatine monohydrate", "Whey Protein": "Whey protein",
+  "Magnezyum": "Magnesium", "Çinko": "Zinc",
+  "damla/kapsül": "drop/capsule", "softjel": "softgel",
+  "Tok karnına": "With food", "Bol su ile": "With plenty of water", "Uykudan 1 saat önce": "1 hour before sleep", "Akşam": "Evening",
+
+  // --- Öğün penceresi
+  "Öğünü Düzenle": "Edit meal",
+  "Dinlenme Günü Menüsüne Öğün Ekle": "Add a meal to your rest-day plan",
+  "Antrenman Günü Menüsüne Öğün Ekle": "Add a meal to your training-day plan",
+  "{n}. Öğün: ": "Meal {n}: ",
+  "Öğün adını yaz.": "Enter a name for the meal.",
+  "Öğün güncellendi": "Meal updated",
+  "\"{m}\" eklendi": "\"{m}\" added",
+  "Öğün adı": "Meal name", "Saat (isteğe bağlı)": "Time (optional)", "Kısa not": "Short note", "örn: 50g protein": "e.g. 50g protein",
+  "Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.": "If you enter a time, the meal slots into the right place in your plan by itself. You can also drag it by the ⠿ handle afterwards.",
 });
 
 </script>
