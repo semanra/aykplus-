@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 import os, sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
@@ -7,7 +8,7 @@ srv=subprocess.Popen(['python3','-m','http.server','8765'],cwd=REPO,stdout=subpr
 from playwright.sync_api import sync_playwright
 errs=[]; dialogs=[]
 with sync_playwright() as p:
-    b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script(TEST_INIT)
     pg=ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
     pg.on("dialog", lambda d: (dialogs.append(d.message), d.accept()))
     pg.goto("http://localhost:8765/index.html"); pg.wait_for_timeout(400)

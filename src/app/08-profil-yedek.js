@@ -344,7 +344,7 @@ async function resetToDefaults() {
   if (!(await askConfirm("Fabrika ayarlarına sıfırla", "TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?", "Devam et", true))) return;
   if (!(await askConfirm("Son onay", "Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?", "Sıfırla", true))) return;
   await storageSnapshotNow();   // v41: sıfırlamadan önceki hâl iç yedekte (Profil → Otomatik iç yedekler)
-  state = normalizeState({});
+  state = freshState();   // v44: kurulum ekranı yeniden açılır
   state.today = logicalToday();
   closeSettings();
   stopTimer();

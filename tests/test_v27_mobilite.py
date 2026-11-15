@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v27: Mobilite yeniden tasarım — tek sıralı liste + bir kerelik göç, vücut bölgeleri (ana/ikincil),
 # hareket detayı (set/tekrar/süre/taraf/tür/bölge), hareket ekle, nefes daireli sayaç, sessiz günlük kayıt.
 import os, sys
@@ -44,7 +45,7 @@ def seed(pg, data):
 try:
   with sync_playwright() as p:
     b = p.chromium.launch(); ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
-    ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
 
     # ================= 1) GÖÇ =================

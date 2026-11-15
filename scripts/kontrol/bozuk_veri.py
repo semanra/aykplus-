@@ -3,7 +3,7 @@
 # Kullanım: python scripts/kontrol/bozuk_veri.py [deneme sayısı] [tohum]
 import os, sys, json, random, copy, collections
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
-from ortak import server
+from ortak import server, TEST_INIT
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 200
 SEED_RNG = int(sys.argv[2]) if len(sys.argv) > 2 else 7
@@ -77,7 +77,7 @@ def main():
     with server(REPO) as url, sync_playwright() as p:
         b = p.chromium.launch()
         ctx = b.new_context(viewport={"width": 390, "height": 844}, color_scheme="dark")
-        ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+        ctx.add_init_script(TEST_INIT)
         pg = ctx.new_page(); perr = []
         pg.on("pageerror", lambda e: perr.append(str(e)[:160]))
         pg.goto(url); pg.wait_for_timeout(400)

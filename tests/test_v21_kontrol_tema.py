@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v21: lor adı düzeltildi, etiket/barkod tutarlılık kontrolü, makul başlangıç gramları, Türkiye'de bulunmayan ABD ürünleri
 # gizlendi, beslenmede temalı onay/metin pencereleri (koyu + gündüz), Profil → Gün geçişi (varsayılan 00:00).
 import os, sys, json, subprocess, time
@@ -15,7 +16,7 @@ def st(pg): return pg.evaluate("aykStoredState()")
 SPLASH = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 def new_page(b, clock=None, state=None):
     ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
-    ctx.add_init_script(SPLASH)
+    ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
     native = []; pg.on("dialog", lambda d: (native.append(d.message), d.accept()))
     if clock: pg.clock.set_fixed_time(clock)

@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v25: service worker. Uygulama bir kez açılıp önbellek dolduktan sonra sunucu 404 / 503 döndürse, internet olmasa
 # ya da sunucu çok yavaş yanıt verse de (3 sn zaman aşımı) uygulama önbellekteki kopyayla açılmalı.
 # Test kendi sunucusunu çalıştırır; sunucunun davranışı (normal / 404 / 503 / yavaş) testten değiştirilir.
@@ -53,7 +54,7 @@ try:
   with sync_playwright() as p:
     b = p.chromium.launch()
     ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, is_mobile=True, has_touch=True)
-    ctx.add_init_script(SPLASH)
+    ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
 
     # Kurulum: ilk açılış, service worker yüklenir ve dosyaları önbelleğe alır

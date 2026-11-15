@@ -3,7 +3,9 @@
 import os, sys, subprocess, time, socket, contextlib, datetime
 
 FIXED_TIME = datetime.datetime(2026, 11, 14, 10, 30, 0)   # ekranlar her çalıştırmada aynı çıksın diye sabit saat
-NO_ANIM = ("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();"
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tests"))
+from ortak_tohum import TEST_INIT   # v44: açılış animasyonu kaldırma + eski varsayılan tohum (kurulum ekranı çıkmasın)
+NO_ANIM = (TEST_INIT + ";" + "document.addEventListener('DOMContentLoaded',()=>{"
            "const st=document.createElement('style'); st.textContent='*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}';"
            "document.head.appendChild(st);})")
 

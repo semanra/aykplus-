@@ -5,7 +5,7 @@
 # Gereksinim: pip install playwright pillow && python -m playwright install chromium
 import os, sys, json, shutil, subprocess, tarfile, io
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
-from ortak import server, SEED, SCREENS, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME
+from ortak import TEST_INIT, server, SEED, SCREENS, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(REPO, "build", "kontrol")
 HIZLI = "--hizli" in sys.argv
@@ -84,7 +84,7 @@ def perf(root):
         b = p.chromium.launch()
         for rate in (1, 4):
             ctx = b.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True, color_scheme="dark")
-            ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+            ctx.add_init_script(TEST_INIT)
             pg = ctx.new_page(); cdp = ctx.new_cdp_session(pg)
             pg.goto(url); pg.wait_for_timeout(400); pg.evaluate(PERF_SEED); pg.wait_for_timeout(200)
             cdp.send("Emulation.setCPUThrottlingRate", {"rate": rate})

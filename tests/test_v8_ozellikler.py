@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 import os, sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
@@ -11,7 +12,7 @@ def st(pg): return pg.evaluate("aykStoredState()")
 def ov(pg,tag):
     w=pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]"); print(tag,"overflow" if w[0]>w[1] else "ok",w)
 with sync_playwright() as p:
-    b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script(TEST_INIT)
     pg=ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
     def on_dialog(d):
         if d.type=="prompt" and prompts: d.accept(prompts.pop(0))

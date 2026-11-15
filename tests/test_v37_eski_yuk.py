@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v37: eski sürümlerden kalan yük. Küçültülmemiş eski profil fotoğrafı açılışta / yedek geri yüklenince küçültülür;
 # ilk sürümlerin kaydı (ayk_plus_v4_state) yalnızca bugünkü kayıt sorunsuz okunduysa silinir. Diğer veriye dokunulmaz.
 import os, sys, json, subprocess, time
@@ -24,7 +25,7 @@ try:
     b = p.chromium.launch()
     def page():
         ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
-        ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+        ctx.add_init_script(TEST_INIT)
         pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.goto(URL); pg.wait_for_timeout(300)
         return ctx, pg

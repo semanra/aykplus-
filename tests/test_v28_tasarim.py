@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v28: tasarım denetimi düzeltmeleri (docs/ANALIZ-tasarim.md "Hemen" listesi) + Mobilite "Alacakaranlık" + Profil "Grafit".
 import os, sys, json, subprocess, time
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -29,7 +30,7 @@ try:
     b = p.chromium.launch()
     for W in (320, 390):
       ctx = b.new_context(color_scheme="dark", viewport={"width": W, "height": 700}, device_scale_factor=2, is_mobile=True, has_touch=True)
-      ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+      ctx.add_init_script(TEST_INIT)
       pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
       pg.goto(URL); pg.wait_for_timeout(400)
       tag = f"[{W}px] "

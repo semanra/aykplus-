@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v39: Mobilite — birden fazla rutin (eski tek liste bir kez "Rutinim"e taşınır), nasıl yapılır, ana ekran,
 # rutinin içi + Düzenle, rehberli seans (her zaman baştan) + bitiş ekranı.
 import os, sys, json, subprocess, time, datetime
@@ -32,7 +33,7 @@ try:
   with sync_playwright() as p:
     b = p.chromium.launch()
     ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
-    ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
 
     # ================= 1) VERİ: RUTİNLER VE GÖÇ =================
@@ -91,7 +92,7 @@ try:
 
     # ================= 3) ANA EKRAN =================
     ctx3 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
-    ctx3.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    ctx3.add_init_script(TEST_INIT)
     p3 = ctx3.new_page(); p3.on("pageerror", lambda e: errs.append(str(e)))
     p3.clock.install(time=datetime.datetime.fromisoformat("2026-11-13T10:00:00"))   # Cuma
     home = {"activeTab": "mobility", "today": "2026-11-13", "settings": {"splash": False},
@@ -194,7 +195,7 @@ try:
 
     # ================= 5) SEANS (BAŞLAT) + BİTİŞ =================
     ctx5 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
-    ctx5.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    ctx5.add_init_script(TEST_INIT)
     p5 = ctx5.new_page(); p5.on("pageerror", lambda e: errs.append(str(e)))
     p5.clock.install(time=datetime.datetime.fromisoformat("2026-11-13T10:00:00"))
     five = {"activeTab": "mobility", "today": "2026-11-13", "settings": {"splash": False},

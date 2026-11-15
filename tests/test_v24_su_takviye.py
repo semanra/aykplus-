@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v24: Su ve Takviye Rutini kartları — halka, yüzde, kiloya göre su hedefi (+kreatin),
 # zamana göre 3 grup, doz ayarlayıcı (−/+), hazır takviyeler, tamamlanma parıltısı, yeni gün.
 import os, sys
@@ -22,7 +23,7 @@ def supp(pg, name): return [x for x in st(pg)["supplementList"] if name in x["na
 try:
   with sync_playwright() as p:
     b = p.chromium.launch(); ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
-    ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
 
     # ---------- Eski kayıt (v23): doz alanı yok, waterAuto yok, bozuk doz

@@ -7,6 +7,7 @@ const ACTIVITY_MULT = { low: [1.45, 1.30], mid: [1.55, 1.43], high: [1.70, 1.58]
 const GAIN_PACE = { slow: 0.10, mid: 0.15, fast: 0.20 };
 
 const DEFAULT_SETTINGS = {
+  onboarded: true,   // v44: yeni kurulumda freshState() false yapar; var olan kayıt hep true
   sex: "male", height: 180, age: 26, targetWeight: 82,
   waterTarget: 3.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
@@ -217,7 +218,7 @@ function normMobItem(x) {
 // çalışmaz. normalizeState yalnızca doğrulama/temizlik yapar. Yeni bir biçim değişikliği = yeni adım + DATA_VER + 1.
 // (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
 // ---------------------------------------------------------------------------
-const DATA_VER = 3;
+const DATA_VER = 4;
 function migrateState(s) {
   const v = Number.isInteger(s.dataVer) && s.dataVer >= 0 ? s.dataVer : 0;
   if (v < 1) {   // v27 + v39: mobilitenin eski listeleri (dynamic/static, sonra tek items) → rutinler; eski diziler yedek olarak kalır
@@ -232,6 +233,7 @@ function migrateState(s) {
     delete s.settings.macroViewV26;
   }
   if (v < 3 && s.settings.goal === DEFAULT_SETTINGS.goal) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43: hedef Ver/Koru/Al (açık 0 = eskiden "kilo koruma"; ayarda açıkça başka hedef varsa ona dokunulmaz)
+  if (v < 4) s.settings.onboarded = true;   // v44: var olan kayıt kurulum ekranını görmez
   s.dataVer = Math.max(v, DATA_VER);
 }
 
@@ -380,6 +382,7 @@ function normalizeState(raw) {
   if (!["lose", "keep", "gain"].includes(s.settings.goal)) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43
   if (!["slow", "mid", "fast"].includes(s.settings.gainPace)) s.settings.gainPace = "mid";
   if (!["low", "mid", "high"].includes(s.settings.activity)) s.settings.activity = "mid";
+  if (typeof s.settings.onboarded !== "boolean") s.settings.onboarded = true;   // v44
   s.settings.proteinHigh = s.settings.proteinHigh === true;
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
@@ -406,6 +409,8 @@ function loadState() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) { const st = normalizeState(JSON.parse(saved)); hadV5State = true; return st; }
     const oldV4 = localStorage.getItem("ayk_plus_v4_state");
+    // v44: kayıt yok, v4 kaydı yok, okuma hatası yok ve bu cihazda IndexedDB hiç kullanılmadıysa yeni kurulum
+    if (!oldV4 && localStorage.getItem("ayk_plus_v5_idb") !== "1") { freshInstall = true; return freshState(); }
     if (oldV4) {
       const o = JSON.parse(oldV4);
       return normalizeState({
@@ -426,6 +431,18 @@ function loadState() {
   }
   return normalizeState({});
 }
+// v44: yeni kurulum durumu. Test kancası: window.AYK_TEST_SEED nesneyse onunla (kurulum ekranı yok) açılır.
+function freshState() {
+  if (typeof window !== "undefined" && isObj(window.AYK_TEST_SEED)) {
+    const t = normalizeState(JSON.parse(JSON.stringify(window.AYK_TEST_SEED)));
+    t.settings.onboarded = true;
+    return t;
+  }
+  const s = normalizeState({});
+  s.settings.onboarded = false;   // normalizeState (göç adım 4) true yapar; bilerek sonradan
+  return s;
+}
+var freshInstall = false;   // v44: bu açılış yeni kurulum mu
 const RESCUE_KEY = "ayk_plus_v5_state_kurtarma";
 var loadFailed = false;
 var hadV5State = false;   // v37: açılışta bugünkü kayıt vardı ve okundu (eski v4 kaydı ancak o zaman silinir)

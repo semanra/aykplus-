@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v35: veri güvenliği — bozuk kayıtlarda toplu kayıp yok, gün geçişi sınır durumları, kurtarma kopyası arayüzü,
 # yedekten geri yükleme, kullanıcı metninin HTML olarak işlenmemesi.
 import os, sys, json, subprocess, time, datetime
@@ -18,7 +19,7 @@ VISIT = """() => { const out = []; for (const s of ["switchTab('nutrition'); set
 
 def new_page(b, clock=None):
     ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, accept_downloads=True)
-    ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
     if clock: pg.clock.set_fixed_time(datetime.datetime.fromisoformat(clock))
     return ctx, pg

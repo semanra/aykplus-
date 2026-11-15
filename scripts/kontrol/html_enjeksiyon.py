@@ -3,7 +3,7 @@
 # Kullanım: python scripts/kontrol/html_enjeksiyon.py
 import os, sys, json
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
-from ortak import server
+from ortak import server, TEST_INIT
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 
 def P(tag):   # her alan için ayrı izlenebilir parça (tırnak türleri dahil)
@@ -54,7 +54,7 @@ def main():
     with server(REPO) as url, sync_playwright() as p:
         b = p.chromium.launch()
         ctx = b.new_context(viewport={"width": 390, "height": 844}, color_scheme="dark")
-        ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+        ctx.add_init_script(TEST_INIT)
         pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)[:150]))
         pg.goto(url); pg.wait_for_timeout(400)
         pg.evaluate(SETUP, payload); pg.wait_for_timeout(200)

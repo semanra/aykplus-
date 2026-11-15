@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 import os, sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
@@ -20,7 +21,7 @@ legacy = {
 }
 with sync_playwright() as p:
     b=p.chromium.launch()
-    ctx=b.new_context(color_scheme="dark", viewport={"width":390,"height":844},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    ctx=b.new_context(color_scheme="dark", viewport={"width":390,"height":844},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script(TEST_INIT)
     pg=ctx.new_page()
     pg.on("console", lambda m: errors.append("console:"+m.text) if m.type=="error" else None)
     pg.on("pageerror", lambda e: errors.append("pageerror:"+str(e)))

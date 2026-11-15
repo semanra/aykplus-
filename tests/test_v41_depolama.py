@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v41: depolama temeli — IndexedDB (parçalı), localStorage "ayna" (silinmez, güncel tutulur), güvenli geçiş + "Geçiş öncesi"
 # iç yedeği, dışarıdan değişen kaydın içe alınması, IndexedDB yokken eski mod, yazma hatası, bozuk parça kurtarma,
 # otomatik iç yedekler (son 7 gece + 4 hafta) ve geri dönme, ayna dolunca çalışmaya devam, hız ölçümü.
@@ -29,7 +30,7 @@ try:
     b = p.chromium.launch()
     def page(t0="2026-11-13T10:00:00", init=None):
         ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
-        ctx.add_init_script(SPLASH)
+        ctx.add_init_script(TEST_INIT)
         if init: ctx.add_init_script(init)
         pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.clock.install(time=T(t0))

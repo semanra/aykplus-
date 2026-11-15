@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v43: hedef (Ver/Koru/Al), hareketlilik, kanıta dayalı protein, yağ %25 — hesap ve göç.
 import os, sys, json, subprocess, time, datetime
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -16,7 +17,7 @@ try:
     b = p.chromium.launch()
     def page():
         ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
-        ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+        ctx.add_init_script(TEST_INIT)
         pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.goto(URL); pg.wait_for_function("window.aykBooted === true"); pg.wait_for_timeout(50)
         return ctx, pg
@@ -29,7 +30,7 @@ try:
     OWNER = {"weight": 105, "deficit": 700, "dayType": "train",
              "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}}
     seed(pg, OWNER); t = pg.evaluate("getTargets()"); s = st(pg)
-    check(s["dataVer"] == 3 and s["settings"]["goal"] == "lose" and s["settings"]["activity"] == "mid", "eski kayıt: lose + mid, dataVer 3")
+    check(s["dataVer"] == 4 and s["settings"]["goal"] == "lose" and s["settings"]["activity"] == "mid", "eski kayıt: lose + mid, dataVer 4")
     check(t["calTarget"] == 2478, "sahibin kalorisi değişmedi (2478)")
     check(t["proTarget"] == 180 and t["fatTarget"] == 69 and t["carbTarget"] == 284, "protein 180, yağ 69, karb 284")
     check(s["deficit"] == 700, "açık korunuyor")
@@ -63,10 +64,10 @@ try:
     check(s["goal"] == "lose" and s["activity"] == "mid" and s["gainPace"] == "mid" and s["proteinHigh"] is False, "bozuk ayarlar geçerli değere döndü")
     for df, want in [(0, "keep"), (700, "lose")]:
         seed(pg, {"weight": 105, "deficit": df, "dayType": "train", "dataVer": 2, "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}})
-        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 3, f"v42 kaydı (açık {df}) → {want}, dataVer 3")
+        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 4, f"v42 kaydı (açık {df}) → {want}, dataVer 4")
         bk = {"weight": 105, "deficit": df, "dayType": "train", "dataVer": 2, "meals": [], "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}}
         pg.evaluate("t => void restoreFromText(t)", json.dumps(bk)); pg.wait_for_timeout(150); pg.click("#uiDlgOk"); pg.wait_for_timeout(250)
-        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 3, f"v42 yedeği geri yüklendi (açık {df}) → {want}, dataVer 3")
+        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 4, f"v42 yedeği geri yüklendi (açık {df}) → {want}, dataVer 4")
     seed(pg, {**OWNER, "dataVer": 3, "deficit": 0, "settings": {**OWNER["settings"], "goal": "lose"}})
     check(st(pg)["settings"]["goal"] == "lose", "dataVer 3 kayıtta göç tekrar çalışmıyor (kullanıcının seçimi korunur)")
     ctx.close()

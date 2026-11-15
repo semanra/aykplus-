@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v31: Görünüm (Sistem / Koyu / Aydınlık), aydınlık tema tüm uygulamada, her ekranda okunurluk ölçümü.
 import os, sys, json, subprocess, time
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -77,7 +78,7 @@ SCREENS = [
 
 def ctx_page(b, scheme, init_theme=None):
     ctx = b.new_context(color_scheme=scheme, viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True)
-    ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
     return ctx, pg
 

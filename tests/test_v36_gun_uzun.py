@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v36: tam gün senaryosu (sabahtan gece yarısına), "Yeni gün" düğmesinin arşivi ezmemesi, açık uygulamada gece yarısı,
 # antrenman geçmişinin artık silinmemesi, kayıt alanı göstergesi, kapanıp açılan uygulamada dinlenme sayacı, kayıt hatası.
 import os, sys, json, subprocess, time, datetime
@@ -20,7 +21,7 @@ try:
     b = p.chromium.launch()
     def page(t0, clean=True):
         ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
-        ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+        ctx.add_init_script(TEST_INIT)
         pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.clock.install(time=T(t0)); pg.goto(URL); pg.wait_for_timeout(300)
         return ctx, pg

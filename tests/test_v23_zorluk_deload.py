@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v23: set başına zorluk (Kolay/Orta/Zor/Tükeniş, isteğe bağlı), kilo önerisinin zorluğu hesaba katması, dinlenme haftası notu.
 import os, sys, json, subprocess, time
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -22,7 +23,7 @@ try:
   with sync_playwright() as p:
     b = p.chromium.launch()
     ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
-    ctx.add_init_script(SPLASH)
+    ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
     pg.goto(URL); pg.wait_for_timeout(300)
     keys = pg.evaluate("['Bench Press','Barbell Row','Overhead Press','Lat Pulldown'].map(exKey)")

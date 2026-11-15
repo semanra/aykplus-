@@ -1,0 +1,1397 @@
+{
+ "activeTab": "nutrition",
+ "weight": 105,
+ "deficit": 700,
+ "dayType": "train",
+ "waterLiters": 0,
+ "supplements": {
+  "creatine": false,
+  "greens": false,
+  "omega": false
+ },
+ "weightLogs": [
+  {
+   "date": "Başlangıç",
+   "weight": 105
+  }
+ ],
+ "customFoods": {},
+ "customIconDataUrl": "",
+ "meals": [
+  {
+   "id": "breakfast",
+   "title": "1. Öğün: Kahvaltı (Yulaf + Yumurta + Yeşillik)",
+   "targetNote": "Hedef: 50-60g Protein",
+   "done": false,
+   "items": [
+    {
+     "foodId": "tam_yumurta",
+     "amount": 3
+    },
+    {
+     "foodId": "yulaf",
+     "amount": 80
+    },
+    {
+     "foodId": "whey_shake",
+     "amount": 1
+    },
+    {
+     "foodId": "domates_salatalik",
+     "amount": 200
+    }
+   ]
+  },
+  {
+   "id": "lunch",
+   "title": "2. Öğün: Öğle Yemeği (Antrenman Öncesi)",
+   "targetNote": "Yüksek Karbonhidrat & Protein",
+   "done": false,
+   "items": [
+    {
+     "foodId": "tavuk_gogsu",
+     "amount": 200
+    },
+    {
+     "foodId": "pirinc",
+     "amount": 90
+    },
+    {
+     "foodId": "yesil_salata",
+     "amount": 1
+    },
+    {
+     "foodId": "zeytinyagi",
+     "amount": 10
+    }
+   ]
+  },
+  {
+   "id": "snack",
+   "title": "3. Öğün: Ara Öğün (Antrenman Sonrası / İkindi)",
+   "targetNote": "Hızlı Toparlanma & Kuruyemiş",
+   "done": false,
+   "items": [
+    {
+     "foodId": "whey_shake",
+     "amount": 1
+    },
+    {
+     "foodId": "suzme_yogurt",
+     "amount": 150
+    },
+    {
+     "foodId": "muz",
+     "amount": 1
+    },
+    {
+     "foodId": "ceviz",
+     "amount": 25
+    }
+   ]
+  },
+  {
+   "id": "dinner",
+   "title": "4. Öğün: Akşam Yemeği",
+   "targetNote": "Kas Onarımı & Sebze/Lif",
+   "done": false,
+   "items": [
+    {
+     "foodId": "dana_kiyma",
+     "amount": 200
+    },
+    {
+     "foodId": "makarna_tam",
+     "amount": 85
+    },
+    {
+     "foodId": "brokoli_karnabahar",
+     "amount": 200
+    },
+    {
+     "foodId": "zeytinyagi",
+     "amount": 5
+    }
+   ]
+  }
+ ],
+ "activeWorkoutDayIdx": 0,
+ "workoutLogs": [],
+ "workoutDays": [
+  {
+   "id": "upperA",
+   "name": "1. GÜN: Üst Vücut A",
+   "exercises": [
+    {
+     "name": "Barbell Bench Press",
+     "targetInfo": "3x5–8",
+     "note": "Hedef: 3 Set x 5–8 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 6,
+       "target": "5–8",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 6,
+       "target": "5–8",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 6,
+       "target": "5–8",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Chest-Supported Row",
+     "targetInfo": "4x6–10",
+     "note": "Hedef: 4 Set x 6–10 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Incline Dumbbell Press",
+     "targetInfo": "3x8–10",
+     "note": "Hedef: 3 Set x 8–10 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–10",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Lat Pulldown",
+     "targetInfo": "3x8–12",
+     "note": "Hedef: 3 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Cable Lateral Raise",
+     "targetInfo": "4x10–15",
+     "note": "Hedef: 4 Set x 10–15 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Reverse Pec Deck veya Face Pull",
+     "targetInfo": "3x12–15",
+     "note": "Hedef: 3 Set x 12–15 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Overhead Cable Triceps Extension",
+     "targetInfo": "3x8–12",
+     "note": "Hedef: 3 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Triceps Rope/Bar Pushdown",
+     "targetInfo": "2x10–12",
+     "note": "Hedef: 2 Set x 10–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Preacher Curl",
+     "targetInfo": "3x8–12",
+     "note": "Hedef: 3 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    }
+   ]
+  },
+  {
+   "id": "lowerA",
+   "name": "2. GÜN: Alt Vücut A",
+   "exercises": [
+    {
+     "name": "Hack Squat",
+     "targetInfo": "3x5–8",
+     "note": "Hedef: 3 Set x 5–8 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 6,
+       "target": "5–8",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 6,
+       "target": "5–8",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 6,
+       "target": "5–8",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Romanian Deadlift",
+     "targetInfo": "3x6–10",
+     "note": "Hedef: 3 Set x 6–10 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Seated Leg Curl",
+     "targetInfo": "3x8–12",
+     "note": "Hedef: 3 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Leg Extension",
+     "targetInfo": "3x10–12",
+     "note": "Hedef: 3 Set x 10–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Standing Calf Raise",
+     "targetInfo": "4x8–12",
+     "note": "Hedef: 4 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Crunch Machine",
+     "targetInfo": "3x10–15",
+     "note": "Hedef: 3 Set x 10–15 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    }
+   ]
+  },
+  {
+   "id": "upperB",
+   "name": "3. GÜN: Üst Vücut B",
+   "exercises": [
+    {
+     "name": "Machine Shoulder Press",
+     "targetInfo": "3x6–10 (36kg)",
+     "note": "Hedef: 3 Set x 6–10 Tekrar (36K)",
+     "sets": [
+      {
+       "kg": 36,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 36,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 36,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Pull-up",
+     "targetInfo": "4x6–10",
+     "note": "Hedef: 4 Set x 6–10 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Weighted Dips",
+     "targetInfo": "3x6–10",
+     "note": "Hedef: 3 Set x 6–10 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Seated Cable Row",
+     "targetInfo": "3x8–12",
+     "note": "Hedef: 3 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Pec Deck Fly VEYA Cable Crossover",
+     "targetInfo": "3x10–12",
+     "note": "Hedef: 3 Set x 10–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Dumbbell Lateral Raise",
+     "targetInfo": "4x12–15",
+     "note": "Hedef: 4 Set x 12–15 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Incline Dumbbell Curl",
+     "targetInfo": "3x8–12",
+     "note": "Hedef: 3 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Skullcrusher",
+     "targetInfo": "3x8–12",
+     "note": "Hedef: 3 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Hammer Curl",
+     "targetInfo": "3x8–12",
+     "note": "Hedef: 3 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    }
+   ]
+  },
+  {
+   "id": "lowerB",
+   "name": "4. GÜN: Alt Vücut B",
+   "exercises": [
+    {
+     "name": "Barbell Hip Thrust",
+     "targetInfo": "3x6–10",
+     "note": "Hedef: 3 Set x 6–10 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 8,
+       "target": "6–10",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Leg Press",
+     "targetInfo": "3x8–10",
+     "note": "Hedef: 3 Set x 8–10 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–10",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Bulgarian Split Squat",
+     "targetInfo": "3x8–10",
+     "note": "Hedef: 3 Set x 8–10 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–10",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–10",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Lying Leg Curl",
+     "targetInfo": "3x8–12",
+     "note": "Hedef: 3 Set x 8–12 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 10,
+       "target": "8–12",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Leg Extension",
+     "targetInfo": "3x10–15",
+     "note": "Hedef: 3 Set x 10–15 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Hyperextension",
+     "targetInfo": "2x10–15",
+     "note": "Hedef: 2 Set x 10–15 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "10–15",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Seated Calf Raise",
+     "targetInfo": "3x12–15",
+     "note": "Hedef: 3 Set x 12–15 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 15,
+       "target": "12–15",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    },
+    {
+     "name": "Hanging Leg Raise",
+     "targetInfo": "3x8–15",
+     "note": "Hedef: 3 Set x 8–15 Tekrar",
+     "sets": [
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "8–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "8–15",
+       "done": false
+      },
+      {
+       "kg": 0,
+       "reps": 12,
+       "target": "8–15",
+       "done": false
+      }
+     ],
+     "kind": "weight"
+    }
+   ]
+  }
+ ],
+ "mobilityRoutine": {
+  "dynamic": [
+   {
+    "name": "World’s Greatest Stretch",
+    "prescription": "1 Set x 8–10 Tekrar",
+    "note": "Sağ ve sol akıcı geçiş",
+    "done": false
+   },
+   {
+    "name": "90/90 Hip Switch",
+    "prescription": "1 Set x 8–10 Tekrar",
+    "note": "Gövde dik, kalça rotasyonu",
+    "done": false
+   },
+   {
+    "name": "Kneeling Ankle Dorsiflexion",
+    "prescription": "1 Set x 8–10 Tekrar",
+    "note": "Topuk yerden kalkmadan diz ileri",
+    "done": false
+   },
+   {
+    "name": "Quadruped Cat-Cow",
+    "prescription": "1 Set x 8–10 Tekrar",
+    "note": "Nefes alarak ekstansiyon, vererek fleksiyon",
+    "done": false
+   },
+   {
+    "name": "Towel/Band Shoulder Dislocates",
+    "prescription": "1 Set x 8–10 Tekrar",
+    "note": "Dirsekler bükülmeden tam tur",
+    "done": false
+   }
+  ],
+  "static": [
+   {
+    "name": "Doorway Pec & Biceps Stretch",
+    "prescription": "2 Set x 30 sn",
+    "timerSec": 30,
+    "note": "Kapı eşiğinde göğüs ve biceps esnetme",
+    "done": false
+   },
+   {
+    "name": "Child’s Pose with Lat Reach",
+    "prescription": "Sağ ve Sol için 1'er Set x 45 sn",
+    "timerSec": 45,
+    "note": "Ellerle çapraza uzanarak kanat esnetme",
+    "done": false
+   },
+   {
+    "name": "Couch Stretch",
+    "prescription": "Sağ ve Sol için 2'şer Set x 30 sn",
+    "timerSec": 30,
+    "note": "Kalça fleksörü ve üst bacak",
+    "done": false
+   },
+   {
+    "name": "Supine Figure-4 Glute Stretch",
+    "prescription": "Sağ ve Sol için 2'şer Set x 30 sn",
+    "timerSec": 30,
+    "note": "Sırtüstü 4 figürü ile kalça esnetme",
+    "done": false
+   },
+   {
+    "name": "Single-Leg Seated Hamstring Stretch",
+    "prescription": "Sağ ve Sol için 2'şer Set x 30 sn",
+    "timerSec": 30,
+    "note": "Tek bacak oturarak arka bacak esnetme",
+    "done": false
+   }
+  ],
+  "routines": [
+   {
+    "id": "mr_main",
+    "name": "Rutinim",
+    "items": [
+     {
+      "id": "mob_mwhciwgvyw0yj",
+      "name": "World’s Greatest Stretch",
+      "type": "dynamic",
+      "region": "hip",
+      "region2": "spine",
+      "sets": 1,
+      "mode": "reps",
+      "reps": 10,
+      "sec": 30,
+      "sides": 1,
+      "note": "Sağ ve sol akıcı geçiş",
+      "rx": "1 Set x 8–10 Tekrar",
+      "rxOk": true,
+      "done": false
+     },
+     {
+      "id": "mob_mwhciwgvlahio",
+      "name": "90/90 Hip Switch",
+      "type": "dynamic",
+      "region": "hip",
+      "region2": "",
+      "sets": 1,
+      "mode": "reps",
+      "reps": 10,
+      "sec": 30,
+      "sides": 1,
+      "note": "Gövde dik, kalça rotasyonu",
+      "rx": "1 Set x 8–10 Tekrar",
+      "rxOk": true,
+      "done": false
+     },
+     {
+      "id": "mob_mwhciwgvwweez",
+      "name": "Kneeling Ankle Dorsiflexion",
+      "type": "dynamic",
+      "region": "ankle",
+      "region2": "",
+      "sets": 1,
+      "mode": "reps",
+      "reps": 10,
+      "sec": 30,
+      "sides": 1,
+      "note": "Topuk yerden kalkmadan diz ileri",
+      "rx": "1 Set x 8–10 Tekrar",
+      "rxOk": true,
+      "done": false
+     },
+     {
+      "id": "mob_mwhciwgvt32vb",
+      "name": "Quadruped Cat-Cow",
+      "type": "dynamic",
+      "region": "spine",
+      "region2": "",
+      "sets": 1,
+      "mode": "reps",
+      "reps": 10,
+      "sec": 30,
+      "sides": 1,
+      "note": "Nefes alarak ekstansiyon, vererek fleksiyon",
+      "rx": "1 Set x 8–10 Tekrar",
+      "rxOk": true,
+      "done": false
+     },
+     {
+      "id": "mob_mwhciwgvh99vu",
+      "name": "Towel/Band Shoulder Dislocates",
+      "type": "dynamic",
+      "region": "shoulder",
+      "region2": "chest",
+      "sets": 1,
+      "mode": "reps",
+      "reps": 10,
+      "sec": 30,
+      "sides": 1,
+      "note": "Dirsekler bükülmeden tam tur",
+      "rx": "1 Set x 8–10 Tekrar",
+      "rxOk": true,
+      "done": false
+     },
+     {
+      "id": "mob_mwhciwgvzumcq",
+      "name": "Doorway Pec & Biceps Stretch",
+      "type": "static",
+      "region": "chest",
+      "region2": "shoulder",
+      "sets": 2,
+      "mode": "time",
+      "reps": 10,
+      "sec": 30,
+      "sides": 1,
+      "note": "Kapı eşiğinde göğüs ve biceps esnetme",
+      "rx": "2 Set x 30 sn",
+      "rxOk": true,
+      "done": false
+     },
+     {
+      "id": "mob_mwhciwgvww397",
+      "name": "Child’s Pose with Lat Reach",
+      "type": "static",
+      "region": "shoulder",
+      "region2": "spine",
+      "sets": 1,
+      "mode": "time",
+      "reps": 10,
+      "sec": 45,
+      "sides": 2,
+      "note": "Ellerle çapraza uzanarak kanat esnetme",
+      "rx": "Sağ ve Sol için 1'er Set x 45 sn",
+      "rxOk": true,
+      "done": false
+     },
+     {
+      "id": "mob_mwhciwgvxcixa",
+      "name": "Couch Stretch",
+      "type": "static",
+      "region": "hip",
+      "region2": "",
+      "sets": 2,
+      "mode": "time",
+      "reps": 10,
+      "sec": 30,
+      "sides": 2,
+      "note": "Kalça fleksörü ve üst bacak",
+      "rx": "Sağ ve Sol için 2'şer Set x 30 sn",
+      "rxOk": true,
+      "done": false
+     },
+     {
+      "id": "mob_mwhciwgvx8tyv",
+      "name": "Supine Figure-4 Glute Stretch",
+      "type": "static",
+      "region": "hip",
+      "region2": "",
+      "sets": 2,
+      "mode": "time",
+      "reps": 10,
+      "sec": 30,
+      "sides": 2,
+      "note": "Sırtüstü 4 figürü ile kalça esnetme",
+      "rx": "Sağ ve Sol için 2'şer Set x 30 sn",
+      "rxOk": true,
+      "done": false
+     },
+     {
+      "id": "mob_mwhciwgvqwj4t",
+      "name": "Single-Leg Seated Hamstring Stretch",
+      "type": "static",
+      "region": "hamstring",
+      "region2": "",
+      "sets": 2,
+      "mode": "time",
+      "reps": 10,
+      "sec": 30,
+      "sides": 2,
+      "note": "Tek bacak oturarak arka bacak esnetme",
+      "rx": "Sağ ve Sol için 2'şer Set x 30 sn",
+      "rxOk": true,
+      "done": false
+     }
+    ]
+   }
+  ]
+ },
+ "settings": {
+  "sex": "male",
+  "height": 180,
+  "age": 26,
+  "targetWeight": 82,
+  "waterTarget": 3.5,
+  "restSec": 90,
+  "sound": true,
+  "mobSound": true,
+  "mobVoice": false,
+  "warmupCard": true,
+  "keepAwake": true,
+  "bodyFat": "",
+  "targetBodyFat": "",
+  "macroView": "eaten",
+  "calAdjust": 0,
+  "coachAppliedAt": 0,
+  "barKg": 20,
+  "separatePlans": true,
+  "splash": true,
+  "nutriLight": false,
+  "scaleOn": false,
+  "scaleBase": 0,
+  "goal": "lose",
+  "gainPace": "mid",
+  "activity": "mid",
+  "proteinHigh": false,
+  "theme": "system",
+  "dayStartHour": 0,
+  "waterAuto": true
+ },
+ "dataVer": 3,
+ "mobilityRoutineLog": {},
+ "mobilityLog": {},
+ "exerciseHistory": {},
+ "dailyLogs": {},
+ "recentFoods": [],
+ "supplementList": [
+  {
+   "id": "creatine",
+   "name": "⚡ Kreatin (5g)"
+  },
+  {
+   "id": "greens",
+   "name": "🥬 Greens"
+  },
+  {
+   "id": "omega",
+   "name": "🐟 Omega/Vit"
+  }
+ ],
+ "restMeals": [
+  {
+   "id": "breakfast_rest",
+   "title": "1. Öğün: Kahvaltı (Yulaf + Yumurta + Yeşillik)",
+   "targetNote": "Hedef: 50-60g Protein",
+   "done": false,
+   "items": [
+    {
+     "foodId": "tam_yumurta",
+     "amount": 3
+    },
+    {
+     "foodId": "yulaf",
+     "amount": 80
+    },
+    {
+     "foodId": "whey_shake",
+     "amount": 1
+    },
+    {
+     "foodId": "domates_salatalik",
+     "amount": 200
+    }
+   ]
+  },
+  {
+   "id": "lunch_rest",
+   "title": "2. Öğün: Öğle Yemeği (Antrenman Öncesi)",
+   "targetNote": "Yüksek Karbonhidrat & Protein",
+   "done": false,
+   "items": [
+    {
+     "foodId": "tavuk_gogsu",
+     "amount": 200
+    },
+    {
+     "foodId": "pirinc",
+     "amount": 90
+    },
+    {
+     "foodId": "yesil_salata",
+     "amount": 1
+    },
+    {
+     "foodId": "zeytinyagi",
+     "amount": 10
+    }
+   ]
+  },
+  {
+   "id": "snack_rest",
+   "title": "3. Öğün: Ara Öğün (Antrenman Sonrası / İkindi)",
+   "targetNote": "Hızlı Toparlanma & Kuruyemiş",
+   "done": false,
+   "items": [
+    {
+     "foodId": "whey_shake",
+     "amount": 1
+    },
+    {
+     "foodId": "suzme_yogurt",
+     "amount": 150
+    },
+    {
+     "foodId": "muz",
+     "amount": 1
+    },
+    {
+     "foodId": "ceviz",
+     "amount": 25
+    }
+   ]
+  },
+  {
+   "id": "dinner_rest",
+   "title": "4. Öğün: Akşam Yemeği",
+   "targetNote": "Kas Onarımı & Sebze/Lif",
+   "done": false,
+   "items": [
+    {
+     "foodId": "dana_kiyma",
+     "amount": 200
+    },
+    {
+     "foodId": "makarna_tam",
+     "amount": 85
+    },
+    {
+     "foodId": "brokoli_karnabahar",
+     "amount": 200
+    },
+    {
+     "foodId": "zeytinyagi",
+     "amount": 5
+    }
+   ]
+  }
+ ],
+ "measurements": [],
+ "workoutStartedAt": 0,
+ "dayPlan": null,
+ "combos": [],
+ "shopChecked": {},
+ "shopTrainDays": null,
+ "nutriHistRange": "7",
+ "missSearches": [],
+ "foodSnap": {},
+ "gymView": "today",
+ "nutriView": "today",
+ "progressView": "genel",
+ "libRange": "week"
+}

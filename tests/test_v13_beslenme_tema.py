@@ -1,3 +1,4 @@
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
 # v13: Beslenme yeni temada ve tasarım dosyasındaki yapıda:
 # Bugün / Menülerim / Besinler / Geçmiş sekmeleri, ikame (⇄), hazır porsiyonlar, kiloya göre gramaj,
 # gündüz (açık) teması, barkod okuma (Open Food Facts; testte internet yanıtı taklit edilir).
@@ -38,7 +39,7 @@ OFF_NOVAL = {"status": 1, "product": {"product_name": "Değersiz Ürün", "nutri
 try:
   with sync_playwright() as p:
     b = p.chromium.launch(); ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
-    ctx.add_init_script("document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})")
+    ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
     off_calls = []
     def off_route(route):
