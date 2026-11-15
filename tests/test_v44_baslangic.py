@@ -69,7 +69,7 @@ try:
     pg2 = ctx2.new_page(); pg2.on("pageerror", lambda e: errs.append(str(e)))
     pg2.goto(URL); boot(pg2)
     check(pg2.evaluate("state.settings.onboarded") is True and pg2.evaluate("state.weight") == 105, "test kancası: eski varsayılanlarla, kurulumsuz")
-    check(pg2.evaluate("freshInstall") is False, "test kancası: freshInstall false")
+    check(pg2.evaluate("typeof freshInstall") == "undefined", "kullanılmayan freshInstall kaldırıldı")
     check(pg2.evaluate("state.settings.onboarded") is True and st(pg2)["settings"]["onboarded"] is True, "test kancası: kayıt da onboarded true")
     # ---- Bölüm 2: genel varsayılanlar ve boş durumlar ----
     pg = page_fresh(); errs.clear()
@@ -164,7 +164,9 @@ try:
     pg.click("#obNext")
     pg.click("#obGoalLose"); pg.fill("#obTarget", "65"); pg.click("#obPaceMid")
     check("kg" in pg.inner_text("#obWeekly") and "0,45" in pg.inner_text("#obWeekly"), "haftalık tahmin yazılır: " + pg.inner_text("#obWeekly"))
-    pg.click("#obPaceFast"); check("0,64" in pg.inner_text("#obWeekly"), "hız değişince tahmin güncellenir")
+    pg.click("#obPaceFast"); wf = pg.inner_text("#obWeekly")
+    avgf = pg.evaluate("() => { const a = obTargets('train'), r = obTargets('rest'); return Math.round(((a.tdee - a.calTarget) + (r.tdee - r.calTarget)) / 2); }")
+    check("0,45" not in wf and "0,64" not in wf.replace(".", ",") and str(avgf) in wf.replace(".", "") and avgf < 700, f"hız değişince tahmin güncellenir (alt sınırlı gerçek açık {avgf}): {wf}")
     pg.click("#obPaceMid"); pg.click("#obNext")
     pg.click("#obActLow"); check("Masa başı iş, günde az yürüyüş" in pg.inner_text("#onboard"), "hareketlilik örnek satırı"); pg.click("#obNext")
     pg.click("#obExpNew"); pg.click("#obNext")
@@ -268,6 +270,57 @@ try:
     pg.click("#obStart"); check(no_overflow(pg) and tall_ok(pg), "iPad: taşma yok, düğmeler ≥ 44 px")
     pg.wait_for_timeout(350); pg.screenshot(path=os.path.join(SHOTS, "v44_kurulum_ipad_koyu.png")); ctx4.close()
     check(errs == [], "bölüm 4 sayfa hatası yok: " + str(errs[:3]))
+    # ---- Bölüm 4b: son inceleme düzeltmeleri ----
+    pg = page_fresh(); errs.clear()
+    # 1: haftalık tahmin alt sınırdan sonraki gerçek açığı kullanır
+    pg.click("#obStart"); pg.click("#obSexFemale"); pg.fill("#obAge", "25"); pg.fill("#obHeight", "160"); pg.fill("#obWeight", "50"); pg.click("#obNext")
+    pg.click("#obGoalLose"); pg.fill("#obTarget", "45"); pg.click("#obPaceFast")
+    wk = pg.inner_text("#obWeekly")
+    avg = pg.evaluate("() => { const a = obTargets('train'), r = obTargets('rest'); return Math.round(((a.tdee - a.calTarget) + (r.tdee - r.calTarget)) / 2); }")
+    import re as _re
+    m = _re.search(r"günde ~([\d.]+) kcal", wk); n = int(m.group(1).replace(".", "")) if m else -1
+    check(0 < avg < 700 and n == avg, f"haftalık tahmin gerçek ortalama açıkla aynı (metin {n}, hesap {avg}): {wk}")
+    # gerçek açık 0 ise hafta sayısı yok, açık söylenir
+    pg.evaluate("() => { obDraft.weight = '40'; obDraft.height = '140'; obDraft.age = '60'; obDraft.target = '38'; obUpdateWeekly(); }")
+    wk0 = pg.inner_text("#obWeekly")
+    real0 = pg.evaluate("() => { const a = obTargets('train'), r = obTargets('rest'); return (a.calTarget - a.tdee + r.calTarget - r.tdee) / 2; }")
+    if real0 > -1:
+        check("Haftada yaklaşık" not in wk0 and wk0.strip() != "", "gerçek açık yoksa hafta sayısı yazılmaz: " + wk0)
+    else:
+        check(("günde ~" + str(int(round(-real0))).replace("", "")) in wk0.replace(".", "") or "günde ~" in wk0, "küçük açık yine gerçek değerle yazılır: " + wk0)
+    # 3: kurulum açıkken iç yedek yok, bitince var
+    pg.evaluate("() => { obDraft.weight = '50'; obDraft.height = '160'; obDraft.age = '25'; obDraft.target = '45'; }")
+    sn0 = pg.evaluate("async () => { await autoSnapshot(); const a = await idbGetAll('snaps'); return Object.keys(a).filter(k => /^(day|week)-/.test(k)).length; }")
+    check(sn0 == 0, f"kurulum açıkken iç yedek yazılmaz ({sn0})")
+    pg.close()
+    pg = page_fresh(); errs.clear()
+    walk(pg); pg.click("#obFinish"); pg.wait_for_timeout(200)
+    sn1 = pg.evaluate("async () => { await autoSnapshot(); const a = await idbGetAll('snaps'); return Object.keys(a).filter(k => /^day-/.test(k)).length; }")
+    check(sn1 == 1, f"kurulum bitince autoSnapshot bir 'day' yedeği yazar ({sn1})")
+    # 6: boş menü kartı yalnızca o gün tipinin menüsü boşsa
+    pg.evaluate("() => { state.settings.separatePlans = true; state.dayType = 'train'; state.meals = []; state.restMeals = []; renderAll(); setNutriView('today'); }")
+    t1 = pg.inner_text("#todayMeals")
+    check("Menün henüz boş" in t1 and "Dinlenme" not in t1, "antrenman günü boş menü kartı")
+    pg.evaluate("() => { state.dayType = 'rest'; renderAll(); }")
+    check("Dinlenme günü menün henüz boş" in pg.inner_text("#todayMeals"), "dinlenme günü boş menü kartı sözü uyar")
+    pg.evaluate("() => { setNutriView('menus'); }")
+    check("Dinlenme günü menün henüz boş" in pg.inner_text("#mealsContainer"), "Menülerim dinlenme günü boş kartı")
+    pg.evaluate("() => { state.meals = [{ id: 'x1', title: 'A', time: '08:00', items: [{ foodId: 'u173424', amount: 100 }] }]; state.dayPlan = null; state.dayType = 'train'; renderAll(); setNutriView('today'); }")
+    check("Menün henüz boş" not in pg.inner_text("#todayMeals"), "menüde öğün varken boş menü kartı yok")
+    pg.evaluate("() => { state.dayPlan = { date: state.today, train: [], rest: [] }; renderAll(); }")
+    tt = pg.inner_text("#todayMeals")
+    check("Bu menüde henüz öğün yok" in tt and "Menün henüz boş" not in tt, "menü dolu, bugünkü kopya boş: eski metin")
+    # 7: besin veritabanı yoksa örnek menü kurulmaz, kurulum biter, tek bildirim
+    pg2 = page_fresh(); errs.clear()
+    walk(pg2)
+    # kimlik bulunamıyormuş gibi: şablondaki bir kimlik gerçek besin değil
+    pg2.evaluate("() => { SAMPLE_MENU_TEMPLATE[0].items[0][0] = 'yok_boyle_besin'; }")
+    check(pg2.evaluate("buildSampleMenu(2000).length") == 0, "şablonda çözümlenmeyen besin: örnek menü boş döner")
+    pg2.click("#obFinish"); pg2.wait_for_timeout(200)
+    s2 = st(pg2)
+    check(s2["settings"]["onboarded"] is True and s2["meals"] == [] and s2["restMeals"] == [] and len(s2["workoutDays"]) == 3, "menü hazırlanamadı: kurulum yine biter, program yazılır")
+    check(pg2.evaluate("[...document.querySelectorAll('.toast')].filter(t => t.textContent.includes('Örnek menü şu an hazırlanamadı')).length") == 1, "tek bildirim: örnek menü hazırlanamadı")
+    check(errs == [], "bölüm 4b sayfa hatası yok: " + str(errs[:3]))
     # ---- Bölüm 5: Profil → Hakkında ----
     for scheme in ("dark", "light"):
         ctx5 = b.new_context(color_scheme=scheme, viewport={"width": 390, "height": 844}); ctx5.add_init_script(SPLASH_OFF)
@@ -278,10 +331,11 @@ try:
         check(all(k in txt for k in ("tıbbi tavsiye", "Open Food Facts", "ODbL", "Apache-2.0", "OFL", "MIT", "CC0")), scheme + " Hakkında: not, gizlilik, lisanslar")
         check(all(k in txt for k in ("Morton", "Nunes", "ISSN", "Helms", "Iraki", "Joslin", "AMDR", "Whittaker", "Katch")), scheme + " kaynaklar")
         check("1,55" in txt and "1,43" in txt and "1,7" in txt and "%15" in txt and "%25" in txt and "2,5 g" in txt, scheme + " çarpanlar ve kurallar sabitten, Türkçe ondalık")
+        check("1.400" in txt and "1.750" in txt and "alt sınırın altına inmez" in txt and "en az 60 g" in txt, scheme + " Hakkında: kalori alt sınırı ve karbonhidrat en az 60 g")
         check(pg.evaluate("document.getElementById('pfAboutHealth').textContent === HEALTH_NOTE"), scheme + " sağlık notu tek kaynaktan")
         check(pg.evaluate("!document.getElementById('pfMethod').open && !document.getElementById('pfLicenses').open"), scheme + " uzun bölümler kapalı başlar")
         check(pg.evaluate("[...document.querySelectorAll('#pfAbout summary')].every(e => e.getBoundingClientRect().height >= 44)"), scheme + " özetler >= 44 px")
-        check(pg.evaluate("document.querySelector('#pfAbout').compareDocumentPosition(document.querySelector('#pfScroll').lastElementChild.lastElementChild) !== 0"), scheme + " yerleşim")
+        check(pg.evaluate("(() => { const a = document.querySelector('#pfAbout'); const rows = [...document.querySelectorAll('#profilePage *')].filter(e => /AYK\\+ v\\d+/.test(e.textContent) && e.children.length === 0); return rows.length > 0 && rows.every(r => !!(a.compareDocumentPosition(r) & Node.DOCUMENT_POSITION_FOLLOWING)); })()"), scheme + " yerleşim")
         pg.evaluate("document.getElementById('pfAbout').scrollIntoView({block:'start'})"); pg.wait_for_timeout(100)
         pg.screenshot(path=os.path.join(SHOTS, "v44_hakkinda_kapali_%s.png" % scheme))
         pg.evaluate("document.querySelectorAll('#pfAbout details').forEach(d => d.open = true)"); pg.wait_for_timeout(100)

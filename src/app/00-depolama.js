@@ -326,6 +326,7 @@ async function storagePruneSnapKind(kind, keep) {
 // --- İç yedekler ---
 async function autoSnapshot() {
   if (storeMode !== "idb" || !aykDB) return;
+  if (state.settings && state.settings.onboarded === false) return;   // v44: kurulum bitene dek iç yedek yok (bitince sonraki açılış/gün dönümü oluşturur)
   try {
     const day = logicalToday(), key = "day-" + day;
     if (await idbGet("snaps", key)) return;

@@ -12,7 +12,10 @@ const SAMPLE_MENU_TEMPLATE = [
 ];
 let _sampleMenuSeq = 0;
 function buildSampleMenu(calTarget) {
+  // v44: besin veritabanı yüklenmediyse ya da şablondaki bir besin gerçek (bulunamayan olmayan) kayıt değilse menü kurulmaz
+  if (typeof USDA_FOODS === "undefined") return [];
   const db = getFoodDB();
+  if (SAMPLE_MENU_TEMPLATE.some(m => m.items.some(([id]) => !db[id] || db[id]._lost))) return [];
   const mk = tpl => tpl.map(m => ({ title: m.title, time: m.time, items: m.items.map(([foodId, amount]) => ({ foodId, amount })) }));
   const rawMeals = mk(SAMPLE_MENU_TEMPLATE);
   const baseKcal = nutritionTotals(rawMeals).cal;

@@ -124,7 +124,11 @@ function obWeeklyText() {
   const d = obDraft, v = obVals();
   if (d.goal === "keep") return "Kilonu korumaya göre hesaplanır; kalori ihtiyacın kadar yersin.";
   if (d.goal !== "lose" && d.goal !== "gain") return "";
-  const kcal = d.goal === "lose" ? OB_LOSE_PACE[d.pace] : Math.round((obTargets("train").goalDelta + obTargets("rest").goalDelta) / 2);
+  // Gerçek ortalama fark: güvenli alt sınır uygulandıktan sonraki hedefle harcama arasındaki fark (antrenman + dinlenme günü ortalaması)
+  const a = obTargets("train"), r = obTargets("rest");
+  const real = ((a.calTarget - a.tdee) + (r.calTarget - r.tdee)) / 2;
+  const kcal = Math.round(d.goal === "lose" ? -real : real);
+  if (kcal <= 0) return d.goal === "lose" ? "Güvenli alt sınır yüzünden bu hızda kilo kaybı olmuyor; kalori hedefin harcamana eşit ya da üstünde kalır." : "Bu seçimle günlük kalori fazlası oluşmuyor.";
   const kg = kcal * 7 / 7700;
   let t = `Haftada yaklaşık ${fmtKg(kg)} kg ${d.goal === "lose" ? "kayıp" : "artış"} (günde ~${fmtInt(kcal)} kcal ${d.goal === "lose" ? "açık" : "fazla"}).`;
   const diff = Math.abs(v.weight - v.target);
@@ -262,7 +266,11 @@ function finishOnboarding() {
   state.weight = v.weight;
   const now = Date.now();
   state.weightLogs = [{ date: fmtDate(now), weight: v.weight, ts: now }];
-  if (d.menu) { state.meals = buildSampleMenu(tr.calTarget); state.restMeals = buildSampleMenu(re.calTarget); state.dayPlan = null; }
+  let menuFailed = false;
+  if (d.menu) {
+    const m1 = buildSampleMenu(tr.calTarget), m2 = buildSampleMenu(re.calTarget);
+    if (m1.length && m2.length) { state.meals = m1; state.restMeals = m2; state.dayPlan = null; } else menuFailed = true;
+  }
   if (d.prog) { state.workoutDays = samplePrograms(d.exp); state.activeWorkoutDayIdx = 0; }
   if (d.mob) state.mobilityRoutine.routines = [sampleMobility()];
   st.onboarded = true;
@@ -272,4 +280,5 @@ function finishOnboarding() {
   window.scrollTo(0, 0);
   renderAll();
   updateWakeLock();
+  if (menuFailed) toast("Örnek menü şu an hazırlanamadı; menünü kendin ekleyebilirsin.", "error");
 }

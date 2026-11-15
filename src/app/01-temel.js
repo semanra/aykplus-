@@ -217,7 +217,7 @@ function normMobItem(x) {
 // (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
 // ---------------------------------------------------------------------------
 const DATA_VER = 4;
-function migrateState(s) {
+function migrateState(s, rawHadGoal) {
   const v = Number.isInteger(s.dataVer) && s.dataVer >= 0 ? s.dataVer : 0;
   if (v < 1) {   // v27 + v39: mobilitenin eski listeleri (dynamic/static, sonra tek items) → rutinler; eski diziler yedek olarak kalır
     const mr = s.mobilityRoutine;
@@ -230,7 +230,7 @@ function migrateState(s) {
     if (!s.settings.macroViewV26) s.settings.macroView = "eaten";
     delete s.settings.macroViewV26;
   }
-  if (v < 3 && s.settings.goal === DEFAULT_SETTINGS.goal) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43: hedef Ver/Koru/Al (açık 0 = eskiden "kilo koruma"; ayarda açıkça başka hedef varsa ona dokunulmaz)
+  if (v < 3 && !rawHadGoal) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43: hedef Ver/Koru/Al (açık 0 = eskiden "kilo koruma"; ayarda açıkça başka hedef varsa ona dokunulmaz)
   if (v < 4) s.settings.onboarded = true;   // v44: var olan kayıt kurulum ekranını görmez
   s.dataVer = Math.max(v, DATA_VER);
 }
@@ -252,7 +252,7 @@ function normalizeState(raw) {
   if (!Array.isArray(s.mobilityRoutine.static)) s.mobilityRoutine.static = [];
   // v27: iki eski liste bir kez tek sıralı listeye çevrilir; eski diziler yedek olarak dokunulmadan kalır
   const mr = s.mobilityRoutine;
-  migrateState(s);   // v42: eski biçim çevirileri (tek zincir, kayıt başına bir kez)
+  migrateState(s, !!(raw && isObj(raw.settings) && raw.settings.goal));   // v42: eski biçim çevirileri (tek zincir, kayıt başına bir kez)
   if (!Array.isArray(mr.routines)) mr.routines = [];
   delete mr.items;
   mr.routines = mr.routines.filter(isObj).map(r => ({
@@ -407,7 +407,7 @@ function loadState(allowFresh = false) {
     if (saved) { const st = normalizeState(JSON.parse(saved)); hadV5State = true; return st; }
     const oldV4 = localStorage.getItem("ayk_plus_v4_state");
     // v44: kayıt yok, v4 kaydı yok, okuma hatası yok ve bu cihazda IndexedDB hiç kullanılmadıysa yeni kurulum
-    if (allowFresh && !oldV4 && localStorage.getItem("ayk_plus_v5_idb") !== "1") { freshInstall = !(typeof window !== "undefined" && isObj(window.AYK_TEST_SEED)); return freshState(); }
+    if (allowFresh && !oldV4 && localStorage.getItem("ayk_plus_v5_idb") !== "1") return freshState();
     if (oldV4) {
       const o = JSON.parse(oldV4);
       return normalizeState({
@@ -439,7 +439,6 @@ function freshState() {
   s.settings.onboarded = false;   // normalizeState (göç adım 4) true yapar; bilerek sonradan
   return s;
 }
-var freshInstall = false;   // v44: bu açılış yeni kurulum mu
 const RESCUE_KEY = "ayk_plus_v5_state_kurtarma";
 var loadFailed = false;
 var hadV5State = false;   // v37: açılışta bugünkü kayıt vardı ve okundu (eski v4 kaydı ancak o zaman silinir)

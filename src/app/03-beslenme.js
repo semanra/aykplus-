@@ -367,7 +367,8 @@ function renderWater() {
 // ---------------------------------------------------------------------------
 // v44: menüde hiç öğün yokken (yeni kurulum) Bugün ve Menülerim'de gösterilen boş durum kartı
 function emptyMenuCardHtml() {
-  return `<div data-empty-menu class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[15px] font-bold">Menün henüz boş</p>
+  const rest = state.settings.separatePlans && state.dayType === "rest";
+  return `<div data-empty-menu class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[15px] font-bold">${rest ? "Dinlenme günü menün henüz boş" : "Menün henüz boş"}</p>
     <p class="text-[13px] n-muted">Öğünlerini ekledikçe kalori ve makro takibi burada başlar.</p>
     <button onclick="openMealModal()" class="n-btn h-12 px-6 rounded-full text-[14px]">İlk öğününü ekle</button></div>`;
 }
@@ -376,7 +377,10 @@ function renderTodayMeals() {
   const meals = dayMeals();
   const nextIdx = meals.findIndex(m => !m.done);
   if (!meals.length) {
-    $("todayMeals").innerHTML = emptyMenuCardHtml();
+    // v44: "menün boş" kartı yalnızca bu gün tipinin menüsü gerçekten boşsa; menüde öğün varken bugünkü kopya boşsa eski metin
+    $("todayMeals").innerHTML = !curMeals().length ? emptyMenuCardHtml()
+      : `<div class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[14px] n-muted">Bu menüde henüz öğün yok.</p>
+      <button onclick="setNutriView('menus')" class="n-btn h-12 px-6 rounded-full text-[14px]">Menülerim'e git</button></div>`;
     return;
   }
   const changed = dayChangedIds();

@@ -2425,6 +2425,7 @@ async function storagePruneSnapKind(kind, keep) {
 // --- İç yedekler ---
 async function autoSnapshot() {
   if (storeMode !== "idb" || !aykDB) return;
+  if (state.settings && state.settings.onboarded === false) return;   // v44: kurulum bitene dek iç yedek yok (bitince sonraki açılış/gün dönümü oluşturur)
   try {
     const day = logicalToday(), key = "day-" + day;
     if (await idbGet("snaps", key)) return;
@@ -2682,7 +2683,7 @@ function normMobItem(x) {
 // (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
 // ---------------------------------------------------------------------------
 const DATA_VER = 4;
-function migrateState(s) {
+function migrateState(s, rawHadGoal) {
   const v = Number.isInteger(s.dataVer) && s.dataVer >= 0 ? s.dataVer : 0;
   if (v < 1) {   // v27 + v39: mobilitenin eski listeleri (dynamic/static, sonra tek items) → rutinler; eski diziler yedek olarak kalır
     const mr = s.mobilityRoutine;
@@ -2695,7 +2696,7 @@ function migrateState(s) {
     if (!s.settings.macroViewV26) s.settings.macroView = "eaten";
     delete s.settings.macroViewV26;
   }
-  if (v < 3 && s.settings.goal === DEFAULT_SETTINGS.goal) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43: hedef Ver/Koru/Al (açık 0 = eskiden "kilo koruma"; ayarda açıkça başka hedef varsa ona dokunulmaz)
+  if (v < 3 && !rawHadGoal) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43: hedef Ver/Koru/Al (açık 0 = eskiden "kilo koruma"; ayarda açıkça başka hedef varsa ona dokunulmaz)
   if (v < 4) s.settings.onboarded = true;   // v44: var olan kayıt kurulum ekranını görmez
   s.dataVer = Math.max(v, DATA_VER);
 }
@@ -2717,7 +2718,7 @@ function normalizeState(raw) {
   if (!Array.isArray(s.mobilityRoutine.static)) s.mobilityRoutine.static = [];
   // v27: iki eski liste bir kez tek sıralı listeye çevrilir; eski diziler yedek olarak dokunulmadan kalır
   const mr = s.mobilityRoutine;
-  migrateState(s);   // v42: eski biçim çevirileri (tek zincir, kayıt başına bir kez)
+  migrateState(s, !!(raw && isObj(raw.settings) && raw.settings.goal));   // v42: eski biçim çevirileri (tek zincir, kayıt başına bir kez)
   if (!Array.isArray(mr.routines)) mr.routines = [];
   delete mr.items;
   mr.routines = mr.routines.filter(isObj).map(r => ({
@@ -2872,7 +2873,7 @@ function loadState(allowFresh = false) {
     if (saved) { const st = normalizeState(JSON.parse(saved)); hadV5State = true; return st; }
     const oldV4 = localStorage.getItem("ayk_plus_v4_state");
     // v44: kayıt yok, v4 kaydı yok, okuma hatası yok ve bu cihazda IndexedDB hiç kullanılmadıysa yeni kurulum
-    if (allowFresh && !oldV4 && localStorage.getItem("ayk_plus_v5_idb") !== "1") { freshInstall = !(typeof window !== "undefined" && isObj(window.AYK_TEST_SEED)); return freshState(); }
+    if (allowFresh && !oldV4 && localStorage.getItem("ayk_plus_v5_idb") !== "1") return freshState();
     if (oldV4) {
       const o = JSON.parse(oldV4);
       return normalizeState({
@@ -2904,7 +2905,6 @@ function freshState() {
   s.settings.onboarded = false;   // normalizeState (göç adım 4) true yapar; bilerek sonradan
   return s;
 }
-var freshInstall = false;   // v44: bu açılış yeni kurulum mu
 const RESCUE_KEY = "ayk_plus_v5_state_kurtarma";
 var loadFailed = false;
 var hadV5State = false;   // v37: açılışta bugünkü kayıt vardı ve okundu (eski v4 kaydı ancak o zaman silinir)
@@ -3840,7 +3840,8 @@ function renderWater() {
 // ---------------------------------------------------------------------------
 // v44: menüde hiç öğün yokken (yeni kurulum) Bugün ve Menülerim'de gösterilen boş durum kartı
 function emptyMenuCardHtml() {
-  return `<div data-empty-menu class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[15px] font-bold">Menün henüz boş</p>
+  const rest = state.settings.separatePlans && state.dayType === "rest";
+  return `<div data-empty-menu class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[15px] font-bold">${rest ? "Dinlenme günü menün henüz boş" : "Menün henüz boş"}</p>
     <p class="text-[13px] n-muted">Öğünlerini ekledikçe kalori ve makro takibi burada başlar.</p>
     <button onclick="openMealModal()" class="n-btn h-12 px-6 rounded-full text-[14px]">İlk öğününü ekle</button></div>`;
 }
@@ -3849,7 +3850,10 @@ function renderTodayMeals() {
   const meals = dayMeals();
   const nextIdx = meals.findIndex(m => !m.done);
   if (!meals.length) {
-    $("todayMeals").innerHTML = emptyMenuCardHtml();
+    // v44: "menün boş" kartı yalnızca bu gün tipinin menüsü gerçekten boşsa; menüde öğün varken bugünkü kopya boşsa eski metin
+    $("todayMeals").innerHTML = !curMeals().length ? emptyMenuCardHtml()
+      : `<div class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[14px] n-muted">Bu menüde henüz öğün yok.</p>
+      <button onclick="setNutriView('menus')" class="n-btn h-12 px-6 rounded-full text-[14px]">Menülerim'e git</button></div>`;
     return;
   }
   const changed = dayChangedIds();
@@ -6809,9 +6813,9 @@ function renderAbout() {
   $("pfMethodBody").innerHTML = [
     "<p><b>Günlük harcama.</b> Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.</p>",
     `<p><b>Hareketlilik çarpanları</b> (antrenman günü · dinlenme günü): az hareketli ${tr(A.low[0])} · ${tr(A.low[1])}, orta ${tr(A.mid[0])} · ${tr(A.mid[1])}, çok hareketli ${tr(A.high[0])} · ${tr(A.high[1])}.</p>`,
-    `<p><b>Hedef kalori.</b> Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %${Math.round(G.slow * 100)} (yavaş), %${Math.round(G.mid * 100)} (orta) ya da %${Math.round(G.fast * 100)} (hızlı) kadarı eklenir. Korurken harcamana eşittir.</p>`,
+    `<p><b>Hedef kalori.</b> Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %${Math.round(G.slow * 100)} (yavaş), %${Math.round(G.mid * 100)} (orta) ya da %${Math.round(G.fast * 100)} (hızlı) kadarı eklenir. Korurken harcamana eşittir. Hedef kalori güvenli alt sınırın altına inmez: kadında 1.400, erkekte 1.750 kcal.</p>`,
     "<p><b>Protein.</b> Kilo verirken yağ oranı biliniyorsa yağsız kütle × 2,5 g, bilinmiyorsa referans kilo × 2,2 g. Korurken 1,6 g, alırken 1,8 g (kilo başına). Referans kilo, mevcut ile hedef kilonun küçüğüdür. Üst sınır kilo × 2,2 g; \"Yüksek\" seçeneği en az kilo × 2,0 g verir.</p>",
-    "<p><b>Yağ ve karbonhidrat.</b> Yağ kalorinin %25'i, karbonhidrat kalan kaloridir.</p>",
+    "<p><b>Yağ ve karbonhidrat.</b> Yağ kalorinin %25'i, karbonhidrat kalan kaloridir; en az 60 g olur.</p>",
     "<p>Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.</p>",
     "<p class=\"font-semibold text-[var(--t-text)]\">Kaynaklar</p>",
     "<ul class=\"list-disc pl-4 space-y-1\">" + METHOD_SOURCES.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul>"
@@ -9796,7 +9800,10 @@ const SAMPLE_MENU_TEMPLATE = [
 ];
 let _sampleMenuSeq = 0;
 function buildSampleMenu(calTarget) {
+  // v44: besin veritabanı yüklenmediyse ya da şablondaki bir besin gerçek (bulunamayan olmayan) kayıt değilse menü kurulmaz
+  if (typeof USDA_FOODS === "undefined") return [];
   const db = getFoodDB();
+  if (SAMPLE_MENU_TEMPLATE.some(m => m.items.some(([id]) => !db[id] || db[id]._lost))) return [];
   const mk = tpl => tpl.map(m => ({ title: m.title, time: m.time, items: m.items.map(([foodId, amount]) => ({ foodId, amount })) }));
   const rawMeals = mk(SAMPLE_MENU_TEMPLATE);
   const baseKcal = nutritionTotals(rawMeals).cal;
@@ -10013,7 +10020,11 @@ function obWeeklyText() {
   const d = obDraft, v = obVals();
   if (d.goal === "keep") return "Kilonu korumaya göre hesaplanır; kalori ihtiyacın kadar yersin.";
   if (d.goal !== "lose" && d.goal !== "gain") return "";
-  const kcal = d.goal === "lose" ? OB_LOSE_PACE[d.pace] : Math.round((obTargets("train").goalDelta + obTargets("rest").goalDelta) / 2);
+  // Gerçek ortalama fark: güvenli alt sınır uygulandıktan sonraki hedefle harcama arasındaki fark (antrenman + dinlenme günü ortalaması)
+  const a = obTargets("train"), r = obTargets("rest");
+  const real = ((a.calTarget - a.tdee) + (r.calTarget - r.tdee)) / 2;
+  const kcal = Math.round(d.goal === "lose" ? -real : real);
+  if (kcal <= 0) return d.goal === "lose" ? "Güvenli alt sınır yüzünden bu hızda kilo kaybı olmuyor; kalori hedefin harcamana eşit ya da üstünde kalır." : "Bu seçimle günlük kalori fazlası oluşmuyor.";
   const kg = kcal * 7 / 7700;
   let t = `Haftada yaklaşık ${fmtKg(kg)} kg ${d.goal === "lose" ? "kayıp" : "artış"} (günde ~${fmtInt(kcal)} kcal ${d.goal === "lose" ? "açık" : "fazla"}).`;
   const diff = Math.abs(v.weight - v.target);
@@ -10151,7 +10162,11 @@ function finishOnboarding() {
   state.weight = v.weight;
   const now = Date.now();
   state.weightLogs = [{ date: fmtDate(now), weight: v.weight, ts: now }];
-  if (d.menu) { state.meals = buildSampleMenu(tr.calTarget); state.restMeals = buildSampleMenu(re.calTarget); state.dayPlan = null; }
+  let menuFailed = false;
+  if (d.menu) {
+    const m1 = buildSampleMenu(tr.calTarget), m2 = buildSampleMenu(re.calTarget);
+    if (m1.length && m2.length) { state.meals = m1; state.restMeals = m2; state.dayPlan = null; } else menuFailed = true;
+  }
   if (d.prog) { state.workoutDays = samplePrograms(d.exp); state.activeWorkoutDayIdx = 0; }
   if (d.mob) state.mobilityRoutine.routines = [sampleMobility()];
   st.onboarded = true;
@@ -10161,6 +10176,7 @@ function finishOnboarding() {
   window.scrollTo(0, 0);
   renderAll();
   updateWakeLock();
+  if (menuFailed) toast("Örnek menü şu an hazırlanamadı; menünü kendin ekleyebilirsin.", "error");
 }
 
 </script>
