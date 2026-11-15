@@ -56,5 +56,6 @@ function setLang(l) {
   i18nTouched = true;
   try { if (typeof uiDlg !== "undefined" && uiDlg) uiDialogDone(false); } catch (e) { /* yoksay */ }
   applyStaticI18n();
+  try { if (typeof profileIsOpen === "function" && profileIsOpen()) fillProfileFields(); } catch (e) { /* yoksay */ }   // v47: kutulardaki sayılar (80,5 / 80.5) yeni dile göre
   renderAll();   // Profil açıksa renderAll içinde yeniden çizilir
 }

@@ -319,14 +319,142 @@ try:
     x = modal("openCustomFoodModal()", "customFoodModal")
     check("Kendi özel besinini tanımla" in x and "Besin Adı:" in x, "Türkçeye dönüş: özel besin penceresi")
     pg.evaluate("closeModal('customFoodModal')")
+    # ===== bölüm 3: Profil (Hakkında hariç), Yedekleme, iç yedekler, kurtarma kartı, otomatik kayıt bildirimi, ölçü penceresi, ortak seçici
+    SHOTS = os.path.join(REPO, "tests", "shots"); os.makedirs(SHOTS, exist_ok=True)
+    def pf_text():
+        return pg.evaluate("""() => {
+          const el = document.getElementById('profilePage').cloneNode(true);
+          ['#pfAbout', '[data-miss]', '[data-lang-opt="tr"]'].forEach(q => el.querySelectorAll(q).forEach(n => n.remove()));
+          let out = el.textContent;
+          el.querySelectorAll('[aria-label],[placeholder]').forEach(n => { out += ' ' + (n.getAttribute('aria-label') || '') + ' ' + (n.getAttribute('placeholder') || ''); });
+          return out; }""")
+    def pf_free(label, x=None):
+        x = pf_text() if x is None else x; m = TR_CH.findall(x)
+        check(not m, label + ": Türkçe harf yok" + ("" if not m else " -> " + str(sorted(set(re.findall(r".{0,25}[çğıöşüÇĞİÖŞÜ].{0,25}", x)))[:6])))
+    def dlg():
+        pg.wait_for_selector("#uiDialog:not(.hidden)")
+        return pg.evaluate("() => [$('uiDlgTitle').textContent, $('uiDlgMsg').textContent, $('uiDlgOk').textContent, $('uiDlgCancel').textContent]")
+    pg.evaluate("""() => { state.settings.lang = 'tr'; applyStaticI18n();
+      state.weightLogs = [{ weight: 82, date: 'Başlangıç' }, { weight: 80.5, ts: Date.now(), date: 'x', bf: 18.5 }];
+      state.weight = 80.5; state.measurements = []; state.missSearches = [{ q: 'çorba', n: 2, ts: Date.now() }];
+      state.lastBackupAt = Date.now() - 3 * DAY_MS; saveState(); renderAll(); }""")
+    # --- Türkçe: temel metinler aynı
+    pg.evaluate("openProfile()"); pg.wait_for_timeout(200)
+    check(pg.evaluate("[$('pfTitle').textContent, $('pfH1').textContent, $('pfH6').textContent, document.querySelector('label[for=setSex]').textContent, $('setActivity').options[0].textContent, $('setProtein').options[1].textContent]") == ["Profil", "KİŞİSEL BİLGİLER", "YEDEKLEME", "Cinsiyet", "Az (masa başı)", "Yüksek"], "tr: Profil başlıkları ve seçenekleri aynı")
+    check(re.fullmatch(r"Son yedek: \d{2} \S+ \d{2}:\d{2} \(3 gün önce\)", pg.evaluate("$('lastBackupText').textContent")) is not None, "tr: son yedek satırı: " + pg.evaluate("$('lastBackupText').textContent"))
+    wb = re.sub(r"\s+", " ", pg.evaluate("$('pfWeightBox').textContent"))
+    check("Son tartı" in wb and "2 kayıt" in wb and "· %18,5 yağ" in wb and "Başlangıç" in wb, "tr: tartı kutusu metinleri aynı: " + wb)
+    check("Bugünün hedefleri:" in pg.evaluate("$('pfTargetsBox').textContent") and pg.evaluate("$('pfTargetsBox').textContent").count("Karb") == 1, "tr: hedef kutusu aynı")
+    check(pg.evaluate("$('pfMeasureBox').textContent").strip().startswith("Henüz ölçü eklemedin."), "tr: ölçü boş durumu aynı")
+    check(pg.evaluate("$('setWaterHint').textContent").startswith(("80,5 kg × 35 ml", "Kilo")), "tr: su ipucu: " + pg.evaluate("$('setWaterHint').textContent"))
+    pg.evaluate("localStorage.setItem(RESCUE_KEY, '{}'); renderProfile()")
+    check(pg.evaluate("[$('pfRescueSave').textContent, $('pfRescueRestore').textContent, $('pfRescueDelete').textContent]") == ["İndir", "Geri yükle", "Sil"], "tr: kurtarma kartı düğmeleri aynı")
+    pg.evaluate("void deleteRescue()"); d = dlg()
+    check(d == ["Kurtarma kopyası silinsin mi?", "Okunamayan eski verinin kopyası telefondan silinir. Önce indirdiysen dosyan güvende.", "Sil", "Vazgeç"], "tr: kurtarma silme penceresi aynı")
+    pg.click("#uiDlgCancel")
+    pg.evaluate("$('setAge').value = '41'; $('setAge').dispatchEvent(new Event('change'))"); pg.wait_for_timeout(120)
+    check(pg.evaluate("$('toastWrap').textContent").count("Kaydedildi") >= 1, "tr: otomatik kayıt bildirimi 'Kaydedildi'")
+    pg.evaluate("$('setBf').value = '99'; $('setBf').dispatchEvent(new Event('change'))"); pg.wait_for_timeout(120)
+    check("Yağ oranı %3 ile %60 arasında olmalı; eski değer geri geldi." in pg.evaluate("$('toastWrap').textContent"), "tr: yağ oranı hata bildirimi aynı")
+    # --- İngilizce
+    pg.evaluate("setLang('en')"); pg.wait_for_timeout(200)
+    check(pg.evaluate("$('pfWeight').value") == '80.5', "en: kilo kutusu yeni dile göre yenilendi (80.5)")
+    pg.evaluate("$('pfScroll').scrollTop = 0"); pg.screenshot(path=os.path.join(SHOTS, "v47_profil_en_ust.png"))
+    pf_free("en: Profil (boş ölçü, kurtarma kartı görünür)")
+    check(pg.evaluate("[$('pfTitle').textContent, $('pfH1').textContent, $('pfH3').textContent, $('pfH6').textContent, document.querySelector('label[for=setSex]').textContent, $('setActivity').options[0].textContent, $('setActivity').options[1].textContent, $('setProtein').options[0].textContent, $('setProtein').options[1].textContent]") == ["Profile", "PERSONAL DETAILS", "TARGETS", "BACKUP", "Sex", "Low (desk job)", "Moderate", "Standard", "High"], "en: Profil başlıkları ve seçenekleri")
+    check(pg.evaluate("[...document.querySelectorAll('#pfTheme [data-theme-opt]')].map(b => b.textContent)") == ["System", "Dark", "Light"], "en: Görünüm düğmeleri")
+    wb = re.sub(r"\s+", " ", pg.evaluate("$('pfWeightBox').textContent"))
+    check("Last weigh-in" in wb and "2 entries" in wb and "· 18.5% body fat" in wb and "Start" in wb and "to gain" in wb, "en: tartı kutusu: " + wb)
+    tb = re.sub(r"\s+", " ", pg.evaluate("$('pfTargetsBox').textContent"))
+    check("Calories" in tb and "Carbs" in tb and "Fat" in tb and "Today's targets are based on" in tb, "en: hedef kutusu: " + tb[:80])
+    mb_ = pg.evaluate("$('pfMeasureBox').textContent").strip()
+    check(mb_.startswith("No measurements yet.") and "+ Add measurement" in mb_, "en: ölçü boş durumu")
+    lb = pg.evaluate("$('lastBackupText').textContent")
+    check(re.fullmatch(r"Last backup: \d{2} \w+,? \d{2}:\d{2} \(3 days ago\)", lb) is not None, "en: son yedek satırı: " + lb)
+    check(pg.evaluate("$('setWaterHint').textContent").startswith(("80.5 kg", "Calculated")), "en: su ipucu: " + pg.evaluate("$('setWaterHint').textContent"))
+    pg.evaluate("$('setWaterAuto').checked = false; updateWaterAutoHint()")
+    check(pg.evaluate("$('setWaterHint').textContent") == "Off: the target you entered above is used.", "en: su ipucu kapalı")
+    pg.evaluate("$('setWaterAuto').checked = true; updateWaterAutoHint()")
+    check(pg.evaluate("[$('pfRescueSave').textContent, $('pfRescueRestore').textContent, $('pfRescueDelete').textContent]") == ["Download", "Restore", "Delete"], "en: kurtarma kartı düğmeleri")
+    pg.evaluate("state.measurements = [{ ts: Date.now() - 9 * DAY_MS, bel: 92, kol: 35.5 }, { ts: Date.now(), bel: 90, kol: 36 }]; renderProfile()")
+    ms_ = re.sub(r"\s+", " ", pg.evaluate("$('pfMeasureBox').textContent"))
+    check("Waist" in ms_ and "Arm (biceps)" in ms_ and "Last measurement:" in ms_ and not TR_CH.search(ms_), "en: ölçü kutusu: " + ms_)
+    pg.evaluate("$('pfScroll').scrollTop = $('pfScroll').scrollHeight / 2"); pg.screenshot(path=os.path.join(SHOTS, "v47_profil_en_orta.png"))
+    pg.evaluate("$('pfSnaps').closest('details').open = true"); pg.wait_for_timeout(400)
+    sn0 = pg.evaluate("$('pfSnaps').textContent")
+    check(not TR_CH.search(sn0), "en: iç yedek listesi: " + sn0[:90])
+    pg.evaluate("storageSnapshotNow()"); pg.wait_for_timeout(300)
+    pg.evaluate("renderSnapList()"); pg.wait_for_timeout(400)
+    sn1 = pg.evaluate("$('pfSnaps').textContent")
+    check(not TR_CH.search(sn1), "en: iç yedek satırı: " + re.sub(r"\s+", " ", sn1)[:120])
+    if pg.evaluate("!!document.querySelector('[data-snap]')"):
+        check("Restore this version" in sn1 and re.search(r"Before changes|Nightly backup|Weekly backup|Before import|Before upgrade", sn1) is not None, "en: iç yedek türü etiketi ve düğmesi")
+        pg.evaluate("void aykSnapRestore(document.querySelector('[data-snap]').dataset.snap)"); d = dlg()
+        check(d == ["Restore this version?", "All your data will go back to how it was in this backup. If you change your mind, you can undo it straight afterwards.", "Restore this version", "Cancel"], "en: iç yedeğe dönme penceresi: %s" % d)
+        pg.click("#uiDlgCancel")
+    else:
+        print("not: iç yedek satırı oluşmadı (eski mod?): " + sn1[:80])
+    pg.evaluate("$('pfScroll').scrollTop = $('pfScroll').scrollHeight"); pg.screenshot(path=os.path.join(SHOTS, "v47_profil_en_alt.png"))
+    pf_free("en: Profil (ölçüler dolu, Yedekleme açık, iç yedek listesi)")
+    pg.evaluate("void deleteRescue()"); d = dlg()
+    check(d == ["Delete recovery copy?", "The copy of your unreadable data will be deleted from this phone. If you've already downloaded it, your file is safe.", "Delete", "Cancel"], "en: kurtarma silme penceresi: %s" % d)
+    pg.click("#uiDlgCancel")
+    pg.evaluate("void restoreFromText('not json')"); d = dlg()
+    check(d[0] == "Invalid backup" and d[1] == "This backup isn't valid. The file or code looks corrupted." and d[2] == "OK", "en: geçersiz yedek uyarısı: %s" % d)
+    pg.click("#uiDlgOk")
+    pg.evaluate("void restoreFromText('{\"meals\": []}')"); d = dlg()
+    check(d == ["Restore this backup?", "All your current data will be replaced with this backup. Continue?", "Restore", "Cancel"], "en: yedek geri yükleme onayı: %s" % d)
+    pg.click("#uiDlgCancel")
+    pg.evaluate("void resetToDefaults()"); d = dlg()
+    check(d == ["Erase all data", "All your data will be erased and the app will go back to its default settings. Continue?", "Continue", "Cancel"], "en: tüm veriyi sil (1. onay): %s" % d)
+    pg.click("#uiDlgOk"); pg.wait_for_timeout(150); d = dlg()
+    check(d == ["Final confirmation", "This can't be undone. We recommend making a backup first. Erase everything?", "Erase", "Cancel"], "en: tüm veriyi sil (son onay): %s" % d)
+    pg.click("#uiDlgCancel")
+    pg.evaluate("$('pfWeight').value = '5'; profileLogWeight()"); d = dlg()
+    check(d[:3] == ["Invalid weight", "Enter a weight between 30 and 300 kg (e.g. 98.4).", "OK"], "en: geçersiz kilo uyarısı: %s" % d)
+    pg.click("#uiDlgOk"); pg.evaluate("fillProfileFields()")
+    pg.evaluate("$('setAge').value = '42'; $('setAge').dispatchEvent(new Event('change'))"); pg.wait_for_timeout(120)
+    tt_ = pg.evaluate("$('toastWrap').textContent")
+    check("Saved" in tt_ and not TR_CH.search(tt_), "en: otomatik kayıt bildirimi 'Saved': " + tt_)
+    check(pg.evaluate("[...$('toastWrap').querySelectorAll('button')].map(b => b.textContent).includes('Undo')"), "en: otomatik kayıt bildirimi 'Undo' düğmesi")
+    pg.evaluate("$('setBf').value = '99'; $('setBf').dispatchEvent(new Event('change'))"); pg.wait_for_timeout(120)
+    check("Body fat must be between 3% and 60%; the previous value was restored." in pg.evaluate("$('toastWrap').textContent"), "en: yağ oranı hata bildirimi")
+    pg.evaluate("$('pfWeight').value = '9'; $('pfWeight').dispatchEvent(new Event('change'))"); pg.wait_for_timeout(120)
+    check("Weight must be between 30 and 300 kg; not saved." in pg.evaluate("$('toastWrap').textContent"), "en: kilo hata bildirimi")
+    pg.evaluate("fillProfileFields()")
+    pg.evaluate("renderStorageMeter()"); pg.wait_for_timeout(300)
+    check(re.fullmatch(r"\d+% full( · [\d.]+ MB)?", pg.evaluate("$('pfStorageTxt').textContent")) is not None, "en: kayıt alanı göstergesi: " + pg.evaluate("$('pfStorageTxt').textContent"))
+    stm = pg.evaluate("[t(\"Telefondaki kayıt alanının %{p}'i dolu. Yedek dosyası kaydet (Profil → Yedekleme).\", { p: 85 }), t('Alan dolmak üzere. Hemen yedek dosyası kaydet; kayıt dolarsa yeni bilgiler kaydedilemez.')]")
+    check(stm[0] == "Storage on this phone is 85% full. Save a backup file (Profile → Backup)." and stm[1].startswith("Storage is almost full."), "en: depolama uyarıları")
+    pg.evaluate("openMeasureModal()"); pg.wait_for_timeout(120)
+    mod_free("en: ölçü penceresi", txt_of(["chartModal"]), ("Add measurements (cm)", "Waist", "Hips", "Thigh", "Tip: measure every week or two", "Cancel", "Save"))
+    pg.evaluate("closeModal('chartModal')")
+    check(pg.evaluate("$('missClear').textContent.trim()") == "Clear list", "en: listeyi temizle düğmesi")
+    pg.evaluate("closeProfile()")
+    pg.evaluate("openPicker(t('Malzeme ekle'), [{ label: 'Group', short: 'Grp', items: Array.from({ length: 160 }, (_, i) => ({ label: 'Item ' + i })) }], () => {})"); pg.wait_for_timeout(120)
+    pg.evaluate("$('pickerExtraBtn').textContent = 'x'")   # düğme etiketini çağıran verir (kapsam dışı)
+    x = txt_of(["pickerModal"]) + " " + pg.evaluate("$('pickerSearch').placeholder")
+    mod_free("en: seçici", x, ("All", "Search...", "10 more results; narrow your search."))
+    pg.evaluate("$('pickerSearch').value = 'zzz'; renderPickerList()")
+    check(pg.evaluate("$('pickerList').textContent.trim()") == "No results found.", "en: seçici sonuç yok")
+    pg.evaluate("closeModal('pickerModal')")
+    # --- Türkçeye dönüş
+    pg.evaluate("setLang('tr')"); pg.wait_for_timeout(100)
+    pg.evaluate("openProfile()"); pg.wait_for_timeout(200)
+    check(pg.evaluate("[$('pfTitle').textContent, $('pfH6').textContent, $('pfRescueDelete').textContent, $('setWaterHint').textContent.slice(0, 4), $('lastBackupText').textContent.slice(0, 10)]") == ["Profil", "YEDEKLEME", "Sil", "80,5", "Son yedek:"], "Türkçeye dönüş: Profil metinleri geri geldi")
+    check("Bel" in pg.evaluate("$('pfMeasureBox').textContent") and "Son ölçüm:" in pg.evaluate("$('pfMeasureBox').textContent"), "Türkçeye dönüş: ölçü kutusu")
+    pg.evaluate("openPicker('X', [{ label: 'G', items: [{ label: 'a' }] }], () => {})")
+    check(pg.evaluate("[$('pickerSearch').placeholder, $('pickerChips').firstElementChild.textContent]") == ["Ara...", "Tümü"], "Türkçeye dönüş: seçici metinleri")
+    pg.evaluate("closeModal('pickerModal'); closeProfile(); localStorage.removeItem(RESCUE_KEY)")
     # statik anahtar denetimi: 04/11/09/markup'taki her anahtar EN'de; yer tutucular ve etiketler tutar
     import json as _json
     keys = set()
     lit = r'"((?:[^"\\\n]|\\.)*)"'
-    for fnm in ["04-besinler-barkod.js", "11-mutfak-akilli.js", "09-kas-plaka-koc-takviye.js"]:
+    for fnm in ["04-besinler-barkod.js", "11-mutfak-akilli.js", "09-kas-plaka-koc-takviye.js", "08-profil-yedek.js", "05-secici-hareket.js"]:
         raw = open(os.path.join(REPO, "src", "app", fnm), encoding="utf-8").read()
         for mm in re.finditer(r"(?<![.\w])t\(\s*" + lit, raw): keys.add(mm.group(1))
         for mm in re.finditer(r"(?<![.\w])tn\(\s*[^,()]+,\s*" + lit, raw): keys.add(mm.group(1))
+    keys.update(["Son yedek: {d} ({n} gün önce)", "{w} kg × 35 ml = {b} L + 0,5 L kreatin → {tot} L", "{w} kg × 35 ml = {b} L → {tot} L", "Sıfırla|tüm veri", "AYK-yedek-{d}.json", "AYK-kurtarma-{d}.json", "{n} kayıt"])
     mk = open(os.path.join(REPO, "src", "markup.html"), encoding="utf-8").read()
     for mm in re.finditer(r'data-t(?:-aria|-ph)?="([^"]*)"', mk): keys.add(mm.group(1))
     def unesc(k):
@@ -339,8 +467,9 @@ try:
         const vs = typeof e === 'string' ? [e] : [e.one, e.other]; const base = k.split('|')[0];
         vs.forEach(v => { if (typeof v !== 'string') { out.missing.push(k); return; }
           if (ph(base) !== ph(v)) out.ph.push(k); if (tg(base) !== tg(v)) out.tag.push(k);
-          if (/[<>&]/.test(v.replace(/<[^>]*>/g, '')) && !/^(Workout & daytime|Evening & bedtime)$/.test(v)) out.stray.push(k); }); });
+          if (/[<>&]/.test(v.replace(/<[^>]*>/g, '')) && !/^(Workout & daytime|Evening & bedtime|How we calculate & sources)$/.test(v)) out.stray.push(k); }); });
       const dyn = [...SUPP_TIMES.map(x => x[1]), ...SUPP_GROUPS.map(x => x[0]), ...SUPP_PRESETS.flatMap(p => [p.name, p.unit, p.note].filter(Boolean))];
+      dyn.push(...MEASURES.map(m => m[1]), ...Object.values(SNAP_KIND_LABEL), 'Yedek', 'Kalori', 'Protein', 'Karb', 'Yağ');
       dyn.forEach(k => { if (EN[k] === undefined && !['g', 'mg'].includes(k)) out.missing.push(k); });
       return out; }""", sorted(keys))
     check(len(keys) > 250 and all(not v for v in res.values()), "statik denetim (%d anahtar): EN'de eksik, yer tutucu/etiket uyuşmazlığı, başıboş < > &: %s" % (len(keys), res))

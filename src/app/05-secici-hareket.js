@@ -7,7 +7,7 @@ function openPicker(title, groups, onPick, extra) {
   picker = { groups, onPick, extra: extra || null, cat: "all", flat: [] };
   $("pickerTitle").textContent = title;
   $("pickerSearch").value = "";
-  $("pickerSearch").placeholder = "Ara...";
+  $("pickerSearch").placeholder = t("Ara...");
   $("pickerExtraWrap").classList.toggle("hidden", !extra);
   if (extra) $("pickerExtraBtn").textContent = extra.label;
   renderPickerChips();
@@ -21,7 +21,7 @@ function renderPickerChips() {
     const on = picker.cat === key;
     return `<button onclick="setPickerCat('${key}')" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${on ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
   };
-  $("pickerChips").innerHTML = chip("all", "Tümü") + picker.groups.map((g, i) => chip(String(i), g.short || g.label)).join("");
+  $("pickerChips").innerHTML = chip("all", t("Tümü")) + picker.groups.map((g, i) => chip(String(i), g.short || g.label)).join("");
 }
 
 function setPickerCat(key) { picker.cat = key; renderPickerChips(); renderPickerList(); }
@@ -55,8 +55,8 @@ function renderPickerList() {
       html += `<div class="bg-[var(--w-elev)] border border-[var(--w-line)] rounded-xl active:bg-[var(--w-elev2)] flex">${main}</div>`;
     });
   });
-  if (hidden) html += `<div class="text-[12px] text-[var(--w-dim)] text-center py-3">${hidden} sonuç daha var; aramayı daralt.</div>`;
-  $("pickerList").innerHTML = html || `<div class="text-sm text-[var(--w-dim)] text-center py-8">Sonuç bulunamadı.</div>`;
+  if (hidden) html += `<div class="text-[12px] text-[var(--w-dim)] text-center py-3">${tn(hidden, "{n} sonuç daha var; aramayı daralt.")}</div>`;
+  $("pickerList").innerHTML = html || `<div class="text-sm text-[var(--w-dim)] text-center py-8">${t("Sonuç bulunamadı.")}</div>`;
 }
 
 function pickerChoose(idx) {

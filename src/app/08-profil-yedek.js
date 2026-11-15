@@ -80,6 +80,7 @@ function renderProfile() {
   const lr = $("pfLang"); if (lr) lr.classList.toggle("hidden", !langAvailable());   // v46
   document.querySelectorAll("[data-lang-opt]").forEach(b => { const on = b.dataset.langOpt === curLang(); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
+  if (profileIsOpen()) { updateWaterAutoHint(); updateBfHint(); if ($("pfSnaps").closest("details").open) renderSnapList(); }   // v47: dil değişince ipuçları da yenilenir
   // Kilo kayıtları
   const wl = state.weightLogs.filter(l => num(l.weight) > 0);
   const lastW = wl[wl.length - 1], firstW = wl[0];
@@ -89,21 +90,21 @@ function renderProfile() {
   if (wl.length) {
     const d = round1(num(lastW.weight) - num(firstW.weight));
     wh += `<div class="grid grid-cols-3 gap-2">
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Son tartı</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : lastW.date || "")}</div></div>
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Değişim</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${wl.length} kayıt</div></div>
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">Hedefe</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${!tW ? "hedef yok" : left > 0 ? "verilecek" : left < 0 ? "alınacak" : "hedeftesin"}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Son tartı")}</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : t(lastW.date || ""))}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Değişim")}</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${tn(wl.length, "{n} kayıt")}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Hedefe")}</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${!tW ? t("hedef yok") : left > 0 ? t("verilecek") : left < 0 ? t("alınacak") : t("hedeftesin")}</div></div>
     </div>`;
-    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date || "")}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">· %${fmtNum(validBf(l.bf))} yağ</span>` : ""}</span></div>`).join("");
+    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : t(l.date || ""))}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">${t("· %{p} yağ", { p: fmtNum(validBf(l.bf)) })}</span>` : ""}</span></div>`).join("");
     wh += `<div class="mt-2">${rows}</div>`;
   } else {
-    wh = `<p class="text-[13px] t-dim">Henüz tartı kaydın yok. Kilonu yazıp "Tartıyı kaydet"e dokun; ilerlemen İlerleme sekmesinde grafiğe dönüşür.</p>`;
+    wh = `<p class="text-[13px] t-dim">${t("Henüz tartı kaydın yok. Kilonu yazıp \"Tartıyı kaydet\"e dokun; ilerlemen İlerleme sekmesinde grafiğe dönüşür.")}</p>`;
   }
   $("pfWeightBox").innerHTML = wh;
   // Günlük hedefler (hesaplanan)
   const tg = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
-    ${[["Kalori", Math.round(tg.calTarget).toLocaleString(locale()), "kcal"], ["Protein", Math.round(tg.proTarget), "g"], ["Karb", Math.round(tg.carbTarget), "g"], ["Yağ", Math.round(tg.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
-  </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.</p>`;
+    ${[["Kalori", Math.round(tg.calTarget).toLocaleString(locale()), "kcal"], ["Protein", Math.round(tg.proTarget), "g"], ["Karb", Math.round(tg.carbTarget), "g"], ["Yağ", Math.round(tg.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${t(l)}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
+  </div><p class="text-[12px] t-dim mt-2">${t("Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.")}</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
   const lastOf = k => { for (let i = ms.length - 1; i >= 0; i--) if (ms[i][k] != null) return ms[i]; return null; };
@@ -114,18 +115,18 @@ function renderProfile() {
     const d = round1(l[k] - firstOf(k)[k]);
     const good = d === 0 ? null : (lowerBetter ? d < 0 : d > 0);
     return `<div class="bg-[var(--t-surface)] border border-[var(--t-line)] rounded-2xl px-3 py-2.5 min-w-0">
-      <div class="text-[12px] t-muted truncate">${n}</div>
+      <div class="text-[12px] t-muted truncate">${t(n)}</div>
       <div class="t-display text-[22px]">${fmtNum(l[k])}<span class="t-dim text-sm"> cm</span></div>
-      <div class="text-[12px] ${good == null ? "t-dim" : good ? "t-accent" : "text-[var(--t-danger-text)]"}">${d === 0 ? "değişim yok" : (d > 0 ? "+" : "") + fmtNum(d) + " cm"}</div>
+      <div class="text-[12px] ${good == null ? "t-dim" : good ? "t-accent" : "text-[var(--t-danger-text)]"}">${d === 0 ? t("değişim yok") : (d > 0 ? "+" : "") + fmtNum(d) + " cm"}</div>
     </div>`;
   }).join("");
   const lastM = ms[ms.length - 1];
   $("pfMeasureBox").innerHTML = cells
-    ? `<div class="grid grid-cols-3 gap-2">${cells}</div><p class="text-[12px] t-dim mt-2">Son ölçüm: ${esc(fmtDate(lastM.ts, true))} · Değişim ilk ölçüne göre. Grafik İlerleme sekmesinde.</p>`
-    : `<div class="t-card rounded-[22px] p-4 text-[13px] t-dim">Henüz ölçü eklemedin. Kilo yerinde sayarken belin inceliyorsa yağ yakıp kas kazanıyorsun demektir. İlk ölçünü eklemek için "+ Ölçü ekle"ye dokun.</div>`;
+    ? `<div class="grid grid-cols-3 gap-2">${cells}</div><p class="text-[12px] t-dim mt-2">${esc(t("Son ölçüm: {d} · Değişim ilk ölçüne göre. Grafik İlerleme sekmesinde.", { d: fmtDate(lastM.ts, true) }))}</p>`
+    : `<div class="t-card rounded-[22px] p-4 text-[13px] t-dim">${t("Henüz ölçü eklemedin. Kilo yerinde sayarken belin inceliyorsa yağ yakıp kas kazanıyorsun demektir. İlk ölçünü eklemek için \"+ Ölçü ekle\"ye dokun.")}</div>`;
   $("lastBackupText").textContent = state.lastBackupAt
-    ? `Son yedek: ${fmtDate(state.lastBackupAt, true)} (${Math.floor((Date.now() - state.lastBackupAt) / DAY_MS)} gün önce)`
-    : "Henüz yedek alınmadı. Verilerin sadece bu telefonda duruyor; düzenli yedek almanı öneririm.";
+    ? tn(Math.floor((Date.now() - state.lastBackupAt) / DAY_MS), "Son yedek: {d} ({n} gün önce)", { d: fmtDate(state.lastBackupAt, true) })
+    : t("Henüz yedek alınmadı. Verilerin sadece bu telefonda duruyor; düzenli yedek almanı öneririm.");
 }
 
 // v24: "Su hedefi kiloya göre" açıkken elle hedef kutusu pasif, hesap açıklamada
@@ -134,8 +135,8 @@ function updateWaterAutoHint() {
   $("setWater").disabled = on && !!a;
   $("setWater").classList.toggle("opacity-50", on && !!a);
   $("setWaterHint").textContent = on
-    ? (a ? `${fmtNum(a.w)} kg × 35 ml = ${fmtNum(a.base)} L${a.cr ? " + 0,5 L kreatin" : ""} → ${fmtNum(a.total)} L` : "Kilo girilince hesaplanır; şimdilik elle yazdığın hedef kullanılır.")
-    : "Kapalı: yukarıda elle yazdığın hedef kullanılır.";
+    ? (a ? t(a.cr ? "{w} kg × 35 ml = {b} L + 0,5 L kreatin → {tot} L" : "{w} kg × 35 ml = {b} L → {tot} L", { w: fmtNum(a.w), b: fmtNum(a.base), tot: fmtNum(a.total) }) : t("Kilo girilince hesaplanır; şimdilik elle yazdığın hedef kullanılır."))
+    : t("Kapalı: yukarıda elle yazdığın hedef kullanılır.");
 }
 function readProfileWeight() {
   const raw = $("pfWeight").value.trim();
@@ -144,7 +145,7 @@ function readProfileWeight() {
 }
 function profileLogWeight() {
   const w = readProfileWeight();
-  if (!w) { uiAlert("Kilo geçersiz", "Kilonu 30 ile 300 kg arasında yaz (örn: 98,4)."); return; }
+  if (!w) { uiAlert(t("Kilo geçersiz"), t("Kilonu 30 ile 300 kg arasında yaz (örn: 98,4).")); return; }
   state.weight = w;
   logCurrentWeight();
   $("pfWeight").value = fmtNum(w);
@@ -165,12 +166,12 @@ function applyProfileFields(changedId) {
     $("setBf").value = validBf(st.bodyFat) ? fmtNum(validBf(st.bodyFat)) : "";
     $("setTargetBf").value = validBf(st.targetBodyFat) ? fmtNum(validBf(st.targetBodyFat)) : "";
     updateBfHint();
-    toast("Yağ oranı %3 ile %60 arasında olmalı; eski değer geri geldi.", "error");
+    toast(t("Yağ oranı %3 ile %60 arasında olmalı; eski değer geri geldi."), "error");
     return false;
   }
   const wRaw = $("pfWeight").value.trim(), w = readProfileWeight();
   if (wRaw && !w) {   // kutu olduğu gibi kalır ("Tartıyı kaydet" de bu değeri reddeder); kayıtlı kilo değişmez
-    toast("Kilo 30 ile 300 kg arasında olmalı; kaydedilmedi.", "error");
+    toast(t("Kilo 30 ile 300 kg arasında olmalı; kaydedilmedi."), "error");
     return false;
   }
   const before = JSON.stringify([state.settings, state.weight]);
@@ -199,7 +200,7 @@ function applyProfileFields(changedId) {
   renderAll();
   fillProfileFields();   // sınırlanan değerler kutuda düzgün görünsün
   updateWakeLock();
-  offerUndo("Kaydedildi");
+  offerUndo(t("Kaydedildi"));
   return true;
 }
 // Eski adı (testler ve eski çağrılar): bekleyen alanı kaydeder; profili kapatmaz.
@@ -210,7 +211,7 @@ function saveSettings() {
 }
 
 // Bağlama göre onay: profil/antrenman ekranında temalı pencere, diğer yerlerde sistem kutusu.
-async function askConfirm(title, message, ok = "Devam et", danger = false) {
+async function askConfirm(title, message, ok = t("Devam et"), danger = false) {
   if (trainCtx() || nutriCtx()) return !!(await uiAsk({ title, message, ok, danger }));
   return confirm(message);
 }
@@ -238,10 +239,10 @@ async function saveTextFile(text, name, title) {
   } catch (e) { return "failed"; }
 }
 async function exportBackupFile() {
-  const r = await saveTextFile(JSON.stringify(state), `AYK-yedek-${todayStr()}.json`, "AYK+ Yedek");
-  if (r === "shared") { markBackup(); toast("Yedek paylaşıldı. 'Dosyalar'a Kaydet'i seçtiysen güvende."); }
-  else if (r === "downloaded") { markBackup(); toast("Yedek dosyası indirildi"); }
-  else if (r === "failed") toast("Dosya oluşturulamadı. Ayarlar > Yedek kodu ile kopyala.", "error");
+  const r = await saveTextFile(JSON.stringify(state), t("AYK-yedek-{d}.json", { d: todayStr() }), t("AYK+ Yedek"));
+  if (r === "shared") { markBackup(); toast(t("Yedek paylaşıldı. 'Dosyalar'a Kaydet'i seçtiysen güvende.")); }
+  else if (r === "downloaded") { markBackup(); toast(t("Yedek dosyası indirildi")); }
+  else if (r === "failed") toast(t("Dosya oluşturulamadı. Ayarlar > Yedek kodu ile kopyala."), "error");
 }
 
 // v36: KAYIT ALANI — bütün veri tek localStorage kaydında. iPhone Safari'nin sınırı kesin bilinmiyor; temkinli tahmin
@@ -264,46 +265,46 @@ function renderStorageMeter() {
   storageEstimate().then(({ pct, mb }) => {
     if (!$("pfStorageTxt")) return;
     const hi = pct >= 70;
-    $("pfStorageTxt").textContent = `%${pct} dolu` + (mb != null ? ` · ${fmtNum(mb)} MB` : "");
+    $("pfStorageTxt").textContent = t("%{p} dolu", { p: pct }) + (mb != null ? ` · ${fmtNum(mb)} MB` : "");
     $("pfStorageBar").style.width = Math.max(2, pct) + "%";
     $("pfStorageBar").style.background = hi ? "var(--t-warn-icon)" : "";
     $("pfStorageWarn").classList.toggle("hidden", !hi);
-    if (hi) $("pfStorageWarn").textContent = "Alan dolmak üzere. Hemen yedek dosyası kaydet; kayıt dolarsa yeni bilgiler kaydedilemez.";
+    if (hi) $("pfStorageWarn").textContent = t("Alan dolmak üzere. Hemen yedek dosyası kaydet; kayıt dolarsa yeni bilgiler kaydedilemez.");
   });
 }
 async function checkStorageWarn() {
   const { pct } = await storageEstimate();
   if (pct < 70 || Date.now() - num(state.storageWarnAt, 0) < 7 * DAY_MS) return;
   state.storageWarnAt = Date.now(); saveState();
-  toast(`Telefondaki kayıt alanının %${pct}'i dolu. Yedek dosyası kaydet (Profil → Yedekleme).`, "error");
+  toast(t("Telefondaki kayıt alanının %{p}'i dolu. Yedek dosyası kaydet (Profil → Yedekleme).", { p: pct }), "error");
 }
 
 // v41: OTOMATİK İÇ YEDEKLER — her gün ilk açılışta bütün verinin kopyası (son 7 gece + son 4 hafta + "Geçiş öncesi").
 const SNAP_KIND_LABEL = { day: "Gece yedeği", week: "Haftalık yedek", pre: "Geçiş öncesi", import: "İçe alma öncesi", safe: "Değişiklik öncesi" };
 function renderSnapList() {
   const box = $("pfSnaps"); if (!box) return;
-  if (storeMode !== "idb") { box.innerHTML = `<p class="text-[13px] text-[var(--t-dim)]">Otomatik iç yedek bu cihazda kullanılamıyor; yedek dosyası kaydet.</p>`; return; }
+  if (storeMode !== "idb") { box.innerHTML = `<p class="text-[13px] text-[var(--t-dim)]">${t("Otomatik iç yedek bu cihazda kullanılamıyor; yedek dosyası kaydet.")}</p>`; return; }
   aykSnapList().then(list => {
     if (!$("pfSnaps")) return;
     box.innerHTML = list.length ? list.map(x => `<div data-snap="${esc(x.key)}" class="flex items-center justify-between gap-3 min-h-[52px] border-t border-[var(--t-line)] first:border-t-0">
         <span class="min-w-0"><span class="block text-[14px] font-semibold text-[var(--t-text)]">${esc(fmtDate(new Date(x.date + "T12:00:00").getTime()))}</span>
-          <span class="block text-[12px] text-[var(--t-dim)]">${esc(SNAP_KIND_LABEL[x.kind] || "Yedek")} · ${fmtNum(x.size / 1048576 * 2)} MB</span></span>
-        <button data-snap-restore onclick='aykSnapRestore(${esc(JSON.stringify(x.key))})' class="t-btn-ghost h-11 px-3.5 rounded-xl text-[13px] shrink-0">Bu hâle dön</button>
-      </div>`).join("") : `<p class="text-[13px] text-[var(--t-dim)]">İlk iç yedek yarın oluşacak.</p>`;
+          <span class="block text-[12px] text-[var(--t-dim)]">${esc(t(SNAP_KIND_LABEL[x.kind] || "Yedek"))} · ${fmtNum(x.size / 1048576 * 2)} MB</span></span>
+        <button data-snap-restore onclick='aykSnapRestore(${esc(JSON.stringify(x.key))})' class="t-btn-ghost h-11 px-3.5 rounded-xl text-[13px] shrink-0">${t("Bu hâle dön")}</button>
+      </div>`).join("") : `<p class="text-[13px] text-[var(--t-dim)]">${t("İlk iç yedek yarın oluşacak.")}</p>`;
   });
 }
 async function aykSnapRestore(key) {
   const json = await aykSnapJson(key); if (!json) return;
   let next;
-  try { next = normalizeState(JSON.parse(json)); } catch (e) { sayAlert("Yedek okunamadı", "Bu iç yedek okunamadı; mevcut verilerin değişmedi."); return; }
-  if (!(await askConfirm("Bu hâle dönülsün mü?", "Bütün verilerin bu yedekteki hâline döner. İstersen hemen ardından Geri al ile vazgeçebilirsin.", "Bu hâle dön", true))) return;
+  try { next = normalizeState(JSON.parse(json)); } catch (e) { sayAlert(t("Yedek okunamadı"), t("Bu iç yedek okunamadı; mevcut verilerin değişmedi.")); return; }
+  if (!(await askConfirm(t("Bu hâle dönülsün mü?"), t("Bütün verilerin bu yedekteki hâline döner. İstersen hemen ardından Geri al ile vazgeçebilirsin."), t("Bu hâle dön"), true))) return;
   await storageSnapshotNow();   // dönmeden önceki hâl de iç yedekte kalsın
   snapshot();
   state = next;
   checkNewDay();
   renderAll();
   renderSnapList();
-  offerUndo("Yedekteki hâle dönüldü");
+  offerUndo(t("Yedekteki hâle dönüldü"));
 }
 
 // v35: KURTARMA KOPYASI — açılışta okunamayan kaydın ham hâli (RESCUE_KEY). Önceden yalnızca saklanıyordu,
@@ -311,27 +312,27 @@ async function aykSnapRestore(key) {
 function rescueText() { try { return localStorage.getItem(RESCUE_KEY) || ""; } catch (e) { return ""; } }
 async function downloadRescue() {
   const txt = rescueText(); if (!txt) return;
-  const r = await saveTextFile(txt, `AYK-kurtarma-${todayStr()}.json`, "AYK+ kurtarma kopyası");
-  if (r === "shared" || r === "downloaded") toast("Kurtarma kopyası kaydedildi");
-  else if (r === "failed") toast("Dosya oluşturulamadı.", "error");
+  const r = await saveTextFile(txt, t("AYK-kurtarma-{d}.json", { d: todayStr() }), t("AYK+ kurtarma kopyası"));
+  if (r === "shared" || r === "downloaded") toast(t("Kurtarma kopyası kaydedildi"));
+  else if (r === "failed") toast(t("Dosya oluşturulamadı."), "error");
 }
 async function restoreRescue() { const txt = rescueText(); if (txt) await restoreFromText(txt); }
 async function deleteRescue() {
-  if (!(await askConfirm("Kurtarma kopyası silinsin mi?", "Okunamayan eski verinin kopyası telefondan silinir. Önce indirdiysen dosyan güvende.", "Sil", true))) return;
+  if (!(await askConfirm(t("Kurtarma kopyası silinsin mi?"), t("Okunamayan eski verinin kopyası telefondan silinir. Önce indirdiysen dosyan güvende."), t("Sil"), true))) return;
   try { localStorage.removeItem(RESCUE_KEY); } catch (e) { /* yok sayılır */ }
   renderProfile();
-  toast("Kurtarma kopyası silindi");
+  toast(t("Kurtarma kopyası silindi"));
 }
 
 // v44: opts.onboarding = kurulum ekranından (kaybedilecek veri yok → onay sorulmaz). Başarılı geri yükleme kurulumu kapatır.
 async function restoreFromText(text, opts = {}) {
   let parsed;
-  try { parsed = JSON.parse(String(text || "").trim()); } catch (e) { sayAlert("Geçersiz yedek", "Geçersiz yedek! Dosya veya kod bozuk görünüyor."); return false; }
+  try { parsed = JSON.parse(String(text || "").trim()); } catch (e) { sayAlert(t("Geçersiz yedek"), t("Geçersiz yedek! Dosya veya kod bozuk görünüyor.")); return false; }
   if (parsed && parsed.state && (parsed.state.meals || parsed.state.workoutDays)) parsed = parsed.state;
-  if (!parsed || typeof parsed !== "object" || !(parsed.meals || parsed.workoutDays)) { sayAlert("Yedek tanınmadı", "Bu bir AYK+ yedeği değil."); return false; }
-  if (!opts.onboarding && !(await askConfirm("Yedek geri yüklensin mi?", "Mevcut tüm verilerin bu yedekle DEĞİŞTİRİLECEK. Devam edilsin mi?", "Geri yükle", true))) return false;
+  if (!parsed || typeof parsed !== "object" || !(parsed.meals || parsed.workoutDays)) { sayAlert(t("Yedek tanınmadı"), t("Bu bir AYK+ yedeği değil.")); return false; }
+  if (!opts.onboarding && !(await askConfirm(t("Yedek geri yüklensin mi?"), t("Mevcut tüm verilerin bu yedekle DEĞİŞTİRİLECEK. Devam edilsin mi?"), t("Geri yükle"), true))) return false;
   let next;
-  try { next = normalizeState(parsed); } catch (e) { console.error(e); sayAlert("Yedek okunamadı", "Yedek dosyası bozuk görünüyor; mevcut verilerin değiştirilmedi."); return false; }
+  try { next = normalizeState(parsed); } catch (e) { console.error(e); sayAlert(t("Yedek okunamadı"), t("Yedek dosyası bozuk görünüyor; mevcut verilerin değiştirilmedi.")); return false; }
   await storageSnapshotNow();   // v41: geri yüklemeden önceki hâl iç yedekte
   next.settings.onboarded = true;   // v44: yedekten dönen kullanıcı kurulumu görmez (renderAll → syncOnboarding kapatır)
   state = next;
@@ -340,7 +341,7 @@ async function restoreFromText(text, opts = {}) {
   closeSettings();
   renderAll();
   slimOldPhoto();   // v37: eski yedekteki küçültülmemiş fotoğraf
-  toast("Yedek başarıyla geri yüklendi");
+  toast(t("Yedek başarıyla geri yüklendi"));
   return true;
 }
 
@@ -350,7 +351,7 @@ function importBackupFile(event, opts = {}) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => restoreFromText(e.target.result, opts);
-  reader.onerror = () => sayAlert("Dosya okunamadı", "Dosya okunamadı.");
+  reader.onerror = () => sayAlert(t("Dosya okunamadı"), t("Dosya okunamadı."));
   reader.readAsText(file);
 }
 
@@ -361,22 +362,22 @@ async function copyBackup() {
   try { await navigator.clipboard.writeText(txt.value); ok = true; } catch (e) {
     try { txt.focus(); txt.select(); ok = document.execCommand("copy"); } catch (e2) { ok = false; }
   }
-  if (ok) { markBackup(); toast("Yedek kodu kopyalandı. Notlar'a yapıştırıp sakla."); }
-  else toast("Kopyalanamadı. Kutudaki metni elle seçip kopyala.", "error");
+  if (ok) { markBackup(); toast(t("Yedek kodu kopyalandı. Notlar'a yapıştırıp sakla.")); }
+  else toast(t("Kopyalanamadı. Kutudaki metni elle seçip kopyala."), "error");
 }
 
 function restoreBackupFromText() { restoreFromText($("backupText").value); }
 
 async function resetToDefaults() {
-  if (!(await askConfirm("Fabrika ayarlarına sıfırla", "TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?", "Devam et", true))) return;
-  if (!(await askConfirm("Son onay", "Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?", "Sıfırla", true))) return;
+  if (!(await askConfirm(t("Fabrika ayarlarına sıfırla"), t("TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?"), t("Devam et"), true))) return;
+  if (!(await askConfirm(t("Son onay"), t("Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?"), t("Sıfırla|tüm veri"), true))) return;
   await storageSnapshotNow();   // v41: sıfırlamadan önceki hâl iç yedekte (Profil → Otomatik iç yedekler)
   state = freshState();   // v44: kurulum ekranı yeniden açılır
   state.today = logicalToday();
   closeSettings();
   stopTimer();
   renderAll();
-  toast("Uygulama sıfırlandı");
+  toast(t("Uygulama sıfırlandı"));
 }
 
 function hasMeaningfulData() {

@@ -714,16 +714,16 @@ let measureSel = "bel";
 
 function openMeasureModal() {
   const last = state.measurements[state.measurements.length - 1] || {};
-  $("chartTitle").textContent = "Ölçü ekle (cm)";
+  $("chartTitle").textContent = t("Ölçü ekle (cm)");
   $("chartBody").innerHTML = `
     <div class="grid grid-cols-2 gap-2 text-xs">
-      ${MEASURES.map(([k, n]) => `<div><label class="block text-[var(--w-muted)] mb-1">${n}</label>
+      ${MEASURES.map(([k, n]) => `<div><label class="block text-[var(--w-muted)] mb-1">${t(n)}</label>
         <input id="ms_${k}" type="text" inputmode="decimal" placeholder="—" value="${last[k] ? esc(fmtNum(last[k])) : ""}" class="w-full p-2 rounded-lg text-base text-center" /></div>`).join("")}
     </div>
-    <p class="text-[12px] text-[var(--w-dim)] mt-2">İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.</p>
+    <p class="text-[12px] text-[var(--w-dim)] mt-2">${t("İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.")}</p>
     <div class="flex justify-end gap-2 mt-3">
-      <button onclick="closeModal('chartModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">İptal</button>
-      <button onclick="saveMeasurement()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">Kaydet</button>
+      <button onclick="closeModal('chartModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">${t("İptal")}</button>
+      <button onclick="saveMeasurement()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">${t("Kaydet")}</button>
     </div>`;
   openModal("chartModal");
 }
@@ -737,19 +737,19 @@ function saveMeasurement() {
     const v = num(raw, 0);
     if (v >= 10 && v <= 250) { entry[k] = round1(v); any = true; }
   });
-  if (!any) { sayAlert("Ölçü girilmedi", "En az bir ölçüyü 10–250 cm arasında gir."); return; }
+  if (!any) { sayAlert(t("Ölçü girilmedi"), t("En az bir ölçüyü 10–250 cm arasında gir.")); return; }
   const last = state.measurements[state.measurements.length - 1];
   if (last && todayStr(new Date(last.ts)) === todayStr()) state.measurements[state.measurements.length - 1] = entry;
   else state.measurements.push(entry);
   closeModal("chartModal");
-  toast("Ölçüler kaydedildi");
+  toast(t("Ölçüler kaydedildi"));
   renderAll();
 }
 function deleteMeasurement(i) {
   snapshot();
   state.measurements.splice(i, 1);
   renderAll();
-  offerUndo("Ölçü kaydı silindi");
+  offerUndo(t("Ölçü kaydı silindi"));
 }
 
 
