@@ -17,7 +17,7 @@ Bu aşamanın sonunda:
 
 Hedefler: yukarıdaki beş madde.
 
-Hedef değil (bu aşamada): İngilizce ve kg/lb birimleri (Aşama 3), yağ hedefinin formülü (bugünkü `kilo × 0,72`, alt sınır 55/45 g aynen kalır), takviye önerisi, hazır program kütüphanesi/şablon mağazası, hesap/oturum.
+Hedef değil (bu aşamada): İngilizce ve kg/lb birimleri (Aşama 3), takviye önerisi, hazır program kütüphanesi/şablon mağazası, hesap/oturum.
 
 Başarısızlık (çalışsa bile): sahibin verisinden tek bir alanın değişmesi (protein hedefinin bilinçli değişimi hariç, bkz. §5.4); mevcut kullanıcıya kurulum ekranı çıkması; boş menü/programla bir ekranın hata vermesi veya boş kalıp ne yapılacağının anlaşılmaması; kilolu bir kullanıcıya kilosunun 2 katı protein önerilmesi; örneğin "zorunlu şablon" gibi hissettirmesi (kullanıcı kendi programını kurabileceğini bilmeli).
 
@@ -63,11 +63,12 @@ Başarısızlık (çalışsa bile): sahibin verisinden tek bir alanın değişme
 - **Koru:** `ref × 1,6`. **Al:** `ref × 1,8`.
 - Üst sınır: `kilo × 2,2`.
 - Yeni ayar `settings.proteinHigh` (varsayılan kapalı; Profil → "Protein: Standart / Yüksek"): açıksa `max(Standart, kilo × 2,0)` (Yüksek hiçbir zaman Standart'tan az olmaz; üst sınır uygulanmaz, bilinçli seçim). *(Benim kararım, gözden geçirme sonrası.)* Altında tek satır: "Standart, araştırmalara göre yeterli miktardır. Yüksek, daha fazlasını isteyenler için."
-- Karbonhidrat bugünkü gibi kalan kaloriden (alt sınır 60 g). Yağ formülü değişmez.
+- **Yağ (kullanıcı B'yi seçti):** `yağ = kalori hedefinin %25'i / 9` (gün tipine göre; antrenman ve dinlenme günü farklı çıkar). Eski `max(55/45, kilo × 0,72)` kalkar. Gerekçe: AMDR %20–35, Helms 2014 %15–30; çok düşük yağda testosteron düşüşü (Whittaker 2021). Eski formül kiloya baktığı için uçlarda bozuluyordu (120 kg kadın, 1400 kcal → yağ %55, hedefler toplamı kaloriyi aşıyordu; 70 kg kilo alan erkek, 3000 kcal → %16).
+- Karbonhidrat bugünkü gibi kalan kaloriden (alt sınır 60 g).
 - Kanıt (Hakkında'da kaynakçası): Morton 2018 (~1,6 g/kg tavan, üst güven sınırı ~2,2), Nunes 2022 (≥1,6 g/kg), ISSN 2017 (1,4–2,0; açıkta daha yüksek gerekebilir), Helms 2014 (açıkta zayıf antrenmanlılarda yağsız kütle başına 2,3–3,1 g), Joslin klinik rehberi (kilolularda toplam kiloya göre hesap ihtiyacı abartır).
 
 ### 5.4 Sahibin hesabına etkisi (bilinçli, kullanıcı onayladı)
-- 105 kg, hedef 82, Ver, yağ oranı yok → protein **~201 g → 180 g**; kalori aynı; proteinden düşen ~21 g kadar karbonhidrat artar (kesin değer uygulamada ölçülüp kullanıcıya söylenir). Yağ oranı girerse lean × 2,5; "Yüksek" ile ~210 g.
+- 105 kg, hedef 82, Ver, yağ oranı yok → protein **~201 g → 180 g**; kalori aynı; proteinden düşen ~21 g kadar karbonhidrat artar (kesin değer uygulamada ölçülüp kullanıcıya söylenir). Yağ oranı girerse lean × 2,5; "Yüksek" ile ~210 g. Yağ ~76 g → antrenman günü ~%25 (≈69 g), dinlenme günü ≈62 g (tahmini; kesin değer uygulamada ölçülüp söylenir).
 - Hareketlilik `mid` → kalori değişmez.
 
 ### 5.5 Koç (iki yön)
@@ -81,7 +82,7 @@ Başarısızlık (çalışsa bile): sahibin verisinden tek bir alanın değişme
 - Yeni alan `settings.onboarded` (boolean).
 - **Yeni kurulum** = açılışta hiçbir kayıt yok (localStorage `ayk_plus_v5_state` yok, `ayk_plus_v4_state` yok, IndexedDB'de çekirdek parça yok). Yalnızca bu durumda `onboarded = false` ve kurulum çıkar.
 - **Herhangi bir kayıt varsa** (eski formatta bile) `migrateState` **adım 4 (v44, `DATA_VER` 4)** `onboarded = true` yazar. Sahip kurulumu hiç görmez.
-- Dikkat: `normalizeState({})` yeni kurulumda da çalışır ve dataVer 0 görür. Yeni kurulum **açık bir işaretle** (depolamanın "hiç kayıt yok" sonucu) ayrılır; o yolda göç adımları eski değerleri/`onboarded=true` yazmaz, durum doğrudan güncel `DATA_VER` ile oluşturulur. *(Benim kararım.)*
+- Dikkat: `normalizeState({})` yeni kurulumda da çalışır ve dataVer 0 görür. Yeni kurulum **açık bir işaretle** (depolamanın "hiç kayıt yok" sonucu) ayrılır; o yolda göç adımları `onboarded=true` yazmaz, durum doğrudan güncel `DATA_VER` ile oluşturulur. *(Benim kararım.)*
 - Kurulum yarıda kapatılırsa sonraki açılışta baştan çıkar (kurulum bitene dek kalıcı kayıt yapılmaz veya `onboarded=false` kalır; hangisi daha güvenliyse kurucunun kararı).
 
 ### 6.2 Kurulum ekranları (tam ekran, adım adım, geri düğmeli, ilerleme noktaları)
@@ -100,8 +101,8 @@ Başarısızlık (çalışsa bile): sahibin verisinden tek bir alanın değişme
 - **Takviye:** boş liste (hazır takviyeler Düzenle'de duruyor). Su hedefi otomatik (bugünkü `waterAuto`).
 
 ### 6.4 Kod içindeki kişisel varsayılanların kaldırılması
-- `DEFAULT_STATE` (kilo 105, menü, program, mobilite), `DEFAULT_SETTINGS` (yaş 26, boy 180, hedef 82, su 3,5), `DEFAULT_SUPPS` genel/boş değerlere iner. Sahibin bugünkü varsayılan verisi testler için bir fikstür dosyasına da konur (ör. `tests/fixtures/`); uygulamada yalnızca göç verisi olarak kalır (aşağıda).
-- **"Eski varsayılanları dondur" kuralı (veri güvenliği):** `normalizeState` kayıtta eksik alanı varsayılanla doldurur (`{...DEFAULT_STATE, ...raw}`, `{...DEFAULT_SETTINGS, ...raw.settings}`). Varsayılanlar değişince, bir alanı hiç kaydedilmemiş eski bir kayıt farklı değer alır. Bu yüzden `migrateState` adım 4, `dataVer < 4` olan kayıtlarda **ham kayıtta** eksik olan her değişen alanı **eski varsayılan değeriyle** doldurur (göç, varsayılanlar birleştirilmeden önceki ham kaydı görmeli; `normalizeState` 01-temel.js:233'te birleştiriyor, sıra buna göre düzenlenir). Kapsam: tekil ayarlar (kilo 105, yaş 26, boy 180, hedef 82, açık 700, su 3,5 …) **ve listeler** (menü, dinlenme menüsü, program, takviye listesi, mobilite rutini). Listeler için sahibin bugünkü varsayılanları uygulamada yalnızca göç verisi olarak (`LEGACY_DEFAULTS`) kalır; yeni kullanıcıya hiçbir yolda gösterilmez. Gerekçe: v4 içe alma yalnızca `meals` taşıyor, eski yedeklerde liste eksik olabilir; eksik liste boş açılırsa eski kayıt görünür biçimde değişir (§2). *(Benim kararım.)* Test: alanları/listeleri eksik eski kayıt ve eski yedek → v43 ile aynı hesap ve aynı listeler.
+- `DEFAULT_STATE` (kilo 105, menü, program, mobilite), `DEFAULT_SETTINGS` (yaş 26, boy 180, hedef 82, su 3,5), `DEFAULT_SUPPS` genel/boş değerlere iner. Sahibin bugünkü varsayılan verisi testler için bir fikstür dosyasına taşınır (ör. `tests/fixtures/`); uygulamadan çıkar.
+- **Eski varsayılanlar uygulamada TUTULMAZ (kullanıcı kararı, 15 Kasım 2026):** sahibin menüsü/programı/listesi yalnızca kendi telefonundaki kayıtta kalır; koddan tamamen çıkar (testler için fikstürde durur). Gerekçe: sahibin güncel kaydı `normalizeState` çıktısıdır ve her alanı içerir, eksik alan doldurmaya ihtiyacı yoktur; eksik alan ancak çok eski bir yedek dosyasında olabilir ve yedek geri yüklenmeden önce o anki hâl zaten "Değişiklik öncesi" iç yedeği olur (v41–v42), yani hiçbir şey kaybolmaz. Uygulama sırasında doğrulanacak: (1) sahibin kayıt biçimi (`stateParts` + ayna) bütün `DEFAULT_STATE` / `DEFAULT_SETTINGS` alanlarını yazıyor; (2) listeleri/alanları eksik eski bir kayıt hatasız açılır (eksik liste boş, eksik sayı genel varsayılan), sayfa hatası 0. Bu doğrulamalardan biri tutmazsa sahibe sorulmadan dondurma yapılmaz; durum sahibe bildirilir.
 - `normalizeState`'in boş menüyü/programı sahibin menüsüyle doldurması kalkar; boş liste geçerli olur. `restMeals` boşsa `meals`'tan kopyalanan bugünkü davranış korunur (meals da boşsa boş).
 - **Boş durumlar:** menü boşken Menülerim ve Bugün'de "İlk öğününü ekle" kartı; program boşken Antrenman → Bugün/Programım'da "İlk antrenman gününü oluştur"; mobilitede rutin yokken mevcut "Yeni rutin". Boş listeyle hiçbir yerde hata olmamalı (ör. `activeWorkoutDayIdx`, sıradaki gün, ısınma kartı, kas yükü, alışveriş listesi, İlerleme şeridi).
 
