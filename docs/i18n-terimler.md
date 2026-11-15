@@ -175,6 +175,10 @@ Bu belge, AYK+ İngilizce arayüzünde kullanılacak **tek ve bağlayıcı** ter
 | Not ekle | **Add note** | Hareket | Doğrudan karşılık. |
 | Isınma (kart) | **Warm-up** | `#gymWarmup` | İsim "warm-up", fiil "warm up". |
 | Isınma kartını gizle | **Hide warm-up** | `#gymWarmupHide` | Aynı. |
+| Kas grupları: Göğüs, Sırt, Omuz, Ön Bacak, Arka Bacak & Kalça, Kalf, Biceps, Triceps, Karın | **Chest, Back, Shoulders, Quads, Hamstrings and glutes, Calves, Biceps, Triceps, Abs** | `MUSCLES`, `muscleL()` | Fitness uygulamalarında yaygın adlar; mobilite bölgeleriyle (Hips, Shoulders, Chest, Hamstrings) aynı kelimeler. Anahtar "&" içerdiği için İngilizcede "and" yazılır (İngilizce metinde "&" yasak). Dar çipte sığmazsa Task 4 ölçümüne göre satır kırılır; "Hams & glutes" kullanılmaz. Kayıtta (`ex.muscle`, `state.libMuscle`) Türkçe kalır. |
+| Hareket kütüphanesi kategori başlıkları (11) | "1. Chest (press and fly)" ... "11. Cardio and conditioning" | `libCatL()`, `21-en-antrenman.js` | Başlıklardaki parantezli İngilizce zaten vardı; Türkçe kısım atıldı, numara korundu (sıra `LIB_CAT_MUSCLE` ile eşleşir). "&" yerine "and". |
+| Eğim/Seviye | **Incline / level** | Kardiyo alanı | Koşu bandı eğimi ve makine seviyesi; iki anlamı da taşır. |
+| Kilo artış adımı | **Weight step** | `exInc` | "Kademe" (increment) makinenin kilo kademeleridir; bu alan tek hareketin otomatik artış miktarıdır, karışmasın diye "step". |
 
 ## 6. Antrenman: yük, ilerleme, zorluk
 

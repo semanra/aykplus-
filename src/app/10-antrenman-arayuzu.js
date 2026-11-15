@@ -122,7 +122,7 @@ function updateExEquipUI() {
   const kind = exModal.kind;
   const sel = $("exEquip").value;
   const eq = sel === "auto" ? autoEquip($("exName").value) : sel;
-  $("exEquip").options[0].textContent = "Otomatik (" + EQUIP_SHORT[autoEquip($("exName").value)] + ")";
+  $("exEquip").options[0].textContent = "Otomatik (" + equipL(autoEquip($("exName").value), true) + ")";
   const lv = kind === "weight" && (eq === "stack" || eq === "dumbbell");
   $("exEquipWrap").classList.toggle("hidden", kind !== "weight");
   $("exLevelsWrap").classList.toggle("hidden", !lv);
@@ -146,6 +146,8 @@ function fillExLevels(v) {
 // ---------------------------------------------------------------------------
 // YENİ ANTRENMAN ARAYÜZÜ
 // ---------------------------------------------------------------------------
+// v48: ekipman görünen adı (kayıt anahtarı plates|stack|dumbbell|bodyweight)
+function equipL(eq, short) { return t((short ? EQUIP_SHORT : EQUIP_LABEL)[eq] || ""); }
 const GYM_VIEWS = [["today", "Bugün"], ["program", "Programım"], ["library", "Hareketler"], ["history", "Geçmiş"]];
 const ICON = {
   talk: "M4 5h16v11H9l-5 4V5zM8 9.5h8M8 12.5h5",
@@ -332,9 +334,9 @@ function gymActiveHtml() {
             <div class="t-label">HAREKET ${exIdx + 1} / ${total}${allDone ? ' <span class="t-accent">· TAMAMLANDI</span>' : ""}</div>
             <div class="text-[21px] font-bold leading-tight">${esc(ex.name)}</div>
             <div class="flex flex-wrap gap-1.5">
-              ${ex.targetInfo ? `<span class="t-chip-accent">${esc(ex.targetInfo)}</span>` : ""}
+              ${ex.targetInfo ? `<span class="t-chip-accent">${esc(targetL(ex.targetInfo))}</span>` : ""}
               ${muscleOf(ex) ? `<span class="t-chip">${esc(muscleOf(ex))}</span>` : ""}
-              ${eq && eq !== "plates" ? `<span class="t-chip">${EQUIP_SHORT[eq]}</span>` : ""}
+              ${eq && eq !== "plates" ? `<span class="t-chip">${equipL(eq, true)}</span>` : ""}
               ${ex.kind !== "weight" ? `<span class="t-chip">${ex.kind === "cardio" ? "Kardiyo" : "Süreli"}</span>` : ""}
             </div>
           </div>
@@ -387,7 +389,7 @@ function gymProgramHtml() {
   const chips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-4 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "bg-[var(--t-surface)] border border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${esc(d.name)}${i === nIdx ? ' <span class="text-[11px] font-bold" style="color:#1FD1C1">SIRADA</span>' : ""}</button>`).join("");
   const rows = day.exercises.map((ex, i) => {
     const eq = equipOf(ex);
-    const meta = [ex.targetInfo, muscleOf(ex), eq ? EQUIP_SHORT[eq] : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
+    const meta = [targetL(ex.targetInfo), muscleOf(ex), eq ? equipL(eq, true) : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
     const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[12px] text-[var(--t-warn-mid)]">Kademe tanımlı değil</span>` : usesLevels(ex) ? `<span class="text-[12px] t-dim">Kademe: ${esc(levelsSummary(ex))}</span>` : "";
     return `<div data-ex-row="${i}" class="t-card-flat rounded-2xl min-h-[64px] pl-1 pr-1.5 py-2 flex items-center gap-2">
       ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${esc(ex.name)} hareketini sürükleyerek taşı" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
@@ -630,7 +632,7 @@ function openExSheet(exIdx) {
       <span class="t-dim">${svgI("chevR", 18)}</span></button>`;
   $("exSheetBody").innerHTML = `
     <div class="px-1 pb-2"><div class="text-xl font-bold">${esc(ex.name)}</div>
-      <div class="text-[13px] t-muted">${esc([muscleOf(ex), ex.targetInfo, ex.kind !== "cardio" ? "Dinlenme " + (ex.rest ?? state.settings.restSec) + " sn" : ""].filter(Boolean).join(" · "))}</div></div>
+      <div class="text-[13px] t-muted">${esc([muscleOf(ex), targetL(ex.targetInfo), ex.kind !== "cardio" ? "Dinlenme " + (ex.rest ?? state.settings.restSec) + " sn" : ""].filter(Boolean).join(" · "))}</div></div>
     ${item(`openExerciseChart(${exIdx})`, "chart", "İlerleme grafiği", "Tahmini 1RM ve son kayıtlar")}
     ${ex.kind === "weight" && eq !== "bodyweight" ? item(`openPlateTool(${exIdx})`, "calc", eq === "plates" ? "Plaka ve ısınma" : "Kademe ve ısınma", plateSub) : ""}
     ${item(`openEditExercise(${exIdx})`, "edit", "Hareketi düzenle", ex.kind === "weight" ? "Set, tekrar, ekipman, kademeler, kas grubu" : "Set, süre, dinlenme")}

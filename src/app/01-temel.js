@@ -104,6 +104,9 @@ function makeCardioRow(min = 30, km = "", lvl = "") { return { min, km, lvl, don
 // ---------------------------------------------------------------------------
 // v23: set zorluğu etiketleri (durum yüklenirken de kullanıldığı için en üstte)
 const EFFORT_LABELS = { 1: "Kolay", 2: "Orta", 3: "Zor", 4: "Tükeniş" };
+// v48: gösterim yardımcıları (kayıtta Türkçe kalır; çağrı anında t() çalışır, tanım anında değil)
+function kindL(kind) { return t(KIND_LABEL[kind] || kind); }
+function effortL(v) { return t(EFFORT_LABELS[v] || ""); }
 const EFFORT_COLORS = { 1: "#4ADE80", 2: "#1FD1C1", 3: "#FBBF24", 4: "#FF5A5F" };
 function normalizeExercise(ex) {
   // v35: adı okunamayan hareket silinmez, "Adsız hareket" olur; boş/bozuk set kayıtları atılır

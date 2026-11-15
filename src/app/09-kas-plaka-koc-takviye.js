@@ -3,6 +3,15 @@
 // ============================================================================
 
 const MUSCLES = ["Göğüs", "Sırt", "Omuz", "Ön Bacak", "Arka Bacak & Kalça", "Kalf", "Biceps", "Triceps", "Karın"];
+// v48: kayıtlı kas adının (MUSCLES, ex.muscle, state.libMuscle) görünen adı; kayıt hep Türkçe kalır
+function muscleL(m) { return t(m); }
+// v48: EXERCISE_LIBRARY kategori başlığının görünen adı (anahtar ve sıra değişmez)
+function libCatL(cat) { return t(cat); }
+// v48: kayıtlı targetInfo / set.target metnindeki " sn" / " dk" birimleri İngilizcede " sec" / " min" gösterilir (kayıt Türkçe)
+function targetL(s) {
+  s = String(s == null ? "" : s);
+  return curLang() === "en" ? s.replace(/(\d) sn(?![\wÀ-ɏ])/g, "$1 sec").replace(/(\d) dk(?![\wÀ-ɏ])/g, "$1 min") : s;
+}
 const LIB_CAT_MUSCLE = [0, 1, 1, 2, 3, 4, 5, 6, 7, 8, null]; // EXERCISE_LIBRARY kategori sırası → kas grubu
 
 // Kütüphanedeki isimlerin kas grubu haritası (tam eşleşme)

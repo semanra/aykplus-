@@ -1072,7 +1072,7 @@
           <div><label for="exMuscle" class="t-field">Kas grubu</label>
             <select id="exMuscle" class="t-in">
               <option value="auto">Otomatik</option>
-              <option>Göğüs</option><option>Sırt</option><option>Omuz</option><option>Ön Bacak</option><option>Arka Bacak & Kalça</option><option>Kalf</option><option>Biceps</option><option>Triceps</option><option>Karın</option>
+              <option value="Göğüs">Göğüs</option><option value="Sırt">Sırt</option><option value="Omuz">Omuz</option><option value="Ön Bacak">Ön Bacak</option><option value="Arka Bacak & Kalça">Arka Bacak & Kalça</option><option value="Kalf">Kalf</option><option value="Biceps">Biceps</option><option value="Triceps">Triceps</option><option value="Karın">Karın</option>
             </select></div>
           <div id="exIncWrap"><label for="exInc" class="t-field">Kilo artış adımı (kg)</label>
             <input id="exInc" type="text" inputmode="decimal" placeholder="2,5 (otomatik)" class="t-in" /></div>
@@ -2577,6 +2577,9 @@ function makeCardioRow(min = 30, km = "", lvl = "") { return { min, km, lvl, don
 // ---------------------------------------------------------------------------
 // v23: set zorluğu etiketleri (durum yüklenirken de kullanıldığı için en üstte)
 const EFFORT_LABELS = { 1: "Kolay", 2: "Orta", 3: "Zor", 4: "Tükeniş" };
+// v48: gösterim yardımcıları (kayıtta Türkçe kalır; çağrı anında t() çalışır, tanım anında değil)
+function kindL(kind) { return t(KIND_LABEL[kind] || kind); }
+function effortL(v) { return t(EFFORT_LABELS[v] || ""); }
 const EFFORT_COLORS = { 1: "#4ADE80", 2: "#1FD1C1", 3: "#FBBF24", 4: "#FF5A5F" };
 function normalizeExercise(ex) {
   // v35: adı okunamayan hareket silinmez, "Adsız hareket" olur; boş/bozuk set kayıtları atılır
@@ -5232,7 +5235,8 @@ function fillExModalFields(v) {
 function updateExMuscleAuto() {
   const name = $("exName").value;
   const g = autoMuscle(name);
-  $("exMuscle").options[0].textContent = "Otomatik" + (g ? ` (${g})` : " (belirlenemedi)");
+  $("exMuscle").options[0].textContent = "Otomatik" + (g ? ` (${muscleL(g)})` : " (belirlenemedi)");
+  for (let i = 1; i < $("exMuscle").options.length; i++) $("exMuscle").options[i].textContent = muscleL($("exMuscle").options[i].value);   // v48: değer Türkçe kalır
   $("exInc").placeholder = fmtNum(autoInc(name)) + " (otomatik)";
 }
 
@@ -5494,7 +5498,7 @@ function removeExercise(exIdx) {
 }
 
 async function addWorkoutDay() {
-  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: `${state.workoutDays.length + 1}. GÜN: `, placeholder: "Örn: 5. GÜN: Kol" }, ok: "Ekle" });
+  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: curLang() === "en" ? `DAY ${state.workoutDays.length + 1}: ` : `${state.workoutDays.length + 1}. GÜN: `, placeholder: curLang() === "en" ? "E.g. DAY 5: Arms" : "Örn: 5. GÜN: Kol" }, ok: "Ekle" });
   if (!name || !name.trim()) return;
   state.workoutDays.push({ id: "day_" + Date.now(), name: name.trim(), exercises: [] });
   state.activeWorkoutDayIdx = state.workoutDays.length - 1;
@@ -7208,6 +7212,15 @@ function snoozeBackup() { state.backupSnoozeUntil = Date.now() + 3 * DAY_MS; sav
 // ============================================================================
 
 const MUSCLES = ["Göğüs", "Sırt", "Omuz", "Ön Bacak", "Arka Bacak & Kalça", "Kalf", "Biceps", "Triceps", "Karın"];
+// v48: kayıtlı kas adının (MUSCLES, ex.muscle, state.libMuscle) görünen adı; kayıt hep Türkçe kalır
+function muscleL(m) { return t(m); }
+// v48: EXERCISE_LIBRARY kategori başlığının görünen adı (anahtar ve sıra değişmez)
+function libCatL(cat) { return t(cat); }
+// v48: kayıtlı targetInfo / set.target metnindeki " sn" / " dk" birimleri İngilizcede " sec" / " min" gösterilir (kayıt Türkçe)
+function targetL(s) {
+  s = String(s == null ? "" : s);
+  return curLang() === "en" ? s.replace(/(\d) sn(?![\wÀ-ɏ])/g, "$1 sec").replace(/(\d) dk(?![\wÀ-ɏ])/g, "$1 min") : s;
+}
 const LIB_CAT_MUSCLE = [0, 1, 1, 2, 3, 4, 5, 6, 7, 8, null]; // EXERCISE_LIBRARY kategori sırası → kas grubu
 
 // Kütüphanedeki isimlerin kas grubu haritası (tam eşleşme)
@@ -8263,7 +8276,7 @@ function updateExEquipUI() {
   const kind = exModal.kind;
   const sel = $("exEquip").value;
   const eq = sel === "auto" ? autoEquip($("exName").value) : sel;
-  $("exEquip").options[0].textContent = "Otomatik (" + EQUIP_SHORT[autoEquip($("exName").value)] + ")";
+  $("exEquip").options[0].textContent = "Otomatik (" + equipL(autoEquip($("exName").value), true) + ")";
   const lv = kind === "weight" && (eq === "stack" || eq === "dumbbell");
   $("exEquipWrap").classList.toggle("hidden", kind !== "weight");
   $("exLevelsWrap").classList.toggle("hidden", !lv);
@@ -8287,6 +8300,8 @@ function fillExLevels(v) {
 // ---------------------------------------------------------------------------
 // YENİ ANTRENMAN ARAYÜZÜ
 // ---------------------------------------------------------------------------
+// v48: ekipman görünen adı (kayıt anahtarı plates|stack|dumbbell|bodyweight)
+function equipL(eq, short) { return t((short ? EQUIP_SHORT : EQUIP_LABEL)[eq] || ""); }
 const GYM_VIEWS = [["today", "Bugün"], ["program", "Programım"], ["library", "Hareketler"], ["history", "Geçmiş"]];
 const ICON = {
   talk: "M4 5h16v11H9l-5 4V5zM8 9.5h8M8 12.5h5",
@@ -8473,9 +8488,9 @@ function gymActiveHtml() {
             <div class="t-label">HAREKET ${exIdx + 1} / ${total}${allDone ? ' <span class="t-accent">· TAMAMLANDI</span>' : ""}</div>
             <div class="text-[21px] font-bold leading-tight">${esc(ex.name)}</div>
             <div class="flex flex-wrap gap-1.5">
-              ${ex.targetInfo ? `<span class="t-chip-accent">${esc(ex.targetInfo)}</span>` : ""}
+              ${ex.targetInfo ? `<span class="t-chip-accent">${esc(targetL(ex.targetInfo))}</span>` : ""}
               ${muscleOf(ex) ? `<span class="t-chip">${esc(muscleOf(ex))}</span>` : ""}
-              ${eq && eq !== "plates" ? `<span class="t-chip">${EQUIP_SHORT[eq]}</span>` : ""}
+              ${eq && eq !== "plates" ? `<span class="t-chip">${equipL(eq, true)}</span>` : ""}
               ${ex.kind !== "weight" ? `<span class="t-chip">${ex.kind === "cardio" ? "Kardiyo" : "Süreli"}</span>` : ""}
             </div>
           </div>
@@ -8528,7 +8543,7 @@ function gymProgramHtml() {
   const chips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-4 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "bg-[var(--t-surface)] border border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${esc(d.name)}${i === nIdx ? ' <span class="text-[11px] font-bold" style="color:#1FD1C1">SIRADA</span>' : ""}</button>`).join("");
   const rows = day.exercises.map((ex, i) => {
     const eq = equipOf(ex);
-    const meta = [ex.targetInfo, muscleOf(ex), eq ? EQUIP_SHORT[eq] : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
+    const meta = [targetL(ex.targetInfo), muscleOf(ex), eq ? equipL(eq, true) : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
     const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[12px] text-[var(--t-warn-mid)]">Kademe tanımlı değil</span>` : usesLevels(ex) ? `<span class="text-[12px] t-dim">Kademe: ${esc(levelsSummary(ex))}</span>` : "";
     return `<div data-ex-row="${i}" class="t-card-flat rounded-2xl min-h-[64px] pl-1 pr-1.5 py-2 flex items-center gap-2">
       ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${esc(ex.name)} hareketini sürükleyerek taşı" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
@@ -8771,7 +8786,7 @@ function openExSheet(exIdx) {
       <span class="t-dim">${svgI("chevR", 18)}</span></button>`;
   $("exSheetBody").innerHTML = `
     <div class="px-1 pb-2"><div class="text-xl font-bold">${esc(ex.name)}</div>
-      <div class="text-[13px] t-muted">${esc([muscleOf(ex), ex.targetInfo, ex.kind !== "cardio" ? "Dinlenme " + (ex.rest ?? state.settings.restSec) + " sn" : ""].filter(Boolean).join(" · "))}</div></div>
+      <div class="text-[13px] t-muted">${esc([muscleOf(ex), targetL(ex.targetInfo), ex.kind !== "cardio" ? "Dinlenme " + (ex.rest ?? state.settings.restSec) + " sn" : ""].filter(Boolean).join(" · "))}</div></div>
     ${item(`openExerciseChart(${exIdx})`, "chart", "İlerleme grafiği", "Tahmini 1RM ve son kayıtlar")}
     ${ex.kind === "weight" && eq !== "bodyweight" ? item(`openPlateTool(${exIdx})`, "calc", eq === "plates" ? "Plaka ve ısınma" : "Kademe ve ısınma", plateSub) : ""}
     ${item(`openEditExercise(${exIdx})`, "edit", "Hareketi düzenle", ex.kind === "weight" ? "Set, tekrar, ekipman, kademeler, kas grubu" : "Set, süre, dinlenme")}
@@ -10924,6 +10939,33 @@ Object.assign(EN, {
   "Ara...": "Search...",
   "{n} sonuç daha var; aramayı daralt.": { one: "{n} more result; narrow your search.", other: "{n} more results; narrow your search." },
   "Sonuç bulunamadı.": "No results found.",
+});
+// v48: İngilizce sözlük, Antrenman (terimler ve kayıtlı değerlerin görünen adları). Anahtar = Türkçe metin.
+// Terimler docs/i18n-terimler.md bölüm 5–6'ya uyar. Kayıtta Türkçe kalanlar docs/i18n-kayitli-metinler.md'ye göre (kas adı, targetInfo).
+Object.assign(EN, {
+  // --- kas grupları (MUSCLES: kayıtta Türkçe, gösterimde muscleL)
+  "Göğüs": "Chest", "Sırt": "Back", "Omuz": "Shoulders", "Ön Bacak": "Quads", "Arka Bacak & Kalça": "Hamstrings and glutes",
+  "Kalf": "Calves", "Biceps": "Biceps", "Triceps": "Triceps", "Karın": "Abs",
+  // --- hareket türü, zorluk, ekipman
+  "🏋️ Ağırlık": "🏋️ Weights", "🏃 Kardiyo": "🏃 Cardio", "⏱️ Süreli": "⏱️ Timed",
+  "Kolay": "Easy", "Orta": "Moderate", "Zor": "Hard", "Tükeniş": "Failure",
+  "Plakalı (bar / plaka)": "Barbell & plates", "Ağırlık yığını (makine / kablo)": "Weight stack (machine / cable)",
+  "Dambıl": "Dumbbell", "Vücut ağırlığı": "Bodyweight",
+  "Plakalı": "Plates", "Makine": "Machine", "Vücut ağ.": "Bodyweight",
+  // --- hareket kütüphanesi kategori başlıkları (anahtar = EXERCISE_LIBRARY anahtarı; numara korunur)
+  "1. Göğüs (Chest - Press & Fly)": "1. Chest (press and fly)",
+  "2. Sırt - Dikey Çekiş (Lats / Width)": "2. Back: vertical pulls (lats / width)",
+  "3. Sırt - Yatay Çekiş & Alt Sırt (Thickness & Lower Back)": "3. Back: horizontal rows and lower back (thickness)",
+  "4. Omuz - Ön, Yan, Arka & Trapez (Delts & Traps)": "4. Shoulders: front, side, rear and traps",
+  "5. Bacak - Ön Bacak (Quadriceps)": "5. Legs: quads",
+  "6. Bacak - Arka Bacak & Kalça (Hamstrings & Glutes)": "6. Legs: hamstrings and glutes",
+  "7. Bacak - Kalf (Calves & Tibialis)": "7. Legs: calves and tibialis",
+  "8. Kol - Biceps & Ön Kol (Biceps & Forearms)": "8. Arms: biceps and forearms",
+  "9. Kol - Triceps (Arka Kol)": "9. Arms: triceps",
+  "10. Karın & Merkez Bölge (Core & Abs)": "10. Core and abs",
+  "11. Kardiyo & Kondisyon (Cardio & Conditioning)": "11. Cardio and conditioning",
+  // --- hareket penceresi alan adları
+  "Eğim/Seviye": "Incline / level", "Kilo artış adımı (kg)": "Weight step (kg)", "Kilo artış adımı": "Weight step",
 });
 
 </script>

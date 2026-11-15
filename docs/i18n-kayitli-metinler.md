@@ -42,7 +42,7 @@ Tablo kısaltması: **K** = kayıt (state/yedek/ayna içine yazılıyor), **C** 
 
 | Konum | Metin | Tür | Çeviride ne yapılmalı |
 |---|---|---|---|
-| src/app/05-secici-hareket.js:390 | `` `${n}. GÜN: ` `` (yeni antrenman günü ad kutusu varsayılanı; kullanıcı yazıp Ekle der → `state.workoutDays[].name`) | K | dile göre üret ("DAY n: ") |
+| src/app/05-secici-hareket.js:390 | `` `${n}. GÜN: ` `` (yeni antrenman günü ad kutusu varsayılanı; kullanıcı yazıp Ekle der → `state.workoutDays[].name`) | K | **KARAR (v48):** dile göre üret: Türkçe `${n}. GÜN: ` aynen, İngilizce `DAY ${n}: `; yer tutucu örneği de çevrilir; ":" ayracı korunur (`split(":")[0]` kısa etiketi) |
 | src/app/10-antrenman-arayuzu.js:657 | `` `${n}. Öğün: ` `` (yeni öğün ad kutusu varsayılanı → `meal.title`) | K | dile göre üret ("Meal n: ") |
 | src/app/09-kas-plaka-koc-takviye.js `copyMeal` | `src.title + " (kopya)"` (öğün kopyalanınca yeni öğün başlığı) | K | dile göre üret (" (copy)"); Türkçede tam " (kopya)" (v47 yapıldı) |
 | src/app/06-mobilite.js:99 | `r.name + " (kopya)"` (rutin kopyalanınca yeni rutin adı) | K | dile göre üret (" (copy)") |
@@ -104,7 +104,7 @@ Tablo kısaltması: **K** = kayıt (state/yedek/ayna içine yazılıyor), **C** 
 | src/app/09-kas-plaka-koc-takviye.js:584 | `s.time === "custom"` → `s.timeLabel \|\| "Özel"` | C (anahtar İngilizce) | dokunma; `"Özel"` bkz. a1 |
 | src/app/01-temel.js:113, 118 | `/^Hedef:/.test(ex.note)` | C (kayıtlı not) | bkz. a3 |
 | src/app/01-temel.js:112, 117 | `ex.targetInfo = "30 dk"`, `n + "x45 sn"` (kardiyo/süreli otomatik çeviri) | K | dile göre üret ("30 min", "3x45 sec"); `parseRepRange` `^\d+x` kalıbı dokunma |
-| src/app/05-secici-hareket.js:200–203 (`targetInfoFor`) | `${n}x${hedef}`, `${n}x${sec} sn`, `${min} dk • ${km} km` (kullanıcı hareket eklerken `ex.targetInfo`'ya yazılır) | K | dile göre üret ("sn"→"sec", "dk"→"min"); sayı/"x" kalıbı dokunma |
+| src/app/05-secici-hareket.js:200–203 (`targetInfoFor`), `addSetToExercise` (`set.target`) | `${n}x${hedef}`, `${n}x${sec} sn`, `${min} dk • ${km} km`; süreli sette `sec + " sn"` (kullanıcı hareket eklerken `ex.targetInfo` / `set.target`'a yazılır) | K + C | **KARAR (v48): kayıtta her dilde Türkçe** ("sn"/"dk"); ekranda `targetL()` İngilizcede " sec"/" min" gösterir. Gerekçe: veri katmanı `fmtDateStore` ile aynı ilke; `parseRepRange` ve `/^\d+x/` değişmeden çalışır, eski kayıtlarla tek biçim. Sayı/"x" kalıbı dokunma |
 | src/app/10-antrenman-arayuzu.js:229 | `d.name.split(":")[0]` (gün kısa etiketi) | C (kayıtlı ad ayrıştırma) | dokunma (":" ayracı dilde korunmalı) |
 | src/app/03-beslenme.js:728–734 (`shortMealTitle`), src/app/11-mutfak-akilli.js:21–26 (`mealTitleBody`) | `title.indexOf(":")` ≤ 16 karakter içindeki iki nokta ile öğün başlığı kısaltma ("2. Öğün: Öğle Yemeği" → "2. Öğün") | C (kayıtlı başlık ayrıştırma) | dokunma; örnek öğün başlıkları (a3) iki nokta içermediği için bu kısaltmayı kullanmıyor; dile göre üretilen `n. Öğün: ` kalıbında ":" korunmalı |
 | src/app/09-kas-plaka-koc-takviye.js:668, 577 | `normSearch(unit) === normSearch(s.unit)`, `/olcek\|scoop/`, `/^(mcg\|µg\|ug\|iu)$/` (takviye doz birimi, kayıtlı `unit` = "ölçek", "damla/kapsül", "softjel", "g", "mg") | C | dokunma; `"ölçek"` zaten `olcek\|scoop` ile iki dilli karşılanıyor |

@@ -125,7 +125,8 @@ function fillExModalFields(v) {
 function updateExMuscleAuto() {
   const name = $("exName").value;
   const g = autoMuscle(name);
-  $("exMuscle").options[0].textContent = "Otomatik" + (g ? ` (${g})` : " (belirlenemedi)");
+  $("exMuscle").options[0].textContent = "Otomatik" + (g ? ` (${muscleL(g)})` : " (belirlenemedi)");
+  for (let i = 1; i < $("exMuscle").options.length; i++) $("exMuscle").options[i].textContent = muscleL($("exMuscle").options[i].value);   // v48: değer Türkçe kalır
   $("exInc").placeholder = fmtNum(autoInc(name)) + " (otomatik)";
 }
 
@@ -387,7 +388,7 @@ function removeExercise(exIdx) {
 }
 
 async function addWorkoutDay() {
-  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: `${state.workoutDays.length + 1}. GÜN: `, placeholder: "Örn: 5. GÜN: Kol" }, ok: "Ekle" });
+  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: curLang() === "en" ? `DAY ${state.workoutDays.length + 1}: ` : `${state.workoutDays.length + 1}. GÜN: `, placeholder: curLang() === "en" ? "E.g. DAY 5: Arms" : "Örn: 5. GÜN: Kol" }, ok: "Ekle" });
   if (!name || !name.trim()) return;
   state.workoutDays.push({ id: "day_" + Date.now(), name: name.trim(), exercises: [] });
   state.activeWorkoutDayIdx = state.workoutDays.length - 1;
