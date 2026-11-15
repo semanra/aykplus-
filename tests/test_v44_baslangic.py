@@ -107,10 +107,10 @@ try:
     check(st(pg)["weight"] == 88 and st(pg)["settings"]["onboarded"] is True and errs == [], "listeleri eksik eski kayıt hatasız açılır")
     # ---- Bölüm 3: örnek içerik üreticileri ----
     pg = page_fresh()
-    for cal in (1600, 2400, 3200):
+    for cal in (1400, 1600, 2000, 2400, 3200):
         menu = pg.evaluate(f"buildSampleMenu({cal})")
         kcal = pg.evaluate("m => nutritionTotals(m).cal", menu)
-        check(len(menu) == 4 and abs(kcal - cal) / cal <= 0.08, f"örnek menü {cal} kcal ±%8 (çıkan {kcal})")
+        check(len(menu) == 4 and -0.05 <= (kcal - cal) / cal <= 0.02, f"örnek menü {cal} kcal −%5 … +%2 (çıkan {round(kcal)})")
         check(pg.evaluate("m => m.every(x => x.items.every(i => getFoodDB()[i.foodId] && !isHiddenFood(getFoodDB()[i.foodId])))", menu), "menü besinleri var ve gizli değil")
         check(pg.evaluate("m => normMealList(JSON.parse(JSON.stringify(m))).every((x, i) => x.items.length === m[i].items.length && x.items.every(it => it.amount > 0))", menu), f"menü {cal}: normMealList biçimi, miktarlar pozitif")
     ids = pg.evaluate("() => [...buildSampleMenu(2000), ...buildSampleMenu(2000)].map(m => m.id)")
@@ -176,6 +176,7 @@ try:
     # baştan sona tamamla (her adımda 44 px + taşma ölçülür, koyu ekran görüntüleri)
     walk(pg, shot="koyu", measure=True)
     check("kcal" in pg.inner_text("#obSummary") and "L" in pg.inner_text("#obSummary"), "özet: kalori ve su")
+    check(pg.is_visible("#obFloor") and "Dinlenme günü güvenli alt sınırda (1.400 kcal)" in pg.inner_text("#obFloor"), "alt sınır satırı: " + (pg.inner_text("#obFloor") if pg.is_visible("#obFloor") else "yok"))
     exp_cal = pg.evaluate("""() => { const saved = state; state = JSON.parse(JSON.stringify(saved));
         Object.assign(state, { weight: 72.5, deficit: 500, dayType: 'train' }); Object.assign(state.settings, { sex: 'female', age: 34, height: 165, goal: 'lose', activity: 'low', targetWeight: 65 });
         const tr = getTargets().calTarget; state.dayType = 'rest'; const re = getTargets().calTarget; state = saved; return [tr, re]; }""")
@@ -232,6 +233,35 @@ try:
     pg.set_input_files("#obRestoreFile", files=[{"name": "bozuk.json", "mimeType": "application/json", "buffer": b"{bozuk"}])
     pg.wait_for_selector("#uiDialog:not(.hidden)", timeout=3000); pg.click("#uiDlgOk"); pg.wait_for_timeout(100)
     check(pg.is_visible("#onboard") and obstep(pg) == "1" and st(pg)["settings"]["onboarded"] is False, "bozuk yedek: kurulumda kalır")
+    check("nd" not in pg.get_attribute("#uiDialog", "class").split(), "kurulumda pencere Antrenman temasında (beslenme .nd değil)")
+    # 1: kurulumdan açılan ortak pencere .tm alır; bozuk yedek uyarısı Antrenman temasında
+    pg.set_input_files("#obRestoreFile", files=[{"name": "bozuk.json", "mimeType": "application/json", "buffer": b"{bozuk"}])
+    pg.wait_for_selector("#uiDialog:not(.hidden)", timeout=3000); pg.wait_for_timeout(250)
+    check("nd" not in pg.get_attribute("#uiDialog", "class").split() and "t-btn" in pg.get_attribute("#uiDlgOk", "class").split(), "bozuk yedek uyarısı turkuaz temada")
+    pg.screenshot(path=os.path.join(SHOTS, "v44_kurulum_pencere_koyu.png")); pg.click("#uiDlgOk"); pg.wait_for_timeout(100)
+    check(pg.evaluate("trainCtx() && !nutriCtx()"), "kurulum açıkken trainCtx")
+    pg.evaluate("openModal('shopModal')"); cls = pg.get_attribute("#shopModal", "class").split(); pg.evaluate("closeModal('shopModal')")
+    check("tm" in cls and "nm" not in cls, "kurulum açıkken ortak pencere .tm")
+    # 6: kurulum bitmeden gün arşivlenmez
+    r6 = pg.evaluate("""() => { const t = logicalToday(); const y = todayStr(new Date(Date.parse(t + 'T12:00:00') - 86400000));
+        state.today = y; const ch = checkNewDay(); return [ch, Object.keys(state.dailyLogs).length, state.today === t, !!state.dailyLogs[y]]; }""")
+    check(r6[0] is False and r6[1] == 0 and r6[2] and not r6[3], f"kurulum açıkken gün arşivi yazılmaz {r6}")
+    # 3: Enter sonraki kutuya geçer; son kutuda İleri
+    pg.click("#obStart"); pg.click("#obSexMale"); pg.fill("#obAge", "30"); pg.focus("#obAge"); pg.keyboard.press("Enter")
+    check(pg.evaluate("document.activeElement.id") == "obHeight" and pg.inner_text("#obErr").strip() == "" and obstep(pg) == "2", "Enter: yaş → boy, uyarı yok")
+    check(pg.get_attribute("#obWeight", "enterkeyhint") == "done" and pg.get_attribute("#obAge", "enterkeyhint") == "next", "enterkeyhint: son kutu done")
+    pg.fill("#obHeight", "180"); pg.keyboard.press("Enter"); check(pg.evaluate("document.activeElement.id") == "obWeight", "Enter: boy → kilo")
+    pg.fill("#obWeight", "280"); pg.keyboard.press("Enter"); check(obstep(pg) == "3", "Enter son kutuda: İleri")
+    # 2: hedef kilo en çok 250 (Profil sınırı)
+    pg.click("#obGoalLose"); pg.fill("#obTarget", "260"); pg.click("#obNext")
+    check(obstep(pg) == "3" and "250" in pg.inner_text("#obErr"), "Ver: hedef 250'den büyükse uyarı")
+    pg.click("#obGoalKeep"); pg.click("#obNext"); check(obstep(pg) == "3" and "250" in pg.inner_text("#obErr"), "Koru: kilo 250'den büyükse uyarı")
+    pg.click("#obGoalLose"); pg.fill("#obTarget", "240"); pg.click("#obNext"); check(obstep(pg) == "4", "Ver: 240 geçerli")
+    # kurulum bitince gün dönümü normal: dünkü gün arşivlenir
+    pg.click("#obActMid"); pg.click("#obNext"); pg.click("#obExpNew"); pg.click("#obNext"); pg.click("#obNext"); pg.click("#obFinish"); pg.wait_for_timeout(150)
+    r6b = pg.evaluate("""() => { const t = logicalToday(); const y = todayStr(new Date(Date.parse(t + 'T12:00:00') - 86400000));
+        state.today = y; checkNewDay(); return !!state.dailyLogs[y]; }""")
+    check(r6b, "kurulumdan sonra gün arşivi normal")
     # iPad boyutu: taşmasız
     ctx4 = b.new_context(color_scheme="dark", viewport={"width": 820, "height": 1180}); ctx4.add_init_script(SPLASH_OFF)
     pg = ctx4.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.goto(URL); boot(pg)

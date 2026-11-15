@@ -37,8 +37,8 @@ window.addEventListener("error", e => { toast("Hata: " + (e.message || "bilinmey
 // ---------------------------------------------------------------------------
 // MODAL YÖNETİMİ
 // ---------------------------------------------------------------------------
-// Antrenman sekmesinden veya Profil ekranından açılan ortak pencereler yeni (siyah) temada görünür.
-function trainCtx() { try { return state.activeTab === "gym" || state.activeTab === "mobility" || state.activeTab === "progress" || profileIsOpen(); } catch (e) { return false; } }
+// Antrenman sekmesinden, Profil ekranından veya ilk açılış kurulumundan (v44) açılan ortak pencereler yeni (siyah) temada görünür.
+function trainCtx() { try { return obIsOpen() || state.activeTab === "gym" || state.activeTab === "mobility" || state.activeTab === "progress" || profileIsOpen(); } catch (e) { return false; } }
 // Beslenme sekmesinden a\u00E7\u0131lan ortak pencereler beslenme temas\u0131nda (.nm) g\u00F6r\u00FCn\u00FCr.
 function nutriCtx() { try { return !trainCtx() && state.activeTab === "nutrition"; } catch (e) { return false; } }
 const EMOJI_LEAD = /^(?:[\p{Extended_Pictographic}\u2190-\u21FF\u2700-\u27BF\uFE0F\u200D]+\s*)+/u;
@@ -296,6 +296,8 @@ function resetDaily() {
 function checkNewDay() {
   const t = logicalToday();
   if (!state.today) { state.today = t; return false; }
+  // v44: kurulum bitmeden (yer tutucu hedeflerle) gün arşivlenmez; yalnızca tarih güncellenir. Bitince normal sürer.
+  if (state.settings.onboarded === false) { if (state.today !== t) state.today = t; return false; }
   // v35: telefonun saati ileri alınmışken kaydedilen tarih bugünden en az 2 gün ilerideyse bugüne çekilir (tikler silinmez,
   // arşiv yazılmaz); eskiden gün geçişi o tarihe kadar hiç çalışmıyordu. 1 günlük geri gidiş meşrudur (Gün geçişi saati
   // ileri alınınca mantıksal gün bir gün geri gider) — o durumda dokunulmaz, yoksa dünün arşivi bugünün verisiyle ezilirdi.

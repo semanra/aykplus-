@@ -18,7 +18,7 @@ function buildSampleMenu(calTarget) {
   const baseKcal = nutritionTotals(rawMeals).cal;
   const k = baseKcal > 0 && num(calTarget, 0) > 0 ? num(calTarget, 0) / baseKcal : 1;
   const tag = Date.now().toString(36) + (++_sampleMenuSeq) + Math.random().toString(36).slice(2, 5);
-  return rawMeals.map((m, mi) => ({
+  const meals = rawMeals.map((m, mi) => ({
     id: "sm_" + tag + "_" + mi, title: m.title, time: m.time, done: false,
     items: m.items.map(it => {
       const unit = db[it.foodId] && db[it.foodId].unit;
@@ -26,6 +26,31 @@ function buildSampleMenu(calTarget) {
       return { foodId: it.foodId, amount: unit === "g" || unit === "ml" ? Math.max(5, Math.round(v / 5) * 5) : Math.max(1, Math.round(v)) };
     })
   }));
+  // v44 düzeltme: yuvarlamadan sonra menü hedefi aşmasın (−%5 … +%2). Karbonhidratı baskın gram besinlerden en çok kalori
+  // vereni 5 g adımlarla kısılır (fazlaysa) ya da artırılır (eksikse); en az 5 g kalır.
+  const tgt = num(calTarget, 0);
+  if (tgt > 0) {
+    const carbItems = [];
+    meals.forEach(m => m.items.forEach(it => {
+      const f = db[it.foodId];
+      if (f && (f.unit === "g" || f.unit === "ml") && f.c * 4 > f.p * 4 && f.c * 4 > f.f * 9) carbItems.push(it);
+    }));
+    const kc = it => calcItemMacros(it).cal;
+    for (let guard = 0; guard < 400 && carbItems.length; guard++) {
+      const total = nutritionTotals(meals).cal;
+      if (total > tgt * 1.02) {
+        const c = carbItems.filter(it => it.amount > 5).sort((a, b) => kc(b) - kc(a))[0];
+        if (!c) break;
+        c.amount -= 5;
+      } else if (total < tgt * 0.95) {
+        const c = carbItems.slice().sort((a, b) => kc(b) - kc(a))[0];
+        const step = calcItemMacros({ foodId: c.foodId, amount: 5 }).cal;
+        if (total + step > tgt * 1.02) break;
+        c.amount += 5;
+      } else break;
+    }
+  }
+  return meals;
 }
 
 // Hareket adları EXERCISE_LIBRARY içinden birebir (kas haritası adla eşleşir). [ad, set, hedef tekrar, varsayılan tekrar]; süreli: [ad, set, "t", saniye]

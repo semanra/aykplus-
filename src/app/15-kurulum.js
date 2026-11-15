@@ -51,7 +51,12 @@ function obTargets(dayType) {
       bodyFat: "", calAdjust: 0, proteinHigh: false
     })
   });
-  try { return getTargets(); } finally { state = saved; }
+  try {
+    const t = getTargets();
+    t.floor = d.sex === "female" ? 1400 : 1750;
+    t.floored = t.tdee + t.goalDelta < t.floor;   // güvenli alt sınır hedefi yukarı çekti
+    return t;
+  } finally { state = saved; }
 }
 // Adımın eksik/hatalı alanı (boşsa geçerli)
 function obCheck(step) {
@@ -67,8 +72,10 @@ function obCheck(step) {
   }
   if (step === 3) {
     if (!d.goal) return "Bir hedef seç.";
+    if (d.goal === "keep" && v.weight > 250) return 'Hedef kilo en çok 250 kg olabilir. Bu kilo için "Kilo vermek" hedefini seç.';
     if (d.goal === "lose" || d.goal === "gain") {
       if (isNaN(v.target)) return "Hedef kilonu yaz.";
+      if (!(v.target >= 30 && v.target <= 250)) return "Hedef kilo 30 ile 250 kg arasında olmalı.";
       if (d.goal === "lose" && !(v.target >= 30 && v.target < v.weight)) return `Kilo vermek için hedef kilo şu anki kilondan (${fmtNum(v.weight)} kg) az olmalı.`;
       if (d.goal === "gain" && !(v.target > v.weight && v.target <= 250)) return `Kilo almak için hedef kilo şu anki kilondan (${fmtNum(v.weight)} kg) fazla olmalı (en çok 250 kg).`;
     }
@@ -102,7 +109,15 @@ function obPick(key, val) {
   obSetErr("");
   obRender(true);
 }
-function obKey(e) { if (e.key === "Enter") { e.preventDefault(); if (e.target.blur) e.target.blur(); obNext(); } }
+// Enter: aynı adımdaki sonraki kutuya geçer; son kutuda İleri gibi çalışır
+function obKey(e) {
+  if (e.key !== "Enter") return;
+  e.preventDefault();
+  const ins = [...document.querySelectorAll("#obBody input.ob-in")], i = ins.indexOf(e.target);
+  if (i >= 0 && i < ins.length - 1) { ins[i + 1].focus(); return; }
+  if (e.target.blur) e.target.blur();
+  obNext();
+}
 
 // Haftalık tahmini değişim (3. adım). 1 kg ≈ 7700 kcal. Hareketlilik henüz seçilmediyse "orta" ile.
 function obWeeklyText() {
@@ -203,6 +218,7 @@ function obStepHtml(n) {
       </div>
       <div class="ob-sum-water"><span>Su</span><b>${wa ? fmtNum(wa.total) : fmtNum(2.5)} L</b></div>
     </div>
+    ${tr.floored || re.floored ? `<p id="obFloor" class="ob-floor">${tr.floored && re.floored ? "Antrenman ve dinlenme günü" : tr.floored ? "Antrenman günü" : "Dinlenme günü"} güvenli alt sınırda (${fmtInt(tr.floor)} kcal); kalori bunun altına indirilmez.</p>` : ""}
     <p class="ob-small">Hepsini Profil'den istediğin zaman değiştirebilirsin. Hesaplar tahminidir; tartıldıkça uygulama kalorini kilonun gidişine göre ayarlamayı önerir.</p>`;
   }
   return "";
@@ -213,6 +229,8 @@ function obRender(keepScroll) {
   root.dataset.step = String(obStep);
   const sc = $("obScroll"), top = sc ? sc.scrollTop : 0;
   $("obBody").innerHTML = `<div class="ob-step${keepScroll ? " ob-still" : ""}">${obStepHtml(obStep)}</div>`;   // seçim değişince yeniden belirmez
+  const ins = document.querySelectorAll("#obBody input.ob-in");
+  if (ins.length) ins[ins.length - 1].setAttribute("enterkeyhint", "done");   // son kutu "Bitti"
   $("obDots").innerHTML = Array.from({ length: OB_STEPS }, (_, i) => `<span class="ob-dot${i + 1 === obStep ? " on" : i + 1 < obStep ? " done" : ""}"></span>`).join("");
   $("obDots").setAttribute("aria-label", `Adım ${obStep} / ${OB_STEPS}`);
   $("obBack").style.visibility = obStep > 1 ? "visible" : "hidden";
