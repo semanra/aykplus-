@@ -1,4 +1,4 @@
-import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT, with_defaults
 import os, sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
@@ -26,7 +26,7 @@ with sync_playwright() as p:
     pg.on("console", lambda m: errors.append("console:"+m.text) if m.type=="error" else None)
     pg.on("pageerror", lambda e: errors.append("pageerror:"+str(e)))
     pg.goto("http://localhost:8765/index.html")
-    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(legacy))
+    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(with_defaults(legacy)))
     pg.reload(); pg.wait_for_timeout(400); pg.evaluate("startWorkout()"); pg.wait_for_timeout(150)
     def overflow(tag):
         w=pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]")
@@ -114,7 +114,7 @@ with sync_playwright() as p:
     if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(300)   # v21: temalı onay
     st=pg.evaluate("aykStoredState()")
     print("restored logs:", len(st["workoutLogs"]), "history keys:", list(st["exerciseHistory"].keys()))
-    pg.evaluate("t=>{ void restoreFromText(t); }", json.dumps(legacy)); pg.wait_for_timeout(200)
+    pg.evaluate("t=>{ void restoreFromText(t); }", json.dumps(with_defaults(legacy))); pg.wait_for_timeout(200)
     if pg.is_visible("#uiDialog"): pg.click("#uiDlgOk"); pg.wait_for_timeout(300)   # v21: temalı onay
     st=pg.evaluate("aykStoredState()")
     print("legacy restore kinds:", [e["kind"] for e in st["workoutDays"][0]["exercises"]])

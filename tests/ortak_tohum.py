@@ -8,3 +8,11 @@ with open(FIXTURE, encoding="utf-8") as _f:
     _SEED = json.load(_f)
 TEST_INIT = "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";\n" + SPLASH_OFF
 SEED_ONLY = "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";"   # açılış animasyonu kalır (splash testleri)
+
+def with_defaults(seed):
+    """Eski normalizeState davranışı: {...DEFAULT_STATE, ...kayıt}, ayarlar bir seviye derin birleşir.
+    Kısmi tohum kayıtlarını sahibin eski varsayılanlarıyla tamamlar (dataVer taşınmaz: göç adımları çalışsın)."""
+    base = {k: v for k, v in _SEED.items() if k != "dataVer"}
+    out = {**base, **seed}
+    out["settings"] = {**_SEED.get("settings", {}), **seed.get("settings", {})}
+    return out

@@ -1,4 +1,4 @@
-import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT, with_defaults
 import os, sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
@@ -29,7 +29,7 @@ with sync_playwright() as p:
         "chest-supported row":[{"ts":now-3*DAY,"logId":"a","kind":"weight","name":"Chest-Supported Row","sets":[{"kg":60,"reps":5},{"kg":60,"reps":4},{"kg":60,"reps":7},{"kg":60,"reps":8}]}],
         "incline dumbbell press":[{"ts":now-3*DAY,"logId":"a","kind":"weight","name":"Incline Dumbbell Press","sets":[{"kg":30,"reps":10},{"kg":30,"reps":10}]}]
       }}
-    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(seed)); pg.reload(); pg.wait_for_timeout(400)
+    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(with_defaults(seed))); pg.reload(); pg.wait_for_timeout(400)
     pg.evaluate("startWorkout()"); pg.evaluate("()=>{activeDay().exercises[1].sets.forEach(s=>s.kg=60); activeDay().exercises[0].sets.forEach(s=>s.kg=80); renderAll();}")
     sug=pg.evaluate("activeDay().exercises.slice(0,3).map(e=>{const s=overloadSuggestion(e); return e.name+': '+(s? s.type+' '+s.kg+'x'+s.reps : 'none');})")
     print("suggestions:", sug)  # bench up 82.5x5 ; row down 57.5 ; incline DB: only 2 of 3 sets → none
@@ -69,7 +69,7 @@ with sync_playwright() as p:
     for d in range(1,21):
         k=(datetime.date.today()-datetime.timedelta(days=d)).isoformat(); dl[k]={"kcal":2500,"eatenKcal":2400,"mealsDone":4,"mealsTotal":4,"water":3}
     seed2={"activeTab":"progress","weight":105.25,"weightLogs":wl,"dailyLogs":dl}
-    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(seed2)); pg.reload(); pg.wait_for_timeout(400)
+    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(with_defaults(seed2))); pg.reload(); pg.wait_for_timeout(400)
     a=pg.evaluate("JSON.stringify(coachAnalysis())"); print("coach:", a)
     print("hint:", pg.evaluate("coachHintText()"))
     pg.screenshot(path=""+SHOTS+"/v7_coach.png")

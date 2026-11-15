@@ -1,4 +1,4 @@
-import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT, with_defaults
 import os, sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
@@ -29,7 +29,7 @@ with sync_playwright() as p:
     assert r["stepNext"]==27.5 and r["addonNext"]==22.5 and r["listNext"]==40 and r["plates"]==82.5, r
     # --- senin örneğin: makinede 20 → 27,5 önerisi
     seed={"activeTab":"gym","exerciseHistory":{"lat pulldown":[{"ts":now-3*DAY,"logId":"a","kind":"weight","name":"Lat Pulldown","sets":[{"kg":20,"reps":12},{"kg":20,"reps":12},{"kg":20,"reps":13}]}]}}
-    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(seed)); pg.reload(); pg.wait_for_timeout(300)
+    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(with_defaults(seed))); pg.reload(); pg.wait_for_timeout(300)
     li=pg.evaluate("activeDay().exercises.findIndex(e=>e.name==='Lat Pulldown')")
     print("Lat Pulldown idx:", li, "equip:", pg.evaluate(f"equipOf(activeDay().exercises[{li}])"))
     pg.evaluate(f"()=>{{activeDay().exercises[{li}].sets.forEach(s=>s.kg=20); renderAll();}}")
@@ -47,7 +47,7 @@ with sync_playwright() as p:
       {"ts":now-9*DAY,"logId":"a","kind":"weight","name":"Lat Pulldown","sets":[{"kg":20,"reps":12}]},
       {"ts":now-6*DAY,"logId":"b","kind":"weight","name":"Lat Pulldown","sets":[{"kg":27.5,"reps":10}]},
       {"ts":now-3*DAY,"logId":"c","kind":"weight","name":"Lat Pulldown","sets":[{"kg":35,"reps":8}]}]}}
-    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(seed2)); pg.reload(); pg.wait_for_timeout(300)
+    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(with_defaults(seed2))); pg.reload(); pg.wait_for_timeout(300)
     print("inferred:", pg.evaluate(f"JSON.stringify(inferLevels(activeDay().exercises[{li}]))"))
     print("ask banner:", pg.locator(f"#exCard_{li}", has_text="arayla mı gidiyor").count())
     pg.locator(f'[onclick="confirmInferredLevels({li})"]').click(); pg.wait_for_timeout(150)

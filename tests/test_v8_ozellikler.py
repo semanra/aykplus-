@@ -1,4 +1,4 @@
-import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
+import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT, with_defaults
 import os, sys
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 SHOTS = os.path.join(os.path.dirname(__file__), "shots")
@@ -20,10 +20,10 @@ with sync_playwright() as p:
     pg.on("dialog", on_dialog)
     pg.goto("http://localhost:8765/index.html"); pg.wait_for_timeout(300)
     # ---------- 1) sıradaki gün (dayId ile ve eski isimle)
-    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps({"activeTab":"gym","workoutLogs":[{"id":"w1","ts":now-2*DAY,"dayId":"upperA","dayName":"1. GÜN: Üst Vücut A","sets":10,"volume":1000}]}))
+    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(with_defaults({"activeTab":"gym","workoutLogs":[{"id":"w1","ts":now-2*DAY,"dayId":"upperA","dayName":"1. GÜN: Üst Vücut A","sets":10,"volume":1000}]})))
     pg.reload(); pg.wait_for_timeout(300)
     print("next by id -> active:", pg.evaluate("state.activeWorkoutDayIdx"), "badge:", pg.evaluate("state.workoutDays[nextDayIdx()].name"))
-    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps({"activeTab":"gym","workoutLogs":[{"ts":now-2*DAY,"dayName":"4. GÜN: Alt Vücut B","sets":10,"volume":1000}]}))
+    pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(with_defaults({"activeTab":"gym","workoutLogs":[{"ts":now-2*DAY,"dayName":"4. GÜN: Alt Vücut B","sets":10,"volume":1000}]})))
     pg.reload(); pg.wait_for_timeout(300)
     print("next by legacy name (day4 -> wraps to day1):", pg.evaluate("state.activeWorkoutDayIdx"))
     # ---------- 2) aktif set halkası + otomatik kaydırma + süre
