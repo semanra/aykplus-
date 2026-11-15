@@ -240,7 +240,7 @@ function macroLine(p, c, f, dec) {
 function renderNutrition() {
   const st = state.settings;
   const view = NUTRI_VIEWS.some(x => x[0] === state.nutriView) ? state.nutriView : "today";
-  $("nutriNav").innerHTML = NUTRI_VIEWS.map(([k, l]) => `<button onclick="setNutriView('${k}')" class="n-tab ${view === k ? "on" : ""}" ${view === k ? 'aria-current="page"' : ""}>${l}</button>`).join("");
+  $("nutriNav").innerHTML = NUTRI_VIEWS.map(([k, l]) => `<button onclick="setNutriView('${k}')" class="n-tab ${view === k ? "on" : ""}" ${view === k ? 'aria-current="page"' : ""}>${t(l)}</button>`).join("");
   [["today", "nvToday"], ["menus", "nvMenus"], ["foods", "nvFoods"], ["history", "nvHistory"]].forEach(([k, id]) => $(id).classList.toggle("hidden", k !== view));
 
   // v34: yalnızca açık alt ekran çizilir (gizli ekranlar açıldıklarında setNutriView → renderAll ile güncellenir)

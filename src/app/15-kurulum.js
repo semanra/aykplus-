@@ -9,7 +9,7 @@ const OB_LOSE_PACE = { slow: 300, mid: 500, fast: 700 };   // kcal açık
 let obDraft = null, obStep = 1;
 
 function obNewDraft() {
-  return { sex: "", age: "", height: "", weight: "", goal: "", target: "", pace: "mid", act: "", exp: "", menu: true, prog: true, mob: true };
+  return { sex: "", age: "", height: "", weight: "", goal: "", target: "", pace: "mid", act: "", exp: "", menu: true, prog: true, mob: true, lang: curLang() };
 }
 function obIsOpen() { const el = $("onboard"); return !!el && !el.classList.contains("hidden"); }
 function openOnboarding() {
@@ -103,6 +103,13 @@ function obInput(key, val) {
   obSetErr("");
   if (obStep === 3) obUpdateWeekly();
 }
+function obPickLang(l) {   // v46: ekran hemen yeni dile geçer
+  if (!obDraft) return;
+  obDraft.lang = l;
+  state.settings.lang = l; i18nTouched = true;
+  applyStaticI18n();
+  obRender(true);
+}
 function obPick(key, val) {
   if (!obDraft) return;
   obDraft[key] = val;
@@ -164,6 +171,10 @@ function obStepHtml(n) {
     </div>
     <div id="obHealth" class="ob-note" role="note"><span class="ob-note-t">Sağlık notu</span>${esc(HEALTH_NOTE)}</div>
     <p class="ob-small">Verilerin yalnızca bu telefonda kalır; hesap açman gerekmez.</p>
+    ${langAvailable() ? `<div class="t-seg ob-seg2" id="obLang" role="group" aria-label="${esc(t("Dil"))}">
+      <button type="button" data-lang-opt="tr" class="${d.lang === "tr" ? "on" : ""}" aria-pressed="${d.lang === "tr"}" onclick="obPickLang('tr')">Türkçe</button>
+      <button type="button" data-lang-opt="en" class="${d.lang === "en" ? "on" : ""}" aria-pressed="${d.lang === "en"}" onclick="obPickLang('en')">English</button>
+    </div>` : ""}
     <div class="ob-actions">
       <button id="obStart" type="button" class="ob-main t-btn" onclick="obGo(2)">Başlayalım</button>
       <button id="obRestore" type="button" class="ob-second" onclick="document.getElementById('obRestoreFile').click()">Yedeğim var, geri yükle</button>
@@ -255,6 +266,7 @@ function finishOnboarding() {
   for (let n = 2; n <= 5; n++) { const e = obCheck(n); if (e) { obGo(n); obSetErr(e); return; } }
   const v = obVals(), tr = obTargets("train"), re = obTargets("rest");
   const st = state.settings;
+  if (d.lang === "tr" || d.lang === "en") st.lang = d.lang;   // v46
   st.sex = d.sex === "female" ? "female" : "male";
   st.age = Math.round(v.age);
   st.height = Math.round(v.height);

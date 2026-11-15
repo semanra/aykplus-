@@ -496,7 +496,7 @@ function progBeslenmeHtml() {
 
 function renderProgress() {
   const v = PROG_VIEWS.some(x => x[0] === state.progressView) ? state.progressView : "genel";
-  const nav = `<nav id="progNav" class="p-subnav" aria-label="İlerleme bölümleri">${PROG_VIEWS.map(([k, l]) => `<button onclick="setProgressView('${k}')" data-pv="${k}" class="${v === k ? "on" : ""}" ${v === k ? 'aria-current="page"' : ""}>${l}</button>`).join("")}</nav>`;
+  const nav = `<nav id="progNav" class="p-subnav" aria-label="${t("İlerleme bölümleri")}">${PROG_VIEWS.map(([k, l]) => `<button onclick="setProgressView('${k}')" data-pv="${k}" class="${v === k ? "on" : ""}" ${v === k ? 'aria-current="page"' : ""}>${t(l)}</button>`).join("")}</nav>`;
   const body = v === "kilo" ? progKiloHtml() : v === "guc" ? progGucHtml() : v === "beslenme" ? progBeslenmeHtml() : progGenelHtml();
   $("progressContent").innerHTML = nav + `<div id="pv_${v}">${body}</div>`;
 }

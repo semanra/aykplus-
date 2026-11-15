@@ -188,7 +188,7 @@ function exitActiveWorkout() { state.gymActive = false; window.scrollTo(0, 0); r
 
 function gymSubNav() {
   return `<nav class="gym-subnav flex gap-5 border-b border-[var(--t-line)] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="Antrenman bölümleri">
-    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${l}</button>`).join("")}
+    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${t(l)}</button>`).join("")}
   </nav>`;
 }
 

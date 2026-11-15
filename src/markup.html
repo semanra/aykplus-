@@ -950,13 +950,13 @@
   <div class="bottom-nav px-3 pt-2">
     <div class="max-w-lg mx-auto grid grid-cols-4">
       <button id="navBtnNutrition" onclick="switchTab('nutrition')" class="nav-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3.2 2.2-3.2 5.2S15 12 17 12v9"></path></svg><span>Beslenme</span></button>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M5 3v4a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 0-3.2 2.2-3.2 5.2S15 12 17 12v9"></path></svg><span data-t="Beslenme">Beslenme</span></button>
       <button id="navBtnGym" onclick="switchTab('gym')" class="nav-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg><span>Antrenman</span></button>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg><span data-t="Antrenman">Antrenman</span></button>
       <button id="navBtnMobility" onclick="switchTab('mobility')" class="nav-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2"></circle><path d="M4 9.5l8 2 8-2M12 11.5v4.5M8 21l4-5 4 5"></path></svg><span>Mobilite</span></button>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2"></circle><path d="M4 9.5l8 2 8-2M12 11.5v4.5M8 21l4-5 4 5"></path></svg><span data-t="Mobilite">Mobilite</span></button>
       <button id="navBtnProgress" onclick="switchTab('progress')" class="nav-btn">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"></path></svg><span>İlerleme</span></button>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"></path></svg><span data-t="İlerleme">İlerleme</span></button>
     </div>
   </div>
 
@@ -1358,6 +1358,13 @@
                 <button type="button" data-theme-opt="system" onclick="setTheme('system')">Sistem</button>
                 <button type="button" data-theme-opt="dark" onclick="setTheme('dark')">Koyu</button>
                 <button type="button" data-theme-opt="light" onclick="setTheme('light')">Aydınlık</button>
+              </div>
+            </div>
+            <div class="px-4 py-3 space-y-2.5 border-t border-[var(--t-line)] hidden" id="pfLang">
+              <div><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Dil">Dil</span></div>
+              <div class="t-seg grid-cols-2" role="group" aria-label="Dil" data-t-aria="Dil">
+                <button type="button" data-lang-opt="tr" onclick="setLang('tr')">Türkçe</button>
+                <button type="button" data-lang-opt="en" onclick="setLang('en')">English</button>
               </div>
             </div>
             <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">

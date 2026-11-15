@@ -22,6 +22,7 @@ function renderAll() {
   invalidateFoodDB();
   refreshFoodSnaps();
   applyCustomIcon();
+  applyStaticI18n();   // v46
   applyTabVisibility();
   // v34: yalnızca açık sekme çizilir (sekme değişimi switchTab → renderAll ile yeni sekmeyi çizer)
   const tab = state.activeTab;

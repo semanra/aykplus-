@@ -32,7 +32,7 @@ try:
 
     pg = page_fresh()
     s = st(pg)
-    check(s["settings"]["onboarded"] is False and s["dataVer"] == 5, "yeni kurulum: onboarded false, dataVer 4")
+    check(s["settings"]["onboarded"] is False and s["dataVer"] == 5, "yeni kurulum: onboarded false, dataVer 5")
     pg.reload(); boot(pg)
     check(st(pg)["settings"]["onboarded"] is False, "kurulum bitmeden yeniden açılınca yine onboarded false")
     OWNER43 = json.load(open(FIXTURE, encoding="utf-8")); OWNER43["dataVer"] = 3

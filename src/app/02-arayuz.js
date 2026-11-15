@@ -369,7 +369,7 @@ function applyTabVisibility() {
     tb.setAttribute("aria-label", light ? "Koyu temaya geç" : "Aydınlık temaya geç");
   }
   const tt = $("tabTitle");
-  const title = TAB_TITLES[state.activeTab] || "AYK+";
+  const title = t(TAB_TITLES[state.activeTab] || "AYK+");
   if (tt.textContent !== title) tt.textContent = title;
   Object.keys(map).forEach(k => {
     const [tabId, headId, btnId, disp] = map[k];
