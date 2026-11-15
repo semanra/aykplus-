@@ -113,13 +113,13 @@ function rankBrowse(ids) {
   return [...freq.filter(id => ids.includes(id)), ...custom, ...own, ...usda];
 }
 function noResultHtml(q) {
-  if (!q) return `<div class="text-[14px] n-muted text-center py-8">Bu kategoride besin yok.</div>`;
+  if (!q) return `<div class="text-[14px] n-muted text-center py-8">${t("Bu kategoride besin yok.")}</div>`;
   return `<div id="noResult" class="text-center py-5 space-y-3">
-      <p class="text-[14px] n-muted">"${esc(q)}" bulunamadı. Şunlardan birini dene:</p>
+      <p class="text-[14px] n-muted">${t('"{q}" bulunamadı. Şunlardan birini dene:', { q: esc(q) })}</p>
       <div class="grid gap-2">
-        <button onclick="openBarcode()" class="n-btn-outline h-12 rounded-full text-[14px]">Barkod okut</button>
-        <button onclick="newFoodFromSearch()" class="n-btn-outline h-12 rounded-full text-[14px]">Özel besin oluştur</button>
-        <button onclick="newRecipeFromSearch()" class="n-btn-outline h-12 rounded-full text-[14px]">Tarif oluştur</button>
+        <button onclick="openBarcode()" class="n-btn-outline h-12 rounded-full text-[14px]">${t("Barkod okut")}</button>
+        <button onclick="newFoodFromSearch()" class="n-btn-outline h-12 rounded-full text-[14px]">${t("Özel besin oluştur")}</button>
+        <button onclick="newRecipeFromSearch()" class="n-btn-outline h-12 rounded-full text-[14px]">${t("Tarif oluştur")}</button>
       </div>
     </div>`;
 }
@@ -145,7 +145,7 @@ function noteMissSearch(raw) {
 function cancelMissSearch() { clearTimeout(missTimer); }
 function clearMissSearches() {   // v26: Geri al
   snapshot(); state.missSearches = []; saveState(); renderMissList();
-  toast("Bulunamayan aramalar temizlendi", "ok", { label: "Geri al", fn: () => { doUndo(); renderMissList(); } });
+  toast(t("Bulunamayan aramalar temizlendi"), "ok", { label: t("Geri al"), fn: () => { doUndo(); renderMissList(); } });
 }
 function renderMissList() {
   const el = $("missList");
@@ -153,12 +153,12 @@ function renderMissList() {
   const l = state.missSearches || [];
   el.innerHTML = l.length
     ? l.map(x => `<span class="px-3 py-2 rounded-full bg-[var(--t-elev)] text-[13px]" data-miss="${esc(x.q)}">${esc(x.q)}${num(x.n, 1) > 1 ? ` <span class="text-[var(--t-dim)]">×${num(x.n, 1)}</span>` : ""}</span>`).join("")
-    : `<span class="text-[13px] text-[var(--t-dim)]">Henüz yok.</span>`;
+    : `<span class="text-[13px] text-[var(--t-dim)]">${t("Henüz yok.")}</span>`;
   $("missClear").classList.toggle("hidden", !l.length);
 }
 // Besin kartındaki kaynak satırı
 function foodSourceText(f) {
-  if (f.src === "tarif") return "Tarif hesaplaması (yaklaşık), USDA malzemeleriyle";
+  if (f.src === "tarif") return t("Tarif hesaplaması (yaklaşık), USDA malzemeleriyle");
   if (typeof f.src === "number") return `USDA FoodData Central · ${f.src}`;
   return "";
 }
