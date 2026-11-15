@@ -132,7 +132,7 @@
     :is(.tm, .nm) :is(select, input[type="text"], input[inputmode], input[type="time"], textarea) { background-color: var(--w-elev2) !important; border: 0 !important; color: var(--w-text) !important; border-radius: 12px !important; min-height: 44px; }
     :is(.tm, .nm) :is(select, input, textarea):focus { outline: 2px solid var(--w-focus); outline-offset: 0; }
     :is(.tm, .nm) input::placeholder { color: var(--w-faint); }
-    :is(.tm, .nm) .modal-x { width: 44px; height: 44px; border-radius: var(--w-r-x); background: var(--w-elev); color: var(--w-muted) !important; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
+    :is(.tm, .nm) .modal-x { flex-shrink: 0; width: 44px; height: 44px; border-radius: var(--w-r-x); background: var(--w-elev); color: var(--w-muted) !important; display: flex; align-items: center; justify-content: center; padding: 0 !important; }
     .w-btn { background-color: var(--w-btn) !important; color: var(--w-btn-text) !important; font-weight: 800 !important; border-color: var(--w-btn-line) !important; }
     #profilePage.tm { background-color: var(--t-bg) !important; }
     #profilePage .pf-top { padding-top: calc(0.5rem + env(safe-area-inset-top, 0px)); }
@@ -469,7 +469,7 @@
     .n-seg > button { min-height: 44px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--n-muted); }
     .n-seg > button.on { background: var(--n-on-bg); color: var(--n-on-text); font-weight: 800; }
     .n-hero .n-seg { background: rgba(0, 0, 0, 0.28); border-color: rgba(255, 255, 255, 0.08); }
-    .n-tab { flex-shrink: 0; height: 44px; font-size: 15px; font-weight: 500; color: var(--n-muted); border-bottom: 2.5px solid transparent; margin-bottom: -1px; }
+    .n-tab { flex-shrink: 0; height: 44px; min-width: 44px; font-size: 15px; font-weight: 500; color: var(--n-muted); border-bottom: 2.5px solid transparent; margin-bottom: -1px; }
     .n-tab.on { color: var(--n-text); font-weight: 800; border-bottom-color: var(--n-accent); }
     /* v28: dar ekranda (iPhone SE) dört alt sekme yana kaydırmadan sığar; "Geçmiş" kesilmez */
     @media (max-width: 379px) {
@@ -1466,7 +1466,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v46</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v47</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

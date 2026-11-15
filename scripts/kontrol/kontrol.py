@@ -5,7 +5,7 @@
 # Gereksinim: pip install playwright pillow && python -m playwright install chromium
 import os, sys, json, shutil, subprocess, tarfile, io
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
-from ortak import TEST_INIT, SPLASH_ANIM, server, SEED, SCREENS, ONBOARD_SCREENS, FRESH_SCREENS, FIXED_NAMES, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME
+from ortak import TEST_INIT, SPLASH_ANIM, server, SEED, SCREENS, ONBOARD_SCREENS, FRESH_SCREENS, FIXED_NAMES, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME, EN_INIT, EN_SCREENS, EN_ROOT
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(REPO, "build", "kontrol")
 HIZLI = "--hizli" in sys.argv
@@ -58,6 +58,27 @@ def shoot_fresh(root, out_dir, scheme):
             pg.wait_for_timeout(250); pg.evaluate("window.scrollTo(0,0)")
             pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=True)
             res[name] = pg.evaluate(AUDIT_JS, "#onboard" if name.startswith("ob-") else None)
+        b.close()
+    return res, errs
+
+def shoot_en(root, out_dir, scheme):
+    """v47: İngilizce Beslenme + Profil ekranları (yalnız ölçüm; piksel karşılaştırması yok)."""
+    from playwright.sync_api import sync_playwright
+    os.makedirs(out_dir, exist_ok=True); res = {}; errs = []
+    with server(root) as url, sync_playwright() as p:
+        b = p.chromium.launch()
+        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True, color_scheme=scheme, locale="en-GB")
+        ctx.add_init_script(EN_INIT)
+        pg = ctx.new_page(); pg.clock.set_fixed_time(FIXED_TIME)
+        pg.on("pageerror", lambda e: errs.append(str(e)))
+        pg.goto(url); pg.wait_for_timeout(400); pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.wait_for_timeout(400)
+        pg.evaluate(SEED); pg.wait_for_timeout(250)
+        for name, js in EN_SCREENS:
+            try: pg.evaluate("() => { " + js + " }")
+            except Exception as e: errs.append(f"{name}: {str(e)[:160]}")
+            pg.wait_for_timeout(220); pg.evaluate("window.scrollTo(0,0)")
+            pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=True)
+            res[name] = pg.evaluate(AUDIT_JS, EN_ROOT.get(name))
         b.close()
     return res, errs
 
@@ -136,6 +157,10 @@ def main():
         print(f"• {tr}: ekranlar (önce)…"); _, e0 = shoot(old, os.path.join(OUT, "onceki", scheme), scheme)
         print(f"• {tr}: ekranlar (şimdi)…"); audit, e1 = shoot(REPO, os.path.join(OUT, "simdi", scheme), scheme)
         fa, f1 = shoot_fresh(REPO, os.path.join(OUT, "simdi", scheme), scheme); audit.update(fa); e1 = e1 + f1
+        print(f"• {tr}: İngilizce ekranlar…"); fe, f2 = shoot_en(REPO, os.path.join(OUT, "simdi", scheme), scheme); audit.update(fe); e1 = e1 + f2
+        if scheme == "dark":   # inceleme için İngilizce ekran görüntüleri
+            sd = os.path.join(REPO, "tests", "shots"); os.makedirs(sd, exist_ok=True)
+            for n, _ in EN_SCREENS: shutil.copy(os.path.join(OUT, "simdi", scheme, n + ".png"), os.path.join(sd, "v47_" + n.replace("en-", "en_", 1).replace("-", "_") + ".png"))
         rows = pixdiff(os.path.join(OUT, "onceki", scheme), os.path.join(OUT, "simdi", scheme), os.path.join(OUT, "fark", scheme))
         lines += [f"## Tema: {tr}", "", f"### Görsel farklar ({len(rows)} / {len(SCREENS) + len(FIXED_NAMES)} ekran)", ""]
         lines += [f"- `{n}`: {k} — {d}" for n, k, d in rows] or ["- Fark yok: bütün ekranlar birebir aynı."]

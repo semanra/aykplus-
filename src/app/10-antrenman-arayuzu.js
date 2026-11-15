@@ -765,7 +765,7 @@ function endMealDrag() {
   const [m] = meals.splice(from, 1);
   meals.splice(to, 0, m);
   renderAll();
-  toast("Öğün taşındı");
+  toast(t("Öğün taşındı"));
 }
 document.addEventListener("pointerup", endMealDrag);
 document.addEventListener("pointercancel", endMealDrag);
@@ -780,7 +780,7 @@ function editCustomFood(id) {
   if (f.recipe) { openRecipeModal(id); return; }
   closeModal("pickerModal");
   cfEditId = id;
-  $("cfTitle").textContent = "Özel besini düzenle";
+  $("cfTitle").textContent = t("Özel besini düzenle");
   $("cfName").value = String(f.name || "").replace(/^⭐\s*/, "");
   $("cfHint").classList.add("hidden");
   const gram = f.unit === "g" || f.unit === "ml";
@@ -805,7 +805,7 @@ async function deleteCustomFood(id) {
   const f = state.customFoods[id];
   if (!f) return;
   const uses = customFoodUses(id);
-  if (uses > 0 && !(await askConfirm(`${stripEmoji(f.name).replace(/^⭐\s*/, "")} silinsin mi?`, `${uses} öğün/komboda kullanılıyor. Silersen oralardan da çıkarılacak.`, "Sil", true))) return;
+  if (uses > 0 && !(await askConfirm(t("{ad} silinsin mi?", { ad: stripEmoji(f.name).replace(/^⭐\s*/, "") }), tn(uses, "{n} öğün/komboda kullanılıyor. Silersen oralardan da çıkarılacak."), t("Sil"), true))) return;
   snapshot();
   delete state.customFoods[id];
   invalidateFoodDB();
@@ -815,6 +815,6 @@ async function deleteCustomFood(id) {
   state.recentFoods = state.recentFoods.filter(x => x !== id);
   closeModal("pickerModal");
   renderAll();
-  offerUndo(`${f.name} silindi`);
+  offerUndo(t("{ad} silindi", { ad: f.name }));
 }
 

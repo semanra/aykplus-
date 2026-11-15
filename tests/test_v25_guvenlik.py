@@ -168,11 +168,11 @@ try:
     # 9) "Dünkü" etiketi gün geçiş saatine göre: 03:00 ayarında saat 02:00 iken mantıksal gün 9 Mart, dün 8 Mart
     base = {"activeTab": "nutrition", "settings": {"dayStartHour": 3}, "today": "2026-03-09"}
     ctx, pg, errs, _ = new_page(b, clock="2026-03-10T02:00:00", raw=base)
-    check(pg.evaluate("dayLabelShort('2026-03-08')") == "Dünkü", "02:00'de (gün geçişi 03:00) 8 Mart 'Dünkü'")
-    check(pg.evaluate("dayLabelShort('2026-03-09')") != "Dünkü", "02:00'de 9 Mart 'Dünkü' sayılmıyor (o hâlâ bugün)")
+    check(pg.evaluate("repeatLabel('2026-03-08')") == "Dünkü gibi", "02:00'de (gün geçişi 03:00) 8 Mart 'Dünkü'")
+    check(pg.evaluate("repeatLabel('2026-03-09')") != "Dünkü gibi", "02:00'de 9 Mart 'Dünkü' sayılmıyor (o hâlâ bugün)")
     ctx.close()
     ctx, pg, errs2, _ = new_page(b, clock="2026-03-10T12:00:00", raw={"activeTab": "nutrition"})
-    check(pg.evaluate("dayLabelShort('2026-03-09')") == "Dünkü", "gün geçişi 00:00'da 9 Mart 'Dünkü'")
+    check(pg.evaluate("repeatLabel('2026-03-09')") == "Dünkü gibi", "gün geçişi 00:00'da 9 Mart 'Dünkü'")
     check(not (errs or errs2), f"hata yok {(errs + errs2)[:1]}")
     ctx.close()
     b.close()

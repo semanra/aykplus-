@@ -412,4 +412,7 @@ Object.assign(EN, {
   "\"{m}\" eklendi": "\"{m}\" added",
   "Öğün adı": "Meal name", "Saat (isteğe bağlı)": "Time (optional)", "Kısa not": "Short note", "örn: 50g protein": "e.g. 50g protein",
   "Saat girersen öğün, menüde saatine göre doğru sıraya kendisi yerleşir. Sonra ⠿ tutamacından sürükleyerek de taşıyabilirsin.": "If you enter a time, the meal slots into the right place in your plan by itself. You can also drag it by the ⠿ handle afterwards.",
+  "Öğün taşındı": "Meal moved", "Özel besini düzenle": "Edit custom food", "{ad} silinsin mi?": "Delete {ad}?",
+  "{n} öğün/komboda kullanılıyor. Silersen oralardan da çıkarılacak.": { one: "Used in {n} meal or combo. If you delete it, it will be removed from there too.", other: "Used in {n} meals or combos. If you delete it, it will be removed from them too." },
+  "{ad} silindi": "{ad} deleted",
 });

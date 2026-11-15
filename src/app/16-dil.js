@@ -39,15 +39,25 @@ function upperL(s) { return String(s).toLocaleUpperCase(locale()); }
 function lowerL(s) { return String(s).toLocaleLowerCase(locale()); }
 
 // v46: statik metinler ([data-t] = Türkçe metin). Türkçede ve dil hiç değişmemişken DOM'a dokunulmaz.
-let i18nTouched = false;
-function applyStaticI18n(root) {
-  root = root || document;
+// v47 (M7): düğüm listeleri önbellekte (data-t yalnız statik işaretlemede; JS ile eklenen data-t yok). Yeniden tarama:
+// setLang / kurulumda dil seçimi (rescan), önbellekteki bir düğüm DOM'dan çıkmışsa, ya da belirli bir bölge (root) verilince.
+let i18nTouched = false, i18nNodes = null;
+function i18nCollect(root) {
+  return { t: [...root.querySelectorAll("[data-t]")], a: [...root.querySelectorAll("[data-t-aria]")], p: [...root.querySelectorAll("[data-t-ph]")] };
+}
+function applyStaticI18n(root, rescan) {
   if (curLang() === "tr" && !i18nTouched) return;
   i18nTouched = true;   // DOM çevrildi; Türkçeye dönülünce (yedek, iç yedek, fabrika) eski metin geri yazılmalı
   document.documentElement.lang = curLang();
-  root.querySelectorAll("[data-t]").forEach(el => { const v = t(el.dataset.t); if (el.textContent !== v) el.textContent = v; });
-  root.querySelectorAll("[data-t-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.tAria)));
-  root.querySelectorAll("[data-t-ph]").forEach(el => el.setAttribute("placeholder", t(el.dataset.tPh)));
+  let c;
+  if (root && root !== document) { c = i18nCollect(root); i18nNodes = null; }
+  else {
+    if (rescan || !i18nNodes || i18nNodes.t.some(el => !el.isConnected)) i18nNodes = i18nCollect(document);
+    c = i18nNodes;
+  }
+  c.t.forEach(el => { const v = t(el.dataset.t); if (el.textContent !== v) el.textContent = v; });
+  c.a.forEach(el => el.setAttribute("aria-label", t(el.dataset.tAria)));
+  c.p.forEach(el => el.setAttribute("placeholder", t(el.dataset.tPh)));
 }
 function setLang(l) {
   l = l === "en" && langAvailable() ? "en" : "tr";
@@ -55,7 +65,7 @@ function setLang(l) {
   state.settings.lang = l;
   i18nTouched = true;
   try { if (typeof uiDlg !== "undefined" && uiDlg) uiDialogDone(false); } catch (e) { /* yoksay */ }
-  applyStaticI18n();
+  applyStaticI18n(null, true);
   try { if (typeof profileIsOpen === "function" && profileIsOpen()) fillProfileFields(); } catch (e) { /* yoksay */ }   // v47: kutulardaki sayılar (80,5 / 80.5) yeni dile göre
   renderAll();   // Profil açıksa renderAll içinde yeniden çizilir
 }

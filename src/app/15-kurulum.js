@@ -108,7 +108,7 @@ function obPickLang(l) {   // v46: ekran hemen yeni dile geçer
   l = l === "en" && langAvailable() ? "en" : "tr";
   obDraft.lang = l;
   state.settings.lang = l; i18nTouched = true;
-  applyStaticI18n();
+  applyStaticI18n(null, true);
   obRender(true);
 }
 function obPick(key, val) {

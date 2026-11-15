@@ -473,6 +473,140 @@ try:
       dyn.forEach(k => { if (EN[k] === undefined && !['g', 'mg'].includes(k)) out.missing.push(k); });
       return out; }""", sorted(keys))
     check(len(keys) > 250 and all(not v for v in res.values()), "statik denetim (%d anahtar): EN'de eksik, yer tutucu/etiket uyuşmazlığı, başıboş < > &: %s" % (len(keys), res))
+    # ===== bölüm 4: denetimler (Task 5)
+    # --- 4a. Review Focus 1: kayıtta tutulan varsayılan adlar (docs/i18n-kayitli-metinler.md: yeni kayıt "dile göre üret";
+    #         var olan kayıt değişmez; sayı alanları (m.balanced) hiç metin değildir)
+    def stored_defaults(mi):
+        pg.evaluate("() => { try { if (profileIsOpen()) closeProfile(); } catch (e) {} setNutriView('today'); }"); pg.wait_for_timeout(60)
+        return pg.evaluate("""() => {
+          const o = {};
+          openMealModal(null); o.mealDefault = $('mmName').value; closeModal('mealModal');
+          openFreeMeal(%d); $('fmKcal').value = '500'; $('fmP').value = '20'; saveFreeMeal();
+          const ms = dayMeals(); const est = ms[%d].items.filter(i => i.est).pop(); o.freeName = est && est.est.name;
+          if (!state.supplementList.some(x => x.id === 'sup_t47')) { state.supplementList.push({ id: 'sup_t47', name: 'Test supp' }); renderAll(); }
+          return o;
+        }""" % (mi, mi))
+    pg.evaluate("() => { state.settings.lang = 'tr'; applyStaticI18n(); renderAll(); }")
+    title0 = pg.evaluate("state.meals[0].title")
+    d_tr = stored_defaults(0)
+    check(re.fullmatch(r"\d+\. Öğün: ", d_tr["mealDefault"]) is not None and d_tr["freeName"] == "Dışarıda yemek", "tr: kayıtlı varsayılan adlar Türkçe: %s" % d_tr)
+    pg.evaluate("setLang('en')"); pg.wait_for_timeout(100)
+    d_en = stored_defaults(1)
+    check(re.fullmatch(r"Meal \d+: ", d_en["mealDefault"]) is not None and d_en["freeName"] == "Eating out", "en: yeni kayıt İngilizce ad alır (belge: dile göre üret): %s" % d_en)
+    check(pg.evaluate("state.meals[0].title") == title0 and pg.evaluate("dayMeals()[0].items.filter(i => i.est).map(i => i.est.name)")[-1] == "Dışarıda yemek", "en: dil değişince var olan Türkçe kayıtlar değişmez")
+    idx = pg.evaluate("state.supplementList.findIndex(x => x.id === 'sup_t47')")
+    pg.evaluate("void setSuppTime(%d, 'custom')" % idx); pg.wait_for_selector("#uiDialog:not(.hidden)")
+    pg.fill("#uiDlgInput", ""); pg.click("#uiDlgOk"); pg.wait_for_timeout(60)
+    check(pg.evaluate("state.supplementList.find(x => x.id === 'sup_t47').timeLabel") == "Custom", "en: boş özel zaman etiketi kayda 'Custom'")
+    check(pg.evaluate("[...state.meals, ...state.restMeals].every(m => m.balanced == null || typeof m.balanced === 'number')"), "en: m.balanced sayı kalır (metin kaydedilmez)")
+    # --- 4b. M7: düğüm listeleri önbellekte; yeniden tarama yalnız setLang / bayat önbellek; Türkçe değişmediyse hiç çalışmaz
+    pg.evaluate("setLang('tr')"); pg.wait_for_timeout(60)
+    r = pg.evaluate("""() => {
+      const calls = { n: 0 }; const orig = Element.prototype.querySelectorAll, origD = Document.prototype.querySelectorAll;
+      Element.prototype.querySelectorAll = function (q) { if (typeof q === 'string' && q.indexOf('data-t') >= 0) calls.n++; return orig.apply(this, arguments); };
+      Document.prototype.querySelectorAll = function (q) { if (typeof q === 'string' && q.indexOf('data-t') >= 0) calls.n++; return origD.apply(this, arguments); };
+      const out = {};
+      const b0 = calls.n; for (let i = 0; i < 5; i++) applyStaticI18n(); out.repeat = calls.n - b0;
+      setLang('en'); const b1 = calls.n; for (let i = 0; i < 5; i++) applyStaticI18n(); out.enRepeat = calls.n - b1;
+      out.enText = document.querySelector('[data-t="Yedekle"]').textContent;
+      setLang('tr'); out.trText = document.querySelector('[data-t="Yedekle"]').textContent;
+      Element.prototype.querySelectorAll = orig; Document.prototype.querySelectorAll = origD;
+      return out; }""")
+    check(r["repeat"] == 0 and r["enRepeat"] == 0, "M7: tekrarlı applyStaticI18n yeniden taramaz (tr %s, en %s)" % (r["repeat"], r["enRepeat"]))
+    check(r["enText"] == "Back up" and r["trText"] == "Yedekle", "M7/I1: dil değişince statik metin güncellenir, Türkçeye dönüş geri yazar: %s" % r)
+    r2 = pg.evaluate("""() => {
+      const h = document.createElement('div'); h.id = 't47host'; h.innerHTML = '<span id="t47a" data-t="Yedekle">Yedekle</span>'; document.body.appendChild(h);
+      setLang('en'); const a = $('t47a').textContent;
+      h.innerHTML = '<span id="t47b" data-t="Yedekle">Yedekle</span>'; applyStaticI18n(h);
+      const b = $('t47b').textContent; setLang('tr'); const c = $('t47b').textContent; h.remove(); return [a, b, c]; }""")
+    check(r2 == ["Back up", "Back up", "Yedekle"], "M7: sonradan eklenen düğümler de çevrilir / geri yazılır: %s" % r2)
+    # --- 4c. statik denetim: kaynakta Türkçe harfli metin sabiti yalnız gerekçeli izin listesinde
+    from ortak_tr_tarama import tarama, markup_tarama, islev_govdesi
+    A = os.path.join(REPO, "src", "app")
+    def rd(f): return open(os.path.join(A, f), encoding="utf-8").read()
+    HATA = "geliştirici hata iletisi (Error / console; kullanıcıya gösterilmez)"
+    IZIN = {
+      "00-depolama.js": {"zaman aşımı": HATA, "depolama doğrulaması": HATA, "bağlantı yok": HATA},
+      "01-temel.js": {
+        "AYK+ genel bilgi amaçlıdır": "HEALTH_NOTE: Hakkında gövdesi v49",
+        "damla/kapsül": "SUPP_PRESETS veri (kayıt/gösterim t(p.unit), t(p.name) ile, Task 3b)", "Tok karnına": "SUPP_PRESETS notu (addPresetSupp t(note))",
+        "ölçek": "SUPP_PRESETS birimi", "Antrenman sonrası": "SUPP_PRESETS notu", "Uykudan 1 saat önce": "SUPP_PRESETS notu", "Çinko": "SUPP_PRESETS adı", "Akşam": "SUPP_PRESETS notu",
+        "🏋️ Ağırlık": "KIND_LABEL: Antrenman (v48)", "⏱️ Süreli": "KIND_LABEL: v48", "Tükeniş": "EFFORT_LABELS: Antrenman (v48)",
+        "Adsız hareket": "normalizeState onarım yedeği (bozuk kayıt; kayıtlı-metinler a1)", "Tahmini öğün": "normalizeState onarım yedeği (a1)",
+        "${}. Öğün": "normalizeState onarım yedeği (a1)", "Antrenman günü": "normalizeState onarım yedeği (a1)", "Adsız besin": "normalizeState onarım yedeği (a1)", "Özel": "normalizeState onarım yedeği (a1)",
+        "Göğüs": "libMuscle kas adları: veri/anahtar (v48)", "Sırt": "kas adı veri", "Ön Bacak": "kas adı veri", "Arka Bacak & Kalça": "kas adı veri", "Karın": "kas adı veri"},
+      "02-arayuz.js": {"İlerleme": "TAB_TITLES değeri, gösterimde t(TAB_TITLES[..])", "boş görsel": HATA, "okunamadı": HATA},
+      "03-beslenme.js": {"Bugün": "NUTRI_VIEWS etiketleri, gösterimde t(l)", "Menülerim": "NUTRI_VIEWS", "Geçmiş": "NUTRI_VIEWS"},
+      "04-besinler-barkod.js": {"Diğer": "besin kategori anahtarı (veri, v49)", "<div class=\"text-[12px] n-dim mt-0.5\">Kalori USDA": "f.kx besin verisi cümlesi (v49)", "ZXing yüklenemedi": HATA,
+        "⭐ Özel Eklediklerim": "özel besin cat değeri: kayıtta Türkçe, gösterimde t(stripEmoji(cat)) (kayıtlı-metinler a2)"},
+      "08-profil-yedek.js": {
+        "Verilerin yalnızca bu telefonda": "PRIVACY_NOTE: Hakkında v49", "Open Food Facts verisi": "LICENSES: Hakkında v49", "USDA FoodData Central": "LICENSES v49", "Vücut haritası görseli": "LICENSES v49",
+        "Katch-McArdle": "METHOD_SOURCES v49", "Iraki ve ark.": "METHOD_SOURCES v49", "AMDR": "METHOD_SOURCES v49", "<p>": "renderAbout gövdesi (Hakkında) v49", "<ul": "renderAbout v49",
+        "Yağ": "pfTargetsBox etiketleri ['Kalori','Protein','Karb','Yağ'], gösterimde t(l)",
+        "Gece yedeği": "SNAP_KIND_LABEL, gösterimde t(..)", "Haftalık yedek": "SNAP_KIND_LABEL", "Geçiş öncesi": "SNAP_KIND_LABEL", "İçe alma öncesi": "SNAP_KIND_LABEL", "Değişiklik öncesi": "SNAP_KIND_LABEL"},
+      "11-mutfak-akilli.js": {"Diğer": "besin kategorisi yedeği (veri, v49)"},
+      "12-besin-veritabani.js": {}, "13-cizim-baslat.js": {}}
+    # kısmen kapsamdaki dosyalar: yalnız bu işlevlerin gövdeleri taranır (kalanı v48: Antrenman/Mobilite/İlerleme)
+    KISMI = {
+      "05-secici-hareket.js": ["openPicker", "pickerChoose", "pickerExtra"],
+      "09-kas-plaka-koc-takviye.js": ["renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose"],
+      "10-antrenman-arayuzu.js": ["openMealModal", "saveMealModal", "editCustomFood", "deleteCustomFood"]}
+    bad = []; used = {}
+    for f, tbl in IZIN.items():
+        for (ln, txt, wr, raw) in tarama(rd(f)):
+            if wr: continue
+            hit = [k for k in tbl if txt.startswith(k)]
+            if hit: used.setdefault(f, set()).add(hit[0]); continue
+            bad.append("%s:%d %r" % (f, ln, txt[:50]))
+    for f, fns in KISMI.items():
+        src = rd(f)
+        for fn in fns:
+            body = islev_govdesi(src, fn)
+            if body is None: bad.append("%s: işlev yok %s" % (f, fn)); continue
+            for (ln, txt, wr, raw) in tarama(body):
+                if not wr: bad.append("%s %s %r" % (f, fn, txt[:50]))
+    check(not bad, "statik: kapsamdaki kaynaklarda t(/tn( dışında Türkçe harfli metin yok (%d dosya + %d kısmi): %s" % (len(IZIN), len(KISMI), bad[:8]))
+    stale = [(f, k) for f, tbl in IZIN.items() for k in tbl if k not in used.get(f, set())]
+    check(not stale, "statik: izin listesinde kullanılmayan (bayat) giriş yok: %s" % stale[:6])
+    # tarayıcının kendi sınaması: sarılmamış bir Türkçe sabit yakalanır, sarılı olan yakalanmaz
+    probe = tarama('const a = "çay"; x(t("şeker " + b), tn(n, "{n} öğün")); const r = /ç/; // ğ\nconst s = `${t("ü")} ö`;')
+    check([p[1] for p in probe if not p[2]] == ["çay", "${} ö"], "statik tarayıcı kendi sınamasını geçer: %s" % [(p[1], p[2]) for p in probe])
+    # --- markup: Beslenme, Profil (Hakkında hariç), pencereler, ortak panel
+    MK_IZIN = {
+      "nutriThemeBtn": "aria-label her renderda JS yazar", "backupBannerText": "JS her renderda yazar (renderBanner)", "suppCounter": "JS yazar (renderSupps)",
+      "restPillLabel": "JS yazar (timerLabelText)", "cfTitle": "JS yazar (openCustomFood/editCustomFood)", "pickerTitle": "JS yazar (openPicker)", "pickerExtraBtn": "JS yazar (openPicker)",
+      "mealModalTitle": "JS yazar (openMealModal)", "pfPhotoBtnText": "JS yazar (refreshProfilePhoto)", "lastBackupText": "JS yazar (renderProfile)", "uiDlgCancel": "JS yazar (uiDialog)",
+      "pfLang": "dil adı kendi dilinde kalır ('Türkçe' / 'English')", "pfAvatar": "alt metni: görsel yalnızca süs",
+      "mobTimer": "Mobilite (v48)", "exerciseModal": "Antrenman hareket penceresi (v48)", "exSheet": "Antrenman (v48)", "chartModal": "İlerleme grafik penceresi (v48; başlığı JS yazar)",
+      "onboard": "ilk kurulum ekranları (ayrı sürüm)"}
+    mk = open(os.path.join(REPO, "src", "markup.html"), encoding="utf-8").read(); mk = mk[mk.index("<body"):]
+    mhit = markup_tarama(mk)
+    mbad = [(k, x[:40], ids[-1] if ids else None) for (k, x, ids, ln) in mhit if not any(i in MK_IZIN for i in ids)]
+    check(not mbad, "statik: markup'ta data-t'siz Türkçe metin yok (izin listesi hariç %d kimlik): %s" % (len(MK_IZIN), mbad[:8]))
+    mstale = [i for i in MK_IZIN if not any(i in ids for (k, x, ids, ln) in mhit)]
+    check(not mstale, "statik: markup izin listesinde bayat kimlik yok: %s" % mstale)
+    # --- 4d. her t("…")/tn(…, "…") anahtarı: EN girişi, yer tutucular/etiketler eşit, çoğul → {one, other}
+    lit = r'"((?:[^"\\\n]|\\.)*)"'
+    keys = set(); tnkeys = set()
+    def collect(src):
+        for mm in re.finditer(r"(?<![.\w])t\(\s*" + lit, src): keys.add(mm.group(1))
+        for mm in re.finditer(r"(?<![.\w])tn\(\s*[^,]+,\s*" + lit, src): keys.add(mm.group(1)); tnkeys.add(mm.group(1))
+    for f in list(IZIN) + ["05-secici-hareket.js", "09-kas-plaka-koc-takviye.js"]: collect(rd(f))
+    for fn in KISMI["10-antrenman-arayuzu.js"]: collect(islev_govdesi(rd("10-antrenman-arayuzu.js"), fn))
+    for mm in re.finditer(r'data-t(?:-aria|-ph)?="([^"]*)"', mk): keys.add(mm.group(1))
+    def unesc2(k):
+        try: return _json.loads('"' + k + '"')
+        except Exception: return k
+    keys = {unesc2(k) for k in keys}; tnkeys = {unesc2(k) for k in tnkeys}
+    res = pg.evaluate("""([keys, tnk]) => { const ph = s => (String(s).match(/\\{\\w+\\}/g) || []).sort().join(); const tg = s => (String(s).match(/<\\/?\\w+/g) || []).join();
+      const out = { missing: [], ph: [], tag: [], plural: [], tnString: [] };
+      keys.forEach(k => { const e = Object.prototype.hasOwnProperty.call(EN, k) ? EN[k] : undefined; if (e === undefined) { out.missing.push(k); return; }
+        const vs = typeof e === 'string' ? [e] : [e.one, e.other]; const base = k.split('|')[0];
+        vs.forEach(v => { if (typeof v !== 'string') { out.missing.push(k); return; } if (ph(base) !== ph(v)) out.ph.push(k); if (tg(base) !== tg(v)) out.tag.push(k); });
+        if (typeof e === 'object' && !(typeof e.one === 'string' && typeof e.other === 'string')) out.plural.push(k);
+        if (tnk.includes(k) && /\\{n\\}/.test(base) && typeof e === 'string') out.tnString.push(k); });
+      return out; }""", [sorted(keys), sorted(tnkeys)])
+    check(len(keys) > 500 and all(not v for v in res.values()), "anahtar denetimi (%d anahtar, %d tn): EN'de eksik / yer tutucu / etiket / {one,other} / tn'de tekil-çoğul eksik: %s" % (len(keys), len(tnkeys), {k: v[:6] for k, v in res.items() if v}))
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

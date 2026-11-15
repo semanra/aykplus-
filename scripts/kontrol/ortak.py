@@ -112,6 +112,25 @@ SCREENS = [
 SCREEN_ROOT = {"profil": "#profilePage", "profil-orta": "#profilePage", "profil-alt": "#profilePage", "m-sayac": "#mobTimer",
                "m-seans-tekrar": "#mobTimer", "m-seans-sure": "#mobTimer", "m-bitis": "#mobTimer"}
 
+# v47: İngilizce ölçüm ekranları (piksel karşılaştırması YOK, yalnız taşma / 44 px / okunurluk). setLang('en') ile açılır (AYK_TEST_EN).
+EN_INIT = NO_ANIM + ";window.AYK_TEST_EN = true"
+EN_SCREENS = [
+  ("en-n-bugun", "setLang('en'); switchTab('nutrition'); setNutriView('today')"),
+  ("en-n-menu", "setNutriView('menus')"),
+  ("en-n-besin", "setNutriView('foods')"),
+  ("en-n-gecmis", "setNutriView('history')"),
+  ("en-n-swap-modal", "setNutriView('today'); openSwap(1, 0, 'day')"),
+  ("en-n-ozel-besin", "closeModal('pickerModal'); openCustomFoodModal()"),
+  ("en-n-ogun-modal", "closeModal('customFoodModal'); openMealModal(0)"),
+  ("en-n-tarif", "closeModal('mealModal'); openRecipeModal()"),
+  ("en-n-alisveris", "closeModal('recipeModal'); openShopList()"),
+  ("en-n-disarida", "closeModal('shopModal'); openFreeMeal(1)"),
+  ("en-n-dialog", "closeModal('freeMealModal'); void manualNewDay()"),
+  ("en-profil", "uiDialogDone(false); openProfile()"),
+  ("en-profil-orta", PF_SCROLL % 0.45),
+  ("en-profil-alt", PF_SCROLL % 1),
+]
+EN_ROOT = {"en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage"}
 # v44: kurulum ekranları. TEST_INIT OLMADAN, temiz depoda açılır (gerçek yeni kurulum yolu). Sırayla; her adım öncekinin üstüne.
 ONBOARD_SCREENS = [
   ("ob-1", ""),
