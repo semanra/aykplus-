@@ -192,6 +192,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 
 **v44 (15 Kasım 2026):** App Store Aşama 2 — herkes için başlangıç: ilk açılış kurulumu (7 adım, örnekle ya da boş başla, yedekten dönüş), genel varsayılanlar (sahip verisi koddan çıktı, fikstürde), örnek menü/program/esneme rutini üreticileri, Profil → Hakkında (sağlık notu, gizlilik, yöntem, lisanslar), veri sürümü 4. Sahibin kaydı etkilenmez (doğrulandı). Test: `tests/test_v44_baslangic.py`, `tests/ortak_tohum.py`.
 
+**v45 (15 Kasım 2026):** v44 artıkları: boş gündeki "İlk hareketini ekle" doğrudan hareket seçiciyi açar (`openExercisePicker`), Hakkında'daki protein kuralları madde madde.
+
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 
 **App Store (14 Kasım 2026 kararı):** uygulama herkese açık App Store'a çıkacak (TR + EN, önce ücretsiz, abonelik sonra, geliştirici hesabı alındı). Sıra ve kararlar: `docs/YOL-HARITASI-appstore.md` (Aşama 1: depolama temeli). Durum raporu: `docs/ANALIZ-appstore.md`.

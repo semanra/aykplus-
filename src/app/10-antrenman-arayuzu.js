@@ -242,7 +242,7 @@ function gymTodayHtml() {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ICON.play}"></path></svg>${inProg ? "Antrenmana Devam Et" : "Antrenmanı Başlat"}
       </button>
       ${day.exercises.length ? "" : `<div data-empty-day class="rounded-2xl bg-[var(--t-elev)] p-4 space-y-2.5 text-center"><p class="text-[14px] t-muted">Bu günde henüz hareket yok.</p>
-        <button onclick="setGymView('program')" class="t-btn-ghost w-full h-11 rounded-xl text-sm">İlk hareketini ekle</button></div>`}
+        <button onclick="openExercisePicker()" class="t-btn-ghost w-full h-11 rounded-xl text-sm">İlk hareketini ekle</button></div>`}
     </div>
     ${warmupCardHtml(day, inProg)}
     <div class="space-y-2.5">

@@ -1459,7 +1459,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v44</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v45</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -6814,7 +6814,9 @@ function renderAbout() {
     "<p><b>Günlük harcama.</b> Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.</p>",
     `<p><b>Hareketlilik çarpanları</b> (antrenman günü · dinlenme günü): az hareketli ${tr(A.low[0])} · ${tr(A.low[1])}, orta ${tr(A.mid[0])} · ${tr(A.mid[1])}, çok hareketli ${tr(A.high[0])} · ${tr(A.high[1])}.</p>`,
     `<p><b>Hedef kalori.</b> Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %${Math.round(G.slow * 100)} (yavaş), %${Math.round(G.mid * 100)} (orta) ya da %${Math.round(G.fast * 100)} (hızlı) kadarı eklenir. Korurken harcamana eşittir. Hedef kalori güvenli alt sınırın altına inmez: kadında 1.400, erkekte 1.750 kcal.</p>`,
-    "<p><b>Protein.</b> Kilo verirken yağ oranı biliniyorsa yağsız kütle × 2,5 g, bilinmiyorsa referans kilo × 2,2 g. Korurken 1,6 g, alırken 1,8 g (kilo başına). Referans kilo, mevcut ile hedef kilonun küçüğüdür. Üst sınır kilo × 2,2 g; \"Yüksek\" seçeneği en az kilo × 2,0 g verir.</p>",
+    "<p><b>Protein.</b> Kilo başına hesaplanır. Hesapta kullanılan kilo, mevcut kilonla hedef kilonun küçüğüdür; böylece kilolu biri gereğinden fazla protein almaz.</p>",
+    "<ul class=\"list-disc pl-4 space-y-1\"><li>Kilo verirken: yağ oranın biliniyorsa yağsız kütlenin her kilosu için 2,5 g, bilinmiyorsa 2,2 g.</li><li>Kilo korurken: 1,6 g.</li><li>Kilo alırken: 1,8 g.</li></ul>",
+    "<p>Toplam, mevcut kilonun 2,2 katını geçmez. \"Yüksek\" seçeneğini açarsan en az mevcut kilonun 2 katı olur.</p>",
     "<p><b>Yağ ve karbonhidrat.</b> Yağ kalorinin %25'i, karbonhidrat kalan kaloridir; en az 60 g olur.</p>",
     "<p>Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.</p>",
     "<p class=\"font-semibold text-[var(--t-text)]\">Kaynaklar</p>",
@@ -8340,7 +8342,7 @@ function gymTodayHtml() {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ICON.play}"></path></svg>${inProg ? "Antrenmana Devam Et" : "Antrenmanı Başlat"}
       </button>
       ${day.exercises.length ? "" : `<div data-empty-day class="rounded-2xl bg-[var(--t-elev)] p-4 space-y-2.5 text-center"><p class="text-[14px] t-muted">Bu günde henüz hareket yok.</p>
-        <button onclick="setGymView('program')" class="t-btn-ghost w-full h-11 rounded-xl text-sm">İlk hareketini ekle</button></div>`}
+        <button onclick="openExercisePicker()" class="t-btn-ghost w-full h-11 rounded-xl text-sm">İlk hareketini ekle</button></div>`}
     </div>
     ${warmupCardHtml(day, inProg)}
     <div class="space-y-2.5">
