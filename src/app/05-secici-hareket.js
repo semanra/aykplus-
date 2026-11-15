@@ -461,7 +461,7 @@ async function finishAndLogWorkout() {
   renderAll();
   const li = state.workoutLogs.length - 1;
   const dTxt = state.workoutLogs[li].durationMin ? `${fmtMinutes(state.workoutLogs[li].durationMin)}, ` : "";
-  toast(`Tebrikler! ${dTxt}${Math.round(vol).toLocaleString("tr-TR")} kg tonaj${cMin > 0 ? `, ${fmtNum(cMin)} dk kardiyo` : ""}${prs ? `, ${prs} rekor` : ""} kaydedildi`, prs ? "pr" : "ok", { label: "Paylaş", fn: () => openShareCard(li) });
+  toast(`Tebrikler! ${dTxt}${Math.round(vol).toLocaleString(locale())} kg tonaj${cMin > 0 ? `, ${fmtNum(cMin)} dk kardiyo` : ""}${prs ? `, ${prs} rekor` : ""} kaydedildi`, prs ? "pr" : "ok", { label: "Paylaş", fn: () => openShareCard(li) });
 }
 
 function deleteWorkoutLog(idx) {

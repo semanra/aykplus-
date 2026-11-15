@@ -2515,9 +2515,9 @@ function num(v, d = 0) {
 }
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function round1(n) { return Math.round(n * 10) / 10; }
-function fmtNum(n) { return String(round1(n)).replace(".", ","); }
+function fmtNum(n) { const s = String(round1(n)); return curLang() === "en" ? s : s.replace(".", ","); }
 function round2(n) { return Math.round(n * 100) / 100; }
-function fmtKg(n) { return String(round2(n)).replace(".", ","); }
+function fmtKg(n) { const s = String(round2(n)); return curLang() === "en" ? s : s.replace(".", ","); }
 function todayStr(d = new Date()) {
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 }
@@ -2528,7 +2528,7 @@ function logicalToday() { return todayStr(logicalNow()); }
 function fmtDate(ts, withTime = false) {
   const o = { day: "2-digit", month: "short" };
   if (withTime) { o.hour = "2-digit"; o.minute = "2-digit"; }
-  return new Date(ts).toLocaleDateString("tr-TR", o);
+  return new Date(ts).toLocaleDateString(locale(), o);
 }
 function fmtClock(sec) {
   sec = Math.max(0, Math.round(sec));
@@ -3580,7 +3580,7 @@ window.addEventListener("focus", onSystemTheme);
 window.addEventListener("pageshow", onSystemTheme);
 
 // Tam sayıyı Türkçe binlik ayırıcıyla yazar: 2478 → "2.478"
-function fmtInt(n) { return Math.round(num(n, 0)).toLocaleString("tr-TR"); }
+function fmtInt(n) { return Math.round(num(n, 0)).toLocaleString(locale()); }
 // Etiketten girilen kalori (f.kcal) varsa o kullanılır; yoksa 4P + 4K + 9Y
 function kcalPerUnit(f) {
   if (!f) return 0;
@@ -4690,7 +4690,7 @@ function renderNutriHistory() {
   Object.keys(state.dailyLogs).sort().reverse().filter(k => k !== rows[0].key).slice(0, 60).forEach(k => rows.push({ key: k, ...state.dailyLogs[k] }));
   const dayLabel = k => {
     const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
-    return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString("tr-TR", { weekday: "short", day: "numeric", month: "short" }) : k;
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(locale(), { weekday: "short", day: "numeric", month: "short" }) : k;
   };
   const card = r => {
     const hasEaten = r.eatenKcal != null;
@@ -5535,7 +5535,7 @@ async function finishAndLogWorkout() {
   renderAll();
   const li = state.workoutLogs.length - 1;
   const dTxt = state.workoutLogs[li].durationMin ? `${fmtMinutes(state.workoutLogs[li].durationMin)}, ` : "";
-  toast(`Tebrikler! ${dTxt}${Math.round(vol).toLocaleString("tr-TR")} kg tonaj${cMin > 0 ? `, ${fmtNum(cMin)} dk kardiyo` : ""}${prs ? `, ${prs} rekor` : ""} kaydedildi`, prs ? "pr" : "ok", { label: "Paylaş", fn: () => openShareCard(li) });
+  toast(`Tebrikler! ${dTxt}${Math.round(vol).toLocaleString(locale())} kg tonaj${cMin > 0 ? `, ${fmtNum(cMin)} dk kardiyo` : ""}${prs ? `, ${prs} rekor` : ""} kaydedildi`, prs ? "pr" : "ok", { label: "Paylaş", fn: () => openShareCard(li) });
 }
 
 function deleteWorkoutLog(idx) {
@@ -5567,7 +5567,7 @@ function mobRoutine(rid) { return mobRoutines().find(r => r.id === rid) || null;
 function mobNewRoutineId() { return "mr_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function mobItems() { const r = mobRoutine(mobUI.rid) || mobRoutines()[0]; return r ? r.items : []; }
 function mobFind(id) { return mobItems().find(i => i.id === id) || null; }
-function mobUpper(t) { return String(t).toLocaleUpperCase("tr-TR"); }
+function mobUpper(t) { return String(t).toLocaleUpperCase(locale()); }
 function mobArg(id) { return esc(JSON.stringify(String(id))); }
 function mobNorm(t) { return String(t || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
 // v39: nasıl yapılır (MOB_GUIDE, data.js). Anahtar karşılaştırması büyük/küçük harf ve kesme işaretinden bağımsız.
@@ -5686,7 +5686,7 @@ function mobReset() {
   offerUndo("Tikler sıfırlandı");
 }
 // --- v39: ANA EKRAN (bu hafta, rutin kartları, bölgeler · son çalışma) ---
-const MOB_DAY_LABELS = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"];
+const MOB_DAY_LABELS = { map(f) { return dayShort().map(f); } };   // v46: dile göre (dayShort)
 function mobTodayKey() { return todayStr(logicalNow()); }
 function mobShiftKey(key, off) { const d = new Date(key + "T12:00:00"); d.setDate(d.getDate() + off); return todayStr(d); }
 function mobDaysAgo(key) { return Math.round((new Date(mobTodayKey() + "T12:00:00") - new Date(key + "T12:00:00")) / DAY_MS); }
@@ -6103,7 +6103,7 @@ function mobSay(text) {
     if (!ss || typeof SpeechSynthesisUtterance === "undefined") return;
     ss.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "tr-TR";
+    u.lang = locale();
     const v = (ss.getVoices() || []).find(x => /^tr/i.test(x.lang));
     if (v) u.voice = v;
     ss.speak(u);
@@ -6255,7 +6255,7 @@ function warmupCardHtml(day, inProg) {
   if (items.every(i => i.done)) return `<div id="gymWarmup" class="m-warm flex items-center gap-3 !py-2">
       <span class="text-[var(--d-lv)]">${svgI("check", 20, 2.6)}</span>
       <span class="flex-1 min-w-0 text-[15px] font-semibold">Isınma yapıldı <span class="font-normal text-[var(--t-muted)]">· ${items.length} hareket</span></span>${hide}</div>`;
-  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => MOB_REGION_LABEL[k].toLocaleLowerCase("tr-TR"));
+  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => MOB_REGION_LABEL[k].toLocaleLowerCase(locale()));
   const min = Math.max(1, Math.round(items.reduce((a, it) => a + mobItemSec(it), 0) / 60));
   return `<div id="gymWarmup" class="m-warm">
     <div class="flex items-start justify-between gap-2">
@@ -6545,7 +6545,7 @@ function progCoachHtml() {
     : (a.delta < 0 ? "Beklediğinden yavaş ilerliyorsun." : "Beklediğinden hızlı veriyorsun; kas kaybını önlemek için.");
   const step = Math.abs(a.fullDelta) > Math.abs(a.delta) ? `<p class="p-fine">Tam düzeltme ${a.fullDelta > 0 ? "+" : ""}${a.fullDelta} kcal olurdu; enerjin düşmesin diye kademeli. Bir hafta sonra koç kalanını yeniden değerlendirir.</p>` : "";
   return `<div class="p-card" id="pCoach">${head("Kalori koçu", why)}
-    <div class="p-cn"><span>Önerilen hedef</span><b class="t-display">${a.newTarget.toLocaleString("tr-TR")}</b><span>kcal</span>${pDelta(a.delta, "", null, 0)}</div>
+    <div class="p-cn"><span>Önerilen hedef</span><b class="t-display">${a.newTarget.toLocaleString(locale())}</b><span>kcal</span>${pDelta(a.delta, "", null, 0)}</div>
     ${fresh ? `<p class="p-fine">Son ayardan bu yana ${sinceApply} gün geçti. Vücudun uyum sağlasın diye bir sonraki düzeltme için en az 7 gün beklemeni öneririm.</p>
       <button onclick="applyCoach()" class="p-btn">Yine de uygula (${a.delta > 0 ? "+" : ""}${a.delta} kcal)</button>`
       : `<button onclick="applyCoach()" class="p-btn pri">Öneriyi uygula</button>`}
@@ -6567,7 +6567,7 @@ function progGenelHtml() {
   const tKey = todayStr(logicalNow()), tKeyCal = todayStr();
   const cell = (on, cls, sym, aria) => `<i class="p-sd ${cls}" role="img" aria-label="${aria}">${on ? sym : ""}</i>`;
   const row = (name, color, fn) => `<div class="p-sr"><span><i class="p-sdot" style="background:${color}"></i>${name}</span><div class="p-sc">${days.map(fn).join("")}</div></div>`;
-  const DN = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"];
+  const DN = dayShort();
   const strip = `<div class="p-card" id="pStrip">${pSec("Bu hafta, gün gün")}
     <div class="p-sr hdr"><span></span><div class="p-sc">${DN.map(d => `<b>${d}</b>`).join("")}</div></div>
     ${row("Antrenman", PC.tq, (d, i) => { const k = todayStr(d); const fut = k > tKeyCal; const on = !!wd[k]; return cell(on, fut ? "fut" : on ? "tq" : "", pI("check", 14, 3), `${DN[i]}: ${on ? "antrenman yapıldı" : fut ? "henüz gelmedi" : "antrenman yok"}`); })}
@@ -6671,7 +6671,7 @@ function progGucHtml() {
     const pts = ser.points.filter(p => p.t).slice(-30);
     const best = pts.length ? Math.max(...pts.map(p => p.y)) : 0;
     const chart = pts.length >= 4
-      ? pLine([{ pts, color: PC.tq, name: ser.metric === "Tahmini 1RM" ? "tahmini 1RM" : ser.metric.toLocaleLowerCase("tr-TR") }], { unit: ser.unit, h: 170, label: name + " " + ser.metric })
+      ? pLine([{ pts, color: PC.tq, name: ser.metric === "Tahmini 1RM" ? "tahmini 1RM" : ser.metric.toLocaleLowerCase(locale()) }], { unit: ser.unit, h: 170, label: name + " " + ser.metric })
       : `<div class="p-lowd"><div><b>${esc(name)}</b><span>${pts.length} seans · grafik için en az 4 gerekir</span></div>
           <div class="p-lowd-v"><b class="t-display">${fmtNum(best)}</b><span>${esc(ser.unit)}</span>${pts.length >= 2 ? pDelta(pts[pts.length - 1].y - pts[0].y, "", pts[pts.length - 1].y >= pts[0].y) : ""}</div></div>`;
     const recentRows = hist.slice().reverse().slice(0, 5).map(h => `<div class="p-row"><span class="p-dim">${fmtDate(h.ts)}</span><span class="p-row-r p-trunc">${esc(sessionSummary(h))}</span></div>`).join("");
@@ -6714,7 +6714,7 @@ function progGucHtml() {
   const ton = Array.from({ length: 8 }, (_, i) => {
     const a = ws - (7 - i) * 7 * DAY_MS, b = a + 7 * DAY_MS;
     const v = state.workoutLogs.filter(l => l.ts && l.ts >= a && l.ts < b).reduce((s, l) => s + num(l.volume), 0) / 1000;
-    return { label: i === 7 ? "Bu h." : i === 0 ? new Date(a).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }) : String(new Date(a).getDate()), v: round1(v), flag: i === 7 ? "now" : "" };
+    return { label: i === 7 ? "Bu h." : i === 0 ? new Date(a).toLocaleDateString(locale(), { day: "numeric", month: "short" }) : String(new Date(a).getDate()), v: round1(v), flag: i === 7 ? "now" : "" };
   });
   const hasTon = ton.some(t => t.v > 0);
   const tonCard = `<div class="p-card" id="pTonnage">${pSec("Haftalık tonaj", PC.tq, `<span class="p-dim p-sm">ton</span>`)}
@@ -6723,12 +6723,12 @@ function progGucHtml() {
   // Takvim: son 5 hafta (antrenman dolgu + ✓, mobilite alt çizgi, bugün çerçeve)
   const wd = progWorkoutDays(), mob = progMobDays();
   const calStart = ws - 4 * 7 * DAY_MS, tKey = todayStr();
-  let cal = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"].map(d => `<div class="p-cal-h">${d}</div>`).join("");
+  let cal = dayShort().map(d => `<div class="p-cal-h">${d}</div>`).join("");
   for (let i = 0; i < 35; i++) {
     const d = new Date(calStart + i * DAY_MS + 12 * 3600000), k = todayStr(d);
     const on = !!wd[k], fut = k > tKey;
-    cal += `<div class="p-cal-d ${on ? "w" : ""} ${fut ? "fut" : ""} ${k === tKey ? "today" : ""}" role="img" aria-label="${d.getDate()} ${d.toLocaleDateString("tr-TR", { month: "long" })}${on ? ", antrenman" : ""}${mob[k] ? ", mobilite" : ""}">
-      <span>${d.getDate()}${d.getDate() === 1 ? `<small>${d.toLocaleDateString("tr-TR", { month: "short" })}</small>` : ""}</span>${on ? `<em>${pI("check", 11, 3)}</em>` : ""}${mob[k] ? "<u></u>" : ""}</div>`;
+    cal += `<div class="p-cal-d ${on ? "w" : ""} ${fut ? "fut" : ""} ${k === tKey ? "today" : ""}" role="img" aria-label="${d.getDate()} ${d.toLocaleDateString(locale(), { month: "long" })}${on ? ", antrenman" : ""}${mob[k] ? ", mobilite" : ""}">
+      <span>${d.getDate()}${d.getDate() === 1 ? `<small>${d.toLocaleDateString(locale(), { month: "short" })}</small>` : ""}</span>${on ? `<em>${pI("check", 11, 3)}</em>` : ""}${mob[k] ? "<u></u>" : ""}</div>`;
   }
   const n28 = Object.keys(wd).filter(k => new Date(k + "T12:00:00").getTime() >= Date.now() - 28 * DAY_MS).length;
   const calCard = `<div class="p-card" id="pCalendar">${pSec("Antrenman takvimi", PC.tq, `<span class="p-dim p-sm">son 4 hafta: ${n28} gün</span>`)}<div class="p-cal">${cal}</div>
@@ -6752,17 +6752,17 @@ function progBeslenmeHtml() {
   const calHit = past.filter(s => s.eaten && hitClass(s.kcal, s.calT) === "ok").length;
   const eatenDays = past.filter(s => s.eaten);
   const avgKcal = eatenDays.length ? Math.round(eatenDays.reduce((a, s) => a + s.kcal, 0) / eatenDays.length) : null;
-  const lbl = s => s.live ? "Bugün" : histRange <= 7 ? ["Pz", "Pt", "Sa", "Ça", "Pe", "Cu", "Ct"][new Date(s.key + "T12:00:00").getDay()] : String(new Date(s.key + "T12:00:00").getDate());
+  const lbl = s => s.live ? "Bugün" : histRange <= 7 ? (d7 => [d7[6], ...d7.slice(0, 6)])(dayShort())[new Date(s.key + "T12:00:00").getDay()] : String(new Date(s.key + "T12:00:00").getDate());
   const kItems = ser.map(s => ({ label: lbl(s), v: s.empty ? null : s.kcal, flag: s.live ? "now" : s.empty ? "" : !s.eaten ? "plan" : s.calT > 0 && s.kcal > s.calT * 1.05 ? "over" : "" }));
   const wItems = ser.map(s => ({ label: lbl(s), v: s.empty ? null : s.water, flag: s.live ? "now" : "" }));
   const tile = (l, v, sub) => `<div class="p-mt"><span>${l}</span><b>${v}</b><small>${sub}</small></div>`;
-  const rows = past.slice().reverse().map(s => `<div class="p-row p-row4"><span class="p-dim">${esc(s.label)}</span><b>${s.kcal.toLocaleString("tr-TR")} kcal${s.eaten ? "" : " *"}</b><span>${fmtNum(s.water)} L</span><span class="p-dim">${num(s.raw.mealsDone)}/${num(s.raw.mealsTotal)} öğün</span></div>`).join("");
+  const rows = past.slice().reverse().map(s => `<div class="p-row p-row4"><span class="p-dim">${esc(s.label)}</span><b>${s.kcal.toLocaleString(locale())} kcal${s.eaten ? "" : " *"}</b><span>${fmtNum(s.water)} L</span><span class="p-dim">${num(s.raw.mealsDone)}/${num(s.raw.mealsTotal)} öğün</span></div>`).join("");
   return `${head}
     <div class="p-card" id="pNutriHist">${pSec("Su ve beslenme geçmişi", PC.gr)}
       <div class="p-mt-g">${tile("Kalori hedefte", `${calHit}/${eatenDays.length} gün`, "±%5 · öğünü işaretli günler")}${tile("Protein hedefte", `${proHit}/${past.length} gün`, "hedefin %95'i ve üstü")}${tile("Su hedefte", `${waterHit}/${past.length} gün`, "ort. " + fmtNum(avgWater) + " L")}</div></div>
-    <div class="p-card" id="pKcal">${pSec("Kalori", PC.gr, avgKcal != null ? `<span class="p-dim p-sm">ort. ${avgKcal.toLocaleString("tr-TR")}</span>` : "")}
+    <div class="p-card" id="pKcal">${pSec("Kalori", PC.gr, avgKcal != null ? `<span class="p-dim p-sm">ort. ${avgKcal.toLocaleString(locale())}</span>` : "")}
       ${pBars(kItems, { color: PC.gr, target: calT, id: "kc", fmt: v => fmtNum(v / 1000), label: `Son ${histRange} günün kalorisi` })}
-      ${pLegend([[`<i class="p-lg-sq" style="background:${PC.gr}"></i>`, "Yenen"], [`<i class="p-lg-tgt"></i>`, "Hedef " + calT.toLocaleString("tr-TR")], [`<i class="p-lg-hatch"></i>`, "Hedefin %5 üstü (↑)"], [`<i class="p-lg-plan"></i>`, "İşaretlenmemiş: plan (*)"]])}
+      ${pLegend([[`<i class="p-lg-sq" style="background:${PC.gr}"></i>`, "Yenen"], [`<i class="p-lg-tgt"></i>`, "Hedef " + calT.toLocaleString(locale())], [`<i class="p-lg-hatch"></i>`, "Hedefin %5 üstü (↑)"], [`<i class="p-lg-plan"></i>`, "İşaretlenmemiş: plan (*)"]])}
       ${histRange <= 7 ? `<p class="p-fine">Çubuklardaki sayılar bin kcal.</p>` : ""}</div>
     <div class="p-card" id="pWater">${pSec("Su", PC.wa, `<span class="p-dim p-sm">ort. ${fmtNum(avgWater)} L</span>`)}
       ${pBars(wItems, { color: PC.wa, target: waterT, id: "wa", fmt: v => fmtNum(v), label: `Son ${histRange} günün suyu (litre)` })}
@@ -6879,7 +6879,7 @@ function renderProfile() {
   // Günlük hedefler (hesaplanan)
   const t = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
-    ${[["Kalori", Math.round(t.calTarget).toLocaleString("tr-TR"), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
+    ${[["Kalori", Math.round(t.calTarget).toLocaleString(locale()), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
   </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
@@ -7982,15 +7982,15 @@ async function buildShareCanvas(log) {
   const aw = ctx.measureText("AYK").width;
   ctx.fillStyle = ACC; ctx.fillText("+", 212 + aw + 2, 130);
   ctx.fillStyle = "#A1A1AA"; ctx.font = `500 32px ${F}`; ctx.textAlign = "right";
-  ctx.fillText(log.ts ? new Date(log.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 130);
+  ctx.fillText(log.ts ? new Date(log.ts).toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 130);
   ctx.textAlign = "left";
 
   ctx.fillStyle = ACC; ctx.font = `700 32px ${F}`; ctx.fillText("Antrenman tamamlandı", 72, 286);
-  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, (log.dayName || "Antrenman").toLocaleUpperCase("tr-TR"), W - 144), 68, 372);
+  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, (log.dayName || "Antrenman").toLocaleUpperCase(locale()), W - 144), 68, 372);
 
   const stats = [];
   if (num(log.durationMin) > 0) stats.push(["Süre", fmtMinutes(num(log.durationMin)), "#FFFFFF"]);
-  stats.push(["Tonaj", Math.round(num(log.volume)).toLocaleString("tr-TR") + " kg", "#FFFFFF"]);
+  stats.push(["Tonaj", Math.round(num(log.volume)).toLocaleString(locale()) + " kg", "#FFFFFF"]);
   if (num(log.prs) > 0) stats.push(["Rekor", String(num(log.prs)), ACC]);
   if (num(log.cardioMin) > 0) stats.push(["Kardiyo", fmtNum(num(log.cardioMin)) + " dk" + (num(log.cardioKm) > 0 ? " · " + fmtNum(num(log.cardioKm)) + " km" : ""), "#FFFFFF"]);
   stats.push(["Set", String(num(log.sets)), "#FFFFFF"]);
@@ -8084,7 +8084,7 @@ function historySeries(n) {
   for (let i = n - 1; i >= 0; i--) {
     const dt = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i, 12);
     const key = todayStr(dt);
-    const label = dt.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+    const label = dt.toLocaleDateString(locale(), { day: "numeric", month: "short" });
     if (key === tKey) {
       const e = eatenTotals();
       out.push({ key, label, live: true, water: state.waterLiters || 0, kcal: Math.round(e.cal), p: Math.round(e.p), eaten: true, calT: tg.calTarget, proT: tg.proTarget });
@@ -8482,7 +8482,7 @@ function exRightText(ex) {
   ex.sets.forEach(s => { vol += num(s.kg) * num(s.reps); best = Math.max(best, e1rm(s.kg, s.reps)); });
   const lv = usesLevels(ex) ? levelsSummary(ex) : "";
   if (best <= 0 && vol <= 0) return lv ? "Kademe: " + lv : "";   // v32: kilo girilmeden "~0 kg" gösterme
-  return `Tahmini 1RM ~${Math.round(best)} kg · Tonaj ${Math.round(vol).toLocaleString("tr-TR")} kg${lv ? " · Kademe: " + lv : ""}`;
+  return `Tahmini 1RM ~${Math.round(best)} kg · Tonaj ${Math.round(vol).toLocaleString(locale())} kg${lv ? " · Kademe: " + lv : ""}`;
 }
 
 function gymProgramHtml() {
@@ -8679,7 +8679,7 @@ function gymHistoryHtml() {
       <div class="flex-1 min-w-0">
         <div class="text-xs t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date)}</div>
         <div class="text-[15px] font-semibold truncate">${esc(l.dayName)}</div>
-        <div class="text-xs t-muted mt-0.5">${num(l.sets)} set · ${num(l.volume).toLocaleString("tr-TR")} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + fmtNum(num(l.cardioMin)) + " dk kardiyo" : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${l.prs} rekor</span>` : ""}</div>
+        <div class="text-xs t-muted mt-0.5">${num(l.sets)} set · ${num(l.volume).toLocaleString(locale())} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + fmtNum(num(l.cardioMin)) + " dk kardiyo" : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${l.prs} rekor</span>` : ""}</div>
       </div>
       <button onclick="openShareCard(${i})" aria-label="Paylaş" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("share", 20)}</button>
       <button onclick="deleteWorkoutLog(${i})" aria-label="Kaydı sil" class="w-11 h-11 rounded-xl flex items-center justify-center t-dim">${svgI("trash", 19)}</button>
@@ -9151,7 +9151,7 @@ function dayLabelShort(k) {
   const y = logicalNow(); y.setDate(y.getDate() - 1);   // v25: gün geçiş saatine göre "dün"
   if (k === todayStr(y)) return "Dünkü";
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
-  return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }) + " günkü" : "Önceki";
+  return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(locale(), { day: "numeric", month: "short" }) + " günkü" : "Önceki";
 }
 function repeatLastMeal(mIdx) {
   const cur = dayMeals()[mIdx];
@@ -9163,7 +9163,7 @@ function repeatLastMeal(mIdx) {
   m.items = clone(r.items);
   openEditMeals.delete(m.id);
   renderAll();
-  offerUndo(`${shortMealTitle(m)}: ${dayLabelShort(r.key).toLocaleLowerCase("tr")} öğün tekrarlandı (yalnızca bugün)`);
+  offerUndo(`${shortMealTitle(m)}: ${dayLabelShort(r.key).toLocaleLowerCase(locale())} öğün tekrarlandı (yalnızca bugün)`);
 }
 
 // ---------------------------------------------------------------------------
@@ -9232,7 +9232,7 @@ function renderShopList() {
   $("shopItems").innerHTML = list.length ? list.map(r => {
     const cat = stripEmoji(r.f.cat || "Diğer");
     const on = !!state.shopChecked[r.id];
-    const head = cat !== lastCat ? `<div class="n-label pt-3 pb-1">${esc(cat.toLocaleUpperCase("tr"))}</div>` : "";
+    const head = cat !== lastCat ? `<div class="n-label pt-3 pb-1">${esc(cat.toLocaleUpperCase(locale()))}</div>` : "";
     lastCat = cat;
     return head + `<label class="flex items-center gap-3 min-h-[48px] py-1 cursor-pointer n-bb" data-shop="${esc(r.id)}">
         <input type="checkbox" class="n-check shrink-0" ${on ? "checked" : ""} onchange='toggleShop(${esc(JSON.stringify(r.id))})' aria-label="${esc(shopName(r.f))} alındı" />
@@ -9478,7 +9478,7 @@ function heatHtml(n) {
     const x = isToday ? null : logIntake(state.dailyLogs[k]);
     const cls = isToday ? "today" : x ? hitClass(x.k, x.t) : "none";
     const d = keyToDate(k);
-    const lbl = d.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+    const lbl = d.toLocaleDateString(locale(), { day: "numeric", month: "short" });
     const tip = isToday ? `${lbl}: bugün (devam ediyor)` : x ? `${lbl}: ${fmtInt(x.k)} / ${fmtInt(x.t)} kcal` : `${lbl}: kayıt yok`;
     const sym = { ok: "✓", near: "~", far: "!" }[cls] || "";   // v32: renk tek başına anlam taşımaz (İlerleme şeridiyle aynı dil)
     cells.push(`<span class="n-heat ${cls}" data-heat="${k}" data-cls="${cls}" role="img" aria-label="${esc(tip)}" title="${esc(tip)}">${d.getDate()}${sym ? `<i class="n-heat-sym" aria-hidden="true">${sym}</i>` : ""}</span>`);
@@ -10207,6 +10207,11 @@ function tn(n, key, vars) {
   if (curLang() === "en" && typeof EN !== "undefined" && EN[key] && typeof EN[key] === "object") s = n === 1 ? EN[key].one : EN[key].other;
   return trFill(s, { ...(vars || {}), n });
 }
+// v46: dile göre gösterim yardımcıları (veri anahtarları exKey/normSearch/mobNorm hep Türkçe kalır)
+function fmtDay(d, opts) { return new Date(d).toLocaleDateString(locale(), opts); }
+function dayShort() { return curLang() === "en" ? ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"] : ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"]; }
+function upperL(s) { return String(s).toLocaleUpperCase(locale()); }
+function lowerL(s) { return String(s).toLocaleLowerCase(locale()); }
 // v46: İngilizce sözlük (anahtar = Türkçe metin). Terimler docs/i18n-terimler.md'ye uyar.
 const EN = {};
 

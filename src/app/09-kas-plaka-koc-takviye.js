@@ -811,15 +811,15 @@ async function buildShareCanvas(log) {
   const aw = ctx.measureText("AYK").width;
   ctx.fillStyle = ACC; ctx.fillText("+", 212 + aw + 2, 130);
   ctx.fillStyle = "#A1A1AA"; ctx.font = `500 32px ${F}`; ctx.textAlign = "right";
-  ctx.fillText(log.ts ? new Date(log.ts).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 130);
+  ctx.fillText(log.ts ? new Date(log.ts).toLocaleDateString(locale(), { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 130);
   ctx.textAlign = "left";
 
   ctx.fillStyle = ACC; ctx.font = `700 32px ${F}`; ctx.fillText("Antrenman tamamlandı", 72, 286);
-  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, (log.dayName || "Antrenman").toLocaleUpperCase("tr-TR"), W - 144), 68, 372);
+  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, (log.dayName || "Antrenman").toLocaleUpperCase(locale()), W - 144), 68, 372);
 
   const stats = [];
   if (num(log.durationMin) > 0) stats.push(["Süre", fmtMinutes(num(log.durationMin)), "#FFFFFF"]);
-  stats.push(["Tonaj", Math.round(num(log.volume)).toLocaleString("tr-TR") + " kg", "#FFFFFF"]);
+  stats.push(["Tonaj", Math.round(num(log.volume)).toLocaleString(locale()) + " kg", "#FFFFFF"]);
   if (num(log.prs) > 0) stats.push(["Rekor", String(num(log.prs)), ACC]);
   if (num(log.cardioMin) > 0) stats.push(["Kardiyo", fmtNum(num(log.cardioMin)) + " dk" + (num(log.cardioKm) > 0 ? " · " + fmtNum(num(log.cardioKm)) + " km" : ""), "#FFFFFF"]);
   stats.push(["Set", String(num(log.sets)), "#FFFFFF"]);
@@ -913,7 +913,7 @@ function historySeries(n) {
   for (let i = n - 1; i >= 0; i--) {
     const dt = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i, 12);
     const key = todayStr(dt);
-    const label = dt.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+    const label = dt.toLocaleDateString(locale(), { day: "numeric", month: "short" });
     if (key === tKey) {
       const e = eatenTotals();
       out.push({ key, label, live: true, water: state.waterLiters || 0, kcal: Math.round(e.cal), p: Math.round(e.p), eaten: true, calT: tg.calTarget, proT: tg.proTarget });

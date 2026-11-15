@@ -49,9 +49,9 @@ function num(v, d = 0) {
 }
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function round1(n) { return Math.round(n * 10) / 10; }
-function fmtNum(n) { return String(round1(n)).replace(".", ","); }
+function fmtNum(n) { const s = String(round1(n)); return curLang() === "en" ? s : s.replace(".", ","); }
 function round2(n) { return Math.round(n * 100) / 100; }
-function fmtKg(n) { return String(round2(n)).replace(".", ","); }
+function fmtKg(n) { const s = String(round2(n)); return curLang() === "en" ? s : s.replace(".", ","); }
 function todayStr(d = new Date()) {
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 }
@@ -62,7 +62,7 @@ function logicalToday() { return todayStr(logicalNow()); }
 function fmtDate(ts, withTime = false) {
   const o = { day: "2-digit", month: "short" };
   if (withTime) { o.hour = "2-digit"; o.minute = "2-digit"; }
-  return new Date(ts).toLocaleDateString("tr-TR", o);
+  return new Date(ts).toLocaleDateString(locale(), o);
 }
 function fmtClock(sec) {
   sec = Math.max(0, Math.round(sec));

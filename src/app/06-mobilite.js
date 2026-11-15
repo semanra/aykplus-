@@ -12,7 +12,7 @@ function mobRoutine(rid) { return mobRoutines().find(r => r.id === rid) || null;
 function mobNewRoutineId() { return "mr_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function mobItems() { const r = mobRoutine(mobUI.rid) || mobRoutines()[0]; return r ? r.items : []; }
 function mobFind(id) { return mobItems().find(i => i.id === id) || null; }
-function mobUpper(t) { return String(t).toLocaleUpperCase("tr-TR"); }
+function mobUpper(t) { return String(t).toLocaleUpperCase(locale()); }
 function mobArg(id) { return esc(JSON.stringify(String(id))); }
 function mobNorm(t) { return String(t || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
 // v39: nasıl yapılır (MOB_GUIDE, data.js). Anahtar karşılaştırması büyük/küçük harf ve kesme işaretinden bağımsız.
@@ -131,7 +131,7 @@ function mobReset() {
   offerUndo("Tikler sıfırlandı");
 }
 // --- v39: ANA EKRAN (bu hafta, rutin kartları, bölgeler · son çalışma) ---
-const MOB_DAY_LABELS = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"];
+const MOB_DAY_LABELS = { map(f) { return dayShort().map(f); } };   // v46: dile göre (dayShort)
 function mobTodayKey() { return todayStr(logicalNow()); }
 function mobShiftKey(key, off) { const d = new Date(key + "T12:00:00"); d.setDate(d.getDate() + off); return todayStr(d); }
 function mobDaysAgo(key) { return Math.round((new Date(mobTodayKey() + "T12:00:00") - new Date(key + "T12:00:00")) / DAY_MS); }
@@ -548,7 +548,7 @@ function mobSay(text) {
     if (!ss || typeof SpeechSynthesisUtterance === "undefined") return;
     ss.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "tr-TR";
+    u.lang = locale();
     const v = (ss.getVoices() || []).find(x => /^tr/i.test(x.lang));
     if (v) u.voice = v;
     ss.speak(u);
@@ -700,7 +700,7 @@ function warmupCardHtml(day, inProg) {
   if (items.every(i => i.done)) return `<div id="gymWarmup" class="m-warm flex items-center gap-3 !py-2">
       <span class="text-[var(--d-lv)]">${svgI("check", 20, 2.6)}</span>
       <span class="flex-1 min-w-0 text-[15px] font-semibold">Isınma yapıldı <span class="font-normal text-[var(--t-muted)]">· ${items.length} hareket</span></span>${hide}</div>`;
-  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => MOB_REGION_LABEL[k].toLocaleLowerCase("tr-TR"));
+  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => MOB_REGION_LABEL[k].toLocaleLowerCase(locale()));
   const min = Math.max(1, Math.round(items.reduce((a, it) => a + mobItemSec(it), 0) / 60));
   return `<div id="gymWarmup" class="m-warm">
     <div class="flex items-start justify-between gap-2">

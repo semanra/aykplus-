@@ -103,7 +103,7 @@ window.addEventListener("focus", onSystemTheme);
 window.addEventListener("pageshow", onSystemTheme);
 
 // Tam sayıyı Türkçe binlik ayırıcıyla yazar: 2478 → "2.478"
-function fmtInt(n) { return Math.round(num(n, 0)).toLocaleString("tr-TR"); }
+function fmtInt(n) { return Math.round(num(n, 0)).toLocaleString(locale()); }
 // Etiketten girilen kalori (f.kcal) varsa o kullanılır; yoksa 4P + 4K + 9Y
 function kcalPerUnit(f) {
   if (!f) return 0;

@@ -21,3 +21,8 @@ function tn(n, key, vars) {
   if (curLang() === "en" && typeof EN !== "undefined" && EN[key] && typeof EN[key] === "object") s = n === 1 ? EN[key].one : EN[key].other;
   return trFill(s, { ...(vars || {}), n });
 }
+// v46: dile göre gösterim yardımcıları (veri anahtarları exKey/normSearch/mobNorm hep Türkçe kalır)
+function fmtDay(d, opts) { return new Date(d).toLocaleDateString(locale(), opts); }
+function dayShort() { return curLang() === "en" ? ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"] : ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"]; }
+function upperL(s) { return String(s).toLocaleUpperCase(locale()); }
+function lowerL(s) { return String(s).toLocaleLowerCase(locale()); }

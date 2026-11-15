@@ -378,7 +378,7 @@ function exRightText(ex) {
   ex.sets.forEach(s => { vol += num(s.kg) * num(s.reps); best = Math.max(best, e1rm(s.kg, s.reps)); });
   const lv = usesLevels(ex) ? levelsSummary(ex) : "";
   if (best <= 0 && vol <= 0) return lv ? "Kademe: " + lv : "";   // v32: kilo girilmeden "~0 kg" gösterme
-  return `Tahmini 1RM ~${Math.round(best)} kg · Tonaj ${Math.round(vol).toLocaleString("tr-TR")} kg${lv ? " · Kademe: " + lv : ""}`;
+  return `Tahmini 1RM ~${Math.round(best)} kg · Tonaj ${Math.round(vol).toLocaleString(locale())} kg${lv ? " · Kademe: " + lv : ""}`;
 }
 
 function gymProgramHtml() {
@@ -575,7 +575,7 @@ function gymHistoryHtml() {
       <div class="flex-1 min-w-0">
         <div class="text-xs t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date)}</div>
         <div class="text-[15px] font-semibold truncate">${esc(l.dayName)}</div>
-        <div class="text-xs t-muted mt-0.5">${num(l.sets)} set · ${num(l.volume).toLocaleString("tr-TR")} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + fmtNum(num(l.cardioMin)) + " dk kardiyo" : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${l.prs} rekor</span>` : ""}</div>
+        <div class="text-xs t-muted mt-0.5">${num(l.sets)} set · ${num(l.volume).toLocaleString(locale())} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + fmtNum(num(l.cardioMin)) + " dk kardiyo" : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${l.prs} rekor</span>` : ""}</div>
       </div>
       <button onclick="openShareCard(${i})" aria-label="Paylaş" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("share", 20)}</button>
       <button onclick="deleteWorkoutLog(${i})" aria-label="Kaydı sil" class="w-11 h-11 rounded-xl flex items-center justify-center t-dim">${svgI("trash", 19)}</button>
