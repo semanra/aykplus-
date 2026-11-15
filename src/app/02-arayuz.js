@@ -398,6 +398,7 @@ function applyCustomIcon() {
     if (src) { if (img.getAttribute("src") !== src) img.setAttribute("src", src); }
     else img.removeAttribute("src");
     img.classList.toggle("hidden", !src);
+    if (imgId === "pfAvatar") img.setAttribute("alt", t("Profil fotoğrafı"));
     ico.classList.toggle("hidden", !!src);
   });
   if ($("pfPhotoRemove")) {

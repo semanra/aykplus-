@@ -6,11 +6,11 @@ Object.assign(EN, {
   // bildirimler
   "Hata: {m}": "Error: {m}", "bilinmeyen": "unknown",
   // dinlenme sayacı
-  "Dinlenme": "Rest", "Dinlenme • {ad}": "Rest • {ad}", "{ad} bitti!": "{ad} over", "BİTTİ!": "DONE",
+  "Dinlenme": "Rest", "Dinlenme • {ad}": "Rest • {ad}", "{ad} bitti!": "{ad}: done", "BİTTİ!": "DONE",
   // gün dönümü
-  "Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.": "New day started. Water, supplements, meals and mobility check-offs were reset.",
+  "Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.": "New day started. Water, supplement, meal and mobility ticks have been reset.",
   "Yeni güne geçilsin mi?": "Start a new day?",
-  "Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir.": "Water, supplements, meals and mobility check-offs will be reset. Today's summary is saved in Nutrition → History.",
+  "Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir.": "Water, supplement, meal and mobility ticks will be reset. Today's summary is saved in Nutrition → History.",
   "Yeni güne geç": "Start new day",
   // tema düğmesi, profil fotoğrafı
   "Koyu temaya geç": "Switch to dark theme", "Aydınlık temaya geç": "Switch to light theme",

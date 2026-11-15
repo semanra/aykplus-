@@ -51,7 +51,7 @@ try:
     check(one.startswith("Your last backup was 1 day ago") and "2 days ago" in two, "en: tn tekil/çoğul")
     pg.evaluate("void manualNewDay()"); pg.wait_for_selector("#uiDialog:not(.hidden)")
     d = pg.evaluate("() => [$('uiDlgTitle').textContent, $('uiDlgMsg').textContent, $('uiDlgOk').textContent, $('uiDlgCancel').textContent]")
-    check(d == ["Start a new day?", "Water, supplements, meals and mobility check-offs will be reset. Today's summary is saved in Nutrition → History.", "Start new day", "Cancel"], "en: gün dönümü uiAsk penceresi: %s" % d)
+    check(d == ["Start a new day?", "Water, supplement, meal and mobility ticks will be reset. Today's summary is saved in Nutrition → History.", "Start new day", "Cancel"], "en: gün dönümü uiAsk penceresi: %s" % d)
     check(not any(TR_CH.search(x) for x in d), "en: pencere Türkçe harf içermez")
     pg.click("#uiDlgCancel")
     pg.evaluate("void uiAlert(t('Fotoğraf yüklenemedi'), t('Bu fotoğraf açılamadı. Başka bir fotoğraf seçmeyi dene.'))"); pg.wait_for_selector("#uiDialog:not(.hidden)")
@@ -65,7 +65,7 @@ try:
     check(pg.evaluate("[timerLabelText('Dinlenme'), timerLabelText('Dinlenme • Squat'), timerLabelText('Plank')]") == ["Rest", "Rest • Squat", "Plank"], "en: sayaç etiketi, hareket adı dokunulmaz")
     pg.evaluate("startTimer(1, 'Dinlenme • Squat')"); pg.wait_for_timeout(1600)
     tt = pg.evaluate("[$('restPillTime').textContent, $('toastWrap').textContent]")
-    check(tt[0] == "DONE" and "Rest • Squat over" in tt[1], "en: sayaç bitişi ve bildirim: %s" % tt)
+    check(tt[0] == "DONE" and "Rest • Squat: done" in tt[1], "en: sayaç bitişi ve bildirim: %s" % tt)
     check(pg.evaluate("JSON.parse(localStorage.getItem('ayk_timer') || 'null')") is None, "sayaç kaydı bitince silinir")
     pg.evaluate("toast(t('Veriler kaydedilemedi! Hemen yedek al.'), 'error')")
     tx = pg.evaluate("$('toastWrap').lastElementChild.textContent")
@@ -248,7 +248,7 @@ try:
     check("Choose time" in pg.evaluate("$('suppList').innerHTML") and "Pre-workout" in pg.evaluate("$('suppList').innerHTML"), "en: zaman seçici seçenekleri")
     pg.evaluate("() => { state.supplementList = []; addPresetSupp('magnesium'); addPresetSupp('whey'); addPresetSupp('creatine'); }")
     pl = pg.evaluate("state.supplementList.map(s => [s.name, s.unit, s.note || '', s.dose])")
-    check(pl == [["Magnesium", "mg", "1 hour before sleep", 200], ["Whey protein", "scoop", "Post-workout", 1], ["Creatine monohydrate", "g", "With plenty of water", 5]], "en: hazır takviye eklenirken o anki dilde yazılır: %s" % pl)
+    check(pl == [["Magnesium", "mg", "1 hour before bed", 200], ["Whey protein", "scoop", "Post-workout", 1], ["Creatine monohydrate", "g", "With plenty of water", 5]], "en: hazır takviye eklenirken o anki dilde yazılır: %s" % pl)
     check(pg.evaluate("[normSearch('Magnesium'), normSearch('Whey protein')].map((n, i) => SUPP_PRESETS[i === 0 ? 4 : 3].m.test(n))") == [True, True], "en: İngilizce ad hazır takviye düzenli ifadesine uyar")
     pg.evaluate("() => { state.supplementList = []; suppEdit = false; renderAll(); }")
     check("Your supplement list is empty" in pg.evaluate("$('suppList').textContent"), "en: boş takviye listesi")
@@ -307,7 +307,7 @@ try:
     pg.evaluate("closeModal('freeMealModal')")
     mod_free("en: tarif penceresi", modal("openRecipeModal()", "recipeModal", "(() => { rcp.items.push({ foodId: window.__fid, amount: 100 }); renderRecipe(); $('rcCooked').value = '150'; updateRecipeSummary(); })()"), ("New recipe", "Recipe name", "INGREDIENTS (RAW)", "Whole recipe", "Cooked, per 100 g"))
     pg.evaluate("closeModal('recipeModal')")
-    mod_free("en: alışveriş penceresi", modal("openShopList()", "shopModal"), ("Weekly shopping list", "Copy to Notes", "Clear checkmarks", "Share", "Training day"))
+    mod_free("en: alışveriş penceresi", modal("openShopList()", "shopModal"), ("Weekly shopping list", "Copy to Notes", "Clear checkmarks", "Share", "Training days"))
     pg.evaluate("closeModal('shopModal')")
     mod_free("en: öğün penceresi", modal("openMealModal()", "mealModal"), ("Meal name", "Time (optional)", "Short note", "Meal "))
     pg.evaluate("closeModal('mealModal')")
@@ -367,6 +367,8 @@ try:
     check("Last weigh-in" in wb and "2 entries" in wb and "· 18.5% body fat" in wb and "Start" in wb and "to gain" in wb, "en: tartı kutusu: " + wb)
     tb = re.sub(r"\s+", " ", pg.evaluate("$('pfTargetsBox').textContent"))
     check("Calories" in tb and "Carbs" in tb and "Fat" in tb and "Today's targets are based on" in tb, "en: hedef kutusu: " + tb[:80])
+    cal_ = pg.evaluate("[getTargets().calTarget, $('pfTargetsBox').querySelector('.t-display').textContent]")
+    check(cal_[0] >= 1000 and cal_[1] == "{:,}".format(round(cal_[0])), "en: Profil kalori hedefi >= 1000 biçimli sayı gösterir, '—' değil: %s" % cal_)
     mb_ = pg.evaluate("$('pfMeasureBox').textContent").strip()
     check(mb_.startswith("No measurements yet.") and "+ Add measurement" in mb_, "en: ölçü boş durumu")
     lb = pg.evaluate("$('lastBackupText').textContent")
@@ -408,7 +410,7 @@ try:
     pg.evaluate("void resetToDefaults()"); d = dlg()
     check(d == ["Erase all data", "All your data will be erased and the app will go back to its default settings. Continue?", "Continue", "Cancel"], "en: tüm veriyi sil (1. onay): %s" % d)
     pg.click("#uiDlgOk"); pg.wait_for_timeout(150); d = dlg()
-    check(d == ["Final confirmation", "This can't be undone. We recommend making a backup first. Erase everything?", "Erase", "Cancel"], "en: tüm veriyi sil (son onay): %s" % d)
+    check(d == ["Final confirmation", "This can't be undone. Back up your data first. Erase everything?", "Erase", "Cancel"], "en: tüm veriyi sil (son onay): %s" % d)
     pg.click("#uiDlgCancel")
     pg.evaluate("$('pfWeight').value = '5'; profileLogWeight()"); d = dlg()
     check(d[:3] == ["Invalid weight", "Enter a weight between 30 and 300 kg (e.g. 98.4).", "OK"], "en: geçersiz kilo uyarısı: %s" % d)
@@ -467,7 +469,7 @@ try:
         const vs = typeof e === 'string' ? [e] : [e.one, e.other]; const base = k.split('|')[0];
         vs.forEach(v => { if (typeof v !== 'string') { out.missing.push(k); return; }
           if (ph(base) !== ph(v)) out.ph.push(k); if (tg(base) !== tg(v)) out.tag.push(k);
-          if (/[<>&]/.test(v.replace(/<[^>]*>/g, '')) && !/^(Workout & daytime|Evening & bedtime|How we calculate & sources)$/.test(v)) out.stray.push(k); }); });
+          if (/[<>&]/.test(v.replace(/<[^>]*>/g, '')) && !/^(Workout & daytime|Evening & bedtime|How we calculate & sources|VITAMINS & PERFORMANCE)$/.test(v)) out.stray.push(k); }); });
       const dyn = [...SUPP_TIMES.map(x => x[1]), ...SUPP_GROUPS.map(x => x[0]), ...SUPP_PRESETS.flatMap(p => [p.name, p.unit, p.note].filter(Boolean))];
       dyn.push(...MEASURES.map(m => m[1]), ...Object.values(SNAP_KIND_LABEL), 'Yedek', 'Kalori', 'Protein', 'Karb', 'Yağ');
       dyn.forEach(k => { if (EN[k] === undefined && !['g', 'mg'].includes(k)) out.missing.push(k); });
@@ -498,6 +500,12 @@ try:
     pg.evaluate("void setSuppTime(%d, 'custom')" % idx); pg.wait_for_selector("#uiDialog:not(.hidden)")
     pg.fill("#uiDlgInput", ""); pg.click("#uiDlgOk"); pg.wait_for_timeout(60)
     check(pg.evaluate("state.supplementList.find(x => x.id === 'sup_t47').timeLabel") == "Custom", "en: boş özel zaman etiketi kayda 'Custom'")
+    cp = pg.evaluate("""() => { state.settings.separatePlans = false; const n = curMeals().length, t0 = curMeals()[0].title; copyMeal(0); const r = { title: curMeals()[1].title, toast: document.querySelector('.toast-wrap').textContent }; deleteMeal(1); r.del = document.querySelector('.toast-wrap').textContent; r.n = curMeals().length === n; r.t0 = t0; return r; }""")
+    check(cp["title"] == cp["t0"] + " (copy)" and "Meal duplicated" in cp["toast"] and "deleted" in cp["del"] and cp["n"], "en: öğün kopyala/sil bildirimleri ve kopya adı İngilizce: %s" % cp)
+    pg.evaluate("setLang('tr')"); pg.wait_for_timeout(100)
+    cp = pg.evaluate("""() => { const t0 = curMeals()[0].title; copyMeal(0); const r = { title: curMeals()[1].title, t0 }; deleteMeal(1); return r; }""")
+    check(cp["title"] == cp["t0"] + " (kopya)", "tr: kopya öğün adı tam ' (kopya)': %s" % cp)
+    pg.evaluate("setLang('en')"); pg.wait_for_timeout(100)
     check(pg.evaluate("[...state.meals, ...state.restMeals].every(m => m.balanced == null || typeof m.balanced === 'number')"), "en: m.balanced sayı kalır (metin kaydedilmez)")
     # --- 4b. M7: düğüm listeleri önbellekte; yeniden tarama yalnız setLang / bayat önbellek; Türkçe değişmediyse hiç çalışmaz
     pg.evaluate("setLang('tr')"); pg.wait_for_timeout(60)
@@ -549,7 +557,7 @@ try:
     # kısmen kapsamdaki dosyalar: yalnız bu işlevlerin gövdeleri taranır (kalanı v48: Antrenman/Mobilite/İlerleme)
     KISMI = {
       "05-secici-hareket.js": ["openPicker", "pickerChoose", "pickerExtra"],
-      "09-kas-plaka-koc-takviye.js": ["renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose"],
+      "09-kas-plaka-koc-takviye.js": ["renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose", "deleteMeal", "copyMeal", "otherMeals"],
       "10-antrenman-arayuzu.js": ["openMealModal", "saveMealModal", "editCustomFood", "deleteCustomFood"]}
     bad = []; used = {}
     for f, tbl in IZIN.items():

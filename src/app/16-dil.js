@@ -6,6 +6,8 @@ function curLang() {
   try { return state && state.settings && state.settings.lang === "en" && langAvailable() ? "en" : "tr"; } catch (e) { return "tr"; }
 }
 function locale() { return curLang() === "en" ? "en-GB" : "tr-TR"; }
+// v47: kayıtlı tarih etiketi kullanıcı verisidir ve çevrilmez; yalnızca sistemin yazdığı "Başlangıç" çevrilir (kayıtlı-metinler kural 1)
+function logDateLabel(d) { return d === "Başlangıç" ? t("Başlangıç") : d; }
 function trFill(str, vars) {
   if (!vars) return str;
   return str.replace(/\{(\w+)\}/g, (m, k) => (Object.prototype.hasOwnProperty.call(vars, k) ? (typeof vars[k] === "number" ? fmtNum(vars[k]) : String(vars[k])) : m));
@@ -66,6 +68,6 @@ function setLang(l) {
   i18nTouched = true;
   try { if (typeof uiDlg !== "undefined" && uiDlg) uiDialogDone(false); } catch (e) { /* yoksay */ }
   applyStaticI18n(null, true);
-  try { if (typeof profileIsOpen === "function" && profileIsOpen()) fillProfileFields(); } catch (e) { /* yoksay */ }   // v47: kutulardaki sayılar (80,5 / 80.5) yeni dile göre
+  try { if (typeof profileIsOpen === "function" && profileIsOpen()) { fillProfileFields(); updateWaterAutoHint(); updateBfHint(); if ($("pfSnaps").closest("details").open) renderSnapList(); } } catch (e) { /* yoksay */ }   // v47: kutulardaki sayılar (80,5 / 80.5) yeni dile göre
   renderAll();   // Profil açıksa renderAll içinde yeniden çizilir
 }

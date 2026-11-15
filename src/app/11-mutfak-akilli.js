@@ -176,7 +176,7 @@ function rcAddIngredient() {
     if (id === rcp.id) return;
     const f = db[id];
     if (isHiddenFood(f)) return;
-    const cat = stripEmoji(f.cat || "Diğer");
+    const cat = t(stripEmoji(f.cat || "Diğer"));
     (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: t("{n} {u} · {k} kcal", { n: fmtNum(f.def), u: unitL(f.def, f.unit), k: String(Math.round(kcalPerUnit(f) * num(f.def, 1))) }) });
   });
   const groups = Object.keys(cats).map(c => ({ label: c, short: c.replace(/\s*[&/].*$/, ""), items: cats[c] }));
@@ -301,7 +301,7 @@ function renderShopList() {
   const list = shopList();
   const nT = shopTrainDays();
   $("shopDays").innerHTML = `<div class="flex items-center justify-between gap-2">
-      <div class="min-w-0"><div class="text-[14px] font-bold">${t("Antrenman günü")}</div><div class="text-[12px] n-muted">${tn(7 - nT, "Haftanın kalan {n} günü dinlenme menüsü")}</div></div>
+      <div class="min-w-0"><div class="text-[14px] font-bold">${t("Antrenman günü|alışveriş")}</div><div class="text-[12px] n-muted">${tn(7 - nT, "Haftanın kalan {n} günü dinlenme menüsü")}</div></div>
       <div class="flex items-center gap-1 shrink-0">
         <button onclick="setShopDays(-1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="${esc(t("Antrenman gününü azalt"))}">${svgI("minus", 18, 2.4)}</button>
         <span id="shopDaysVal" class="t-display text-[24px] w-8 text-center tabular-nums">${nT}</span>

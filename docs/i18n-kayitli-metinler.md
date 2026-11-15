@@ -44,6 +44,7 @@ Tablo kısaltması: **K** = kayıt (state/yedek/ayna içine yazılıyor), **C** 
 |---|---|---|---|
 | src/app/05-secici-hareket.js:390 | `` `${n}. GÜN: ` `` (yeni antrenman günü ad kutusu varsayılanı; kullanıcı yazıp Ekle der → `state.workoutDays[].name`) | K | dile göre üret ("DAY n: ") |
 | src/app/10-antrenman-arayuzu.js:657 | `` `${n}. Öğün: ` `` (yeni öğün ad kutusu varsayılanı → `meal.title`) | K | dile göre üret ("Meal n: ") |
+| src/app/09-kas-plaka-koc-takviye.js `copyMeal` | `src.title + " (kopya)"` (öğün kopyalanınca yeni öğün başlığı) | K | dile göre üret (" (copy)"); Türkçede tam " (kopya)" (v47 yapıldı) |
 | src/app/06-mobilite.js:99 | `r.name + " (kopya)"` (rutin kopyalanınca yeni rutin adı) | K | dile göre üret (" (copy)") |
 | src/app/04-besinler-barkod.js:539, 711, 712 | `name: "⭐ " + ad`, `cat: "⭐ Özel Eklediklerim"` (özel besin / barkodlu ürün; `state.customFoods`, ayrıca `foodSnap`) | K + C (cat anahtar: `foodCatKey`) | `name` ön eki ⭐ emojidir, dokunma. **`cat` kayıtta Türkçe kalır**; gösterirken `t(stripEmoji(f.cat))` (04:155, 11:179, 11:309) |
 | src/app/11-mutfak-akilli.js:201 | `name: "🍲 " + ad`, `cat: "🍲 Tariflerim"` (tarif; `state.customFoods["custom_recipe_<id>"]`) | K + C | `cat` aynı şekilde; `🍲` ön eki dokunma |

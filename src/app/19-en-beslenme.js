@@ -33,8 +33,12 @@ Object.assign(EN, {
   "Kilo girilmemiş; Profil'deki hedef kullanılıyor.": "No weight entered; using the target from Profile.",
   "Hedef Profil'de elle ayarlı.": "Target is set manually in Profile.",
   "Takviye rutini": "Supplements", "Takviye Rutini": "Supplements",
-  "MİKRO & ERGOJENİK": "MICRONUTRIENTS AND ERGOGENICS",
-  "Yeni gün": "New day",
+  "MİKRO & ERGOJENİK": "VITAMINS & PERFORMANCE",
+  "Yeni gün": "Start new day",
+  "Antrenman günü|alışveriş": "Training days",
+  "\"{ad}\" silindi": "\"{ad}\" deleted", "⧉ \"{ad}\" dinlenme günü menüsüne kopyalandı": "⧉ \"{ad}\" copied to your rest-day plan",
+  "⧉ \"{ad}\" antrenman günü menüsüne kopyalandı": "⧉ \"{ad}\" copied to your training-day plan", "⧉ Öğün kopyalandı": "⧉ Meal duplicated", " (kopya)": " (copy)",
+  "Özel Eklediklerim": "Your custom foods",
 
   // --- Bugün: öğün zaman çizelgesi
   "BUGÜNÜN ÖĞÜNLERİ": "TODAY'S MEALS",
@@ -221,7 +225,7 @@ Object.assign(EN, {
 
   // --- Geçmiş
   "· devam ediyor": "· in progress", "yenen": "eaten", "planlanan": "planned",
-  "Her gün gece yarısı (ya da \"Yeni gün\" ile) günün özeti buraya eklenir.": "A summary of each day is added here at midnight (or when you tap \"New day\").",
+  "Her gün gece yarısı (ya da \"Yeni gün\" ile) günün özeti buraya eklenir.": "A summary of each day is added here at midnight (or when you tap \"Start new day\").",
   "Grafikler için İlerleme sekmesine git": "See charts in Progress",
   "Haftalık görünüm": "Weekly overview", "SON 7 GÜN": "LAST 7 DAYS",
   "{n} gün kayıt": { one: "{n} day logged", other: "{n} days logged" },
@@ -310,7 +314,7 @@ Object.assign(EN, {
 
   // --- Dışarıda yedim penceresi
   "Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.": "Enter your estimated values. This entry only affects today; your plan stays the same.",
-  "Ne yedin? (isteğe bağlı)": "What did you eat? (optional)", "örn: Döner dürüm + ayran": "e.g. Chicken wrap + ayran",
+  "Ne yedin? (isteğe bağlı)": "What did you eat? (optional)", "örn: Döner dürüm + ayran": "e.g. Chicken wrap and a drink",
   "Kalori (kcal)": "Calories (kcal)", "Protein (g)": "Protein (g)",
   "Karb (g) · isteğe bağlı": "Carbs (g) · optional", "Yağ (g) · isteğe bağlı": "Fat (g) · optional",
   "örn: 850": "e.g. 850", "örn: 40": "e.g. 40",
@@ -354,7 +358,7 @@ Object.assign(EN, {
   "İşaretler temizlendi": "Checkmarks cleared",
   "Haftanın kalan {n} günü dinlenme menüsü": { one: "Rest-day plan for the remaining {n} day of the week", other: "Rest-day plan for the remaining {n} days of the week" },
   "Antrenman gününü azalt": "Decrease training days", "Antrenman gününü artır": "Increase training days",
-  "{ad} alındı": "{ad} bought",
+  "{ad} alındı": "Mark {ad} as bought",
   "Menülerinde besin yok.": "There are no foods in your plans.",
   "{left} / {n} ürün alınacak": { one: "{left} / {n} item left to buy", other: "{left} / {n} items left to buy" },
   "AYK+ alışveriş listesi (7 gün: {a} antrenman, {b} dinlenme)": "AYK+ shopping list (7 days: {a} training, {b} rest)",
@@ -399,8 +403,8 @@ Object.assign(EN, {
   // hazır takviyeler: eklenirken kullanıcı verisine o anki dilde yazılır
   "Vitamin D3 + K2": "Vitamin D3 + K2", "Omega-3": "Omega-3", "Kreatin Monohidrat": "Creatine monohydrate", "Whey Protein": "Whey protein",
   "Magnezyum": "Magnesium", "Çinko": "Zinc",
-  "damla/kapsül": "drop/capsule", "softjel": "softgel",
-  "Tok karnına": "With food", "Bol su ile": "With plenty of water", "Uykudan 1 saat önce": "1 hour before sleep", "Akşam": "Evening",
+  "damla/kapsül": "drop/capsule", "softjel": { one: "softgel", other: "softgels" },
+  "Tok karnına": "With food", "Bol su ile": "With plenty of water", "Uykudan 1 saat önce": "1 hour before bed", "Akşam": "Evening",
 
   // --- Öğün penceresi
   "Öğünü Düzenle": "Edit meal",

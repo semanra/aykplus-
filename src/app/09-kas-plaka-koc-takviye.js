@@ -537,18 +537,18 @@ function deleteMeal(mIdx) {
   const ttl = meals[mIdx].title;
   meals.splice(mIdx, 1);
   renderAll();
-  offerUndo(`"${ttl}" silindi`);
+  offerUndo(t("\"{ad}\" silindi", { ad: ttl }));
 }
 function copyMeal(mIdx) {
   const src = curMeals()[mIdx];
   const copy = { ...clone(src), id: "meal_" + Date.now(), done: false };
   if (state.settings.separatePlans) {
     otherMeals().push(copy);
-    toast(`⧉ "${src.title}" ${curMeals() === state.meals ? "dinlenme" : "antrenman"} günü menüsüne kopyalandı`);
+    toast(curMeals() === state.meals ? t("⧉ \"{ad}\" dinlenme günü menüsüne kopyalandı", { ad: src.title }) : t("⧉ \"{ad}\" antrenman günü menüsüne kopyalandı", { ad: src.title }));
   } else {
-    copy.title = src.title + " (kopya)";
+    copy.title = src.title + t(" (kopya)");   // v47: kayıtlı varsayılan, yeni kayıt için o anki dilde
     curMeals().splice(mIdx + 1, 0, copy);
-    toast("⧉ Öğün kopyalandı");
+    toast(t("⧉ Öğün kopyalandı"));
   }
   renderAll();
 }
@@ -675,7 +675,7 @@ function addPresetSupp(key) {
   const { m, key: k, ...rest } = p;
   // v47: eklenen takviye kullanıcı verisi olur; o anki dilin adı/birimi/notu yazılır (docs/i18n-kayitli-metinler.md)
   const own = clone(rest);
-  own.name = t(own.name); own.unit = tn(1, own.unit); if (own.note) own.note = t(own.note);
+  own.name = t(own.name); own.unit = tn(own.dose || 1, own.unit); if (own.note) own.note = t(own.note);
   state.supplementList.push({ id: "sup_" + k + "_" + Date.now(), preset: k, ...own });
   renderAll();
 }

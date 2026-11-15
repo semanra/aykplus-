@@ -1287,7 +1287,7 @@
           <div class="t-card rounded-[22px] p-4 grid grid-cols-2 gap-2.5">
             <div class="col-span-2 flex items-center gap-4 pb-1">
               <div class="w-20 h-20 shrink-0 rounded-full bg-[var(--t-elev)] border border-[var(--t-line)] overflow-hidden flex items-center justify-center text-[var(--t-dim)]">
-                <img id="pfAvatar" alt="Profil fotoğrafı" data-t-aria="Profil fotoğrafı" class="hidden w-full h-full object-cover" />
+                <img id="pfAvatar" alt="Profil fotoğrafı" class="hidden w-full h-full object-cover" />
                 <svg id="pfAvatarIcon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>
               </div>
               <div class="flex-1 min-w-0 space-y-2">
@@ -3423,6 +3423,7 @@ function applyCustomIcon() {
     if (src) { if (img.getAttribute("src") !== src) img.setAttribute("src", src); }
     else img.removeAttribute("src");
     img.classList.toggle("hidden", !src);
+    if (imgId === "pfAvatar") img.setAttribute("alt", t("Profil fotoğrafı"));
     ico.classList.toggle("hidden", !!src);
   });
   if ($("pfPhotoRemove")) {
@@ -3774,7 +3775,7 @@ function renderWeightBlock(st) {
   $("gainBox").classList.toggle("hidden", goal !== "gain");
   $("goalVal").textContent = (tg.goalDelta < 0 ? "−" : tg.goalDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.goalDelta));
   $("weightHistoryText").textContent = state.weightLogs.length > 0
-    ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.ts ? fmtDate(l.ts) : t(l.date)})`).join(" → ")
+    ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.ts ? fmtDate(l.ts) : logDateLabel(l.date)})`).join(" → ")
     : t("Hedef: {w} kg", { w: fmtNum(num(st.targetWeight, 82)) });
   const wa7 = weightAvg7();
   $("weightAvgText").textContent = wa7 ? tn(wa7.n, "7 günlük ortalama: {avg} kg ({n} tartı)", { avg: fmtNum(wa7.avg) }) : "";
@@ -4535,7 +4536,7 @@ function renderFoodList() {
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3.5 my-2" data-food="${esc(id)}" id="foodSelCard">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(f.name)}</h3>
-            <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
+            <div class="text-[12px] n-muted mt-0.5">${esc(t(stripEmoji(f.cat || "")))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
             ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
             ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">Kalori USDA ölçümüdür (${esc(f.kx)} nedeniyle makrolardan hesaplanandan farklı).</div>` : ""}</div>
@@ -6890,7 +6891,6 @@ function renderProfile() {
   const lr = $("pfLang"); if (lr) lr.classList.toggle("hidden", !langAvailable());   // v46
   document.querySelectorAll("[data-lang-opt]").forEach(b => { const on = b.dataset.langOpt === curLang(); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
-  if (profileIsOpen()) { updateWaterAutoHint(); updateBfHint(); if ($("pfSnaps").closest("details").open) renderSnapList(); }   // v47: dil değişince ipuçları da yenilenir
   // Kilo kayıtları
   const wl = state.weightLogs.filter(l => num(l.weight) > 0);
   const lastW = wl[wl.length - 1], firstW = wl[0];
@@ -6900,11 +6900,11 @@ function renderProfile() {
   if (wl.length) {
     const d = round1(num(lastW.weight) - num(firstW.weight));
     wh += `<div class="grid grid-cols-3 gap-2">
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Son tartı")}</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : t(lastW.date || ""))}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Son tartı")}</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : logDateLabel(lastW.date || ""))}</div></div>
       <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Değişim")}</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${tn(wl.length, "{n} kayıt")}</div></div>
       <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Hedefe")}</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${!tW ? t("hedef yok") : left > 0 ? t("verilecek") : left < 0 ? t("alınacak") : t("hedeftesin")}</div></div>
     </div>`;
-    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : t(l.date || ""))}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">${t("· %{p} yağ", { p: fmtNum(validBf(l.bf)) })}</span>` : ""}</span></div>`).join("");
+    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : logDateLabel(l.date || ""))}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">${t("· %{p} yağ", { p: fmtNum(validBf(l.bf)) })}</span>` : ""}</span></div>`).join("");
     wh += `<div class="mt-2">${rows}</div>`;
   } else {
     wh = `<p class="text-[13px] t-dim">${t("Henüz tartı kaydın yok. Kilonu yazıp \"Tartıyı kaydet\"e dokun; ilerlemen İlerleme sekmesinde grafiğe dönüşür.")}</p>`;
@@ -6913,7 +6913,7 @@ function renderProfile() {
   // Günlük hedefler (hesaplanan)
   const tg = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
-    ${[["Kalori", Math.round(tg.calTarget).toLocaleString(locale()), "kcal"], ["Protein", Math.round(tg.proTarget), "g"], ["Karb", Math.round(tg.carbTarget), "g"], ["Yağ", Math.round(tg.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${t(l)}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
+    ${[["Kalori", Math.round(tg.calTarget), "kcal", true], ["Protein", Math.round(tg.proTarget), "g"], ["Karb", Math.round(tg.carbTarget), "g"], ["Yağ", Math.round(tg.fatTarget), "g"]].map(([l, v, u, loc]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${t(l)}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? (loc ? v.toLocaleString(locale()) : v) : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
   </div><p class="text-[12px] t-dim mt-2">${t("Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.")}</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
@@ -7742,18 +7742,18 @@ function deleteMeal(mIdx) {
   const ttl = meals[mIdx].title;
   meals.splice(mIdx, 1);
   renderAll();
-  offerUndo(`"${ttl}" silindi`);
+  offerUndo(t("\"{ad}\" silindi", { ad: ttl }));
 }
 function copyMeal(mIdx) {
   const src = curMeals()[mIdx];
   const copy = { ...clone(src), id: "meal_" + Date.now(), done: false };
   if (state.settings.separatePlans) {
     otherMeals().push(copy);
-    toast(`⧉ "${src.title}" ${curMeals() === state.meals ? "dinlenme" : "antrenman"} günü menüsüne kopyalandı`);
+    toast(curMeals() === state.meals ? t("⧉ \"{ad}\" dinlenme günü menüsüne kopyalandı", { ad: src.title }) : t("⧉ \"{ad}\" antrenman günü menüsüne kopyalandı", { ad: src.title }));
   } else {
-    copy.title = src.title + " (kopya)";
+    copy.title = src.title + t(" (kopya)");   // v47: kayıtlı varsayılan, yeni kayıt için o anki dilde
     curMeals().splice(mIdx + 1, 0, copy);
-    toast("⧉ Öğün kopyalandı");
+    toast(t("⧉ Öğün kopyalandı"));
   }
   renderAll();
 }
@@ -7880,7 +7880,7 @@ function addPresetSupp(key) {
   const { m, key: k, ...rest } = p;
   // v47: eklenen takviye kullanıcı verisi olur; o anki dilin adı/birimi/notu yazılır (docs/i18n-kayitli-metinler.md)
   const own = clone(rest);
-  own.name = t(own.name); own.unit = tn(1, own.unit); if (own.note) own.note = t(own.note);
+  own.name = t(own.name); own.unit = tn(own.dose || 1, own.unit); if (own.note) own.note = t(own.note);
   state.supplementList.push({ id: "sup_" + k + "_" + Date.now(), preset: k, ...own });
   renderAll();
 }
@@ -9137,7 +9137,7 @@ function rcAddIngredient() {
     if (id === rcp.id) return;
     const f = db[id];
     if (isHiddenFood(f)) return;
-    const cat = stripEmoji(f.cat || "Diğer");
+    const cat = t(stripEmoji(f.cat || "Diğer"));
     (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: t("{n} {u} · {k} kcal", { n: fmtNum(f.def), u: unitL(f.def, f.unit), k: String(Math.round(kcalPerUnit(f) * num(f.def, 1))) }) });
   });
   const groups = Object.keys(cats).map(c => ({ label: c, short: c.replace(/\s*[&/].*$/, ""), items: cats[c] }));
@@ -9262,7 +9262,7 @@ function renderShopList() {
   const list = shopList();
   const nT = shopTrainDays();
   $("shopDays").innerHTML = `<div class="flex items-center justify-between gap-2">
-      <div class="min-w-0"><div class="text-[14px] font-bold">${t("Antrenman günü")}</div><div class="text-[12px] n-muted">${tn(7 - nT, "Haftanın kalan {n} günü dinlenme menüsü")}</div></div>
+      <div class="min-w-0"><div class="text-[14px] font-bold">${t("Antrenman günü|alışveriş")}</div><div class="text-[12px] n-muted">${tn(7 - nT, "Haftanın kalan {n} günü dinlenme menüsü")}</div></div>
       <div class="flex items-center gap-1 shrink-0">
         <button onclick="setShopDays(-1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="${esc(t("Antrenman gününü azalt"))}">${svgI("minus", 18, 2.4)}</button>
         <span id="shopDaysVal" class="t-display text-[24px] w-8 text-center tabular-nums">${nT}</span>
@@ -10247,6 +10247,8 @@ function curLang() {
   try { return state && state.settings && state.settings.lang === "en" && langAvailable() ? "en" : "tr"; } catch (e) { return "tr"; }
 }
 function locale() { return curLang() === "en" ? "en-GB" : "tr-TR"; }
+// v47: kayıtlı tarih etiketi kullanıcı verisidir ve çevrilmez; yalnızca sistemin yazdığı "Başlangıç" çevrilir (kayıtlı-metinler kural 1)
+function logDateLabel(d) { return d === "Başlangıç" ? t("Başlangıç") : d; }
 function trFill(str, vars) {
   if (!vars) return str;
   return str.replace(/\{(\w+)\}/g, (m, k) => (Object.prototype.hasOwnProperty.call(vars, k) ? (typeof vars[k] === "number" ? fmtNum(vars[k]) : String(vars[k])) : m));
@@ -10307,7 +10309,7 @@ function setLang(l) {
   i18nTouched = true;
   try { if (typeof uiDlg !== "undefined" && uiDlg) uiDialogDone(false); } catch (e) { /* yoksay */ }
   applyStaticI18n(null, true);
-  try { if (typeof profileIsOpen === "function" && profileIsOpen()) fillProfileFields(); } catch (e) { /* yoksay */ }   // v47: kutulardaki sayılar (80,5 / 80.5) yeni dile göre
+  try { if (typeof profileIsOpen === "function" && profileIsOpen()) { fillProfileFields(); updateWaterAutoHint(); updateBfHint(); if ($("pfSnaps").closest("details").open) renderSnapList(); } } catch (e) { /* yoksay */ }   // v47: kutulardaki sayılar (80,5 / 80.5) yeni dile göre
   renderAll();   // Profil açıksa renderAll içinde yeniden çizilir
 }
 // v46: İngilizce sözlük (anahtar = Türkçe metin). Terimler docs/i18n-terimler.md'ye uyar.
@@ -10329,11 +10331,11 @@ Object.assign(EN, {
   // bildirimler
   "Hata: {m}": "Error: {m}", "bilinmeyen": "unknown",
   // dinlenme sayacı
-  "Dinlenme": "Rest", "Dinlenme • {ad}": "Rest • {ad}", "{ad} bitti!": "{ad} over", "BİTTİ!": "DONE",
+  "Dinlenme": "Rest", "Dinlenme • {ad}": "Rest • {ad}", "{ad} bitti!": "{ad}: done", "BİTTİ!": "DONE",
   // gün dönümü
-  "Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.": "New day started. Water, supplements, meals and mobility check-offs were reset.",
+  "Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.": "New day started. Water, supplement, meal and mobility ticks have been reset.",
   "Yeni güne geçilsin mi?": "Start a new day?",
-  "Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir.": "Water, supplements, meals and mobility check-offs will be reset. Today's summary is saved in Nutrition → History.",
+  "Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir.": "Water, supplement, meal and mobility ticks will be reset. Today's summary is saved in Nutrition → History.",
   "Yeni güne geç": "Start new day",
   // tema düğmesi, profil fotoğrafı
   "Koyu temaya geç": "Switch to dark theme", "Aydınlık temaya geç": "Switch to light theme",
@@ -10396,8 +10398,12 @@ Object.assign(EN, {
   "Kilo girilmemiş; Profil'deki hedef kullanılıyor.": "No weight entered; using the target from Profile.",
   "Hedef Profil'de elle ayarlı.": "Target is set manually in Profile.",
   "Takviye rutini": "Supplements", "Takviye Rutini": "Supplements",
-  "MİKRO & ERGOJENİK": "MICRONUTRIENTS AND ERGOGENICS",
-  "Yeni gün": "New day",
+  "MİKRO & ERGOJENİK": "VITAMINS & PERFORMANCE",
+  "Yeni gün": "Start new day",
+  "Antrenman günü|alışveriş": "Training days",
+  "\"{ad}\" silindi": "\"{ad}\" deleted", "⧉ \"{ad}\" dinlenme günü menüsüne kopyalandı": "⧉ \"{ad}\" copied to your rest-day plan",
+  "⧉ \"{ad}\" antrenman günü menüsüne kopyalandı": "⧉ \"{ad}\" copied to your training-day plan", "⧉ Öğün kopyalandı": "⧉ Meal duplicated", " (kopya)": " (copy)",
+  "Özel Eklediklerim": "Your custom foods",
 
   // --- Bugün: öğün zaman çizelgesi
   "BUGÜNÜN ÖĞÜNLERİ": "TODAY'S MEALS",
@@ -10584,7 +10590,7 @@ Object.assign(EN, {
 
   // --- Geçmiş
   "· devam ediyor": "· in progress", "yenen": "eaten", "planlanan": "planned",
-  "Her gün gece yarısı (ya da \"Yeni gün\" ile) günün özeti buraya eklenir.": "A summary of each day is added here at midnight (or when you tap \"New day\").",
+  "Her gün gece yarısı (ya da \"Yeni gün\" ile) günün özeti buraya eklenir.": "A summary of each day is added here at midnight (or when you tap \"Start new day\").",
   "Grafikler için İlerleme sekmesine git": "See charts in Progress",
   "Haftalık görünüm": "Weekly overview", "SON 7 GÜN": "LAST 7 DAYS",
   "{n} gün kayıt": { one: "{n} day logged", other: "{n} days logged" },
@@ -10673,7 +10679,7 @@ Object.assign(EN, {
 
   // --- Dışarıda yedim penceresi
   "Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.": "Enter your estimated values. This entry only affects today; your plan stays the same.",
-  "Ne yedin? (isteğe bağlı)": "What did you eat? (optional)", "örn: Döner dürüm + ayran": "e.g. Chicken wrap + ayran",
+  "Ne yedin? (isteğe bağlı)": "What did you eat? (optional)", "örn: Döner dürüm + ayran": "e.g. Chicken wrap and a drink",
   "Kalori (kcal)": "Calories (kcal)", "Protein (g)": "Protein (g)",
   "Karb (g) · isteğe bağlı": "Carbs (g) · optional", "Yağ (g) · isteğe bağlı": "Fat (g) · optional",
   "örn: 850": "e.g. 850", "örn: 40": "e.g. 40",
@@ -10717,7 +10723,7 @@ Object.assign(EN, {
   "İşaretler temizlendi": "Checkmarks cleared",
   "Haftanın kalan {n} günü dinlenme menüsü": { one: "Rest-day plan for the remaining {n} day of the week", other: "Rest-day plan for the remaining {n} days of the week" },
   "Antrenman gününü azalt": "Decrease training days", "Antrenman gününü artır": "Increase training days",
-  "{ad} alındı": "{ad} bought",
+  "{ad} alındı": "Mark {ad} as bought",
   "Menülerinde besin yok.": "There are no foods in your plans.",
   "{left} / {n} ürün alınacak": { one: "{left} / {n} item left to buy", other: "{left} / {n} items left to buy" },
   "AYK+ alışveriş listesi (7 gün: {a} antrenman, {b} dinlenme)": "AYK+ shopping list (7 days: {a} training, {b} rest)",
@@ -10762,8 +10768,8 @@ Object.assign(EN, {
   // hazır takviyeler: eklenirken kullanıcı verisine o anki dilde yazılır
   "Vitamin D3 + K2": "Vitamin D3 + K2", "Omega-3": "Omega-3", "Kreatin Monohidrat": "Creatine monohydrate", "Whey Protein": "Whey protein",
   "Magnezyum": "Magnesium", "Çinko": "Zinc",
-  "damla/kapsül": "drop/capsule", "softjel": "softgel",
-  "Tok karnına": "With food", "Bol su ile": "With plenty of water", "Uykudan 1 saat önce": "1 hour before sleep", "Akşam": "Evening",
+  "damla/kapsül": "drop/capsule", "softjel": { one: "softgel", other: "softgels" },
+  "Tok karnına": "With food", "Bol su ile": "With plenty of water", "Uykudan 1 saat önce": "1 hour before bed", "Akşam": "Evening",
 
   // --- Öğün penceresi
   "Öğünü Düzenle": "Edit meal",
@@ -10851,7 +10857,7 @@ Object.assign(EN, {
   "Mobilitede sesli yönlendirme": "Voice guidance in mobility",
   "Seansta hareketin adını, tarafı ve süreyi söyler. iPhone'da yalnızca uygulama açıkken ve telefon sessizde değilken konuşur.": "Announces the exercise name, side and duration during a session. On iPhone it only speaks while the app is open and your phone isn't in silent mode.",
   "Gün geçişi": "Day starts at",
-  "Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.": "Your nutrition day resets at this time. Move it later if you want late-night meals counted toward the previous day.",
+  "Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.": "Your nutrition day resets at this time. Move it later if you want late-night meals counted towards the previous day.",
   "Açılış animasyonu": "Launch animation",
   "Uygulama açılırken logo kısa bir geçişle görünür.": "The logo appears with a short transition when the app opens.",
 
@@ -10864,7 +10870,7 @@ Object.assign(EN, {
   "Henüz yedek alınmadı. Verilerin sadece bu telefonda duruyor; düzenli yedek almanı öneririm.": "No backup yet. Your data is only on this phone, so back it up regularly.",
   "Yedek dosyası kaydet": "Save backup file", "Dosyadan geri yükle": "Restore from file",
   "Yedek kodu ile (kopyala / yapıştır)": "With a backup code (copy / paste)",
-  "Kodu kopyala": "Copy code", "Kodu yükle": "Restore code",
+  "Kodu kopyala": "Copy code", "Kodu yükle": "Restore from code",
   "AYK-yedek-{d}.json": "AYK-backup-{d}.json", "AYK+ Yedek": "AYK+ Backup",
   "Yedek paylaşıldı. 'Dosyalar'a Kaydet'i seçtiysen güvende.": "Backup shared. If you chose Save to Files, it's safe.",
   "Yedek dosyası indirildi": "Backup file downloaded",
@@ -10905,7 +10911,7 @@ Object.assign(EN, {
   "Fabrika ayarlarına sıfırla": "Erase all data",
   "TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?": "All your data will be erased and the app will go back to its default settings. Continue?",
   "Son onay": "Final confirmation",
-  "Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?": "This can't be undone. We recommend making a backup first. Erase everything?",
+  "Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?": "This can't be undone. Back up your data first. Erase everything?",
   "Sıfırla|tüm veri": "Erase",
   "Uygulama sıfırlandı": "All data erased",
 

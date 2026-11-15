@@ -80,7 +80,6 @@ function renderProfile() {
   const lr = $("pfLang"); if (lr) lr.classList.toggle("hidden", !langAvailable());   // v46
   document.querySelectorAll("[data-lang-opt]").forEach(b => { const on = b.dataset.langOpt === curLang(); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   renderMissList();
-  if (profileIsOpen()) { updateWaterAutoHint(); updateBfHint(); if ($("pfSnaps").closest("details").open) renderSnapList(); }   // v47: dil değişince ipuçları da yenilenir
   // Kilo kayıtları
   const wl = state.weightLogs.filter(l => num(l.weight) > 0);
   const lastW = wl[wl.length - 1], firstW = wl[0];
@@ -90,11 +89,11 @@ function renderProfile() {
   if (wl.length) {
     const d = round1(num(lastW.weight) - num(firstW.weight));
     wh += `<div class="grid grid-cols-3 gap-2">
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Son tartı")}</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : t(lastW.date || ""))}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Son tartı")}</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : logDateLabel(lastW.date || ""))}</div></div>
       <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Değişim")}</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${tn(wl.length, "{n} kayıt")}</div></div>
       <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Hedefe")}</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${!tW ? t("hedef yok") : left > 0 ? t("verilecek") : left < 0 ? t("alınacak") : t("hedeftesin")}</div></div>
     </div>`;
-    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : t(l.date || ""))}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">${t("· %{p} yağ", { p: fmtNum(validBf(l.bf)) })}</span>` : ""}</span></div>`).join("");
+    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : logDateLabel(l.date || ""))}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">${t("· %{p} yağ", { p: fmtNum(validBf(l.bf)) })}</span>` : ""}</span></div>`).join("");
     wh += `<div class="mt-2">${rows}</div>`;
   } else {
     wh = `<p class="text-[13px] t-dim">${t("Henüz tartı kaydın yok. Kilonu yazıp \"Tartıyı kaydet\"e dokun; ilerlemen İlerleme sekmesinde grafiğe dönüşür.")}</p>`;
@@ -103,7 +102,7 @@ function renderProfile() {
   // Günlük hedefler (hesaplanan)
   const tg = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
-    ${[["Kalori", Math.round(tg.calTarget).toLocaleString(locale()), "kcal"], ["Protein", Math.round(tg.proTarget), "g"], ["Karb", Math.round(tg.carbTarget), "g"], ["Yağ", Math.round(tg.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${t(l)}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
+    ${[["Kalori", Math.round(tg.calTarget), "kcal", true], ["Protein", Math.round(tg.proTarget), "g"], ["Karb", Math.round(tg.carbTarget), "g"], ["Yağ", Math.round(tg.fatTarget), "g"]].map(([l, v, u, loc]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${t(l)}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? (loc ? v.toLocaleString(locale()) : v) : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
   </div><p class="text-[12px] t-dim mt-2">${t("Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.")}</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;

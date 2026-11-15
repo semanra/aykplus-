@@ -280,7 +280,7 @@ function renderWeightBlock(st) {
   $("gainBox").classList.toggle("hidden", goal !== "gain");
   $("goalVal").textContent = (tg.goalDelta < 0 ? "−" : tg.goalDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.goalDelta));
   $("weightHistoryText").textContent = state.weightLogs.length > 0
-    ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.ts ? fmtDate(l.ts) : t(l.date)})`).join(" → ")
+    ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.ts ? fmtDate(l.ts) : logDateLabel(l.date)})`).join(" → ")
     : t("Hedef: {w} kg", { w: fmtNum(num(st.targetWeight, 82)) });
   const wa7 = weightAvg7();
   $("weightAvgText").textContent = wa7 ? tn(wa7.n, "7 günlük ortalama: {avg} kg ({n} tartı)", { avg: fmtNum(wa7.avg) }) : "";

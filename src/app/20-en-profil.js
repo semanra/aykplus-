@@ -70,7 +70,7 @@ Object.assign(EN, {
   "Mobilitede sesli yönlendirme": "Voice guidance in mobility",
   "Seansta hareketin adını, tarafı ve süreyi söyler. iPhone'da yalnızca uygulama açıkken ve telefon sessizde değilken konuşur.": "Announces the exercise name, side and duration during a session. On iPhone it only speaks while the app is open and your phone isn't in silent mode.",
   "Gün geçişi": "Day starts at",
-  "Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.": "Your nutrition day resets at this time. Move it later if you want late-night meals counted toward the previous day.",
+  "Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.": "Your nutrition day resets at this time. Move it later if you want late-night meals counted towards the previous day.",
   "Açılış animasyonu": "Launch animation",
   "Uygulama açılırken logo kısa bir geçişle görünür.": "The logo appears with a short transition when the app opens.",
 
@@ -83,7 +83,7 @@ Object.assign(EN, {
   "Henüz yedek alınmadı. Verilerin sadece bu telefonda duruyor; düzenli yedek almanı öneririm.": "No backup yet. Your data is only on this phone, so back it up regularly.",
   "Yedek dosyası kaydet": "Save backup file", "Dosyadan geri yükle": "Restore from file",
   "Yedek kodu ile (kopyala / yapıştır)": "With a backup code (copy / paste)",
-  "Kodu kopyala": "Copy code", "Kodu yükle": "Restore code",
+  "Kodu kopyala": "Copy code", "Kodu yükle": "Restore from code",
   "AYK-yedek-{d}.json": "AYK-backup-{d}.json", "AYK+ Yedek": "AYK+ Backup",
   "Yedek paylaşıldı. 'Dosyalar'a Kaydet'i seçtiysen güvende.": "Backup shared. If you chose Save to Files, it's safe.",
   "Yedek dosyası indirildi": "Backup file downloaded",
@@ -124,7 +124,7 @@ Object.assign(EN, {
   "Fabrika ayarlarına sıfırla": "Erase all data",
   "TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?": "All your data will be erased and the app will go back to its default settings. Continue?",
   "Son onay": "Final confirmation",
-  "Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?": "This can't be undone. We recommend making a backup first. Erase everything?",
+  "Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?": "This can't be undone. Back up your data first. Erase everything?",
   "Sıfırla|tüm veri": "Erase",
   "Uygulama sıfırlandı": "All data erased",
 

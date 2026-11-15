@@ -152,7 +152,7 @@ function renderFoodList() {
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3.5 my-2" data-food="${esc(id)}" id="foodSelCard">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(f.name)}</h3>
-            <div class="text-[12px] n-muted mt-0.5">${esc(stripEmoji(f.cat || ""))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
+            <div class="text-[12px] n-muted mt-0.5">${esc(t(stripEmoji(f.cat || "")))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
             ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
             ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">Kalori USDA ölçümüdür (${esc(f.kx)} nedeniyle makrolardan hesaplanandan farklı).</div>` : ""}</div>
