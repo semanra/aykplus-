@@ -269,7 +269,7 @@ function shopList() {
     ms.forEach(m => m.items.forEach(i => { if (!i.est) expand(i.foodId, effAmount(i) * n, 0); }));
   });
   return Object.keys(acc).map(id => ({ id, f: db[id], amt: acc[id] }))
-    .sort((a, b) => stripEmoji(a.f.cat || "").localeCompare(stripEmoji(b.f.cat || ""), "tr") || stripEmoji(a.f.name).localeCompare(stripEmoji(b.f.name), "tr"));
+    .sort((a, b) => stripEmoji(a.f.cat || "").localeCompare(stripEmoji(b.f.cat || ""), locale()) || stripEmoji(a.f.name).localeCompare(stripEmoji(b.f.name), locale()));
 }
 function fmtShopAmt(f, a) {
   if (f.unit === "g") return a >= 1000 ? fmtKg(round2(a / 1000)) + " kg" : (Math.ceil(a / 10) * 10) + " g";
@@ -559,7 +559,7 @@ function heatHtml(n) {
     const sym = { ok: "✓", near: "~", far: "!" }[cls] || "";   // v32: renk tek başına anlam taşımaz (İlerleme şeridiyle aynı dil)
     cells.push(`<span class="n-heat ${cls}" data-heat="${k}" data-cls="${cls}" role="img" aria-label="${esc(tip)}" title="${esc(tip)}">${d.getDate()}${sym ? `<i class="n-heat-sym" aria-hidden="true">${sym}</i>` : ""}</span>`);
   }
-  const wd = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"].map(x => `<span class="text-[12px] n-dim text-center">${x}</span>`).join("");
+  const wd = dayShort().map(x => `<span class="text-[12px] n-dim text-center">${x}</span>`).join("");
   return `<div class="grid grid-cols-7 gap-1.5">${wd}${cells.join("")}</div>`;
 }
 function weekCardHtml() {

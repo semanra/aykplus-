@@ -446,7 +446,7 @@ async function finishAndLogWorkout() {
   const startedAt = num(state.workoutStartedAt, 0);
   const durMin = startedAt ? Math.round((ts - startedAt) / 60000) : 0;
   state.workoutLogs.push({
-    id: logId, ts, date: fmtDate(ts, true), dayId: day.id, dayName: day.name, sets: doneSets,
+    id: logId, ts, date: fmtDateStore(ts, true), dayId: day.id, dayName: day.name, sets: doneSets,
     durationMin: durMin >= 1 && durMin <= MAX_WORKOUT_MIN ? durMin : 0,
     volume: Math.round(vol), cardioMin: round1(cMin), cardioKm: Math.round(cKm * 100) / 100, prs,
     summary: `${day.exercises.length} Hareket`

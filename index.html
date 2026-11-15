@@ -2525,11 +2525,14 @@ function todayStr(d = new Date()) {
 function dayStartHour() { const h = parseInt(state && state.settings ? state.settings.dayStartHour : 0, 10); return h >= 0 && h <= 5 ? h : 0; }
 function logicalNow() { return new Date(Date.now() - dayStartHour() * 3600000); }
 function logicalToday() { return todayStr(logicalNow()); }
-function fmtDate(ts, withTime = false) {
+function fmtDateIn(loc, ts, withTime) {
   const o = { day: "2-digit", month: "short" };
   if (withTime) { o.hour = "2-digit"; o.minute = "2-digit"; }
-  return new Date(ts).toLocaleDateString(locale(), o);
+  return new Date(ts).toLocaleDateString(loc, o);
 }
+function fmtDate(ts, withTime = false) { return fmtDateIn(locale(), ts, withTime); }
+// v46: kayda yazılan tarih metni dilden bağımsız, hep Türkçe (gösterimde ts + fmtDate kullanılır)
+function fmtDateStore(ts, withTime = false) { return fmtDateIn("tr-TR", ts, withTime); }
 function fmtClock(sec) {
   sec = Math.max(0, Math.round(sec));
   return String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
@@ -3750,7 +3753,7 @@ function renderWeightBlock(st) {
   $("gainBox").classList.toggle("hidden", goal !== "gain");
   $("goalVal").textContent = (tg.goalDelta < 0 ? "−" : tg.goalDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.goalDelta));
   $("weightHistoryText").textContent = state.weightLogs.length > 0
-    ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.date})`).join(" → ")
+    ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.ts ? fmtDate(l.ts) : l.date})`).join(" → ")
     : `Hedef: ${fmtNum(num(st.targetWeight, 82))} kg`;
   const wa7 = weightAvg7();
   $("weightAvgText").textContent = wa7 ? `7 günlük ortalama: ${fmtNum(wa7.avg)} kg (${wa7.n} tartı)` : "";
@@ -4944,7 +4947,7 @@ function adjustWeight(d) { state.weight = Math.max(30, round1(state.weight + d))
 function logCurrentWeight() {
   const now = Date.now();
   const last = state.weightLogs[state.weightLogs.length - 1];
-  const entry = { date: fmtDate(now), weight: state.weight, ts: now };
+  const entry = { date: fmtDateStore(now), weight: state.weight, ts: now };
   if (validBf(state.settings.bodyFat)) entry.bf = validBf(state.settings.bodyFat);
   if (last && last.ts && todayStr(new Date(last.ts)) === todayStr()) state.weightLogs[state.weightLogs.length - 1] = entry;
   else state.weightLogs.push(entry);
@@ -5520,7 +5523,7 @@ async function finishAndLogWorkout() {
   const startedAt = num(state.workoutStartedAt, 0);
   const durMin = startedAt ? Math.round((ts - startedAt) / 60000) : 0;
   state.workoutLogs.push({
-    id: logId, ts, date: fmtDate(ts, true), dayId: day.id, dayName: day.name, sets: doneSets,
+    id: logId, ts, date: fmtDateStore(ts, true), dayId: day.id, dayName: day.name, sets: doneSets,
     durationMin: durMin >= 1 && durMin <= MAX_WORKOUT_MIN ? durMin : 0,
     volume: Math.round(vol), cardioMin: round1(cMin), cardioKm: Math.round(cKm * 100) / 100, prs,
     summary: `${day.exercises.length} Hareket`
@@ -5686,7 +5689,6 @@ function mobReset() {
   offerUndo("Tikler sıfırlandı");
 }
 // --- v39: ANA EKRAN (bu hafta, rutin kartları, bölgeler · son çalışma) ---
-const MOB_DAY_LABELS = { map(f) { return dayShort().map(f); } };   // v46: dile göre (dayShort)
 function mobTodayKey() { return todayStr(logicalNow()); }
 function mobShiftKey(key, off) { const d = new Date(key + "T12:00:00"); d.setDate(d.getDate() + off); return todayStr(d); }
 function mobDaysAgo(key) { return Math.round((new Date(mobTodayKey() + "T12:00:00") - new Date(key + "T12:00:00")) / DAY_MS); }
@@ -5703,7 +5705,7 @@ function mobDoneDays() {
 function mobWeekStats() {
   const done = mobDoneDays(), t = mobTodayKey();
   const dow = (new Date(t + "T12:00:00").getDay() + 6) % 7;
-  const days = MOB_DAY_LABELS.map((_, i) => done.has(mobShiftKey(t, i - dow)));
+  const days = dayShort().map((_, i) => done.has(mobShiftKey(t, i - dow)));
   let k = done.has(t) ? t : mobShiftKey(t, -1), streak = 0;
   while (done.has(k)) { streak++; k = mobShiftKey(k, -1); }
   return { days, count: days.filter(Boolean).length, streak, dow };
@@ -5767,7 +5769,7 @@ function mobHomeHtml() {
       <div class="m-wk"><b class="t-display">${w.count}</b><span>gün bu hafta</span></div>
       <div class="m-wk"><b class="t-display">${w.streak}</b><span>gün üst üste</span></div>
     </div>
-    <div class="m-days" aria-label="Bu hafta mobilite yapılan günler">${MOB_DAY_LABELS.map((l, i) =>
+    <div class="m-days" aria-label="Bu hafta mobilite yapılan günler">${dayShort().map((l, i) =>
       `<i class="${w.days[i] ? "d" : ""} ${i === w.dow ? "t" : ""}" aria-label="${l}${w.days[i] ? " yapıldı" : ""}">${l}</i>`).join("")}</div>
     <div class="m-lbl">Rutinlerin</div>
     <div class="space-y-2.5">${mobRoutines().map(mobRoutineCardHtml).join("")}</div>
@@ -6104,7 +6106,7 @@ function mobSay(text) {
     ss.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = locale();
-    const v = (ss.getVoices() || []).find(x => /^tr/i.test(x.lang));
+    const v = (ss.getVoices() || []).find(x => String(x.lang).toLowerCase().startsWith(locale().slice(0, 2)));
     if (v) u.voice = v;
     ss.speak(u);
   } catch (e) { /* ses yok */ }
@@ -6752,7 +6754,7 @@ function progBeslenmeHtml() {
   const calHit = past.filter(s => s.eaten && hitClass(s.kcal, s.calT) === "ok").length;
   const eatenDays = past.filter(s => s.eaten);
   const avgKcal = eatenDays.length ? Math.round(eatenDays.reduce((a, s) => a + s.kcal, 0) / eatenDays.length) : null;
-  const lbl = s => s.live ? "Bugün" : histRange <= 7 ? (d7 => [d7[6], ...d7.slice(0, 6)])(dayShort())[new Date(s.key + "T12:00:00").getDay()] : String(new Date(s.key + "T12:00:00").getDate());
+  const lbl = s => s.live ? "Bugün" : histRange <= 7 ? dayShort()[(new Date(s.key + "T12:00:00").getDay() + 6) % 7] : String(new Date(s.key + "T12:00:00").getDate());
   const kItems = ser.map(s => ({ label: lbl(s), v: s.empty ? null : s.kcal, flag: s.live ? "now" : s.empty ? "" : !s.eaten ? "plan" : s.calT > 0 && s.kcal > s.calT * 1.05 ? "over" : "" }));
   const wItems = ser.map(s => ({ label: lbl(s), v: s.empty ? null : s.water, flag: s.live ? "now" : "" }));
   const tile = (l, v, sub) => `<div class="p-mt"><span>${l}</span><b>${v}</b><small>${sub}</small></div>`;
@@ -9193,7 +9195,7 @@ function shopList() {
     ms.forEach(m => m.items.forEach(i => { if (!i.est) expand(i.foodId, effAmount(i) * n, 0); }));
   });
   return Object.keys(acc).map(id => ({ id, f: db[id], amt: acc[id] }))
-    .sort((a, b) => stripEmoji(a.f.cat || "").localeCompare(stripEmoji(b.f.cat || ""), "tr") || stripEmoji(a.f.name).localeCompare(stripEmoji(b.f.name), "tr"));
+    .sort((a, b) => stripEmoji(a.f.cat || "").localeCompare(stripEmoji(b.f.cat || ""), locale()) || stripEmoji(a.f.name).localeCompare(stripEmoji(b.f.name), locale()));
 }
 function fmtShopAmt(f, a) {
   if (f.unit === "g") return a >= 1000 ? fmtKg(round2(a / 1000)) + " kg" : (Math.ceil(a / 10) * 10) + " g";
@@ -9483,7 +9485,7 @@ function heatHtml(n) {
     const sym = { ok: "✓", near: "~", far: "!" }[cls] || "";   // v32: renk tek başına anlam taşımaz (İlerleme şeridiyle aynı dil)
     cells.push(`<span class="n-heat ${cls}" data-heat="${k}" data-cls="${cls}" role="img" aria-label="${esc(tip)}" title="${esc(tip)}">${d.getDate()}${sym ? `<i class="n-heat-sym" aria-hidden="true">${sym}</i>` : ""}</span>`);
   }
-  const wd = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"].map(x => `<span class="text-[12px] n-dim text-center">${x}</span>`).join("");
+  const wd = dayShort().map(x => `<span class="text-[12px] n-dim text-center">${x}</span>`).join("");
   return `<div class="grid grid-cols-7 gap-1.5">${wd}${cells.join("")}</div>`;
 }
 function weekCardHtml() {
@@ -10167,7 +10169,7 @@ function finishOnboarding() {
   state.deficit = d.goal === "lose" ? OB_LOSE_PACE[d.pace] : 0;
   state.weight = v.weight;
   const now = Date.now();
-  state.weightLogs = [{ date: fmtDate(now), weight: v.weight, ts: now }];
+  state.weightLogs = [{ date: fmtDateStore(now), weight: v.weight, ts: now }];
   let menuFailed = false;
   if (d.menu) {
     const m1 = buildSampleMenu(tr.calTarget), m2 = buildSampleMenu(re.calTarget);

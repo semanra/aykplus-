@@ -593,7 +593,7 @@ function adjustWeight(d) { state.weight = Math.max(30, round1(state.weight + d))
 function logCurrentWeight() {
   const now = Date.now();
   const last = state.weightLogs[state.weightLogs.length - 1];
-  const entry = { date: fmtDate(now), weight: state.weight, ts: now };
+  const entry = { date: fmtDateStore(now), weight: state.weight, ts: now };
   if (validBf(state.settings.bodyFat)) entry.bf = validBf(state.settings.bodyFat);
   if (last && last.ts && todayStr(new Date(last.ts)) === todayStr()) state.weightLogs[state.weightLogs.length - 1] = entry;
   else state.weightLogs.push(entry);

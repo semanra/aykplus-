@@ -59,11 +59,14 @@ function todayStr(d = new Date()) {
 function dayStartHour() { const h = parseInt(state && state.settings ? state.settings.dayStartHour : 0, 10); return h >= 0 && h <= 5 ? h : 0; }
 function logicalNow() { return new Date(Date.now() - dayStartHour() * 3600000); }
 function logicalToday() { return todayStr(logicalNow()); }
-function fmtDate(ts, withTime = false) {
+function fmtDateIn(loc, ts, withTime) {
   const o = { day: "2-digit", month: "short" };
   if (withTime) { o.hour = "2-digit"; o.minute = "2-digit"; }
-  return new Date(ts).toLocaleDateString(locale(), o);
+  return new Date(ts).toLocaleDateString(loc, o);
 }
+function fmtDate(ts, withTime = false) { return fmtDateIn(locale(), ts, withTime); }
+// v46: kayda yazılan tarih metni dilden bağımsız, hep Türkçe (gösterimde ts + fmtDate kullanılır)
+function fmtDateStore(ts, withTime = false) { return fmtDateIn("tr-TR", ts, withTime); }
 function fmtClock(sec) {
   sec = Math.max(0, Math.round(sec));
   return String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");

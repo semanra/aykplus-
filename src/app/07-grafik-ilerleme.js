@@ -476,7 +476,7 @@ function progBeslenmeHtml() {
   const calHit = past.filter(s => s.eaten && hitClass(s.kcal, s.calT) === "ok").length;
   const eatenDays = past.filter(s => s.eaten);
   const avgKcal = eatenDays.length ? Math.round(eatenDays.reduce((a, s) => a + s.kcal, 0) / eatenDays.length) : null;
-  const lbl = s => s.live ? "Bugün" : histRange <= 7 ? (d7 => [d7[6], ...d7.slice(0, 6)])(dayShort())[new Date(s.key + "T12:00:00").getDay()] : String(new Date(s.key + "T12:00:00").getDate());
+  const lbl = s => s.live ? "Bugün" : histRange <= 7 ? dayShort()[(new Date(s.key + "T12:00:00").getDay() + 6) % 7] : String(new Date(s.key + "T12:00:00").getDate());
   const kItems = ser.map(s => ({ label: lbl(s), v: s.empty ? null : s.kcal, flag: s.live ? "now" : s.empty ? "" : !s.eaten ? "plan" : s.calT > 0 && s.kcal > s.calT * 1.05 ? "over" : "" }));
   const wItems = ser.map(s => ({ label: lbl(s), v: s.empty ? null : s.water, flag: s.live ? "now" : "" }));
   const tile = (l, v, sub) => `<div class="p-mt"><span>${l}</span><b>${v}</b><small>${sub}</small></div>`;

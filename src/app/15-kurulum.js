@@ -265,7 +265,7 @@ function finishOnboarding() {
   state.deficit = d.goal === "lose" ? OB_LOSE_PACE[d.pace] : 0;
   state.weight = v.weight;
   const now = Date.now();
-  state.weightLogs = [{ date: fmtDate(now), weight: v.weight, ts: now }];
+  state.weightLogs = [{ date: fmtDateStore(now), weight: v.weight, ts: now }];
   let menuFailed = false;
   if (d.menu) {
     const m1 = buildSampleMenu(tr.calTarget), m2 = buildSampleMenu(re.calTarget);

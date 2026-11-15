@@ -131,7 +131,6 @@ function mobReset() {
   offerUndo("Tikler sıfırlandı");
 }
 // --- v39: ANA EKRAN (bu hafta, rutin kartları, bölgeler · son çalışma) ---
-const MOB_DAY_LABELS = { map(f) { return dayShort().map(f); } };   // v46: dile göre (dayShort)
 function mobTodayKey() { return todayStr(logicalNow()); }
 function mobShiftKey(key, off) { const d = new Date(key + "T12:00:00"); d.setDate(d.getDate() + off); return todayStr(d); }
 function mobDaysAgo(key) { return Math.round((new Date(mobTodayKey() + "T12:00:00") - new Date(key + "T12:00:00")) / DAY_MS); }
@@ -148,7 +147,7 @@ function mobDoneDays() {
 function mobWeekStats() {
   const done = mobDoneDays(), t = mobTodayKey();
   const dow = (new Date(t + "T12:00:00").getDay() + 6) % 7;
-  const days = MOB_DAY_LABELS.map((_, i) => done.has(mobShiftKey(t, i - dow)));
+  const days = dayShort().map((_, i) => done.has(mobShiftKey(t, i - dow)));
   let k = done.has(t) ? t : mobShiftKey(t, -1), streak = 0;
   while (done.has(k)) { streak++; k = mobShiftKey(k, -1); }
   return { days, count: days.filter(Boolean).length, streak, dow };
@@ -212,7 +211,7 @@ function mobHomeHtml() {
       <div class="m-wk"><b class="t-display">${w.count}</b><span>gün bu hafta</span></div>
       <div class="m-wk"><b class="t-display">${w.streak}</b><span>gün üst üste</span></div>
     </div>
-    <div class="m-days" aria-label="Bu hafta mobilite yapılan günler">${MOB_DAY_LABELS.map((l, i) =>
+    <div class="m-days" aria-label="Bu hafta mobilite yapılan günler">${dayShort().map((l, i) =>
       `<i class="${w.days[i] ? "d" : ""} ${i === w.dow ? "t" : ""}" aria-label="${l}${w.days[i] ? " yapıldı" : ""}">${l}</i>`).join("")}</div>
     <div class="m-lbl">Rutinlerin</div>
     <div class="space-y-2.5">${mobRoutines().map(mobRoutineCardHtml).join("")}</div>
@@ -549,7 +548,7 @@ function mobSay(text) {
     ss.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = locale();
-    const v = (ss.getVoices() || []).find(x => /^tr/i.test(x.lang));
+    const v = (ss.getVoices() || []).find(x => String(x.lang).toLowerCase().startsWith(locale().slice(0, 2)));
     if (v) u.voice = v;
     ss.speak(u);
   } catch (e) { /* ses yok */ }
