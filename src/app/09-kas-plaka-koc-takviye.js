@@ -4,7 +4,7 @@
 
 const MUSCLES = ["Göğüs", "Sırt", "Omuz", "Ön Bacak", "Arka Bacak & Kalça", "Kalf", "Biceps", "Triceps", "Karın"];
 // v48: kayıtlı kas adının (MUSCLES, ex.muscle, state.libMuscle) görünen adı; kayıt hep Türkçe kalır
-function muscleL(m) { return t(m); }
+function muscleL(m) { return MUSCLES.includes(m) ? t(m) : m; }
 // v48: EXERCISE_LIBRARY kategori başlığının görünen adı (anahtar ve sıra değişmez)
 function libCatL(cat) { return t(cat); }
 // v48: kayıtlı targetInfo / set.target metnindeki " sn" / " dk" birimleri İngilizcede " sec" / " min" gösterilir (kayıt Türkçe)
@@ -528,7 +528,7 @@ function fmtDuration(ms) {
 }
 function fmtMinutes(min) {
   min = Math.round(min);
-  return min >= 60 ? `${Math.floor(min / 60)} sa ${min % 60} dk` : `${min} dk`;
+  return min >= 60 ? t("{h} sa {m} dk", { h: Math.floor(min / 60), m: min % 60 }) : t("{m} dk", { m: min });
 }
 
 // ---------------------------------------------------------------------------

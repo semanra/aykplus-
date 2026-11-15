@@ -5393,15 +5393,15 @@ function paceText(min, km) {
   const speed = km / (min / 60);
   const pace = min / km;
   const pm = Math.floor(pace), ps = Math.round((pace - pm) * 60);
-  return `${fmtNum(speed)} km/s • ${pm}:${String(ps === 60 ? 59 : ps).padStart(2, "0")} /km`;
+  return t("{speed} km/s • {pm}:{ps} /km", { speed, pm: String(pm), ps: String(ps === 60 ? 59 : ps).padStart(2, "0") });
 }
 function sessionSummary(sess) {
   const sets = sess.sets || [];
   if (sess.kind === "cardio") {
     const ct = cardioTotals(sets, false);
-    return `${fmtNum(ct.min)} dk` + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : "");
+    return t("{n} dk", { n: ct.min }) + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : "");
   }
-  if (sess.kind === "time") return sets.map(s => `${num(s.sec)} sn`).join(" · ");
+  if (sess.kind === "time") return sets.map(s => t("{n} sn", { n: String(num(s.sec)) })).join(" · ");
   return sets.map(s => `${fmtKg(num(s.kg))}×${num(s.reps)}`).join(" · ");
 }
 
@@ -5498,7 +5498,7 @@ function removeExercise(exIdx) {
 }
 
 async function addWorkoutDay() {
-  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: curLang() === "en" ? `DAY ${state.workoutDays.length + 1}: ` : `${state.workoutDays.length + 1}. GÜN: `, placeholder: curLang() === "en" ? "E.g. DAY 5: Arms" : "Örn: 5. GÜN: Kol" }, ok: "Ekle" });
+  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: curLang() === "en" ? `DAY ${state.workoutDays.length + 1}: ` : `${state.workoutDays.length + 1}. GÜN: `, placeholder: t("Örn: 5. GÜN: Kol") }, ok: "Ekle" });
   if (!name || !name.trim()) return;
   state.workoutDays.push({ id: "day_" + Date.now(), name: name.trim(), exercises: [] });
   state.activeWorkoutDayIdx = state.workoutDays.length - 1;
@@ -6287,20 +6287,20 @@ function warmupCardHtml(day, inProg) {
   if (!state.settings.warmupCard || inProg) return "";
   const items = mobWarmupItems(day);
   if (!items.length) return "";
-  const hide = `<button id="gymWarmupHide" onclick="mobWarmupHide()" class="m-round shrink-0 !bg-transparent" aria-label="Isınma kartını gizle">${svgI("x", 18, 2.2)}</button>`;
+  const hide = `<button id="gymWarmupHide" onclick="mobWarmupHide()" class="m-round shrink-0 !bg-transparent" aria-label="${t("Isınma kartını gizle")}">${svgI("x", 18, 2.2)}</button>`;
   if (items.every(i => i.done)) return `<div id="gymWarmup" class="m-warm flex items-center gap-3 !py-2">
       <span class="text-[var(--d-lv)]">${svgI("check", 20, 2.6)}</span>
-      <span class="flex-1 min-w-0 text-[15px] font-semibold">Isınma yapıldı <span class="font-normal text-[var(--t-muted)]">· ${items.length} hareket</span></span>${hide}</div>`;
-  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => lowerL(MOB_REGION_LABEL[k]));
+      <span class="flex-1 min-w-0 text-[15px] font-semibold">${t("Isınma yapıldı")} <span class="font-normal text-[var(--t-muted)]">· ${tn(items.length, "{n} hareket|ısınma")}</span></span>${hide}</div>`;
+  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => lowerL(t(MOB_REGION_LABEL[k])));
   const min = Math.max(1, Math.round(items.reduce((a, it) => a + mobItemSec(it), 0) / 60));
   return `<div id="gymWarmup" class="m-warm">
     <div class="flex items-start justify-between gap-2">
-      <div class="min-w-0"><b class="block text-[15.5px]">Isınma${regs.length ? ": " + esc(regs.join(" + ")) : ""}</b>
-        <span class="block text-[13px] text-[var(--t-muted)] mt-0.5">${items.length} hareket · ~${min} dk · mobilite rutinlerinden</span></div>
+      <div class="min-w-0"><b class="block text-[15.5px]">${regs.length ? t("Isınma: {regs}", { regs: esc(regs.join(" + ")) }) : t("Isınma")}</b>
+        <span class="block text-[13px] text-[var(--t-muted)] mt-0.5">${tn(items.length, "{n} hareket · ~{min} dk · mobilite rutinlerinden", { min })}</span></div>
       ${hide}
     </div>
     <div class="text-[12.5px] text-[var(--t-dim)] mt-2">${items.map(i => esc(i.name)).join(" · ")}</div>
-    <button id="gymWarmupStart" onclick="mobWarmupStart()" class="m-warm-go w-full justify-center mt-3">${svgI("play", 16, 2.4)}Isınmayı başlat</button>
+    <button id="gymWarmupStart" onclick="mobWarmupStart()" class="m-warm-go w-full justify-center mt-3">${svgI("play", 16, 2.4)}${t("Isınmayı başlat")}</button>
   </div>`;
 }
 function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds("Isınma", items.map(i => i.id), null); }
@@ -6308,7 +6308,7 @@ function mobWarmupHide() {
   snapshot();
   state.settings.warmupCard = false;
   renderAll();
-  offerUndo("Isınma kartı gizlendi. Profil'den geri açabilirsin");
+  offerUndo(t("Isınma kartı gizlendi. Profil'den geri açabilirsin"));
 }
 // ---------------------------------------------------------------------------
 // GRAFİK (SVG)
@@ -7213,7 +7213,7 @@ function snoozeBackup() { state.backupSnoozeUntil = Date.now() + 3 * DAY_MS; sav
 
 const MUSCLES = ["Göğüs", "Sırt", "Omuz", "Ön Bacak", "Arka Bacak & Kalça", "Kalf", "Biceps", "Triceps", "Karın"];
 // v48: kayıtlı kas adının (MUSCLES, ex.muscle, state.libMuscle) görünen adı; kayıt hep Türkçe kalır
-function muscleL(m) { return t(m); }
+function muscleL(m) { return MUSCLES.includes(m) ? t(m) : m; }
 // v48: EXERCISE_LIBRARY kategori başlığının görünen adı (anahtar ve sıra değişmez)
 function libCatL(cat) { return t(cat); }
 // v48: kayıtlı targetInfo / set.target metnindeki " sn" / " dk" birimleri İngilizcede " sec" / " min" gösterilir (kayıt Türkçe)
@@ -7737,7 +7737,7 @@ function fmtDuration(ms) {
 }
 function fmtMinutes(min) {
   min = Math.round(min);
-  return min >= 60 ? `${Math.floor(min / 60)} sa ${min % 60} dk` : `${min} dk`;
+  return min >= 60 ? t("{h} sa {m} dk", { h: Math.floor(min / 60), m: min % 60 }) : t("{m} dk", { m: min });
 }
 
 // ---------------------------------------------------------------------------
@@ -8228,8 +8228,8 @@ function nearestLevelBelow(list, kg) {
 }
 function levelsSummary(ex) {
   const L = ex.levels;
-  if (L && L.mode === "step" && num(L.step) > 0) return `${fmtKg(num(L.step))} kg arayla${num(L.addon) > 0 ? ` (+${fmtKg(num(L.addon))} ek plaka)` : ""}`;
-  if (L && L.mode === "list") return `${(L.list || []).length} kademe${num(L.addon) > 0 ? ` (+${fmtKg(num(L.addon))} ek)` : ""}`;
+  if (L && L.mode === "step" && num(L.step) > 0) return num(L.addon) > 0 ? t("{step} kg arayla (+{add} ek plaka)", { step: fmtKg(num(L.step)), add: fmtKg(num(L.addon)) }) : t("{step} kg arayla", { step: fmtKg(num(L.step)) });
+  if (L && L.mode === "list") { const cnt = (L.list || []).length; return num(L.addon) > 0 ? tn(cnt, "{n} kademe (+{add} ek)", { add: fmtKg(num(L.addon)) }) : tn(cnt, "{n} kademe"); }
   return "";
 }
 
@@ -8242,11 +8242,13 @@ function levelsAskHtml(ex, exIdx) {
   const around = list.filter(v => v >= num(ex.sets[0] && ex.sets[0].kg) - inf.step * 2).slice(0, 5).map(fmtKg).join(" · ");
   return `
     <div class="t-panel rounded-2xl px-3 py-2.5 text-[13px] space-y-2">
-      <div class="text-[var(--t-text2)]">Bu ${equipOf(ex) === "dumbbell" ? "dambılların" : "makinenin"} kademeleri <b class="text-[var(--t-text)]">${fmtKg(inf.step)} kg</b> arayla mı gidiyor? <span class="t-dim">(${around} …)</span></div>
+      <div class="text-[var(--t-text2)]">${equipOf(ex) === "dumbbell"
+        ? t("Bu dambılların kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtKg(inf.step), around })
+        : t("Bu makinenin kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtKg(inf.step), around })}</div>
       <div class="flex gap-2">
-        <button onclick="confirmInferredLevels(${exIdx})" class="t-btn h-11 px-4 rounded-xl text-[13px]">Evet, kaydet</button>
-        <button onclick="openEditExercise(${exIdx})" class="t-btn-ghost h-11 px-4 rounded-xl text-[13px]">Düzenle</button>
-        <button onclick="dismissLevelsAsk(${exIdx})" class="t-btn-ghost h-11 w-11 rounded-xl" aria-label="Kapat">&times;</button>
+        <button onclick="confirmInferredLevels(${exIdx})" class="t-btn h-11 px-4 rounded-xl text-[13px]">${t("Evet, kaydet")}</button>
+        <button onclick="openEditExercise(${exIdx})" class="t-btn-ghost h-11 px-4 rounded-xl text-[13px]">${t("Düzenle")}</button>
+        <button onclick="dismissLevelsAsk(${exIdx})" class="t-btn-ghost h-11 w-11 rounded-xl" aria-label="${t("Kapat")}">&times;</button>
       </div>
     </div>`;
 }
@@ -8255,7 +8257,7 @@ function confirmInferredLevels(exIdx) {
   const inf = inferLevels(ex);
   if (!inf) return;
   ex.levels = inf;
-  toast(`Kademeler kaydedildi: ${fmtKg(inf.step)} kg arayla`);
+  toast(t("Kademeler kaydedildi: {step} kg arayla", { step: fmtKg(inf.step) }));
   renderAll();
 }
 function dismissLevelsAsk(exIdx) { activeDay().exercises[exIdx].levelsAskDismiss = true; renderAll(); }
@@ -8276,7 +8278,7 @@ function updateExEquipUI() {
   const kind = exModal.kind;
   const sel = $("exEquip").value;
   const eq = sel === "auto" ? autoEquip($("exName").value) : sel;
-  $("exEquip").options[0].textContent = "Otomatik (" + equipL(autoEquip($("exName").value), true) + ")";
+  $("exEquip").options[0].textContent = t("Otomatik ({e})", { e: equipL(autoEquip($("exName").value), true) });
   const lv = kind === "weight" && (eq === "stack" || eq === "dumbbell");
   $("exEquipWrap").classList.toggle("hidden", kind !== "weight");
   $("exLevelsWrap").classList.toggle("hidden", !lv);
@@ -8284,7 +8286,7 @@ function updateExEquipUI() {
   const incShown = kind === "weight" && !lv;
   $("exExtraWrap").classList.toggle("grid-cols-2", incShown);
   $("exExtraWrap").classList.toggle("grid-cols-1", !incShown);
-  $("exLvTitle").textContent = eq === "dumbbell" ? "Salonundaki dambıl kiloları" : "Makinenin kilo kademeleri";
+  $("exLvTitle").textContent = eq === "dumbbell" ? t("Salonundaki dambıl kiloları") : t("Makinenin kilo kademeleri");
 }
 function fillExLevels(v) {
   $("exEquip").value = v.equip && EQUIP_LABEL[v.equip] ? v.equip : "auto";
@@ -8343,7 +8345,7 @@ function startWorkout() {
 function exitActiveWorkout() { state.gymActive = false; window.scrollTo(0, 0); renderAll(); }
 
 function gymSubNav() {
-  return `<nav class="gym-subnav flex gap-5 border-b border-[var(--t-line)] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="Antrenman bölümleri">
+  return `<nav class="gym-subnav flex gap-5 border-b border-[var(--t-line)] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="${t("Antrenman bölümleri")}">
     ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${t(l)}</button>`).join("")}
   </nav>`;
 }
@@ -8364,7 +8366,7 @@ function gymTodayHtml() {
   const tKey = todayStr();
   const doneDays = {};
   state.workoutLogs.forEach(l => { if (l.ts) doneDays[todayStr(new Date(l.ts))] = true; });
-  const names = ["PZT", "SAL", "ÇAR", "PER", "CUM", "CMT", "PAZ"];
+  const names = [t("PZT|gün"), t("SAL|gün"), t("ÇAR|gün"), t("PER|gün"), t("CUM|gün"), t("CMT|gün"), t("PAZ|gün")];
   const strip = names.map((n, i) => {
     const d = new Date(ws + i * DAY_MS + 12 * 3600000);
     const k = todayStr(d), today = k === tKey, done = doneDays[k];
@@ -8387,29 +8389,29 @@ function gymTodayHtml() {
   return `
     <div class="grid grid-cols-7 gap-1.5">${strip}</div>
     <div class="t-card rounded-[22px] p-5 space-y-3.5">
-      <div class="t-label ${inProg ? "" : "t-accent"}" style="${inProg ? "" : "color:var(--t-acc-text)"}">${inProg ? "DEVAM EDEN ANTRENMAN" : state.activeWorkoutDayIdx === nIdx ? "SIRADAKİ ANTRENMAN" : "SEÇİLİ ANTRENMAN"}</div>
+      <div class="t-label ${inProg ? "" : "t-accent"}" style="${inProg ? "" : "color:var(--t-acc-text)"}">${inProg ? t("DEVAM EDEN ANTRENMAN") : state.activeWorkoutDayIdx === nIdx ? t("SIRADAKİ ANTRENMAN") : t("SEÇİLİ ANTRENMAN")}</div>
       <div class="t-display text-[34px] leading-none uppercase">${esc(day.name)}</div>
       <div class="flex gap-4 t-muted text-sm">
-        <span><b class="text-[var(--t-text)]">${day.exercises.length}</b> hareket</span><span><b class="text-[var(--t-text)]">${sets}</b> set</span><span>~<b class="text-[var(--t-text)]">${estimateMinutes(day)}</b> dk</span>
+        <span><b class="text-[var(--t-text)]">${day.exercises.length}</b> ${tn(day.exercises.length, "hareket|antrenman")}</span><span><b class="text-[var(--t-text)]">${sets}</b> ${tn(sets, "set|sayı")}</span><span>~<b class="text-[var(--t-text)]">${estimateMinutes(day)}</b> ${t("dk")}</span>
       </div>
-      ${muscles.length ? `<div class="flex flex-wrap gap-1.5">${muscles.map(m => `<span class="t-chip">${esc(m)}</span>`).join("")}</div>` : ""}
+      ${muscles.length ? `<div class="flex flex-wrap gap-1.5">${muscles.map(m => `<span class="t-chip">${esc(muscleL(m))}</span>`).join("")}</div>` : ""}
       ${state.workoutDays.length > 1 && !inProg ? `<div class="flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1">${dayChips}</div>` : ""}
       <button onclick="startWorkout()" ${day.exercises.length ? "" : "disabled"} class="t-btn w-full h-14 rounded-2xl text-[17px] flex items-center justify-center gap-2.5 ${day.exercises.length ? "" : "opacity-40"}">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ICON.play}"></path></svg>${inProg ? "Antrenmana Devam Et" : "Antrenmanı Başlat"}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${ICON.play}"></path></svg>${inProg ? t("Antrenmana Devam Et") : t("Antrenmanı Başlat")}
       </button>
-      ${day.exercises.length ? "" : `<div data-empty-day class="rounded-2xl bg-[var(--t-elev)] p-4 space-y-2.5 text-center"><p class="text-[14px] t-muted">Bu günde henüz hareket yok.</p>
-        <button onclick="openExercisePicker()" class="t-btn-ghost w-full h-11 rounded-xl text-sm">İlk hareketini ekle</button></div>`}
+      ${day.exercises.length ? "" : `<div data-empty-day class="rounded-2xl bg-[var(--t-elev)] p-4 space-y-2.5 text-center"><p class="text-[14px] t-muted">${t("Bu günde henüz hareket yok.")}</p>
+        <button onclick="openExercisePicker()" class="t-btn-ghost w-full h-11 rounded-xl text-sm">${t("İlk hareketini ekle")}</button></div>`}
     </div>
     ${warmupCardHtml(day, inProg)}
     <div class="space-y-2.5">
-      <div class="t-label">BU HAFTA</div>
+      <div class="t-label">${t("BU HAFTA")}</div>
       <div class="grid grid-cols-3 gap-2">
-        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">Antrenman</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg">/${state.workoutDays.length}</span></div></div>
-        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">Tonaj</div><div class="t-display text-[26px]">${fmtNum(wVol / 1000)}<span class="t-dim text-lg"> t</span></div></div>
-        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">Süre</div><div class="t-display text-[26px]">${Math.floor(wMin / 60)}:${String(Math.round(wMin % 60)).padStart(2, "0")}<span class="t-dim text-lg"> sa</span></div></div>
+        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Antrenman|sayı")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg">/${state.workoutDays.length}</span></div></div>
+        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(wVol / 1000)}<span class="t-dim text-lg"> ${t("t|ton")}</span></div></div>
+        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Süre")}</div><div class="t-display text-[26px]">${Math.floor(wMin / 60)}:${String(Math.round(wMin % 60)).padStart(2, "0")}<span class="t-dim text-lg"> ${t("sa")}</span></div></div>
       </div>
       ${last ? `<button onclick="setGymView('history')" class="t-card-flat w-full min-h-[60px] rounded-2xl px-3.5 flex items-center justify-between text-left">
-        <span class="flex flex-col gap-0.5"><span class="text-xs t-muted">Son antrenman · ${esc(last.ts ? fmtDate(last.ts) : last.date)}</span><span class="text-[15px] font-semibold">${esc(last.dayName)}${num(last.durationMin) ? " · " + fmtMinutes(num(last.durationMin)) : ""}</span></span>
+        <span class="flex flex-col gap-0.5"><span class="text-xs t-muted">${t("Son antrenman · {date}", { date: esc(last.ts ? fmtDate(last.ts) : last.date) })}</span><span class="text-[15px] font-semibold">${esc(last.dayName)}${num(last.durationMin) ? " · " + fmtMinutes(num(last.durationMin)) : ""}</span></span>
         <span class="t-dim">${svgI("chevR")}</span></button>` : ""}
     </div>`;
 }
@@ -8424,9 +8426,9 @@ function setEffort(exIdx, sIdx, v) {
 }
 function effortRowHtml(exIdx, s, i) {
   return `<div class="px-1 pt-1 pb-1.5 space-y-1.5" data-effort-row="${exIdx}-${i}">
-      <div class="text-[12px] t-muted">${i + 1}. set nasıl geçti? <span class="t-dim">(isteğe bağlı)</span></div>
-      <div class="grid grid-cols-4 gap-1.5" role="group" aria-label="${i + 1}. set zorluğu">
-        ${[1, 2, 3, 4].map(v => `<button onclick="setEffort(${exIdx}, ${i}, ${v})" aria-pressed="${s.e === v}" class="h-11 rounded-xl text-[13px] ${s.e === v ? "font-extrabold text-black" : "font-semibold bg-[var(--t-elev)] text-[var(--t-text2)]"}" ${s.e === v ? `style="background:${EFFORT_COLORS[v]}"` : ""}>${EFFORT_LABELS[v]}</button>`).join("")}
+      <div class="text-[12px] t-muted">${t("{n}. set nasıl geçti? <span class=\"t-dim\">(isteğe bağlı)</span>", { n: i + 1 })}</div>
+      <div class="grid grid-cols-4 gap-1.5" role="group" aria-label="${t("{n}. set zorluğu", { n: i + 1 })}">
+        ${[1, 2, 3, 4].map(v => `<button onclick="setEffort(${exIdx}, ${i}, ${v})" aria-pressed="${s.e === v}" class="h-11 rounded-xl text-[13px] ${s.e === v ? "font-extrabold text-black" : "font-semibold bg-[var(--t-elev)] text-[var(--t-text2)]"}" ${s.e === v ? `style="background:${EFFORT_COLORS[v]}"` : ""}>${effortL(v)}</button>`).join("")}
       </div>
     </div>`;
 }
@@ -8434,33 +8436,33 @@ function effortRowHtml(exIdx, s, i) {
 function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   const isNext = ptr && ptr.e === exIdx && ptr.s === i;
   const rowCls = s.done ? "bg-[var(--t-panel)]" : isNext ? "bg-[var(--t-elev0)] ring-[1.5px] ring-[var(--t-acc-text)] ring-inset" : "";
-  const check = `<button onclick="toggleSetDone(${exIdx}, ${i})" aria-label="Seti tamamla" class="w-11 h-11 rounded-xl flex items-center justify-center ${s.done ? "bg-[var(--t-acc)] text-[var(--t-on-acc)]" : "border-[1.5px] border-[var(--t-faint)] t-muted"}">${svgI("check", 22, 2.6)}</button>`;
+  const check = `<button onclick="toggleSetDone(${exIdx}, ${i})" aria-label="${t("Seti tamamla")}" class="w-11 h-11 rounded-xl flex items-center justify-center ${s.done ? "bg-[var(--t-acc)] text-[var(--t-on-acc)]" : "border-[1.5px] border-[var(--t-faint)] t-muted"}">${svgI("check", 22, 2.6)}</button>`;
   if (ex.kind === "cardio") {
     return `<div class="rounded-2xl p-2.5 space-y-2 ${rowCls}">
-      <div class="flex items-center justify-between"><span class="text-xs font-bold t-muted">${ex.sets.length > 1 ? (i + 1) + ". BÖLÜM" : "KARDİYO"}</span>${check}</div>
+      <div class="flex items-center justify-between"><span class="text-xs font-bold t-muted">${ex.sets.length > 1 ? t("{n}. BÖLÜM", { n: i + 1 }) : t("KARDİYO")}</span>${check}</div>
       <div class="grid grid-cols-3 gap-2">
-        <label class="block"><span class="block text-[12px] t-muted mb-1">Süre (dk)</span><input type="text" inputmode="decimal" data-fk="c-${exIdx}-${i}-min" value="${esc(s.min === "" ? "" : fmtNum(num(s.min)))}" onchange="updateSetData(${exIdx}, ${i}, 'min', this.value)" class="t-input w-full" /></label>
-        <label class="block"><span class="block text-[12px] t-muted mb-1">Mesafe (km)</span><input type="text" inputmode="decimal" placeholder="—" data-fk="c-${exIdx}-${i}-km" value="${esc(s.km === "" || s.km == null ? "" : fmtNum(num(s.km)))}" onchange="updateSetData(${exIdx}, ${i}, 'km', this.value)" class="t-input w-full" /></label>
-        <label class="block"><span class="block text-[12px] t-muted mb-1">Eğim/Seviye</span><input type="text" placeholder="—" data-fk="c-${exIdx}-${i}-lvl" value="${esc(s.lvl || "")}" onchange="updateSetData(${exIdx}, ${i}, 'lvl', this.value)" class="t-input w-full" /></label>
+        <label class="block"><span class="block text-[12px] t-muted mb-1">${t("Süre (dk)")}</span><input type="text" inputmode="decimal" data-fk="c-${exIdx}-${i}-min" value="${esc(s.min === "" ? "" : fmtNum(num(s.min)))}" onchange="updateSetData(${exIdx}, ${i}, 'min', this.value)" class="t-input w-full" /></label>
+        <label class="block"><span class="block text-[12px] t-muted mb-1">${t("Mesafe (km)")}</span><input type="text" inputmode="decimal" placeholder="—" data-fk="c-${exIdx}-${i}-km" value="${esc(s.km === "" || s.km == null ? "" : fmtNum(num(s.km)))}" onchange="updateSetData(${exIdx}, ${i}, 'km', this.value)" class="t-input w-full" /></label>
+        <label class="block"><span class="block text-[12px] t-muted mb-1">${t("Eğim/Seviye")}</span><input type="text" placeholder="—" data-fk="c-${exIdx}-${i}-lvl" value="${esc(s.lvl || "")}" onchange="updateSetData(${exIdx}, ${i}, 'lvl', this.value)" class="t-input w-full" /></label>
       </div>
     </div>`;
   }
   if (ex.kind === "time") {
     return `<div class="grid items-center gap-2 h-14 px-1 rounded-2xl ${rowCls}" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px">
       <span class="t-display text-[22px] text-center ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}</span>
-      <span class="flex items-center gap-1.5"><input type="text" inputmode="numeric" data-fk="t-${exIdx}-${i}" value="${num(s.sec)}" onchange="updateSetData(${exIdx}, ${i}, 'sec', this.value)" class="t-input w-20" /><span class="text-xs t-muted">sn</span></span>
-      <button onclick="startTimer(${num(s.sec)}, ${esc(JSON.stringify(ex.name.slice(0, 40)))})" class="t-btn-ghost h-11 rounded-xl text-[13px] flex items-center justify-center gap-1">${svgI("play", 14)}Başlat</button>
+      <span class="flex items-center gap-1.5"><input type="text" inputmode="numeric" data-fk="t-${exIdx}-${i}" value="${num(s.sec)}" onchange="updateSetData(${exIdx}, ${i}, 'sec', this.value)" class="t-input w-20" /><span class="text-xs t-muted">${t("sn")}</span></span>
+      <button onclick="startTimer(${num(s.sec)}, ${esc(JSON.stringify(ex.name.slice(0, 40)))})" class="t-btn-ghost h-11 rounded-xl text-[13px] flex items-center justify-center gap-1">${svgI("play", 14)}${t("Başlat")}</button>
       ${check}
     </div>`;
   }
   let lastDone = -1;
   ex.sets.forEach((x, j) => { if (x.done) lastDone = j; });
-  const effLbl = s.done && EFFORT_LABELS[s.e] ? `<span class="block font-sans text-[11px] font-bold leading-none mt-0.5" style="color:${EFFORT_COLORS[s.e]}">${EFFORT_LABELS[s.e]}</span>` : "";
+  const effLbl = s.done && EFFORT_LABELS[s.e] ? `<span class="block font-sans text-[11px] font-bold leading-none mt-0.5" style="color:${EFFORT_COLORS[s.e]}">${effortL(s.e)}</span>` : "";
   return `<div class="rounded-2xl ${rowCls}"><div class="grid items-center gap-2 h-14 px-1" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px">
     <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-[var(--t-warn-icon)] text-sm">★</span>' : ""}${effLbl}</span>
     <span class="text-[13px] t-dim truncate">${prev}</span>
-    <input type="text" inputmode="decimal" aria-label="${i + 1}. set kilo" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtKg(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
-    <input type="text" inputmode="numeric" aria-label="${i + 1}. set tekrar" data-fk="w-${exIdx}-${i}-reps" value="${num(s.reps)}" onchange="updateSetData(${exIdx}, ${i}, 'reps', this.value)" class="t-input w-full" />
+    <input type="text" inputmode="decimal" aria-label="${t("{n}. set kilo", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtKg(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
+    <input type="text" inputmode="numeric" aria-label="${t("{n}. set tekrar", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-reps" value="${num(s.reps)}" onchange="updateSetData(${exIdx}, ${i}, 'reps', this.value)" class="t-input w-full" />
     ${check}
   </div>${s.done && i === lastDone ? effortRowHtml(exIdx, s, i) : ""}</div>`;
 }
@@ -8479,77 +8481,77 @@ function gymActiveHtml() {
       return ps ? `${fmtKg(num(ps.kg))}×${num(ps.reps)}` : "—";
     };
     const head = ex.kind === "weight"
-      ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">SET</span><span class="truncate">ÖNCEKİ</span><span class="text-center">KG</span><span class="text-center">TEKRAR</span><span></span></div>`
-      : ex.kind === "time" ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px"><span class="text-center">SET</span><span>SÜRE</span><span></span><span></span></div>` : "";
+      ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">${t("SET")}</span><span class="truncate">${t("ÖNCEKİ")}</span><span class="text-center">${t("KG")}</span><span class="text-center">${t("TEKRAR")}</span><span></span></div>`
+      : ex.kind === "time" ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px"><span class="text-center">${t("SET")}</span><span>${t("SÜRE")}</span><span></span><span></span></div>` : "";
     return `
       <div id="exCard_${exIdx}" class="t-card rounded-[22px] p-4 space-y-3" style="scroll-margin-top: 9rem;">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0 space-y-1.5">
-            <div class="t-label">HAREKET ${exIdx + 1} / ${total}${allDone ? ' <span class="t-accent">· TAMAMLANDI</span>' : ""}</div>
+            <div class="t-label">${t("HAREKET {n} / {total}", { n: exIdx + 1, total })}${allDone ? ` <span class="t-accent">· ${t("TAMAMLANDI")}</span>` : ""}</div>
             <div class="text-[21px] font-bold leading-tight">${esc(ex.name)}</div>
             <div class="flex flex-wrap gap-1.5">
               ${ex.targetInfo ? `<span class="t-chip-accent">${esc(targetL(ex.targetInfo))}</span>` : ""}
-              ${muscleOf(ex) ? `<span class="t-chip">${esc(muscleOf(ex))}</span>` : ""}
+              ${muscleOf(ex) ? `<span class="t-chip">${esc(muscleL(muscleOf(ex)))}</span>` : ""}
               ${eq && eq !== "plates" ? `<span class="t-chip">${equipL(eq, true)}</span>` : ""}
-              ${ex.kind !== "weight" ? `<span class="t-chip">${ex.kind === "cardio" ? "Kardiyo" : "Süreli"}</span>` : ""}
+              ${ex.kind !== "weight" ? `<span class="t-chip">${ex.kind === "cardio" ? t("Kardiyo") : t("Süreli")}</span>` : ""}
             </div>
           </div>
-          <button onclick="openExSheet(${exIdx})" aria-label="Hareket seçenekleri" class="w-11 h-11 shrink-0 rounded-[14px] bg-[var(--t-elev)] flex items-center justify-center">
+          <button onclick="openExSheet(${exIdx})" aria-label="${t("Hareket seçenekleri")}" class="w-11 h-11 shrink-0 rounded-[14px] bg-[var(--t-elev)] flex items-center justify-center">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
           </button>
         </div>
-        ${last ? `<div class="text-[13px] t-muted">Geçen sefer (${fmtDate(last.ts)}): <span class="text-[var(--t-text2)] font-semibold">${esc(sessionSummary(last))}</span></div>` : ""}
+        ${last ? `<div class="text-[13px] t-muted">${t("Geçen sefer ({date}):", { date: fmtDate(last.ts) })} <span class="text-[var(--t-text2)] font-semibold">${esc(sessionSummary(last))}</span></div>` : ""}
         <div id="exRight_${exIdx}" class="text-[12px] t-dim">${exRightText(ex)}</div>
         ${levelsAskHtml(ex, exIdx)}
         ${suggestionHtml(ex, exIdx)}
-        <input type="text" value="${esc(ex.note || "")}" placeholder="Not ekle (koltuk ayarı, tutuş...)" onchange="updateExerciseNote(${exIdx}, this.value)" class="t-note w-full text-[13px]" />
+        <input type="text" value="${esc(ex.note || "")}" placeholder="${t("Not ekle (koltuk ayarı, tutuş...)")}" onchange="updateExerciseNote(${exIdx}, this.value)" class="t-note w-full text-[13px]" />
         ${head}
         <div class="space-y-1.5">${ex.sets.map((s, i) => setRowHtml(ex, exIdx, s, i, ptr, prevOf(i))).join("")}</div>
-        <button onclick="addSetToExercise(${exIdx})" class="w-full h-11 rounded-[14px] border-[1.5px] border-dashed border-[var(--t-line)] t-muted text-sm font-semibold">+ ${ex.kind === "cardio" ? "Bölüm" : "Set"} ekle</button>
+        <button onclick="addSetToExercise(${exIdx})" class="w-full h-11 rounded-[14px] border-[1.5px] border-dashed border-[var(--t-line)] t-muted text-sm font-semibold">${ex.kind === "cardio" ? t("+ Bölüm ekle") : t("+ Set ekle")}</button>
       </div>`;
   }).join("");
 
   return `
     <div class="flex items-center justify-between gap-2">
-      <button onclick="exitActiveWorkout()" aria-label="Antrenman özetine dön" class="w-11 h-11 rounded-full bg-[var(--t-surface)] flex items-center justify-center">${svgI("chevL", 22)}</button>
+      <button onclick="exitActiveWorkout()" aria-label="${t("Antrenman özetine dön")}" class="w-11 h-11 rounded-full bg-[var(--t-surface)] flex items-center justify-center">${svgI("chevL", 22)}</button>
       <div class="flex flex-col items-center min-w-0">
         <div class="t-display text-xl leading-none uppercase truncate max-w-[220px]">${esc(day.name)}</div>
-        <div class="text-xs t-muted tabular-nums mt-1"><span id="gymElapsed">00:00</span> · <span id="gymProgText">0/0 set</span></div>
+        <div class="text-xs t-muted tabular-nums mt-1"><span id="gymElapsed">00:00</span> · <span id="gymProgText">${tn(0, "{d}/{n} set", { d: 0 })}</span></div>
       </div>
-      <button onclick="finishAndLogWorkout()" class="t-btn-outline h-11 px-4 rounded-full text-sm">Bitir</button>
+      <button onclick="finishAndLogWorkout()" class="t-btn-outline h-11 px-4 rounded-full text-sm">${t("Bitir")}</button>
     </div>
     <div class="h-1 rounded-full bg-[var(--t-elev)] overflow-hidden"><div id="gymProgBar" class="h-full bg-[var(--t-acc)] transition-all duration-300" style="width:0%"></div></div>
-    ${cards || `<div class="t-card rounded-[22px] p-6 text-center text-sm t-muted">Bu günde hareket yok. <button onclick="exitActiveWorkout(); setGymView('program')" class="t-accent font-semibold underline" style="color:#1FD1C1">Programım</button> sekmesinden ekleyebilirsin.</div>`}
-    <button onclick="finishAndLogWorkout()" class="t-btn w-full h-14 rounded-2xl text-[16px]">✓ Antrenmanı Bitir ve Kaydet</button>
-    <button onclick="uncheckAllSets()" class="t-btn-ghost w-full h-11 rounded-xl text-sm">Tikleri sıfırla</button>`;
+    ${cards || `<div class="t-card rounded-[22px] p-6 text-center text-sm t-muted">${t("Bu günde hareket yok. {prog} sekmesinden ekleyebilirsin.", { prog: `<button onclick="exitActiveWorkout(); setGymView('program')" class="t-accent font-semibold underline" style="color:#1FD1C1">${t("Programım")}</button>` })}</div>`}
+    <button onclick="finishAndLogWorkout()" class="t-btn w-full h-14 rounded-2xl text-[16px]">${t("✓ Antrenmanı Bitir ve Kaydet")}</button>
+    <button onclick="uncheckAllSets()" class="t-btn-ghost w-full h-11 rounded-xl text-sm">${t("Tikleri sıfırla")}</button>`;
 }
 function exRightText(ex) {
   if (ex.kind === "cardio") {
     const ct = cardioTotals(ex.sets, false);
     const pace = paceText(ct.min, ct.km);
-    return `Toplam ${fmtNum(ct.min)} dk${ct.km > 0 ? " · " + fmtNum(ct.km) + " km" : ""}${pace ? " · " + pace : ""}`;
+    return `${t("Toplam {n} dk", { n: ct.min })}${ct.km > 0 ? " · " + fmtNum(ct.km) + " km" : ""}${pace ? " · " + pace : ""}`;
   }
-  if (ex.kind === "time") return `Toplam ${ex.sets.reduce((a, s) => a + num(s.sec), 0)} sn${ex.rest ? " · dinlenme " + ex.rest + " sn" : ""}`;
+  if (ex.kind === "time") return `${t("Toplam {n} sn", { n: String(ex.sets.reduce((a, s) => a + num(s.sec), 0)) })}${ex.rest ? " · " + t("dinlenme {n} sn", { n: String(ex.rest) }) : ""}`;
   let vol = 0, best = 0;
   ex.sets.forEach(s => { vol += num(s.kg) * num(s.reps); best = Math.max(best, e1rm(s.kg, s.reps)); });
   const lv = usesLevels(ex) ? levelsSummary(ex) : "";
-  if (best <= 0 && vol <= 0) return lv ? "Kademe: " + lv : "";   // v32: kilo girilmeden "~0 kg" gösterme
-  return `Tahmini 1RM ~${Math.round(best)} kg · Tonaj ${Math.round(vol).toLocaleString(locale())} kg${lv ? " · Kademe: " + lv : ""}`;
+  if (best <= 0 && vol <= 0) return lv ? t("Kademe: {lv}", { lv }) : "";   // v32: kilo girilmeden "~0 kg" gösterme
+  return `${t("Tahmini 1RM ~{best} kg · Tonaj {vol} kg", { best: String(Math.round(best)), vol: Math.round(vol).toLocaleString(locale()) })}${lv ? " · " + t("Kademe: {lv}", { lv }) : ""}`;
 }
 
 function gymProgramHtml() {
   const day = activeDay();
   const nIdx = nextDayIdx();
-  const chips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-4 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "bg-[var(--t-surface)] border border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${esc(d.name)}${i === nIdx ? ' <span class="text-[11px] font-bold" style="color:#1FD1C1">SIRADA</span>' : ""}</button>`).join("");
+  const chips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-4 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "bg-[var(--t-surface)] border border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${esc(d.name)}${i === nIdx ? ` <span class="text-[11px] font-bold" style="color:#1FD1C1">${t("SIRADA")}</span>` : ""}</button>`).join("");
   const rows = day.exercises.map((ex, i) => {
     const eq = equipOf(ex);
-    const meta = [targetL(ex.targetInfo), muscleOf(ex), eq ? equipL(eq, true) : (ex.kind === "cardio" ? "Kardiyo" : "Süreli")].filter(Boolean).join(" · ");
-    const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[12px] text-[var(--t-warn-mid)]">Kademe tanımlı değil</span>` : usesLevels(ex) ? `<span class="text-[12px] t-dim">Kademe: ${esc(levelsSummary(ex))}</span>` : "";
+    const meta = [targetL(ex.targetInfo), muscleL(muscleOf(ex)), eq ? equipL(eq, true) : (ex.kind === "cardio" ? t("Kardiyo") : t("Süreli"))].filter(Boolean).join(" · ");
+    const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[12px] text-[var(--t-warn-mid)]">${t("Kademe tanımlı değil")}</span>` : usesLevels(ex) ? `<span class="text-[12px] t-dim">${t("Kademe: {lv}", { lv: esc(levelsSummary(ex)) })}</span>` : "";
     return `<div data-ex-row="${i}" class="t-card-flat rounded-2xl min-h-[64px] pl-1 pr-1.5 py-2 flex items-center gap-2">
-      ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${esc(ex.name)} hareketini sürükleyerek taşı" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
+      ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${t("{name} hareketini sürükleyerek taşı", { name: esc(ex.name) })}" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
       <span class="t-display text-xl t-dim w-6 text-center">${i + 1}</span>
       <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold line-clamp-2 leading-snug">${esc(ex.name)}</span><span class="text-xs t-muted truncate">${esc(meta)}</span>${lvWarn}</span>
-      <button onclick="openExSheet(${i})" aria-label="${esc(ex.name)} seçenekleri" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-muted">
+      <button onclick="openExSheet(${i})" aria-label="${t("{name} seçenekleri", { name: esc(ex.name) })}" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-muted">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
       </button>
     </div>`;
@@ -8557,20 +8559,20 @@ function gymProgramHtml() {
   return `
     <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">${chips}</div>
     <div class="grid grid-cols-3 gap-2">
-      <button onclick="addWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]">+ Yeni gün</button>
-      <button onclick="renameWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]">Adlandır</button>
-      <button onclick="deleteWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]" style="color:var(--t-danger-text)">Günü sil</button>
+      <button onclick="addWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]">${t("+ Yeni gün")}</button>
+      <button onclick="renameWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]">${t("Adlandır")}</button>
+      <button onclick="deleteWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]" style="color:var(--t-danger-text)">${t("Günü sil")}</button>
     </div>
     <div class="space-y-2">
-      <div class="flex items-baseline justify-between"><span class="t-label">HAREKETLER</span><span class="text-xs t-dim">${day.exercises.length} hareket · ~${estimateMinutes(day)} dk</span></div>
-      ${day.exercises.length > 1 ? `<div class="text-xs t-dim">Sırayı değiştirmek için soldaki tutamacı basılı tutup sürükle.</div>` : ""}
-      <div id="progExList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center text-sm t-muted">Bu günde henüz hareket yok.</div>`}</div>
+      <div class="flex items-baseline justify-between"><span class="t-label">${t("HAREKETLER")}</span><span class="text-xs t-dim">${tn(day.exercises.length, "{n} hareket · ~{min} dk", { min: estimateMinutes(day) })}</span></div>
+      ${day.exercises.length > 1 ? `<div class="text-xs t-dim">${t("Sırayı değiştirmek için soldaki tutamacı basılı tutup sürükle.")}</div>` : ""}
+      <div id="progExList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center text-sm t-muted">${t("Bu günde henüz hareket yok.")}</div>`}</div>
     </div>
     <div class="grid grid-cols-2 gap-2">
-      <button onclick="openExercisePicker()" class="t-btn h-12 rounded-xl text-[14px]">+ Kütüphaneden ekle</button>
-      <button onclick="openExerciseModal({ name: '', kind: 'weight' })" class="t-btn-outline h-12 rounded-xl text-[14px]">Özel hareket</button>
+      <button onclick="openExercisePicker()" class="t-btn h-12 rounded-xl text-[14px]">${t("+ Kütüphaneden ekle")}</button>
+      <button onclick="openExerciseModal({ name: '', kind: 'weight' })" class="t-btn-outline h-12 rounded-xl text-[14px]">${t("Özel hareket")}</button>
     </div>
-    ${day.exercises.length ? `<button onclick="startWorkout()" class="t-btn-ghost w-full h-12 rounded-xl text-[14px] flex items-center justify-center gap-2">${svgI("play", 16)} Bu antrenmanı başlat</button>` : ""}`;
+    ${day.exercises.length ? `<button onclick="startWorkout()" class="t-btn-ghost w-full h-12 rounded-xl text-[14px] flex items-center justify-center gap-2">${svgI("play", 16)} ${t("Bu antrenmanı başlat")}</button>` : ""}`;
 }
 
 // --- Vücut haritası ---
@@ -8631,21 +8633,21 @@ function libExerciseItems(muscle, q) {
 function libListHtml() {
   const q = libSearchQ.trim();
   const m = state.libMuscle;
-  if (!q && !m) return `<div class="text-sm t-muted text-center py-4">Hareketleri görmek için haritada bir kasa dokun ya da yukarıdan ara.</div>`;
+  if (!q && !m) return `<div class="text-sm t-muted text-center py-4">${t("Hareketleri görmek için haritada bir kasa dokun ya da yukarıdan ara.")}</div>`;
   const items = libExerciseItems(m, q);
   const inDay = new Set(activeDay().exercises.map(e => exKey(e.name)));
-  if (!items.length) return `<div class="text-sm t-muted text-center py-4">Sonuç bulunamadı.</div>`;
+  if (!items.length) return `<div class="text-sm t-muted text-center py-4">${t("Sonuç bulunamadı.")}</div>`;
   return items.map(n => {
     const h = historyFor(n);
     const last = h[h.length - 1];
-    const meta = last ? `Son: ${sessionSummary(last)} · ${fmtDate(last.ts)}` : "Henüz yapılmadı";
+    const meta = last ? t("Son: {s} · {d}", { s: sessionSummary(last), d: fmtDate(last.ts) }) : t("Henüz yapılmadı");
     return `<div class="t-card-flat rounded-2xl min-h-[72px] pl-3.5 pr-2 py-2 flex items-center gap-3">
       <span class="flex-1 min-w-0 flex flex-col gap-1">
         <span class="text-[15px] font-bold">${esc(n)}</span>
         <span class="text-xs t-muted truncate">${esc(meta)}</span>
-        ${inDay.has(exKey(n)) ? `<span class="self-start text-[11px] font-bold px-2 py-0.5 rounded-full border border-[var(--t-panel-line)] bg-[var(--t-panel)]" style="color:#1FD1C1">PROGRAMDA</span>` : ""}
+        ${inDay.has(exKey(n)) ? `<span class="self-start text-[11px] font-bold px-2 py-0.5 rounded-full border border-[var(--t-panel-line)] bg-[var(--t-panel)]" style="color:#1FD1C1">${t("PROGRAMDA")}</span>` : ""}
       </span>
-      <button onclick="openExerciseModal({ name: ${esc(JSON.stringify(n))}, kind: detectKind(${esc(JSON.stringify(n))}) })" aria-label="${esc(n)} hareketini ${esc(activeDay().name)} gününe ekle" class="t-btn-outline w-11 h-11 rounded-xl flex items-center justify-center">${svgI("plus", 20, 2.4)}</button>
+      <button onclick="openExerciseModal({ name: ${esc(JSON.stringify(n))}, kind: detectKind(${esc(JSON.stringify(n))}) })" aria-label="${t("{name} hareketini {day} gününe ekle", { name: esc(n), day: esc(activeDay().name) })}" class="t-btn-outline w-11 h-11 rounded-xl flex items-center justify-center">${svgI("plus", 20, 2.4)}</button>
     </div>`;
   }).join("");
 }
@@ -8664,60 +8666,63 @@ function gymLibraryHtml() {
     });
   });
   const n = sel ? counts[sel] || 0 : 0;
-  const tag = n === 0 ? "henüz çalışılmadı" : n < 10 ? "az" : n <= 20 ? "ideal aralıkta" : "yüksek hacim";
+  const tag = n === 0 ? t("henüz çalışılmadı") : n < 10 ? t("az|yük") : n <= 20 ? t("ideal aralıkta") : t("yüksek hacim");
+  const selTag = range === "program" && n === 0 ? t("programında yok") : tag;
+  const selLine = range === "today" ? tn(n, "Bugün <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", { tag: selTag })
+    : range === "program" ? tn(n, "Programında haftada <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", { tag: selTag })
+    : tn(n, "Bu hafta <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", { tag: selTag });
   const rangeBtn = (k, l) => `<button onclick="setLibRange('${k}')" aria-pressed="${range === k}" class="h-11 rounded-[11px] text-[13px] ${range === k ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "t-muted font-semibold"}">${l}</button>`;
-  const rangeTxt = range === "today" ? "Bugünkü set sayısına göre" : range === "program" ? "Programının bir haftada verdiği set sayısı" : "Bu haftaki set sayısına göre";
-  const rangeWord = range === "today" ? "Bugün" : range === "program" ? "Programında haftada" : "Bu hafta";
+  const rangeTxt = range === "today" ? t("Bugünkü set sayısına göre") : range === "program" ? t("Programının bir haftada verdiği set sayısı") : t("Bu haftaki set sayısına göre");
   const pTotal = range !== "today" ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
   const pRows = range !== "today" ? MUSCLES.map(m => {
     const c = counts[m] || 0;
-    const tg = c === 0 ? "yok" : c < 10 ? "az" : c <= 20 ? "ideal" : "yüksek";
+    const tg = c === 0 ? t("yok|yük") : c < 10 ? t("az|yük") : c <= 20 ? t("ideal|yük") : t("yüksek|yük");
     const col = c === 0 ? "#3A3A40" : c < 10 ? "#3E8F88" : c <= 20 ? "#14D9C6" : "#00FFE5";
     return `<button onclick="selectMuscle(${esc(JSON.stringify(m))})" class="w-full min-h-[44px] flex items-center gap-2.5 text-left">
-      <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} truncate">${esc(m)}</span>
+      <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} truncate">${esc(muscleL(m))}</span>
       <span class="relative flex-1 h-2.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / 24 * 100)}%;background:${col}"></span></span>
       <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b> <span class="t-dim text-[12px]">${tg}</span></span>
     </button>`;
   }).join("") : "";
   return `
     <div class="flex items-center justify-between">
-      <div class="flex flex-col"><span class="t-label">KAS YÜKÜ</span><span class="text-[13px] text-[var(--t-text2)]">${rangeTxt}</span></div>
+      <div class="flex flex-col"><span class="t-label">${t("KAS YÜKÜ")}</span><span class="text-[13px] text-[var(--t-text2)]">${rangeTxt}</span></div>
     </div>
-    <div class="grid grid-cols-3 gap-0.5 bg-[var(--t-surface)] border border-[var(--t-line)] rounded-[14px] p-0.5">${rangeBtn("week", "Bu hafta")}${rangeBtn("today", "Bugün")}${rangeBtn("program", "Programım")}</div>
+    <div class="grid grid-cols-3 gap-0.5 bg-[var(--t-surface)] border border-[var(--t-line)] rounded-[14px] p-0.5">${rangeBtn("week", t("Bu hafta"))}${rangeBtn("today", t("Bugün"))}${rangeBtn("program", t("Programım"))}</div>
     <div class="flex justify-center">
       <div class="relative t-bodymap" style="width: min(100%, 340px); aspect-ratio: 765 / 1024;">
-        <img src="anatomy.jpg" alt="Önden ve arkadan kas anatomisi" class="absolute inset-0 w-full h-full select-none" draggable="false" />
-        <svg viewBox="0 0 765 1024" class="absolute inset-0 w-full h-full" role="img" aria-label="Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç">
+        <img src="anatomy.jpg" alt="${t("Önden ve arkadan kas anatomisi")}" class="absolute inset-0 w-full h-full select-none" draggable="false" />
+        <svg viewBox="0 0 765 1024" class="absolute inset-0 w-full h-full" role="img" aria-label="${t("Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç")}">
           <g style="mix-blend-mode: color">${polys}</g>
           <g style="pointer-events:none">${sels}</g>
         </svg>
-        <span class="absolute left-1.5 bottom-1 text-[12px] font-bold tracking-widest t-muted">ÖN</span>
-        <span class="absolute right-1.5 bottom-1 text-[12px] font-bold tracking-widest t-muted">ARKA</span>
+        <span class="absolute left-1.5 bottom-1 text-[12px] font-bold tracking-widest t-muted">${t("ÖN")}</span>
+        <span class="absolute right-1.5 bottom-1 text-[12px] font-bold tracking-widest t-muted">${t("ARKA")}</span>
       </div>
     </div>
     <div class="flex items-center justify-center gap-3.5 text-[12px] t-muted">
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#9A9AA0]"></span>0</span>
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#6FA39E]"></span>1–9</span>
       <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#2FC4B6]"></span>10–20</span>
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#4DF2E1]"></span>20+ set</span>
+      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#4DF2E1]"></span>${t("20+ set")}</span>
     </div>
     ${range === "program" ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5">
-      <div class="flex items-baseline justify-between pb-1"><span class="t-label">PROGRAMIN HAFTALIK ETKİSİ</span><span class="text-xs t-dim">${state.workoutDays.length} gün · ${pTotal} set</span></div>
+      <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("PROGRAMIN HAFTALIK ETKİSİ")}</span><span class="text-xs t-dim">${tn(state.workoutDays.length, "{n} gün")} · ${tn(pTotal, "{n} set")}</span></div>
       ${pRows}
-      <p class="text-[12px] t-dim pt-1.5">Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.</p>
+      <p class="text-[12px] t-dim pt-1.5">${t("Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.")}</p>
     </div>` : range === "week" && pTotal ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5" data-week-muscles>
-      <div class="flex items-baseline justify-between pb-1"><span class="t-label">BU HAFTA · KAS BAŞINA SET</span><span class="text-xs t-dim">${pTotal} set</span></div>
+      <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("BU HAFTA · KAS BAŞINA SET")}</span><span class="text-xs t-dim">${tn(pTotal, "{n} set")}</span></div>
       ${pRows}
-      <p class="text-[12px] t-dim pt-1.5">Pazartesiden bu yana kaydedilen setler. Kas gelişimi için genel öneri haftada 10–20 set.</p>
+      <p class="text-[12px] t-dim pt-1.5">${t("Pazartesiden bu yana kaydedilen setler. Kas gelişimi için genel öneri haftada 10–20 set.")}</p>
     </div>` : ""}
     ${sel ? `<div class="t-card rounded-[18px] min-h-[64px] px-4 flex items-center justify-between gap-2">
-      <span class="flex flex-col gap-0.5"><span class="text-base font-bold">${esc(sel)}</span><span class="text-[13px] t-muted">${rangeWord} <b class="text-[var(--t-text)]">${n} set</b> · ${range === "program" && n === 0 ? "programında yok" : tag}</span></span>
-      <button onclick="selectMuscle(null)" class="t-btn-ghost h-11 px-3 rounded-xl text-[13px]">Temizle</button>
+      <span class="flex flex-col gap-0.5"><span class="text-base font-bold">${esc(muscleL(sel))}</span><span class="text-[13px] t-muted">${selLine}</span></span>
+      <button onclick="selectMuscle(null)" class="t-btn-ghost h-11 px-3 rounded-xl text-[13px]">${t("Temizle")}</button>
     </div>` : ""}
     <label class="flex items-center gap-2.5 h-12 rounded-[14px] bg-[var(--t-surface)] border border-[var(--t-line)] px-3.5 t-muted">
       ${svgI("search", 18)}
-      <span class="sr-only">Hareket ara</span>
-      <input type="text" value="${esc(libSearchQ)}" oninput="onLibSearch(this.value)" placeholder="135+ hareket içinde ara" class="t-search flex-1 min-w-0" />
+      <span class="sr-only">${t("Hareket ara")}</span>
+      <input type="text" value="${esc(libSearchQ)}" oninput="onLibSearch(this.value)" placeholder="${t("135+ hareket içinde ara")}" class="t-search flex-1 min-w-0" />
     </label>
     <div id="libList" class="space-y-2">${libListHtml()}</div>`;
 }
@@ -8731,19 +8736,19 @@ function gymHistoryHtml() {
       <div class="flex-1 min-w-0">
         <div class="text-xs t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date)}</div>
         <div class="text-[15px] font-semibold truncate">${esc(l.dayName)}</div>
-        <div class="text-xs t-muted mt-0.5">${num(l.sets)} set · ${num(l.volume).toLocaleString(locale())} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + fmtNum(num(l.cardioMin)) + " dk kardiyo" : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${l.prs} rekor</span>` : ""}</div>
+        <div class="text-xs t-muted mt-0.5">${tn(num(l.sets), "{n} set")} · ${num(l.volume).toLocaleString(locale())} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + t("{n} dk kardiyo", { n: num(l.cardioMin) }) : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${tn(num(l.prs), "{n} rekor")}</span>` : ""}</div>
       </div>
-      <button onclick="openShareCard(${i})" aria-label="Paylaş" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("share", 20)}</button>
-      <button onclick="deleteWorkoutLog(${i})" aria-label="Kaydı sil" class="w-11 h-11 rounded-xl flex items-center justify-center t-dim">${svgI("trash", 19)}</button>
+      <button onclick="openShareCard(${i})" aria-label="${t("Paylaş")}" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("share", 20)}</button>
+      <button onclick="deleteWorkoutLog(${i})" aria-label="${t("Kaydı sil")}" class="w-11 h-11 rounded-xl flex items-center justify-center t-dim">${svgI("trash", 19)}</button>
     </div>`).join("");
   return `
     <div class="grid grid-cols-3 gap-2">
-      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">Bu hafta</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg"> antr.</span></div></div>
-      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">Tonaj</div><div class="t-display text-[26px]">${fmtNum(weekLogs.reduce((a, l) => a + num(l.volume), 0) / 1000)}<span class="t-dim text-lg"> t</span></div></div>
-      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">Toplam</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> antr.</span></div></div>
+      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Bu hafta")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg"> ${t("antr.")}</span></div></div>
+      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(weekLogs.reduce((a, l) => a + num(l.volume), 0) / 1000)}<span class="t-dim text-lg"> ${t("t|ton")}</span></div></div>
+      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Toplam")}</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> ${t("antr.")}</span></div></div>
     </div>
-    <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">Bugünün antrenmanına git</button></div>`}</div>
-    <button onclick="switchTab('progress')" class="t-btn-ghost w-full min-h-11 px-4 py-2 rounded-xl text-sm">Grafikler ve rekorlar: İlerleme sekmesi</button>`;
+    <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">${t("Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.")}</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">${t("Bugünün antrenmanına git")}</button></div>`}</div>
+    <button onclick="switchTab('progress')" class="t-btn-ghost w-full min-h-11 px-4 py-2 rounded-xl text-sm">${t("Grafikler ve rekorlar: İlerleme sekmesi")}</button>`;
 }
 
 function renderGym() {
@@ -8759,7 +8764,7 @@ function updateActiveProgress() {
   if (!progEl) return;
   let d = 0, n = 0;
   activeDay().exercises.forEach(ex => ex.sets.forEach(s => { n++; if (s.done) d++; }));
-  progEl.textContent = `${d}/${n} set`;
+  progEl.textContent = tn(n, "{d}/{n} set", { d });
   $("gymProgBar").style.width = (n ? Math.round(d / n * 100) : 0) + "%";
   const el = $("gymElapsed");
   if (el) el.textContent = state.workoutStartedAt ? fmtDuration(Date.now() - state.workoutStartedAt) : "00:00";
@@ -8778,27 +8783,27 @@ function openExSheet(exIdx) {
   let plateSub = "";
   if (ex.kind === "weight" && eq === "plates" && W > 0) {
     const r = platesFor(W, num(state.settings.barKg, 20));
-    plateSub = r.ok && r.list.length ? `${fmtKg(W)} kg: her tarafa ${r.list.map(fmtKg).join(" + ")}` : "Isınma setleri ve plaka dağılımı";
-  } else if (ex.kind === "weight" && usesLevels(ex)) plateSub = levelListOf(ex) ? "Isınma setleri ve makine kademeleri" : "Önce kademeleri tanımla";
+    plateSub = r.ok && r.list.length ? t("{w} kg: her tarafa {list}", { w: fmtKg(W), list: r.list.map(fmtKg).join(" + ") }) : t("Isınma setleri ve plaka dağılımı");
+  } else if (ex.kind === "weight" && usesLevels(ex)) plateSub = levelListOf(ex) ? t("Isınma setleri ve makine kademeleri") : t("Önce kademeleri tanımla");
   const item = (fn, icon, label, sub, extra = "") => `<button onclick="closeModal('exSheet'); ${fn}" class="w-full min-h-[60px] rounded-2xl px-2.5 flex items-center gap-3.5 bg-[var(--t-elev0)] text-left ${extra}">
       <span class="w-10 h-10 shrink-0 rounded-xl bg-[var(--t-elev2)] flex items-center justify-center" style="color:#1FD1C1">${svgI(icon, 20, 1.9)}</span>
       <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold">${label}</span>${sub ? `<span class="text-xs t-muted truncate">${esc(sub)}</span>` : ""}</span>
       <span class="t-dim">${svgI("chevR", 18)}</span></button>`;
   $("exSheetBody").innerHTML = `
     <div class="px-1 pb-2"><div class="text-xl font-bold">${esc(ex.name)}</div>
-      <div class="text-[13px] t-muted">${esc([muscleOf(ex), targetL(ex.targetInfo), ex.kind !== "cardio" ? "Dinlenme " + (ex.rest ?? state.settings.restSec) + " sn" : ""].filter(Boolean).join(" · "))}</div></div>
-    ${item(`openExerciseChart(${exIdx})`, "chart", "İlerleme grafiği", "Tahmini 1RM ve son kayıtlar")}
-    ${ex.kind === "weight" && eq !== "bodyweight" ? item(`openPlateTool(${exIdx})`, "calc", eq === "plates" ? "Plaka ve ısınma" : "Kademe ve ısınma", plateSub) : ""}
-    ${item(`openEditExercise(${exIdx})`, "edit", "Hareketi düzenle", ex.kind === "weight" ? "Set, tekrar, ekipman, kademeler, kas grubu" : "Set, süre, dinlenme")}
+      <div class="text-[13px] t-muted">${esc([muscleL(muscleOf(ex)), targetL(ex.targetInfo), ex.kind !== "cardio" ? t("Dinlenme {n} sn", { n: String(ex.rest ?? state.settings.restSec) }) : ""].filter(Boolean).join(" · "))}</div></div>
+    ${item(`openExerciseChart(${exIdx})`, "chart", t("İlerleme grafiği"), t("Tahmini 1RM ve son kayıtlar"))}
+    ${ex.kind === "weight" && eq !== "bodyweight" ? item(`openPlateTool(${exIdx})`, "calc", eq === "plates" ? t("Plaka ve ısınma") : t("Kademe ve ısınma"), plateSub) : ""}
+    ${item(`openEditExercise(${exIdx})`, "edit", t("Hareketi düzenle"), ex.kind === "weight" ? t("Set, tekrar, ekipman, kademeler, kas grubu") : t("Set, süre, dinlenme"))}
     <div class="grid grid-cols-2 gap-1.5">
-      <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, -1)" ${exIdx === 0 ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[var(--t-elev0)] flex items-center justify-center gap-2 text-[14px] font-semibold ${exIdx === 0 ? "opacity-30" : ""}">${svgI("up", 18)} Yukarı taşı</button>
-      <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, 1)" ${last ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[var(--t-elev0)] flex items-center justify-center gap-2 text-[14px] font-semibold ${last ? "opacity-30" : ""}">${svgI("down", 18)} Aşağı taşı</button>
+      <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, -1)" ${exIdx === 0 ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[var(--t-elev0)] flex items-center justify-center gap-2 text-[14px] font-semibold ${exIdx === 0 ? "opacity-30" : ""}">${svgI("up", 18)} ${t("Yukarı taşı")}</button>
+      <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, 1)" ${last ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[var(--t-elev0)] flex items-center justify-center gap-2 text-[14px] font-semibold ${last ? "opacity-30" : ""}">${svgI("down", 18)} ${t("Aşağı taşı")}</button>
     </div>
-    ${ex.sets.length > 1 ? item(`removeLastSetFromExercise(${exIdx})`, "minus", ex.kind === "cardio" ? "Son bölümü sil" : "Son seti sil", `${ex.sets.length} → ${ex.sets.length - 1}`) : ""}
+    ${ex.sets.length > 1 ? item(`removeLastSetFromExercise(${exIdx})`, "minus", ex.kind === "cardio" ? t("Son bölümü sil") : t("Son seti sil"), `${ex.sets.length} → ${ex.sets.length - 1}`) : ""}
     <button onclick="closeModal('exSheet'); removeExercise(${exIdx})" class="w-full min-h-[60px] rounded-2xl px-2.5 flex items-center gap-3.5 bg-[var(--t-elev0)] text-left mt-1" style="color:#FF8A8A">
       <span class="w-10 h-10 shrink-0 rounded-xl bg-[var(--t-danger-bg)] flex items-center justify-center">${svgI("trash", 20, 1.9)}</span>
-      <span class="flex-1 flex flex-col gap-0.5"><span class="text-[15px] font-semibold">Hareketi kaldır</span><span class="text-xs t-muted">6 saniye içinde geri alınabilir</span></span></button>
-    <button onclick="closeModal('exSheet')" class="w-full h-[52px] rounded-2xl bg-[var(--t-elev2)] font-bold text-[15px] mt-2">Kapat</button>`;
+      <span class="flex-1 flex flex-col gap-0.5"><span class="text-[15px] font-semibold">${t("Hareketi kaldır")}</span><span class="text-xs t-muted">${t("6 saniye içinde geri alınabilir")}</span></span></button>
+    <button onclick="closeModal('exSheet')" class="w-full h-[52px] rounded-2xl bg-[var(--t-elev2)] font-bold text-[15px] mt-2">${t("Kapat")}</button>`;
   openModal("exSheet");
 }
 
@@ -10949,7 +10954,7 @@ Object.assign(EN, {
   // --- hareket türü, zorluk, ekipman
   "🏋️ Ağırlık": "🏋️ Weights", "🏃 Kardiyo": "🏃 Cardio", "⏱️ Süreli": "⏱️ Timed",
   "Kolay": "Easy", "Orta": "Moderate", "Zor": "Hard", "Tükeniş": "Failure",
-  "Plakalı (bar / plaka)": "Barbell & plates", "Ağırlık yığını (makine / kablo)": "Weight stack (machine / cable)",
+  "Plakalı (bar / plaka)": "Barbell and plates", "Ağırlık yığını (makine / kablo)": "Weight stack (machine / cable)",
   "Dambıl": "Dumbbell", "Vücut ağırlığı": "Bodyweight",
   "Plakalı": "Plates", "Makine": "Machine", "Vücut ağ.": "Bodyweight",
   // --- hareket kütüphanesi kategori başlıkları (anahtar = EXERCISE_LIBRARY anahtarı; numara korunur)
@@ -10966,6 +10971,111 @@ Object.assign(EN, {
   "11. Kardiyo & Kondisyon (Cardio & Conditioning)": "11. Cardio and conditioning",
   // --- hareket penceresi alan adları
   "Eğim/Seviye": "Incline / level", "Kilo artış adımı (kg)": "Weight step (kg)", "Kilo artış adımı": "Weight step",
+  // --- Antrenman ekranları (v48 görev 2)
+  "Antrenman bölümleri": "Training sections",
+  "PZT|gün": "MON", "SAL|gün": "TUE", "ÇAR|gün": "WED", "PER|gün": "THU", "CUM|gün": "FRI", "CMT|gün": "SAT", "PAZ|gün": "SUN",
+  "DEVAM EDEN ANTRENMAN": "WORKOUT IN PROGRESS", "SIRADAKİ ANTRENMAN": "UP NEXT", "SEÇİLİ ANTRENMAN": "SELECTED WORKOUT",
+  "hareket|antrenman": { one: "exercise", other: "exercises" }, "set|sayı": { one: "set", other: "sets" },
+  "dk": "min", "sn": "sec", "sa": "h", "t|ton": "t",
+  "Antrenmana Devam Et": "Continue workout", "Antrenmanı Başlat": "Start workout",
+  "Bu günde henüz hareket yok.": "No exercises on this day yet.", "İlk hareketini ekle": "Add your first exercise",
+  "BU HAFTA": "THIS WEEK", "Antrenman|sayı": "Workouts", "Tonaj": "Volume", "Süre": "Time",
+  "Son antrenman · {date}": "Last workout · {date}",
+  "{n}. set nasıl geçti? <span class=\"t-dim\">(isteğe bağlı)</span>": "How did set {n} go? <span class=\"t-dim\">(optional)</span>",
+  "{n}. set zorluğu": "Set {n} effort",
+  "Seti tamamla": "Complete set",
+  "{n}. BÖLÜM": "PART {n}", "KARDİYO": "CARDIO",
+  "Süre (dk)": "Time (min)", "Mesafe (km)": "Distance (km)", "Başlat": "Start",
+  "{n}. set kilo": "Set {n} weight", "{n}. set tekrar": "Set {n} reps",
+  "SET": "SET", "ÖNCEKİ": "PREVIOUS", "KG": "KG", "TEKRAR": "REPS", "SÜRE": "TIME",
+  "HAREKET {n} / {total}": "EXERCISE {n} / {total}",
+  "Kardiyo": "Cardio", "Süreli": "Timed",
+  "Hareket seçenekleri": "Exercise options",
+  "Geçen sefer ({date}):": "Last time ({date}):",
+  "Not ekle (koltuk ayarı, tutuş...)": "Add a note (seat setting, grip...)",
+  "+ Bölüm ekle": "+ Add part", "+ Set ekle": "+ Add set",
+  "Antrenman özetine dön": "Back to workout summary",
+  "{d}/{n} set": { one: "{d}/{n} set", other: "{d}/{n} sets" },
+  "Bitir": "Finish",
+  "Bu günde hareket yok. {prog} sekmesinden ekleyebilirsin.": "No exercises on this day. Add some from the {prog} tab.",
+  "✓ Antrenmanı Bitir ve Kaydet": "✓ Finish and save workout",
+  "Tikleri sıfırla": "Uncheck all sets",
+  "Toplam {n} dk": "Total {n} min", "Toplam {n} sn": "Total {n} sec", "dinlenme {n} sn": "rest {n} sec",
+  "Kademe: {lv}": "Weight increments: {lv}",
+  "Tahmini 1RM ~{best} kg · Tonaj {vol} kg": "Estimated 1RM ~{best} kg · Volume {vol} kg",
+  "{step} kg arayla": "every {step} kg",
+  "{step} kg arayla (+{add} ek plaka)": "every {step} kg (+{add} kg extra plate)",
+  "{n} kademe": { one: "{n} weight", other: "{n} weights" },
+  "{n} kademe (+{add} ek)": { one: "{n} weight (+{add} kg extra)", other: "{n} weights (+{add} kg extra)" },
+  "Bu dambılların kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>": "Do your dumbbells go up in <b class=\"text-[var(--t-text)]\">{step} kg</b> increments? <span class=\"t-dim\">({around} …)</span>",
+  "Bu makinenin kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>": "Do the weights on this machine go up in <b class=\"text-[var(--t-text)]\">{step} kg</b> increments? <span class=\"t-dim\">({around} …)</span>",
+  "Evet, kaydet": "Yes, save",
+  "Kademeler kaydedildi: {step} kg arayla": "Weight increments saved: every {step} kg",
+  "Otomatik ({e})": "Auto ({e})",
+  "Salonundaki dambıl kiloları": "Dumbbell weights at your gym", "Makinenin kilo kademeleri": "Machine weight increments",
+  "SIRADA": "UP NEXT",
+  "Kademe tanımlı değil": "No weight increments set",
+  "{name} hareketini sürükleyerek taşı": "Drag to move {name}", "{name} seçenekleri": "{name} options",
+  "+ Yeni gün": "+ New day", "Adlandır": "Rename", "Günü sil": "Delete day",
+  "HAREKETLER": "EXERCISES",
+  "{n} hareket · ~{min} dk": { one: "{n} exercise · ~{min} min", other: "{n} exercises · ~{min} min" },
+  "Sırayı değiştirmek için soldaki tutamacı basılı tutup sürükle.": "Press and hold the handle on the left, then drag to reorder.",
+  "+ Kütüphaneden ekle": "+ Add from library", "Özel hareket": "Custom exercise", "Bu antrenmanı başlat": "Start this workout",
+  // --- Hareketler (kütüphane, vücut haritası)
+  "Hareketleri görmek için haritada bir kasa dokun ya da yukarıdan ara.": "Tap a muscle on the map or search above to see exercises.",
+  "Son: {s} · {d}": "Last: {s} · {d}", "Henüz yapılmadı": "Not done yet", "PROGRAMDA": "IN PROGRAM",
+  "{name} hareketini {day} gününe ekle": "Add {name} to {day}",
+  "henüz çalışılmadı": "not worked yet", "az|yük": "low", "ideal aralıkta": "in the ideal range", "yüksek hacim": "high volume",
+  "Bugünkü set sayısına göre": "Based on today's sets",
+  "Programının bir haftada verdiği set sayısı": "Sets your program gives in a week",
+  "Bu haftaki set sayısına göre": "Based on this week's sets",
+  "yok|yük": "none", "ideal|yük": "ideal", "yüksek|yük": "high",
+  "KAS YÜKÜ": "MUSCLE MAP", "Bu hafta": "This week",
+  "Önden ve arkadan kas anatomisi": "Muscle anatomy, front and back",
+  "Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç": "Muscle groups are coloured by number of sets; tap a coloured muscle to select it",
+  "ÖN": "FRONT", "ARKA": "BACK", "20+ set": "20+ sets",
+  "PROGRAMIN HAFTALIK ETKİSİ": "YOUR PROGRAM'S WEEKLY IMPACT",
+  "{n} gün": { one: "{n} day", other: "{n} days" }, "{n} set": { one: "{n} set", other: "{n} sets" },
+  "Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.": "Assuming each day is done once a week. A common guideline for muscle growth is 10–20 sets per week. Each set counts towards the exercise's main muscle.",
+  "BU HAFTA · KAS BAŞINA SET": "WEEKLY SETS PER MUSCLE",
+  "Pazartesiden bu yana kaydedilen setler. Kas gelişimi için genel öneri haftada 10–20 set.": "Sets logged since Monday. A common guideline for muscle growth is 10–20 sets per week.",
+  "Bugün <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "Today <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", other: "Today <b class=\"text-[var(--t-text)]\">{n} sets</b> · {tag}" },
+  "Programında haftada <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "Weekly in your program <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", other: "Weekly in your program <b class=\"text-[var(--t-text)]\">{n} sets</b> · {tag}" },
+  "Bu hafta <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "This week <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", other: "This week <b class=\"text-[var(--t-text)]\">{n} sets</b> · {tag}" },
+  "programında yok": "not in your program", "Temizle": "Clear",
+  "Hareket ara": "Search exercises", "135+ hareket içinde ara": "Search 135+ exercises",
+  // --- Geçmiş
+  "{n} dk kardiyo": "{n} min cardio", "{n} rekor": { one: "{n} PR", other: "{n} PRs" },
+  "Kaydı sil": "Delete entry", "antr.": "workouts", "Toplam": "Total",
+  "Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.": "No workouts saved yet. When you finish and save a workout, it appears here.",
+  "Bugünün antrenmanına git": "Go to today's workout",
+  "Grafikler ve rekorlar: İlerleme sekmesi": "Charts and records: Progress tab",
+  // --- hareket menüsü
+  "{w} kg: her tarafa {list}": "{w} kg: {list} on each side",
+  "Isınma setleri ve plaka dağılımı": "Warm-up sets and plate breakdown",
+  "Isınma setleri ve makine kademeleri": "Warm-up sets and machine weight increments",
+  "Önce kademeleri tanımla": "Set the weight increments first",
+  "Dinlenme {n} sn": "Rest {n} sec",
+  "İlerleme grafiği": "Progress chart", "Tahmini 1RM ve son kayıtlar": "Estimated 1RM and recent entries",
+  "Plaka ve ısınma": "Plates and warm-up", "Kademe ve ısınma": "Increments and warm-up",
+  "Hareketi düzenle": "Edit exercise",
+  "Set, tekrar, ekipman, kademeler, kas grubu": "Sets, reps, equipment, weight increments, muscle group",
+  "Set, süre, dinlenme": "Sets, time, rest",
+  "Yukarı taşı": "Move up", "Aşağı taşı": "Move down",
+  "Son bölümü sil": "Delete last part", "Son seti sil": "Delete last set",
+  "Hareketi kaldır": "Remove exercise", "6 saniye içinde geri alınabilir": "Can be undone within 6 seconds",
+  // --- ısınma kartı (Antrenman → Bugün)
+  "Isınma kartını gizle": "Hide warm-up card", "Isınma yapıldı": "Warm-up done",
+  "{n} hareket|ısınma": { one: "{n} move", other: "{n} moves" },
+  "Isınma: {regs}": "Warm-up: {regs}", "Isınma": "Warm-up",
+  "{n} hareket · ~{min} dk · mobilite rutinlerinden": { one: "{n} move · ~{min} min · from your mobility routines", other: "{n} moves · ~{min} min · from your mobility routines" },
+  "Isınmayı başlat": "Start warm-up",
+  "Isınma kartı gizlendi. Profil'den geri açabilirsin": "Warm-up card hidden. You can turn it back on in Profile",
+  "Kalça": "Hips", "Omurga": "Spine", "Arka bacak": "Hamstrings", "Ayak bileği": "Ankles",
+  // --- süre / mesafe gösterimleri (ortak)
+  "{h} sa {m} dk": "{h} h {m} min", "{m} dk": "{m} min", "{n} dk": "{n} min", "{n} sn": "{n} sec",
+  "{speed} km/s • {pm}:{ps} /km": "{speed} km/h • {pm}:{ps} /km",
+  "Örn: 5. GÜN: Kol": "E.g. DAY 5: Arms",
 });
 
 </script>

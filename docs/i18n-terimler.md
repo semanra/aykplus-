@@ -164,7 +164,7 @@ Bu belge, AYK+ İngilizce arayüzünde kullanılacak **tek ve bağlayıcı** ter
 | Tekrar | **Reps** (tekil **rep**) | Set satırı | Yaygın kısa hâl. Reddedilen: "Repetitions" (dar alanda uzun). |
 | Kilo (sette) | **Weight** (sütunda **kg**) | Set satırı | Dar sütunda birim yeterli ve açık. |
 | Hareket türü: Ağırlık / Kardiyo / Süreli | **Weights / Cardio / Timed** | `ex.kind`, hareket penceresi | "Timed", plank gibi süreyle yapılan hareketler için açık bir sıfat. Reddedilen: "Duration" (sıfat değil), "Strength" (İlerleme'deki Güç sekmesinin adı; çakışır). |
-| Ekipman: Plakalı (bar / plaka) | **Barbell & plates** (kısa: **Plates**) | `EQUIP_LABEL/EQUIP_SHORT` | Plaka hesabını açan ekipman türü; anlamı açık. |
+| Ekipman: Plakalı (bar / plaka) | **Barbell and plates** (kısa: **Plates**) | `EQUIP_LABEL/EQUIP_SHORT` | Plaka hesabını açan ekipman türü; anlamı açık. |
 | Ağırlık yığını (makine / kablo) | **Weight stack (machine / cable)** (kısa: **Machine**) | Aynı | "Weight stack", makinenin pimli ağırlık kulesinin İngilizce adıdır; MacroFactor de pimli makineler için bu ifadeyi kullanıyor **[K3]**. |
 | Dambıl | **Dumbbell** | Aynı | Doğrudan karşılık. |
 | Vücut ağırlığı | **Bodyweight** | Aynı | Fitness yazımında bitişik "bodyweight" yaygın. |

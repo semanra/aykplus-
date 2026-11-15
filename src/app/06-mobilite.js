@@ -695,20 +695,20 @@ function warmupCardHtml(day, inProg) {
   if (!state.settings.warmupCard || inProg) return "";
   const items = mobWarmupItems(day);
   if (!items.length) return "";
-  const hide = `<button id="gymWarmupHide" onclick="mobWarmupHide()" class="m-round shrink-0 !bg-transparent" aria-label="Isınma kartını gizle">${svgI("x", 18, 2.2)}</button>`;
+  const hide = `<button id="gymWarmupHide" onclick="mobWarmupHide()" class="m-round shrink-0 !bg-transparent" aria-label="${t("Isınma kartını gizle")}">${svgI("x", 18, 2.2)}</button>`;
   if (items.every(i => i.done)) return `<div id="gymWarmup" class="m-warm flex items-center gap-3 !py-2">
       <span class="text-[var(--d-lv)]">${svgI("check", 20, 2.6)}</span>
-      <span class="flex-1 min-w-0 text-[15px] font-semibold">Isınma yapıldı <span class="font-normal text-[var(--t-muted)]">· ${items.length} hareket</span></span>${hide}</div>`;
-  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => lowerL(MOB_REGION_LABEL[k]));
+      <span class="flex-1 min-w-0 text-[15px] font-semibold">${t("Isınma yapıldı")} <span class="font-normal text-[var(--t-muted)]">· ${tn(items.length, "{n} hareket|ısınma")}</span></span>${hide}</div>`;
+  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => lowerL(t(MOB_REGION_LABEL[k])));
   const min = Math.max(1, Math.round(items.reduce((a, it) => a + mobItemSec(it), 0) / 60));
   return `<div id="gymWarmup" class="m-warm">
     <div class="flex items-start justify-between gap-2">
-      <div class="min-w-0"><b class="block text-[15.5px]">Isınma${regs.length ? ": " + esc(regs.join(" + ")) : ""}</b>
-        <span class="block text-[13px] text-[var(--t-muted)] mt-0.5">${items.length} hareket · ~${min} dk · mobilite rutinlerinden</span></div>
+      <div class="min-w-0"><b class="block text-[15.5px]">${regs.length ? t("Isınma: {regs}", { regs: esc(regs.join(" + ")) }) : t("Isınma")}</b>
+        <span class="block text-[13px] text-[var(--t-muted)] mt-0.5">${tn(items.length, "{n} hareket · ~{min} dk · mobilite rutinlerinden", { min })}</span></div>
       ${hide}
     </div>
     <div class="text-[12.5px] text-[var(--t-dim)] mt-2">${items.map(i => esc(i.name)).join(" · ")}</div>
-    <button id="gymWarmupStart" onclick="mobWarmupStart()" class="m-warm-go w-full justify-center mt-3">${svgI("play", 16, 2.4)}Isınmayı başlat</button>
+    <button id="gymWarmupStart" onclick="mobWarmupStart()" class="m-warm-go w-full justify-center mt-3">${svgI("play", 16, 2.4)}${t("Isınmayı başlat")}</button>
   </div>`;
 }
 function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds("Isınma", items.map(i => i.id), null); }
@@ -716,5 +716,5 @@ function mobWarmupHide() {
   snapshot();
   state.settings.warmupCard = false;
   renderAll();
-  offerUndo("Isınma kartı gizlendi. Profil'den geri açabilirsin");
+  offerUndo(t("Isınma kartı gizlendi. Profil'den geri açabilirsin"));
 }

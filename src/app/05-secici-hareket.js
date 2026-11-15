@@ -283,15 +283,15 @@ function paceText(min, km) {
   const speed = km / (min / 60);
   const pace = min / km;
   const pm = Math.floor(pace), ps = Math.round((pace - pm) * 60);
-  return `${fmtNum(speed)} km/s • ${pm}:${String(ps === 60 ? 59 : ps).padStart(2, "0")} /km`;
+  return t("{speed} km/s • {pm}:{ps} /km", { speed, pm: String(pm), ps: String(ps === 60 ? 59 : ps).padStart(2, "0") });
 }
 function sessionSummary(sess) {
   const sets = sess.sets || [];
   if (sess.kind === "cardio") {
     const ct = cardioTotals(sets, false);
-    return `${fmtNum(ct.min)} dk` + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : "");
+    return t("{n} dk", { n: ct.min }) + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : "");
   }
-  if (sess.kind === "time") return sets.map(s => `${num(s.sec)} sn`).join(" · ");
+  if (sess.kind === "time") return sets.map(s => t("{n} sn", { n: String(num(s.sec)) })).join(" · ");
   return sets.map(s => `${fmtKg(num(s.kg))}×${num(s.reps)}`).join(" · ");
 }
 
@@ -388,7 +388,7 @@ function removeExercise(exIdx) {
 }
 
 async function addWorkoutDay() {
-  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: curLang() === "en" ? `DAY ${state.workoutDays.length + 1}: ` : `${state.workoutDays.length + 1}. GÜN: `, placeholder: curLang() === "en" ? "E.g. DAY 5: Arms" : "Örn: 5. GÜN: Kol" }, ok: "Ekle" });
+  const name = await uiAsk({ title: "Yeni antrenman günü", message: "Günün adını yaz.", input: { value: curLang() === "en" ? `DAY ${state.workoutDays.length + 1}: ` : `${state.workoutDays.length + 1}. GÜN: `, placeholder: t("Örn: 5. GÜN: Kol") }, ok: "Ekle" });
   if (!name || !name.trim()) return;
   state.workoutDays.push({ id: "day_" + Date.now(), name: name.trim(), exercises: [] });
   state.activeWorkoutDayIdx = state.workoutDays.length - 1;
