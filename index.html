@@ -761,10 +761,24 @@
         </div>
         <div class="pt-4 n-bt">
           <div class="flex items-center justify-between gap-2 min-h-[44px]">
-            <span class="n-label">KALORİ AÇIĞI</span>
-            <span class="whitespace-nowrap n-k"><span class="t-display text-[26px] leading-none tabular-nums">−<span id="deficitVal">700</span></span> <span class="text-[13px] font-semibold">kcal</span></span>
+            <span class="n-label">HEDEF</span>
+            <span class="whitespace-nowrap n-k"><span id="goalVal" class="t-display text-[26px] leading-none tabular-nums">−700</span> <span class="text-[13px] font-semibold">kcal</span></span>
           </div>
-          <input id="deficitSlider" type="range" min="0" max="1000" step="50" value="700" oninput="updateProfile()" class="w-full h-11" aria-label="Kalori açığı" />
+          <div class="n-seg grid-cols-3 mb-1" role="group" aria-label="Hedef">
+            <button id="goalLose" onclick="setGoal('lose')">Ver</button>
+            <button id="goalKeep" onclick="setGoal('keep')">Koru</button>
+            <button id="goalGain" onclick="setGoal('gain')">Al</button>
+          </div>
+          <div id="loseBox">
+            <input id="deficitSlider" type="range" min="0" max="1000" step="50" value="700" oninput="updateProfile()" class="w-full h-11" aria-label="Kalori açığı" />
+          </div>
+          <div id="gainBox" class="hidden my-1">
+            <div class="n-seg grid-cols-3" role="group" aria-label="Kilo alma hızı">
+              <button id="paceSlow" onclick="setGainPace('slow')">Yavaş</button>
+              <button id="paceMid" onclick="setGainPace('mid')">Orta</button>
+              <button id="paceFast" onclick="setGainPace('fast')">Hızlı</button>
+            </div>
+          </div>
           <div id="timelineInfo" class="text-[12px] n-muted">-</div>
           <button id="coachHint" onclick="switchTab('progress')" class="hidden mt-2 w-full min-h-[44px] text-left text-[13px] font-semibold n-k border border-current rounded-2xl px-3.5 py-2"></button>
         </div>
@@ -1234,6 +1248,11 @@
               <div><label for="setTargetBf" class="t-field">Hedef yağ oranı (%)</label><input id="setTargetBf" type="text" inputmode="decimal" placeholder="Örn: 15" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
             </div>
             <p class="text-[12px] text-[var(--t-dim)] -mt-1">Yağ oranını bilmiyorsan boş bırakabilirsin.</p>
+            <div class="space-y-2.5">
+              <div><label for="setActivity" class="t-field">Hareketlilik</label><select id="setActivity" class="t-in font-bold"><option value="low">Az (masa başı)</option><option value="mid">Orta</option><option value="high">Çok (ayakta iş)</option></select></div>
+              <div><label for="setProtein" class="t-field">Protein</label><select id="setProtein" class="t-in font-bold"><option value="std">Standart</option><option value="high">Yüksek</option></select></div>
+            </div>
+            <p class="text-[12px] text-[var(--t-dim)] -mt-1">Standart, araştırmalara göre yeterli miktardır. Yüksek, daha fazlasını isteyenler için.</p>
             <label class="flex items-center justify-between gap-3 min-h-[52px]">
               <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]">Su hedefi kiloya göre</span><span id="setWaterHint" class="block text-[13px] text-[var(--t-dim)]">Kilo × 35 ml; listende kreatin varsa +0,5 L.</span></span>
               <input id="setWaterAuto" type="checkbox" class="t-sw" onchange="updateWaterAutoHint()" />
@@ -1343,7 +1362,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v42</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v43</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -2457,12 +2476,17 @@ async function aykRawPut(store, key, value) { await idbWrite([[store, key, value
 // AYK+ — UYGULAMA MANTIĞI (sürüm: src/markup.html Ayarlar etiketi ve sw.js CACHE)
 // ============================================================================
 
+// v43: hareketlilik çarpanı [antrenman günü, dinlenme günü] ve kilo alma hızı (TDEE'nin oranı)
+const ACTIVITY_MULT = { low: [1.45, 1.30], mid: [1.55, 1.43], high: [1.70, 1.58] };
+const GAIN_PACE = { slow: 0.10, mid: 0.15, fast: 0.20 };
+
 const DEFAULT_SETTINGS = {
   sex: "male", height: 180, age: 26, targetWeight: 82,
   waterTarget: 3.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
   macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
   nutriLight: false, scaleOn: false, scaleBase: 0,
+  goal: "lose", gainPace: "mid", activity: "mid", proteinHigh: false,   // v43: hedef Ver/Koru/Al, hız, hareketlilik, yüksek protein
   theme: "system"   // v31: system | dark | light (nutriLight eski alan, artık kullanılmıyor ama silinmez)
 };
 const DEFAULT_SUPPS = [
@@ -2667,7 +2691,7 @@ function normMobItem(x) {
 // çalışmaz. normalizeState yalnızca doğrulama/temizlik yapar. Yeni bir biçim değişikliği = yeni adım + DATA_VER + 1.
 // (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
 // ---------------------------------------------------------------------------
-const DATA_VER = 2;
+const DATA_VER = 3;
 function migrateState(s) {
   const v = Number.isInteger(s.dataVer) && s.dataVer >= 0 ? s.dataVer : 0;
   if (v < 1) {   // v27 + v39: mobilitenin eski listeleri (dynamic/static, sonra tek items) → rutinler; eski diziler yedek olarak kalır
@@ -2681,6 +2705,7 @@ function migrateState(s) {
     if (!s.settings.macroViewV26) s.settings.macroView = "eaten";
     delete s.settings.macroViewV26;
   }
+  if (v < 3 && s.settings.goal === DEFAULT_SETTINGS.goal) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43: hedef Ver/Koru/Al (açık 0 = eskiden "kilo koruma"; ayarda açıkça başka hedef varsa ona dokunulmaz)
   s.dataVer = Math.max(v, DATA_VER);
 }
 
@@ -2826,6 +2851,10 @@ function normalizeState(raw) {
   if (s.settings.macroView !== "plan") s.settings.macroView = "eaten";
   { const h = parseInt(s.settings.dayStartHour, 10); s.settings.dayStartHour = h >= 0 && h <= 5 ? h : 0; }   // v21
   s.settings.waterAuto = s.settings.waterAuto !== false;   // v24: su hedefi kiloya göre (varsayılan açık)
+  if (!["lose", "keep", "gain"].includes(s.settings.goal)) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43
+  if (!["slow", "mid", "fast"].includes(s.settings.gainPace)) s.settings.gainPace = "mid";
+  if (!["low", "mid", "high"].includes(s.settings.activity)) s.settings.activity = "mid";
+  s.settings.proteinHigh = s.settings.proteinHigh === true;
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
   s.settings.scaleOn = !!s.settings.scaleOn;
@@ -3446,13 +3475,23 @@ function getTargets() {
   const bmr = bf
     ? 370 + 21.6 * state.weight * (1 - bf / 100)
     : (10 * state.weight) + (6.25 * num(st.height, 180)) - (5 * num(st.age, 26)) + (female ? -161 : 5);
-  const mult = state.dayType === "train" ? 1.55 : 1.43;
+  const act = ACTIVITY_MULT[st.activity] || ACTIVITY_MULT.mid;
+  const mult = state.dayType === "train" ? act[0] : act[1];
   const tdee = Math.round(bmr * mult);
-  const calTarget = Math.max(female ? 1400 : 1750, tdee + Math.round(num(st.calAdjust, 0)) - state.deficit);
-  const proTarget = Math.round((num(st.targetWeight, 82) * 2.0) + (state.weight * 0.35));
-  const fatTarget = Math.max(female ? 45 : 55, Math.round(state.weight * 0.72));
+  const goal = ["lose", "keep", "gain"].includes(st.goal) ? st.goal : "lose";
+  const goalDelta = goal === "lose" ? -state.deficit : goal === "gain" ? Math.round(tdee * (GAIN_PACE[st.gainPace] || GAIN_PACE.mid)) : 0;
+  const calTarget = Math.max(female ? 1400 : 1750, tdee + Math.round(num(st.calAdjust, 0)) + goalDelta);
+  // v43: kanıta dayalı protein. ref = hedef kilo (≥ 30 ise, kilodan büyük olamaz), yoksa kilo
+  const tw = num(st.targetWeight, 0);
+  const ref = tw >= 30 ? Math.min(state.weight, tw) : state.weight;
+  const perKg = goal === "lose" ? (bf ? null : 2.2) : goal === "keep" ? 1.6 : 1.8;
+  const base = perKg === null ? state.weight * (1 - bf / 100) * 2.5 : ref * perKg;
+  let pro = Math.min(base, state.weight * 2.2);
+  if (st.proteinHigh) pro = Math.max(pro, state.weight * 2.0);
+  const proTarget = Math.round(pro);
+  const fatTarget = Math.round(calTarget * 0.25 / 9);
   const carbTarget = Math.max(60, Math.round((calTarget - (proTarget * 4) - (fatTarget * 9)) / 4));
-  return { calTarget, proTarget, carbTarget, fatTarget, tdee };
+  return { calTarget, proTarget, carbTarget, fatTarget, tdee, goal, goalDelta };
 }
 
 function validBf(v) {
@@ -3692,7 +3731,13 @@ function renderWeightBlock(st) {
   slider.min = minW; slider.max = maxW; slider.value = state.weight;
   $("weightVal").textContent = fmtNum(state.weight);
   $("deficitSlider").value = state.deficit;
-  $("deficitVal").textContent = state.deficit;
+  const tg = getTargets();
+  const goal = tg.goal;
+  [["goalLose", "lose"], ["goalKeep", "keep"], ["goalGain", "gain"]].forEach(([id, g]) => { $(id).className = goal === g ? "on" : ""; });
+  [["paceSlow", "slow"], ["paceMid", "mid"], ["paceFast", "fast"]].forEach(([id, p]) => { $(id).className = st.gainPace === p ? "on" : ""; });
+  $("loseBox").classList.toggle("hidden", goal !== "lose");
+  $("gainBox").classList.toggle("hidden", goal !== "gain");
+  $("goalVal").textContent = (tg.goalDelta < 0 ? "−" : tg.goalDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.goalDelta));
   $("weightHistoryText").textContent = state.weightLogs.length > 0
     ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.date})`).join(" → ")
     : `Hedef: ${fmtNum(num(st.targetWeight, 82))} kg`;
@@ -3702,9 +3747,15 @@ function renderWeightBlock(st) {
   const target = num(st.targetWeight, 82);
   const diffKg = state.weight - target;
   const weeklyLoss = (state.deficit * 7) / 7700;
-  $("timelineInfo").textContent = diffKg <= 0 ? `${fmtNum(target)} kg hedefine ulaştın!`
+  const weeklyGain = (tg.goalDelta * 7) / 7700;
+  let info;
+  if (goal === "keep") info = "Kilo koruma: hedef kalorin harcamana eşit";
+  else if (goal === "gain") info = diffKg >= 0 || weeklyGain <= 0 ? `${fmtNum(target)} kg hedefine ulaştın!`
+    : `Haftalık ~${fmtKg(weeklyGain)} kg alım → ${fmtNum(target)} kg hedefine ~${Math.ceil(-diffKg / weeklyGain)} hafta`;
+  else info = diffKg <= 0 ? `${fmtNum(target)} kg hedefine ulaştın!`
     : weeklyLoss > 0 ? `Haftalık ~${fmtKg(weeklyLoss)} kg kayıp → ${fmtNum(target)} kg hedefine ~${Math.ceil(diffKg / weeklyLoss)} hafta`
     : "Kalori açığı yok: kilo koruma modu";
+  $("timelineInfo").textContent = info;
   const hint = coachHintText();
   $("coachHint").classList.toggle("hidden", !hint);
   $("coachHint").textContent = hint;
@@ -4854,6 +4905,17 @@ document.addEventListener("click", e => { if (e.target && e.target.id === "barco
 function updateProfile() {
   state.weight = round1(num($("weightSlider").value, state.weight));
   state.deficit = Math.round(num($("deficitSlider").value, state.deficit));
+  renderAll();
+}
+function setGoal(g) {
+  if (g !== "lose" && g !== "keep" && g !== "gain") return;
+  state.settings.goal = g;
+  if (g === "lose" && !(state.deficit > 0)) state.deficit = 500;
+  renderAll();
+}
+function setGainPace(p) {
+  if (p !== "slow" && p !== "mid" && p !== "fast") return;
+  state.settings.gainPace = p;
   renderAll();
 }
 function adjustWeight(d) { state.weight = Math.max(30, round1(state.weight + d)); renderAll(); }
@@ -6448,13 +6510,18 @@ function progCoachHtml() {
   const details = `<details class="p-det"><summary>Hesap ayrıntıları · ${a.n} tartı, ${Math.floor(a.spanDays)} gün</summary>${rows}
     <p class="p-fine">${a.intakeAssumed ? "* Yeterli günlük kayıt olmadığı için planladığın kaloriyi yediğin varsayıldı. " : ""}İlk 1–2 hafta su kaybı nedeniyle kilo hızlı düşebilir; öneriler 3–4 hafta veriyle en isabetli hâle gelir.</p></details>`;
   const warns = (a.tooFast ? `<p class="p-warn">${pI("warn", 16, 2)}Haftada vücut ağırlığının %${fmtNum(Math.abs(a.pctPerWeek))}'ini kaybediyorsun; %1'in üstü kas kaybı riskini artırır.</p>` : "")
+    + (a.gainTooFast ? `<p class="p-warn">${pI("warn", 16, 2)}Haftada vücut ağırlığının %${fmtNum(Math.abs(a.pctPerWeek))}'i kadar alıyorsun; %0,5'in üstü fazla yağ birikmesine yol açabilir.</p>` : "")
+    + (a.notGaining ? `<p class="p-warn">${pI("warn", 16, 2)}Kalori fazlası verdiğin hâlde kilo almıyorsun. Porsiyonları tartarak girmeyi ve öğün tiklerini kontrol etmeyi öneririm.</p>` : "")
+    + (a.keepDrift ? `<p class="p-warn">${pI("warn", 16, 2)}Kilon korunmuyor: haftada %${fmtNum(Math.abs(a.pctPerWeek))} değişiyor.</p>` : "")
     + (a.gaining ? `<p class="p-warn">${pI("warn", 16, 2)}Açık verdiğin hâlde kilo alıyorsun. Porsiyonları tartarak girmeyi ve öğün tiklerini kontrol etmeyi öneririm.</p>` : "");
   if (Math.abs(a.delta) < 100) {
     return `<div class="p-card" id="pCoach">${head("Kalori koçu", "Doğru yoldasın; kalorinde değişiklik gerekmiyor.")}${warns}${details}${adjLine}</div>`;
   }
   const sinceApply = state.settings.coachAppliedAt ? Math.floor((Date.now() - state.settings.coachAppliedAt) / DAY_MS) : null;
   const fresh = sinceApply != null && sinceApply < 7;
-  const why = a.delta < 0 ? "Beklediğinden yavaş ilerliyorsun." : "Beklediğinden hızlı veriyorsun; kas kaybını önlemek için.";
+  const why = a.goal === "gain" ? (a.delta > 0 ? "Beklediğinden yavaş alıyorsun." : "Beklediğinden hızlı alıyorsun; fazla yağ birikmesin diye.")
+    : a.goal === "keep" ? (a.delta > 0 ? "Kilo veriyorsun." : "Kilo alıyorsun.")
+    : (a.delta < 0 ? "Beklediğinden yavaş ilerliyorsun." : "Beklediğinden hızlı veriyorsun; kas kaybını önlemek için.");
   const step = Math.abs(a.fullDelta) > Math.abs(a.delta) ? `<p class="p-fine">Tam düzeltme ${a.fullDelta > 0 ? "+" : ""}${a.fullDelta} kcal olurdu; enerjin düşmesin diye kademeli. Bir hafta sonra koç kalanını yeniden değerlendirir.</p>` : "";
   return `<div class="p-card" id="pCoach">${head("Kalori koçu", why)}
     <div class="p-cn"><span>Önerilen hedef</span><b class="t-display">${a.newTarget.toLocaleString("tr-TR")}</b><span>kcal</span>${pDelta(a.delta, "", null, 0)}</div>
@@ -6693,7 +6760,7 @@ function renderProgress() {
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 function fillProfileFields() {
   const st = state.settings;
@@ -6702,6 +6769,8 @@ function fillProfileFields() {
   $("setHeight").value = st.height;
   $("pfWeight").value = fmtNum(num(state.weight, 0));
   $("setTarget").value = fmtNum(num(st.targetWeight, 82));
+  $("setActivity").value = ["low", "mid", "high"].includes(st.activity) ? st.activity : "mid";
+  $("setProtein").value = st.proteinHigh === true ? "high" : "std";
   $("setWater").value = fmtNum(num(st.waterTarget, 3.5));
   $("setWaterAuto").checked = st.waterAuto !== false;
   updateWaterAutoHint();
@@ -6843,6 +6912,8 @@ function applyProfileFields(changedId) {
   st.age = Math.max(12, Math.min(99, Math.round(num($("setAge").value, st.age))));
   st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));
   st.targetWeight = Math.max(30, Math.min(250, round1(num($("setTarget").value, st.targetWeight))));
+  st.activity = ["low", "mid", "high"].includes($("setActivity").value) ? $("setActivity").value : "mid";
+  st.proteinHigh = $("setProtein").value === "high";
   st.waterTarget = Math.max(0.5, Math.min(10, round1(num($("setWater").value, st.waterTarget))));
   st.waterAuto = $("setWaterAuto").checked;
   st.restSec = Math.max(10, Math.min(900, Math.round(num($("setRest").value, st.restSec))));
@@ -7462,20 +7533,24 @@ function coachAnalysis() {
   const tdeeEst = Math.round(avgIntake - (weekly * 7700) / 7);
   const female = state.settings.sex === "female";
   const floor = female ? 1400 : 1750;
-  const desired = Math.max(floor, tdeeEst - state.deficit);
+  const goal = targets.goal;
+  const gainAdd = goal === "gain" ? Math.round(tdeeEst * (GAIN_PACE[state.settings.gainPace] || GAIN_PACE.mid)) : 0;
+  const desired = Math.max(floor, goal === "lose" ? tdeeEst - state.deficit : goal === "gain" ? tdeeEst + gainAdd : tdeeEst);
   const fullDelta = Math.round((desired - targets.calTarget) / 50) * 50;
   let delta = Math.max(-COACH_MAX_STEP, Math.min(COACH_MAX_STEP, fullDelta));
   const adj = num(state.settings.calAdjust, 0);
   if (adj + delta > 1000) delta = 1000 - adj;
   if (adj + delta < -1000) delta = -1000 - adj;
 
-  const expectedWeekly = -(state.deficit * 7) / 7700;
+  const expectedWeekly = targets.goalDelta === 0 ? 0 : (targets.goalDelta * 7) / 7700;
   const pctPerWeek = (weekly / state.weight) * 100;
   return {
-    ready: true, n: pts.length, spanDays: res.spanDays, weekly, expectedWeekly, pctPerWeek,
+    ready: true, goal, n: pts.length, spanDays: res.spanDays, weekly, expectedWeekly, pctPerWeek,
     avgIntake: Math.round(avgIntake), intakeDays: intakes.length, intakeAssumed,
     tdeeEst, tdeeFormula: targets.tdee, desired, delta, fullDelta, newTarget: targets.calTarget + delta, calTarget: targets.calTarget,
-    tooFast: pctPerWeek < -1.0, gaining: weekly > 0.1 && state.deficit > 0
+    tooFast: goal === "lose" && pctPerWeek < -1.0, gaining: goal === "lose" && weekly > 0.1 && state.deficit > 0,
+    gainTooFast: goal === "gain" && pctPerWeek > 0.5, notGaining: goal === "gain" && weekly < 0.05,
+    keepDrift: goal === "keep" && Math.abs(pctPerWeek) > 0.25
   };
 }
 
