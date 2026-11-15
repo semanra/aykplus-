@@ -298,15 +298,17 @@ async function deleteRescue() {
   toast("Kurtarma kopyası silindi");
 }
 
-async function restoreFromText(text) {
+// v44: opts.onboarding = kurulum ekranından (kaybedilecek veri yok → onay sorulmaz). Başarılı geri yükleme kurulumu kapatır.
+async function restoreFromText(text, opts = {}) {
   let parsed;
   try { parsed = JSON.parse(String(text || "").trim()); } catch (e) { sayAlert("Geçersiz yedek", "Geçersiz yedek! Dosya veya kod bozuk görünüyor."); return false; }
   if (parsed && parsed.state && (parsed.state.meals || parsed.state.workoutDays)) parsed = parsed.state;
   if (!parsed || typeof parsed !== "object" || !(parsed.meals || parsed.workoutDays)) { sayAlert("Yedek tanınmadı", "Bu bir AYK+ yedeği değil."); return false; }
-  if (!(await askConfirm("Yedek geri yüklensin mi?", "Mevcut tüm verilerin bu yedekle DEĞİŞTİRİLECEK. Devam edilsin mi?", "Geri yükle", true))) return false;
+  if (!opts.onboarding && !(await askConfirm("Yedek geri yüklensin mi?", "Mevcut tüm verilerin bu yedekle DEĞİŞTİRİLECEK. Devam edilsin mi?", "Geri yükle", true))) return false;
   let next;
   try { next = normalizeState(parsed); } catch (e) { console.error(e); sayAlert("Yedek okunamadı", "Yedek dosyası bozuk görünüyor; mevcut verilerin değiştirilmedi."); return false; }
   await storageSnapshotNow();   // v41: geri yüklemeden önceki hâl iç yedekte
+  next.settings.onboarded = true;   // v44: yedekten dönen kullanıcı kurulumu görmez (renderAll → syncOnboarding kapatır)
   state = next;
   state.lastBackupAt = state.lastBackupAt || Date.now();
   checkNewDay();
@@ -317,12 +319,12 @@ async function restoreFromText(text) {
   return true;
 }
 
-function importBackupFile(event) {
+function importBackupFile(event, opts = {}) {
   const file = event.target.files[0];
   event.target.value = "";
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => restoreFromText(e.target.result);
+  reader.onload = e => restoreFromText(e.target.result, opts);
   reader.onerror = () => sayAlert("Dosya okunamadı", "Dosya okunamadı.");
   reader.readAsText(file);
 }

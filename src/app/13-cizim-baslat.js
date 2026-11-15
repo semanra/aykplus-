@@ -31,6 +31,7 @@ function renderAll() {
   else if (tab === "progress") renderProgress();
   if (profileIsOpen()) renderProfile();
   renderBanner();
+  syncOnboarding();   // v44: kurulum ekranı kayda göre açılır/kapanır
   saveState();
   restorePendingFocus();
 }
@@ -86,6 +87,7 @@ function bootApp() {
     writeMirror();
   });
   window.addEventListener("pagehide", () => writeMirror());
+  if (state.settings.onboarded === false) openOnboarding();   // v44: yeni kurulum → ilk açılış kurulumu
   window.aykBooted = true;
 }
 storageInit().then(bootApp, e => { console.error(e); storageUseLegacy(); bootApp(); });

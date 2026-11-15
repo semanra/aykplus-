@@ -5,6 +5,8 @@
 // v43: hareketlilik çarpanı [antrenman günü, dinlenme günü] ve kilo alma hızı (TDEE'nin oranı)
 const ACTIVITY_MULT = { low: [1.45, 1.30], mid: [1.55, 1.43], high: [1.70, 1.58] };
 const GAIN_PACE = { slow: 0.10, mid: 0.15, fast: 0.20 };
+// v44: sağlık notu (kurulumun ilk ekranı ve Profil → Hakkında)
+const HEALTH_NOTE = "AYK+ genel bilgi amaçlıdır; tıbbi tavsiye, teşhis ya da tedavi yerine geçmez. Hamileysen, emziriyorsan, bir sağlık sorunun ya da yeme bozukluğu geçmişin varsa, beslenme ve egzersiz planını değiştirmeden önce bir doktora veya diyetisyene danış.";
 
 const DEFAULT_SETTINGS = {
   onboarded: true,   // v44: yeni kurulumda freshState() false yapar; var olan kayıt hep true

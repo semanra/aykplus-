@@ -585,6 +585,86 @@
       #splash img, #splash .t, #splash .logo-wrap::before { animation: none; }
       #brandTag { animation-duration: .01s; animation-delay: 2.5s; }
     }
+    /* v44 İLK AÇILIŞ KURULUMU (#onboard; 15-kurulum.js). Antrenman ailesi değişkenleri (--t-*), iki temada okunur.
+       Başlık/alt menü/pencerelerin (z 45–50) üstünde; temalı onay penceresi (70) ve bildirimler (80) üstünde kalır. */
+    #onboard { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; background: var(--t-bg); color: var(--t-text);
+      padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+    #onboard.hidden { display: none; }
+    body.ob-open { overflow: hidden; }
+    .ob-top, .ob-body, .ob-foot-in { width: 100%; max-width: 520px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+    .ob-top { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 8px; padding-top: calc(8px + env(safe-area-inset-top, 0px)); padding-bottom: 8px; flex-shrink: 0; }
+    .ob-back { width: 44px; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; color: var(--t-text); background: var(--t-elev); }
+    .ob-dots { display: flex; justify-content: center; align-items: center; gap: 6px; }
+    .ob-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--t-line2); transition: width .2s, background-color .2s; }
+    .ob-dot.done { background: var(--t-acc-text); opacity: .55; }
+    .ob-dot.on { width: 24px; background: var(--t-acc-text); }
+    .ob-scroll { flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    .ob-body { padding-top: 8px; padding-bottom: 24px; min-height: 100%; display: flex; flex-direction: column; }
+    .ob-step { display: flex; flex-direction: column; gap: 18px; flex: 1 0 auto; animation: obIn .22s ease-out; }
+    .ob-step.ob-still { animation: none; }
+    @keyframes obIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .ob-title { font-size: 34px; line-height: 1.02; color: var(--t-text); outline: none; margin: 0; }
+    .ob-sub { font-size: 16px; line-height: 1.45; color: var(--t-muted); margin: -8px 0 0; }
+    .ob-hero { display: flex; flex-direction: column; gap: 14px; padding-top: 12px; }
+    .ob-hero .ob-title { font-size: 42px; }
+    .ob-hero .ob-sub { margin: 0; }
+    .ob-logo { width: 72px; height: 72px; border-radius: 18px; }
+    .ob-note { background: var(--t-surface); border: 1px solid var(--t-line); border-radius: 20px; padding: 14px 16px; font-size: 14px; line-height: 1.5; color: var(--t-text2); }
+    .ob-note-t { display: block; font-size: 13px; font-weight: 700; color: var(--t-text); margin-bottom: 4px; }
+    .ob-small { font-size: 13px; line-height: 1.45; color: var(--t-dim); margin: 0; }
+    .ob-actions { display: flex; flex-direction: column; gap: 10px; margin-top: auto; padding-top: 8px; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .ob-main { width: 100%; min-height: 52px; border-radius: 16px; font-size: 17px; }
+    .ob-second { width: 100%; min-height: 52px; border-radius: 16px; font-size: 16px; font-weight: 700; color: var(--t-text); background: var(--t-elev); }
+    .ob-group { display: flex; flex-direction: column; }
+    .ob-seg2 { grid-template-columns: 1fr 1fr; }
+    .ob-seg3 { grid-template-columns: 1fr 1fr 1fr; }
+    .ob-seg3 > button { min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 4px 2px; }
+    .ob-pace-t { font-size: 15px; }
+    .ob-pace-s { font-size: 12px; font-weight: 600; opacity: .85; }
+    .ob-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ob-field { display: block; min-width: 0; }
+    .ob-inwrap { position: relative; display: block; }
+    input.t-in.ob-in { height: 52px; font-size: 20px; font-weight: 700; padding-right: 44px; }
+    .ob-unit { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 15px; font-weight: 600; color: var(--t-muted); pointer-events: none; }
+    .ob-list { display: flex; flex-direction: column; gap: 10px; }
+    .ob-opt, .ob-check { width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; text-align: left; padding: 12px 16px; border-radius: 18px;
+      background: var(--t-surface); border: 1.5px solid var(--t-line); color: var(--t-text); cursor: pointer; }
+    .ob-opt.on { border-color: var(--t-acc-text); background: rgba(var(--t-acc-rgb), .10); }
+    .ob-check:has(.ob-cb:checked) { border-color: var(--t-acc-text); }
+    .ob-opt-tx { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .ob-opt-t { font-size: 17px; font-weight: 700; color: var(--t-text); }
+    .ob-opt-s { font-size: 14px; line-height: 1.35; color: var(--t-muted); }
+    .ob-radio { width: 26px; height: 26px; flex-shrink: 0; border-radius: 999px; border: 2px solid var(--t-line3); display: flex; align-items: center; justify-content: center; color: var(--t-on-acc); }
+    .ob-opt.on .ob-radio { background: var(--t-acc); border-color: var(--t-acc); }
+    .ob-cb { appearance: none; -webkit-appearance: none; order: 2; width: 28px; height: 28px; flex-shrink: 0; border-radius: 8px; border: 2px solid var(--t-line3); background: var(--t-elev0); margin: 0;
+      display: grid; place-items: center; cursor: pointer; }
+    .ob-cb:checked { background: var(--t-acc); border-color: var(--t-acc); }
+    .ob-cb:checked::after { content: ""; width: 7px; height: 13px; border: solid var(--t-on-acc); border-width: 0 3px 3px 0; transform: translateY(-2px) rotate(45deg); }
+    .ob-cb:focus-visible { outline: 2px solid var(--t-acc-text); outline-offset: 2px; }
+    .ob-weekly { font-size: 15px; line-height: 1.45; color: var(--t-text2); margin: 0; min-height: 1.45em; }
+    .ob-weekly:empty { display: none; }
+    .ob-sum { display: flex; flex-direction: column; gap: 10px; }
+    .ob-sum-hero { background: var(--t-panel); border: 1px solid var(--t-panel-line); border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 4px; color: var(--t-panel-text); }
+    .ob-sum-hero .ob-sum-l { color: var(--t-panel-text); }
+    .ob-sum-kcal { font-size: 18px; font-weight: 700; color: var(--t-text); }
+    .ob-sum-kcal b { font-size: 56px; line-height: 1; color: var(--t-acc-text); margin-right: 4px; }
+    .ob-sum-l { font-size: 14px; color: var(--t-muted); }
+    .ob-sum-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .ob-sum-c { background: var(--t-surface); border: 1px solid var(--t-line); border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .ob-sum-c b { font-size: 30px; line-height: 1.05; color: var(--t-text); }
+    .ob-sum-u { font-size: 13px; color: var(--t-muted); }
+    .ob-sum-water { background: var(--t-surface); border: 1px solid var(--t-line); border-radius: 18px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; color: var(--t-text2); }
+    .ob-sum-water b { font-size: 18px; color: var(--t-text); }
+    .ob-foot { flex-shrink: 0; border-top: 1px solid var(--t-line); background: var(--t-bg); padding-top: 10px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+    .ob-foot.hidden { display: none; }
+    .ob-err { font-size: 14px; line-height: 1.4; font-weight: 600; color: var(--t-danger-text); margin: 0 0 8px; }
+    .ob-err:empty { display: none; }
+    @media (max-height: 720px) {   /* iPhone SE / 8: ilk ekranın iki düğmesi ve hedef ekranındaki tahmin kaydırmadan görünsün */
+      .ob-step { gap: 14px; } .ob-hero { padding-top: 0; gap: 10px; } .ob-logo { width: 52px; height: 52px; border-radius: 14px; }
+      .ob-hero .ob-title { font-size: 36px; } .ob-title { font-size: 30px; } .ob-note { padding: 12px 14px; font-size: 13.5px; }
+      .ob-opt, .ob-check { min-height: 56px; padding: 9px 14px; } .ob-opt-s { font-size: 13px; }
+    }
+    @media (min-width: 768px) { .ob-title { font-size: 40px; } .ob-hero .ob-title { font-size: 52px; } .ob-body { padding-top: 32px; } }
   </style>
 </head>
 <body class="pb-36">
@@ -1367,6 +1447,24 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- v44: İLK AÇILIŞ KURULUMU (yalnızca yeni kurulumda; içerik 15-kurulum.js obRender ile çizilir) -->
+  <div id="onboard" class="hidden" data-step="1" role="dialog" aria-modal="true" aria-labelledby="obTitle">
+    <div class="ob-top">
+      <button id="obBack" type="button" class="ob-back" onclick="obBack()" aria-label="Geri" style="visibility:hidden"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+      <div id="obDots" class="ob-dots" role="img" aria-label="Adım 1 / 7"></div>
+      <span aria-hidden="true"></span>
+    </div>
+    <div id="obScroll" class="ob-scroll"><div id="obBody" class="ob-body"></div></div>
+    <div id="obFoot" class="ob-foot hidden">
+      <div class="ob-foot-in">
+        <p id="obErr" class="ob-err" role="alert" aria-live="assertive"></p>
+        <button id="obNext" type="button" class="ob-main t-btn" onclick="obNext()">İleri</button>
+        <button id="obFinish" type="button" class="ob-main t-btn hidden" onclick="finishOnboarding()">Uygulamaya geç</button>
+      </div>
+    </div>
+    <input id="obRestoreFile" type="file" accept="application/json,.json,text/plain,.txt" class="hidden" onchange="importBackupFile(event, { onboarding: true })" />
   </div>
 
   <!-- TEMALI ONAY / METİN PENCERESİ (antrenman ve profil için; sistem kutusu yerine) -->
