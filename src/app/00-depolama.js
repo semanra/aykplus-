@@ -164,7 +164,7 @@ function storageContinueReadOnly() {
   storeGen += 1e9;
   try { localStorage.removeItem(MIRROR_OFF_KEY); } catch (e) {}
   saveState();
-  toast("Bu verilerle devam ediliyor");
+  toast(t("Bu verilerle devam ediliyor"));
 }
 // İlk geçiş ya da localStorage daha yeni / dışarıdan yazılmış: ham kayıt (v4/kurtarma mantığıyla) okunur, parçalar
 // yazılır, geri okunup doğrulanır. Mevcut IndexedDB hâli önce "İçe alma öncesi" iç yedeği olur.
@@ -239,7 +239,7 @@ function saveStateLegacy() {
     saveFailNotified = false;
   } catch (e) {
     console.error(e);
-    if (!saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
+    if (!saveFailNotified) { toast(t("Veriler kaydedilemedi! Hemen yedek al."), "error"); saveFailNotified = true; }
   }
 }
 function storageSaveFailed(e) {
@@ -249,7 +249,7 @@ function storageSaveFailed(e) {
   storeLast = {};   // bağlantı geri gelince her şey baştan yazılır
   mirrorDirty = true;
   writeMirror(true);   // localStorage'a, IndexedDB'dekinden büyük numarayla (sonraki açılış buradan açar)
-  if (lsGet(STORAGE_KEY) !== JSON.stringify(state) && !saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
+  if (lsGet(STORAGE_KEY) !== JSON.stringify(state) && !saveFailNotified) { toast(t("Veriler kaydedilemedi! Hemen yedek al."), "error"); saveFailNotified = true; }
   const now = Date.now();
   if (now - idbReconnectAt > 10000) {   // en fazla 10 sn'de bir yeniden bağlanma
     idbReconnectAt = now;

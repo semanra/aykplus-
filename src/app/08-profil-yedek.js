@@ -388,7 +388,7 @@ function renderBanner() {
   const need = hasMeaningfulData() && days >= 7 && Date.now() > (state.backupSnoozeUntil || 0);
   $("backupBanner").classList.toggle("hidden", !need);
   $("backupDot").classList.toggle("hidden", !(hasMeaningfulData() && days >= 7));
-  if (need) $("backupBannerText").textContent = state.lastBackupAt ? `Son yedeğin ${days} gün önce. Verilerini korumak için yedekle.` : "Henüz hiç yedek almadın. Verilerin sadece bu telefonda.";
+  if (need) $("backupBannerText").textContent = state.lastBackupAt ? tn(days, "Son yedeğin {n} gün önce. Verilerini korumak için yedekle.") : t("Henüz hiç yedek almadın. Verilerin sadece bu telefonda.");
 }
 function snoozeBackup() { state.backupSnoozeUntil = Date.now() + 3 * DAY_MS; saveState(); renderBanner(); }
 

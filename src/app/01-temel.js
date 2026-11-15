@@ -493,7 +493,7 @@ function lostFood(x) {
   const unit = known && x.u ? x.u : "g";
   const scal = unit === "g" || unit === "ml";
   const f = {
-    name: "⚠ " + (known ? x.n : "Bulunamayan besin"), cat: "⚠ Bulunamayan", unit, step: scal ? 10 : 1,
+    name: "⚠ " + (known ? x.n : t("Bulunamayan besin")), cat: "⚠ Bulunamayan", unit, step: scal ? 10 : 1,
     def: num(known && x.d, scal ? 100 : 1) || (scal ? 100 : 1),
     p: known ? num(x.p, 0) : 0, c: known ? num(x.c, 0) : 0, f: known ? num(x.f, 0) : 0, _lost: known ? 1 : 2
   };
@@ -544,9 +544,9 @@ function lostFoodIds() {
 }
 // Açılışta bir kez: veritabanı yüklenemediyse veya bulunamayan besin varsa söyle
 function checkFoodHealth() {
-  if (typeof USDA_FOODS === "undefined") { toast("Besin veritabanı yüklenemedi. Uygulamayı tamamen kapatıp yeniden aç.", "error"); return; }
+  if (typeof USDA_FOODS === "undefined") { toast(t("Besin veritabanı yüklenemedi. Uygulamayı tamamen kapatıp yeniden aç."), "error"); return; }
   const n = lostFoodIds().length;
-  if (n) toast(`${n} besin veritabanında bulunamadı; "⚠" işaretliler son kayıtlı değerleriyle hesaplanıyor.`, "error");
+  if (n) toast(tn(n, "{n} besin veritabanında bulunamadı; \"⚠\" işaretliler son kayıtlı değerleriyle hesaplanıyor."), "error");
 }
 function activeDay() { return state.workoutDays[state.activeWorkoutDayIdx]; }
 

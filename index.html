@@ -689,7 +689,7 @@
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
           <button id="nutriThemeBtn" onclick="toggleNutriLight()" class="hidden w-11 h-11 items-center justify-center rounded-full" aria-label="Gündüz temasına geç"></button>
-          <button id="profileBtn" onclick="openProfile()" class="relative w-11 h-11 flex items-center justify-center bg-[var(--t-surface)] border border-[var(--t-line)] rounded-full text-[var(--t-text2)]" aria-label="Profil">
+          <button id="profileBtn" onclick="openProfile()" class="relative w-11 h-11 flex items-center justify-center bg-[var(--t-surface)] border border-[var(--t-line)] rounded-full text-[var(--t-text2)]" aria-label="Profil" data-t-aria="Profil">
             <img id="profileAvatar" alt="" class="hidden w-full h-full rounded-full object-cover" />
             <svg id="profileIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>
             <span id="backupDot" class="hidden absolute top-0 right-0 w-3 h-3 bg-[var(--t-danger)] rounded-full border-2 border-[var(--t-bg)]"></span>
@@ -712,8 +712,8 @@
     <div class="flex items-center justify-between gap-2 bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)] rounded-2xl pl-3.5 pr-1 py-1">
       <div id="backupBannerText" class="text-[13px] leading-snug text-[var(--t-warn-hi)]">Uzun süredir yedek almadın.</div>
       <div class="flex items-center gap-0.5 shrink-0">
-        <button onclick="exportBackupFile()" class="h-11 px-4 rounded-xl text-[14px] font-bold bg-[var(--t-warn-icon)] text-[#1F1503]">Yedekle</button>
-        <button onclick="snoozeBackup()" class="w-11 h-11 rounded-xl flex items-center justify-center text-[var(--t-warn-mid)]" aria-label="Uyarıyı 3 gün gizle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <button onclick="exportBackupFile()" class="h-11 px-4 rounded-xl text-[14px] font-bold bg-[var(--t-warn-icon)] text-[#1F1503]" data-t="Yedekle">Yedekle</button>
+        <button onclick="snoozeBackup()" class="w-11 h-11 rounded-xl flex items-center justify-center text-[var(--t-warn-mid)]" aria-label="Uyarıyı 3 gün gizle" data-t-aria="Uyarıyı 3 gün gizle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
     </div>
   </div>
@@ -941,7 +941,7 @@
       <div class="flex gap-1.5">
         <button onclick="adjustTimer(-15)" class="w-14 h-12 rounded-[14px] bg-[var(--t-elev)] text-[var(--t-text)] font-bold text-[15px]">−15</button>
         <button onclick="adjustTimer(15)" class="w-14 h-12 rounded-[14px] bg-[var(--t-elev)] text-[var(--t-text)] font-bold text-[15px]">+15</button>
-        <button onclick="stopTimer()" class="h-12 px-4 rounded-[14px] bg-[var(--t-text)] text-[var(--t-bg)] font-extrabold text-[15px]">Atla</button>
+        <button onclick="stopTimer()" class="h-12 px-4 rounded-[14px] bg-[var(--t-text)] text-[var(--t-bg)] font-extrabold text-[15px]" data-t="Atla">Atla</button>
       </div>
     </div>
   </div>
@@ -2270,7 +2270,7 @@ function storageContinueReadOnly() {
   storeGen += 1e9;
   try { localStorage.removeItem(MIRROR_OFF_KEY); } catch (e) {}
   saveState();
-  toast("Bu verilerle devam ediliyor");
+  toast(t("Bu verilerle devam ediliyor"));
 }
 // İlk geçiş ya da localStorage daha yeni / dışarıdan yazılmış: ham kayıt (v4/kurtarma mantığıyla) okunur, parçalar
 // yazılır, geri okunup doğrulanır. Mevcut IndexedDB hâli önce "İçe alma öncesi" iç yedeği olur.
@@ -2345,7 +2345,7 @@ function saveStateLegacy() {
     saveFailNotified = false;
   } catch (e) {
     console.error(e);
-    if (!saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
+    if (!saveFailNotified) { toast(t("Veriler kaydedilemedi! Hemen yedek al."), "error"); saveFailNotified = true; }
   }
 }
 function storageSaveFailed(e) {
@@ -2355,7 +2355,7 @@ function storageSaveFailed(e) {
   storeLast = {};   // bağlantı geri gelince her şey baştan yazılır
   mirrorDirty = true;
   writeMirror(true);   // localStorage'a, IndexedDB'dekinden büyük numarayla (sonraki açılış buradan açar)
-  if (lsGet(STORAGE_KEY) !== JSON.stringify(state) && !saveFailNotified) { toast("Veriler kaydedilemedi! Hemen yedek al.", "error"); saveFailNotified = true; }
+  if (lsGet(STORAGE_KEY) !== JSON.stringify(state) && !saveFailNotified) { toast(t("Veriler kaydedilemedi! Hemen yedek al."), "error"); saveFailNotified = true; }
   const now = Date.now();
   if (now - idbReconnectAt > 10000) {   // en fazla 10 sn'de bir yeniden bağlanma
     idbReconnectAt = now;
@@ -2966,7 +2966,7 @@ function lostFood(x) {
   const unit = known && x.u ? x.u : "g";
   const scal = unit === "g" || unit === "ml";
   const f = {
-    name: "⚠ " + (known ? x.n : "Bulunamayan besin"), cat: "⚠ Bulunamayan", unit, step: scal ? 10 : 1,
+    name: "⚠ " + (known ? x.n : t("Bulunamayan besin")), cat: "⚠ Bulunamayan", unit, step: scal ? 10 : 1,
     def: num(known && x.d, scal ? 100 : 1) || (scal ? 100 : 1),
     p: known ? num(x.p, 0) : 0, c: known ? num(x.c, 0) : 0, f: known ? num(x.f, 0) : 0, _lost: known ? 1 : 2
   };
@@ -3017,9 +3017,9 @@ function lostFoodIds() {
 }
 // Açılışta bir kez: veritabanı yüklenemediyse veya bulunamayan besin varsa söyle
 function checkFoodHealth() {
-  if (typeof USDA_FOODS === "undefined") { toast("Besin veritabanı yüklenemedi. Uygulamayı tamamen kapatıp yeniden aç.", "error"); return; }
+  if (typeof USDA_FOODS === "undefined") { toast(t("Besin veritabanı yüklenemedi. Uygulamayı tamamen kapatıp yeniden aç."), "error"); return; }
   const n = lostFoodIds().length;
-  if (n) toast(`${n} besin veritabanında bulunamadı; "⚠" işaretliler son kayıtlı değerleriyle hesaplanıyor.`, "error");
+  if (n) toast(tn(n, "{n} besin veritabanında bulunamadı; \"⚠\" işaretliler son kayıtlı değerleriyle hesaplanıyor."), "error");
 }
 function activeDay() { return state.workoutDays[state.activeWorkoutDayIdx]; }
 
@@ -3057,7 +3057,7 @@ function toast(msg, type = "ok", action = null) {
   setTimeout(() => el.remove(), life + 400);
 }
 
-window.addEventListener("error", e => { toast("Hata: " + (e.message || "bilinmeyen"), "error"); });
+window.addEventListener("error", e => { toast(t("Hata: {m}", { m: e.message || t("bilinmeyen") }), "error"); });
 
 // ---------------------------------------------------------------------------
 // MODAL YÖNETİMİ
@@ -3083,7 +3083,7 @@ document.addEventListener("click", e => {
 
 // Temalı onay / metin penceresi. Sonuç: onay → true (veya yazılan metin), vazgeç → null.
 let uiDlg = null;
-function uiAsk({ title, message = "", input = null, ok = "Tamam", cancel = "Vazgeç", danger = false, dismissable = true }) {
+function uiAsk({ title, message = "", input = null, ok = t("Tamam"), cancel = t("Vazgeç"), danger = false, dismissable = true }) {
   if (uiDlg) uiDialogDone(false);
   return new Promise(resolve => {
     uiDlg = { resolve, input: !!input, dismissable };
@@ -3121,11 +3121,11 @@ function uiDialogDone(okPressed) {
   inp.blur();
   d.resolve(okPressed ? (d.input ? inp.value : true) : null);
 }
-function uiAlert(title, message) { return uiAsk({ title, message, ok: "Tamam", cancel: null }); }
+function uiAlert(title, message) { return uiAsk({ title, message, ok: t("Tamam"), cancel: null }); }
 // Bağlama göre uyarı: antrenman/profil ekranında temalı pencere, diğer yerlerde sistem kutusu.
 function sayAlert(title, message) { if (trainCtx() || nutriCtx()) return uiAlert(title, message); alert(message); return Promise.resolve(true); }
 // v21: metin sorma (temalı; mobilite gibi eski temalı yerlerde sistem kutusu). Sonuç: yazılan metin veya null.
-async function askText(title, value = "", placeholder = "", message = "", ok = "Kaydet") {
+async function askText(title, value = "", placeholder = "", message = "", ok = t("Kaydet")) {
   if (trainCtx() || nutriCtx()) return uiAsk({ title, message, input: { value, placeholder }, ok });
   return prompt(message ? title + "\n" + message : title, value);
 }
@@ -3202,6 +3202,13 @@ function resumeTimer() {
   tickTimer();
 }
 
+// Sayaç etiketi kayıtta Türkçe ("Dinlenme" / "Dinlenme • hareket adı"); yalnızca gösterirken çevrilir
+function timerLabelText(label) {
+  const L = String(label == null ? "" : label);
+  if (L === "Dinlenme") return t("Dinlenme");
+  if (L.startsWith("Dinlenme • ")) return t("Dinlenme • {ad}", { ad: L.slice(11) });
+  return L;
+}
 function startTimer(sec, label = "Dinlenme") {
   sec = Math.round(num(sec, 0));
   if (sec <= 0) return;
@@ -3231,10 +3238,10 @@ function finishTimer() {
   timerPersist();
   beep();
   try { if (navigator.vibrate) navigator.vibrate([300, 150, 300]); } catch (e) { /* yoksay */ }
-  $("restPillTime").textContent = "BİTTİ!";
+  $("restPillTime").textContent = t("BİTTİ!");
   $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums text-[var(--d-over)]";
   $("restPillInner").classList.add("timer-flash");
-  toast("" + timer.label + " bitti!");
+  toast(t("{ad} bitti!", { ad: timerLabelText(timer.label) }));
   setTimeout(() => { if (!timer.running) resetTimerUI(); }, 4500);
 }
 
@@ -3254,7 +3261,7 @@ function stopTimer() {
 
 function renderTimerUI(rem) {
   $("restPill").classList.remove("hidden");
-  $("restPillLabel").textContent = timer.label;
+  $("restPillLabel").textContent = timerLabelText(timer.label);
   $("restPillTime").textContent = fmtClock(rem);
   $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums " + (rem <= 10 ? "text-[var(--d-over)]" : "text-[var(--t-acc-text)]");
 }
@@ -3335,14 +3342,14 @@ function checkNewDay() {
     archiveDay(state.today);
     resetDaily();
     state.today = td;
-    toast("Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.");
+    toast(t("Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı."));
     return true;
   }
   return false;
 }
 
 async function manualNewDay() {
-  if (!(await askConfirm("Yeni güne geçilsin mi?", "Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir.", "Yeni güne geç"))) return;
+  if (!(await askConfirm(t("Yeni güne geçilsin mi?"), t("Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir."), t("Yeni güne geç")))) return;
   const key = state.today || logicalToday();
   archiveDay(key);
   if (state.dailyLogs[key]) state.dailyLogs[key].manual = true;   // v36: gece yarısı bu özet ezilmesin (archiveDay)
@@ -3391,8 +3398,8 @@ function applyTabVisibility() {
     tb.innerHTML = light
       ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>'
       : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
-    tb.setAttribute("aria-label", light ? "Koyu temaya geç" : "Aydınlık temaya geç");
   }
+  tb.setAttribute("aria-label", light ? t("Koyu temaya geç") : t("Aydınlık temaya geç"));
   const tt = $("tabTitle");
   const title = t(TAB_TITLES[state.activeTab] || "AYK+");
   if (tt.textContent !== title) tt.textContent = title;
@@ -3420,7 +3427,7 @@ function applyCustomIcon() {
   });
   if ($("pfPhotoRemove")) {
     $("pfPhotoRemove").classList.toggle("hidden", !src);
-    $("pfPhotoBtnText").textContent = src ? "Değiştir" : "Fotoğraf seç";
+    $("pfPhotoBtnText").textContent = src ? t("Değiştir") : t("Fotoğraf seç");
   }
 }
 // Telefondan seçilen fotoğraf (birkaç MB olabilir) ortadan kare kırpılıp 320×320 JPEG'e küçültülür;
@@ -3455,9 +3462,9 @@ async function handleIconUpload(event) {
   try {
     state.customIconDataUrl = await shrinkPhoto(file);
     renderAll();
-    toast("Profil fotoğrafı güncellendi");
+    toast(t("Profil fotoğrafı güncellendi"));
   } catch (e) {
-    sayAlert("Fotoğraf yüklenemedi", "Bu fotoğraf açılamadı. Başka bir fotoğraf seçmeyi dene.");
+    sayAlert(t("Fotoğraf yüklenemedi"), t("Bu fotoğraf açılamadı. Başka bir fotoğraf seçmeyi dene."));
   }
 }
 // v37: v12'den önce (logo alanıyken) fotoğraf küçültülmeden kaydediliyordu; telefondan seçilen tek fotoğraf
@@ -3482,7 +3489,7 @@ function removeCustomIcon() {
   snapshot();
   state.customIconDataUrl = "";
   renderAll();
-  offerUndo("Profil fotoğrafı kaldırıldı");
+  offerUndo(t("Profil fotoğrafı kaldırıldı"));
 }
 
 // ---------------------------------------------------------------------------
@@ -7176,7 +7183,7 @@ function renderBanner() {
   const need = hasMeaningfulData() && days >= 7 && Date.now() > (state.backupSnoozeUntil || 0);
   $("backupBanner").classList.toggle("hidden", !need);
   $("backupDot").classList.toggle("hidden", !(hasMeaningfulData() && days >= 7));
-  if (need) $("backupBannerText").textContent = state.lastBackupAt ? `Son yedeğin ${days} gün önce. Verilerini korumak için yedekle.` : "Henüz hiç yedek almadın. Verilerin sadece bu telefonda.";
+  if (need) $("backupBannerText").textContent = state.lastBackupAt ? tn(days, "Son yedeğin {n} gün önce. Verilerini korumak için yedekle.") : t("Henüz hiç yedek almadın. Verilerin sadece bu telefonda.");
 }
 function snoozeBackup() { state.backupSnoozeUntil = Date.now() + 3 * DAY_MS; saveState(); renderBanner(); }
 
@@ -7644,14 +7651,14 @@ function coachHintText() {
 // ---------------------------------------------------------------------------
 let undoSnap = null;
 function snapshot() { undoSnap = JSON.stringify(state); }
-function offerUndo(msg) { toast(msg, "ok", { label: "Geri al", fn: doUndo }); }
+function offerUndo(msg) { toast(msg, "ok", { label: t("Geri al"), fn: doUndo }); }
 function doUndo() {
   if (!undoSnap) return;
   state = normalizeState(JSON.parse(undoSnap));
   undoSnap = null;
   renderAll();
   if (profileIsOpen()) fillProfileFields();   // v42: Profil otomatik kaydında Geri al kutuları da geri getirir
-  toast("Geri alındı");
+  toast(t("Geri alındı"));
 }
 
 // ---------------------------------------------------------------------------
@@ -9769,8 +9776,8 @@ function bootApp() {
   try { if (hadV5State && !loadFailed && localStorage.getItem("ayk_plus_v4_state") != null) localStorage.removeItem("ayk_plus_v4_state"); } catch (e) { /* yok sayılır */ }
   setTimeout(checkFoodHealth, 1500);
   setTimeout(checkStorageWarn, 2500);   // v36
-  if (storeReadOnly) setTimeout(() => toast("Kayıt deposu açılamadı. Verilerin güvende; uygulamayı tamamen kapatıp yeniden aç. Bu açılışta yapılan değişiklikler kaydedilmez.", "error", { label: "Bu verilerle devam", fn: storageContinueReadOnly }), 300);
-  if (loadFailed) setTimeout(() => toast("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.", "error"), 300);
+  if (storeReadOnly) setTimeout(() => toast(t("Kayıt deposu açılamadı. Verilerin güvende; uygulamayı tamamen kapatıp yeniden aç. Bu açılışta yapılan değişiklikler kaydedilmez."), "error", { label: t("Bu verilerle devam"), fn: storageContinueReadOnly }), 300);
+  if (loadFailed) setTimeout(() => toast(t("Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin."), "error"), 300);
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
@@ -10280,6 +10287,46 @@ const EN = {
   // bölüm 9: Dil satırı (dil adları çevrilmez)
   "Dil": "Language",
 };
+// v47: İngilizce sözlük, ortak metinler (bildirim, pencere, depolama/yedek uyarıları, üst panel). Anahtar = Türkçe metin.
+Object.assign(EN, {
+  // ortak düğme ve pencere kelimeleri
+  "Tamam": "OK", "Vazgeç": "Cancel", "Kaydet": "Save", "Geri al": "Undo", "Geri alındı": "Undone",
+  "Değiştir": "Change", "Atla": "Skip", "Yedekle": "Back up", "Profil": "Profile",
+  // bildirimler
+  "Hata: {m}": "Error: {m}", "bilinmeyen": "unknown",
+  // dinlenme sayacı
+  "Dinlenme": "Rest", "Dinlenme • {ad}": "Rest • {ad}", "{ad} bitti!": "{ad} over", "BİTTİ!": "DONE",
+  // gün dönümü
+  "Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.": "New day started. Water, supplements, meals and mobility check-offs were reset.",
+  "Yeni güne geçilsin mi?": "Start a new day?",
+  "Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir.": "Water, supplements, meals and mobility check-offs will be reset. Today's summary is saved in Nutrition → History.",
+  "Yeni güne geç": "Start new day",
+  // tema düğmesi, profil fotoğrafı
+  "Koyu temaya geç": "Switch to dark theme", "Aydınlık temaya geç": "Switch to light theme",
+  "Fotoğraf seç": "Choose photo", "Profil fotoğrafı güncellendi": "Profile photo updated",
+  "Fotoğraf yüklenemedi": "Couldn't upload photo",
+  "Bu fotoğraf açılamadı. Başka bir fotoğraf seçmeyi dene.": "This photo couldn't be opened. Try choosing a different one.",
+  "Profil fotoğrafı kaldırıldı": "Profile photo removed",
+  // depolama, kurtarma, yedek uyarıları
+  "Bu verilerle devam ediliyor": "Continuing with this data",
+  "Bu verilerle devam": "Continue with this data",
+  "Veriler kaydedilemedi! Hemen yedek al.": "Your data couldn't be saved. Back it up now.",
+  "Kayıt deposu açılamadı. Verilerin güvende; uygulamayı tamamen kapatıp yeniden aç. Bu açılışta yapılan değişiklikler kaydedilmez.": "Couldn't open the storage. Your data is safe: fully close the app and reopen it. Changes made in this session won't be saved.",
+  "Kayıtlı veriler okunamadı. Okunamayan hâli saklandı: Profil → Yedekleme'den indirebilir veya geri yüklemeyi deneyebilirsin.": "Your saved data couldn't be read. The unreadable copy was kept: you can download it or try restoring it from Profile → Backup.",
+  "Son yedeğin {n} gün önce. Verilerini korumak için yedekle.": {
+    one: "Your last backup was {n} day ago. Back up to keep your data safe.",
+    other: "Your last backup was {n} days ago. Back up to keep your data safe."
+  },
+  "Henüz hiç yedek almadın. Verilerin sadece bu telefonda.": "You haven't made a backup yet. Your data is only on this phone.",
+  "Uyarıyı 3 gün gizle": "Hide reminder for 3 days",
+  // besin veritabanı sağlığı
+  "Besin veritabanı yüklenemedi. Uygulamayı tamamen kapatıp yeniden aç.": "Couldn't load the food database. Fully close the app and reopen it.",
+  "{n} besin veritabanında bulunamadı; \"⚠\" işaretliler son kayıtlı değerleriyle hesaplanıyor.": {
+    one: "{n} food wasn't found in the database; items marked \"⚠\" use their last saved values.",
+    other: "{n} foods weren't found in the database; items marked \"⚠\" use their last saved values."
+  },
+  "Bulunamayan besin": "Missing food",
+});
 
 </script>
 </body>

@@ -32,7 +32,7 @@ function toast(msg, type = "ok", action = null) {
   setTimeout(() => el.remove(), life + 400);
 }
 
-window.addEventListener("error", e => { toast("Hata: " + (e.message || "bilinmeyen"), "error"); });
+window.addEventListener("error", e => { toast(t("Hata: {m}", { m: e.message || t("bilinmeyen") }), "error"); });
 
 // ---------------------------------------------------------------------------
 // MODAL YÖNETİMİ
@@ -58,7 +58,7 @@ document.addEventListener("click", e => {
 
 // Temalı onay / metin penceresi. Sonuç: onay → true (veya yazılan metin), vazgeç → null.
 let uiDlg = null;
-function uiAsk({ title, message = "", input = null, ok = "Tamam", cancel = "Vazgeç", danger = false, dismissable = true }) {
+function uiAsk({ title, message = "", input = null, ok = t("Tamam"), cancel = t("Vazgeç"), danger = false, dismissable = true }) {
   if (uiDlg) uiDialogDone(false);
   return new Promise(resolve => {
     uiDlg = { resolve, input: !!input, dismissable };
@@ -96,11 +96,11 @@ function uiDialogDone(okPressed) {
   inp.blur();
   d.resolve(okPressed ? (d.input ? inp.value : true) : null);
 }
-function uiAlert(title, message) { return uiAsk({ title, message, ok: "Tamam", cancel: null }); }
+function uiAlert(title, message) { return uiAsk({ title, message, ok: t("Tamam"), cancel: null }); }
 // Bağlama göre uyarı: antrenman/profil ekranında temalı pencere, diğer yerlerde sistem kutusu.
 function sayAlert(title, message) { if (trainCtx() || nutriCtx()) return uiAlert(title, message); alert(message); return Promise.resolve(true); }
 // v21: metin sorma (temalı; mobilite gibi eski temalı yerlerde sistem kutusu). Sonuç: yazılan metin veya null.
-async function askText(title, value = "", placeholder = "", message = "", ok = "Kaydet") {
+async function askText(title, value = "", placeholder = "", message = "", ok = t("Kaydet")) {
   if (trainCtx() || nutriCtx()) return uiAsk({ title, message, input: { value, placeholder }, ok });
   return prompt(message ? title + "\n" + message : title, value);
 }
@@ -177,6 +177,13 @@ function resumeTimer() {
   tickTimer();
 }
 
+// Sayaç etiketi kayıtta Türkçe ("Dinlenme" / "Dinlenme • hareket adı"); yalnızca gösterirken çevrilir
+function timerLabelText(label) {
+  const L = String(label == null ? "" : label);
+  if (L === "Dinlenme") return t("Dinlenme");
+  if (L.startsWith("Dinlenme • ")) return t("Dinlenme • {ad}", { ad: L.slice(11) });
+  return L;
+}
 function startTimer(sec, label = "Dinlenme") {
   sec = Math.round(num(sec, 0));
   if (sec <= 0) return;
@@ -206,10 +213,10 @@ function finishTimer() {
   timerPersist();
   beep();
   try { if (navigator.vibrate) navigator.vibrate([300, 150, 300]); } catch (e) { /* yoksay */ }
-  $("restPillTime").textContent = "BİTTİ!";
+  $("restPillTime").textContent = t("BİTTİ!");
   $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums text-[var(--d-over)]";
   $("restPillInner").classList.add("timer-flash");
-  toast("" + timer.label + " bitti!");
+  toast(t("{ad} bitti!", { ad: timerLabelText(timer.label) }));
   setTimeout(() => { if (!timer.running) resetTimerUI(); }, 4500);
 }
 
@@ -229,7 +236,7 @@ function stopTimer() {
 
 function renderTimerUI(rem) {
   $("restPill").classList.remove("hidden");
-  $("restPillLabel").textContent = timer.label;
+  $("restPillLabel").textContent = timerLabelText(timer.label);
   $("restPillTime").textContent = fmtClock(rem);
   $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums " + (rem <= 10 ? "text-[var(--d-over)]" : "text-[var(--t-acc-text)]");
 }
@@ -310,14 +317,14 @@ function checkNewDay() {
     archiveDay(state.today);
     resetDaily();
     state.today = td;
-    toast("Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.");
+    toast(t("Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı."));
     return true;
   }
   return false;
 }
 
 async function manualNewDay() {
-  if (!(await askConfirm("Yeni güne geçilsin mi?", "Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir.", "Yeni güne geç"))) return;
+  if (!(await askConfirm(t("Yeni güne geçilsin mi?"), t("Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir."), t("Yeni güne geç")))) return;
   const key = state.today || logicalToday();
   archiveDay(key);
   if (state.dailyLogs[key]) state.dailyLogs[key].manual = true;   // v36: gece yarısı bu özet ezilmesin (archiveDay)
@@ -366,8 +373,8 @@ function applyTabVisibility() {
     tb.innerHTML = light
       ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>'
       : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
-    tb.setAttribute("aria-label", light ? "Koyu temaya geç" : "Aydınlık temaya geç");
   }
+  tb.setAttribute("aria-label", light ? t("Koyu temaya geç") : t("Aydınlık temaya geç"));
   const tt = $("tabTitle");
   const title = t(TAB_TITLES[state.activeTab] || "AYK+");
   if (tt.textContent !== title) tt.textContent = title;
@@ -395,7 +402,7 @@ function applyCustomIcon() {
   });
   if ($("pfPhotoRemove")) {
     $("pfPhotoRemove").classList.toggle("hidden", !src);
-    $("pfPhotoBtnText").textContent = src ? "Değiştir" : "Fotoğraf seç";
+    $("pfPhotoBtnText").textContent = src ? t("Değiştir") : t("Fotoğraf seç");
   }
 }
 // Telefondan seçilen fotoğraf (birkaç MB olabilir) ortadan kare kırpılıp 320×320 JPEG'e küçültülür;
@@ -430,9 +437,9 @@ async function handleIconUpload(event) {
   try {
     state.customIconDataUrl = await shrinkPhoto(file);
     renderAll();
-    toast("Profil fotoğrafı güncellendi");
+    toast(t("Profil fotoğrafı güncellendi"));
   } catch (e) {
-    sayAlert("Fotoğraf yüklenemedi", "Bu fotoğraf açılamadı. Başka bir fotoğraf seçmeyi dene.");
+    sayAlert(t("Fotoğraf yüklenemedi"), t("Bu fotoğraf açılamadı. Başka bir fotoğraf seçmeyi dene."));
   }
 }
 // v37: v12'den önce (logo alanıyken) fotoğraf küçültülmeden kaydediliyordu; telefondan seçilen tek fotoğraf
@@ -457,6 +464,6 @@ function removeCustomIcon() {
   snapshot();
   state.customIconDataUrl = "";
   renderAll();
-  offerUndo("Profil fotoğrafı kaldırıldı");
+  offerUndo(t("Profil fotoğrafı kaldırıldı"));
 }
 

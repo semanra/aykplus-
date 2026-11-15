@@ -462,14 +462,14 @@ function coachHintText() {
 // ---------------------------------------------------------------------------
 let undoSnap = null;
 function snapshot() { undoSnap = JSON.stringify(state); }
-function offerUndo(msg) { toast(msg, "ok", { label: "Geri al", fn: doUndo }); }
+function offerUndo(msg) { toast(msg, "ok", { label: t("Geri al"), fn: doUndo }); }
 function doUndo() {
   if (!undoSnap) return;
   state = normalizeState(JSON.parse(undoSnap));
   undoSnap = null;
   renderAll();
   if (profileIsOpen()) fillProfileFields();   // v42: Profil otomatik kaydında Geri al kutuları da geri getirir
-  toast("Geri alındı");
+  toast(t("Geri alındı"));
 }
 
 // ---------------------------------------------------------------------------
