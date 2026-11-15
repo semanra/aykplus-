@@ -1248,6 +1248,11 @@
               <div><label for="setTargetBf" class="t-field">Hedef yağ oranı (%)</label><input id="setTargetBf" type="text" inputmode="decimal" placeholder="Örn: 15" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
             </div>
             <p class="text-[12px] text-[var(--t-dim)] -mt-1">Yağ oranını bilmiyorsan boş bırakabilirsin.</p>
+            <div class="grid grid-cols-2 gap-2.5 items-end">
+              <div><label for="setActivity" class="t-field">Hareketlilik</label><select id="setActivity" class="t-in font-bold"><option value="low">Az (masa başı)</option><option value="mid">Orta</option><option value="high">Çok (ayakta ya da bedenen çalışma)</option></select></div>
+              <div><label for="setProtein" class="t-field">Protein</label><select id="setProtein" class="t-in font-bold"><option value="std">Standart</option><option value="high">Yüksek</option></select></div>
+            </div>
+            <p class="text-[12px] text-[var(--t-dim)] -mt-1">Standart, araştırmalara göre yeterli miktardır. Yüksek, daha fazlasını isteyenler için.</p>
             <label class="flex items-center justify-between gap-3 min-h-[52px]">
               <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]">Su hedefi kiloya göre</span><span id="setWaterHint" class="block text-[13px] text-[var(--t-dim)]">Kilo × 35 ml; listende kreatin varsa +0,5 L.</span></span>
               <input id="setWaterAuto" type="checkbox" class="t-sw" onchange="updateWaterAutoHint()" />

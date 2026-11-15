@@ -112,6 +112,24 @@ try:
     check(a["tooFast"] and not a["gainTooFast"] and a["goal"] == "lose", "Ver: eski uyarı aynı")
 
     ctx.close()
+
+    # ================= 4) PROFİL: HAREKETLİLİK + PROTEİN =================
+    ctx, pg = page()
+    seed(pg, OWNER)
+    pg.evaluate("openProfile()"); pg.wait_for_timeout(150)
+    check(pg.input_value("#setActivity") == "mid" and pg.input_value("#setProtein") == "std", "Profil varsayılanları")
+    c0 = pg.evaluate("getTargets().calTarget"); pg.select_option("#setActivity", "high"); pg.wait_for_timeout(100)
+    check(st(pg)["settings"]["activity"] == "high" and pg.evaluate("getTargets().calTarget") > c0 and "Kaydedildi" in pg.inner_text("#toastWrap"), "hareketlilik otomatik kaydedildi, kalori arttı")
+    pg.select_option("#setProtein", "high"); pg.wait_for_timeout(100)
+    check(st(pg)["settings"]["proteinHigh"] is True and pg.evaluate("getTargets().proTarget") == 210, "Yüksek protein kaydedildi")
+    pg.locator("#toastWrap button", has_text="Geri al").last.click(); pg.wait_for_timeout(120)
+    check(st(pg)["settings"]["proteinHigh"] is False and pg.input_value("#setProtein") == "std", "Geri al")
+    check("araştırmalara göre yeterli" in pg.inner_text("#profilePage"), "protein açıklaması görünüyor")
+    for sc in ["dark", "light"]:
+        pg.emulate_media(color_scheme=sc); pg.wait_for_timeout(100)
+        pg.locator("#setActivity").scroll_into_view_if_needed()
+        pg.screenshot(path=os.path.join(REPO, "tests", "shots", f"v43_profil_{sc}.png"))
+    ctx.close()
     check(not errs, f"sayfa hatası yok ({errs[:3]})")
     b.close()
 finally:

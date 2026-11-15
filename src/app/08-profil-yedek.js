@@ -2,7 +2,7 @@
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 function fillProfileFields() {
   const st = state.settings;
@@ -11,6 +11,8 @@ function fillProfileFields() {
   $("setHeight").value = st.height;
   $("pfWeight").value = fmtNum(num(state.weight, 0));
   $("setTarget").value = fmtNum(num(st.targetWeight, 82));
+  $("setActivity").value = ["low", "mid", "high"].includes(st.activity) ? st.activity : "mid";
+  $("setProtein").value = st.proteinHigh === true ? "high" : "std";
   $("setWater").value = fmtNum(num(st.waterTarget, 3.5));
   $("setWaterAuto").checked = st.waterAuto !== false;
   updateWaterAutoHint();
@@ -152,6 +154,8 @@ function applyProfileFields(changedId) {
   st.age = Math.max(12, Math.min(99, Math.round(num($("setAge").value, st.age))));
   st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));
   st.targetWeight = Math.max(30, Math.min(250, round1(num($("setTarget").value, st.targetWeight))));
+  st.activity = ["low", "mid", "high"].includes($("setActivity").value) ? $("setActivity").value : "mid";
+  st.proteinHigh = $("setProtein").value === "high";
   st.waterTarget = Math.max(0.5, Math.min(10, round1(num($("setWater").value, st.waterTarget))));
   st.waterAuto = $("setWaterAuto").checked;
   st.restSec = Math.max(10, Math.min(900, Math.round(num($("setRest").value, st.restSec))));
