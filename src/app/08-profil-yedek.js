@@ -100,9 +100,9 @@ function renderProfile() {
   }
   $("pfWeightBox").innerHTML = wh;
   // Günlük hedefler (hesaplanan)
-  const t = getTargets();
+  const tg = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
-    ${[["Kalori", Math.round(t.calTarget).toLocaleString(locale()), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
+    ${[["Kalori", Math.round(tg.calTarget).toLocaleString(locale()), "kcal"], ["Protein", Math.round(tg.proTarget), "g"], ["Karb", Math.round(tg.carbTarget), "g"], ["Yağ", Math.round(tg.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
   </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
@@ -310,12 +310,12 @@ async function aykSnapRestore(key) {
 // telefondan ulaşılamıyordu; artık Profil → Yedekleme'den indirilebilir, geri yüklenmeye çalışılabilir, silinebilir.
 function rescueText() { try { return localStorage.getItem(RESCUE_KEY) || ""; } catch (e) { return ""; } }
 async function downloadRescue() {
-  const t = rescueText(); if (!t) return;
-  const r = await saveTextFile(t, `AYK-kurtarma-${todayStr()}.json`, "AYK+ kurtarma kopyası");
+  const txt = rescueText(); if (!txt) return;
+  const r = await saveTextFile(txt, `AYK-kurtarma-${todayStr()}.json`, "AYK+ kurtarma kopyası");
   if (r === "shared" || r === "downloaded") toast("Kurtarma kopyası kaydedildi");
   else if (r === "failed") toast("Dosya oluşturulamadı.", "error");
 }
-async function restoreRescue() { const t = rescueText(); if (t) await restoreFromText(t); }
+async function restoreRescue() { const txt = rescueText(); if (txt) await restoreFromText(txt); }
 async function deleteRescue() {
   if (!(await askConfirm("Kurtarma kopyası silinsin mi?", "Okunamayan eski verinin kopyası telefondan silinir. Önce indirdiysen dosyan güvende.", "Sil", true))) return;
   try { localStorage.removeItem(RESCUE_KEY); } catch (e) { /* yok sayılır */ }

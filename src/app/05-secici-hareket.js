@@ -165,7 +165,7 @@ function readExLevels() {
     const start = round2(num($("exLvStart").value, 0));
     if (step > 0) levels = { mode: "step", start: start > 0 ? start : step, step, addon };
   } else {
-    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(t => round2(num(t.trim(), -1))).filter(v => v >= 0);
+    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(tok => round2(num(tok.trim(), -1))).filter(v => v >= 0);
     const uniq = [...new Set(list)].sort((a, b) => a - b);
     if (uniq.length >= 2) levels = { mode: "list", list: uniq, addon };
   }
@@ -287,8 +287,8 @@ function paceText(min, km) {
 function sessionSummary(sess) {
   const sets = sess.sets || [];
   if (sess.kind === "cardio") {
-    const t = cardioTotals(sets, false);
-    return `${fmtNum(t.min)} dk` + (t.km > 0 ? ` • ${fmtNum(t.km)} km` : "");
+    const ct = cardioTotals(sets, false);
+    return `${fmtNum(ct.min)} dk` + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : "");
   }
   if (sess.kind === "time") return sets.map(s => `${num(s.sec)} sn`).join(" · ");
   return sets.map(s => `${fmtKg(num(s.kg))}×${num(s.reps)}`).join(" · ");

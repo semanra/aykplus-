@@ -190,44 +190,101 @@ try:
     check(pg.evaluate("curLang()") == "en" and pg.inner_text("#navBtnGym span") == "Training", "I1: kayıtlı en ile açılış İngilizce")
     pg.evaluate("() => { state.settings.lang = 'tr'; renderAll(); }"); pg.wait_for_timeout(150)
     check(pg.inner_text("#navBtnGym span") == "Antrenman" and pg.evaluate("document.documentElement.lang") == "tr", "I1: setLang olmadan Türkçeye dönüşte statik metin ve html lang Türkçe")
-    # M2: yerel değişken/parametre adı `t` olan işlevde t("metin") çağrısı yasak (global t()'i gölgeler)
+    # M2 (v47): src/app/*.js içinde `t` adlı HİÇBİR bağlama olamaz (global t()'i gölgeler)
     import re, glob
-    def strip_js(src):
-        out = []; i = 0; n = len(src)
+    app_files = lambda: [fn for fn in sorted(glob.glob(os.path.join(REPO, "src", "app", "*.js"))) if not fn.endswith("17-sozluk-en.js")]
+    def code_only(src):
+        """Yorumları, metinleri, düzenli ifadeleri ve şablon metnini boşaltır; ${...} içi kod kalır."""
+        out = []; i = 0; n = len(src); stack = []  # stack: şablon içi ${ süslü sayaçları
+        def prev_sig():
+            for ch in reversed(out):
+                if not ch.isspace(): return ch[-1]
+            return ""
+        def prev_word():
+            m = re.search(r"([A-Za-z_$][\w$]*)\s*$", "".join(out[-20:])); return m.group(1) if m else ""
+        def template(i):
+            out.append("`")
+            while i < n:
+                c = src[i]
+                if c == "\\": i += 2
+                elif c == "`": out.append("`"); return i + 1
+                elif src.startswith("${", i):
+                    stack.append(0); out.append("${"); return i + 2
+                else:
+                    if c == "\n": out.append("\n")
+                    i += 1
+            return i
         while i < n:
             c = src[i]
             if src.startswith("//", i):
                 while i < n and src[i] != "\n": i += 1
             elif src.startswith("/*", i):
-                j = src.find("*/", i + 2); i = n if j < 0 else j + 2
+                j = src.find("*/", i + 2); j = n if j < 0 else j + 2; out.append("\n" * src.count("\n", i, j)); i = j
             elif c in "\"'":
                 j = i + 1
-                while j < n and src[j] != c and src[j] != "\n":
-                    j += 2 if src[j] == "\\" else 1
+                while j < n and src[j] != c and src[j] != "\n": j += 2 if src[j] == "\\" else 1
                 out.append(c + c); i = j + 1
+            elif c == "`":
+                i = template(i + 1)
+            elif c == "/" and (prev_sig() == "" or prev_sig() in "(,=:[!&|?{};+-*%<>~^" or prev_word() in ("return", "typeof", "case", "in", "of")):
+                j = i + 1; cls = False
+                while j < n and src[j] != "\n":
+                    if src[j] == "\\": j += 2; continue
+                    if src[j] == "[": cls = True
+                    elif src[j] == "]": cls = False
+                    elif src[j] == "/" and not cls: break
+                    j += 1
+                out.append("/r/"); i = j + 1
+                while i < n and src[i].isalpha(): i += 1
+            elif stack and c == "{":
+                stack[-1] += 1; out.append(c); i += 1
+            elif stack and c == "}":
+                if stack[-1] == 0:
+                    stack.pop(); out.append("}"); i = template(i + 1)
+                else:
+                    stack[-1] -= 1; out.append(c); i += 1
             else:
                 out.append(c); i += 1
         return "".join(out)
-    def app_files():
-        return [fn for fn in sorted(glob.glob(os.path.join(REPO, "src", "app", "*.js"))) if not fn.endswith(("16-dil.js", "17-sozluk-en.js"))]
-    shadow = []; nfun = 0
+    KW = r"(?!(?:if|for|while|switch|catch|function|return|typeof|void|await|new|else|do)\b)"
+    def t_bindings(code):
+        """code_only çıktısında `t` bağlamalarını (satır no, tür) listeler."""
+        found = []
+        pats = [
+            ("const/let/var t", r"\b(?:const|let|var)\s+t\b"),
+            ("const/let/var ... , t", r"\b(?:const|let|var)\s+[^;]*?,\s*t\s*=(?![=>])|\b(?:let|var)\s+(?:[\w$]+\s*,\s*)+t\s*[;,]"),
+            ("yapı bozma", r"\b(?:const|let|var)\s*[\{\[][^}\]]*?\bt\b[^}\]]*[\}\]]\s*="),
+            ("function(t)", r"\bfunction\b\s*[\w$]*\s*\([^)]*(?<![\w$.])t\b(?!\s*[(.\[])[^)]*\)"),
+            ("t =>", r"(?<![\w$.])t\s*=>"),
+            ("(…t…) =>", r"\([^()]*(?<![\w$.])t\b(?!\s*[(.\[])[^()]*\)\s*=>"),
+            ("catch(t)", r"\bcatch\s*\(\s*t\s*\)"),
+            ("yöntem(t) {", r"(?<![\w$.])" + KW + r"[\w$]+\s*\([^()]*(?<![\w$.])t\b(?!\s*[(.\[])[^()]*\)\s*\{"),
+        ]
+        for name, pat in pats:
+            for m in re.finditer(pat, code):
+                found.append((code.count("\n", 0, m.start()) + 1, name))
+        return found
+    sample = """
+      const t = 1; let a = 2, t = 3; var {x, t} = o = 1; const [t, u] = z;
+      for (const t of xs) {} function f(t) {} function g(a, t, b) {} const h = function(t) {};
+      xs.map(t => t); ys.map((t, i) => i); zs.map((a, t) => a); try {} catch (t) {}
+      const o2 = { m(t) { return 1; } };
+    """
+    sample_hits = {k for _, k in t_bindings(code_only(sample))}
+    want = {"const/let/var t", "const/let/var ... , t", "yapı bozma", "function(t)", "t =>", "(…t…) =>", "catch(t)", "yöntem(t) {"}
+    check(want <= sample_hits, "M2 öz-sınama: yasak biçimlerin hepsi yakalanır, eksik: %s" % sorted(want - sample_hits))
+    clean = """
+      // const t = 1;  /* t => 1 */
+      const s = "t => 1 const t"; const q = 'function(t)'; const r = /t(=>)/g; const z = `a'b ${t("x")} (t) => 1`;
+      const w = `Profil'den ${t("y")}`; if (t) {} while (t("a")) {} items.forEach(it => t("k")); const k = tg.t;
+    """
+    check(t_bindings(code_only(clean)) == [], "M2 öz-sınama: yorum/metin/şablon/global t kullanımı yanlış alarm vermez: %s" % t_bindings(code_only(clean)))
+    shadow = []; nfiles = 0
     for fn in app_files():
-        raw = open(fn, encoding="utf-8").read()
-        for m in re.finditer(r"\bfunction\s+(\w+)\s*\(([^)]*)\)\s*\{", raw):
-            nfun += 1
-            body = strip_js(raw[m.end():]); depth = 1; k = 0
-            while k < len(body) and depth:
-                if body[k] == "{": depth += 1
-                elif body[k] == "}": depth -= 1
-                k += 1
-            body = body[:k]; params = m.group(2)
-            has_t = (re.search(r"(^|[,\s])t\s*(=[^>]|,|$)", params) is not None or
-                     re.search(r"\b(const|let|var)\s+t\b", body) is not None or
-                     re.search(r"\bt\s*=>", body) is not None or
-                     re.search(r"\((?:[^()]*,\s*)?t(?:\s*,[^()]*)?\)\s*=>", body) is not None)
-            if has_t and re.search(r"(?<![.\w])t\(\s*[\"'`]", body):
-                shadow.append(os.path.basename(fn) + ":" + m.group(1))
-    check(nfun > 500 and shadow == [], "M2: yerel `t` bağı olan işlevde t(\"…\") çağrısı yok (%d işlev tarandı) %s" % (nfun, shadow))
+        nfiles += 1
+        for ln, kind in t_bindings(code_only(open(fn, encoding="utf-8").read())):
+            shadow.append("%s:%d %s" % (os.path.basename(fn), ln, kind))
+    check(nfiles >= 15 and shadow == [], "M2: src/app/*.js içinde `t` bağlaması yok (%d dosya) %d yer: %s" % (nfiles, len(shadow), shadow))
     # M8: koddaki t("…")/tn(n,"…") anahtarlarından sözlükte (EN) olmayanlar. v46'da yalnızca UYARI (sayı yazılır);
     # v49'da (İngilizce herkese açılırken) bu denetim BAŞARISIZLIK olur.
     enkeys = set(pg.evaluate("Object.keys(EN)"))

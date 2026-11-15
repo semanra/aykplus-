@@ -83,7 +83,7 @@ function setNutriView(v) {
 // v31: Görünüm (Sistem / Koyu / Aydınlık). Etkin tema html.light sınıfıyla uygulanır; Beslenme'de nutri-light.
 // Açılışta yanıp sönmesin diye <head> içindeki betik "ayk_theme" aynasını okur (asıl kayıt state.settings.theme).
 const THEME_MQ = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
-function themeIsLight() { const t = state.settings.theme; return t === "light" || (t !== "dark" && !!(THEME_MQ && THEME_MQ.matches)); }
+function themeIsLight() { const mode = state.settings.theme; return mode === "light" || (mode !== "dark" && !!(THEME_MQ && THEME_MQ.matches)); }
 function applyTheme() {
   const light = themeIsLight();
   document.documentElement.classList.toggle("light", light);
@@ -92,7 +92,7 @@ function applyTheme() {
   if (meta) { const bg = getComputedStyle(document.body).backgroundColor; if (bg && meta.getAttribute("content") !== bg) meta.setAttribute("content", bg); }
   try { if (localStorage.getItem("ayk_theme") !== state.settings.theme) localStorage.setItem("ayk_theme", state.settings.theme); } catch (e) {}
 }
-function setTheme(t) { state.settings.theme = ["system", "dark", "light"].includes(t) ? t : "system"; renderAll(); }
+function setTheme(mode) { state.settings.theme = ["system", "dark", "light"].includes(mode) ? mode : "system"; renderAll(); }
 function toggleTheme() { setTheme(themeIsLight() ? "dark" : "light"); }
 const toggleNutriLight = toggleTheme;   // eski ad (başlıktaki düğme)
 // Sistem teması değişince: olay + yedek olarak uygulamaya dönüşte yeniden bak (iOS arka plandayken olayı kaçırabilir)
@@ -401,7 +401,7 @@ function renderTodayMeals() {
       </div>`;
   }
   $("todayMeals").innerHTML = banner + meals.map((meal, mIdx) => {
-    const t = mealTotals(meal);
+    const mt = mealTotals(meal);
     const isNext = mIdx === nextIdx;
     const last = mIdx === meals.length - 1;
     const collapsed = meal.done && !openDoneMeals.has(meal.id);
@@ -415,7 +415,7 @@ function renderTodayMeals() {
       return `<div class="flex gap-2" data-today-meal="${mIdx}">${rail}
         <button onclick="toggleMealOpen(${mIdx})" class="flex-1 min-w-0 min-h-[52px] mb-3 flex items-center justify-between gap-3 text-left" aria-expanded="false" aria-label="${esc(meal.title)} öğününü aç">
           <div class="min-w-0"><div class="text-[12px] font-semibold n-muted">${time ? time + " · " : ""}yendi${changed.has(meal.id) ? " · bugüne özel" : ""}</div><div class="text-[16px] font-bold n-muted truncate">${esc(meal.title)}</div></div>
-          <div class="text-[14px] font-semibold n-muted whitespace-nowrap shrink-0">${fmtInt(t.cal)} kcal</div>
+          <div class="text-[14px] font-semibold n-muted whitespace-nowrap shrink-0">${fmtInt(mt.cal)} kcal</div>
         </button></div>`;
     }
     const status = meal.done ? "TAMAMLANDI" : isNext ? "SIRADAKİ" : "";
@@ -477,8 +477,8 @@ function renderTodayMeals() {
               ${meal.targetNote ? `<div class="text-[12px] n-muted mt-0.5">${esc(meal.targetNote)}</div>` : ""}
               ${num(meal.balanced, 0) < 0 ? `<div class="text-[12px] font-semibold n-k mt-0.5" data-balanced="${mIdx}">Gün dengelendi: bu öğünden ${fmtInt(-meal.balanced)} kcal kısıldı</div>` : ""}
             </div>
-            <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[24px] leading-none tabular-nums">${fmtInt(t.cal)}</span><span class="text-[12px] n-muted ml-0.5">kcal</span>
-              <div class="text-[12px] font-semibold tabular-nums mt-0.5">${macroLine(t.p, t.c, t.f)}</div></div>
+            <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[24px] leading-none tabular-nums">${fmtInt(mt.cal)}</span><span class="text-[12px] n-muted ml-0.5">kcal</span>
+              <div class="text-[12px] font-semibold tabular-nums mt-0.5">${macroLine(mt.p, mt.c, mt.f)}</div></div>
           ${headOpen ? "</button>" : "</div>"}
           <div class="n-div">${items || '<div class="text-[13px] n-dim py-2">Bu öğünde henüz besin yok.</div>'}</div>
           ${editPanel}
@@ -727,10 +727,10 @@ function balanceDay(skipIdx) {
 const BALANCE_MAX_CUT = 0.75;
 // "2. Öğün: Öğle Yemeği (...)" → "2. Öğün"; uzun adlar kısaltılır
 function shortMealTitle(m) {
-  const t = String(m.title || "");
-  const i = t.indexOf(":");
-  if (i > 0 && i <= 16) return t.slice(0, i);
-  return t.length > 18 ? t.slice(0, 17) + "…" : t;
+  const ttl = String(m.title || "");
+  const i = ttl.indexOf(":");
+  if (i > 0 && i <= 16) return ttl.slice(0, i);
+  return ttl.length > 18 ? ttl.slice(0, 17) + "…" : ttl;
 }
 
 // ---------------------------------------------------------------------------
@@ -805,7 +805,7 @@ function renderMenus() {
   const meals = curMeals();
   const copyLabel = state.dayType === "rest" ? "Antrenmana kopyala" : "Dinlenmeye kopyala";
   let html = meals.map((meal, mIdx) => {
-    const t = mealTotals(meal);
+    const mt = mealTotals(meal);
     const open = openMenuMeals.has(meal.id);
     const head = `<div class="flex items-center gap-1">
         <button class="drag-handle w-11 h-11 -ml-2 shrink-0 flex items-center justify-center n-dim" data-midx="${mIdx}" aria-label="Öğünü sürükleyerek taşı" style="touch-action: none; cursor: grab;">
@@ -814,7 +814,7 @@ function renderMenus() {
         <button onclick="toggleMenuMeal(${mIdx})" class="flex-1 min-w-0 min-h-[52px] flex items-center gap-3 text-left" aria-expanded="${open}" aria-label="${esc(meal.title)} öğününü ${open ? "kapat" : "aç"}">
           ${meal.time ? `<span class="t-display text-[18px] n-accent tabular-nums shrink-0">${esc(meal.time)}</span>` : ""}
           <span class="flex-1 min-w-0"><span class="block text-[15px] font-bold leading-snug break-words">${esc(meal.title)}</span>
-            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${fmtInt(t.cal)} kcal · ${macroLine(t.p, t.c, t.f)} · ${t.n} besin</span></span>
+            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${fmtInt(mt.cal)} kcal · ${macroLine(mt.p, mt.c, mt.f)} · ${mt.n} besin</span></span>
           <span class="n-dim shrink-0">${svgI(open ? "chevD" : "chevR", 18)}</span>
         </button>
       </div>`;

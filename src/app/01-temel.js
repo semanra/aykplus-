@@ -163,15 +163,15 @@ function normMealList(list) {
 // v27: MOBİLİTE VERİSİ — eski "uygulama" yazısını (örn. "Sağ ve Sol için 2'şer Set x 30 sn") alanlara çevirir.
 // Aralıklarda üst değer alınır; hiçbir değer okunamazsa ok:false (varsayılanlar kullanılır, yazı rx'te saklanır).
 function parseMobRx(rx) {
-  const t = String(rx || "");
+  const rxs = String(rx || "");
   const out = { ok: false };
-  const sm = t.match(/(\d+)\s*(?:['’]?\s*(?:er|şer|ar|şar))?\s*set/i);
+  const sm = rxs.match(/(\d+)\s*(?:['’]?\s*(?:er|şer|ar|şar))?\s*set/i);
   if (sm) out.sets = parseInt(sm[1], 10);
-  const rm = t.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:tekrar|tur)/i);
-  const tm = t.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:sn|saniye|sec)(?![a-zçğıöşü])/i);
+  const rm = rxs.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:tekrar|tur)/i);
+  const tm = rxs.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:sn|saniye|sec)(?![a-zçğıöşü])/i);
   if (tm) { out.mode = "time"; out.sec = parseInt(tm[2] || tm[1], 10); out.ok = true; }
   else if (rm) { out.mode = "reps"; out.reps = parseInt(rm[2] || rm[1], 10); out.ok = true; }
-  if (/sa[gğ]\s*(?:ve|\/|-)\s*sol|her\s*(?:ayak|kol|y[oö]n|bacak|taraf)/i.test(t)) out.sides = 2;
+  if (/sa[gğ]\s*(?:ve|\/|-)\s*sol|her\s*(?:ayak|kol|y[oö]n|bacak|taraf)/i.test(rxs)) out.sides = 2;
   return out;
 }
 function mobLibEntry(name) {
@@ -207,7 +207,7 @@ function normMobItem(x) {
   const region2 = MOB_REGION_KEYS.includes(x.region2) && x.region2 !== region ? x.region2 : "";
   return {
     id: String(x.id || mobNewId()), name: String(x.name).trim().slice(0, 80),
-    type: MOB_TYPES.some(t => t[0] === x.type) ? x.type : "static",
+    type: MOB_TYPES.some(mt => mt[0] === x.type) ? x.type : "static",
     region, region2,
     sets: clampInt(x.sets, 1, 10, 1), mode: x.mode === "reps" ? "reps" : "time",
     reps: clampInt(x.reps, 1, 100, 10), sec: clampInt(x.sec, 5, 600, 30), sides: num(x.sides, 1) === 2 ? 2 : 1,
@@ -437,9 +437,9 @@ function loadState(allowFresh = false) {
 // v44: yeni kurulum durumu. Test kancası: window.AYK_TEST_SEED nesneyse onunla (kurulum ekranı yok) açılır.
 function freshState() {
   if (typeof window !== "undefined" && isObj(window.AYK_TEST_SEED)) {
-    const t = normalizeState(JSON.parse(JSON.stringify(window.AYK_TEST_SEED)));
-    t.settings.onboarded = true;
-    return t;
+    const st = normalizeState(JSON.parse(JSON.stringify(window.AYK_TEST_SEED)));
+    st.settings.onboarded = true;
+    return st;
   }
   const s = normalizeState({});
   s.settings.onboarded = false;   // normalizeState (göç adım 4) true yapar; bilerek sonradan

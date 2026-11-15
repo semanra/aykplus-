@@ -40,7 +40,7 @@ function searchIndex() {
     if (old && old.src === src) { _sIdx[id] = old; return; }   // özel besin yerinde düzenlenirse src değişir → yeniden hesaplanır
     const name = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
     const extra = normSearch((f.aliases || []).join(" ") + " " + stripEmoji(f.cat || ""));
-    const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(t => t.length > 1);
+    const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(tk => tk.length > 1);
     const e = { src, name, nameTok: name.split(/[^a-z0-9%]+/).filter(Boolean), extra, tokens };
     _sEntry.set(f, e);
     _sIdx[id] = e;
@@ -53,25 +53,25 @@ function wordScore(w, e, fuzzy = true) {
   const alts = SEARCH_SYN[w] || [w];
   let best = 0;
   for (const a of alts) {
-    if (e.nameTok.some(t => t.startsWith(a))) best = Math.max(best, 150);
+    if (e.nameTok.some(tk => tk.startsWith(a))) best = Math.max(best, 150);
     else if (e.name.includes(a)) best = Math.max(best, 100);
     else if (e.extra.includes(a)) best = Math.max(best, 60);
   }
   if (best || !fuzzy || w.length < 4) return best;
-  for (const t of e.tokens) if (fuzzyTokHit(w, t)) return 25;
+  for (const tk of e.tokens) if (fuzzyTokHit(w, tk)) return 25;
   return 0;
 }
 // v26: kelime–token yazım hatası sonucu hatırlanır (aynı token yüzlerce besinde geçiyor)
 const _fzMemo = new Map();
-function fuzzyTokHit(w, t) {
-  const key = w + "|" + t;
+function fuzzyTokHit(w, tk) {
+  const key = w + "|" + tk;
   let r = _fzMemo.get(key);
   if (r !== undefined) return r;
   r = false;
   const k = w.length >= 7 ? 2 : 1;
   for (const L of [w.length - 1, w.length, w.length + 1]) {
-    if (L < 3 || L > t.length) continue;
-    if (editDist(w, t.slice(0, L)) <= k) { r = true; break; }
+    if (L < 3 || L > tk.length) continue;
+    if (editDist(w, tk.slice(0, L)) <= k) { r = true; break; }
   }
   if (_fzMemo.size > 200000) _fzMemo.clear();
   _fzMemo.set(key, r);

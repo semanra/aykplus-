@@ -41,7 +41,7 @@ function exerciseSeries(name) {
   if (kind === "cardio") {
     const useKm = sameKind.some(h => cardioTotals(h.sets, false).km > 0);
     return {
-      points: sameKind.map(h => { const t = cardioTotals(h.sets, false); return { label: fmtDate(h.ts), t: h.ts, y: useKm ? t.km : t.min }; }),
+      points: sameKind.map(h => { const ct = cardioTotals(h.sets, false); return { label: fmtDate(h.ts), t: h.ts, y: useKm ? ct.km : ct.min }; }),
       unit: useKm ? "km" : "dk", color: "#38bdf8", metric: useKm ? "Toplam mesafe" : "Toplam süre"
     };
   }
@@ -118,7 +118,7 @@ function pStat(label, value, unit, sub, color) {
   return `<div class="p-tile"><div class="p-tl">${color ? `<i class="p-sdot" style="background:${color}"></i>` : ""}${label}</div>
     <div class="p-tv"><b class="t-display">${value}</b>${unit ? `<span>${unit}</span>` : ""}</div><div class="p-ts">${sub || ""}</div></div>`;
 }
-function pLegend(items) { return `<div class="p-lg">${items.map(([sym, t]) => `<span>${sym}${t}</span>`).join("")}</div>`; }
+function pLegend(items) { return `<div class="p-lg">${items.map(([sym, lb]) => `<span>${sym}${lb}</span>`).join("")}</div>`; }
 
 // Çizgi grafik. series: [{ pts: [{t, y}], color, w, dots, name }] — x zamana göre (düzensiz tartı günleri doğru aralıklı)
 function pLine(series, o = {}) {
@@ -128,16 +128,16 @@ function pLine(series, o = {}) {
   let t0 = Math.min(...ts), t1 = Math.max(...ts); if (t1 === t0) t1 = t0 + 1;
   let lo = Math.min(...ys), hi = Math.max(...ys); if (hi - lo < 0.6) { lo -= 0.3; hi += 0.3; }
   const pad = (hi - lo) * 0.15; lo -= pad; hi += pad;
-  const X = t => L + (W - L - R) * (t - t0) / (t1 - t0);
+  const X = tm => L + (W - L - R) * (tm - t0) / (t1 - t0);
   const Y = v => T + (H - T - B) * (hi - v) / (hi - lo);
   let s = "";
   for (let k = 0; k < 4; k++) {
     const v = lo + (hi - lo) * k / 3, y = Y(v);
     s += `<line x1="${L}" x2="${W - R + 4}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" style="stroke:var(--t-grid)"/><text x="${L - 6}" y="${(y + 4).toFixed(1)}" text-anchor="end" class="p-ax">${hi - lo > 12 ? Math.round(v) : fmtNum(v)}</text>`;
   }
-  const xf = o.xFmt || (t => fmtDate(t));
-  [t0, (t0 + t1) / 2, t1].forEach((t, i) => {
-    s += `<text x="${X(t).toFixed(1)}" y="${H - 7}" text-anchor="${i === 0 ? "start" : i === 2 ? "end" : "middle"}" class="p-ax">${esc(xf(t))}</text>`;
+  const xf = o.xFmt || (tm => fmtDate(tm));
+  [t0, (t0 + t1) / 2, t1].forEach((tm, i) => {
+    s += `<text x="${X(tm).toFixed(1)}" y="${H - 7}" text-anchor="${i === 0 ? "start" : i === 2 ? "end" : "middle"}" class="p-ax">${esc(xf(tm))}</text>`;
   });
   series.forEach(se => {
     if (se.dots) se.pts.forEach(p => { s += `<circle cx="${X(p.t).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="2.6" style="fill:${se.color}"/>`; });
@@ -243,7 +243,7 @@ function progCoachHtml() {
   const adj = num(state.settings.calAdjust, 0);
   const adjLine = adj !== 0 ? `<div class="p-adj"><span>Uygulanan koç düzeltmesi: <b>${adj > 0 ? "+" : ""}${adj} kcal</b>${state.settings.coachAppliedAt ? ` <span class="p-dim">(${fmtDate(state.settings.coachAppliedAt)})</span>` : ""}</span>
       <button onclick="resetCoachAdjust()" class="p-link">Sıfırla</button></div>` : "";
-  const head = (t, sub) => `<div class="p-coach-h"><div class="p-cic">${pI("chat", 20, 2)}</div><div><b>${t}</b><span>${sub}</span></div></div>`;
+  const head = (ttl, sub) => `<div class="p-coach-h"><div class="p-cic">${pI("chat", 20, 2)}</div><div><b>${ttl}</b><span>${sub}</span></div></div>`;
   if (!a.ready) {
     return `<div class="p-card" id="pCoach">${head("Kalori koçu", "Henüz hesap için veri yok")}
       <p class="p-fine">Koçun gerçek harcamanı hesaplayabilmesi için son 4 haftada <b>en az 4 tartı</b> ve ilk ile son tartı arasında <b>en az 10 gün</b> olmalı. Şu an: ${a.n} tartı${a.n >= 2 ? `, ${Math.floor(a.spanDays)} gün aralık` : ""}.</p>${adjLine}</div>`;
@@ -440,7 +440,7 @@ function progGucHtml() {
     const v = state.workoutLogs.filter(l => l.ts && l.ts >= a && l.ts < b).reduce((s, l) => s + num(l.volume), 0) / 1000;
     return { label: i === 7 ? "Bu h." : i === 0 ? fmtDay(new Date(a), { day: "numeric", month: "short" }) : String(new Date(a).getDate()), v: round1(v), flag: i === 7 ? "now" : "" };
   });
-  const hasTon = ton.some(t => t.v > 0);
+  const hasTon = ton.some(tw => tw.v > 0);
   const tonCard = `<div class="p-card" id="pTonnage">${pSec("Haftalık tonaj", PC.tq, `<span class="p-dim p-sm">ton</span>`)}
     ${hasTon ? pBars(ton, { color: PC.tq, id: "ton", fmt: v => fmtNum(v), label: "Son 8 haftanın tonajı (ton)" }) + `<p class="p-fine">Bu hafta sürüyor (yarı saydam); bitmemiş haftayı tam haftalarla karşılaştırma.</p>` : `<p class="p-fine">Henüz tonaj yok.</p>`}
     <div class="p-mini3"><div><span>Bu hafta</span><b>${w.n} seans</b></div><div><span>Kardiyo</span><b>${fmtNum(w.min)} dk${w.km > 0 ? ` · ${fmtNum(w.km)} km` : ""}</b></div><div><span>Rekor</span><b>${w.prs}</b></div></div></div>`;

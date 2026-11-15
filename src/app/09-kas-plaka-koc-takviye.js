@@ -534,10 +534,10 @@ function otherMeals() {
 function deleteMeal(mIdx) {
   const meals = curMeals();
   snapshot();
-  const t = meals[mIdx].title;
+  const ttl = meals[mIdx].title;
   meals.splice(mIdx, 1);
   renderAll();
-  offerUndo(`"${t}" silindi`);
+  offerUndo(`"${ttl}" silindi`);
 }
 function copyMeal(mIdx) {
   const src = curMeals()[mIdx];
@@ -582,8 +582,8 @@ function suppDoseDefaults(dose, unit) {
 }
 function suppTimeLabel(s) {
   if (s.time === "custom") return s.timeLabel || "Özel";
-  const t = SUPP_TIMES.find(x => x[0] === s.time);
-  return t ? t[1] : "";
+  const slot = SUPP_TIMES.find(x => x[0] === s.time);
+  return slot ? slot[1] : "";
 }
 function suppDoseText(s) { return s.dose ? `${fmtDose(s.dose)} ${s.unit || ""}`.trim() : ""; }
 function suppPillHtml(s) {
@@ -629,7 +629,7 @@ function renderSupps() {
     html += `<div class="flex flex-wrap gap-2 pt-1"><button onclick="addSupp()" class="n-chip add">+ Ekle</button>
       <button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}Bitti</button></div>`;
   } else {
-    const groups = SUPP_GROUPS.map(([l, ic, times]) => [l, ic, times.flatMap(t => list.filter(s => s.time === t))]);
+    const groups = SUPP_GROUPS.map(([l, ic, times]) => [l, ic, times.flatMap(tm => list.filter(s => s.time === tm))]);
     [...new Set(list.filter(s => s.time === "custom").map(suppTimeLabel))]
       .forEach(l => groups.push([l, "clock", list.filter(s => s.time === "custom" && suppTimeLabel(s) === l)]));
     const untimed = list.filter(s => !suppTimeLabel(s));
@@ -656,12 +656,12 @@ async function editSuppDose(i) {
   if (!s) return;
   const v = await askText("Doz ve birim", suppDoseText(s), "örn: 5 g · 2 softjel · 1 ölçek", "Boş bırakırsan doz gösterilmez.", "Kaydet");
   if (v === null) return;
-  const t = String(v).trim();
-  if (!t) {   // v26: doz silme Geri al'lı
+  const txt = String(v).trim();
+  if (!txt) {   // v26: doz silme Geri al'lı
     if (!SUPP_DOSE_KEYS.some(k => s[k] != null)) return;
     snapshot(); SUPP_DOSE_KEYS.forEach(k => delete s[k]); renderAll(); offerUndo(`${s.name}: doz kaldırıldı`); return;
   }
-  const m = t.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
+  const m = txt.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
   const d = m ? r2(num(m[1], 0)) : 0;
   if (!(d > 0) || d > 100000) { sayAlert("Doz anlaşılamadı", "Önce sayı, sonra birim yaz (örn: 5 g veya 2 softjel)."); return; }
   const unit = m[2].trim().slice(0, 16);
@@ -761,7 +761,7 @@ function logExerciseLines(log) {
   Object.keys(state.exerciseHistory).forEach(k => state.exerciseHistory[k].forEach(sess => {
     if (sess.logId !== log.id) return;
     let txt;
-    if (sess.kind === "cardio") { const t = cardioTotals(sess.sets, false); txt = `${fmtNum(t.min)} dk` + (t.km > 0 ? ` • ${fmtNum(t.km)} km` : ""); }
+    if (sess.kind === "cardio") { const ct = cardioTotals(sess.sets, false); txt = `${fmtNum(ct.min)} dk` + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : ""); }
     else if (sess.kind === "time") txt = `${sess.sets.length} × ${Math.max(...sess.sets.map(s => num(s.sec)))} sn`;
     else {
       const best = sess.sets.reduce((b, s) => (e1rm(s.kg, s.reps) > e1rm(b.kg, b.reps) ? s : b), sess.sets[0]);
@@ -774,9 +774,9 @@ function logExerciseLines(log) {
 
 function fitText(ctx, text, maxW) {
   if (ctx.measureText(text).width <= maxW) return text;
-  let t = text;
-  while (t.length > 1 && ctx.measureText(t + "…").width > maxW) t = t.slice(0, -1);
-  return t + "…";
+  let s = text;
+  while (s.length > 1 && ctx.measureText(s + "…").width > maxW) s = s.slice(0, -1);
+  return s + "…";
 }
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();

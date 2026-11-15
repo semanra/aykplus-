@@ -52,10 +52,10 @@ function obTargets(dayType) {
     })
   });
   try {
-    const t = getTargets();
-    t.floor = d.sex === "female" ? 1400 : 1750;
-    t.floored = t.tdee + t.goalDelta < t.floor;   // güvenli alt sınır hedefi yukarı çekti
-    return t;
+    const tg = getTargets();
+    tg.floor = d.sex === "female" ? 1400 : 1750;
+    tg.floored = tg.tdee + tg.goalDelta < tg.floor;   // güvenli alt sınır hedefi yukarı çekti
+    return tg;
   } finally { state = saved; }
 }
 // Adımın eksik/hatalı alanı (boşsa geçerli)
@@ -138,11 +138,11 @@ function obWeeklyText() {
   const kcal = Math.round(d.goal === "lose" ? -real : real);
   if (kcal <= 0) return d.goal === "lose" ? "Güvenli alt sınır yüzünden bu hızda kilo kaybı olmuyor; kalori hedefin harcamana eşit ya da üstünde kalır." : "Bu seçimle günlük kalori fazlası oluşmuyor.";
   const kg = kcal * 7 / 7700;
-  let t = `Haftada yaklaşık ${fmtKg(kg)} kg ${d.goal === "lose" ? "kayıp" : "artış"} (günde ~${fmtInt(kcal)} kcal ${d.goal === "lose" ? "açık" : "fazla"}).`;
+  let txt = `Haftada yaklaşık ${fmtKg(kg)} kg ${d.goal === "lose" ? "kayıp" : "artış"} (günde ~${fmtInt(kcal)} kcal ${d.goal === "lose" ? "açık" : "fazla"}).`;
   const diff = Math.abs(v.weight - v.target);
   const ok = d.goal === "lose" ? v.target >= 30 && v.target < v.weight : v.target > v.weight && v.target <= 250;
-  if (ok && kg > 0) t += ` Hedefe yaklaşık ${Math.max(1, Math.round(diff / kg))} haftada ulaşırsın.`;
-  return t;
+  if (ok && kg > 0) txt += ` Hedefe yaklaşık ${Math.max(1, Math.round(diff / kg))} haftada ulaşırsın.`;
+  return txt;
 }
 function obUpdateWeekly() { const el = $("obWeekly"); if (el) el.textContent = obWeeklyText(); }
 
@@ -191,7 +191,7 @@ function obStepHtml(n) {
   if (n === 3) {
     const tgt = d.goal === "lose" || d.goal === "gain";
     const kc = p => d.goal === "lose" ? `${OB_LOSE_PACE[p]} kcal` : `+%${Math.round(GAIN_PACE[p] * 100)}`;
-    const pace = (id, p, t) => `<button id="${id}" type="button" class="${d.pace === p ? "on" : ""}" aria-pressed="${d.pace === p}" onclick="obPick('pace', '${p}')"><span class="ob-pace-t">${t}</span><span class="ob-pace-s">${kc(p)}</span></button>`;
+    const pace = (id, p, lb) => `<button id="${id}" type="button" class="${d.pace === p ? "on" : ""}" aria-pressed="${d.pace === p}" onclick="obPick('pace', '${p}')"><span class="ob-pace-t">${lb}</span><span class="ob-pace-s">${kc(p)}</span></button>`;
     return `${obHead("Hedefin ne?", "")}
     <div class="ob-list">
       ${obOpt("obGoalLose", d.goal === "lose", "Kilo vermek", "Yağ kaybı, kası koruyarak", "obPick('goal', 'lose')")}
@@ -256,8 +256,8 @@ function obRender(keepScroll) {
   if (!keepScroll) {
     obSetErr("");
     if (sc) sc.scrollTop = 0;
-    const t = $("obTitle");
-    if (t && obStep > 1) { try { t.focus({ preventScroll: true }); } catch (e) { /* yoksay */ } }
+    const el = $("obTitle");
+    if (el && obStep > 1) { try { el.focus({ preventScroll: true }); } catch (e) { /* yoksay */ } }
   } else if (sc) sc.scrollTop = top;
 }
 

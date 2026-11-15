@@ -369,9 +369,9 @@ function gymActiveHtml() {
 }
 function exRightText(ex) {
   if (ex.kind === "cardio") {
-    const t = cardioTotals(ex.sets, false);
-    const pace = paceText(t.min, t.km);
-    return `Toplam ${fmtNum(t.min)} dk${t.km > 0 ? " · " + fmtNum(t.km) + " km" : ""}${pace ? " · " + pace : ""}`;
+    const ct = cardioTotals(ex.sets, false);
+    const pace = paceText(ct.min, ct.km);
+    return `Toplam ${fmtNum(ct.min)} dk${ct.km > 0 ? " · " + fmtNum(ct.km) + " km" : ""}${pace ? " · " + pace : ""}`;
   }
   if (ex.kind === "time") return `Toplam ${ex.sets.reduce((a, s) => a + num(s.sec), 0)} sn${ex.rest ? " · dinlenme " + ex.rest + " sn" : ""}`;
   let vol = 0, best = 0;
@@ -599,11 +599,11 @@ function renderGym() {
   updateActiveProgress();
 }
 function updateActiveProgress() {
-  const t = $("gymProgText");
-  if (!t) return;
+  const progEl = $("gymProgText");
+  if (!progEl) return;
   let d = 0, n = 0;
   activeDay().exercises.forEach(ex => ex.sets.forEach(s => { n++; if (s.done) d++; }));
-  t.textContent = `${d}/${n} set`;
+  progEl.textContent = `${d}/${n} set`;
   $("gymProgBar").style.width = (n ? Math.round(d / n * 100) : 0) + "%";
   const el = $("gymElapsed");
   if (el) el.textContent = state.workoutStartedAt ? fmtDuration(Date.now() - state.workoutStartedAt) : "00:00";

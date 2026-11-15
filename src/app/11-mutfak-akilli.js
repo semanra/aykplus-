@@ -20,9 +20,9 @@ function itemsTotals(items) {
 }
 // "2. Öğün: Öğle Yemeği" → "Öğle Yemeği"
 function mealTitleBody(m) {
-  const t = String(m.title || "");
-  const i = t.indexOf(":");
-  return (i > 0 && i <= 16 ? t.slice(i + 1) : t).trim() || t;
+  const ttl = String(m.title || "");
+  const i = ttl.indexOf(":");
+  return (i > 0 && i <= 16 ? ttl.slice(i + 1) : ttl).trim() || ttl;
 }
 
 // ---------------------------------------------------------------------------
@@ -79,7 +79,7 @@ function deleteCombo(id) {
 }
 function comboRowHtml(c) {
   const db = getFoodDB();
-  const t = itemsTotals(c.items);
+  const ct = itemsTotals(c.items);
   const names = c.items.filter(i => db[i.foodId]).map(i => stripEmoji(db[i.foodId].name).replace(/^⭐\s*/, "")).join(", ");
   if (foodUI.sel === "combo:" + c.id) {
     const rows = c.items.map(i => {
@@ -91,11 +91,11 @@ function comboRowHtml(c) {
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3 my-2" id="comboSelCard" data-combo="${esc(c.id)}">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(c.name)}</h3><div class="text-[12px] n-muted">Kombo · ${c.items.length} besin</div></div>
-          <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[28px] leading-none tabular-nums">${fmtInt(t.cal)}</span><span class="text-[12px] n-muted ml-1">kcal</span>
-            <div class="text-[12px] font-semibold tabular-nums">${macroLine(t.p, t.c, t.f)}</div></div>
+          <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[28px] leading-none tabular-nums">${fmtInt(ct.cal)}</span><span class="text-[12px] n-muted ml-1">kcal</span>
+            <div class="text-[12px] font-semibold tabular-nums">${macroLine(ct.p, ct.c, ct.f)}</div></div>
         </div>
         <div class="n-div">${rows}</div>
-        <button id="comboAddBtn" onclick='addComboToMeal(${esc(JSON.stringify(c.id))})' class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}>${tIdx < 0 ? "Önce bir öğün oluştur" : `Öğüne ekle · ${fmtInt(t.cal)} kcal`}</button>
+        <button id="comboAddBtn" onclick='addComboToMeal(${esc(JSON.stringify(c.id))})' class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}>${tIdx < 0 ? "Önce bir öğün oluştur" : `Öğüne ekle · ${fmtInt(ct.cal)} kcal`}</button>
         <div class="flex justify-end pt-1 n-bt">
           <button onclick='deleteCombo(${esc(JSON.stringify(c.id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}Komboyu sil</button>
         </div>
@@ -103,7 +103,7 @@ function comboRowHtml(c) {
   }
   return `<button onclick='selectCombo(${esc(JSON.stringify(c.id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-combo="${esc(c.id)}">
       <span class="min-w-0"><span class="flex items-center gap-1.5 text-[15px] font-bold leading-snug"><span class="n-accent shrink-0">${svgI("star", 16, 2)}</span><span class="truncate">${esc(c.name)}</span></span>
-        <span class="block text-[12px] n-muted mt-0.5 truncate">${fmtInt(t.cal)} kcal · ${Math.round(t.p)} g protein · ${esc(names)}</span></span>
+        <span class="block text-[12px] n-muted mt-0.5 truncate">${fmtInt(ct.cal)} kcal · ${Math.round(ct.p)} g protein · ${esc(names)}</span></span>
       <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
     </button>`;
 }
@@ -159,14 +159,14 @@ function rcAmount(i, v) {
 }
 function rcRemove(i) { rcp.items.splice(i, 1); renderRecipe(); }
 function updateRecipeSummary() {
-  const t = recipeTotals();
+  const rt = recipeTotals();
   const cooked = num($("rcCooked").value, 0);
-  $("rcCooked").placeholder = t.raw > 0 ? `çiğ malzemeler toplam ${fmtInt(t.raw)} g` : "örn: 1200";
+  $("rcCooked").placeholder = rt.raw > 0 ? `çiğ malzemeler toplam ${fmtInt(rt.raw)} g` : "örn: 1200";
   const per = cooked > 0 ? 100 / cooked : 0;
-  $("rcSum").innerHTML = `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">Tarifin tamamı</span><strong class="tabular-nums">${fmtInt(t.cal)} kcal · ${macroLine(t.p, t.c, t.f)}</strong></div>`
+  $("rcSum").innerHTML = `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">Tarifin tamamı</span><strong class="tabular-nums">${fmtInt(rt.cal)} kcal · ${macroLine(rt.p, rt.c, rt.f)}</strong></div>`
     + (cooked > 0
-      ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">Pişmiş 100 g</span><strong class="tabular-nums n-accent">${fmtInt(t.cal * per)} kcal</strong></div>
-         <div class="text-right text-[12px] font-semibold tabular-nums">${macroLine(t.p * per, t.c * per, t.f * per, true)}</div>`
+      ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">Pişmiş 100 g</span><strong class="tabular-nums n-accent">${fmtInt(rt.cal * per)} kcal</strong></div>
+         <div class="text-right text-[12px] font-semibold tabular-nums">${macroLine(rt.p * per, rt.c * per, rt.f * per, true)}</div>`
       : `<div class="text-[12px] n-dim mt-1">100 g değerlerini hesaplamam için pişmiş toplam ağırlığı yaz.</div>`);
 }
 function rcAddIngredient() {
@@ -194,12 +194,12 @@ function saveRecipe() {
   if (!rcp.items.length) { sayAlert("Malzeme yok", "En az bir malzeme ekle."); return; }
   const cooked = num($("rcCooked").value, 0);
   if (!(cooked > 0) || cooked > 30000) { sayAlert("Pişmiş ağırlık eksik", "Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş)."); return; }
-  const t = recipeTotals();
+  const rt = recipeTotals();
   const id = rcp.id || "custom_recipe_" + Date.now().toString(36);
   const editing = !!rcp.id;
   state.customFoods[id] = {
     name: "🍲 " + name, cat: "🍲 Tariflerim", unit: "g", step: 10, def: Math.max(10, Math.min(250, Math.round(cooked))),
-    p: t.p / cooked, c: t.c / cooked, f: t.f / cooked, kcal: t.cal / cooked,
+    p: rt.p / cooked, c: rt.c / cooked, f: rt.f / cooked, kcal: rt.cal / cooked,
     recipe: { items: rcp.items.filter(i => num(i.amount) > 0).map(i => ({ foodId: i.foodId, amount: num(i.amount) })), cooked }
   };
   invalidateFoodDB();
@@ -326,11 +326,11 @@ function shopText() {
   const nT = shopTrainDays();
   return `AYK+ alışveriş listesi (7 gün: ${nT} antrenman, ${7 - nT} dinlenme)\n` + rows.join("\n");
 }
-async function copyText(t) {
-  try { await navigator.clipboard.writeText(t); return true; }
+async function copyText(txt) {
+  try { await navigator.clipboard.writeText(txt); return true; }
   catch (e) {
     const ta = document.createElement("textarea");
-    ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    ta.value = txt; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
     document.body.appendChild(ta); ta.select();
     let ok = false;
     try { ok = document.execCommand("copy"); } catch (e2) { ok = false; }
@@ -447,9 +447,9 @@ function renderFoodSuggest() {
   const el = $("foodSuggest");
   if (!el) return;
   const tIdx = foodTargetIdx();
-  const t = getTargets();
+  const tg = getTargets();
   const tot = nutritionTotals(foodMeals());
-  const remP = t.proTarget - tot.p, remK = t.calTarget - tot.cal;
+  const remP = tg.proTarget - tot.p, remK = tg.calTarget - tot.cal;
   foodSuggestCache = tIdx >= 0 && remK >= 80 && remP >= 8 ? fillSuggestions(remP, remK) : [];
   if (!foodSuggestCache.length) { el.innerHTML = ""; el.classList.add("hidden"); return; }
   const db = getFoodDB();
@@ -505,11 +505,11 @@ function logIntake(d) {
 function dateKeyOffset(n) { const d = logicalNow(); d.setDate(d.getDate() + n); return todayStr(d); }
 function keyToDate(k) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
 // Hedefe yakınlık: yeşil ±%5 (en az 50 kcal), sarı ±%15, kırmızı daha uzak
-function hitClass(k, t) {
-  if (!(t > 0)) return "none";
-  const d = Math.abs(k - t);
-  if (d <= Math.max(50, t * 0.05)) return "ok";
-  if (d <= t * 0.15) return "near";
+function hitClass(k, tgt) {
+  if (!(tgt > 0)) return "none";
+  const d = Math.abs(k - tgt);
+  if (d <= Math.max(50, tgt * 0.05)) return "ok";
+  if (d <= tgt * 0.15) return "near";
   return "far";
 }
 function weekStats() {
@@ -518,7 +518,7 @@ function weekStats() {
   const avgK = days7.length ? days7.reduce((a, b) => a + b.k, 0) / days7.length : 0;
   const avgP = days7.length ? days7.reduce((a, b) => a + b.p, 0) / days7.length : 0;
   // Bu hafta (Pazartesi–Pazar)
-  const t = getTargets().calTarget;
+  const calT = getTargets().calTarget;
   const ws = new Date(weekStart(logicalNow()));
   let total = 0, taken = 0, daysLeft = 0;
   const today = dayKey();
@@ -527,10 +527,10 @@ function weekStats() {
     const k = todayStr(d);
     if (k < today) {
       const x = logIntake(state.dailyLogs[k]);
-      total += x && x.t > 0 ? x.t : t;
+      total += x && x.t > 0 ? x.t : calT;
       if (x) taken += x.k;
     } else {
-      total += t;
+      total += calT;
       if (k === today) taken += eatenTotals().cal;
       daysLeft++;
     }

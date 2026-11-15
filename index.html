@@ -2209,8 +2209,8 @@ function lsGen() { const n = parseInt(lsGet(LS_GEN_KEY), 10); return n > 0 ? n :
 
 // --- Açılış ---
 async function storageInit() {
-  { const [n, t] = String(lsGet(IDB_FAIL_KEY) || "0:0").split(":").map(Number);   // içe alma tutmuyor: 7 gün eski mod
-    if (n >= 2 && Date.now() - t < 7 * DAY_MS) return storageUseLegacy(); }
+  { const [n, tm] = String(lsGet(IDB_FAIL_KEY) || "0:0").split(":").map(Number);   // içe alma tutmuyor: 7 gün eski mod
+    if (n >= 2 && Date.now() - tm < 7 * DAY_MS) return storageUseLegacy(); }
   try { aykDB = await idbOpen(); } catch (e) { aykDB = null; }
   if (!aykDB && lsGet(IDB_USED_KEY) === "1" && lsGet(MIRROR_OFF_KEY) !== "1") {   // R3-I2: kullanılan depo geç açılıyor olabilir
     try { aykDB = await idbOpen(10000); } catch (e) { aykDB = null; }
@@ -2440,7 +2440,7 @@ async function autoSnapshot() {
     await storagePruneSnaps();
   } catch (e) { console.error(e); }
 }
-function isoWeekKey(d) { const t = new Date(d + "T12:00:00"); t.setDate(t.getDate() - ((t.getDay() + 6) % 7)); return todayStr(t); }
+function isoWeekKey(d) { const dt = new Date(d + "T12:00:00"); dt.setDate(dt.getDate() - ((dt.getDay() + 6) % 7)); return todayStr(dt); }
 // Son 7 gece "day"; daha eskiler arasında en yeni 4 haftanın her birinden en yeni kopya "week"; gerisi silinir.
 async function storagePruneSnaps() {
   const all = await idbGetAll("snaps");
@@ -2636,15 +2636,15 @@ function normMealList(list) {
 // v27: MOBİLİTE VERİSİ — eski "uygulama" yazısını (örn. "Sağ ve Sol için 2'şer Set x 30 sn") alanlara çevirir.
 // Aralıklarda üst değer alınır; hiçbir değer okunamazsa ok:false (varsayılanlar kullanılır, yazı rx'te saklanır).
 function parseMobRx(rx) {
-  const t = String(rx || "");
+  const rxs = String(rx || "");
   const out = { ok: false };
-  const sm = t.match(/(\d+)\s*(?:['’]?\s*(?:er|şer|ar|şar))?\s*set/i);
+  const sm = rxs.match(/(\d+)\s*(?:['’]?\s*(?:er|şer|ar|şar))?\s*set/i);
   if (sm) out.sets = parseInt(sm[1], 10);
-  const rm = t.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:tekrar|tur)/i);
-  const tm = t.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:sn|saniye|sec)(?![a-zçğıöşü])/i);
+  const rm = rxs.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:tekrar|tur)/i);
+  const tm = rxs.match(/(\d+)(?:\s*[-–]\s*(\d+))?\s*(?:sn|saniye|sec)(?![a-zçğıöşü])/i);
   if (tm) { out.mode = "time"; out.sec = parseInt(tm[2] || tm[1], 10); out.ok = true; }
   else if (rm) { out.mode = "reps"; out.reps = parseInt(rm[2] || rm[1], 10); out.ok = true; }
-  if (/sa[gğ]\s*(?:ve|\/|-)\s*sol|her\s*(?:ayak|kol|y[oö]n|bacak|taraf)/i.test(t)) out.sides = 2;
+  if (/sa[gğ]\s*(?:ve|\/|-)\s*sol|her\s*(?:ayak|kol|y[oö]n|bacak|taraf)/i.test(rxs)) out.sides = 2;
   return out;
 }
 function mobLibEntry(name) {
@@ -2680,7 +2680,7 @@ function normMobItem(x) {
   const region2 = MOB_REGION_KEYS.includes(x.region2) && x.region2 !== region ? x.region2 : "";
   return {
     id: String(x.id || mobNewId()), name: String(x.name).trim().slice(0, 80),
-    type: MOB_TYPES.some(t => t[0] === x.type) ? x.type : "static",
+    type: MOB_TYPES.some(mt => mt[0] === x.type) ? x.type : "static",
     region, region2,
     sets: clampInt(x.sets, 1, 10, 1), mode: x.mode === "reps" ? "reps" : "time",
     reps: clampInt(x.reps, 1, 100, 10), sec: clampInt(x.sec, 5, 600, 30), sides: num(x.sides, 1) === 2 ? 2 : 1,
@@ -2910,9 +2910,9 @@ function loadState(allowFresh = false) {
 // v44: yeni kurulum durumu. Test kancası: window.AYK_TEST_SEED nesneyse onunla (kurulum ekranı yok) açılır.
 function freshState() {
   if (typeof window !== "undefined" && isObj(window.AYK_TEST_SEED)) {
-    const t = normalizeState(JSON.parse(JSON.stringify(window.AYK_TEST_SEED)));
-    t.settings.onboarded = true;
-    return t;
+    const st = normalizeState(JSON.parse(JSON.stringify(window.AYK_TEST_SEED)));
+    st.settings.onboarded = true;
+    return st;
   }
   const s = normalizeState({});
   s.settings.onboarded = false;   // normalizeState (göç adım 4) true yapar; bilerek sonradan
@@ -3077,8 +3077,8 @@ function openModal(id) {
 }
 function closeModal(id) { const m = $(id); m.classList.add("hidden"); m.classList.remove("flex"); }
 document.addEventListener("click", e => {
-  const t = e.target;
-  if (t && t.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "exSheet", "mealModal", "shopModal"].includes(t.id)) closeModal(t.id);
+  const el = e.target;
+  if (el && el.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "exSheet", "mealModal", "shopModal"].includes(el.id)) closeModal(el.id);
 });
 
 // Temalı onay / metin penceresi. Sonuç: onay → true (veya yazılan metin), vazgeç → null.
@@ -3192,11 +3192,11 @@ function timerPersist() {
   try { if (timer.running) localStorage.setItem(TIMER_KEY, JSON.stringify({ endAt: timer.endAt, label: timer.label })); else localStorage.removeItem(TIMER_KEY); } catch (e) { /* yok sayılır */ }
 }
 function resumeTimer() {
-  let t = null;
-  try { t = JSON.parse(localStorage.getItem(TIMER_KEY) || "null"); } catch (e) { t = null; }
-  const left = t ? num(t.endAt, 0) - Date.now() : 0;
+  let sv = null;
+  try { sv = JSON.parse(localStorage.getItem(TIMER_KEY) || "null"); } catch (e) { sv = null; }
+  const left = sv ? num(sv.endAt, 0) - Date.now() : 0;
   if (left <= 0 || left > 3600000) { timer.running = false; timerPersist(); return; }
-  timer.endAt = num(t.endAt, 0); timer.label = typeof t.label === "string" ? t.label.slice(0, 40) : "Dinlenme";
+  timer.endAt = num(sv.endAt, 0); timer.label = typeof sv.label === "string" ? sv.label.slice(0, 40) : "Dinlenme";
   timer.running = true; timer.finishedAt = 0;
   clearInterval(timer.iv); timer.iv = setInterval(tickTimer, 250);
   tickTimer();
@@ -3282,12 +3282,12 @@ function archiveDay(dateKey) {
   if (mobDone.length) state.mobilityLog[dateKey] = [...new Set([...prevMob, ...mobDone])];
   const rDone = mobRoutines().filter(r => r.items.some(i => i.done)).map(r => r.id);   // v40
   if (rDone.length) state.mobilityRoutineLog[dateKey] = [...new Set([...(state.mobilityRoutineLog[dateKey] || []), ...rDone])];
-  const t = nutritionTotals();
+  const tt = nutritionTotals();
   const e = eatenTotals();
   const sup = state.supplements || {};
   const dm = dayMeals();
   const log = {
-    kcal: Math.round(t.cal), p: Math.round(t.p), c: Math.round(t.c), f: Math.round(t.f),
+    kcal: Math.round(tt.cal), p: Math.round(tt.p), c: Math.round(tt.c), f: Math.round(tt.f),
     eatenKcal: Math.round(e.cal), eatenP: Math.round(e.p),
     water: state.waterLiters || 0,
     mealsDone: dm.filter(m => m.done).length, mealsTotal: dm.length,
@@ -3319,22 +3319,22 @@ function resetDaily() {
 }
 
 function checkNewDay() {
-  const t = logicalToday();
-  if (!state.today) { state.today = t; return false; }
+  const td = logicalToday();
+  if (!state.today) { state.today = td; return false; }
   // v44: kurulum bitmeden (yer tutucu hedeflerle) gün arşivlenmez; yalnızca tarih güncellenir. Bitince normal sürer.
-  if (state.settings.onboarded === false) { if (state.today !== t) state.today = t; return false; }
+  if (state.settings.onboarded === false) { if (state.today !== td) state.today = td; return false; }
   // v35: telefonun saati ileri alınmışken kaydedilen tarih bugünden en az 2 gün ilerideyse bugüne çekilir (tikler silinmez,
   // arşiv yazılmaz); eskiden gün geçişi o tarihe kadar hiç çalışmıyordu. 1 günlük geri gidiş meşrudur (Gün geçişi saati
   // ileri alınınca mantıksal gün bir gün geri gider) — o durumda dokunulmaz, yoksa dünün arşivi bugünün verisiyle ezilirdi.
-  if (state.today > t && (Date.parse(state.today) - Date.parse(t)) / DAY_MS >= 2) {
-    state.today = t;
-    if (state.dailyLogs[t]) state.dailyLogs[t].manual = true;   // v36: saat ileriyken bugün zaten arşivlendiyse o özet ezilmesin
+  if (state.today > td && (Date.parse(state.today) - Date.parse(td)) / DAY_MS >= 2) {
+    state.today = td;
+    if (state.dailyLogs[td]) state.dailyLogs[td].manual = true;   // v36: saat ileriyken bugün zaten arşivlendiyse o özet ezilmesin
     return true;   // v36: çağıran yeniden çizip kaydetsin (eskiden düzeltme bir sonraki dokunuşa kadar kaydedilmiyordu)
   }
-  if (t > state.today) {   // yalnızca ileri gidince (gün geçişi saati ileri alınınca aynı gün tekrar arşivlenmez)
+  if (td > state.today) {   // yalnızca ileri gidince (gün geçişi saati ileri alınınca aynı gün tekrar arşivlenmez)
     archiveDay(state.today);
     resetDaily();
-    state.today = t;
+    state.today = td;
     toast("Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.");
     return true;
   }
@@ -3570,7 +3570,7 @@ function setNutriView(v) {
 // v31: Görünüm (Sistem / Koyu / Aydınlık). Etkin tema html.light sınıfıyla uygulanır; Beslenme'de nutri-light.
 // Açılışta yanıp sönmesin diye <head> içindeki betik "ayk_theme" aynasını okur (asıl kayıt state.settings.theme).
 const THEME_MQ = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
-function themeIsLight() { const t = state.settings.theme; return t === "light" || (t !== "dark" && !!(THEME_MQ && THEME_MQ.matches)); }
+function themeIsLight() { const mode = state.settings.theme; return mode === "light" || (mode !== "dark" && !!(THEME_MQ && THEME_MQ.matches)); }
 function applyTheme() {
   const light = themeIsLight();
   document.documentElement.classList.toggle("light", light);
@@ -3579,7 +3579,7 @@ function applyTheme() {
   if (meta) { const bg = getComputedStyle(document.body).backgroundColor; if (bg && meta.getAttribute("content") !== bg) meta.setAttribute("content", bg); }
   try { if (localStorage.getItem("ayk_theme") !== state.settings.theme) localStorage.setItem("ayk_theme", state.settings.theme); } catch (e) {}
 }
-function setTheme(t) { state.settings.theme = ["system", "dark", "light"].includes(t) ? t : "system"; renderAll(); }
+function setTheme(mode) { state.settings.theme = ["system", "dark", "light"].includes(mode) ? mode : "system"; renderAll(); }
 function toggleTheme() { setTheme(themeIsLight() ? "dark" : "light"); }
 const toggleNutriLight = toggleTheme;   // eski ad (başlıktaki düğme)
 // Sistem teması değişince: olay + yedek olarak uygulamaya dönüşte yeniden bak (iOS arka plandayken olayı kaçırabilir)
@@ -3888,7 +3888,7 @@ function renderTodayMeals() {
       </div>`;
   }
   $("todayMeals").innerHTML = banner + meals.map((meal, mIdx) => {
-    const t = mealTotals(meal);
+    const mt = mealTotals(meal);
     const isNext = mIdx === nextIdx;
     const last = mIdx === meals.length - 1;
     const collapsed = meal.done && !openDoneMeals.has(meal.id);
@@ -3902,7 +3902,7 @@ function renderTodayMeals() {
       return `<div class="flex gap-2" data-today-meal="${mIdx}">${rail}
         <button onclick="toggleMealOpen(${mIdx})" class="flex-1 min-w-0 min-h-[52px] mb-3 flex items-center justify-between gap-3 text-left" aria-expanded="false" aria-label="${esc(meal.title)} öğününü aç">
           <div class="min-w-0"><div class="text-[12px] font-semibold n-muted">${time ? time + " · " : ""}yendi${changed.has(meal.id) ? " · bugüne özel" : ""}</div><div class="text-[16px] font-bold n-muted truncate">${esc(meal.title)}</div></div>
-          <div class="text-[14px] font-semibold n-muted whitespace-nowrap shrink-0">${fmtInt(t.cal)} kcal</div>
+          <div class="text-[14px] font-semibold n-muted whitespace-nowrap shrink-0">${fmtInt(mt.cal)} kcal</div>
         </button></div>`;
     }
     const status = meal.done ? "TAMAMLANDI" : isNext ? "SIRADAKİ" : "";
@@ -3964,8 +3964,8 @@ function renderTodayMeals() {
               ${meal.targetNote ? `<div class="text-[12px] n-muted mt-0.5">${esc(meal.targetNote)}</div>` : ""}
               ${num(meal.balanced, 0) < 0 ? `<div class="text-[12px] font-semibold n-k mt-0.5" data-balanced="${mIdx}">Gün dengelendi: bu öğünden ${fmtInt(-meal.balanced)} kcal kısıldı</div>` : ""}
             </div>
-            <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[24px] leading-none tabular-nums">${fmtInt(t.cal)}</span><span class="text-[12px] n-muted ml-0.5">kcal</span>
-              <div class="text-[12px] font-semibold tabular-nums mt-0.5">${macroLine(t.p, t.c, t.f)}</div></div>
+            <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[24px] leading-none tabular-nums">${fmtInt(mt.cal)}</span><span class="text-[12px] n-muted ml-0.5">kcal</span>
+              <div class="text-[12px] font-semibold tabular-nums mt-0.5">${macroLine(mt.p, mt.c, mt.f)}</div></div>
           ${headOpen ? "</button>" : "</div>"}
           <div class="n-div">${items || '<div class="text-[13px] n-dim py-2">Bu öğünde henüz besin yok.</div>'}</div>
           ${editPanel}
@@ -4214,10 +4214,10 @@ function balanceDay(skipIdx) {
 const BALANCE_MAX_CUT = 0.75;
 // "2. Öğün: Öğle Yemeği (...)" → "2. Öğün"; uzun adlar kısaltılır
 function shortMealTitle(m) {
-  const t = String(m.title || "");
-  const i = t.indexOf(":");
-  if (i > 0 && i <= 16) return t.slice(0, i);
-  return t.length > 18 ? t.slice(0, 17) + "…" : t;
+  const ttl = String(m.title || "");
+  const i = ttl.indexOf(":");
+  if (i > 0 && i <= 16) return ttl.slice(0, i);
+  return ttl.length > 18 ? ttl.slice(0, 17) + "…" : ttl;
 }
 
 // ---------------------------------------------------------------------------
@@ -4292,7 +4292,7 @@ function renderMenus() {
   const meals = curMeals();
   const copyLabel = state.dayType === "rest" ? "Antrenmana kopyala" : "Dinlenmeye kopyala";
   let html = meals.map((meal, mIdx) => {
-    const t = mealTotals(meal);
+    const mt = mealTotals(meal);
     const open = openMenuMeals.has(meal.id);
     const head = `<div class="flex items-center gap-1">
         <button class="drag-handle w-11 h-11 -ml-2 shrink-0 flex items-center justify-center n-dim" data-midx="${mIdx}" aria-label="Öğünü sürükleyerek taşı" style="touch-action: none; cursor: grab;">
@@ -4301,7 +4301,7 @@ function renderMenus() {
         <button onclick="toggleMenuMeal(${mIdx})" class="flex-1 min-w-0 min-h-[52px] flex items-center gap-3 text-left" aria-expanded="${open}" aria-label="${esc(meal.title)} öğününü ${open ? "kapat" : "aç"}">
           ${meal.time ? `<span class="t-display text-[18px] n-accent tabular-nums shrink-0">${esc(meal.time)}</span>` : ""}
           <span class="flex-1 min-w-0"><span class="block text-[15px] font-bold leading-snug break-words">${esc(meal.title)}</span>
-            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${fmtInt(t.cal)} kcal · ${macroLine(t.p, t.c, t.f)} · ${t.n} besin</span></span>
+            <span class="block text-[12px] n-muted tabular-nums mt-0.5">${fmtInt(mt.cal)} kcal · ${macroLine(mt.p, mt.c, mt.f)} · ${mt.n} besin</span></span>
           <span class="n-dim shrink-0">${svgI(open ? "chevD" : "chevR", 18)}</span>
         </button>
       </div>`;
@@ -4442,8 +4442,8 @@ function foodSelMacros() {
   if (foodUI.sel && String(foodUI.sel).startsWith("combo:")) {
     const c = state.combos.find(x => "combo:" + x.id === foodUI.sel);
     if (!c) return null;
-    const t = itemsTotals(c.items);
-    return { combo: true, f: null, a: 1, p: t.p, c: t.c, fat: t.f, cal: t.cal };
+    const ct = itemsTotals(c.items);
+    return { combo: true, f: null, a: 1, p: ct.p, c: ct.c, fat: ct.f, cal: ct.cal };
   }
   const f = foodUI.sel && getFoodDB()[foodUI.sel];
   if (!f) return null;
@@ -4634,13 +4634,13 @@ const SALT_LIMIT = 5;   // g/gün (DSÖ önerisi)
 function renderMicroLine(view) {
   const el = $("microLine");
   if (!el) return;
-  const t = microTotals(view);
-  if (!t.n) { el.innerHTML = ""; el.classList.add("hidden"); return; }
+  const mc = microTotals(view);
+  if (!mc.n) { el.innerHTML = ""; el.classList.add("hidden"); return; }
   el.classList.remove("hidden");
-  const over = t.salt > SALT_LIMIT;
-  el.innerHTML = `<span>Lif <strong class="text-white tabular-nums">${fmtNum(t.fib)}</strong> / ${fibTarget()} g</span>
-    <span>Tuz <strong class="tabular-nums" style="color:${over ? "#FB7185" : "#fff"}">${fmtNum(t.salt)}</strong> / ${SALT_LIMIT} g</span>
-    ${t.miss ? `<span class="text-white/60" data-micro-miss>${t.miss} besinde lif/tuz verisi yok</span>` : ""}`;
+  const over = mc.salt > SALT_LIMIT;
+  el.innerHTML = `<span>Lif <strong class="text-white tabular-nums">${fmtNum(mc.fib)}</strong> / ${fibTarget()} g</span>
+    <span>Tuz <strong class="tabular-nums" style="color:${over ? "#FB7185" : "#fff"}">${fmtNum(mc.salt)}</strong> / ${SALT_LIMIT} g</span>
+    ${mc.miss ? `<span class="text-white/60" data-micro-miss>${mc.miss} besinde lif/tuz verisi yok</span>` : ""}`;
 }
 function foodAmtInput(v) { foodUI.amt = Math.max(0, num(v, 0)); updateFoodSelUI(); }
 function foodStep(dir) {
@@ -4686,14 +4686,14 @@ function addToMenuById(mealId, foodId, amount) {
 // GEÇMİŞ
 // ---------------------------------------------------------------------------
 function renderNutriHistory() {
-  const t = getTargets();
+  const tg = getTargets();
   const plan = nutritionTotals();
   const eaten = eatenTotals();
   const meals = dayMeals();
   const sup = state.supplements || {};
   const rows = [{
     key: state.today || logicalToday(), live: true, dayType: state.dayType,
-    eatenKcal: eaten.cal, eatenP: eaten.p, kcal: plan.cal, calTarget: t.calTarget, proTarget: t.proTarget,
+    eatenKcal: eaten.cal, eatenP: eaten.p, kcal: plan.cal, calTarget: tg.calTarget, proTarget: tg.proTarget,
     water: state.waterLiters || 0, mealsDone: meals.filter(m => m.done).length, mealsTotal: meals.length,
     supps: state.supplementList.filter(x => sup[x.id]).length
   }];
@@ -4797,7 +4797,7 @@ function stopScan() {
   try { if (bc.reader) bc.reader.reset(); } catch (e) { /* yoksay */ }
   bc.reader = null;
   const v = $("bcVideo");
-  if (v && v.srcObject) { try { v.srcObject.getTracks().forEach(t => t.stop()); } catch (e) { /* yoksay */ } v.srcObject = null; }
+  if (v && v.srcObject) { try { v.srcObject.getTracks().forEach(tr => tr.stop()); } catch (e) { /* yoksay */ } v.srcObject = null; }
 }
 function barcodeManual() { stopScan(); $("bcCamWrap").classList.add("hidden"); onBarcode($("bcManual").value); }
 
@@ -5249,7 +5249,7 @@ function readExLevels() {
     const start = round2(num($("exLvStart").value, 0));
     if (step > 0) levels = { mode: "step", start: start > 0 ? start : step, step, addon };
   } else {
-    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(t => round2(num(t.trim(), -1))).filter(v => v >= 0);
+    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(tok => round2(num(tok.trim(), -1))).filter(v => v >= 0);
     const uniq = [...new Set(list)].sort((a, b) => a - b);
     if (uniq.length >= 2) levels = { mode: "list", list: uniq, addon };
   }
@@ -5371,8 +5371,8 @@ function paceText(min, km) {
 function sessionSummary(sess) {
   const sets = sess.sets || [];
   if (sess.kind === "cardio") {
-    const t = cardioTotals(sets, false);
-    return `${fmtNum(t.min)} dk` + (t.km > 0 ? ` • ${fmtNum(t.km)} km` : "");
+    const ct = cardioTotals(sets, false);
+    return `${fmtNum(ct.min)} dk` + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : "");
   }
   if (sess.kind === "time") return sets.map(s => `${num(s.sec)} sn`).join(" · ");
   return sets.map(s => `${fmtKg(num(s.kg))}×${num(s.reps)}`).join(" · ");
@@ -5577,9 +5577,9 @@ function mobRoutine(rid) { return mobRoutines().find(r => r.id === rid) || null;
 function mobNewRoutineId() { return "mr_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function mobItems() { const r = mobRoutine(mobUI.rid) || mobRoutines()[0]; return r ? r.items : []; }
 function mobFind(id) { return mobItems().find(i => i.id === id) || null; }
-function mobUpper(t) { return upperL(t); }
+function mobUpper(s) { return upperL(s); }
 function mobArg(id) { return esc(JSON.stringify(String(id))); }
-function mobNorm(t) { return String(t || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
+function mobNorm(s) { return String(s || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
 // v39: nasıl yapılır (MOB_GUIDE, data.js). Anahtar karşılaştırması büyük/küçük harf ve kesme işaretinden bağımsız.
 let _mobGuideIdx = null;
 function mobGuide(name) {
@@ -5710,10 +5710,10 @@ function mobDoneDays() {
 }
 // Bu hafta (Pt–Pz) yapılan günler, sayısı ve seri (bugün yapılmadıysa dünden geriye kesintisiz günler)
 function mobWeekStats() {
-  const done = mobDoneDays(), t = mobTodayKey();
-  const dow = (new Date(t + "T12:00:00").getDay() + 6) % 7;
-  const days = dayShort().map((_, i) => done.has(mobShiftKey(t, i - dow)));
-  let k = done.has(t) ? t : mobShiftKey(t, -1), streak = 0;
+  const done = mobDoneDays(), todayK = mobTodayKey();
+  const dow = (new Date(todayK + "T12:00:00").getDay() + 6) % 7;
+  const days = dayShort().map((_, i) => done.has(mobShiftKey(todayK, i - dow)));
+  let k = done.has(todayK) ? todayK : mobShiftKey(todayK, -1), streak = 0;
   while (done.has(k)) { streak++; k = mobShiftKey(k, -1); }
   return { days, count: days.filter(Boolean).length, streak, dow };
 }
@@ -6139,7 +6139,7 @@ function mobTimerUpdate() {
   if (!mobT) return;
   const left = (mobT.endAt - Date.now()) / 1000;
   if (mobT.phase === "work" && mobT.sec >= 20 && left <= 10 && left > 8 && mobT.s10 !== mobT.idx) { mobT.s10 = mobT.idx; mobSay("Son 10 saniye"); }
-  const t = $("mobTTime"); if (t) t.textContent = mobFmt(left);
+  const el = $("mobTTime"); if (el) el.textContent = mobFmt(left);
   const b = $("mobTBreath"); if (b && mobT.phase === "work") b.textContent = mobBreathLabel();
 }
 function mobRoundLabel(x) { return x.side ? x.side + " " + x.set : "Set " + x.set; }
@@ -6326,7 +6326,7 @@ function exerciseSeries(name) {
   if (kind === "cardio") {
     const useKm = sameKind.some(h => cardioTotals(h.sets, false).km > 0);
     return {
-      points: sameKind.map(h => { const t = cardioTotals(h.sets, false); return { label: fmtDate(h.ts), t: h.ts, y: useKm ? t.km : t.min }; }),
+      points: sameKind.map(h => { const ct = cardioTotals(h.sets, false); return { label: fmtDate(h.ts), t: h.ts, y: useKm ? ct.km : ct.min }; }),
       unit: useKm ? "km" : "dk", color: "#38bdf8", metric: useKm ? "Toplam mesafe" : "Toplam süre"
     };
   }
@@ -6403,7 +6403,7 @@ function pStat(label, value, unit, sub, color) {
   return `<div class="p-tile"><div class="p-tl">${color ? `<i class="p-sdot" style="background:${color}"></i>` : ""}${label}</div>
     <div class="p-tv"><b class="t-display">${value}</b>${unit ? `<span>${unit}</span>` : ""}</div><div class="p-ts">${sub || ""}</div></div>`;
 }
-function pLegend(items) { return `<div class="p-lg">${items.map(([sym, t]) => `<span>${sym}${t}</span>`).join("")}</div>`; }
+function pLegend(items) { return `<div class="p-lg">${items.map(([sym, lb]) => `<span>${sym}${lb}</span>`).join("")}</div>`; }
 
 // Çizgi grafik. series: [{ pts: [{t, y}], color, w, dots, name }] — x zamana göre (düzensiz tartı günleri doğru aralıklı)
 function pLine(series, o = {}) {
@@ -6413,16 +6413,16 @@ function pLine(series, o = {}) {
   let t0 = Math.min(...ts), t1 = Math.max(...ts); if (t1 === t0) t1 = t0 + 1;
   let lo = Math.min(...ys), hi = Math.max(...ys); if (hi - lo < 0.6) { lo -= 0.3; hi += 0.3; }
   const pad = (hi - lo) * 0.15; lo -= pad; hi += pad;
-  const X = t => L + (W - L - R) * (t - t0) / (t1 - t0);
+  const X = tm => L + (W - L - R) * (tm - t0) / (t1 - t0);
   const Y = v => T + (H - T - B) * (hi - v) / (hi - lo);
   let s = "";
   for (let k = 0; k < 4; k++) {
     const v = lo + (hi - lo) * k / 3, y = Y(v);
     s += `<line x1="${L}" x2="${W - R + 4}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" style="stroke:var(--t-grid)"/><text x="${L - 6}" y="${(y + 4).toFixed(1)}" text-anchor="end" class="p-ax">${hi - lo > 12 ? Math.round(v) : fmtNum(v)}</text>`;
   }
-  const xf = o.xFmt || (t => fmtDate(t));
-  [t0, (t0 + t1) / 2, t1].forEach((t, i) => {
-    s += `<text x="${X(t).toFixed(1)}" y="${H - 7}" text-anchor="${i === 0 ? "start" : i === 2 ? "end" : "middle"}" class="p-ax">${esc(xf(t))}</text>`;
+  const xf = o.xFmt || (tm => fmtDate(tm));
+  [t0, (t0 + t1) / 2, t1].forEach((tm, i) => {
+    s += `<text x="${X(tm).toFixed(1)}" y="${H - 7}" text-anchor="${i === 0 ? "start" : i === 2 ? "end" : "middle"}" class="p-ax">${esc(xf(tm))}</text>`;
   });
   series.forEach(se => {
     if (se.dots) se.pts.forEach(p => { s += `<circle cx="${X(p.t).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="2.6" style="fill:${se.color}"/>`; });
@@ -6528,7 +6528,7 @@ function progCoachHtml() {
   const adj = num(state.settings.calAdjust, 0);
   const adjLine = adj !== 0 ? `<div class="p-adj"><span>Uygulanan koç düzeltmesi: <b>${adj > 0 ? "+" : ""}${adj} kcal</b>${state.settings.coachAppliedAt ? ` <span class="p-dim">(${fmtDate(state.settings.coachAppliedAt)})</span>` : ""}</span>
       <button onclick="resetCoachAdjust()" class="p-link">Sıfırla</button></div>` : "";
-  const head = (t, sub) => `<div class="p-coach-h"><div class="p-cic">${pI("chat", 20, 2)}</div><div><b>${t}</b><span>${sub}</span></div></div>`;
+  const head = (ttl, sub) => `<div class="p-coach-h"><div class="p-cic">${pI("chat", 20, 2)}</div><div><b>${ttl}</b><span>${sub}</span></div></div>`;
   if (!a.ready) {
     return `<div class="p-card" id="pCoach">${head("Kalori koçu", "Henüz hesap için veri yok")}
       <p class="p-fine">Koçun gerçek harcamanı hesaplayabilmesi için son 4 haftada <b>en az 4 tartı</b> ve ilk ile son tartı arasında <b>en az 10 gün</b> olmalı. Şu an: ${a.n} tartı${a.n >= 2 ? `, ${Math.floor(a.spanDays)} gün aralık` : ""}.</p>${adjLine}</div>`;
@@ -6725,7 +6725,7 @@ function progGucHtml() {
     const v = state.workoutLogs.filter(l => l.ts && l.ts >= a && l.ts < b).reduce((s, l) => s + num(l.volume), 0) / 1000;
     return { label: i === 7 ? "Bu h." : i === 0 ? fmtDay(new Date(a), { day: "numeric", month: "short" }) : String(new Date(a).getDate()), v: round1(v), flag: i === 7 ? "now" : "" };
   });
-  const hasTon = ton.some(t => t.v > 0);
+  const hasTon = ton.some(tw => tw.v > 0);
   const tonCard = `<div class="p-card" id="pTonnage">${pSec("Haftalık tonaj", PC.tq, `<span class="p-dim p-sm">ton</span>`)}
     ${hasTon ? pBars(ton, { color: PC.tq, id: "ton", fmt: v => fmtNum(v), label: "Son 8 haftanın tonajı (ton)" }) + `<p class="p-fine">Bu hafta sürüyor (yarı saydam); bitmemiş haftayı tam haftalarla karşılaştırma.</p>` : `<p class="p-fine">Henüz tonaj yok.</p>`}
     <div class="p-mini3"><div><span>Bu hafta</span><b>${w.n} seans</b></div><div><span>Kardiyo</span><b>${fmtNum(w.min)} dk${w.km > 0 ? ` · ${fmtNum(w.km)} km` : ""}</b></div><div><span>Rekor</span><b>${w.prs}</b></div></div></div>`;
@@ -6888,9 +6888,9 @@ function renderProfile() {
   }
   $("pfWeightBox").innerHTML = wh;
   // Günlük hedefler (hesaplanan)
-  const t = getTargets();
+  const tg = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
-    ${[["Kalori", Math.round(t.calTarget).toLocaleString(locale()), "kcal"], ["Protein", Math.round(t.proTarget), "g"], ["Karb", Math.round(t.carbTarget), "g"], ["Yağ", Math.round(t.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
+    ${[["Kalori", Math.round(tg.calTarget).toLocaleString(locale()), "kcal"], ["Protein", Math.round(tg.proTarget), "g"], ["Karb", Math.round(tg.carbTarget), "g"], ["Yağ", Math.round(tg.fatTarget), "g"]].map(([l, v, u]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${l}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? v : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
   </div><p class="text-[12px] t-dim mt-2">Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
@@ -7098,12 +7098,12 @@ async function aykSnapRestore(key) {
 // telefondan ulaşılamıyordu; artık Profil → Yedekleme'den indirilebilir, geri yüklenmeye çalışılabilir, silinebilir.
 function rescueText() { try { return localStorage.getItem(RESCUE_KEY) || ""; } catch (e) { return ""; } }
 async function downloadRescue() {
-  const t = rescueText(); if (!t) return;
-  const r = await saveTextFile(t, `AYK-kurtarma-${todayStr()}.json`, "AYK+ kurtarma kopyası");
+  const txt = rescueText(); if (!txt) return;
+  const r = await saveTextFile(txt, `AYK-kurtarma-${todayStr()}.json`, "AYK+ kurtarma kopyası");
   if (r === "shared" || r === "downloaded") toast("Kurtarma kopyası kaydedildi");
   else if (r === "failed") toast("Dosya oluşturulamadı.", "error");
 }
-async function restoreRescue() { const t = rescueText(); if (t) await restoreFromText(t); }
+async function restoreRescue() { const txt = rescueText(); if (txt) await restoreFromText(txt); }
 async function deleteRescue() {
   if (!(await askConfirm("Kurtarma kopyası silinsin mi?", "Okunamayan eski verinin kopyası telefondan silinir. Önce indirdiysen dosyan güvende.", "Sil", true))) return;
   try { localStorage.removeItem(RESCUE_KEY); } catch (e) { /* yok sayılır */ }
@@ -7716,10 +7716,10 @@ function otherMeals() {
 function deleteMeal(mIdx) {
   const meals = curMeals();
   snapshot();
-  const t = meals[mIdx].title;
+  const ttl = meals[mIdx].title;
   meals.splice(mIdx, 1);
   renderAll();
-  offerUndo(`"${t}" silindi`);
+  offerUndo(`"${ttl}" silindi`);
 }
 function copyMeal(mIdx) {
   const src = curMeals()[mIdx];
@@ -7764,8 +7764,8 @@ function suppDoseDefaults(dose, unit) {
 }
 function suppTimeLabel(s) {
   if (s.time === "custom") return s.timeLabel || "Özel";
-  const t = SUPP_TIMES.find(x => x[0] === s.time);
-  return t ? t[1] : "";
+  const slot = SUPP_TIMES.find(x => x[0] === s.time);
+  return slot ? slot[1] : "";
 }
 function suppDoseText(s) { return s.dose ? `${fmtDose(s.dose)} ${s.unit || ""}`.trim() : ""; }
 function suppPillHtml(s) {
@@ -7811,7 +7811,7 @@ function renderSupps() {
     html += `<div class="flex flex-wrap gap-2 pt-1"><button onclick="addSupp()" class="n-chip add">+ Ekle</button>
       <button onclick="suppEdit = false; renderAll();" class="n-chip on">${svgI("check", 14, 3)}Bitti</button></div>`;
   } else {
-    const groups = SUPP_GROUPS.map(([l, ic, times]) => [l, ic, times.flatMap(t => list.filter(s => s.time === t))]);
+    const groups = SUPP_GROUPS.map(([l, ic, times]) => [l, ic, times.flatMap(tm => list.filter(s => s.time === tm))]);
     [...new Set(list.filter(s => s.time === "custom").map(suppTimeLabel))]
       .forEach(l => groups.push([l, "clock", list.filter(s => s.time === "custom" && suppTimeLabel(s) === l)]));
     const untimed = list.filter(s => !suppTimeLabel(s));
@@ -7838,12 +7838,12 @@ async function editSuppDose(i) {
   if (!s) return;
   const v = await askText("Doz ve birim", suppDoseText(s), "örn: 5 g · 2 softjel · 1 ölçek", "Boş bırakırsan doz gösterilmez.", "Kaydet");
   if (v === null) return;
-  const t = String(v).trim();
-  if (!t) {   // v26: doz silme Geri al'lı
+  const txt = String(v).trim();
+  if (!txt) {   // v26: doz silme Geri al'lı
     if (!SUPP_DOSE_KEYS.some(k => s[k] != null)) return;
     snapshot(); SUPP_DOSE_KEYS.forEach(k => delete s[k]); renderAll(); offerUndo(`${s.name}: doz kaldırıldı`); return;
   }
-  const m = t.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
+  const m = txt.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
   const d = m ? r2(num(m[1], 0)) : 0;
   if (!(d > 0) || d > 100000) { sayAlert("Doz anlaşılamadı", "Önce sayı, sonra birim yaz (örn: 5 g veya 2 softjel)."); return; }
   const unit = m[2].trim().slice(0, 16);
@@ -7943,7 +7943,7 @@ function logExerciseLines(log) {
   Object.keys(state.exerciseHistory).forEach(k => state.exerciseHistory[k].forEach(sess => {
     if (sess.logId !== log.id) return;
     let txt;
-    if (sess.kind === "cardio") { const t = cardioTotals(sess.sets, false); txt = `${fmtNum(t.min)} dk` + (t.km > 0 ? ` • ${fmtNum(t.km)} km` : ""); }
+    if (sess.kind === "cardio") { const ct = cardioTotals(sess.sets, false); txt = `${fmtNum(ct.min)} dk` + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : ""); }
     else if (sess.kind === "time") txt = `${sess.sets.length} × ${Math.max(...sess.sets.map(s => num(s.sec)))} sn`;
     else {
       const best = sess.sets.reduce((b, s) => (e1rm(s.kg, s.reps) > e1rm(b.kg, b.reps) ? s : b), sess.sets[0]);
@@ -7956,9 +7956,9 @@ function logExerciseLines(log) {
 
 function fitText(ctx, text, maxW) {
   if (ctx.measureText(text).width <= maxW) return text;
-  let t = text;
-  while (t.length > 1 && ctx.measureText(t + "…").width > maxW) t = t.slice(0, -1);
-  return t + "…";
+  let s = text;
+  while (s.length > 1 && ctx.measureText(s + "…").width > maxW) s = s.slice(0, -1);
+  return s + "…";
 }
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
@@ -8484,9 +8484,9 @@ function gymActiveHtml() {
 }
 function exRightText(ex) {
   if (ex.kind === "cardio") {
-    const t = cardioTotals(ex.sets, false);
-    const pace = paceText(t.min, t.km);
-    return `Toplam ${fmtNum(t.min)} dk${t.km > 0 ? " · " + fmtNum(t.km) + " km" : ""}${pace ? " · " + pace : ""}`;
+    const ct = cardioTotals(ex.sets, false);
+    const pace = paceText(ct.min, ct.km);
+    return `Toplam ${fmtNum(ct.min)} dk${ct.km > 0 ? " · " + fmtNum(ct.km) + " km" : ""}${pace ? " · " + pace : ""}`;
   }
   if (ex.kind === "time") return `Toplam ${ex.sets.reduce((a, s) => a + num(s.sec), 0)} sn${ex.rest ? " · dinlenme " + ex.rest + " sn" : ""}`;
   let vol = 0, best = 0;
@@ -8714,11 +8714,11 @@ function renderGym() {
   updateActiveProgress();
 }
 function updateActiveProgress() {
-  const t = $("gymProgText");
-  if (!t) return;
+  const progEl = $("gymProgText");
+  if (!progEl) return;
   let d = 0, n = 0;
   activeDay().exercises.forEach(ex => ex.sets.forEach(s => { n++; if (s.done) d++; }));
-  t.textContent = `${d}/${n} set`;
+  progEl.textContent = `${d}/${n} set`;
   $("gymProgBar").style.width = (n ? Math.round(d / n * 100) : 0) + "%";
   const el = $("gymElapsed");
   if (el) el.textContent = state.workoutStartedAt ? fmtDuration(Date.now() - state.workoutStartedAt) : "00:00";
@@ -8955,9 +8955,9 @@ function itemsTotals(items) {
 }
 // "2. Öğün: Öğle Yemeği" → "Öğle Yemeği"
 function mealTitleBody(m) {
-  const t = String(m.title || "");
-  const i = t.indexOf(":");
-  return (i > 0 && i <= 16 ? t.slice(i + 1) : t).trim() || t;
+  const ttl = String(m.title || "");
+  const i = ttl.indexOf(":");
+  return (i > 0 && i <= 16 ? ttl.slice(i + 1) : ttl).trim() || ttl;
 }
 
 // ---------------------------------------------------------------------------
@@ -9014,7 +9014,7 @@ function deleteCombo(id) {
 }
 function comboRowHtml(c) {
   const db = getFoodDB();
-  const t = itemsTotals(c.items);
+  const ct = itemsTotals(c.items);
   const names = c.items.filter(i => db[i.foodId]).map(i => stripEmoji(db[i.foodId].name).replace(/^⭐\s*/, "")).join(", ");
   if (foodUI.sel === "combo:" + c.id) {
     const rows = c.items.map(i => {
@@ -9026,11 +9026,11 @@ function comboRowHtml(c) {
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3 my-2" id="comboSelCard" data-combo="${esc(c.id)}">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(c.name)}</h3><div class="text-[12px] n-muted">Kombo · ${c.items.length} besin</div></div>
-          <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[28px] leading-none tabular-nums">${fmtInt(t.cal)}</span><span class="text-[12px] n-muted ml-1">kcal</span>
-            <div class="text-[12px] font-semibold tabular-nums">${macroLine(t.p, t.c, t.f)}</div></div>
+          <div class="text-right shrink-0 whitespace-nowrap"><span class="t-display text-[28px] leading-none tabular-nums">${fmtInt(ct.cal)}</span><span class="text-[12px] n-muted ml-1">kcal</span>
+            <div class="text-[12px] font-semibold tabular-nums">${macroLine(ct.p, ct.c, ct.f)}</div></div>
         </div>
         <div class="n-div">${rows}</div>
-        <button id="comboAddBtn" onclick='addComboToMeal(${esc(JSON.stringify(c.id))})' class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}>${tIdx < 0 ? "Önce bir öğün oluştur" : `Öğüne ekle · ${fmtInt(t.cal)} kcal`}</button>
+        <button id="comboAddBtn" onclick='addComboToMeal(${esc(JSON.stringify(c.id))})' class="n-btn w-full h-[52px] rounded-full text-[15px]" ${tIdx < 0 ? "disabled" : ""}>${tIdx < 0 ? "Önce bir öğün oluştur" : `Öğüne ekle · ${fmtInt(ct.cal)} kcal`}</button>
         <div class="flex justify-end pt-1 n-bt">
           <button onclick='deleteCombo(${esc(JSON.stringify(c.id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}Komboyu sil</button>
         </div>
@@ -9038,7 +9038,7 @@ function comboRowHtml(c) {
   }
   return `<button onclick='selectCombo(${esc(JSON.stringify(c.id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-combo="${esc(c.id)}">
       <span class="min-w-0"><span class="flex items-center gap-1.5 text-[15px] font-bold leading-snug"><span class="n-accent shrink-0">${svgI("star", 16, 2)}</span><span class="truncate">${esc(c.name)}</span></span>
-        <span class="block text-[12px] n-muted mt-0.5 truncate">${fmtInt(t.cal)} kcal · ${Math.round(t.p)} g protein · ${esc(names)}</span></span>
+        <span class="block text-[12px] n-muted mt-0.5 truncate">${fmtInt(ct.cal)} kcal · ${Math.round(ct.p)} g protein · ${esc(names)}</span></span>
       <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
     </button>`;
 }
@@ -9094,14 +9094,14 @@ function rcAmount(i, v) {
 }
 function rcRemove(i) { rcp.items.splice(i, 1); renderRecipe(); }
 function updateRecipeSummary() {
-  const t = recipeTotals();
+  const rt = recipeTotals();
   const cooked = num($("rcCooked").value, 0);
-  $("rcCooked").placeholder = t.raw > 0 ? `çiğ malzemeler toplam ${fmtInt(t.raw)} g` : "örn: 1200";
+  $("rcCooked").placeholder = rt.raw > 0 ? `çiğ malzemeler toplam ${fmtInt(rt.raw)} g` : "örn: 1200";
   const per = cooked > 0 ? 100 / cooked : 0;
-  $("rcSum").innerHTML = `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">Tarifin tamamı</span><strong class="tabular-nums">${fmtInt(t.cal)} kcal · ${macroLine(t.p, t.c, t.f)}</strong></div>`
+  $("rcSum").innerHTML = `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">Tarifin tamamı</span><strong class="tabular-nums">${fmtInt(rt.cal)} kcal · ${macroLine(rt.p, rt.c, rt.f)}</strong></div>`
     + (cooked > 0
-      ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">Pişmiş 100 g</span><strong class="tabular-nums n-accent">${fmtInt(t.cal * per)} kcal</strong></div>
-         <div class="text-right text-[12px] font-semibold tabular-nums">${macroLine(t.p * per, t.c * per, t.f * per, true)}</div>`
+      ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">Pişmiş 100 g</span><strong class="tabular-nums n-accent">${fmtInt(rt.cal * per)} kcal</strong></div>
+         <div class="text-right text-[12px] font-semibold tabular-nums">${macroLine(rt.p * per, rt.c * per, rt.f * per, true)}</div>`
       : `<div class="text-[12px] n-dim mt-1">100 g değerlerini hesaplamam için pişmiş toplam ağırlığı yaz.</div>`);
 }
 function rcAddIngredient() {
@@ -9129,12 +9129,12 @@ function saveRecipe() {
   if (!rcp.items.length) { sayAlert("Malzeme yok", "En az bir malzeme ekle."); return; }
   const cooked = num($("rcCooked").value, 0);
   if (!(cooked > 0) || cooked > 30000) { sayAlert("Pişmiş ağırlık eksik", "Pişmiş toplam ağırlığı gram olarak yaz (tencereyi tartıp boş tencerenin ağırlığını düş)."); return; }
-  const t = recipeTotals();
+  const rt = recipeTotals();
   const id = rcp.id || "custom_recipe_" + Date.now().toString(36);
   const editing = !!rcp.id;
   state.customFoods[id] = {
     name: "🍲 " + name, cat: "🍲 Tariflerim", unit: "g", step: 10, def: Math.max(10, Math.min(250, Math.round(cooked))),
-    p: t.p / cooked, c: t.c / cooked, f: t.f / cooked, kcal: t.cal / cooked,
+    p: rt.p / cooked, c: rt.c / cooked, f: rt.f / cooked, kcal: rt.cal / cooked,
     recipe: { items: rcp.items.filter(i => num(i.amount) > 0).map(i => ({ foodId: i.foodId, amount: num(i.amount) })), cooked }
   };
   invalidateFoodDB();
@@ -9261,11 +9261,11 @@ function shopText() {
   const nT = shopTrainDays();
   return `AYK+ alışveriş listesi (7 gün: ${nT} antrenman, ${7 - nT} dinlenme)\n` + rows.join("\n");
 }
-async function copyText(t) {
-  try { await navigator.clipboard.writeText(t); return true; }
+async function copyText(txt) {
+  try { await navigator.clipboard.writeText(txt); return true; }
   catch (e) {
     const ta = document.createElement("textarea");
-    ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+    ta.value = txt; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
     document.body.appendChild(ta); ta.select();
     let ok = false;
     try { ok = document.execCommand("copy"); } catch (e2) { ok = false; }
@@ -9382,9 +9382,9 @@ function renderFoodSuggest() {
   const el = $("foodSuggest");
   if (!el) return;
   const tIdx = foodTargetIdx();
-  const t = getTargets();
+  const tg = getTargets();
   const tot = nutritionTotals(foodMeals());
-  const remP = t.proTarget - tot.p, remK = t.calTarget - tot.cal;
+  const remP = tg.proTarget - tot.p, remK = tg.calTarget - tot.cal;
   foodSuggestCache = tIdx >= 0 && remK >= 80 && remP >= 8 ? fillSuggestions(remP, remK) : [];
   if (!foodSuggestCache.length) { el.innerHTML = ""; el.classList.add("hidden"); return; }
   const db = getFoodDB();
@@ -9440,11 +9440,11 @@ function logIntake(d) {
 function dateKeyOffset(n) { const d = logicalNow(); d.setDate(d.getDate() + n); return todayStr(d); }
 function keyToDate(k) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
 // Hedefe yakınlık: yeşil ±%5 (en az 50 kcal), sarı ±%15, kırmızı daha uzak
-function hitClass(k, t) {
-  if (!(t > 0)) return "none";
-  const d = Math.abs(k - t);
-  if (d <= Math.max(50, t * 0.05)) return "ok";
-  if (d <= t * 0.15) return "near";
+function hitClass(k, tgt) {
+  if (!(tgt > 0)) return "none";
+  const d = Math.abs(k - tgt);
+  if (d <= Math.max(50, tgt * 0.05)) return "ok";
+  if (d <= tgt * 0.15) return "near";
   return "far";
 }
 function weekStats() {
@@ -9453,7 +9453,7 @@ function weekStats() {
   const avgK = days7.length ? days7.reduce((a, b) => a + b.k, 0) / days7.length : 0;
   const avgP = days7.length ? days7.reduce((a, b) => a + b.p, 0) / days7.length : 0;
   // Bu hafta (Pazartesi–Pazar)
-  const t = getTargets().calTarget;
+  const calT = getTargets().calTarget;
   const ws = new Date(weekStart(logicalNow()));
   let total = 0, taken = 0, daysLeft = 0;
   const today = dayKey();
@@ -9462,10 +9462,10 @@ function weekStats() {
     const k = todayStr(d);
     if (k < today) {
       const x = logIntake(state.dailyLogs[k]);
-      total += x && x.t > 0 ? x.t : t;
+      total += x && x.t > 0 ? x.t : calT;
       if (x) taken += x.k;
     } else {
-      total += t;
+      total += calT;
       if (k === today) taken += eatenTotals().cal;
       daysLeft++;
     }
@@ -9582,7 +9582,7 @@ function searchIndex() {
     if (old && old.src === src) { _sIdx[id] = old; return; }   // özel besin yerinde düzenlenirse src değişir → yeniden hesaplanır
     const name = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
     const extra = normSearch((f.aliases || []).join(" ") + " " + stripEmoji(f.cat || ""));
-    const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(t => t.length > 1);
+    const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(tk => tk.length > 1);
     const e = { src, name, nameTok: name.split(/[^a-z0-9%]+/).filter(Boolean), extra, tokens };
     _sEntry.set(f, e);
     _sIdx[id] = e;
@@ -9595,25 +9595,25 @@ function wordScore(w, e, fuzzy = true) {
   const alts = SEARCH_SYN[w] || [w];
   let best = 0;
   for (const a of alts) {
-    if (e.nameTok.some(t => t.startsWith(a))) best = Math.max(best, 150);
+    if (e.nameTok.some(tk => tk.startsWith(a))) best = Math.max(best, 150);
     else if (e.name.includes(a)) best = Math.max(best, 100);
     else if (e.extra.includes(a)) best = Math.max(best, 60);
   }
   if (best || !fuzzy || w.length < 4) return best;
-  for (const t of e.tokens) if (fuzzyTokHit(w, t)) return 25;
+  for (const tk of e.tokens) if (fuzzyTokHit(w, tk)) return 25;
   return 0;
 }
 // v26: kelime–token yazım hatası sonucu hatırlanır (aynı token yüzlerce besinde geçiyor)
 const _fzMemo = new Map();
-function fuzzyTokHit(w, t) {
-  const key = w + "|" + t;
+function fuzzyTokHit(w, tk) {
+  const key = w + "|" + tk;
   let r = _fzMemo.get(key);
   if (r !== undefined) return r;
   r = false;
   const k = w.length >= 7 ? 2 : 1;
   for (const L of [w.length - 1, w.length, w.length + 1]) {
-    if (L < 3 || L > t.length) continue;
-    if (editDist(w, t.slice(0, L)) <= k) { r = true; break; }
+    if (L < 3 || L > tk.length) continue;
+    if (editDist(w, tk.slice(0, L)) <= k) { r = true; break; }
   }
   if (_fzMemo.size > 200000) _fzMemo.clear();
   _fzMemo.set(key, r);
@@ -9966,10 +9966,10 @@ function obTargets(dayType) {
     })
   });
   try {
-    const t = getTargets();
-    t.floor = d.sex === "female" ? 1400 : 1750;
-    t.floored = t.tdee + t.goalDelta < t.floor;   // güvenli alt sınır hedefi yukarı çekti
-    return t;
+    const tg = getTargets();
+    tg.floor = d.sex === "female" ? 1400 : 1750;
+    tg.floored = tg.tdee + tg.goalDelta < tg.floor;   // güvenli alt sınır hedefi yukarı çekti
+    return tg;
   } finally { state = saved; }
 }
 // Adımın eksik/hatalı alanı (boşsa geçerli)
@@ -10052,11 +10052,11 @@ function obWeeklyText() {
   const kcal = Math.round(d.goal === "lose" ? -real : real);
   if (kcal <= 0) return d.goal === "lose" ? "Güvenli alt sınır yüzünden bu hızda kilo kaybı olmuyor; kalori hedefin harcamana eşit ya da üstünde kalır." : "Bu seçimle günlük kalori fazlası oluşmuyor.";
   const kg = kcal * 7 / 7700;
-  let t = `Haftada yaklaşık ${fmtKg(kg)} kg ${d.goal === "lose" ? "kayıp" : "artış"} (günde ~${fmtInt(kcal)} kcal ${d.goal === "lose" ? "açık" : "fazla"}).`;
+  let txt = `Haftada yaklaşık ${fmtKg(kg)} kg ${d.goal === "lose" ? "kayıp" : "artış"} (günde ~${fmtInt(kcal)} kcal ${d.goal === "lose" ? "açık" : "fazla"}).`;
   const diff = Math.abs(v.weight - v.target);
   const ok = d.goal === "lose" ? v.target >= 30 && v.target < v.weight : v.target > v.weight && v.target <= 250;
-  if (ok && kg > 0) t += ` Hedefe yaklaşık ${Math.max(1, Math.round(diff / kg))} haftada ulaşırsın.`;
-  return t;
+  if (ok && kg > 0) txt += ` Hedefe yaklaşık ${Math.max(1, Math.round(diff / kg))} haftada ulaşırsın.`;
+  return txt;
 }
 function obUpdateWeekly() { const el = $("obWeekly"); if (el) el.textContent = obWeeklyText(); }
 
@@ -10105,7 +10105,7 @@ function obStepHtml(n) {
   if (n === 3) {
     const tgt = d.goal === "lose" || d.goal === "gain";
     const kc = p => d.goal === "lose" ? `${OB_LOSE_PACE[p]} kcal` : `+%${Math.round(GAIN_PACE[p] * 100)}`;
-    const pace = (id, p, t) => `<button id="${id}" type="button" class="${d.pace === p ? "on" : ""}" aria-pressed="${d.pace === p}" onclick="obPick('pace', '${p}')"><span class="ob-pace-t">${t}</span><span class="ob-pace-s">${kc(p)}</span></button>`;
+    const pace = (id, p, lb) => `<button id="${id}" type="button" class="${d.pace === p ? "on" : ""}" aria-pressed="${d.pace === p}" onclick="obPick('pace', '${p}')"><span class="ob-pace-t">${lb}</span><span class="ob-pace-s">${kc(p)}</span></button>`;
     return `${obHead("Hedefin ne?", "")}
     <div class="ob-list">
       ${obOpt("obGoalLose", d.goal === "lose", "Kilo vermek", "Yağ kaybı, kası koruyarak", "obPick('goal', 'lose')")}
@@ -10170,8 +10170,8 @@ function obRender(keepScroll) {
   if (!keepScroll) {
     obSetErr("");
     if (sc) sc.scrollTop = 0;
-    const t = $("obTitle");
-    if (t && obStep > 1) { try { t.focus({ preventScroll: true }); } catch (e) { /* yoksay */ } }
+    const el = $("obTitle");
+    if (el && obStep > 1) { try { el.focus({ preventScroll: true }); } catch (e) { /* yoksay */ } }
   } else if (sc) sc.scrollTop = top;
 }
 

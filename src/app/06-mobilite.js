@@ -12,9 +12,9 @@ function mobRoutine(rid) { return mobRoutines().find(r => r.id === rid) || null;
 function mobNewRoutineId() { return "mr_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 function mobItems() { const r = mobRoutine(mobUI.rid) || mobRoutines()[0]; return r ? r.items : []; }
 function mobFind(id) { return mobItems().find(i => i.id === id) || null; }
-function mobUpper(t) { return upperL(t); }
+function mobUpper(s) { return upperL(s); }
 function mobArg(id) { return esc(JSON.stringify(String(id))); }
-function mobNorm(t) { return String(t || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
+function mobNorm(s) { return String(s || "").toLocaleLowerCase("tr-TR").replace(/[’']/g, ""); }
 // v39: nasıl yapılır (MOB_GUIDE, data.js). Anahtar karşılaştırması büyük/küçük harf ve kesme işaretinden bağımsız.
 let _mobGuideIdx = null;
 function mobGuide(name) {
@@ -145,10 +145,10 @@ function mobDoneDays() {
 }
 // Bu hafta (Pt–Pz) yapılan günler, sayısı ve seri (bugün yapılmadıysa dünden geriye kesintisiz günler)
 function mobWeekStats() {
-  const done = mobDoneDays(), t = mobTodayKey();
-  const dow = (new Date(t + "T12:00:00").getDay() + 6) % 7;
-  const days = dayShort().map((_, i) => done.has(mobShiftKey(t, i - dow)));
-  let k = done.has(t) ? t : mobShiftKey(t, -1), streak = 0;
+  const done = mobDoneDays(), todayK = mobTodayKey();
+  const dow = (new Date(todayK + "T12:00:00").getDay() + 6) % 7;
+  const days = dayShort().map((_, i) => done.has(mobShiftKey(todayK, i - dow)));
+  let k = done.has(todayK) ? todayK : mobShiftKey(todayK, -1), streak = 0;
   while (done.has(k)) { streak++; k = mobShiftKey(k, -1); }
   return { days, count: days.filter(Boolean).length, streak, dow };
 }
@@ -574,7 +574,7 @@ function mobTimerUpdate() {
   if (!mobT) return;
   const left = (mobT.endAt - Date.now()) / 1000;
   if (mobT.phase === "work" && mobT.sec >= 20 && left <= 10 && left > 8 && mobT.s10 !== mobT.idx) { mobT.s10 = mobT.idx; mobSay("Son 10 saniye"); }
-  const t = $("mobTTime"); if (t) t.textContent = mobFmt(left);
+  const el = $("mobTTime"); if (el) el.textContent = mobFmt(left);
   const b = $("mobTBreath"); if (b && mobT.phase === "work") b.textContent = mobBreathLabel();
 }
 function mobRoundLabel(x) { return x.side ? x.side + " " + x.set : "Set " + x.set; }

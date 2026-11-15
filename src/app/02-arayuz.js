@@ -52,8 +52,8 @@ function openModal(id) {
 }
 function closeModal(id) { const m = $(id); m.classList.add("hidden"); m.classList.remove("flex"); }
 document.addEventListener("click", e => {
-  const t = e.target;
-  if (t && t.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "exSheet", "mealModal", "shopModal"].includes(t.id)) closeModal(t.id);
+  const el = e.target;
+  if (el && el.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "exSheet", "mealModal", "shopModal"].includes(el.id)) closeModal(el.id);
 });
 
 // Temalı onay / metin penceresi. Sonuç: onay → true (veya yazılan metin), vazgeç → null.
@@ -167,11 +167,11 @@ function timerPersist() {
   try { if (timer.running) localStorage.setItem(TIMER_KEY, JSON.stringify({ endAt: timer.endAt, label: timer.label })); else localStorage.removeItem(TIMER_KEY); } catch (e) { /* yok sayılır */ }
 }
 function resumeTimer() {
-  let t = null;
-  try { t = JSON.parse(localStorage.getItem(TIMER_KEY) || "null"); } catch (e) { t = null; }
-  const left = t ? num(t.endAt, 0) - Date.now() : 0;
+  let sv = null;
+  try { sv = JSON.parse(localStorage.getItem(TIMER_KEY) || "null"); } catch (e) { sv = null; }
+  const left = sv ? num(sv.endAt, 0) - Date.now() : 0;
   if (left <= 0 || left > 3600000) { timer.running = false; timerPersist(); return; }
-  timer.endAt = num(t.endAt, 0); timer.label = typeof t.label === "string" ? t.label.slice(0, 40) : "Dinlenme";
+  timer.endAt = num(sv.endAt, 0); timer.label = typeof sv.label === "string" ? sv.label.slice(0, 40) : "Dinlenme";
   timer.running = true; timer.finishedAt = 0;
   clearInterval(timer.iv); timer.iv = setInterval(tickTimer, 250);
   tickTimer();
@@ -257,12 +257,12 @@ function archiveDay(dateKey) {
   if (mobDone.length) state.mobilityLog[dateKey] = [...new Set([...prevMob, ...mobDone])];
   const rDone = mobRoutines().filter(r => r.items.some(i => i.done)).map(r => r.id);   // v40
   if (rDone.length) state.mobilityRoutineLog[dateKey] = [...new Set([...(state.mobilityRoutineLog[dateKey] || []), ...rDone])];
-  const t = nutritionTotals();
+  const tt = nutritionTotals();
   const e = eatenTotals();
   const sup = state.supplements || {};
   const dm = dayMeals();
   const log = {
-    kcal: Math.round(t.cal), p: Math.round(t.p), c: Math.round(t.c), f: Math.round(t.f),
+    kcal: Math.round(tt.cal), p: Math.round(tt.p), c: Math.round(tt.c), f: Math.round(tt.f),
     eatenKcal: Math.round(e.cal), eatenP: Math.round(e.p),
     water: state.waterLiters || 0,
     mealsDone: dm.filter(m => m.done).length, mealsTotal: dm.length,
@@ -294,22 +294,22 @@ function resetDaily() {
 }
 
 function checkNewDay() {
-  const t = logicalToday();
-  if (!state.today) { state.today = t; return false; }
+  const td = logicalToday();
+  if (!state.today) { state.today = td; return false; }
   // v44: kurulum bitmeden (yer tutucu hedeflerle) gün arşivlenmez; yalnızca tarih güncellenir. Bitince normal sürer.
-  if (state.settings.onboarded === false) { if (state.today !== t) state.today = t; return false; }
+  if (state.settings.onboarded === false) { if (state.today !== td) state.today = td; return false; }
   // v35: telefonun saati ileri alınmışken kaydedilen tarih bugünden en az 2 gün ilerideyse bugüne çekilir (tikler silinmez,
   // arşiv yazılmaz); eskiden gün geçişi o tarihe kadar hiç çalışmıyordu. 1 günlük geri gidiş meşrudur (Gün geçişi saati
   // ileri alınınca mantıksal gün bir gün geri gider) — o durumda dokunulmaz, yoksa dünün arşivi bugünün verisiyle ezilirdi.
-  if (state.today > t && (Date.parse(state.today) - Date.parse(t)) / DAY_MS >= 2) {
-    state.today = t;
-    if (state.dailyLogs[t]) state.dailyLogs[t].manual = true;   // v36: saat ileriyken bugün zaten arşivlendiyse o özet ezilmesin
+  if (state.today > td && (Date.parse(state.today) - Date.parse(td)) / DAY_MS >= 2) {
+    state.today = td;
+    if (state.dailyLogs[td]) state.dailyLogs[td].manual = true;   // v36: saat ileriyken bugün zaten arşivlendiyse o özet ezilmesin
     return true;   // v36: çağıran yeniden çizip kaydetsin (eskiden düzeltme bir sonraki dokunuşa kadar kaydedilmiyordu)
   }
-  if (t > state.today) {   // yalnızca ileri gidince (gün geçişi saati ileri alınınca aynı gün tekrar arşivlenmez)
+  if (td > state.today) {   // yalnızca ileri gidince (gün geçişi saati ileri alınınca aynı gün tekrar arşivlenmez)
     archiveDay(state.today);
     resetDaily();
-    state.today = t;
+    state.today = td;
     toast("Yeni gün! Su, takviye, öğün ve mobilite tikleri sıfırlandı.");
     return true;
   }

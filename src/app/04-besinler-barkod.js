@@ -81,8 +81,8 @@ function foodSelMacros() {
   if (foodUI.sel && String(foodUI.sel).startsWith("combo:")) {
     const c = state.combos.find(x => "combo:" + x.id === foodUI.sel);
     if (!c) return null;
-    const t = itemsTotals(c.items);
-    return { combo: true, f: null, a: 1, p: t.p, c: t.c, fat: t.f, cal: t.cal };
+    const ct = itemsTotals(c.items);
+    return { combo: true, f: null, a: 1, p: ct.p, c: ct.c, fat: ct.f, cal: ct.cal };
   }
   const f = foodUI.sel && getFoodDB()[foodUI.sel];
   if (!f) return null;
@@ -273,13 +273,13 @@ const SALT_LIMIT = 5;   // g/gün (DSÖ önerisi)
 function renderMicroLine(view) {
   const el = $("microLine");
   if (!el) return;
-  const t = microTotals(view);
-  if (!t.n) { el.innerHTML = ""; el.classList.add("hidden"); return; }
+  const mc = microTotals(view);
+  if (!mc.n) { el.innerHTML = ""; el.classList.add("hidden"); return; }
   el.classList.remove("hidden");
-  const over = t.salt > SALT_LIMIT;
-  el.innerHTML = `<span>Lif <strong class="text-white tabular-nums">${fmtNum(t.fib)}</strong> / ${fibTarget()} g</span>
-    <span>Tuz <strong class="tabular-nums" style="color:${over ? "#FB7185" : "#fff"}">${fmtNum(t.salt)}</strong> / ${SALT_LIMIT} g</span>
-    ${t.miss ? `<span class="text-white/60" data-micro-miss>${t.miss} besinde lif/tuz verisi yok</span>` : ""}`;
+  const over = mc.salt > SALT_LIMIT;
+  el.innerHTML = `<span>Lif <strong class="text-white tabular-nums">${fmtNum(mc.fib)}</strong> / ${fibTarget()} g</span>
+    <span>Tuz <strong class="tabular-nums" style="color:${over ? "#FB7185" : "#fff"}">${fmtNum(mc.salt)}</strong> / ${SALT_LIMIT} g</span>
+    ${mc.miss ? `<span class="text-white/60" data-micro-miss>${mc.miss} besinde lif/tuz verisi yok</span>` : ""}`;
 }
 function foodAmtInput(v) { foodUI.amt = Math.max(0, num(v, 0)); updateFoodSelUI(); }
 function foodStep(dir) {
@@ -325,14 +325,14 @@ function addToMenuById(mealId, foodId, amount) {
 // GEÇMİŞ
 // ---------------------------------------------------------------------------
 function renderNutriHistory() {
-  const t = getTargets();
+  const tg = getTargets();
   const plan = nutritionTotals();
   const eaten = eatenTotals();
   const meals = dayMeals();
   const sup = state.supplements || {};
   const rows = [{
     key: state.today || logicalToday(), live: true, dayType: state.dayType,
-    eatenKcal: eaten.cal, eatenP: eaten.p, kcal: plan.cal, calTarget: t.calTarget, proTarget: t.proTarget,
+    eatenKcal: eaten.cal, eatenP: eaten.p, kcal: plan.cal, calTarget: tg.calTarget, proTarget: tg.proTarget,
     water: state.waterLiters || 0, mealsDone: meals.filter(m => m.done).length, mealsTotal: meals.length,
     supps: state.supplementList.filter(x => sup[x.id]).length
   }];
@@ -436,7 +436,7 @@ function stopScan() {
   try { if (bc.reader) bc.reader.reset(); } catch (e) { /* yoksay */ }
   bc.reader = null;
   const v = $("bcVideo");
-  if (v && v.srcObject) { try { v.srcObject.getTracks().forEach(t => t.stop()); } catch (e) { /* yoksay */ } v.srcObject = null; }
+  if (v && v.srcObject) { try { v.srcObject.getTracks().forEach(tr => tr.stop()); } catch (e) { /* yoksay */ } v.srcObject = null; }
 }
 function barcodeManual() { stopScan(); $("bcCamWrap").classList.add("hidden"); onBarcode($("bcManual").value); }
 

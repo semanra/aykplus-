@@ -103,8 +103,8 @@ function lsGen() { const n = parseInt(lsGet(LS_GEN_KEY), 10); return n > 0 ? n :
 
 // --- Açılış ---
 async function storageInit() {
-  { const [n, t] = String(lsGet(IDB_FAIL_KEY) || "0:0").split(":").map(Number);   // içe alma tutmuyor: 7 gün eski mod
-    if (n >= 2 && Date.now() - t < 7 * DAY_MS) return storageUseLegacy(); }
+  { const [n, tm] = String(lsGet(IDB_FAIL_KEY) || "0:0").split(":").map(Number);   // içe alma tutmuyor: 7 gün eski mod
+    if (n >= 2 && Date.now() - tm < 7 * DAY_MS) return storageUseLegacy(); }
   try { aykDB = await idbOpen(); } catch (e) { aykDB = null; }
   if (!aykDB && lsGet(IDB_USED_KEY) === "1" && lsGet(MIRROR_OFF_KEY) !== "1") {   // R3-I2: kullanılan depo geç açılıyor olabilir
     try { aykDB = await idbOpen(10000); } catch (e) { aykDB = null; }
@@ -334,7 +334,7 @@ async function autoSnapshot() {
     await storagePruneSnaps();
   } catch (e) { console.error(e); }
 }
-function isoWeekKey(d) { const t = new Date(d + "T12:00:00"); t.setDate(t.getDate() - ((t.getDay() + 6) % 7)); return todayStr(t); }
+function isoWeekKey(d) { const dt = new Date(d + "T12:00:00"); dt.setDate(dt.getDate() - ((dt.getDay() + 6) % 7)); return todayStr(dt); }
 // Son 7 gece "day"; daha eskiler arasında en yeni 4 haftanın her birinden en yeni kopya "week"; gerisi silinir.
 async function storagePruneSnaps() {
   const all = await idbGetAll("snaps");
