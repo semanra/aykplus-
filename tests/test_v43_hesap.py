@@ -125,6 +125,14 @@ try:
     pg.locator("#toastWrap button", has_text="Geri al").last.click(); pg.wait_for_timeout(120)
     check(st(pg)["settings"]["proteinHigh"] is False and pg.input_value("#setProtein") == "std", "Geri al")
     check("araştırmalara göre yeterli" in pg.inner_text("#profilePage"), "protein açıklaması görünüyor")
+    for opt in ["low", "mid", "high"]:
+        pg.select_option("#setActivity", opt); pg.wait_for_timeout(80)
+        fits = pg.evaluate("""() => { const el = document.getElementById('setActivity'); const cs = getComputedStyle(el);
+          const sp = document.createElement('span'); sp.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:' + cs.font;
+          sp.textContent = el.options[el.selectedIndex].text; document.body.appendChild(sp); const tw = sp.getBoundingClientRect().width; sp.remove();
+          const room = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 30;   // 30 px: ok oku
+          return { ok: tw <= room + 1 && el.scrollWidth <= el.clientWidth + 1, tw, room }; }""")
+        check(fits["ok"], f"Hareketlilik '{opt}' kesilmeden sığıyor ({fits})")
     for sc in ["dark", "light"]:
         pg.emulate_media(color_scheme=sc); pg.wait_for_timeout(100)
         pg.locator("#setActivity").scroll_into_view_if_needed()
