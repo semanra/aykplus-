@@ -365,13 +365,18 @@ function renderWater() {
 // ---------------------------------------------------------------------------
 // BUGÜN: zaman çizelgesi
 // ---------------------------------------------------------------------------
+// v44: menüde hiç öğün yokken (yeni kurulum) Bugün ve Menülerim'de gösterilen boş durum kartı
+function emptyMenuCardHtml() {
+  return `<div data-empty-menu class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[15px] font-bold">Menün henüz boş</p>
+    <p class="text-[13px] n-muted">Öğünlerini ekledikçe kalori ve makro takibi burada başlar.</p>
+    <button onclick="openMealModal()" class="n-btn h-12 px-6 rounded-full text-[14px]">İlk öğününü ekle</button></div>`;
+}
 function renderTodayMeals() {
   const db = getFoodDB();
   const meals = dayMeals();
   const nextIdx = meals.findIndex(m => !m.done);
   if (!meals.length) {
-    $("todayMeals").innerHTML = `<div class="n-card rounded-[22px] p-5 text-center space-y-3"><p class="text-[14px] n-muted">Bu menüde henüz öğün yok.</p>
-      <button onclick="setNutriView('menus')" class="n-btn h-12 px-6 rounded-full text-[14px]">Menülerim'e git</button></div>`;
+    $("todayMeals").innerHTML = emptyMenuCardHtml();
     return;
   }
   const changed = dayChangedIds();
@@ -851,7 +856,8 @@ function renderMenus() {
         </div>
       </div>`;
   }).join("");
-  html += `<button onclick="openMealModal()" class="w-full min-h-[60px] rounded-[20px] border-[1.5px] border-dashed n-accent flex items-center justify-center gap-2 font-bold text-[14px]" style="border-color: var(--n-accent)">
+  if (!meals.length) html = emptyMenuCardHtml();
+  else html += `<button onclick="openMealModal()" class="w-full min-h-[60px] rounded-[20px] border-[1.5px] border-dashed n-accent flex items-center justify-center gap-2 font-bold text-[14px]" style="border-color: var(--n-accent)">
     ${svgI("plus", 20, 2.4)}Yeni öğün ekle</button>`;
   if (dayChangedIds().size) {
     html = `<div id="menuDayNote" class="n-card rounded-[20px] p-3.5 space-y-2.5">

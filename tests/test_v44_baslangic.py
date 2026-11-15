@@ -71,6 +71,40 @@ try:
     check(pg2.evaluate("state.settings.onboarded") is True and pg2.evaluate("state.weight") == 105, "test kancası: eski varsayılanlarla, kurulumsuz")
     check(pg2.evaluate("freshInstall") is False, "test kancası: freshInstall false")
     check(pg2.evaluate("state.settings.onboarded") is True and st(pg2)["settings"]["onboarded"] is True, "test kancası: kayıt da onboarded true")
+    # ---- Bölüm 2: genel varsayılanlar ve boş durumlar ----
+    pg = page_fresh(); errs.clear()
+    s = st(pg)
+    check(s["meals"] == [] and s["restMeals"] == [] and s["supplementList"] == [] and s["weightLogs"] == [], "yeni kurulum: liste yok")
+    check(len(s["workoutDays"]) == 1 and s["workoutDays"][0]["exercises"] == [] and s["mobilityRoutine"]["routines"] == [], "tek boş gün, rutin yok")
+    check(s["weight"] == 70 and s["settings"]["height"] == 170 and s["settings"]["age"] == 30 and s["settings"]["targetWeight"] == 70 and s["settings"]["goal"] == "keep"
+          and s["deficit"] == 0 and s["settings"]["waterTarget"] == 2.5 and s["settings"]["sex"] == "male", "genel değerler tabloya uygun")
+    src = open(os.path.join(REPO, "src", "data.js"), encoding="utf-8").read() + open(os.path.join(REPO, "src", "app", "01-temel.js"), encoding="utf-8").read()
+    check("Üst Vücut A" not in src and "Kas Onarımı" not in src and "🥬 Greens" not in src, "sahibin varsayılanları kodda yok")
+    pg.evaluate("state.settings.onboarded = true; renderAll()")   # kurulum ekranı olmadan boş uygulamayı gez
+    SCREENS = ["switchTab('nutrition'); setNutriView('today')", "setNutriView('menus')", "setNutriView('foods')", "setNutriView('history')", "openShopList(); closeModal('shopModal')",
+               "switchTab('gym'); state.gymView='today'; renderAll()", "state.gymView='program'; renderAll()", "state.gymView='library'; renderAll()", "state.gymView='history'; renderAll()",
+               "switchTab('mobility')", "switchTab('progress'); setProgressView('genel')", "setProgressView('kilo')", "setProgressView('guc')", "setProgressView('beslenme')", "openProfile()"]
+    for js in SCREENS: pg.evaluate(js); pg.wait_for_timeout(60)
+    check(errs == [], "boş başlangıçta bütün ekranlar hatasız: " + str(errs[:3]))
+    pg.evaluate("closeProfile(); switchTab('nutrition'); setNutriView('menus')")
+    check(pg.is_visible("#mealsContainer [data-empty-menu]") and "İlk öğününü ekle" in pg.inner_text("#mealsContainer [data-empty-menu]"), "Menülerim boş kartı")
+    pg.evaluate("setNutriView('today')"); check(pg.is_visible("#todayMeals [data-empty-menu]"), "Bugün boş kartı")
+    pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v44_bos_bugun_koyu.png"))
+    pg.evaluate("setNutriView('menus')"); pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v44_bos_menu_koyu.png"))
+    pg.evaluate("switchTab('gym'); state.gymView='today'; renderAll()")
+    check(pg.is_visible("[data-empty-day]") and "İlk hareketini ekle" in pg.inner_text("[data-empty-day]"), "hareketsiz gün kartı")
+    pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v44_bos_gun_koyu.png"))
+    pg.evaluate("setTheme('light'); switchTab('nutrition'); setNutriView('today')"); pg.wait_for_timeout(100)
+    pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v44_bos_bugun_acik.png"))
+    pg.evaluate("setNutriView('menus')"); pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v44_bos_menu_acik.png"))
+    pg.evaluate("switchTab('gym'); state.gymView='today'; renderAll()"); pg.wait_for_timeout(100)
+    pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v44_bos_gun_acik.png"))
+    for sel in ("#mealsContainer [data-empty-menu] button", "[data-empty-day] button"):
+        pg.evaluate("switchTab('nutrition'); setNutriView('menus')" if "menu" in sel else "switchTab('gym'); state.gymView='today'; renderAll()")
+        bb = pg.locator(sel).first.bounding_box(); check(bb and bb["height"] >= 44, "44 px düğme: " + sel)
+    # eksik listeli eski kayıt (spec §6.4 doğrulaması)
+    seed(pg, {"weight": 88, "dataVer": 1, "settings": {"age": 40}})
+    check(st(pg)["weight"] == 88 and st(pg)["settings"]["onboarded"] is True and errs == [], "listeleri eksik eski kayıt hatasız açılır")
     b.close()
 finally:
     srv.terminate()

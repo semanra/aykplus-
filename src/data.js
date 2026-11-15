@@ -574,143 +574,19 @@ function makeSets(count, targetRange, defaultKg = 0, defaultReps = 8) {
 
 const DEFAULT_STATE = {
   activeTab: "nutrition",
-  weight: 105,
-  deficit: 700,
+  weight: 70,
+  deficit: 0,
   dayType: "train",
   waterLiters: 0,
-  supplements: { creatine: false, greens: false, omega: false },
-  weightLogs: [{ date: "Başlangıç", weight: 105 }],
+  supplements: {},
+  weightLogs: [],
   customFoods: {},
   customIconDataUrl: "",
-  meals: [
-    {
-      id: "breakfast",
-      title: "1. Öğün: Kahvaltı (Yulaf + Yumurta + Yeşillik)",
-      targetNote: "Hedef: 50-60g Protein",
-      done: false,
-      items: [
-        { foodId: "tam_yumurta", amount: 3 },
-        { foodId: "yulaf", amount: 80 },
-        { foodId: "whey_shake", amount: 1 },
-        { foodId: "domates_salatalik", amount: 200 }
-      ]
-    },
-    {
-      id: "lunch",
-      title: "2. Öğün: Öğle Yemeği (Antrenman Öncesi)",
-      targetNote: "Yüksek Karbonhidrat & Protein",
-      done: false,
-      items: [
-        { foodId: "tavuk_gogsu", amount: 200 },
-        { foodId: "pirinc", amount: 90 },
-        { foodId: "yesil_salata", amount: 1 },
-        { foodId: "zeytinyagi", amount: 10 }
-      ]
-    },
-    {
-      id: "snack",
-      title: "3. Öğün: Ara Öğün (Antrenman Sonrası / İkindi)",
-      targetNote: "Hızlı Toparlanma & Kuruyemiş",
-      done: false,
-      items: [
-        { foodId: "whey_shake", amount: 1 },
-        { foodId: "suzme_yogurt", amount: 150 },
-        { foodId: "muz", amount: 1 },
-        { foodId: "ceviz", amount: 25 }
-      ]
-    },
-    {
-      id: "dinner",
-      title: "4. Öğün: Akşam Yemeği",
-      targetNote: "Kas Onarımı & Sebze/Lif",
-      done: false,
-      items: [
-        { foodId: "dana_kiyma", amount: 200 },
-        { foodId: "makarna_tam", amount: 85 },
-        { foodId: "brokoli_karnabahar", amount: 200 },
-        { foodId: "zeytinyagi", amount: 5 }
-      ]
-    }
-  ],
+  meals: [],
 
-  // KULLANICININ AKTİF 4 GÜNLÜK ANTRENMAN PROGRAMI (BİREBİR EŞLEŞTİRİLDİ)
+  // v44: genel varsayılan — yeni kurulumda liste yok; program tek boş gün (en az bir gün kalır), mobilite rutini yok
   activeWorkoutDayIdx: 0,
   workoutLogs: [],
-  workoutDays: [
-    {
-      id: "upperA",
-      name: "1. GÜN: Üst Vücut A",
-      exercises: [
-        { name: "Barbell Bench Press", targetInfo: "3x5–8", note: "Hedef: 3 Set x 5–8 Tekrar", sets: makeSets(3, "5–8", 0, 6) },
-        { name: "Chest-Supported Row", targetInfo: "4x6–10", note: "Hedef: 4 Set x 6–10 Tekrar", sets: makeSets(4, "6–10", 0, 8) },
-        { name: "Incline Dumbbell Press", targetInfo: "3x8–10", note: "Hedef: 3 Set x 8–10 Tekrar", sets: makeSets(3, "8–10", 0, 10) },
-        { name: "Lat Pulldown", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
-        { name: "Cable Lateral Raise", targetInfo: "4x10–15", note: "Hedef: 4 Set x 10–15 Tekrar", sets: makeSets(4, "10–15", 0, 12) },
-        { name: "Reverse Pec Deck veya Face Pull", targetInfo: "3x12–15", note: "Hedef: 3 Set x 12–15 Tekrar", sets: makeSets(3, "12–15", 0, 15) },
-        { name: "Overhead Cable Triceps Extension", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
-        { name: "Triceps Rope/Bar Pushdown", targetInfo: "2x10–12", note: "Hedef: 2 Set x 10–12 Tekrar", sets: makeSets(2, "10–12", 0, 12) },
-        { name: "Preacher Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) }
-      ]
-    },
-    {
-      id: "lowerA",
-      name: "2. GÜN: Alt Vücut A",
-      exercises: [
-        { name: "Hack Squat", targetInfo: "3x5–8", note: "Hedef: 3 Set x 5–8 Tekrar", sets: makeSets(3, "5–8", 0, 6) },
-        { name: "Romanian Deadlift", targetInfo: "3x6–10", note: "Hedef: 3 Set x 6–10 Tekrar", sets: makeSets(3, "6–10", 0, 8) },
-        { name: "Seated Leg Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
-        { name: "Leg Extension", targetInfo: "3x10–12", note: "Hedef: 3 Set x 10–12 Tekrar", sets: makeSets(3, "10–12", 0, 12) },
-        { name: "Standing Calf Raise", targetInfo: "4x8–12", note: "Hedef: 4 Set x 8–12 Tekrar", sets: makeSets(4, "8–12", 0, 10) },
-        { name: "Crunch Machine", targetInfo: "3x10–15", note: "Hedef: 3 Set x 10–15 Tekrar", sets: makeSets(3, "10–15", 0, 12) }
-      ]
-    },
-    {
-      id: "upperB",
-      name: "3. GÜN: Üst Vücut B",
-      exercises: [
-        { name: "Machine Shoulder Press", targetInfo: "3x6–10 (36kg)", note: "Hedef: 3 Set x 6–10 Tekrar (36K)", sets: makeSets(3, "6–10", 36, 8) },
-        { name: "Pull-up", targetInfo: "4x6–10", note: "Hedef: 4 Set x 6–10 Tekrar", sets: makeSets(4, "6–10", 0, 8) },
-        { name: "Weighted Dips", targetInfo: "3x6–10", note: "Hedef: 3 Set x 6–10 Tekrar", sets: makeSets(3, "6–10", 0, 8) },
-        { name: "Seated Cable Row", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
-        { name: "Pec Deck Fly VEYA Cable Crossover", targetInfo: "3x10–12", note: "Hedef: 3 Set x 10–12 Tekrar", sets: makeSets(3, "10–12", 0, 12) },
-        { name: "Dumbbell Lateral Raise", targetInfo: "4x12–15", note: "Hedef: 4 Set x 12–15 Tekrar", sets: makeSets(4, "12–15", 0, 15) },
-        { name: "Incline Dumbbell Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
-        { name: "Skullcrusher", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
-        { name: "Hammer Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) }
-      ]
-    },
-    {
-      id: "lowerB",
-      name: "4. GÜN: Alt Vücut B",
-      exercises: [
-        { name: "Barbell Hip Thrust", targetInfo: "3x6–10", note: "Hedef: 3 Set x 6–10 Tekrar", sets: makeSets(3, "6–10", 0, 8) },
-        { name: "Leg Press", targetInfo: "3x8–10", note: "Hedef: 3 Set x 8–10 Tekrar", sets: makeSets(3, "8–10", 0, 10) },
-        { name: "Bulgarian Split Squat", targetInfo: "3x8–10", note: "Hedef: 3 Set x 8–10 Tekrar", sets: makeSets(3, "8–10", 0, 10) },
-        { name: "Lying Leg Curl", targetInfo: "3x8–12", note: "Hedef: 3 Set x 8–12 Tekrar", sets: makeSets(3, "8–12", 0, 10) },
-        { name: "Leg Extension", targetInfo: "3x10–15", note: "Hedef: 3 Set x 10–15 Tekrar", sets: makeSets(3, "10–15", 0, 12) },
-        { name: "Hyperextension", targetInfo: "2x10–15", note: "Hedef: 2 Set x 10–15 Tekrar", sets: makeSets(2, "10–15", 0, 12) },
-        { name: "Seated Calf Raise", targetInfo: "3x12–15", note: "Hedef: 3 Set x 12–15 Tekrar", sets: makeSets(3, "12–15", 0, 15) },
-        { name: "Hanging Leg Raise", targetInfo: "3x8–15", note: "Hedef: 3 Set x 8–15 Tekrar", sets: makeSets(3, "8–15", 0, 12) }
-      ]
-    }
-  ],
-
-  // DİNAMİK MOBİLİTE AKIŞI & STATİK STRETCHING PROGRAMI (BİREBİR EŞLEŞTİRİLDİ)
-  mobilityRoutine: {
-    dynamic: [
-      { name: "World’s Greatest Stretch", prescription: "1 Set x 8–10 Tekrar", note: "Sağ ve sol akıcı geçiş", done: false },
-      { name: "90/90 Hip Switch", prescription: "1 Set x 8–10 Tekrar", note: "Gövde dik, kalça rotasyonu", done: false },
-      { name: "Kneeling Ankle Dorsiflexion", prescription: "1 Set x 8–10 Tekrar", note: "Topuk yerden kalkmadan diz ileri", done: false },
-      { name: "Quadruped Cat-Cow", prescription: "1 Set x 8–10 Tekrar", note: "Nefes alarak ekstansiyon, vererek fleksiyon", done: false },
-      { name: "Towel/Band Shoulder Dislocates", prescription: "1 Set x 8–10 Tekrar", note: "Dirsekler bükülmeden tam tur", done: false }
-    ],
-    static: [
-      { name: "Doorway Pec & Biceps Stretch", prescription: "2 Set x 30 sn", timerSec: 30, note: "Kapı eşiğinde göğüs ve biceps esnetme", done: false },
-      { name: "Child’s Pose with Lat Reach", prescription: "Sağ ve Sol için 1'er Set x 45 sn", timerSec: 45, note: "Ellerle çapraza uzanarak kanat esnetme", done: false },
-      { name: "Couch Stretch", prescription: "Sağ ve Sol için 2'şer Set x 30 sn", timerSec: 30, note: "Kalça fleksörü ve üst bacak", done: false },
-      { name: "Supine Figure-4 Glute Stretch", prescription: "Sağ ve Sol için 2'şer Set x 30 sn", timerSec: 30, note: "Sırtüstü 4 figürü ile kalça esnetme", done: false },
-      { name: "Single-Leg Seated Hamstring Stretch", prescription: "Sağ ve Sol için 2'şer Set x 30 sn", timerSec: 30, note: "Tek bacak oturarak arka bacak esnetme", done: false }
-    ]
-  }
+  workoutDays: [{ id: "day_1", name: "1. Gün", exercises: [] }],
+  mobilityRoutine: { dynamic: [], static: [], routines: [] }
 };
-

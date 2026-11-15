@@ -8,19 +8,15 @@ const GAIN_PACE = { slow: 0.10, mid: 0.15, fast: 0.20 };
 
 const DEFAULT_SETTINGS = {
   onboarded: true,   // v44: yeni kurulumda freshState() false yapar; var olan kayıt hep true
-  sex: "male", height: 180, age: 26, targetWeight: 82,
-  waterTarget: 3.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
+  sex: "male", height: 170, age: 30, targetWeight: 70,
+  waterTarget: 2.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
   macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
   nutriLight: false, scaleOn: false, scaleBase: 0,
-  goal: "lose", gainPace: "mid", activity: "mid", proteinHigh: false,   // v43: hedef Ver/Koru/Al, hız, hareketlilik, yüksek protein
+  goal: "keep", gainPace: "mid", activity: "mid", proteinHigh: false,   // v43: hedef Ver/Koru/Al, hız, hareketlilik, yüksek protein
   theme: "system"   // v31: system | dark | light (nutriLight eski alan, artık kullanılmıyor ama silinmez)
 };
-const DEFAULT_SUPPS = [
-  { id: "creatine", name: "⚡ Kreatin (5g)" },
-  { id: "greens", name: "🥬 Greens" },
-  { id: "omega", name: "🐟 Omega/Vit" }
-];
+const DEFAULT_SUPPS = [];   // v44: genel varsayılan — takviye listesi boş
 // v24: hazır takviyeler (Düzenle'de tek dokunuşla eklenir; listede adı m'ye uyan takviye varsa gösterilmez)
 const SUPP_PRESETS = [
   { key: "d3k2", m: /d3|d vitamin/, name: "Vitamin D3 + K2", dose: 1, step: 1, min: 1, max: 10, unit: "damla/kapsül", note: "Tok karnına", time: "morning" },
@@ -241,7 +237,6 @@ function normalizeState(raw) {
   const s = { ...clone(DEFAULT_STATE), ...(raw || {}) };
   s.settings = { ...DEFAULT_SETTINGS, ...((raw && raw.settings) || {}) };
   s.meals = normMealList(s.meals);   // v25
-  if (s.meals.length === 0) s.meals = clone(DEFAULT_STATE.meals);
   if (Array.isArray(s.workoutDays)) s.workoutDays = s.workoutDays.filter(isObj);   // v25: boş gün kaydı açılışı bozmasın
   if (!Array.isArray(s.workoutDays) || s.workoutDays.length === 0) s.workoutDays = clone(DEFAULT_STATE.workoutDays);
   s.workoutDays.forEach(day => {
