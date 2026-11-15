@@ -265,7 +265,13 @@ function renderWeightBlock(st) {
   slider.min = minW; slider.max = maxW; slider.value = state.weight;
   $("weightVal").textContent = fmtNum(state.weight);
   $("deficitSlider").value = state.deficit;
-  $("deficitVal").textContent = state.deficit;
+  const tg = getTargets();
+  const goal = tg.goal;
+  [["goalLose", "lose"], ["goalKeep", "keep"], ["goalGain", "gain"]].forEach(([id, g]) => { $(id).className = goal === g ? "on" : ""; });
+  [["paceSlow", "slow"], ["paceMid", "mid"], ["paceFast", "fast"]].forEach(([id, p]) => { $(id).className = st.gainPace === p ? "on" : ""; });
+  $("loseBox").classList.toggle("hidden", goal !== "lose");
+  $("gainBox").classList.toggle("hidden", goal !== "gain");
+  $("goalVal").textContent = (tg.goalDelta < 0 ? "−" : tg.goalDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.goalDelta));
   $("weightHistoryText").textContent = state.weightLogs.length > 0
     ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.date})`).join(" → ")
     : `Hedef: ${fmtNum(num(st.targetWeight, 82))} kg`;
@@ -275,9 +281,15 @@ function renderWeightBlock(st) {
   const target = num(st.targetWeight, 82);
   const diffKg = state.weight - target;
   const weeklyLoss = (state.deficit * 7) / 7700;
-  $("timelineInfo").textContent = diffKg <= 0 ? `${fmtNum(target)} kg hedefine ulaştın!`
+  const weeklyGain = (tg.goalDelta * 7) / 7700;
+  let info;
+  if (goal === "keep") info = "Kilo koruma: hedef kalorin harcamana eşit";
+  else if (goal === "gain") info = diffKg >= 0 || weeklyGain <= 0 ? `${fmtNum(target)} kg hedefine ulaştın!`
+    : `Haftalık ~${fmtKg(weeklyGain)} kg alım → ${fmtNum(target)} kg hedefine ~${Math.ceil(-diffKg / weeklyGain)} hafta`;
+  else info = diffKg <= 0 ? `${fmtNum(target)} kg hedefine ulaştın!`
     : weeklyLoss > 0 ? `Haftalık ~${fmtKg(weeklyLoss)} kg kayıp → ${fmtNum(target)} kg hedefine ~${Math.ceil(diffKg / weeklyLoss)} hafta`
     : "Kalori açığı yok: kilo koruma modu";
+  $("timelineInfo").textContent = info;
   const hint = coachHintText();
   $("coachHint").classList.toggle("hidden", !hint);
   $("coachHint").textContent = hint;

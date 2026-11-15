@@ -65,6 +65,32 @@ try:
     check(st(pg)["settings"]["goal"] == "lose", "dataVer 3 kayıtta göç tekrar çalışmıyor (kullanıcının seçimi korunur)")
     ctx.close()
 
+    # ================= 2) MENÜLERİM HEDEF KARTI =================
+    ctx, pg = page()
+    seed(pg, OWNER); pg.evaluate("setNutriView('menus')"); pg.wait_for_timeout(80)
+    check(pg.is_visible("#goalLose") and pg.is_visible("#goalVal"), "Hedef kartı görünür")
+    check(pg.is_visible("#loseBox") and not pg.is_visible("#gainBox") and "kayıp" in pg.inner_text("#timelineInfo"), "Ver: kaydırıcı görünür, 'kayıp'")
+    pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v43_hedef_ver_koyu.png"))
+    pg.click("#goalGain"); pg.wait_for_timeout(80)
+    check(st(pg)["settings"]["goal"] == "gain" and pg.is_visible("#gainBox") and not pg.is_visible("#loseBox"), "Al: hız düğmeleri görünür")
+    check("ulaştın" in pg.inner_text("#timelineInfo"), "Al + kilo (105) hedefin (82) üstünde: 'hedefine ulaştın', negatif hafta yok")
+    pg.evaluate("state.settings.targetWeight = 110; renderAll()")
+    check("alım" in pg.inner_text("#timelineInfo") and "hafta" in pg.inner_text("#timelineInfo"), "Al: 'haftalık ~… kg alım → … hafta'")
+    c1 = pg.evaluate("getTargets().calTarget"); pg.click("#paceFast"); pg.wait_for_timeout(80)
+    check(st(pg)["settings"]["gainPace"] == "fast" and pg.evaluate("getTargets().calTarget") > c1 and pg.inner_text("#goalVal").startswith("+"), "Hızlı: kalori arttı, '+' gösterilir")
+    pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v43_hedef_al_koyu.png"))
+    pg.click("#goalKeep"); pg.wait_for_timeout(80)
+    check("koru" in pg.inner_text("#timelineInfo").lower() and not pg.is_visible("#loseBox") and not pg.is_visible("#gainBox"), "Koru")
+    pg.evaluate("state.deficit = 0; renderAll()"); pg.click("#goalLose"); pg.wait_for_timeout(80)
+    check(st(pg)["deficit"] == 500, "Ver'e açık 0 iken geçince 500")
+    for sel in ["#goalLose", "#goalKeep", "#goalGain", "#paceSlow"]:
+        pg.click("#goalGain"); bb = pg.locator(sel).bounding_box(); check(bb and bb["height"] >= 44, sel + " ≥ 44 px")
+    pg.evaluate("state.settings.theme = 'light'; applyTheme()"); pg.wait_for_timeout(80)
+    pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v43_hedef_al_acik.png"))
+    pg.click("#goalLose"); pg.wait_for_timeout(80)
+    pg.screenshot(path=os.path.join(REPO, "tests", "shots", "v43_hedef_ver_acik.png"))
+    ctx.close()
+
     check(not errs, f"sayfa hatası yok ({errs[:3]})")
     b.close()
 finally:

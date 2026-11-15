@@ -761,10 +761,24 @@
         </div>
         <div class="pt-4 n-bt">
           <div class="flex items-center justify-between gap-2 min-h-[44px]">
-            <span class="n-label">KALORİ AÇIĞI</span>
-            <span class="whitespace-nowrap n-k"><span class="t-display text-[26px] leading-none tabular-nums">−<span id="deficitVal">700</span></span> <span class="text-[13px] font-semibold">kcal</span></span>
+            <span class="n-label">HEDEF</span>
+            <span class="whitespace-nowrap n-k"><span id="goalVal" class="t-display text-[26px] leading-none tabular-nums">−700</span> <span class="text-[13px] font-semibold">kcal</span></span>
           </div>
-          <input id="deficitSlider" type="range" min="0" max="1000" step="50" value="700" oninput="updateProfile()" class="w-full h-11" aria-label="Kalori açığı" />
+          <div class="n-seg grid-cols-3 mb-1" role="group" aria-label="Hedef">
+            <button id="goalLose" onclick="setGoal('lose')">Ver</button>
+            <button id="goalKeep" onclick="setGoal('keep')">Koru</button>
+            <button id="goalGain" onclick="setGoal('gain')">Al</button>
+          </div>
+          <div id="loseBox">
+            <input id="deficitSlider" type="range" min="0" max="1000" step="50" value="700" oninput="updateProfile()" class="w-full h-11" aria-label="Kalori açığı" />
+          </div>
+          <div id="gainBox" class="hidden my-1">
+            <div class="n-seg grid-cols-3" role="group" aria-label="Kilo alma hızı">
+              <button id="paceSlow" onclick="setGainPace('slow')">Yavaş</button>
+              <button id="paceMid" onclick="setGainPace('mid')">Orta</button>
+              <button id="paceFast" onclick="setGainPace('fast')">Hızlı</button>
+            </div>
+          </div>
           <div id="timelineInfo" class="text-[12px] n-muted">-</div>
           <button id="coachHint" onclick="switchTab('progress')" class="hidden mt-2 w-full min-h-[44px] text-left text-[13px] font-semibold n-k border border-current rounded-2xl px-3.5 py-2"></button>
         </div>

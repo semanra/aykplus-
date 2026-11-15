@@ -577,6 +577,17 @@ function updateProfile() {
   state.deficit = Math.round(num($("deficitSlider").value, state.deficit));
   renderAll();
 }
+function setGoal(g) {
+  if (g !== "lose" && g !== "keep" && g !== "gain") return;
+  state.settings.goal = g;
+  if (g === "lose" && !(state.deficit > 0)) state.deficit = 500;
+  renderAll();
+}
+function setGainPace(p) {
+  if (p !== "slow" && p !== "mid" && p !== "fast") return;
+  state.settings.gainPace = p;
+  renderAll();
+}
 function adjustWeight(d) { state.weight = Math.max(30, round1(state.weight + d)); renderAll(); }
 
 function logCurrentWeight() {
