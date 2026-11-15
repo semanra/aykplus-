@@ -201,7 +201,7 @@ function applyExExtras(ex, v) {
 function targetInfoFor(kind, v, ex) {
   if (kind === "weight") return `${ex ? ex.sets.length : v.count}x${v.target}`;
   if (kind === "time") return `${ex ? ex.sets.length : v.tcount}x${v.sec} sn`;
-  return `${fmtNum(v.min)} dk` + (v.km !== "" && v.km > 0 ? ` • ${fmtNum(v.km)} km` : "");
+  return `${fmtNumTr(v.min)} dk` + (v.km !== "" && v.km > 0 ? ` • ${fmtNumTr(v.km)} km` : "");
 }
 
 function buildSets(kind, v) {

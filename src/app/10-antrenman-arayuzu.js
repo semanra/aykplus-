@@ -525,7 +525,7 @@ function gymLibraryHtml() {
     const tg = c === 0 ? t("yok|yük") : c < 10 ? t("az|yük") : c <= 20 ? t("ideal|yük") : t("yüksek|yük");
     const col = c === 0 ? "#3A3A40" : c < 10 ? "#3E8F88" : c <= 20 ? "#14D9C6" : "#00FFE5";
     return `<button onclick="selectMuscle(${esc(JSON.stringify(m))})" class="w-full min-h-[44px] flex items-center gap-2.5 text-left">
-      <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} truncate">${esc(muscleL(m))}</span>
+      <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} ${curLang() === "en" ? "line-clamp-2 leading-tight" : "truncate"}">${esc(muscleL(m))}</span>
       <span class="relative flex-1 h-2.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / 24 * 100)}%;background:${col}"></span></span>
       <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b> <span class="t-dim text-[12px]">${tg}</span></span>
     </button>`;
@@ -589,9 +589,9 @@ function gymHistoryHtml() {
     </div>`).join("");
   return `
     <div class="grid grid-cols-3 gap-2">
-      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Bu hafta")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg"> ${t("antr.")}</span></div></div>
+      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Bu hafta")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg"> ${tn(weekLogs.length, "antr.")}</span></div></div>
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(weekLogs.reduce((a, l) => a + num(l.volume), 0) / 1000)}<span class="t-dim text-lg"> ${t("t|ton")}</span></div></div>
-      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Toplam")}</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> ${t("antr.")}</span></div></div>
+      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Toplam")}</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> ${tn(state.workoutLogs.length, "antr.")}</span></div></div>
     </div>
     <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">${t("Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.")}</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">${t("Bugünün antrenmanına git")}</button></div>`}</div>
     <button onclick="switchTab('progress')" class="t-btn-ghost w-full min-h-11 px-4 py-2 rounded-xl text-sm">${t("Grafikler ve rekorlar: İlerleme sekmesi")}</button>`;

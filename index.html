@@ -2522,6 +2522,7 @@ function num(v, d = 0) {
 }
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function round1(n) { return Math.round(n * 10) / 10; }
+function fmtNumTr(n) { return String(round1(n)).replace(".", ","); } // kayıtlı metinler her dilde Türkçe biçim
 function fmtNum(n) { const s = String(round1(n)); return curLang() === "en" ? s : s.replace(".", ","); }
 function round2(n) { return Math.round(n * 100) / 100; }
 function fmtKg(n) { const s = String(round2(n)); return curLang() === "en" ? s : s.replace(".", ","); }
@@ -5311,7 +5312,7 @@ function applyExExtras(ex, v) {
 function targetInfoFor(kind, v, ex) {
   if (kind === "weight") return `${ex ? ex.sets.length : v.count}x${v.target}`;
   if (kind === "time") return `${ex ? ex.sets.length : v.tcount}x${v.sec} sn`;
-  return `${fmtNum(v.min)} dk` + (v.km !== "" && v.km > 0 ? ` • ${fmtNum(v.km)} km` : "");
+  return `${fmtNumTr(v.min)} dk` + (v.km !== "" && v.km > 0 ? ` • ${fmtNumTr(v.km)} km` : "");
 }
 
 function buildSets(kind, v) {
@@ -7229,7 +7230,7 @@ function libCatL(cat) { return t(cat); }
 // v48: kayıtlı targetInfo / set.target metnindeki " sn" / " dk" birimleri İngilizcede " sec" / " min" gösterilir (kayıt Türkçe)
 function targetL(s) {
   s = String(s == null ? "" : s);
-  return curLang() === "en" ? s.replace(/(\d) sn(?![\wÀ-ɏ])/g, "$1 sec").replace(/(\d) dk(?![\wÀ-ɏ])/g, "$1 min") : s;
+  return curLang() === "en" ? s.replace(/(\d+),(\d+)(?= (?:sn|dk|km)(?![\wÀ-ɏ]))/g, "$1.$2").replace(/(\d) sn(?![\wÀ-ɏ])/g, "$1 sec").replace(/(\d) dk(?![\wÀ-ɏ])/g, "$1 min") : s;
 }
 const LIB_CAT_MUSCLE = [0, 1, 1, 2, 3, 4, 5, 6, 7, 8, null]; // EXERCISE_LIBRARY kategori sırası → kas grubu
 
@@ -8691,7 +8692,7 @@ function gymLibraryHtml() {
     const tg = c === 0 ? t("yok|yük") : c < 10 ? t("az|yük") : c <= 20 ? t("ideal|yük") : t("yüksek|yük");
     const col = c === 0 ? "#3A3A40" : c < 10 ? "#3E8F88" : c <= 20 ? "#14D9C6" : "#00FFE5";
     return `<button onclick="selectMuscle(${esc(JSON.stringify(m))})" class="w-full min-h-[44px] flex items-center gap-2.5 text-left">
-      <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} truncate">${esc(muscleL(m))}</span>
+      <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} ${curLang() === "en" ? "line-clamp-2 leading-tight" : "truncate"}">${esc(muscleL(m))}</span>
       <span class="relative flex-1 h-2.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / 24 * 100)}%;background:${col}"></span></span>
       <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b> <span class="t-dim text-[12px]">${tg}</span></span>
     </button>`;
@@ -8755,9 +8756,9 @@ function gymHistoryHtml() {
     </div>`).join("");
   return `
     <div class="grid grid-cols-3 gap-2">
-      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Bu hafta")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg"> ${t("antr.")}</span></div></div>
+      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Bu hafta")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg"> ${tn(weekLogs.length, "antr.")}</span></div></div>
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(weekLogs.reduce((a, l) => a + num(l.volume), 0) / 1000)}<span class="t-dim text-lg"> ${t("t|ton")}</span></div></div>
-      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Toplam")}</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> ${t("antr.")}</span></div></div>
+      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Toplam")}</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> ${tn(state.workoutLogs.length, "antr.")}</span></div></div>
     </div>
     <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">${t("Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.")}</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">${t("Bugünün antrenmanına git")}</button></div>`}</div>
     <button onclick="switchTab('progress')" class="t-btn-ghost w-full min-h-11 px-4 py-2 rounded-xl text-sm">${t("Grafikler ve rekorlar: İlerleme sekmesi")}</button>`;
@@ -10996,7 +10997,7 @@ Object.assign(EN, {
   "{n}. set nasıl geçti? <span class=\"t-dim\">(isteğe bağlı)</span>": "How did set {n} go? <span class=\"t-dim\">(optional)</span>",
   "{n}. set zorluğu": "Set {n} effort",
   "Seti tamamla": "Complete set",
-  "{n}. BÖLÜM": "PART {n}", "KARDİYO": "CARDIO",
+  "{n}. BÖLÜM": "SEGMENT {n}", "KARDİYO": "CARDIO",
   "Süre (dk)": "Time (min)", "Mesafe (km)": "Distance (km)", "Başlat": "Start",
   "{n}. set kilo": "Set {n} weight", "{n}. set tekrar": "Set {n} reps",
   "SET": "SET", "ÖNCEKİ": "PREVIOUS", "KG": "KG", "TEKRAR": "REPS", "SÜRE": "TIME",
@@ -11005,7 +11006,7 @@ Object.assign(EN, {
   "Hareket seçenekleri": "Exercise options",
   "Geçen sefer ({date}):": "Last time ({date}):",
   "Not ekle (koltuk ayarı, tutuş...)": "Add a note (seat setting, grip...)",
-  "+ Bölüm ekle": "+ Add part", "+ Set ekle": "+ Add set",
+  "+ Bölüm ekle": "+ Add segment", "+ Set ekle": "+ Add set",
   "Antrenman özetine dön": "Back to workout summary",
   "{d}/{n} set": { one: "{d}/{n} set", other: "{d}/{n} sets" },
   "Bitir": "Finish",
@@ -11017,8 +11018,8 @@ Object.assign(EN, {
   "Tahmini 1RM ~{best} kg · Tonaj {vol} kg": "Estimated 1RM ~{best} kg · Volume {vol} kg",
   "{step} kg arayla": "every {step} kg",
   "{step} kg arayla (+{add} ek plaka)": "every {step} kg (+{add} kg extra plate)",
-  "{n} kademe": { one: "{n} weight", other: "{n} weights" },
-  "{n} kademe (+{add} ek)": { one: "{n} weight (+{add} kg extra)", other: "{n} weights (+{add} kg extra)" },
+  "{n} kademe": { one: "{n} weight option", other: "{n} weight options" },
+  "{n} kademe (+{add} ek)": { one: "{n} weight option (+{add} kg extra)", other: "{n} weight options (+{add} kg extra)" },
   "Bu dambılların kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>": "Do your dumbbells go up in <b class=\"text-[var(--t-text)]\">{step} kg</b> increments? <span class=\"t-dim\">({around} …)</span>",
   "Bu makinenin kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>": "Do the weights on this machine go up in <b class=\"text-[var(--t-text)]\">{step} kg</b> increments? <span class=\"t-dim\">({around} …)</span>",
   "Evet, kaydet": "Yes, save",
@@ -11039,10 +11040,10 @@ Object.assign(EN, {
   "{name} hareketini {day} gününe ekle": "Add {name} to {day}",
   "henüz çalışılmadı": "not worked yet", "az|yük": "low", "ideal aralıkta": "in the ideal range", "yüksek hacim": "high volume",
   "Bugünkü set sayısına göre": "Based on today's sets",
-  "Programının bir haftada verdiği set sayısı": "Sets your program gives in a week",
+  "Programının bir haftada verdiği set sayısı": "Weekly sets from your program",
   "Bu haftaki set sayısına göre": "Based on this week's sets",
   "yok|yük": "none", "ideal|yük": "ideal", "yüksek|yük": "high",
-  "KAS YÜKÜ": "MUSCLE MAP", "Bu hafta": "This week",
+  "KAS YÜKÜ": "MUSCLE LOAD", "Bu hafta": "This week",
   "Önden ve arkadan kas anatomisi": "Muscle anatomy, front and back",
   "Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç": "Muscle groups are coloured by number of sets; tap a coloured muscle to select it",
   "ÖN": "FRONT", "ARKA": "BACK", "20+ set": "20+ sets",
@@ -11052,16 +11053,16 @@ Object.assign(EN, {
   "BU HAFTA · KAS BAŞINA SET": "WEEKLY SETS PER MUSCLE",
   "Pazartesiden bu yana kaydedilen setler. Kas gelişimi için genel öneri haftada 10–20 set.": "Sets logged since Monday. A common guideline for muscle growth is 10–20 sets per week.",
   "Bugün <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "Today <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", other: "Today <b class=\"text-[var(--t-text)]\">{n} sets</b> · {tag}" },
-  "Programında haftada <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "Weekly in your program <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", other: "Weekly in your program <b class=\"text-[var(--t-text)]\">{n} sets</b> · {tag}" },
+  "Programında haftada <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "<b class=\"text-[var(--t-text)]\">{n} set</b> a week in your program · {tag}", other: "<b class=\"text-[var(--t-text)]\">{n} sets</b> a week in your program · {tag}" },
   "Bu hafta <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "This week <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", other: "This week <b class=\"text-[var(--t-text)]\">{n} sets</b> · {tag}" },
   "programında yok": "not in your program", "Temizle": "Clear",
   "Hareket ara": "Search exercises", "135+ hareket içinde ara": "Search 135+ exercises",
   // --- Geçmiş
   "{n} dk kardiyo": "{n} min cardio", "{n} rekor": { one: "{n} PR", other: "{n} PRs" },
-  "Kaydı sil": "Delete entry", "antr.": "workouts", "Toplam": "Total",
+  "Kaydı sil": "Delete entry", "antr.": { one: "workout", other: "workouts" }, "Toplam": "Total",
   "Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.": "No workouts saved yet. When you finish and save a workout, it appears here.",
   "Bugünün antrenmanına git": "Go to today's workout",
-  "Grafikler ve rekorlar: İlerleme sekmesi": "Charts and records: Progress tab",
+  "Grafikler ve rekorlar: İlerleme sekmesi": "Charts and PRs: Progress tab",
   // --- hareket menüsü
   "{w} kg: her tarafa {list}": "{w} kg: {list} on each side",
   "Isınma setleri ve plaka dağılımı": "Warm-up sets and plate breakdown",
@@ -11074,7 +11075,7 @@ Object.assign(EN, {
   "Set, tekrar, ekipman, kademeler, kas grubu": "Sets, reps, equipment, weight increments, muscle group",
   "Set, süre, dinlenme": "Sets, time, rest",
   "Yukarı taşı": "Move up", "Aşağı taşı": "Move down",
-  "Son bölümü sil": "Delete last part", "Son seti sil": "Delete last set",
+  "Son bölümü sil": "Delete last segment", "Son seti sil": "Delete last set",
   "Hareketi kaldır": "Remove exercise", "6 saniye içinde geri alınabilir": "Can be undone within 6 seconds",
   // --- ısınma kartı (Antrenman → Bugün)
   "Isınma kartını gizle": "Hide warm-up card", "Isınma yapıldı": "Warm-up done",
@@ -11175,7 +11176,7 @@ Object.assign(EN, {
   "Ağırlık": "Weights",
   "Set sayısı": "Number of sets",
   "Hedef tekrar": "Target reps",
-  "Başlangıç kg": "Starting weight (kg)",
+  "Başlangıç kg": "Start weight",
   "Süre (saniye)": "Time (seconds)",
   "Kas grubu": "Muscle group",
   "Ekipman": "Equipment",
@@ -11184,10 +11185,10 @@ Object.assign(EN, {
   "En düşük kademe (kg)": "Lowest weight (kg)",
   "Artış aralığı (kg)": "Step size (kg)",
   "Kademeler (noktalı virgül veya boşlukla ayır)": "Weights (separate with semicolons or spaces)",
-  "Ek ara plaka (kg, varsa)": "Extra small plate (kg, if any)",
+  "Ek ara plaka (kg, varsa)": "Add-on plate (kg, if any)",
   "Kilo artırma önerisi sadece bu kademelerden birini söyler. Boş bırakırsan geçmişte girdiğin kilolardan tahmin etmeye çalışırım.": "Progression suggestions will only use one of these weights. If you leave this empty, I will estimate them from the weights you have logged before.",
   "Setler arası dinlenme (saniye)": "Rest between sets (seconds)",
-  "Bir seti tamamladığında alttaki sayaç bu süreyle otomatik başlar.": "When you complete a set, the timer at the bottom starts automatically with this time.",
+  "Bir seti tamamladığında alttaki sayaç bu süreyle otomatik başlar.": "When you complete a set, the rest timer at the bottom starts automatically with this time.",
   "Tipi değiştirirsen bu hareketin setleri yeni değerlerle baştan oluşturulur.": "If you change the type, this exercise's sets are rebuilt from scratch with the new values.",
   "örn: 5": "e.g. 5",
   "örn: 7,5": "e.g. 7.5",

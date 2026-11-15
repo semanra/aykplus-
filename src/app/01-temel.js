@@ -49,6 +49,7 @@ function num(v, d = 0) {
 }
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 function round1(n) { return Math.round(n * 10) / 10; }
+function fmtNumTr(n) { return String(round1(n)).replace(".", ","); } // kayıtlı metinler her dilde Türkçe biçim
 function fmtNum(n) { const s = String(round1(n)); return curLang() === "en" ? s : s.replace(".", ","); }
 function round2(n) { return Math.round(n * 100) / 100; }
 function fmtKg(n) { const s = String(round2(n)); return curLang() === "en" ? s : s.replace(".", ","); }
