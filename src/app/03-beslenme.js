@@ -9,13 +9,23 @@ function getTargets() {
   const bmr = bf
     ? 370 + 21.6 * state.weight * (1 - bf / 100)
     : (10 * state.weight) + (6.25 * num(st.height, 180)) - (5 * num(st.age, 26)) + (female ? -161 : 5);
-  const mult = state.dayType === "train" ? 1.55 : 1.43;
+  const act = ACTIVITY_MULT[st.activity] || ACTIVITY_MULT.mid;
+  const mult = state.dayType === "train" ? act[0] : act[1];
   const tdee = Math.round(bmr * mult);
-  const calTarget = Math.max(female ? 1400 : 1750, tdee + Math.round(num(st.calAdjust, 0)) - state.deficit);
-  const proTarget = Math.round((num(st.targetWeight, 82) * 2.0) + (state.weight * 0.35));
-  const fatTarget = Math.max(female ? 45 : 55, Math.round(state.weight * 0.72));
+  const goal = ["lose", "keep", "gain"].includes(st.goal) ? st.goal : "lose";
+  const goalDelta = goal === "lose" ? -state.deficit : goal === "gain" ? Math.round(tdee * (GAIN_PACE[st.gainPace] || GAIN_PACE.mid)) : 0;
+  const calTarget = Math.max(female ? 1400 : 1750, tdee + Math.round(num(st.calAdjust, 0)) + goalDelta);
+  // v43: kanıta dayalı protein. ref = hedef kilo (≥ 30 ise, kilodan büyük olamaz), yoksa kilo
+  const tw = num(st.targetWeight, 0);
+  const ref = tw >= 30 ? Math.min(state.weight, tw) : state.weight;
+  const perKg = goal === "lose" ? (bf ? null : 2.2) : goal === "keep" ? 1.6 : 1.8;
+  const base = perKg === null ? state.weight * (1 - bf / 100) * 2.5 : ref * perKg;
+  let pro = Math.min(base, state.weight * 2.2);
+  if (st.proteinHigh) pro = Math.max(pro, state.weight * 2.0);
+  const proTarget = Math.round(pro);
+  const fatTarget = Math.round(calTarget * 0.25 / 9);
   const carbTarget = Math.max(60, Math.round((calTarget - (proTarget * 4) - (fatTarget * 9)) / 4));
-  return { calTarget, proTarget, carbTarget, fatTarget, tdee };
+  return { calTarget, proTarget, carbTarget, fatTarget, tdee, goal, goalDelta };
 }
 
 function validBf(v) {

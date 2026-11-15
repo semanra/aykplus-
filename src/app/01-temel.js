@@ -2,12 +2,17 @@
 // AYK+ — UYGULAMA MANTIĞI (sürüm: src/markup.html Ayarlar etiketi ve sw.js CACHE)
 // ============================================================================
 
+// v43: hareketlilik çarpanı [antrenman günü, dinlenme günü] ve kilo alma hızı (TDEE'nin oranı)
+const ACTIVITY_MULT = { low: [1.45, 1.30], mid: [1.55, 1.43], high: [1.70, 1.58] };
+const GAIN_PACE = { slow: 0.10, mid: 0.15, fast: 0.20 };
+
 const DEFAULT_SETTINGS = {
   sex: "male", height: 180, age: 26, targetWeight: 82,
   waterTarget: 3.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
   macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
   nutriLight: false, scaleOn: false, scaleBase: 0,
+  goal: "lose", gainPace: "mid", activity: "mid", proteinHigh: false,   // v43: hedef Ver/Koru/Al, hız, hareketlilik, yüksek protein
   theme: "system"   // v31: system | dark | light (nutriLight eski alan, artık kullanılmıyor ama silinmez)
 };
 const DEFAULT_SUPPS = [
@@ -212,7 +217,7 @@ function normMobItem(x) {
 // çalışmaz. normalizeState yalnızca doğrulama/temizlik yapar. Yeni bir biçim değişikliği = yeni adım + DATA_VER + 1.
 // (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
 // ---------------------------------------------------------------------------
-const DATA_VER = 2;
+const DATA_VER = 3;
 function migrateState(s) {
   const v = Number.isInteger(s.dataVer) && s.dataVer >= 0 ? s.dataVer : 0;
   if (v < 1) {   // v27 + v39: mobilitenin eski listeleri (dynamic/static, sonra tek items) → rutinler; eski diziler yedek olarak kalır
@@ -226,6 +231,7 @@ function migrateState(s) {
     if (!s.settings.macroViewV26) s.settings.macroView = "eaten";
     delete s.settings.macroViewV26;
   }
+  if (v < 3 && s.settings.goal === DEFAULT_SETTINGS.goal) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43: hedef Ver/Koru/Al (açık 0 = eskiden "kilo koruma"; ayarda açıkça başka hedef varsa ona dokunulmaz)
   s.dataVer = Math.max(v, DATA_VER);
 }
 
@@ -371,6 +377,10 @@ function normalizeState(raw) {
   if (s.settings.macroView !== "plan") s.settings.macroView = "eaten";
   { const h = parseInt(s.settings.dayStartHour, 10); s.settings.dayStartHour = h >= 0 && h <= 5 ? h : 0; }   // v21
   s.settings.waterAuto = s.settings.waterAuto !== false;   // v24: su hedefi kiloya göre (varsayılan açık)
+  if (!["lose", "keep", "gain"].includes(s.settings.goal)) s.settings.goal = num(s.deficit, 0) > 0 ? "lose" : "keep";   // v43
+  if (!["slow", "mid", "fast"].includes(s.settings.gainPace)) s.settings.gainPace = "mid";
+  if (!["low", "mid", "high"].includes(s.settings.activity)) s.settings.activity = "mid";
+  s.settings.proteinHigh = s.settings.proteinHigh === true;
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
   s.settings.scaleOn = !!s.settings.scaleOn;
