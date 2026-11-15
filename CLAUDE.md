@@ -24,7 +24,7 @@ src/app/            ← Uygulama mantığı, bölümlere ayrılmış (v34). Derl
                       00-depolama (v41: IndexedDB, ayna, iç yedekler) · 01-temel (yardımcılar, durum) · 02-arayuz (bildirim, pencere, ses, sayaç, gün dönümü, sekmeler, tema)
                       03-beslenme · 04-besinler-barkod · 05-secici-hareket · 06-mobilite · 07-grafik-ilerleme
                       08-profil-yedek · 09-kas-plaka-koc-takviye · 10-antrenman-arayuzu · 11-mutfak-akilli
-                      12-besin-veritabani · 13-cizim-baslat (renderAll + başlat) · 14-ornek-icerik · 15-kurulum · 16-dil · 17-sozluk-en · 18-en-ortak · 19-en-beslenme · 20-en-profil
+                      12-besin-veritabani · 13-cizim-baslat (renderAll + başlat) · 14-ornek-icerik · 15-kurulum · 16-dil · 17-sozluk-en · 18-en-ortak · 19-en-beslenme · 20-en-profil · 21-en-antrenman
                       (NOT: t()/applyStaticI18n üst düzey değerlendirme sırasında ÇALIŞMAZ; açılış async, EN sabiti sonradan tanımlı)
 src/data.js         ← Uygulamanın kendi besin listesi (BASE_FOOD_DB), hareket ve mobilite kütüphaneleri, varsayılan durum
 foods.js            ← v18 USDA besin veritabanı (~1.800 besin + 124 Türk yemeği tarifi). ÜRETİLİR, elle düzenleme (scripts/usda/)
@@ -40,14 +40,14 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 38 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 39 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 pip install pillow   # ilk seferde (kontrol aracı için)
-npm run kontrol      # son commit ile karşılaştırma: 53 ekran × 2 tema piksel farkı + okunurluk/44 px/taşma + hız; v47: ayrıca 14 İngilizce ekran yalnız ölçülür, piksel karşılaştırması yok (`-- --hizli` hızsız)
+npm run kontrol      # son commit ile karşılaştırma: 53 ekran × 2 tema piksel farkı + okunurluk/44 px/taşma + hız; v47–v48: ayrıca 21 İngilizce ekran yalnız ölçülür, piksel karşılaştırması yok (`-- --hizli` hızsız)
 ```
 
 - Tailwind **CDN kullanılmaz**; sınıflar derleme sırasında üretilir. Bu yüzden sınıf adlarını JS içinde **tam ve sabit metin** olarak yaz (`"bg-" + renk` gibi dinamik birleştirme ÇALIŞMAZ). Rastgele değerler (`bg-[#141416]`, `text-[13px]`) kullanılabilir.
 - Testler `tests/shots/` klasörüne ekran görüntüsü kaydeder (git'e girmez). Görsel değişikliklerde bu görüntülere bakıp kontrol et.
-- **Kontrol araçları (v35, `scripts/kontrol/`):** `kontrol.py` (= `npm run kontrol`; 53 ekran + v47: 14 İngilizce ölçüm ekranı `EN_SCREENS` (Beslenme 4 alt ekran + pencereleri, Profil üst/orta/alt; `en-*` adlı, `tests/shots/v47_en_*.png` olarak da kaydedilir), Profil kendi içinde kaydığı için orta/alt ayrıca çekilir; rapor `build/kontrol/RAPOR.md`, fark görselleri `build/kontrol/fark/`; ekran listesi ve ölçüm betiği `ortak.py` içinde, yeni ekran eklenince oraya da ekle), `bozuk_veri.py [N] [tohum]` (kaydın rastgele alanlarını bozar; açılışta kurtarma kopyasına düşme ve sayfa hatası sayar, hedef 0), `html_enjeksiyon.py` (20 kullanıcı alanına HTML/JS parçası yazıp 34 ekranı açar). Veri yapısı veya normalizeState değişince `bozuk_veri.py` ve `html_enjeksiyon.py`'yi de çalıştır.
+- **Kontrol araçları (v35, `scripts/kontrol/`):** `kontrol.py` (= `npm run kontrol`; 53 ekran + v47–v48: 21 İngilizce ölçüm ekranı `EN_SCREENS` (Beslenme 4 alt ekran + pencereleri, Profil üst/orta/alt; v48: Antrenman 7 ekran `en-g-*`; `en-*` adlı, `tests/shots/v47_en_*.png` / `v48_en_g_*.png` olarak da kaydedilir), Profil kendi içinde kaydığı için orta/alt ayrıca çekilir; rapor `build/kontrol/RAPOR.md`, fark görselleri `build/kontrol/fark/`; ekran listesi ve ölçüm betiği `ortak.py` içinde, yeni ekran eklenince oraya da ekle), `bozuk_veri.py [N] [tohum]` (kaydın rastgele alanlarını bozar; açılışta kurtarma kopyasına düşme ve sayfa hatası sayar, hedef 0), `html_enjeksiyon.py` (20 kullanıcı alanına HTML/JS parçası yazıp 34 ekranı açar). Veri yapısı veya normalizeState değişince `bozuk_veri.py` ve `html_enjeksiyon.py`'yi de çalıştır.
 - Testler açılış animasyonunu (splash) bir başlangıç betiğiyle atlar. **v44:** yeni testler `from ortak_tohum import TEST_INIT` kullanır (`add_init_script(TEST_INIT)`): splash'i kaldırır ve `window.AYK_TEST_SEED` ile sahibin eski varsayılan kaydını (`tests/fixtures/eski_varsayilan.json`) tohum yapar, böylece kurulum ekranı çıkmaz; kısmi tohum `with_defaults(seed)` ile tamamlanır. Gerçek yeni kurulum yolunu denemek için tohumsuz `SEED_ONLY`/boş başlatılır (`localStorage.clear()` + `indexedDB.deleteDatabase('aykplus')`). `kontrol` aracı kurulum 1–7 ve boş başlangıç ekranlarını tohumsuz çeker (`ONBOARD_SCREENS`, `FRESH_SCREENS`).
 
 ## 4. Sürüm çıkarma kontrol listesi (her değişiklikte)
@@ -199,6 +199,8 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 **v46 (15 Kasım 2026):** dil altyapısı (İngilizce henüz herkese kapalı, yalnızca test bayrağıyla): `t()`/`tn()`, sözlük dosyası, dile göre sayı/tarih/harf biçimi, statik metin çevirisi (`data-t`), Profil/kurulumda gizli dil seçici, kayıtlı tarihler hep Türkçe, `DATA_VER` 5. Sözlük içeriği (gerçek İngilizce çeviri) sonraki sürümlerde. Sahibin kaydı etkilenmez. Test: `tests/test_v46_dil.py`.
 
 **v47 (15 Kasım 2026):** Beslenme, Profil (Hakkında hariç) ve ortak metinlerin İngilizcesi (herkese hâlâ kapalı, yalnızca test bayrağı): üç yeni sözlük dosyası, terim sözlüğüne uygun, Türkçe ekranlar piksel piksel aynı (yalnız sürüm etiketi), İngilizce ekranlar kontrol aracında ölçülür, statik bekçi testi, `applyStaticI18n` önbelleği. Küçük düzeltmeler: `.n-tab` ve `.modal-x` İngilizce kısa/uzun başlıkta 44 px altına daralmaz. Sahibin kaydı etkilenmez.
+
+**v48 (16 Kasım 2026):** Antrenman İngilizcesi (herkese hâlâ kapalı, yalnızca test bayrağı); Mobilite, İlerleme (koç dahil) ve kurulum/örnek içerik sonraki sürüm, paylaşım kartı + hareket rehberleri + besin adları v49. Sözlük `src/app/21-en-antrenman.js`; gösterim yardımcıları `muscleL` / `kindL` / `effortL` / `equipL` / `libCatL` / `targetL` (kas adı, tür, set zorluğu, ekipman, kütüphane kategorisi, hedef metni). Kayıtlı kurallar (docs/i18n-kayitli-metinler.md): kas adı (`ex.muscle`, `state.libMuscle`), `KIND_LABEL` değerleri, `exKey`, kütüphane kategori sırası kayıtta Türkçe kalır, yalnız gösterimde çevrilir; `targetInfo`/`set.target` metnindeki "sn" / "dk" kayıtta Türkçe yazılır (`parseRepRange`, "+ set" `/^\d+x/` bozulmasın), ekranda `targetL` ile "sec" / "min". Statik bekçi: 05 ve 10 tam, 09 ve 06 kısmen kapsamda. Test: `tests/test_v48_antrenman.py` (port 8806).
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 

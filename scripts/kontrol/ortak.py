@@ -129,6 +129,14 @@ EN_SCREENS = [
   ("en-profil", "uiDialogDone(false); openProfile()"),
   ("en-profil-orta", PF_SCROLL % 0.45),
   ("en-profil-alt", PF_SCROLL % 1),
+  # v48: Antrenman (yalnız ölçüm)
+  ("en-g-bugun", "void closeProfile(); document.getElementById('toastWrap').innerHTML=''; switchTab('gym'); setGymView('today')"),
+  ("en-g-aktif", "startWorkout(); toggleSetDone(0, 0)"),
+  ("en-g-program", "state.gymActive = false; stopTimer(); setGymView('program')"),
+  ("en-g-hareketler", "setGymView('library'); selectMuscle('Arka Bacak & Kalça')"),
+  ("en-g-gecmis", "selectMuscle(null); setGymView('history')"),
+  ("en-g-hareket", "setGymView('today'); openEditExercise(0); const q = document.getElementById('exEquip'); q.value = 'stack'; q.dispatchEvent(new Event('change', { bubbles: true }))"),
+  ("en-g-plaka", "closeModal('exerciseModal'); openPlateTool(0)"),
 ]
 EN_ROOT = {"en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage"}
 # v44: kurulum ekranları. TEST_INIT OLMADAN, temiz depoda açılır (gerçek yeni kurulum yolu). Sırayla; her adım öncekinin üstüne.

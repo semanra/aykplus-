@@ -192,7 +192,7 @@ function exitActiveWorkout() { state.gymActive = false; window.scrollTo(0, 0); r
 
 function gymSubNav() {
   return `<nav class="gym-subnav flex gap-5 border-b border-[var(--t-line)] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="${t("Antrenman bölümleri")}">
-    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${t(l)}</button>`).join("")}
+    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 min-w-[44px] text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${t(l)}</button>`).join("")}
   </nav>`;
 }
 
@@ -756,7 +756,7 @@ function endMealDrag() {
     const [x] = list.splice(from, 1);
     list.splice(to, 0, x);
     renderAll();
-    toast("Hareket taşındı");
+    toast(t("Hareket taşındı"));
     return;
   }
   if (kind === "ex") {
@@ -765,7 +765,7 @@ function endMealDrag() {
     const [x] = day.exercises.splice(from, 1);
     day.exercises.splice(to, 0, x);
     renderAll();
-    toast("Hareket taşındı");
+    toast(t("Hareket taşındı"));
     return;
   }
   const meals = curMeals();

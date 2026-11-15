@@ -552,13 +552,18 @@ try:
         "Katch-McArdle": "METHOD_SOURCES v49", "Iraki ve ark.": "METHOD_SOURCES v49", "AMDR": "METHOD_SOURCES v49", "<p>": "renderAbout gövdesi (Hakkında) v49", "<ul": "renderAbout v49",
         "Yağ": "pfTargetsBox etiketleri ['Kalori','Protein','Karb','Yağ'], gösterimde t(l)",
         "Gece yedeği": "SNAP_KIND_LABEL, gösterimde t(..)", "Haftalık yedek": "SNAP_KIND_LABEL", "Geçiş öncesi": "SNAP_KIND_LABEL", "İçe alma öncesi": "SNAP_KIND_LABEL", "Değişiklik öncesi": "SNAP_KIND_LABEL"},
+      "05-secici-hareket.js": {"${}. GÜN: ": "yeni gün varsayılan adı: kayıtlı metin (Türkçe dal; İngilizce dal 'DAY n: '), kayıtlı-metinler"},
+      "10-antrenman-arayuzu.js": {
+        "Plakalı": "EQUIP_LABEL / EQUIP_SHORT: kayıt değil ama gösterimde equipL t(..) ile çevrilir (sabit tablo)",
+        "Ağırlık yığını": "EQUIP_LABEL: equipL t(..)", "Dambıl": "EQUIP_LABEL / EQUIP_SHORT: equipL t(..)", "Vücut ağırlığı": "EQUIP_LABEL: equipL t(..)", "Vücut ağ.": "EQUIP_SHORT: equipL t(..)",
+        "Bugün": "GYM_VIEWS etiketleri, gösterimde t(l)", "Programım": "GYM_VIEWS", "Geçmiş": "GYM_VIEWS",
+        "Göğüs": "BODY_POLYS anahtarı = MUSCLES kas adı (kayıt anahtarı; gösterimde muscleL)", "Karın": "BODY_POLYS anahtarı", "Ön Bacak": "BODY_POLYS anahtarı", "Sırt": "BODY_POLYS anahtarı", "Arka Bacak & Kalça": "BODY_POLYS anahtarı"},
       "11-mutfak-akilli.js": {"Diğer": "besin kategorisi yedeği (veri, v49)"},
       "12-besin-veritabani.js": {}, "13-cizim-baslat.js": {}}
     # kısmen kapsamdaki dosyalar: yalnız bu işlevlerin gövdeleri taranır (kalanı v48: Antrenman/Mobilite/İlerleme)
     KISMI = {
-      "05-secici-hareket.js": ["openPicker", "pickerChoose", "pickerExtra"],
-      "09-kas-plaka-koc-takviye.js": ["renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose", "deleteMeal", "copyMeal", "otherMeals"],
-      "10-antrenman-arayuzu.js": ["openMealModal", "saveMealModal", "editCustomFood", "deleteCustomFood"]}
+      "06-mobilite.js": ["warmupCardHtml"],
+      "09-kas-plaka-koc-takviye.js": ["muscleL", "libCatL", "targetL", "overloadSuggestion", "deloadInfo", "deloadHtml", "dismissDeload", "suggestionHtml", "applySuggestion", "dismissSuggestion", "weeklyMuscleSets", "plateChips", "warmupSets", "openPlateTool", "renderLevelTool", "renderPlateTool", "offerUndo", "doUndo", "nextDayIdx", "fmtMinutes", "fmtDuration", "renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose", "deleteMeal", "copyMeal", "otherMeals"]}
     bad = []; used = {}
     for f, tbl in IZIN.items():
         for (ln, txt, wr, raw) in tarama(rd(f)):
@@ -585,7 +590,7 @@ try:
       "restPillLabel": "JS yazar (timerLabelText)", "cfTitle": "JS yazar (openCustomFood/editCustomFood)", "pickerTitle": "JS yazar (openPicker)", "pickerExtraBtn": "JS yazar (openPicker)",
       "mealModalTitle": "JS yazar (openMealModal)", "pfPhotoBtnText": "JS yazar (refreshProfilePhoto)", "lastBackupText": "JS yazar (renderProfile)", "uiDlgCancel": "JS yazar (uiDialog)",
       "pfLang": "dil adı kendi dilinde kalır ('Türkçe' / 'English')", "pfAvatar": "alt metni: görsel yalnızca süs",
-      "mobTimer": "Mobilite (v48)", "exerciseModal": "Antrenman hareket penceresi (v48)", "chartModal": "İlerleme grafik penceresi (v48; başlığı JS yazar)",
+      "mobTimer": "Mobilite (v48)", "exMuscle": "kas seçenekleri: değer = kayıtlı Türkçe kas adı; metni JS her açılışta muscleL ile yazar (openExerciseModal)", "chartModal": "İlerleme grafik penceresi (v48; başlığı JS yazar)",
       "onboard": "ilk kurulum ekranları (ayrı sürüm)"}
     mk = open(os.path.join(REPO, "src", "markup.html"), encoding="utf-8").read(); mk = mk[mk.index("<body"):]
     mhit = markup_tarama(mk)
@@ -599,8 +604,9 @@ try:
     def collect(src):
         for mm in re.finditer(r"(?<![.\w])t\(\s*" + lit, src): keys.add(mm.group(1))
         for mm in re.finditer(r"(?<![.\w])tn\(\s*[^,]+,\s*" + lit, src): keys.add(mm.group(1)); tnkeys.add(mm.group(1))
-    for f in list(IZIN) + ["05-secici-hareket.js", "09-kas-plaka-koc-takviye.js"]: collect(rd(f))
-    for fn in KISMI["10-antrenman-arayuzu.js"]: collect(islev_govdesi(rd("10-antrenman-arayuzu.js"), fn))
+    for f in list(IZIN) + ["09-kas-plaka-koc-takviye.js"]: collect(rd(f))
+    for f, fns in KISMI.items():
+        for fn in fns: collect(islev_govdesi(rd(f), fn))
     for mm in re.finditer(r'data-t(?:-aria|-ph)?="([^"]*)"', mk): keys.add(mm.group(1))
     def unesc2(k):
         try: return _json.loads('"' + k + '"')

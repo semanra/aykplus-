@@ -1,3 +1,4 @@
+# v48 bölüm 1-4 (4: İngilizce Antrenman ekranlarında Türkçe artık yok, dar düğmeler sığar)
 # v48 bölüm 1-3 (3: hareket penceresi, plaka/kademe aracı, öneriler, program işlemleri, bitiş bildirimi): Antrenman terimleri, Antrenman ekranları, gösterim yardımcıları, kayıtlı metin kuralları (kas adı, targetInfo, gün adı).
 import os, sys, re, subprocess, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -385,6 +386,39 @@ try:
     setlang('tr')
     ok = pg.evaluate("(() => { if (!mobWarmupItems(activeDay()).length) return 'yok'; mobWarmupStart(); const ti = mobT && mobT.ses ? mobT.ses.title : null; mobTimerClose(); return ti; })()")
     check(ok in ("Isınma", "yok"), "tr: ısınma oturumu başlığı: %s" % ok)
+    # --- 4. İngilizce Antrenman ekranlarında kullanıcı verisi dışında Türkçe harfli metin yok; dar yerler 44 px ve taşmaz
+    setlang('en')
+    SCAN = """(root) => {
+      const userTxt = new Set(); const add = v => { if (typeof v === 'string' && v) userTxt.add(v); };
+      state.workoutDays.forEach(d => { add(d.name); (d.exercises || []).forEach(e => { add(e.name); add(e.note); add(e.muscle); }); });
+      Object.values(EXERCISE_LIBRARY).forEach(l => l.forEach(e => add(e.name || e)));
+      (state.workoutLogs || []).forEach(l => { add(l.dayName); add(l.summary); });
+      const out = []; const w = document.createTreeWalker(document.querySelector(root) || document.body, NodeFilter.SHOW_TEXT);
+      while (w.nextNode()) { const n = w.currentNode; const tx = n.textContent.trim(); if (!tx || !/[çğıöşüÇĞİÖŞÜ]/.test(tx)) continue;
+        const el = n.parentElement; if (!el || !el.checkVisibility || !el.checkVisibility()) continue;
+        if ([...userTxt].some(u => tx.indexOf(u) >= 0 || u.indexOf(tx) >= 0)) continue;
+        out.push(tx.slice(0, 50)); }
+      return out; }"""
+    BAR = """() => { const bad = []; document.querySelectorAll('#gymRoot button, #exerciseModal button, #exerciseModal select, #exerciseModal input, #chartModal button').forEach(e => {
+      if (!e.checkVisibility || !e.checkVisibility()) return; const r = e.getBoundingClientRect(); if (r.width === 0) return;
+      if (r.height < 43.5 && e.tagName === 'BUTTON' && r.width > 24) bad.push('h' + Math.round(r.height) + ':' + (e.textContent || '').trim().slice(0, 20));
+      if (e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible' && e.tagName === 'BUTTON') bad.push('w:' + (e.textContent || '').trim().slice(0, 20)); });
+      return bad.concat(document.documentElement.scrollWidth > innerWidth + 1 ? ['page-x'] : []); }"""
+    scr = [("bugun", "state.activeTab = 'gym'; state.gymActive = false; setGymView('today')", "#gymRoot"),
+           ("aktif", "startWorkout(); toggleSetDone(0, 0)", "#gymRoot"),
+           ("program", "state.gymActive = false; setGymView('program')", "#gymRoot"),
+           ("hareketler", "setGymView('library'); selectMuscle('Göğüs')", "#gymRoot"),
+           ("gecmis", "selectMuscle(null); setGymView('history')", "#gymRoot"),
+           ("hareket", "setGymView('today'); openEditExercise(0); const q = $('exEquip'); q.value = 'stack'; q.dispatchEvent(new Event('change', { bubbles: true }))", "#exerciseModal"),
+           ("plaka", "closeModal('exerciseModal'); openPlateTool(0)", "#chartModal")]
+    for nm, js, root in scr:
+        pg.evaluate("() => { " + js + " }"); pg.wait_for_timeout(150)
+        left = pg.evaluate(SCAN, root)
+        check(left == [], "en: %s ekranında kullanıcı verisi dışında Türkçe metin yok: %s" % (nm, left[:6]))
+        bar = pg.evaluate(BAR)
+        check(bar == [], "en: %s ekranında 44 px altı / taşan düğme yok: %s" % (nm, bar[:6]))
+    pg.evaluate("() => { closeModal('chartModal'); state.gymActive = false; }")
+    setlang('tr')
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

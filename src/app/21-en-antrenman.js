@@ -234,4 +234,5 @@ Object.assign(EN, {
   "örn: 7,5": "e.g. 7.5",
   "20; 27,5; 35; 40; 47,5": "20; 27.5; 35; 40; 47.5",
   "örn: 2,5 — yoksa boş bırak": "e.g. 2.5 — leave empty if none",
+  "Hareket taşındı": "Exercise moved",
 });
