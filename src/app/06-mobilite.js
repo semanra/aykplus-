@@ -438,7 +438,7 @@ function mobTimerStart(id) {
 // Seans
 function mobSesStart(rid) {
   const r = mobRoutine(rid);
-  if (!r || !r.items.length) { toast("Rutinde hareket yok"); return; }
+  if (!r || !r.items.length) { toast(t("Rutinde hareket yok")); return; }
   mobSesStartIds(r.name, r.items.map(i => i.id), r.id, r.name);
 }
 // v40: seans herhangi bir hareket listesiyle (ısınma: rid = null, hareketler kendi rutinlerinde tiklenir)
@@ -529,7 +529,7 @@ function mobTimerFinish() {
   const it = mobFindAny(id);   // kimlikle bütün rutinlerde (açık rutin değişmiş olabilir)
   if (it) it.done = true;
   renderAll();
-  toast(name + " tamamlandı");
+  toast(t("{ad} tamamlandı", { ad: name }));
 }
 function mobTimerClose() {
   if (mobT) clearInterval(mobT.iv);
@@ -581,7 +581,7 @@ function mobTimerVoice() {
   mobTimerRender();
   if (state.settings.mobVoice) mobSayItem(); else try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) {}
 }
-function mobBreathLabel() { return ((Date.now() - mobT.t0) % 10000) < 4000 ? "Nefes al" : "Nefes ver"; }
+function mobBreathLabel() { return ((Date.now() - mobT.t0) % 10000) < 4000 ? t("Nefes al") : t("Nefes ver"); }
 function mobTimerUpdate() {
   if (!mobT) return;
   const left = (mobT.endAt - Date.now()) / 1000;
@@ -589,7 +589,7 @@ function mobTimerUpdate() {
   const el = $("mobTTime"); if (el) el.textContent = mobFmt(left);
   const b = $("mobTBreath"); if (b && mobT.phase === "work") b.textContent = mobBreathLabel();
 }
-function mobRoundLabel(x) { return x.side ? mobSideL(x.side) + " " + x.set : "Set " + x.set; }
+function mobRoundLabel(x) { return x.side ? t("{taraf} {n}", { taraf: mobSideL(x.side), n: x.set }) : t("Set {n}", { n: x.set }); }
 function mobSesFinHtml() {
   const S = mobT.ses, w = mobWeekStats();
   const min = Math.max(1, Math.round((Date.now() - S.t0) / 60000));
@@ -597,17 +597,17 @@ function mobSesFinHtml() {
   const shown = rows.slice(0, 5), more = rows.length - shown.length;
   return `<div id="mobTFin" class="w-full max-w-lg flex flex-col items-center text-center pt-14 pb-4">
     <div class="w-[110px] h-[110px] rounded-full grid place-items-center border-[3px] border-[var(--t-acc-text)] bg-[rgba(var(--t-acc-rgb),0.15)] text-[var(--t-acc-text)]">${svgI("check", 50, 2.6)}</div>
-    <h3 class="t-display text-[36px] leading-[1.02] mt-5 uppercase break-words">${esc(S.title)} bitti</h3>
-    <p class="text-[15px] text-[var(--t-muted)] mt-1.5">Bu hafta ${w.count}. gün · ${w.streak} gün üst üste</p>
+    <h3 class="t-display text-[36px] leading-[1.02] mt-5 uppercase break-words">${t("{ad} bitti", { ad: esc(S.title) })}</h3>
+    <p class="text-[15px] text-[var(--t-muted)] mt-1.5">${tn(w.streak, "Bu hafta {c}. gün · {n} gün üst üste", { c: w.count })}</p>
     <div class="grid grid-cols-3 gap-2 w-full mt-5">
-      <div class="m-wk"><b class="t-display" data-fin="hareket">${S.doneIds.length}</b><span>hareket</span></div>
-      <div class="m-wk"><b class="t-display" data-fin="dakika">${min}</b><span>dakika</span></div>
-      <div class="m-wk"><b class="t-display" data-fin="atlandi">${S.skipped.length}</b><span>atlandı</span></div>
+      <div class="m-wk"><b class="t-display" data-fin="hareket">${S.doneIds.length}</b><span>${tn(S.doneIds.length, "hareket|seans")}</span></div>
+      <div class="m-wk"><b class="t-display" data-fin="dakika">${min}</b><span>${tn(min, "dakika")}</span></div>
+      <div class="m-wk"><b class="t-display" data-fin="atlandi">${S.skipped.length}</b><span>${t("atlandı")}</span></div>
     </div>
     <div class="w-full mt-4 bg-[var(--t-surface)] rounded-[18px] px-3.5 py-1 text-left">${shown.map(x =>
-      `<div class="flex justify-between gap-3 py-2.5 border-b border-[var(--t-line)] last:border-0 text-[14px] ${x.ok ? "text-[var(--t-text)]" : "text-[var(--t-muted)]"}"><span class="min-w-0 truncate">${esc(x.name)}</span><span class="shrink-0">${x.ok ? "Yapıldı" : x.sk ? "Atlandı" : "Yapılmadı"}</span></div>`).join("")}
-      ${more > 0 ? `<div class="py-2.5 text-[13.5px] text-[var(--t-muted)]">… ${more} hareket daha</div>` : ""}</div>
-    <button id="mobTFinOk" onclick="mobSesFinishClose()" class="m-btn pri w-full mt-5">Tamam</button>
+      `<div class="flex justify-between gap-3 py-2.5 border-b border-[var(--t-line)] last:border-0 text-[14px] ${x.ok ? "text-[var(--t-text)]" : "text-[var(--t-muted)]"}"><span class="min-w-0 truncate">${esc(x.name)}</span><span class="shrink-0">${x.ok ? t("Yapıldı") : x.sk ? t("Atlandı") : t("Yapılmadı")}</span></div>`).join("")}
+      ${more > 0 ? `<div class="py-2.5 text-[13.5px] text-[var(--t-muted)]">${tn(more, "… {n} hareket daha")}</div>` : ""}</div>
+    <button id="mobTFinOk" onclick="mobSesFinishClose()" class="m-btn pri w-full mt-5">${t("Tamam")}</button>
   </div>`;
 }
 function mobTimerRender() {
@@ -618,10 +618,11 @@ function mobTimerRender() {
   const reps = T.phase === "reps", prep = T.phase === "prep", work = T.phase === "work";
   const it = mobFindAny(T.id);
   let sub;
-  if (reps) sub = (r.side ? `${r.side} taraf · ` : "") + `Set ${r.set} / ${T.sets}`;
-  else if (prep) sub = "Hazırlan · " + (r.side ? r.side + " taraf, " : "") + `${T.sets} set × ${T.sec} sn`;
-  else if (work) sub = r.side ? `${r.side} taraf · ${r.set}. tur / ${T.sets}` : `Set ${r.set} / ${T.sets}`;
-  else sub = t(next && next.side === "Sol" ? "Sola geç" : next && next.side === "Sağ" ? "Sağa geç" : "Sıradaki set") + ` · ${next ? mobRoundLabel(next) : ""}`;
+  const sd = r.side ? mobSideL(r.side) : "", setOf = { n: r.set, sets: T.sets };
+  if (reps) sub = r.side ? t("{taraf} taraf · Set {n} / {sets}", { taraf: sd, ...setOf }) : t("Set {n} / {sets}", setOf);
+  else if (prep) sub = r.side ? tn(T.sets, "Hazırlan · {taraf} taraf, {n} set × {sn} sn", { taraf: sd, sn: T.sec }) : tn(T.sets, "Hazırlan · {n} set × {sn} sn", { sn: T.sec });
+  else if (work) sub = r.side ? t("{taraf} taraf · {n}. tur / {sets}", { taraf: sd, ...setOf }) : t("Set {n} / {sets}", setOf);
+  else sub = t(next && next.side === "Sol" ? "Sola geç · {x}" : next && next.side === "Sağ" ? "Sağa geç · {x}" : "Sıradaki set · {x}", { x: next ? mobRoundLabel(next) : "" });
   const boxes = T.rounds.map((x, i) => {
     const cls = i < T.idx || (i === T.idx && T.phase === "switch") ? "d" : i === T.idx ? "n" : "";
     return `<i class="${cls}">${mobRoundLabel(x)}</i>`;
@@ -634,44 +635,44 @@ function mobTimerRender() {
   const g = S && it ? mobGuide(it.name) : null;
   const guide = g
     ? `<div id="mobTGuide" class="m-guide w-full max-w-lg !mt-3 text-left">
-        <button id="mobTGuideBtn" onclick="mobSesGuide()" class="w-full min-h-[44px] flex items-center justify-between m-guide-h" aria-expanded="${S.guideOpen}">Nasıl yapılır<span class="text-[var(--t-dim)]">${svgI(S.guideOpen ? "up" : "down", 18)}</span></button>
+        <button id="mobTGuideBtn" onclick="mobSesGuide()" class="w-full min-h-[44px] flex items-center justify-between m-guide-h" aria-expanded="${S.guideOpen}">${t("Nasıl yapılır")}<span class="text-[var(--t-dim)]">${svgI(S.guideOpen ? "up" : "down", 18)}</span></button>
         ${S.guideOpen ? `<ol>${g.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="m-guide-w">${esc(t("Dikkat: {uyari}", { uyari: g.warn }))}</p>` : ""}
       </div>`
     : S && it && it.note ? `<div class="m-guide w-full max-w-lg !mt-3 text-left text-[14px] text-[var(--t-text1)]">${esc(it.note)}</div>` : "";
   const nextName = S && S.pos + 1 < n ? (mobFindAny(S.ids[S.pos + 1]) || {}).name : "";
   const center = reps
     ? `<div class="text-center mt-6"><b id="mobTReps" class="t-display text-[104px] leading-[0.85]">${T.reps}</b>
-        <span class="block text-[16px] font-bold text-[var(--t-acc-text)] mt-2">TEKRAR${r.side ? " · " + mobUpper(r.side) + " TARAF" : ""}</span></div>`
+        <span class="block text-[16px] font-bold text-[var(--t-acc-text)] mt-2">${mobUpper(r.side ? t("Tekrar · {taraf} taraf", { taraf: mobSideL(r.side) }) : t("Tekrar"))}</span></div>`
     : `<div id="mobTCircle" class="m-breath ${S ? "ses" : ""} mt-4 ${work ? "" : "pause"}">
         <span class="o o1"></span><span class="o o2"></span>
-        <div class="core" style="animation-delay:-${(Date.now() - T.t0) % 10000}ms"><b id="mobTTime" class="t-display">${mobFmt((T.endAt - Date.now()) / 1000)}</b><span id="mobTBreath">${work ? mobBreathLabel() : "Hazırlan"}</span></div>
+        <div class="core" style="animation-delay:-${(Date.now() - T.t0) % 10000}ms"><b id="mobTTime" class="t-display">${mobFmt((T.endAt - Date.now()) / 1000)}</b><span id="mobTBreath">${work ? mobBreathLabel() : t("Hazırlan")}</span></div>
       </div>
-      ${S ? "" : `<div class="text-[13.5px] text-[var(--t-dim)] mt-1 text-center">${work ? "4 sn al, 6 sn ver. Her verişte biraz daha derine." : "Sıradaki tur birazdan kendiliğinden başlar."}</div>`}`;
+      ${S ? "" : `<div class="text-[13.5px] text-[var(--t-dim)] mt-1 text-center">${work ? t("4 sn al, 6 sn ver. Her verişte biraz daha derine.") : t("Sıradaki tur birazdan kendiliğinden başlar.")}</div>`}`;
   const ctl = !S
     ? `<div class="grid grid-cols-[1fr_1fr_1.3fr] gap-2.5">
         <button id="mobTMinus" onclick="mobTimerAdjust(-15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">−15</button>
         <button id="mobTPlus" onclick="mobTimerAdjust(15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">+15</button>
-        <button id="mobTSkip" onclick="mobTimerSkip()" class="h-[60px] rounded-[18px] bg-[var(--t-text)] text-[var(--t-bg)] text-[17px] font-bold">Atla</button>
+        <button id="mobTSkip" onclick="mobTimerSkip()" class="h-[60px] rounded-[18px] bg-[var(--t-text)] text-[var(--t-bg)] text-[17px] font-bold">${t("Atla")}</button>
       </div>`
     : reps
     ? `<div class="grid grid-cols-[1fr_1fr_1.8fr] gap-2.5">
-        <button id="mobTPrev" onclick="mobSesPrev()" ${S.pos ? "" : "disabled"} class="h-[62px] rounded-[18px] border border-[var(--t-line)] text-[16px] font-bold text-[var(--t-muted)] disabled:opacity-40" aria-label="Önceki hareket">‹ Önceki</button>
-        <button id="mobTSkip" onclick="mobSesSkip()" class="h-[62px] rounded-[18px] bg-[var(--t-elev)] text-[16px] font-bold" aria-label="Bu hareketi atla">Atla</button>
-        <button id="mobTDone" onclick="mobSesNext()" class="h-[62px] rounded-[18px] bg-[var(--t-acc)] text-[var(--t-on-acc)] text-[18px] font-extrabold">Bitti</button>
+        <button id="mobTPrev" onclick="mobSesPrev()" ${S.pos ? "" : "disabled"} class="h-[62px] rounded-[18px] border border-[var(--t-line)] text-[16px] font-bold text-[var(--t-muted)] disabled:opacity-40" aria-label="${t("Önceki hareket")}">‹ ${t("Önceki")}</button>
+        <button id="mobTSkip" onclick="mobSesSkip()" class="h-[62px] rounded-[18px] bg-[var(--t-elev)] text-[16px] font-bold" aria-label="${t("Bu hareketi atla")}">${t("Atla")}</button>
+        <button id="mobTDone" onclick="mobSesNext()" class="h-[62px] rounded-[18px] bg-[var(--t-acc)] text-[var(--t-on-acc)] text-[18px] font-extrabold">${t("Bitti")}</button>
       </div>`
     : `<div class="grid grid-cols-4 gap-2">
-        <button id="mobTPrev" onclick="mobSesPrev()" ${S.pos ? "" : "disabled"} class="h-[60px] rounded-[18px] border border-[var(--t-line)] text-[17px] font-bold text-[var(--t-muted)] disabled:opacity-40" aria-label="Önceki hareket">‹</button>
+        <button id="mobTPrev" onclick="mobSesPrev()" ${S.pos ? "" : "disabled"} class="h-[60px] rounded-[18px] border border-[var(--t-line)] text-[17px] font-bold text-[var(--t-muted)] disabled:opacity-40" aria-label="${t("Önceki hareket")}">‹</button>
         <button id="mobTMinus" onclick="mobTimerAdjust(-15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">−15</button>
         <button id="mobTPlus" onclick="mobTimerAdjust(15)" class="h-[60px] rounded-[18px] bg-[var(--t-elev)] text-[17px] font-bold">+15</button>
-        <button id="mobTSkip" onclick="mobSesSkip()" class="h-[60px] rounded-[18px] bg-[var(--t-text)] text-[var(--t-bg)] text-[16px] font-bold" aria-label="Bu hareketi atla">Atla ›</button>
+        <button id="mobTSkip" onclick="mobSesSkip()" class="h-[60px] rounded-[18px] bg-[var(--t-text)] text-[var(--t-bg)] text-[16px] font-bold" aria-label="${t("Bu hareketi atla")}">${t("Atla")} ›</button>
       </div>`;
   $("mobTimer").innerHTML = `
     <div class="w-full max-w-lg flex items-center justify-between gap-2 pt-3">
-      <button id="mobTClose" onclick="mobTimerClose()" class="m-round" aria-label="${S ? "Seansı bitir" : "Sayacı kapat"}">${svgI("x", 20, 2.2)}</button>
+      <button id="mobTClose" onclick="mobTimerClose()" class="m-round" aria-label="${S ? t("Seansı bitir") : t("Sayacı kapat")}">${svgI("x", 20, 2.2)}</button>
       ${top}
       <span class="flex gap-2 shrink-0">
-        <button id="mobTVoice" onclick="mobTimerVoice()" class="m-round ${state.settings.mobVoice ? "!text-[var(--t-acc-text)] !border-[var(--t-acc-text)]" : ""}" aria-pressed="${!!state.settings.mobVoice}" aria-label="${state.settings.mobVoice ? "Sesli yönlendirmeyi kapat" : "Sesli yönlendirmeyi aç"}">${svgI("talk", 20)}</button>
-        <button id="mobTSound" onclick="mobTimerSound()" class="m-round" aria-label="${snd ? "Bip sesini kapat" : "Bip sesini aç"}">${svgI(snd ? "vol" : "volOff", 20)}</button>
+        <button id="mobTVoice" onclick="mobTimerVoice()" class="m-round ${state.settings.mobVoice ? "!text-[var(--t-acc-text)] !border-[var(--t-acc-text)]" : ""}" aria-pressed="${!!state.settings.mobVoice}" aria-label="${state.settings.mobVoice ? t("Sesli yönlendirmeyi kapat") : t("Sesli yönlendirmeyi aç")}">${svgI("talk", 20)}</button>
+        <button id="mobTSound" onclick="mobTimerSound()" class="m-round" aria-label="${snd ? t("Bip sesini kapat") : t("Bip sesini aç")}">${svgI(snd ? "vol" : "volOff", 20)}</button>
       </span>
     </div>
     <div class="text-center mt-4 px-2 w-full max-w-lg">
@@ -681,7 +682,7 @@ function mobTimerRender() {
     ${center}
     ${guide}
     <div class="w-full max-w-lg mt-auto pt-5">
-      ${nextName ? `<div class="text-[13px] text-[var(--t-dim)] text-center mb-2.5 truncate">Sıradaki: <b class="text-[var(--t-muted)] font-semibold">${esc(nextName)}</b></div>` : ""}
+      ${nextName ? `<div class="text-[13px] text-[var(--t-dim)] text-center mb-2.5 truncate">${t("Sıradaki: {ad}", { ad: `<b class="text-[var(--t-muted)] font-semibold">${esc(nextName)}</b>` })}</div>` : ""}
       ${ctl}
       <div id="mobTRounds" class="m-rounds mt-3">${boxes}</div>
     </div>`;
