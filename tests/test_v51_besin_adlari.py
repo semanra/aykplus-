@@ -89,7 +89,7 @@ try:
     RCP = "(Object.values(getFoodDB()).find(f => f.src === 'tarif'))"
     check(pg.evaluate("foodNameL(%s)" % RCP) == pg.evaluate("%s.name" % RCP), "en: tarif adı Türkçe")
     check(pg.evaluate("foodNameL({ name: '⚠ Eski besin', _lost: 1, src: 168652 })") == "⚠ Eski besin", "en: _lost besinde ⚠ adı korunur")
-    check(pg.evaluate("typeof BASE_EN") == "object" and pg.evaluate("foodNameL(BASE_FOOD_DB[Object.keys(BASE_FOOD_DB)[0]])") == pg.evaluate("BASE_FOOD_DB[Object.keys(BASE_FOOD_DB)[0]].name"), "en: BASE_EN boşken kendi liste adı aynen")
+    check(pg.evaluate("typeof BASE_EN") == "object" and pg.evaluate("foodNameL({ name: 'Özel besin', cat: 'x' })") == "Özel besin", "en: listede olmayan besin adı aynen")
     check(pg.evaluate("loadFoodsEn()") is True and sum("foods-en.js" in u for u in reqs) == 1, "loadFoodsEn ikinci çağrı: true, yeni istek yok")
     ctx.close()
     # ===== setLang('en'): sonra yeniden çizim
@@ -222,6 +222,65 @@ try:
     chips = pg.evaluate("[...document.querySelectorAll('#foodSelCard [data-preset]')].map(b => b.textContent)")
     check(any("kutu" in c for c in chips) and not any("can (" in c for c in chips), "tr Besinler: porsiyonlar Türkçe %s" % chips)
     check(not any("foods-en.js" in u for u in reqs), "tr: bölüm 2 boyunca foods-en.js isteği yok")
+    ctx.close()
+
+    # ===== Bölüm 3: kendi besin listesi, kategoriler, notlar, hareket adları
+    TRL = re.compile(r"[çğıöşüÇĞİÖŞÜ]")
+    def tr_pg():
+        c, g, r = newctx(False); g.goto(URL); boot(g); return c, g
+    ctx, pg, reqs = newctx(True)
+    pg.goto(URL); boot(pg); pg.evaluate("setLang('en')"); pg.wait_for_function("typeof USDA_EN !== 'undefined'", timeout=5000); pg.wait_for_timeout(300)
+    DB = "BASE_FOOD_DB"
+    want = {"yulaf": "Oats", "muz": "Banana (Medium)", "tavuk_gogsu": "Chicken Breast (Raw)", "tr_beyaz_peynir": "Beyaz peynir (white cheese, full-fat)", "tr_ayran": "Ayran (yogurt drink)", "kefir": "Plain Kefir"}
+    for k, v in want.items():
+        got = pg.evaluate("foodNameL(BASE_FOOD_DB[%s])" % json.dumps(k))
+        check(got == v, "en BASE_FOOD_DB %s -> %r" % (k, got))
+    check(pg.evaluate("Object.keys(BASE_FOOD_DB).every(k => Object.prototype.hasOwnProperty.call(BASE_EN, k))"), "BASE_EN: BASE_FOOD_DB'nin her kimliği için ad var")
+    check(pg.evaluate("BASE_FOOD_DB.yulaf.name") == "Yulaf Ezmesi", "en: besin nesnesi adı Türkçe kaldı")
+    # Kategori başlıkları: bütün kategoriler Türkçe harfsiz
+    cats = pg.evaluate("[...new Set(Object.values(getFoodDB()).map(f => f.cat).filter(Boolean))].map(c => t(stripEmoji(c)))")
+    check(len(cats) >= 30 and not [c for c in cats if TRL.search(c)], "en: bütün kategori başlıkları Türkçe harfsiz %s" % [c for c in cats if TRL.search(c)])
+    pg.evaluate("setNutriView('foods'); renderAll()"); pg.wait_for_timeout(200)
+    chips = pg.evaluate("[...document.querySelectorAll('#foodCats button')].map(b => b.textContent)")
+    check(chips and not [c for c in chips if TRL.search(c)] and "Red meat" in chips and "Turkish cuisine" in chips, "en: kategori çipleri İngilizce %s" % chips[:6])
+    # kx besini: not İngilizce
+    kx = pg.evaluate("Object.keys(getFoodDB()).find(i => getFoodDB()[i].kx && !isHiddenFood(getFoodDB()[i]))")
+    pg.evaluate("selectFood(%s)" % json.dumps(kx)); pg.wait_for_timeout(200)
+    card = pg.inner_text("#foodSelCard")
+    check("Calories are USDA-measured" in card and "ölçümüdür" not in card, "en kx besini (%s): not İngilizce" % kx)
+    # tarif notu + porsiyon
+    rn = pg.evaluate("Object.keys(getFoodDB()).filter(i => getFoodDB()[i].src === 'tarif' && getFoodDB()[i].note)")
+    bad = pg.evaluate("ids => ids.filter(i => /[çğıöşüÇĞİÖŞÜ]/.test(foodNoteL(getFoodDB()[i])))", rn)
+    check(len(rn) >= 20 and not bad, "en: %d yerleşik tarif notunun hiçbirinde Türkçe harf yok %s" % (len(rn), bad[:2]))
+    pg.evaluate("selectFood(%s)" % json.dumps(rn[0])); pg.wait_for_timeout(150)
+    card = pg.inner_text("#foodSelCard")
+    check(not TRL.search(card.split("\n", 1)[1] if False else pg.evaluate("foodNoteL(getFoodDB()[%s])" % json.dumps(rn[0]))), "en: seçili tarif notu İngilizce")
+    rp = pg.evaluate("(() => { const f = Object.values(getFoodDB()).find(f => f.src === 'tarif' && f.portions && f.portions[0] && f.portions[0][0] === '1 porsiyon'); return f ? portionL(f, 0, '1 porsiyon') : null; })()")
+    check(rp == "1 serving", "en: tarif porsiyonu %r" % rp)
+    # Hareket adları
+    names = pg.evaluate("Object.values(EXERCISE_LIBRARY).flat().map(n => exNameL(n))")
+    check(len(names) > 100 and not [n for n in names if TRL.search(n)], "en: kütüphane adlarının hiçbirinde Türkçe harf yok %s" % [n for n in names if TRL.search(n)][:3])
+    NM = "Pull-up (Geniş Tutuş Barfiks)"
+    check(pg.evaluate("exNameL(%s)" % json.dumps(NM)) == "Pull-up (Wide Grip)", "en: exNameL parantez İngilizce")
+    check(pg.evaluate("exNameL('Benim Hareketim (Özel)')") == "Benim Hareketim (Özel)", "en: kullanıcının kendi adına dokunulmaz")
+    pg.evaluate("""nm => { const d = state.workoutDays[0]; d.exercises.push({ name: nm, kind: 'weight', sets: [{ kg: 40, reps: 8, done: false }] });
+      state.exerciseHistory[exKey(nm)] = [{ ts: Date.now() - 86400000, name: nm, kind: 'weight', sets: [{ kg: 40, reps: 8, done: true }] }]; state.activeTab = 'gym'; state.gymView = 'program'; state.active = 0; renderAll(); }""", NM)
+    pg.wait_for_timeout(300)
+    gh = pg.inner_text("#gymRoot")
+    check("Pull-up (Wide Grip)" in gh and "Barfiks" not in gh, "en Programım: hareket adı İngilizce")
+    exn = pg.evaluate("state.workoutDays[0].exercises.slice(-1)[0].name")
+    hk = pg.evaluate("Object.keys(state.exerciseHistory).filter(k => k.includes('barfiks'))")
+    check(exn == NM and len(hk) == 1 and pg.evaluate("exKey(%s)" % json.dumps(NM)) == hk[0], "en: ex.name ve exerciseHistory anahtarı Türkçe/değişmedi %s" % hk)
+    ctx.close()
+    # Türkçe: hepsi aynı
+    ctx, pg = tr_pg()
+    check(pg.evaluate("foodNameL(BASE_FOOD_DB.yulaf)") == "Yulaf Ezmesi" and pg.evaluate("exNameL(%s)" % json.dumps(NM)) == NM, "tr: BASE_FOOD_DB adı ve hareket adı aynen")
+    pg.evaluate("setNutriView('foods'); renderAll()"); pg.wait_for_timeout(200)
+    chips = pg.evaluate("[...document.querySelectorAll('#foodCats button')].map(b => b.textContent)")
+    check("Kırmızı et" in chips and "Türk Mutfağı" in chips, "tr: kategori çipleri Türkçe %s" % chips[:6])
+    kx = pg.evaluate("Object.keys(getFoodDB()).find(i => getFoodDB()[i].kx && !isHiddenFood(getFoodDB()[i]))")
+    pg.evaluate("selectFood(%s)" % json.dumps(kx)); pg.wait_for_timeout(150)
+    check("Kalori USDA ölçümüdür (" in pg.inner_text("#foodSelCard"), "tr: kx notu Türkçe")
     ctx.close()
     b.close()
   check(not errs, "sayfa hatası yok: %s" % errs[:3])

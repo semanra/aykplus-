@@ -66,7 +66,7 @@ function exerciseChartHtml(name, accent) {
 
 function openExerciseChart(exIdx) {
   const ex = activeDay().exercises[exIdx];
-  $("chartTitle").textContent = ex.name;
+  $("chartTitle").textContent = exNameL(ex.name);
   $("chartBody").innerHTML = exerciseChartHtml(ex.name, "var(--t-acc-text)");
   openModal("chartModal");
 }
@@ -390,8 +390,8 @@ function progGucHtml() {
     exCard = `<div class="p-card" id="pExChart">${pSec(t("Hareket ilerlemesi"), PC.tq)}<p class="p-fine">${t("Antrenmanlarını kaydettikçe her hareketin ilerlemesi burada oluşur.")}</p></div>`;
   } else {
     const recent = keys.slice(0, 4);
-    const chips = recent.map(k => `<button onclick="progSelectEx(${esc(JSON.stringify(k))})" class="p-chip ${k === progressSel ? "on" : ""}" aria-pressed="${k === progressSel}">${esc(nm(k))}</button>`).join("");
-    const sel = keys.length > 4 ? `<select aria-label="${t("Hareket seç")}" onchange="progSelectEx(this.value)" class="p-select">${keys.map(k => `<option value="${esc(k)}" ${k === progressSel ? "selected" : ""}>${esc(nm(k))} (${state.exerciseHistory[k].length})</option>`).join("")}</select>` : "";
+    const chips = recent.map(k => `<button onclick="progSelectEx(${esc(JSON.stringify(k))})" class="p-chip ${k === progressSel ? "on" : ""}" aria-pressed="${k === progressSel}">${esc(exNameL(nm(k)))}</button>`).join("");
+    const sel = keys.length > 4 ? `<select aria-label="${t("Hareket seç")}" onchange="progSelectEx(this.value)" class="p-select">${keys.map(k => `<option value="${esc(k)}" ${k === progressSel ? "selected" : ""}>${esc(exNameL(nm(k)))} (${state.exerciseHistory[k].length})</option>`).join("")}</select>` : "";
     const name = nm(progressSel);
     const ser = exerciseSeries(name);
     const hist = historyFor(name);
@@ -399,7 +399,7 @@ function progGucHtml() {
     const best = pts.length ? Math.max(...pts.map(p => p.y)) : 0;
     const chart = pts.length >= 4
       ? pLine([{ pts, color: PC.tq, name: ser.metric === "Tahmini 1RM" ? t("tahmini 1RM") : ser.metric === "Toplam mesafe" ? t("toplam mesafe") : ser.metric === "Toplam süre" ? t("toplam süre") : t("en uzun set") }], { unit: t(ser.unit), h: 170, label: t("{ad} {metrik}|grafik etiketi", { ad: name, metrik: t(ser.metric) }) })
-      : `<div class="p-lowd"><div><b>${esc(name)}</b><span>${tn(pts.length, "{n} seans · grafik için en az 4 gerekir")}</span></div>
+      : `<div class="p-lowd"><div><b>${esc(exNameL(name))}</b><span>${tn(pts.length, "{n} seans · grafik için en az 4 gerekir")}</span></div>
           <div class="p-lowd-v"><b class="t-display">${fmtNum(best)}</b><span>${esc(t(ser.unit))}</span>${pts.length >= 2 ? pDelta(pts[pts.length - 1].y - pts[0].y, "", pts[pts.length - 1].y >= pts[0].y) : ""}</div></div>`;
     const recentRows = hist.slice().reverse().slice(0, 5).map(h => `<div class="p-row"><span class="p-dim">${fmtDate(h.ts)}</span><span class="p-row-r p-trunc">${esc(sessionSummary(h))}</span></div>`).join("");
     exCard = `<div class="p-card" id="pExChart">${pSec(t("Hareket ilerlemesi"), PC.tq)}<div class="p-chips">${chips}</div>${sel}
@@ -421,7 +421,7 @@ function progGucHtml() {
   });
   prs.sort((a, b) => b.ts - a.ts);
   const prRows = prs.slice(0, 12).map(p => `<button onclick="progSelectEx(${esc(JSON.stringify(p.k))})" class="p-pr">
-      <span class="p-pr-n"><b>${esc(p.name)}</b><span>${fmtDate(p.ts)} · ${fmtNum(p.kg)} kg × ${p.reps}</span></span>${pSpark(p.spark, PC.tq)}
+      <span class="p-pr-n"><b>${esc(exNameL(p.name))}</b><span>${fmtDate(p.ts)} · ${fmtNum(p.kg)} kg × ${p.reps}</span></span>${pSpark(p.spark, PC.tq)}
       <span class="p-pr-v"><b class="t-display">${fmtNum(round1(p.v))}</b>${p.d != null ? pDelta(p.d, "", true) : ""}</span></button>`).join("");
   const prCard = `<div class="p-card" id="pPrs">${pSec(t("Hareketlerin en iyileri"), PC.tq, `<span class="p-dim p-sm">${t("tahmini 1RM, kg")}</span>`)}
     ${prRows ? `<div class="p-prs">${prRows}</div>` : `<p class="p-fine">${t("Henüz kayıt yok. Antrenman kaydettikçe her hareketin en iyi seti (tahmini 1RM) burada listelenir.")}</p>`}</div>`;

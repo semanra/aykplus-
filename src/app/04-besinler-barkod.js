@@ -34,8 +34,8 @@ function renderFoods() {
   if (state.combos.length) cats.push(["combos", t("Komboların")]);
   if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", t("Tariflerim")]);
   if (Object.keys(state.customFoods).length) cats.push(["custom", t("Özel eklediklerim")]);
-  [...new Set(Object.values(BASE_FOOD_DB).map(f => f.cat || "Diğer"))].forEach(c => cats.push([foodCatKey(c), stripEmoji(c)]));
-  [...new Set(Object.values(USDA_DB).map(f => f.cat))].forEach(c => { if (!cats.some(x => x[0] === foodCatKey(c))) cats.push([foodCatKey(c), c]); });
+  [...new Set(Object.values(BASE_FOOD_DB).map(f => f.cat || "Diğer"))].forEach(c => cats.push([foodCatKey(c), t(stripEmoji(c))]));
+  [...new Set(Object.values(USDA_DB).map(f => f.cat))].forEach(c => { if (!cats.some(x => x[0] === foodCatKey(c))) cats.push([foodCatKey(c), t(c)]); });
   if (!cats.some(c => c[0] === foodUI.cat)) foodUI.cat = "all";
   $("foodCats").innerHTML = [["all", t("Tümü")], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
   renderFoodHead();
@@ -154,8 +154,8 @@ function renderFoodList() {
           <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(foodNameL(f))}</h3>
             <div class="text-[12px] n-muted mt-0.5">${esc(t(stripEmoji(f.cat || "")))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
-            ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
-            ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">Kalori USDA ölçümüdür (${esc(f.kx)} nedeniyle makrolardan hesaplanandan farklı).</div>` : ""}</div>
+            ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(foodNoteL(f))}</div>` : ""}
+            ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">${esc(t("Kalori USDA ölçümüdür ({x} nedeniyle makrolardan hesaplanandan farklı).", { x: kxL(f.kx) }))}</div>` : ""}</div>
           <div class="text-right shrink-0 whitespace-nowrap"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
         </div>
         <div class="flex items-center justify-between px-1">

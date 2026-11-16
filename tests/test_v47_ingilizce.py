@@ -91,7 +91,7 @@ try:
           Object.values(state.customFoods || {}).forEach(f => add(f.name));
           // besin veritabanı adları/kategorileri/notları/porsiyon adları veridir (v49); yalnız Türkçe harfliler gerekir
           const addTr = x => { if (x && /[çğıöşüÇĞİÖŞÜ]/.test(String(x))) { add(x); const y = typeof stripEmoji === 'function' ? stripEmoji(String(x)) : String(x); add(y); add(y.toLocaleUpperCase('en-GB')); } };
-          Object.values(db).forEach(f => { addTr(f.name); addTr(f.cat); addTr(f.note); addTr(f.kx); (f.portions || []).forEach(p => addTr(p[0])); (f.aliases || []).forEach(addTr); });
+          Object.values(db).forEach(f => { addTr(f.name); addTr(typeof foodNameL === 'function' ? foodNameL(f) : f.name); addTr(f.cat); addTr(f.note); addTr(f.kx); (f.portions || []).forEach(p => addTr(p[0])); (f.aliases || []).forEach(addTr); });
           Object.values(state.customFoods || {}).forEach(f => addTr(f.cat));
           (state.supplementList || []).forEach(x => { add(x.unit); add(x.note); add(x.timeLabel); });
           (state.combos || []).forEach(c => add(c.name));
@@ -545,7 +545,7 @@ try:
         "Göğüs": "MUSCLES kas adı: kayıt/anahtar, gösterimde muscleL (v48)", "Sırt": "MUSCLES: gösterimde muscleL", "Ön Bacak": "MUSCLES: gösterimde muscleL", "Arka Bacak & Kalça": "MUSCLES: gösterimde muscleL", "Karın": "MUSCLES: gösterimde muscleL"},
       "02-arayuz.js": {"İlerleme": "TAB_TITLES değeri, gösterimde t(TAB_TITLES[..])", "boş görsel": HATA, "okunamadı": HATA},
       "03-beslenme.js": {"Bugün": "NUTRI_VIEWS etiketleri, gösterimde t(l)", "Menülerim": "NUTRI_VIEWS", "Geçmiş": "NUTRI_VIEWS"},
-      "04-besinler-barkod.js": {"Diğer": "besin kategori anahtarı (veri, v49)", "<div class=\"text-[12px] n-dim mt-0.5\">Kalori USDA": "f.kx besin verisi cümlesi (v49)", "ZXing yüklenemedi": HATA,
+      "04-besinler-barkod.js": {"Diğer": "besin kategori anahtarı (veri; gösterimde t(stripEmoji(c)), v51)", "ZXing yüklenemedi": HATA,
         "⭐ Özel Eklediklerim": "özel besin cat değeri: kayıtta Türkçe, gösterimde t(stripEmoji(cat)) (kayıtlı-metinler a2)"},
       "08-profil-yedek.js": {
         "Verilerin yalnızca bu telefonda": "PRIVACY_NOTE: Hakkında v49", "Open Food Facts verisi": "LICENSES: Hakkında v49", "USDA FoodData Central": "LICENSES v49", "Vücut haritası görseli": "LICENSES v49",
@@ -558,7 +558,7 @@ try:
         "Ağırlık yığını": "EQUIP_LABEL: equipL t(..)", "Dambıl": "EQUIP_LABEL / EQUIP_SHORT: equipL t(..)", "Vücut ağırlığı": "EQUIP_LABEL: equipL t(..)", "Vücut ağ.": "EQUIP_SHORT: equipL t(..)",
         "Bugün": "GYM_VIEWS etiketleri, gösterimde t(l)", "Programım": "GYM_VIEWS", "Geçmiş": "GYM_VIEWS",
         "Göğüs": "BODY_POLYS anahtarı = MUSCLES kas adı (kayıt anahtarı; gösterimde muscleL)", "Karın": "BODY_POLYS anahtarı", "Ön Bacak": "BODY_POLYS anahtarı", "Sırt": "BODY_POLYS anahtarı", "Arka Bacak & Kalça": "BODY_POLYS anahtarı"},
-      "11-mutfak-akilli.js": {"Diğer": "besin kategorisi yedeği (veri, v49)"},
+      "11-mutfak-akilli.js": {},
       "06-mobilite.js": {
         "Sağ": "tur tarafı kayıt değeri ('Sağ'/'Sol', mobT.rounds; gösterimde mobSideL) ve mobSay Türkçe ses kalıbı 'Sağa geç' (trFill; ses v52'ye kadar Türkçe)",
         "Sola geç": "mobSay Türkçe ses kalıbı (trFill; ses v52'ye kadar Türkçe)", "Sıradaki set": "mobSay Türkçe ses kalıbı (trFill; ses v52'ye kadar Türkçe)",

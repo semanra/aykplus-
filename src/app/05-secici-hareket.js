@@ -77,7 +77,7 @@ function openExercisePicker() {
   const groups = Object.keys(EXERCISE_LIBRARY).map(g => ({
     label: libCatL(g),
     short: t(g.replace(/^\d+\.\s*/, "").replace(/\s*\(.*$/, "") + "|kategori"),   // v48: kısa çip adı (Türkçede bağlam atılır, metin aynı)
-    items: EXERCISE_LIBRARY[g].map(n => n.trim()).map(n => ({ id: n, label: n, sub: detectKind(n) !== "weight" ? kindL(detectKind(n)) : "" }))
+    items: EXERCISE_LIBRARY[g].map(n => n.trim()).map(n => ({ id: n, label: exNameL(n), sub: detectKind(n) !== "weight" ? kindL(detectKind(n)) : "" }))
   }));
   openPicker(t("Hareket Kütüphanesi"), groups, it => openExerciseModal({ name: it.id, kind: detectKind(it.id) }),
     { label: t("Listede yok mu? Özel hareket yaz"), onClick: () => openExerciseModal({ name: "", kind: "weight" }) });

@@ -297,7 +297,7 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
     return `<div class="grid items-center gap-2 h-14 px-1 rounded-2xl ${rowCls}" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px">
       <span class="t-display text-[22px] text-center ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}</span>
       <span class="flex items-center gap-1.5"><input type="text" inputmode="numeric" data-fk="t-${exIdx}-${i}" value="${num(s.sec)}" onchange="updateSetData(${exIdx}, ${i}, 'sec', this.value)" class="t-input w-20" /><span class="text-xs t-muted">${t("sn")}</span></span>
-      <button onclick="startTimer(${num(s.sec)}, ${esc(JSON.stringify(ex.name.slice(0, 40)))})" class="t-btn-ghost h-11 rounded-xl text-[13px] flex items-center justify-center gap-1">${svgI("play", 14)}${t("Başlat")}</button>
+      <button onclick="startTimer(${num(s.sec)}, ${esc(JSON.stringify(exNameL(ex.name).slice(0, 40)))})" class="t-btn-ghost h-11 rounded-xl text-[13px] flex items-center justify-center gap-1">${svgI("play", 14)}${t("Başlat")}</button>
       ${check}
     </div>`;
   }
@@ -334,7 +334,7 @@ function gymActiveHtml() {
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0 space-y-1.5">
             <div class="t-label">${t("HAREKET {n} / {total}", { n: exIdx + 1, total })}${allDone ? ` <span class="t-accent">· ${t("TAMAMLANDI")}</span>` : ""}</div>
-            <div class="text-[21px] font-bold leading-tight">${esc(ex.name)}</div>
+            <div class="text-[21px] font-bold leading-tight">${esc(exNameL(ex.name))}</div>
             <div class="flex flex-wrap gap-1.5">
               ${ex.targetInfo ? `<span class="t-chip-accent">${esc(targetL(ex.targetInfo))}</span>` : ""}
               ${muscleOf(ex) ? `<span class="t-chip">${esc(muscleL(muscleOf(ex)))}</span>` : ""}
@@ -394,10 +394,10 @@ function gymProgramHtml() {
     const meta = [targetL(ex.targetInfo), muscleL(muscleOf(ex)), eq ? equipL(eq, true) : (ex.kind === "cardio" ? t("Kardiyo") : t("Süreli"))].filter(Boolean).join(" · ");
     const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[12px] text-[var(--t-warn-mid)]">${t("Kademe tanımlı değil")}</span>` : usesLevels(ex) ? `<span class="text-[12px] t-dim">${t("Kademe: {lv}", { lv: esc(levelsSummary(ex)) })}</span>` : "";
     return `<div data-ex-row="${i}" class="t-card-flat rounded-2xl min-h-[64px] pl-1 pr-1.5 py-2 flex items-center gap-2">
-      ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${t("{name} hareketini sürükleyerek taşı", { name: esc(ex.name) })}" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
+      ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${t("{name} hareketini sürükleyerek taşı", { name: esc(exNameL(ex.name)) })}" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
       <span class="t-display text-xl t-dim w-6 text-center">${i + 1}</span>
-      <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold line-clamp-2 leading-snug">${esc(ex.name)}</span><span class="text-xs t-muted truncate">${esc(meta)}</span>${lvWarn}</span>
-      <button onclick="openExSheet(${i})" aria-label="${t("{name} seçenekleri", { name: esc(ex.name) })}" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-muted">
+      <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold line-clamp-2 leading-snug">${esc(exNameL(ex.name))}</span><span class="text-xs t-muted truncate">${esc(meta)}</span>${lvWarn}</span>
+      <button onclick="openExSheet(${i})" aria-label="${t("{name} seçenekleri", { name: esc(exNameL(ex.name)) })}" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-muted">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
       </button>
     </div>`;
@@ -489,11 +489,11 @@ function libListHtml() {
     const meta = last ? t("Son: {s} · {d}", { s: sessionSummary(last), d: fmtDate(last.ts) }) : t("Henüz yapılmadı");
     return `<div class="t-card-flat rounded-2xl min-h-[72px] pl-3.5 pr-2 py-2 flex items-center gap-3">
       <span class="flex-1 min-w-0 flex flex-col gap-1">
-        <span class="text-[15px] font-bold">${esc(n)}</span>
+        <span class="text-[15px] font-bold">${esc(exNameL(n))}</span>
         <span class="text-xs t-muted truncate">${esc(meta)}</span>
         ${inDay.has(exKey(n)) ? `<span class="self-start text-[11px] font-bold px-2 py-0.5 rounded-full border border-[var(--t-panel-line)] bg-[var(--t-panel)]" style="color:#1FD1C1">${t("PROGRAMDA")}</span>` : ""}
       </span>
-      <button onclick="openExerciseModal({ name: ${esc(JSON.stringify(n))}, kind: detectKind(${esc(JSON.stringify(n))}) })" aria-label="${t("{name} hareketini {day} gününe ekle", { name: esc(n), day: esc(activeDay().name) })}" class="t-btn-outline w-11 h-11 rounded-xl flex items-center justify-center">${svgI("plus", 20, 2.4)}</button>
+      <button onclick="openExerciseModal({ name: ${esc(JSON.stringify(n))}, kind: detectKind(${esc(JSON.stringify(n))}) })" aria-label="${t("{name} hareketini {day} gününe ekle", { name: esc(exNameL(n)), day: esc(activeDay().name) })}" class="t-btn-outline w-11 h-11 rounded-xl flex items-center justify-center">${svgI("plus", 20, 2.4)}</button>
     </div>`;
   }).join("");
 }
@@ -636,7 +636,7 @@ function openExSheet(exIdx) {
       <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold">${label}</span>${sub ? `<span class="text-xs t-muted truncate">${esc(sub)}</span>` : ""}</span>
       <span class="t-dim">${svgI("chevR", 18)}</span></button>`;
   $("exSheetBody").innerHTML = `
-    <div class="px-1 pb-2"><div class="text-xl font-bold">${esc(ex.name)}</div>
+    <div class="px-1 pb-2"><div class="text-xl font-bold">${esc(exNameL(ex.name))}</div>
       <div class="text-[13px] t-muted">${esc([muscleL(muscleOf(ex)), targetL(ex.targetInfo), ex.kind !== "cardio" ? t("Dinlenme {n} sn", { n: String(ex.rest ?? state.settings.restSec) }) : ""].filter(Boolean).join(" · "))}</div></div>
     ${item(`openExerciseChart(${exIdx})`, "chart", t("İlerleme grafiği"), t("Tahmini 1RM ve son kayıtlar"))}
     ${ex.kind === "weight" && eq !== "bodyweight" ? item(`openPlateTool(${exIdx})`, "calc", eq === "plates" ? t("Plaka ve ısınma") : t("Kademe ve ısınma"), plateSub) : ""}

@@ -310,7 +310,7 @@ function renderShopList() {
     </div>`;
   let lastCat = null;
   $("shopItems").innerHTML = list.length ? list.map(r => {
-    const cat = stripEmoji(r.f.cat || "Diğer");
+    const cat = t(stripEmoji(r.f.cat || "Diğer"));
     const on = !!state.shopChecked[r.id];
     const head = cat !== lastCat ? `<div class="n-label pt-3 pb-1">${esc(upperL(cat))}</div>` : "";
     lastCat = cat;

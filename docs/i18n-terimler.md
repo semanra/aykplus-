@@ -290,6 +290,33 @@ Bu belge, AYK+ İngilizce arayüzünde kullanılacak **tek ve bağlayıcı** ter
 
 ---
 
+## 11b. Besin adları, kategoriler, notlar (v51, İngilizce gizli)
+
+Kural (karar 3): uygulamanın kendi listesinde (`BASE_FOOD_DB`) genel besin doğal İngilizce adla; Türkiye'ye özgü ürün/yemek Türkçe adıyla kalır, gerekirse parantezde kısa İngilizce açıklama. USDA besinleri USDA'nın kendi İngilizce adı (foods-en.js), Türk yemekleri (`r_…`) her dilde Türkçe. Hareket kütüphanesi adlarındaki Türkçe parantez İngilizcede kaldırılır/çevrilir (`EX_EN`).
+
+| Türkçe | English | Not |
+|---|---|---|
+| Yulaf Ezmesi / Muz / Tavuk Göğsü (Çiğ) | Oats / Banana (Medium) / Chicken Breast (Raw) | genel besin → İngilizce |
+| Beyaz Peynir, Kaşar Peyniri, Ayran, Simit, Lavaş, Poğaça, Lahmacun | Beyaz peynir (white cheese, full-fat), Kaşar peyniri (kashar cheese), Ayran (yogurt drink), Simit (sesame bread ring), Whole wheat lavaş (flatbread)… | Türkiye'ye özgü → Türkçe + açıklama |
+| Lor Peyniri | Lor peyniri (curd cheese) | |
+| Sade Kefir | Plain Kefir | kefir İngilizcede de kefir |
+| Protein & Kahvaltı | Protein and breakfast | kategori (BASE); `&` yerine "and" |
+| Et / Tavuk / Balık | Meat / Poultry / Fish | |
+| Karbonhidratlar | Carbs | |
+| Yeşillik & Sebzeler | Greens and vegetables | |
+| Kuruyemiş & Sağlıklı Yağlar | Nuts and healthy fats | |
+| Esnek Diyet / Dışarıdan | Flexible diet / Eating out | |
+| Türk Mutfağı | Turkish cuisine | |
+| Kırmızı et · Sakatat · Şarküteri · Tavuk ve hindi | Red meat · Organ meats · Deli meats · Poultry | USDA kategorileri |
+| Balık ve deniz ürünleri · Yumurta · Süt ürünleri · Takviyeler | Fish and seafood · Eggs · Dairy · Supplements | |
+| Peynirler · Tatlılar · Sebzeler · Soslar ve çorbalar | Cheeses · Sweets and desserts · Vegetables · Sauces and soups | |
+| Kahvaltılıklar · Baklagiller · Kuruyemiş ve tohumlar · Meyveler | Breakfast foods · Legumes · Nuts and seeds · Fruits | |
+| İçecekler · Baharatlar · Yağlar · Tahıllar ve makarna | Beverages · Spices · Oils and fats · Grains and pasta | |
+| Kahvaltılık gevrekler · Atıştırmalıklar · Ekmek ve hamur işleri · Hazır yemekler | Breakfast cereals · Snacks · Bread and pastries · Prepared meals | |
+| Türk yemekleri (tarif) | Turkish dishes (recipes) | |
+| Kalori USDA ölçümüdür ({x} nedeniyle …) | Calories are USDA-measured (they differ from the macro-based calculation because of {x}) | lif → fibre, alkol → alcohol, tatlandırıcı → sweetener |
+| 1 porsiyon (tarif) | 1 serving | |
+
 ## 12. Örnek metinler (bağlayıcı değil)
 
 Aşağıdakiler terim değil, kurulum ekranındaki cümleler için ilk taslaktır. Bağlayıcı değildir; v47–v48'de ekranla birlikte metin dosyalarına taşınır ve orada son hâlini alır. Yalnızca yukarıdaki terimlerle tutarlı olmaları şarttır.

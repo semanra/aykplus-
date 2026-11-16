@@ -202,7 +202,7 @@ function applySuggestion(exIdx) {
   if (!s) return;
   ex.sets.forEach(x => { x.kg = s.kg; x.reps = s.reps; x.pr = false; });
   ex.sugDismiss = s.ts;
-  toast(`${ex.name}: ${fmtKg(s.kg)} kg × ${s.reps}`);
+  toast(`${exNameL(ex.name)}: ${fmtKg(s.kg)} kg × ${s.reps}`);
   renderAll();
 }
 function dismissSuggestion(exIdx) {
@@ -271,7 +271,7 @@ function openPlateTool(exIdx) {
   const W = num(next && next.kg) || Math.max(...ex.sets.map(s => num(s.kg)), 0);
   const lv = usesLevels(ex);
   plateCtx = { name: ex.name, exIdx, levels: lv ? levelListOf(ex) : null, lv };
-  $("chartTitle").textContent = ex.name;
+  $("chartTitle").textContent = exNameL(ex.name);
   const bar = num(state.settings.barKg, 20);
   if (lv && !plateCtx.levels) {
     $("chartBody").innerHTML = `<div class="text-sm text-[var(--w-muted)] space-y-3">
