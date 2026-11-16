@@ -89,6 +89,7 @@ function bootApp() {
   });
   window.addEventListener("pagehide", () => writeMirror());
   if (state.settings.onboarded === false) openOnboarding();   // v44: yeni kurulum → ilk açılış kurulumu
+  loadFoodsEn();   // v51: İngilizceyse besin adları dosyası (Türkçede istek yok)
   window.aykBooted = true;
 }
 storageInit().then(bootApp, e => { console.error(e); storageUseLegacy(); bootApp(); });

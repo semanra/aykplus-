@@ -110,6 +110,7 @@ function obPickLang(l) {   // v46: ekran hemen yeni dile geçer
   state.settings.lang = l; i18nTouched = true;
   applyStaticI18n(null, true);
   obRender(true);
+  loadFoodsEn();   // v51
 }
 function obPick(key, val) {
   if (!obDraft) return;

@@ -69,7 +69,14 @@ def tr_portion(label):
             return (f"{fmt_amt(amt)} {tr}{q}", kind)
     return None
 
-def portions_for(f):
+def clean_en(s):
+    # İngilizce ad/porsiyon: yalnızca biçim temizliği (boşluk, çift virgül); kelimelere dokunulmaz
+    s = re.sub(r"\s+", " ", str(s)).strip()
+    s = re.sub(r",\s*,+", ",", s)
+    return s.strip(" ,")
+
+def portions_for(f, en=None):
+    # en: verilirse (liste) Türkçe porsiyonla AYNI sırada/sayıda USDA'nın kendi İngilizce etiketleri eklenir (v51, foods-en.js)
     out, seen = [], set()
     for lab, g in f.get("portions", []):
         if not (0 < g <= 1500) or "yield" in lab.lower(): continue
@@ -78,9 +85,10 @@ def portions_for(f):
         name, kind = t
         if name in seen: continue
         seen.add(name)
-        out.append((name, round(g, 1), {"n": 0, "s": 1, "k": 2, "c": 3}[kind]))
-    out.sort(key=lambda x: x[2])
-    return [[n, g] for n, g, _ in out[:4]]
+        out.append((name, round(g, 1), {"n": 0, "s": 1, "k": 2, "c": 3}[kind], lab))
+    out.sort(key=lambda x: x[2])      # kararlı sıralama: İngilizce etiket aynı sırada kalır
+    if en is not None: en.extend(clean_en(l) for _, _, _, l in out[:4])
+    return [[n, g] for n, g, _, _ in out[:4]]
 
 # v21: Seçilince kutuya gelen başlangıç miktarı. Önce doğal birim (adet/dilim/parça; "orta" boy varsa o), yoksa
 # kategoriye göre makul gram. ABD ölçüleri (cup, kaşık, ABD porsiyonu) başlangıç olarak KULLANILMAZ (yulaf 27 g gibi
@@ -107,6 +115,7 @@ def default_amount(por, cat, name):
 # ---------------------------------------------------------------- birleştirme
 def r4(x): return round(x, 4)
 foods, names = {}, {}
+foods_en = {}      # v51: "u<fdcId>" -> [İngilizce ad (USDA desc), [porsiyon etiketleri (foods.js "o" ile aynı sıra)]]
 # Uygulamanın kendi listesindeki (src/data.js) adlarla da çakışmasın
 for line in open(os.path.join(REPO, "src", "data.js"), encoding="utf-8").read().splitlines():
     m = re.search(r'name:\s*"([^"]+)"', line)
@@ -130,7 +139,8 @@ for path in sorted(glob.glob(os.path.join(HERE, "tr", "tr_[A-Z].json"))):
         if abs(calc - kcal) > max(25, 0.2 * kcal):
             ke = "alkol" if ("alcoholic" in d or "beer" in d or "wine" in d or "distilled" in d or "vanilla extract" in d) else \
                  "tatlandırıcı" if ("sugar-free" in d or "sugarless" in d or "stevia" in d or "sweetener" in d or "low calorie" in d) else "lif"
-        por = portions_for(src)
+        por_en = []
+        por = portions_for(src, por_en)
         first = default_amount(por, x["cat"], name)
         e = {"n": name, "c": x["cat"], "k": r4(kcal / 100), "p": r4(p / 100), "h": r4(c / 100), "f": r4(fat / 100),
              "a": [a for a in dict.fromkeys(x.get("aliases", [])) if a and norm(a) != k][:5], "s": i}
@@ -140,6 +150,7 @@ for path in sorted(glob.glob(os.path.join(HERE, "tr", "tr_[A-Z].json"))):
         if "fib" in src: e["b"] = r4(src["fib"] / 100)          # v22: lif (g/g)
         if "na" in src: e["na"] = r4(src["na"] / 100)           # v22: sodyum (mg/g)
         foods["u%d" % i] = e
+        foods_en["u%d" % i] = [clean_en(src["desc"]), por_en]
 
 # Tarifler: değerler USDA malzemelerinden hesaplanır (tarif hesaplaması, yaklaşık)
 for x in json.load(open(os.path.join(HERE, "tr", "tr_recipes.json"), encoding="utf-8")):
@@ -246,12 +257,20 @@ with open(out, "w", encoding="utf-8") as o:
     o.write("const USDA_FOODS = ")
     json.dump(foods, o, ensure_ascii=False, separators=(",", ":"))
     o.write(";\n")
+with open(os.path.join(REPO, "foods-en.js"), "w", encoding="utf-8", newline="\n") as o:
+    o.write("// AYK+ İngilizce besin adları (v51) — scripts/usda/build_foods.py ile üretilir, ELLE DÜZENLEME.\n")
+    o.write("// Kaynak: USDA FoodData Central, SR Legacy (kamu malı) kendi açıklama ve porsiyon etiketleri. Yalnızca dil İngilizceyken yüklenir.\n")
+    o.write("// \"u<fdcId>\": [ad, [porsiyon etiketleri]] — porsiyonlar foods.js 'o' dizisiyle aynı sırada ve sayıda; tarifler (r_…) yok.\n")
+    o.write("const USDA_EN = ")
+    json.dump(foods_en, o, ensure_ascii=False, separators=(",", ":"))
+    o.write(";\n")
 import csv
 with open(os.path.join(REPO, "docs", "gizlenen-besinler.csv"), "w", encoding="utf-8-sig", newline="") as o:
     w = csv.writer(o, delimiter=";")
     w.writerow(["kimlik", "gizlenen besin", "kategori", "neden", "listede kalan karşılığı"])
     for r in sorted(hidden_rows, key=lambda r: (r[2], r[1])): w.writerow(r)
 print(f"gizlenen: {sum(1 for v in foods.values() if v.get('z'))} veritabanı + {sum(1 for r in hidden_rows if not r[0].startswith('u'))} eski liste · görünen: {sum(1 for v in foods.values() if not v.get('z'))}")
+print(f"✓ foods-en.js: {len(foods_en)} besin")
 print(f"✓ foods.js: {len(foods)} besin ({sum(1 for k in foods if k.startswith('r_'))} tarif) · {os.path.getsize(out) // 1024} KB")
 for c, n in cats.most_common(): print(f"  {n:4d} {c}")
 print("kalori istisnası:", collections.Counter(v.get("x") for v in foods.values() if v.get("x")))

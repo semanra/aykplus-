@@ -70,4 +70,5 @@ function setLang(l) {
   applyStaticI18n(null, true);
   try { if (typeof profileIsOpen === "function" && profileIsOpen()) { fillProfileFields(); updateWaterAutoHint(); updateBfHint(); if ($("pfSnaps").closest("details").open) renderSnapList(); } } catch (e) { /* yoksay */ }   // v47: kutulardaki sayılar (80,5 / 80.5) yeni dile göre
   renderAll();   // Profil açıksa renderAll içinde yeniden çizilir
+  loadFoodsEn();   // v51: İngilizce besin adları (yalnızca İngilizcede; bitince yeniden çizer)
 }

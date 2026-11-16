@@ -36,3 +36,7 @@ Pişmiş hâller listeden **gizlenir** (silinmez): kategori `HIDE_CATS` içinde,
 
 - `default_amount()`: besin seçilince kutuya gelen miktar. Önce doğal birim (adet/dilim; yumurtada "büyük", diğerlerinde "orta"), etlerde 250 g'dan büyük parça yerine 150 g, yoksa kategoriye göre (`CAT_DEFAULT`). ABD ölçüleri (cup, kaşık, ABD porsiyonu) başlangıç olmaz. Yalnızca öneridir; hesaplamayı etkilemez.
 - `US_HIDE`: Türkiye'de neredeyse hiç bulunmayan ABD ürünleri (fdcId) gizlenir. Türkiye'de de satılanlar (milkshake, cips, dilim peynir, bacon, ranch sos...) listede kalır.
+
+## v51: foods-en.js
+
+`build_foods.py` ikinci çıktı olarak `foods-en.js` (`const USDA_EN = {"u<fdcId>": [USDA açıklaması, [porsiyon etiketleri]]}`) üretir: USDA'nın kendi İngilizce adı ve porsiyon etiketleri (yalnızca boşluk/çift virgül temizliği); porsiyonlar `foods.js` `o` ile aynı sırada ve sayıda (aynı döngü). Tarifler (`r_…`) yok. Uygulama yalnızca dil İngilizceyken yükler. `foods.js` bu eklemeyle bayt bayt değişmez (`git diff --quiet foods.js`).
