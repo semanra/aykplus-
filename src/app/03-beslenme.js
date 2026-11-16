@@ -102,6 +102,11 @@ function toggleTheme() {
   if (typeof animThemeSwitch === "function") animThemeSwitch(() => setTheme(mode));   // v55 ANİM: tema geçişi
   else setTheme(mode);
 }
+// Profil → Görünüm seçenekleri: başlık düğmesiyle aynı geçiş (dokunulan seçenekten dairesel açılma)
+function setThemeOpt(mode, el) {
+  if (typeof animThemeSwitch === "function") animThemeSwitch(() => setTheme(mode), el);   // v55 ANİM: tema geçişi
+  else setTheme(mode);
+}
 const toggleNutriLight = toggleTheme;   // eski ad (başlıktaki düğme)
 // Sistem teması değişince: olay + yedek olarak uygulamaya dönüşte yeniden bak (iOS arka plandayken olayı kaçırabilir)
 function onSystemTheme() { try { if (state.settings.theme === "system" && themeIsLight() !== document.documentElement.classList.contains("light")) applyTabVisibility(); } catch (e) {} }
@@ -347,7 +352,7 @@ function updateMacroCard(prefix, consumed, target, unit) {
   if (prefix === "cal") {
     st.innerHTML = `<div class="text-[12px] font-semibold ${over ? "text-[#FB7185]" : "text-white/70"}">${t(over ? "Aşım" : "Kalan")}</div>
       <div class="flex items-baseline gap-1 whitespace-nowrap"><span id="calLeft" class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-white"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
-    if (typeof animNum === "function") animNum("calLeft", diff, v => (v < -0.5 ? "+" : "") + fmtInt(Math.abs(v)));   // v55 ANİM: sayı
+    if (typeof animNum === "function") animNum("calLeft", diff, v => (v < -0.5 ? "+" : "") + fmtInt(Math.abs(v)), true);   // v55 ANİM: sayı
     const ring = $("calRing");
     const C = 301.59;
     if (typeof animRing === "function") animRing(ring, String(C - (C * pct) / 100));   // v55 ANİM: halka

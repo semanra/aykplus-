@@ -78,12 +78,18 @@ function countTo(el, from, to, fmt) {
   st.raf = requestAnimationFrame(step);
 }
 // Çizimden çağrılır: o anki gösterilen değerden (ilk açılışta 0'dan) yeni değere sayar.
-function animNum(id, value, fmt) {
+function animNum(id, value, fmt, signed) {
   const el = document.getElementById(id);
   if (!el) return;
   const st = animNums[id];
   if (st && st.val === value) { st.final = el.textContent; return; }   // aynı değer: oynamaz (sürüyorsa son metin güncellenir)
   const from = st ? (st.raf ? st.cur : st.val) : 0;
+  // İşaret değişiminde (Kalan ↔ Aşım) ara kareler yanlış işaret/biçim gösterir: sayma, son metin kalsın.
+  if (signed && st && (from < -0.5) !== (value < -0.5)) {
+    if (st.raf) { cancelAnimationFrame(st.raf); st.raf = 0; }
+    st.val = value; st.cur = value; st.final = el.textContent;
+    return;
+  }
   countTo(el, from, value, fmt);
 }
 
@@ -128,9 +134,9 @@ function animRestPulse(rem) {
 
 /* v55 ANİM: tema geçişi */
 // Başlıktaki güneş/ay düğmesi: View Transitions varsa (Safari 18+) düğmeden dairesel açılış, yoksa kısa çapraz solma.
-function animThemeSwitch(apply) {
+function animThemeSwitch(apply, origin) {
   if (!animOK()) { apply(); return; }
-  const btn = document.getElementById("nutriThemeBtn");
+  const btn = origin || document.getElementById("nutriThemeBtn");
   const root = document.documentElement;
   if (typeof document.startViewTransition === "function" && document.visibilityState === "visible") {
     const r = btn ? btn.getBoundingClientRect() : { left: innerWidth - 40, top: 20, width: 0, height: 0 };

@@ -1443,9 +1443,9 @@
             <div class="px-4 py-3 space-y-2.5" id="pfTheme">
               <div><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Görünüm">Görünüm</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Sistem: iPhone'un ayarına uyar (gündüz aydınlık, gece koyu).">Sistem: iPhone'un ayarına uyar (gündüz aydınlık, gece koyu).</span></div>
               <div class="t-seg grid-cols-3" role="group" aria-label="Görünüm" data-t-aria="Görünüm">
-                <button type="button" data-theme-opt="system" onclick="setTheme('system')" data-t="Sistem">Sistem</button>
-                <button type="button" data-theme-opt="dark" onclick="setTheme('dark')" data-t="Koyu">Koyu</button>
-                <button type="button" data-theme-opt="light" onclick="setTheme('light')" data-t="Aydınlık">Aydınlık</button>
+                <button type="button" data-theme-opt="system" onclick="setThemeOpt('system', this)" data-t="Sistem">Sistem</button>
+                <button type="button" data-theme-opt="dark" onclick="setThemeOpt('dark', this)" data-t="Koyu">Koyu</button>
+                <button type="button" data-theme-opt="light" onclick="setThemeOpt('light', this)" data-t="Aydınlık">Aydınlık</button>
               </div>
             </div>
             <div class="px-4 py-3 space-y-2.5 border-t border-[var(--t-line)] hidden" id="pfLang">
@@ -1565,7 +1565,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v54</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v55</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -3720,6 +3720,11 @@ function toggleTheme() {
   if (typeof animThemeSwitch === "function") animThemeSwitch(() => setTheme(mode));   // v55 ANİM: tema geçişi
   else setTheme(mode);
 }
+// Profil → Görünüm seçenekleri: başlık düğmesiyle aynı geçiş (dokunulan seçenekten dairesel açılma)
+function setThemeOpt(mode, el) {
+  if (typeof animThemeSwitch === "function") animThemeSwitch(() => setTheme(mode), el);   // v55 ANİM: tema geçişi
+  else setTheme(mode);
+}
 const toggleNutriLight = toggleTheme;   // eski ad (başlıktaki düğme)
 // Sistem teması değişince: olay + yedek olarak uygulamaya dönüşte yeniden bak (iOS arka plandayken olayı kaçırabilir)
 function onSystemTheme() { try { if (state.settings.theme === "system" && themeIsLight() !== document.documentElement.classList.contains("light")) applyTabVisibility(); } catch (e) {} }
@@ -3965,7 +3970,7 @@ function updateMacroCard(prefix, consumed, target, unit) {
   if (prefix === "cal") {
     st.innerHTML = `<div class="text-[12px] font-semibold ${over ? "text-[#FB7185]" : "text-white/70"}">${t(over ? "Aşım" : "Kalan")}</div>
       <div class="flex items-baseline gap-1 whitespace-nowrap"><span id="calLeft" class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-white"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
-    if (typeof animNum === "function") animNum("calLeft", diff, v => (v < -0.5 ? "+" : "") + fmtInt(Math.abs(v)));   // v55 ANİM: sayı
+    if (typeof animNum === "function") animNum("calLeft", diff, v => (v < -0.5 ? "+" : "") + fmtInt(Math.abs(v)), true);   // v55 ANİM: sayı
     const ring = $("calRing");
     const C = 301.59;
     if (typeof animRing === "function") animRing(ring, String(C - (C * pct) / 100));   // v55 ANİM: halka
@@ -13464,12 +13469,18 @@ function countTo(el, from, to, fmt) {
   st.raf = requestAnimationFrame(step);
 }
 // Çizimden çağrılır: o anki gösterilen değerden (ilk açılışta 0'dan) yeni değere sayar.
-function animNum(id, value, fmt) {
+function animNum(id, value, fmt, signed) {
   const el = document.getElementById(id);
   if (!el) return;
   const st = animNums[id];
   if (st && st.val === value) { st.final = el.textContent; return; }   // aynı değer: oynamaz (sürüyorsa son metin güncellenir)
   const from = st ? (st.raf ? st.cur : st.val) : 0;
+  // İşaret değişiminde (Kalan ↔ Aşım) ara kareler yanlış işaret/biçim gösterir: sayma, son metin kalsın.
+  if (signed && st && (from < -0.5) !== (value < -0.5)) {
+    if (st.raf) { cancelAnimationFrame(st.raf); st.raf = 0; }
+    st.val = value; st.cur = value; st.final = el.textContent;
+    return;
+  }
   countTo(el, from, value, fmt);
 }
 
@@ -13514,9 +13525,9 @@ function animRestPulse(rem) {
 
 /* v55 ANİM: tema geçişi */
 // Başlıktaki güneş/ay düğmesi: View Transitions varsa (Safari 18+) düğmeden dairesel açılış, yoksa kısa çapraz solma.
-function animThemeSwitch(apply) {
+function animThemeSwitch(apply, origin) {
   if (!animOK()) { apply(); return; }
-  const btn = document.getElementById("nutriThemeBtn");
+  const btn = origin || document.getElementById("nutriThemeBtn");
   const root = document.documentElement;
   if (typeof document.startViewTransition === "function" && document.visibilityState === "visible") {
     const r = btn ? btn.getBoundingClientRect() : { left: innerWidth - 40, top: 20, width: 0, height: 0 };

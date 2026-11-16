@@ -1443,9 +1443,9 @@
             <div class="px-4 py-3 space-y-2.5" id="pfTheme">
               <div><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Görünüm">Görünüm</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Sistem: iPhone'un ayarına uyar (gündüz aydınlık, gece koyu).">Sistem: iPhone'un ayarına uyar (gündüz aydınlık, gece koyu).</span></div>
               <div class="t-seg grid-cols-3" role="group" aria-label="Görünüm" data-t-aria="Görünüm">
-                <button type="button" data-theme-opt="system" onclick="setTheme('system')" data-t="Sistem">Sistem</button>
-                <button type="button" data-theme-opt="dark" onclick="setTheme('dark')" data-t="Koyu">Koyu</button>
-                <button type="button" data-theme-opt="light" onclick="setTheme('light')" data-t="Aydınlık">Aydınlık</button>
+                <button type="button" data-theme-opt="system" onclick="setThemeOpt('system', this)" data-t="Sistem">Sistem</button>
+                <button type="button" data-theme-opt="dark" onclick="setThemeOpt('dark', this)" data-t="Koyu">Koyu</button>
+                <button type="button" data-theme-opt="light" onclick="setThemeOpt('light', this)" data-t="Aydınlık">Aydınlık</button>
               </div>
             </div>
             <div class="px-4 py-3 space-y-2.5 border-t border-[var(--t-line)] hidden" id="pfLang">
@@ -1565,7 +1565,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v54</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v55</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
