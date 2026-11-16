@@ -81,6 +81,11 @@ Object.assign(EN, {
   "%{p} dolu": "{p}% full",
   "Alan dolmak üzere. Hemen yedek dosyası kaydet; kayıt dolarsa yeni bilgiler kaydedilemez.": "Storage is almost full. Save a backup file now; once it's full, new data can't be saved.",
   "Telefondaki kayıt alanının %{p}'i dolu. Yedek dosyası kaydet (Profil → Yedekleme).": "Storage on this phone is {p}% full. Save a backup file (Profile → Backup).",
+  // v58: yedek durumu
+  "İç yedekler bu telefonda durur; telefon kaybolursa ya da uygulama silinirse onlar da gider. Ara sıra yedek dosyası kaydedip iCloud Drive'a koy.": "Internal backups stay on this phone; if you lose the phone or delete the app, they go too. Now and then, save a backup file and put it in iCloud Drive.",
+  "Telefon dışı yedek (dosya)": "Off-phone backup (file)", "Otomatik iç yedek": "Automatic internal backup",
+  "Hiç alınmadı": "Never", "Bu cihazda yok": "Not on this device",
+  "Bugün alındı": "Taken today", "Dün alındı": "Taken yesterday", "İlk açılışta oluşur": "Made on next launch",
   "Son yedek: {d} ({n} gün önce)": { one: "Last backup: {d} ({n} day ago)", other: "Last backup: {d} ({n} days ago)" },
   "Henüz yedek alınmadı. Verilerin sadece bu telefonda duruyor; düzenli yedek almanı öneririm.": "No backup yet. Your data is only on this phone, so back it up regularly.",
   "Yedek dosyası kaydet": "Save backup file", "Dosyadan geri yükle": "Restore from file",

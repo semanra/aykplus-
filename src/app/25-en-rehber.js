@@ -1076,7 +1076,7 @@ function mobNoteL(note) {
 // ---------------------------------------------------------------------------
 Object.assign(EN, {
   // --- Hakkında
-  "Verilerin yalnızca bu telefonda. Barkod okuttuğunda yalnızca barkod numarası Open Food Facts'e gönderilir.": "Your data stays on this phone only. When you scan a barcode, only the barcode number is sent to Open Food Facts.",
+  "Verilerin yalnızca bu telefonda; uygulamanın bir sunucusu yok. Barkod okuttuğunda barkod numarası Open Food Facts'e gönderilir; bu istekle telefonun internet adresi (IP) de onlara ulaşır.": "Your data stays on this phone only; the app has no server. When you scan a barcode, the barcode number is sent to Open Food Facts, and your phone's internet address (IP) reaches them with that request.",
   "Günlük harcama.": "Daily energy use.",
   "Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.": "The energy you burn at rest comes from the Mifflin-St Jeor equation. If you entered your body fat, the Katch-McArdle equation, which is based on lean mass, is used instead. The result is then multiplied by your activity factor.",
   "Hareketlilik çarpanları": "Activity factors",

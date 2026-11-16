@@ -4,23 +4,29 @@
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
 const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setAnim", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
-function fillProfileFields() {
-  const st = state.settings;
+// v58: yazı kutularının kayıttan gösterilen değerleri (fillProfileFields ve yazarken kayıt denetimi ortak kullanır)
+function pfTextVals() {
+  const st = state.settings, o = {
+    setAge: String(st.age), setHeight: fmtNum(st.height),
+    pfWeight: fmtNum(num(bodyKgToDisp(num(state.weight, 0)))),
+    setTarget: fmtNum(num(bodyKgToDisp(num(st.targetWeight, 82)))),
+    setWater: fmtNum(num(st.waterTarget, 3.5)),
+    setBf: validBf(st.bodyFat) ? fmtNum(validBf(st.bodyFat)) : "",
+    setTargetBf: validBf(st.targetBodyFat) ? fmtNum(validBf(st.targetBodyFat)) : "",
+    setRest: String(st.restSec) };
+  if (isImperial()) { const [f, i] = cmToFtIn(st.height); o.setHeightFt = String(f); o.setHeightIn = String(i); }   // v53
+  return o;
+}
+// skipId: yazılmakta olan kutu (v58 yazarken kayıt) yeniden yazılmaz, imleç ve yazı yerinde kalır
+function fillProfileFields(skipId) {
+  const st = state.settings, v = pfTextVals();
+  Object.keys(v).forEach(id => { if (id !== skipId) $(id).value = v[id]; });
   $("setSex").value = st.sex;
-  $("setAge").value = st.age;
-  $("setHeight").value = fmtNum(st.height);
-  if (isImperial()) { const [f, i] = cmToFtIn(st.height); $("setHeightFt").value = f; $("setHeightIn").value = i; }   // v53
-  $("pfWeight").value = fmtNum(num(bodyKgToDisp(num(state.weight, 0))));
-  $("setTarget").value = fmtNum(num(bodyKgToDisp(num(st.targetWeight, 82))));
   profileUnitUI();
   $("setActivity").value = ["low", "mid", "high"].includes(st.activity) ? st.activity : "mid";
   $("setProtein").value = st.proteinHigh === true ? "high" : "std";
-  $("setWater").value = fmtNum(num(st.waterTarget, 3.5));
   $("setWaterAuto").checked = st.waterAuto !== false;
   updateWaterAutoHint();
-  $("setBf").value = validBf(st.bodyFat) ? fmtNum(validBf(st.bodyFat)) : "";
-  $("setTargetBf").value = validBf(st.targetBodyFat) ? fmtNum(validBf(st.targetBodyFat)) : "";
-  $("setRest").value = st.restSec;
   $("setSound").checked = !!st.sound;
   $("setAwake").checked = !!st.keepAwake;
   $("setWarmup").checked = st.warmupCard !== false;
@@ -30,7 +36,7 @@ function fillProfileFields() {
   $("setDayStart").value = String(dayStartHour());
   updateBfHint();
 }
-const PRIVACY_NOTE = "Verilerin yalnızca bu telefonda. Barkod okuttuğunda yalnızca barkod numarası Open Food Facts'e gönderilir.";
+const PRIVACY_NOTE = "Verilerin yalnızca bu telefonda; uygulamanın bir sunucusu yok. Barkod okuttuğunda barkod numarası Open Food Facts'e gönderilir; bu istekle telefonun internet adresi (IP) de onlara ulaşır.";   // v58
 const LICENSES = ["Barlow Condensed (SIL OFL 1.1)", "@zxing/library (Apache-2.0)", "Open Food Facts verisi (ODbL; ürün verisi katkıcılara ait)", "USDA FoodData Central (kamu malı / CC0)", "Tailwind CSS (MIT)", "Vücut haritası görseli (uygulama sahibinin kendi görseli)"];
 const METHOD_SOURCES = ["Mifflin ve ark. (1990), Mifflin-St Jeor denklemi", "Katch-McArdle denklemi (yağsız kütleye dayalı)", "Morton ve ark. 2018, Br J Sports Med (protein ve kas)", "Nunes ve ark. 2022, J Cachexia Sarcopenia Muscle (protein ve kas)", "ISSN Pozisyon Bildirisi 2017 (Jäger ve ark.)", "Helms ve ark. 2014 (kilo verirken protein)", "Iraki ve ark. 2019 (kilo alırken beslenme)", "Joslin Klinik Beslenme Rehberi", "AMDR: yağ kalorinin %20–35'i", "Whittaker ve Wu 2021 (bazal metabolizma denklemleri)"];
 function renderAbout() {
@@ -60,7 +66,7 @@ function renderAbout() {
 function openProfile() {
   fillProfileFields();
   renderAbout();
-  $("backupText").value = JSON.stringify(state);
+  $("backupText").value = "";   // v58: bütün kaydı metne çevirmek Profil'i yavaşlatıyordu; kod yalnızca "Kodu kopyala"da üretilir
   renderProfile();
   const el = $("profilePage");
   el.classList.remove("hidden"); el.classList.add("flex");
@@ -144,6 +150,7 @@ function renderProfile() {
   $("pfMeasureBox").innerHTML = cells
     ? `<div class="grid grid-cols-3 gap-2">${cells}</div><p class="text-[12px] t-dim mt-2">${esc(t("Son ölçüm: {d} · Değişim ilk ölçüne göre. Grafik İlerleme sekmesinde.", { d: fmtDate(lastM.ts, true) }))}</p>`
     : `<div class="t-card rounded-[22px] p-4 text-[13px] t-dim">${t("Henüz ölçü eklemedin. Kilo yerinde sayarken belin inceliyorsa yağ yakıp kas kazanıyorsun demektir. İlk ölçünü eklemek için \"+ Ölçü ekle\"ye dokun.")}</div>`;
+  renderBackupStatus();   // v58
   $("lastBackupText").textContent = state.lastBackupAt
     ? tn(Math.floor((Date.now() - state.lastBackupAt) / DAY_MS), "Son yedek: {d} ({n} gün önce)", { d: fmtDate(state.lastBackupAt, true) })
     : t("Henüz yedek alınmadı. Verilerin sadece bu telefonda duruyor; düzenli yedek almanı öneririm.");
@@ -151,9 +158,12 @@ function renderProfile() {
 
 // v24: "Su hedefi kiloya göre" açıkken elle hedef kutusu pasif, hesap açıklamada
 function updateWaterAutoHint() {
-  const on = $("setWaterAuto").checked, a = waterAutoInfo(readProfileWeight() || state.weight);
-  $("setWater").disabled = on && !!a;
-  $("setWater").classList.toggle("opacity-50", on && !!a);
+  const on = $("setWaterAuto").checked, a = waterAutoInfo(readProfileWeight() || state.weight), wb = $("setWater");
+  // v58: otomatikken kutu kullanılan hedefi (hesaplanan) gösterir ve kilitlidir; kapatınca elle yazılan hedef geri gelir
+  if (on && a) { wb.value = fmtNum(a.total); wb.dataset.auto = "1"; }
+  else if (wb.dataset.auto === "1") { wb.value = fmtNum(num(state.settings.waterTarget, 3.5)); wb.dataset.auto = ""; }
+  wb.disabled = on && !!a;
+  wb.classList.toggle("opacity-50", on && !!a);
   $("setWaterHint").textContent = on
     ? (a ? (isImperial()   // v53: imperial'de kilo lb olarak, formül (kg × 35 ml) yazılmaz
         ? t(a.cr ? "Kilona göre ({w} lb): {b} L + 0,5 L kreatin → {tot} L" : "Kilona göre ({w} lb): {b} L", { w: fmtNum(num(bodyKgToDisp(a.w))), b: fmtNum(a.base), tot: fmtNum(a.total) })
@@ -182,12 +192,35 @@ function profileLogWeight() {
 function profileAutoSaveInit() {
   const det = $("pfSnaps") && $("pfSnaps").closest("details");   // v41: iç yedek listesi yalnızca açılınca okunur
   if (det && !det.dataset.snapInit) { det.dataset.snapInit = "1"; det.addEventListener("toggle", () => { if (det.open) renderSnapList(); }); }
-  PF_FIELDS.forEach(id => { const el = $(id); if (el && !el.dataset.autosave) { el.dataset.autosave = "1"; el.addEventListener("change", () => applyProfileFields(id)); } });
+  PF_FIELDS.forEach(id => { const el = $(id); if (el && !el.dataset.autosave) {
+    el.dataset.autosave = "1";
+    el.addEventListener("change", () => { clearTimeout(pfLiveTimer); pfLiveTimer = 0; applyProfileFields(id); });
+    // v58: iPhone'da kutunun dışına dokunmak klavyeyi kapatmaz ("change" gelmez); uygulamadan çıkılırsa yazılan kaybolurdu.
+    // Artık yazmayı bırakınca (0,9 sn) da sessizce kaydedilir; kutudan çıkınca "Kaydedildi · Geri al" yine çıkar.
+    if (el.tagName === "INPUT" && el.type === "text") el.addEventListener("input", () => { clearTimeout(pfLiveTimer); pfLiveTimer = setTimeout(() => pfLiveSave(id), 900); });
+  } });
+  if (!document.body.dataset.pfFlush) {
+    document.body.dataset.pfFlush = "1";
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && profileIsOpen()) pfFlushField(); });
+    window.addEventListener("pagehide", () => { if (profileIsOpen()) pfFlushField(); });
+  }
 }
-function applyProfileFields(changedId) {
+let pfLiveTimer = 0, pfLiveSaved = "";
+function pfLiveSave(id) { pfLiveTimer = 0; const a = document.activeElement; if (a && a.id === id) applyProfileFields(id, { live: true }); }
+// Uygulama arka plana geçerken odaktaki alanı kaydet (kutudan çıkılmış gibi)
+function pfFlushField() {
+  clearTimeout(pfLiveTimer); pfLiveTimer = 0;
+  const a = document.activeElement;
+  if (a && PF_FIELDS.includes(a.id)) applyProfileFields(a.id);
+}
+// opts.live (v58, yazarken): geçersiz / yarım değer sessizce atlanır (bildirim yok, kutuya dokunulmaz); sınıra kırpılacak
+// ya da yuvarlanacak değer (yaş "3" → 12) kaydedilmez, kutudan çıkınca normal yoldan kaydedilir.
+function applyProfileFields(changedId, opts = {}) {
+  const live = !!opts.live;
   const st = state.settings;
   const bfRaw = $("setBf").value.trim(), tbfRaw = $("setTargetBf").value.trim();
   if ((bfRaw && !validBf(bfRaw)) || (tbfRaw && !validBf(tbfRaw))) {
+    if (live) return false;
     $("setBf").value = validBf(st.bodyFat) ? fmtNum(validBf(st.bodyFat)) : "";
     $("setTargetBf").value = validBf(st.targetBodyFat) ? fmtNum(validBf(st.targetBodyFat)) : "";
     updateBfHint();
@@ -195,7 +228,8 @@ function applyProfileFields(changedId) {
     return false;
   }
   const wRaw = $("pfWeight").value.trim(), w = readProfileWeight();
-  if (wRaw && !w) {   // kutu olduğu gibi kalır ("Tartıyı kaydet" de bu değeri reddeder); kayıtlı kilo değişmez
+  if (wRaw && !w) {
+    if (live) return false;   // kutu olduğu gibi kalır ("Tartıyı kaydet" de bu değeri reddeder); kayıtlı kilo değişmez
     toast(isImperial() ? t("Kilo {a} ile {b} arasında olmalı; kaydedilmedi.", { a: fmtW(30, { body: true }), b: fmtW(300, { body: true }) }) : t("Kilo 30 ile 300 kg arasında olmalı; kaydedilmedi."), "error");
     return false;
   }
@@ -205,6 +239,7 @@ function applyProfileFields(changedId) {
     const fr = $("setHeightFt").value.trim(), ir = $("setHeightIn").value.trim();
     const f = num(fr, NaN), i = ir === "" ? 0 : num(ir, NaN), [f0, i0] = cmToFtIn(st.height);
     if (fr !== "" && !(Number.isInteger(f) && f >= 0 && i >= 0 && i < 12)) {
+      if (live) return false;
       $("setHeightFt").value = f0; $("setHeightIn").value = i0;
       toast(t("Boyda ft tam sayı, in 0 ile 11 arasında olmalı."), "error");
       return false;
@@ -212,7 +247,7 @@ function applyProfileFields(changedId) {
     hImp = fr === "" || (f === f0 && i === i0) ? st.height : Math.max(120, Math.min(230, ftInToCm(f, i)));   // ft / in değişmediyse boy aynen (175,3 → 175 olmaz)
   }
   const before = JSON.stringify([state.settings, state.weight]);
-  const undo = JSON.stringify(state);
+  const undo = JSON.stringify(state), oldSt = JSON.stringify(st), oldW = state.weight;
   st.sex = $("setSex").value === "female" ? "female" : "male";
   st.age = Math.max(12, Math.min(99, Math.round(num($("setAge").value, st.age))));
   if (hImp !== null) st.height = hImp;
@@ -221,7 +256,7 @@ function applyProfileFields(changedId) {
   else { const tw = round1(num($("setTarget").value, st.targetWeight)); if (tw !== round1(num(st.targetWeight)) || !(st.targetWeight >= 30 && st.targetWeight <= 250)) st.targetWeight = Math.max(30, Math.min(250, tw)); }
   st.activity = ["low", "mid", "high"].includes($("setActivity").value) ? $("setActivity").value : "mid";
   st.proteinHigh = $("setProtein").value === "high";
-  st.waterTarget = Math.max(0.5, Math.min(10, round1(num($("setWater").value, st.waterTarget))));
+  if (!$("setWater").disabled) st.waterTarget = Math.max(0.5, Math.min(10, round1(num($("setWater").value, st.waterTarget))));   // v58: kilitliyken kutuda hesaplanan değer var
   st.waterAuto = $("setWaterAuto").checked;
   st.restSec = Math.max(10, Math.min(900, Math.round(num($("setRest").value, st.restSec))));
   st.bodyFat = bfRaw ? round1(validBf(bfRaw)) : "";
@@ -234,12 +269,22 @@ function applyProfileFields(changedId) {
   st.anim = $("setAnim").checked;   // v55
   st.dayStartHour = Math.max(0, Math.min(5, parseInt($("setDayStart").value, 10) || 0));
   if (w) state.weight = w;
-  if (JSON.stringify([state.settings, state.weight]) === before) { fillProfileFields(); return true; }
-  undoSnap = undo;   // Geri al bu değişiklikten önceki hâle döner
+  if (live && changedId) {   // kutuda yazılan, kayda girecek değerle aynı değilse (kırpma / yuvarlama) şimdilik kaydetme
+    const raw = $(changedId).value.trim(), shown = pfTextVals()[changedId];
+    if (shown != null && raw !== "" && num(raw, NaN) !== num(shown, NaN)) { state.settings = JSON.parse(oldSt); state.weight = oldW; return false; }
+  }
+  if (JSON.stringify([state.settings, state.weight]) === before) {
+    fillProfileFields(live ? changedId : undefined);
+    if (!live && pfLiveSaved) { pfLiveSaved = ""; offerUndo(t("Kaydedildi")); }   // yazarken sessizce kaydedilmişti: kutudan çıkınca bildir
+    return true;
+  }
+  if (!(live && pfLiveSaved)) undoSnap = undo;   // Geri al bu alana yazmaya başlamadan önceki hâle döner
   if (!timer.running) resetTimerUI();
   renderAll();
-  fillProfileFields();   // sınırlanan değerler kutuda düzgün görünsün
+  fillProfileFields(live ? changedId : undefined);   // sınırlanan değerler kutuda düzgün görünsün (yazılan kutu hariç)
   updateWakeLock();
+  if (live) { pfLiveSaved = changedId; return true; }
+  pfLiveSaved = "";
   offerUndo(t("Kaydedildi"));
   return true;
 }
@@ -433,6 +478,29 @@ function renderBanner() {
   $("backupBanner").classList.toggle("hidden", !need);
   $("backupDot").classList.toggle("hidden", !(hasMeaningfulData() && days >= 7));
   if (need) $("backupBannerText").textContent = state.lastBackupAt ? tn(days, "Son yedeğin {n} gün önce. Verilerini korumak için yedekle.") : t("Henüz hiç yedek almadın. Verilerin sadece bu telefonda.");
+}
+// v58: YEDEK DURUMU — telefon dışı kopya (yedek dosyası / kodu) ve otomatik iç yedek ayrı ayrı, renkli noktayla.
+function backupAgeDays() { return state.lastBackupAt ? Math.max(0, Math.floor((Date.now() - state.lastBackupAt) / DAY_MS)) : -1; }
+function backupLevel() { const d = backupAgeDays(); return d < 0 ? "bad" : d < 7 ? "ok" : d < 30 ? "warn" : "bad"; }
+const BK_DOT = { ok: "bg-[var(--d-gr)]", warn: "bg-[var(--t-warn-icon)]", bad: "bg-[var(--t-danger)]", none: "bg-[var(--t-line2)]" };
+function bkRow(id, lvl, title, val) {
+  return `<div class="flex items-center gap-3 min-h-[44px]"><i class="w-2.5 h-2.5 rounded-full shrink-0 ${BK_DOT[lvl]}" aria-hidden="true"></i>
+    <span class="flex-1 min-w-0 text-[14px] font-semibold text-[var(--t-text)]">${title}</span><span id="${id}" class="text-[13px] text-[var(--t-muted)] text-right">${val}</span></div>`;
+}
+function renderBackupStatus() {
+  const box = $("pfBackupStatus"); if (!box) return;
+  const d = backupAgeDays();
+  const off = d < 0 ? t("Hiç alınmadı") : d === 0 ? t("Bugün") : tn(d, "{n} gün önce");
+  const idb = storeMode === "idb" && !!aykDB;
+  box.innerHTML = bkRow("pfBkOff", backupLevel(), t("Telefon dışı yedek (dosya)"), off)
+    + bkRow("pfBkAuto", idb ? "none" : "bad", t("Otomatik iç yedek"), idb ? "…" : t("Bu cihazda yok"));
+  if (!idb) return;
+  const day = logicalToday(), yday = todayStr(new Date(new Date(day + "T12:00:00").getTime() - DAY_MS));
+  Promise.all([idbGet("snaps", "day-" + day), idbGet("snaps", "day-" + yday)]).then(([a, b]) => {
+    const el = $("pfBkAuto"); if (!el) return;
+    el.textContent = a ? t("Bugün alındı") : b ? t("Dün alındı") : t("İlk açılışta oluşur");
+    el.parentElement.querySelector("i").className = "w-2.5 h-2.5 rounded-full shrink-0 " + BK_DOT[a || b ? "ok" : "warn"];
+  }).catch(() => {});
 }
 function snoozeBackup() { state.backupSnoozeUntil = Date.now() + 3 * DAY_MS; saveState(); renderBanner(); }
 

@@ -1526,18 +1526,18 @@
         <section class="space-y-2.5" aria-labelledby="pfH6">
           <div id="pfH6" class="t-label" data-t="YEDEKLEME">YEDEKLEME</div>
           <div class="t-card rounded-[22px] p-4 space-y-3">
+            <div id="pfBackupStatus" class="-my-1"></div>
             <p id="lastBackupText" class="text-[13px] text-[var(--t-muted)]">Henüz yedek alınmadı.</p>
+            <p class="text-[12.5px] leading-snug text-[var(--t-dim)]" data-t="İç yedekler bu telefonda durur; telefon kaybolursa ya da uygulama silinirse onlar da gider. Ara sıra yedek dosyası kaydedip iCloud Drive'a koy.">İç yedekler bu telefonda durur; telefon kaybolursa ya da uygulama silinirse onlar da gider. Ara sıra yedek dosyası kaydedip iCloud Drive'a koy.</p>
+            <button onclick="exportBackupFile()" class="t-btn w-full h-[52px] rounded-xl text-[15px]" data-t="Yedek dosyası kaydet">Yedek dosyası kaydet</button>
+            <label class="t-btn-ghost w-full h-12 rounded-xl text-[14px] flex items-center justify-center text-center cursor-pointer">
+              <span data-t="Dosyadan geri yükle">Dosyadan geri yükle</span>
+              <input type="file" accept="application/json,.json,text/plain,.txt" class="hidden" onchange="importBackupFile(event)" />
+            </label>
             <div id="pfStorage">
               <div class="flex items-baseline justify-between text-[13px]"><span class="text-[var(--t-muted)]" data-t="Telefondaki kayıt alanı">Telefondaki kayıt alanı</span><span id="pfStorageTxt" class="font-semibold tabular-nums">%0 dolu</span></div>
               <div class="h-1.5 rounded-full bg-[var(--t-elev)] mt-1.5 overflow-hidden" aria-hidden="true"><i id="pfStorageBar" class="block h-full rounded-full bg-[var(--t-text2)]" style="width:0%"></i></div>
               <p id="pfStorageWarn" class="hidden text-[12px] text-[var(--t-warn-text)] mt-1.5"></p>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="exportBackupFile()" class="t-btn h-12 rounded-xl text-[14px]" data-t="Yedek dosyası kaydet">Yedek dosyası kaydet</button>
-              <label class="t-btn-ghost h-12 rounded-xl text-[14px] flex items-center justify-center text-center cursor-pointer">
-                <span data-t="Dosyadan geri yükle">Dosyadan geri yükle</span>
-                <input type="file" accept="application/json,.json,text/plain,.txt" class="hidden" onchange="importBackupFile(event)" />
-              </label>
             </div>
             <details class="bg-[var(--t-well)] border border-[var(--t-line)] rounded-2xl px-3.5 py-2 text-[13px]">
               <summary class="text-[var(--t-muted)] cursor-pointer min-h-[40px] flex items-center" data-t="Yedek kodu ile (kopyala / yapıştır)">Yedek kodu ile (kopyala / yapıştır)</summary>
@@ -1589,7 +1589,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v57</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v58</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
