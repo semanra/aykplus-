@@ -216,7 +216,7 @@ Yapıldı (v6–v12): kardiyo/süreli hareketler, kalori koçu, kilo artırma ö
 
 **v55 (16 Kasım 2026):** yeni simge (vektörden üretilir), Portal Zoom açılış, Kinetic Slice başlık, uygulama içi animasyonlar (sayı, halka, set tiki, rekor, nabız, tema geçişi), Profil → Animasyonlar anahtarı. Sahibin kaydı etkilenmez.
 
-**v56 (16 Kasım 2026):** açılış Portal Zoom yana kaymadan doğrudan "+" merkezinden büyür (`aykSpCam` yalnız scale, `transform-origin` "+" merkezi, sabit kaydırma logoyu başta ortalar); simge bağlantıları sürüm sorgulu (`icon.png?v=55`, manifest `icon-192/512.png?v=55`) — iPhone eski simgeyi önbellekten almasın.
+**v56 (16 Kasım 2026):** açılış Portal Zoom simgedeki hız kesikli logoyla (kadran parçaları simge çiziminden, sırayla yanar), yana kaymadan doğrudan "+" merkezinden büyür (`aykSpCam` yalnız scale, `transform-origin` "+" merkezi, sabit kaydırma logoyu başta ortalar); simge bağlantıları sürüm sorgulu (`icon.png?v=55`, manifest `icon-192/512.png?v=55`) — iPhone eski simgeyi önbellekten almasın.
 
 **SONRAYA NOT (v14):** Etiket fotoğrafından besin değeri okuma (OCR). Safari'de yerleşik metin tanıma yok, ağır bir kütüphane gerekir ve Türkçe tablolarda hata payı yüksek; ileride yeniden değerlendirilecek. Şimdilik yapılmıyor.
 
