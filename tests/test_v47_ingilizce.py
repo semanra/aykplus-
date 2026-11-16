@@ -615,7 +615,7 @@ try:
     def collect(src):
         for mm in re.finditer(r"(?<![.\w])t\(\s*" + lit, src): keys.add(mm.group(1))
         for mm in re.finditer(r"(?<![.\w])tn\(\s*[^,]+,\s*" + lit, src): keys.add(mm.group(1)); tnkeys.add(mm.group(1))
-    for f in list(IZIN) + ["09-kas-plaka-koc-takviye.js", "24-en-besin.js"]: collect(rd(f))   # v51: 24 de anahtar/yer tutucu/etiket denetiminde
+    for f in list(IZIN) + ["09-kas-plaka-koc-takviye.js", "24-en-besin.js", "25-en-rehber.js"]: collect(rd(f))   # v51: 24, v52: 25 de anahtar/yer tutucu/etiket denetiminde
     for f, fns in KISMI.items():
         for fn in fns: collect(islev_govdesi(rd(f), fn))
     for mm in re.finditer(r'data-t(?:-aria|-ph)?="([^"]*)"', mk): keys.add(mm.group(1))
