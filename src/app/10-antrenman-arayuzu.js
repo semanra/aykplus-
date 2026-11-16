@@ -297,7 +297,7 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
     return `<div class="grid items-center gap-2 h-14 px-1 rounded-2xl ${rowCls}" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px">
       <span class="t-display text-[22px] text-center ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}</span>
       <span class="flex items-center gap-1.5"><input type="text" inputmode="numeric" data-fk="t-${exIdx}-${i}" value="${num(s.sec)}" onchange="updateSetData(${exIdx}, ${i}, 'sec', this.value)" class="t-input w-20" /><span class="text-xs t-muted">${t("sn")}</span></span>
-      <button onclick="startTimer(${num(s.sec)}, ${esc(JSON.stringify(exNameL(ex.name).slice(0, 40)))})" class="t-btn-ghost h-11 rounded-xl text-[13px] flex items-center justify-center gap-1">${svgI("play", 14)}${t("Başlat")}</button>
+      <button onclick="startTimer(${num(s.sec)}, ${esc(JSON.stringify(ex.name.slice(0, 40)))})" class="t-btn-ghost h-11 rounded-xl text-[13px] flex items-center justify-center gap-1">${svgI("play", 14)}${t("Başlat")}</button>
       ${check}
     </div>`;
   }

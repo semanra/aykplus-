@@ -182,7 +182,7 @@ function timerLabelText(label) {
   const L = String(label == null ? "" : label);
   if (L === "Dinlenme") return t("Dinlenme");
   if (L.startsWith("Dinlenme • ")) return t("Dinlenme • {ad}", { ad: exNameL(L.slice(11)) });
-  return L;
+  return exNameL(L);   // v51: süreli hareket sayacı ham adı saklar, gösterimde çevrilir
 }
 function startTimer(sec, label = "Dinlenme") {
   sec = Math.round(num(sec, 0));
