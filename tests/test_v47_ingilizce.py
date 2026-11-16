@@ -575,7 +575,7 @@ try:
     KISMI = {
       "09-kas-plaka-koc-takviye.js": ["muscleL", "libCatL", "targetL", "overloadSuggestion", "deloadInfo", "deloadHtml", "dismissDeload", "suggestionHtml", "applySuggestion", "dismissSuggestion", "weeklyMuscleSets", "plateChips", "warmupSets", "openPlateTool", "renderLevelTool", "renderPlateTool", "offerUndo", "doUndo", "nextDayIdx", "fmtMinutes", "fmtDuration", "renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose", "deleteMeal", "copyMeal", "otherMeals", "coachAnalysis", "applyCoach", "resetCoachAdjust", "dayIntake", "historySeries", "setHistRange", "logExerciseLines", "buildShareCanvas", "openShareCard", "shareWorkoutCard"],
       # v53: birim yardımcıları (dosyanın kalanı İngilizce sözlük girişleri; anahtarları 4d denetler)
-      "26-birim.js": ["regionImperial", "isImperial", "wUnit", "lenUnit", "kgToDisp", "dispToKg", "bodyKgToDisp", "bodyDispToKg", "cmToDisp", "dispToCm", "ftInToCm", "cmToFtIn", "fmtHeight", "fmtWNum", "fmtW", "plateSet", "barOptions", "wStep", "setUnits"]}
+      "26-birim.js": ["regionImperial", "isImperial", "unitNum", "wUnit", "lenUnit", "kgToDisp", "dispToKg", "bodyKgToDisp", "bodyDispToKg", "cmToDisp", "dispToCm", "ftInToCm", "cmToFtIn", "fmtHeight", "fmtWNum", "fmtW", "plateSet", "barOptions", "wStep", "setUnits"]}
     bad = []; used = {}
     for f, tbl in IZIN.items():
         for (ln, txt, wr, raw) in tarama(rd(f)):

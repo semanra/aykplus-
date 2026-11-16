@@ -44,10 +44,14 @@ try:
     check(all(k == x for x, _, k in rt), "a: gidiş-dönüş kgToDisp(dispToKg(x)) === x: %s" % rt)
     check(pg.evaluate("dispToKg(45)") == 20.412 and pg.evaluate("dispToKg(135)") == 61.235, "a: dispToKg(45) = 20.412, 135 = 61.235")
     check(pg.evaluate("kgToDisp(dispToKg(kgToDisp(20)))") == pg.evaluate("kgToDisp(20)") == 44 and pg.evaluate("kgToDisp(dispToKg(44))") == 44, "a: kg kaydı (20 kg → 44 lb) yeniden yazılınca kaymaz")
-    r = pg.evaluate("""() => [fmtW(20.412), fmtW(61.235), fmtWNum(102.058), bodyDispToKg(176), bodyKgToDisp(79.8), bodyDispToKg(bodyKgToDisp(79.8)), fmtW(79.8, { body: true }),
+    r = pg.evaluate("""() => [fmtW(20.412), fmtW(61.235), fmtWNum(102.058), bodyDispToKg(176), bodyKgToDisp(79.8), bodyKgToDisp(bodyDispToKg(176)), fmtW(79.8, { body: true }),
       fmtHeight(170.18), fmtHeight(175.3), ftInToCm(5, 9), ftInToCm(6, 0), cmToDisp(42.5), dispToCm(16.7), plateSet(), barOptions(), wStep(), fmtW(0.45, { fine: true })]""")
-    check(r == ["45 lb", "135 lb", "225", 79.8, 175.9, 79.8, "175,9 lb", "5'7\"", "5'9\"", 175.3, 182.9, 16.7, 42.42, [45, 35, 25, 10, 5, 2.5], [45, 35, 15, 0], 5, "0,99 lb"],
+    check(r == ["45 lb", "135 lb", "225", 79.832, 175.9, 176, "175,9 lb", "5'7\"", "5'9\"", 175.3, 182.9, 16.7, 42.42, [45, 35, 25, 10, 5, 2.5], [45, 35, 15, 0], 5, "0,99 lb"],
           "a: imperial biçimler / vücut kilosu / boy / ölçü / plakalar: %s" % r)
+    rt = pg.evaluate("[120, 154, 176, 176.4, 200.5, 250].map(x => [x, bodyDispToKg(x), bodyKgToDisp(bodyDispToKg(x))])")
+    check(all(k == x for x, _, k in rt), "a: vücut kilosu gidiş-dönüş bodyKgToDisp(bodyDispToKg(x)) === x: %s" % rt)
+    r = pg.evaluate("[dispToKg(''), kgToDisp(''), String(bodyDispToKg(NaN)), bodyKgToDisp('abc'), cmToDisp(''), dispToCm(null), dispToKg('2,5')]")
+    check(r == ["", "", "NaN", "abc", "", None, 1.134], "a: imperial'de boş / okunamayan girdi olduğu gibi döner (metrikle aynı), virgüllü sayı okunur: %s" % r)
     pg.evaluate("setLang('en')"); pg.wait_for_timeout(80)
     check(pg.evaluate("[fmtW(102.058), fmtW(79.8, { body: true })]") == ["225 lb", "175.9 lb"], "a: İngilizcede ondalık nokta")
     pg.evaluate("setLang('tr')"); pg.evaluate("setUnits('metric')"); pg.wait_for_timeout(80)
@@ -102,7 +106,11 @@ try:
     bx = q.evaluate("[...document.querySelectorAll('#obUnits [data-units-opt]')].map(e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; })")
     check(len(bx) == 2 and all(w >= 44 and h >= 44 for w, h in bx), "e: kurulum birim düğmeleri ≥ 44 px: %s" % bx)
     check(q.is_visible("#obHeightFt") and q.is_visible("#obHeightIn") and not q.is_visible("#obHeight") and "lb" in q.inner_text("label[for=obWeight]"), "e: boy ft + in iki kutu, kilo lb")
-    q.click("#obSexMale"); q.fill("#obAge", "30"); q.fill("#obHeightFt", "5"); q.fill("#obHeightIn", "9"); q.fill("#obWeight", "700"); q.click("#obNext")
+    q.click("#obSexMale"); q.fill("#obAge", "30"); q.fill("#obHeightFt", "5"); q.fill("#obHeightIn", "9"); q.click("#obNext")
+    check(obstep() == "2" and q.inner_text("#obErr") == "Enter your weight.", "e: imperial'de boş kilo → 'Enter your weight.': %r" % q.inner_text("#obErr"))
+    q.fill("#obHeightIn", "15"); q.fill("#obWeight", "176"); q.click("#obNext")
+    check(obstep() == "2" and "between 0 and 11" in q.inner_text("#obErr"), "e: in 0–11 dışında hata: %r" % q.inner_text("#obErr"))
+    q.fill("#obHeightIn", "9"); q.fill("#obWeight", "700"); q.click("#obNext")
     err = q.inner_text("#obErr")
     check(obstep() == "2" and "lb" in err and "kg" not in err, "e: sınır dışı kilo hatası lb ile: %r" % err)
     q.fill("#obHeightFt", "3"); q.fill("#obHeightIn", "0"); q.fill("#obWeight", "176"); q.click("#obNext")
@@ -125,7 +133,7 @@ try:
     q.click("#obFinish"); q.wait_for_timeout(200)
     s = st(q)
     check(s["settings"]["units"] == "imperial" and s["settings"]["onboarded"] is True, "e: bitince units imperial kayıtta")
-    check(s["weight"] == 79.8 and s["settings"]["height"] == 175.3 and s["settings"]["targetWeight"] == 69.9 and s["weightLogs"][0]["weight"] == 79.8,
+    check(s["weight"] == 79.832 and s["settings"]["height"] == 175.3 and s["settings"]["targetWeight"] == 69.853 and s["weightLogs"][0]["weight"] == 79.832,
           "e: kayda kg / cm yazıldı (kilo %s, boy %s, hedef %s, tartı %s)" % (s["weight"], s["settings"]["height"], s["settings"]["targetWeight"], s["weightLogs"][0]["weight"]))
     c.close()
     # Türkçe telefon: metrik başlar; birim değişince yazılan değerler çevrilir; imperial seçilip bitirilince kayıtta imperial
@@ -144,8 +152,8 @@ try:
     q.click("#obNext"); q.click("#obGoalKeep"); q.click("#obNext"); q.click("#obActLow"); q.click("#obNext"); q.click("#obExpPro"); q.click("#obNext"); q.click("#obNext")
     q.click("#obFinish"); q.wait_for_timeout(200)
     s = st(q)
-    check(s["settings"]["units"] == "imperial" and s["settings"]["lang"] == "tr" and s["weight"] == 70 and s["settings"]["height"] == 170.2 and s["settings"]["targetWeight"] == 70,
-          "e: Türkçe + imperial: units imperial, kilo 70, boy 170.2, hedef 70 (%s, %s, %s, %s)" % (s["settings"]["units"], s["weight"], s["settings"]["height"], s["settings"]["targetWeight"]))
+    check(s["settings"]["units"] == "imperial" and s["settings"]["lang"] == "tr" and s["weight"] == 69.989 and s["settings"]["height"] == 170.2 and s["settings"]["targetWeight"] == 69.989,
+          "e: Türkçe + imperial: units imperial, kilo 69.989 (154,3 lb), boy 170.2, hedef = kilo (%s, %s, %s, %s)" % (s["settings"]["units"], s["weight"], s["settings"]["height"], s["settings"]["targetWeight"]))
     c.close()
     # metrik kurulum yolu değişmedi (boy tam sayı cm, kilo 1 ondalık)
     c, q = fresh("tr-TR")
@@ -153,6 +161,35 @@ try:
       finishOnboarding(); return [state.settings.units, state.settings.height, state.weight]; }""")
     check(r == ["metric", 176, 75.4], "e: metrik kurulum: boy Math.round, kilo round1: %s" % r)
     c.close()
+    # ABD telefonu: boş kutularla metriğe geçince kutular boş kalır ("0" yazılmaz); Türkçede imperial boş kilo → "Kilonu yaz."
+    c, q = fresh("en-US")
+    q.click("#obStart"); q.click("#obUnits [data-units-opt=metric]"); q.wait_for_timeout(80)
+    v = q.evaluate("[document.getElementById('obWeight').value, document.getElementById('obHeight').value]")
+    check(v == ["", ""], "e: boş kutularla birim değişince kutular boş kalır: %s" % v)
+    q.click("#obUnits [data-units-opt=imperial]"); q.wait_for_timeout(80)
+    v = q.evaluate("[document.getElementById('obWeight').value, document.getElementById('obHeightFt').value, document.getElementById('obHeightIn').value]")
+    check(v == ["", "", ""], "e: geri imperial'e geçince de boş: %s" % v)
+    c.close()
+    c, q = fresh("tr-TR")
+    q.click("#obStart"); q.click("#obUnits [data-units-opt=imperial]"); q.wait_for_timeout(80)
+    q.click("#obSexMale"); q.fill("#obAge", "30"); q.fill("#obHeightFt", "5"); q.fill("#obHeightIn", "9"); q.click("#obNext")
+    check(q.inner_text("#obErr") == "Kilonu yaz.", "e: Türkçe + imperial boş kilo → 'Kilonu yaz.': %r" % q.inner_text("#obErr"))
+    q.fill("#obWeight", "176"); q.click("#obNext"); q.click("#obGoalLose"); q.fill("#obTarget", ""); q.click("#obNext")
+    check(q.inner_text("#obErr") == "Hedef kilonu yaz.", "e: imperial boş hedef → 'Hedef kilonu yaz.': %r" % q.inner_text("#obErr"))
+    c.close()
+    # sahip güvenliği: imperial kurulumdan "Yedeğim var" ile eski (dataVer 5) yedek → metric; fabrika ayarları bölgeye göre
+    c, q = fresh("en-US")
+    BK = {k: v for k, v in OWN.items()}; BK["dataVer"] = 5
+    q.set_input_files("#obRestoreFile", files=[{"name": "ayk-yedek.json", "mimeType": "application/json", "buffer": json.dumps(BK).encode("utf-8")}])
+    q.wait_for_function("document.getElementById('onboard').classList.contains('hidden')", timeout=5000); q.wait_for_timeout(150)
+    s = st(q)
+    check(s["settings"]["units"] == "metric" and s["settings"]["onboarded"] is True and s["weight"] == OWN["weight"], "e: imperial kurulumdan eski yedek geri yüklenince metric (%s)" % s["settings"]["units"])
+    c.close()
+    for loc, want in (("tr-TR", "metric"), ("en-US", "imperial")):
+        c, q = fresh(loc); seed(q, BK)   # tohum kancası yok: fabrika ayarları gerçek freshState'e düşer
+        q.evaluate("void resetToDefaults()"); q.click("#uiDlgOk"); q.wait_for_timeout(80); q.click("#uiDlgOk"); q.wait_for_timeout(300)
+        check(q.evaluate("state.settings.units") == want and q.evaluate("state.settings.onboarded") is False and q.is_visible("#onboard"), "e: fabrika ayarları %s → %s, kurulum açık (%s)" % (loc, want, q.evaluate("state.settings.units")))
+        c.close()
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

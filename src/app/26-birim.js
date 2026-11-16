@@ -3,8 +3,15 @@
 // Kayıt HER ZAMAN kg / cm; bu dosyadaki yardımcılar yalnız gösterim ve giriş içindir. Metrikte her yardımcı girdisini
 // aynen döndürür ve biçimleyiciler bugünkü metni birebir verir (fmtW(kg) === fmtKg(kg) + " kg").
 // Set kilosu: lb'de girilen değer kg'a çevrilip 3 ondalıkla saklanır, gösterimde en yakın 0,5 lb'ye yuvarlanır
-// (45 / 95 / 135 / 225 / 2,5 lb gidiş-dönüş birebir). Vücut kilosu lb'de 1 ondalık (kayıt kg, 1 ondalık); boy ft + in
-// (tam inç), ölçüler in (1 ondalık). Not: t()/state bu dosyada üst düzeyde kullanılmaz (açılış async).
+// (45 / 95 / 135 / 225 / 2,5 lb gidiş-dönüş birebir). Vücut kilosu lb'de 1 ondalık gösterilir, kayıt kg 3 ondalık
+// (yazılan lb aynen geri gelir: 176 → 79,832 → 176); boy ft + in (tam inç), ölçüler in (1 ondalık).
+// Arayüz sözleşmesi (Görev 2–3):
+// - Okunamayan / boş girdi ("", NaN, metin) HER İKİ modda olduğu gibi döner; değer uydurulmaz (0'a çevrilmez).
+// - Metrikte çeviriciler girdiyi aynen döndürür (metin olabilir): hesap yapan çağıran sonucu yine num() ile okur.
+// - plateSet / barOptions / wStep GÖSTERİM biriminde; kayıt kg: bar seçimi dispToKg(45) = 20,412 olarak saklanır,
+//   seçili seçenek kgToDisp(settings.barKg) ile eşlenir (sahibin barKg 20 → 44 lb hiçbir seçeneğe uymaz: Görev 2
+//   kullanıcı değiştirene dek ayarı yazmadan 45 lb varsayar). ex.inc kg'dır (2,5); imperial adım kuralı Görev 2'de.
+// Not: t()/state bu dosyada üst düzeyde kullanılmaz (açılış async).
 // ---------------------------------------------------------------------------
 const LB_KG = 0.45359237, IN_CM = 2.54;
 const PLATES_LB = [45, 35, 25, 10, 5, 2.5];
@@ -18,15 +25,17 @@ function isImperial() { return !!(state && state.settings && state.settings.unit
 function wUnit() { return isImperial() ? "lb" : "kg"; }
 function lenUnit() { return isImperial() ? "in" : "cm"; }
 
+// İmperial'de çevrilecek sayı (okunamazsa null → girdi aynen döner)
+function unitNum(v) { if (!isImperial()) return null; const n = num(v, NaN); return isFinite(n) ? n : null; }
 // Set / plaka kilosu
-function kgToDisp(kg) { return isImperial() ? Math.round(num(kg) / LB_KG * 2) / 2 : kg; }
-function dispToKg(v) { return isImperial() ? Math.round(num(v) * LB_KG * 1000) / 1000 : v; }
-// Vücut kilosu (kilo, hedef, tartılar): lb 1 ondalık, kayıt kg 1 ondalık
-function bodyKgToDisp(kg) { return isImperial() ? round1(num(kg) / LB_KG) : kg; }
-function bodyDispToKg(v) { return isImperial() ? round1(num(v) * LB_KG) : v; }
+function kgToDisp(kg) { const n = unitNum(kg); return n === null ? kg : Math.round(n / LB_KG * 2) / 2; }
+function dispToKg(v) { const n = unitNum(v); return n === null ? v : Math.round(n * LB_KG * 1000) / 1000; }
+// Vücut kilosu (kilo, hedef, tartılar): gösterim lb 1 ondalık, kayıt kg 3 ondalık
+function bodyKgToDisp(kg) { const n = unitNum(kg); return n === null ? kg : round1(n / LB_KG); }
+function bodyDispToKg(v) { const n = unitNum(v); return n === null ? v : Math.round(n * LB_KG * 1000) / 1000; }
 // Ölçüler (cm ↔ in, 1 ondalık in; kayıt cm 2 ondalık)
-function cmToDisp(cm) { return isImperial() ? round1(num(cm) / IN_CM) : cm; }
-function dispToCm(v) { return isImperial() ? round2(num(v) * IN_CM) : v; }
+function cmToDisp(cm) { const n = unitNum(cm); return n === null ? cm : round1(n / IN_CM); }
+function dispToCm(v) { const n = unitNum(v); return n === null ? v : round2(n * IN_CM); }
 // Boy: imperial girişte iki kutu (ft, in) → cm (1 ondalık). ft okunamazsa NaN; boş inç 0 sayılır.
 function ftInToCm(ft, inch) {
   const f = num(ft, NaN), i = String(inch ?? "").trim() === "" ? 0 : num(inch, NaN);
@@ -67,6 +76,7 @@ Object.assign(EN, {
   "Birim": "Units",
   "Boy (ft)": "Height (ft)", "Boy (in)": "Height (in)",
   "Boyunu ft ve in olarak yaz.": "Enter your height in feet and inches.",
+  "Boyda ft tam sayı, in 0 ile 11 arasında olmalı.": "Height: feet must be a whole number and inches between 0 and 11.",
   "Boy {a} ile {b} arasında olmalı.": "Height must be between {a} and {b}.",
   "Kilo {a} ile {b} arasında olmalı.": "Weight must be between {a} and {b}.",
   "Hedef kilo {a} ile {b} arasında olmalı.": "Goal weight must be between {a} and {b}.",

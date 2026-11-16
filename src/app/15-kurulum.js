@@ -71,6 +71,8 @@ function obCheck(step) {
     if (!(v.age >= 12 && v.age <= 99)) return t("Yaş 12 ile 99 arasında olmalı.");
     if (imp) {
       if (isNaN(v.height)) return t("Boyunu ft ve in olarak yaz.");
+      { const f = num(d.heightFt, NaN), i = String(d.heightIn).trim() === "" ? 0 : num(d.heightIn, NaN);
+        if (!(Number.isInteger(f) && f >= 0 && i >= 0 && i < 12)) return t("Boyda ft tam sayı, in 0 ile 11 arasında olmalı."); }
       if (!(v.height >= 120 && v.height <= 230)) return t("Boy {a} ile {b} arasında olmalı.", { a: fmtHeight(48 * IN_CM), b: fmtHeight(90 * IN_CM) });   // 4'0" = 121,9 cm, 7'6" = 228,6 cm
       if (isNaN(v.weight)) return t("Kilonu yaz.");
       if (!(v.weight >= 30 && v.weight <= 300)) return t("Kilo {a} ile {b} arasında olmalı.", { a: fmtW(30, { body: true }), b: fmtW(300, { body: true }) });
@@ -251,7 +253,7 @@ function obStepHtml(n) {
       ${obOpt("obGoalKeep", d.goal === "keep", t("Kilomu korumak"), t("Aynı kiloda daha fit ve güçlü"), "obPick('goal', 'keep')")}
       ${obOpt("obGoalGain", d.goal === "gain", t("Kilo almak"), t("Kas kazanmak için kalori fazlası"), "obPick('goal', 'gain')")}
     </div>
-    ${tgt ? `${d.units === "imperial" ? obField("obTarget", t("Hedef kilo"), "target", fmtNum(Math.round(num(d.weight)) + (d.goal === "lose" ? -10 : 10)), "lb")
+    ${tgt ? `${d.units === "imperial" ? obField("obTarget", t("Hedef kilo"), "target", fmtNum(d.goal === "lose" ? Math.max(67, Math.round(num(d.weight)) - 10) : Math.min(551, Math.round(num(d.weight)) + 10)), "lb")
       : obField("obTarget", t("Hedef kilo"), "target", d.goal === "lose" ? fmtNum(Math.max(30, round1(obVals().weight - 5))) : fmtNum(round1(obVals().weight + 5)), "kg")}
     <div class="ob-group"><span class="t-field">${esc(d.goal === "lose" ? t("Ne kadar hızlı? (günlük kalori açığı)") : t("Ne kadar hızlı? (günlük kalori fazlası)"))}</span>
       <div class="t-seg ob-seg3">${pace("obPaceSlow", "slow", t("Yavaş"))}${pace("obPaceMid", "mid", t("Orta"))}${pace("obPaceFast", "fast", t("Hızlı"))}</div></div>` : ""}
