@@ -184,7 +184,7 @@ def main():
         fo, f3 = shoot_en_fresh(REPO, os.path.join(OUT, "simdi", scheme), scheme); audit.update(fo); e1 = e1 + f3
         if scheme == "dark":   # inceleme için İngilizce ekran görüntüleri
             sd = os.path.join(REPO, "tests", "shots"); os.makedirs(sd, exist_ok=True)
-            for n, _ in EN_SCREENS + EN_ONBOARD_SCREENS: shutil.copy(os.path.join(OUT, "simdi", scheme, n + ".png"), os.path.join(sd, ("v51_" if n.startswith("en-n-besin-") else "v50_" if n.startswith(("en-p-", "en-ob-")) else "v49_" if n.startswith("en-m-") else "v48_" if n.startswith("en-g-") else "v47_") + n.replace("en-", "en_", 1).replace("-", "_") + ".png"))
+            for n, _ in EN_SCREENS + EN_ONBOARD_SCREENS: shutil.copy(os.path.join(OUT, "simdi", scheme, n + ".png"), os.path.join(sd, ("v53_" if n.startswith("en-u-") else "v51_" if n.startswith("en-n-besin-") else "v50_" if n.startswith(("en-p-", "en-ob-")) else "v49_" if n.startswith("en-m-") else "v48_" if n.startswith("en-g-") else "v47_") + n.replace("en-", "en_", 1).replace("-", "_") + ".png"))
         rows = pixdiff(os.path.join(OUT, "onceki", scheme), os.path.join(OUT, "simdi", scheme), os.path.join(OUT, "fark", scheme))
         lines += [f"## Tema: {tr}", "", f"### Görsel farklar ({len(rows)} / {len(SCREENS) + len(FIXED_NAMES)} ekran)", ""]
         lines += [f"- `{n}`: {k} — {d}" for n, k, d in rows] or ["- Fark yok: bütün ekranlar birebir aynı."]

@@ -1474,7 +1474,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v52</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v53</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -3886,7 +3886,9 @@ function renderWater() {
   $("waterPct").textContent = t("%{p}", { p: String(pct) });
   $("waterRing").style.strokeDashoffset = String(Math.round(WATER_RING_C * (1 - pct / 100) * 100) / 100);
   const a = state.settings.waterAuto !== false ? waterAutoInfo() : null;
-  $("waterNote").textContent = a ? t(a.cr ? "Kilona göre: {w} kg × 35 ml + 0,5 L kreatin" : "Kilona göre: {w} kg × 35 ml", { w: fmtNum(a.w) })
+  $("waterNote").textContent = a ? (isImperial()   // v53: imperial'de kg formülü yerine kilo lb olarak (hesap kg × 35 ml aynı)
+      ? t(a.cr ? "Kilona göre ({w} lb) + 0,5 L kreatin" : "Kilona göre ({w} lb)", { w: fmtNum(num(bodyKgToDisp(a.w))) })
+      : t(a.cr ? "Kilona göre: {w} kg × 35 ml + 0,5 L kreatin" : "Kilona göre: {w} kg × 35 ml", { w: fmtNum(a.w) }))
     : state.settings.waterAuto !== false ? t("Kilo girilmemiş; Profil'deki hedef kullanılıyor.") : t("Hedef Profil'de elle ayarlı.");
 }
 
@@ -7071,7 +7073,10 @@ function updateWaterAutoHint() {
   $("setWater").disabled = on && !!a;
   $("setWater").classList.toggle("opacity-50", on && !!a);
   $("setWaterHint").textContent = on
-    ? (a ? t(a.cr ? "{w} kg × 35 ml = {b} L + 0,5 L kreatin → {tot} L" : "{w} kg × 35 ml = {b} L → {tot} L", { w: fmtNum(a.w), b: fmtNum(a.base), tot: fmtNum(a.total) }) : t("Kilo girilince hesaplanır; şimdilik elle yazdığın hedef kullanılır."))
+    ? (a ? (isImperial()   // v53: imperial'de kilo lb olarak, formül (kg × 35 ml) yazılmaz
+        ? t(a.cr ? "Kilona göre ({w} lb): {b} L + 0,5 L kreatin → {tot} L" : "Kilona göre ({w} lb): {b} L", { w: fmtNum(num(bodyKgToDisp(a.w))), b: fmtNum(a.base), tot: fmtNum(a.total) })
+        : t(a.cr ? "{w} kg × 35 ml = {b} L + 0,5 L kreatin → {tot} L" : "{w} kg × 35 ml = {b} L → {tot} L", { w: fmtNum(a.w), b: fmtNum(a.base), tot: fmtNum(a.total) }))
+      : t("Kilo girilince hesaplanır; şimdilik elle yazdığın hedef kullanılır."))
     : t("Kapalı: yukarıda elle yazdığın hedef kullanılır.");
 }
 // Kutudaki kilo → kg (geçersizse 0). v53: imperial'de lb; gösterilen değer yeniden yazılırsa kayıttaki kg aynen (round1 YOK)
@@ -13245,7 +13250,12 @@ Object.assign(EN, {
   "Kilo {a} ile {b} arasında olmalı; kaydedilmedi.": "Weight must be between {a} and {b}; not saved.",
   "Kilonu {a} ile {b} arasında yaz (örn: {ex}).": "Enter your weight between {a} and {b} (e.g. {ex}).",
   "{a} ile {b} arasında bir değer yaz (örn. {ex}).": "Enter a value between {a} and {b} (e.g. {ex}).",
-  "En az bir ölçüyü {a}–{b} arasında gir.": "Enter at least one measurement between {a} and {b}."
+  "En az bir ölçüyü {a}–{b} arasında gir.": "Enter at least one measurement between {a} and {b}.",
+  // v53 Görev 4: su hedefi açıklaması (imperial)
+  "Kilona göre ({w} lb)": "Based on your weight ({w} lb)",
+  "Kilona göre ({w} lb) + 0,5 L kreatin": "Based on your weight ({w} lb) + 0.5 L for creatine",
+  "Kilona göre ({w} lb): {b} L": "Based on your weight ({w} lb): {b} L",
+  "Kilona göre ({w} lb): {b} L + 0,5 L kreatin → {tot} L": "Based on your weight ({w} lb): {b} L + 0.5 L for creatine → {tot} L"
 });
 
 </script>

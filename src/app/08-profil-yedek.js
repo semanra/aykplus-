@@ -154,7 +154,10 @@ function updateWaterAutoHint() {
   $("setWater").disabled = on && !!a;
   $("setWater").classList.toggle("opacity-50", on && !!a);
   $("setWaterHint").textContent = on
-    ? (a ? t(a.cr ? "{w} kg × 35 ml = {b} L + 0,5 L kreatin → {tot} L" : "{w} kg × 35 ml = {b} L → {tot} L", { w: fmtNum(a.w), b: fmtNum(a.base), tot: fmtNum(a.total) }) : t("Kilo girilince hesaplanır; şimdilik elle yazdığın hedef kullanılır."))
+    ? (a ? (isImperial()   // v53: imperial'de kilo lb olarak, formül (kg × 35 ml) yazılmaz
+        ? t(a.cr ? "Kilona göre ({w} lb): {b} L + 0,5 L kreatin → {tot} L" : "Kilona göre ({w} lb): {b} L", { w: fmtNum(num(bodyKgToDisp(a.w))), b: fmtNum(a.base), tot: fmtNum(a.total) })
+        : t(a.cr ? "{w} kg × 35 ml = {b} L + 0,5 L kreatin → {tot} L" : "{w} kg × 35 ml = {b} L → {tot} L", { w: fmtNum(a.w), b: fmtNum(a.base), tot: fmtNum(a.total) }))
+      : t("Kilo girilince hesaplanır; şimdilik elle yazdığın hedef kullanılır."))
     : t("Kapalı: yukarıda elle yazdığın hedef kullanılır.");
 }
 // Kutudaki kilo → kg (geçersizse 0). v53: imperial'de lb; gösterilen değer yeniden yazılırsa kayıttaki kg aynen (round1 YOK)

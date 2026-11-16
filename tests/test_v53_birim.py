@@ -474,6 +474,79 @@ try:
     tg = pg.evaluate("getTargets()")
     check([tg["calTarget"], tg["proTarget"], tg["fatTarget"], tg["carbTarget"]] == [2478, 180, 69, 284], "3: sahip fikstürü imperial'de hedefler 2478 / 180 / 69 / 284")
     c.close()
+    # ===== BÖLÜM 4 (görev 4): imperial modda görünen metinde "kg" / "cm" kalmasın — kontrol aracının bütün Türkçe
+    # ekranları (SCREENS) + İngilizce ekranları (EN_SCREENS) + imperial İngilizce ekranlar (en-u-*). Hariç: kullanıcının
+    # yazdığı adlar (öğün, hareket, besin, rutin, takviye, not), Hakkında → hesap yöntemi (#pfMethodBody: formüller kg
+    # üzerinden, kural metni bilinçli olarak değişmez), besin gramı "g" ve su "L" (desen yalnız kg / cm arar), alışveriş
+    # listesindeki besin miktarları (#shopModal: besin miktarı metrik kalır, 1,4 kg = 1400 g) ve Birim seçicisinin kendi
+    # "kg, cm" seçeneği ([data-units-opt]).
+    sys.path.insert(0, os.path.join(REPO, "scripts", "kontrol"))
+    import ortak as K
+    UNIT_SCAN = r"""() => {
+      const RX = /\b(kg|cm)\b/i, U = new Set();
+      const add = x => { if (typeof x === 'string' && x.trim()) U.add(x.trim()); };
+      const S = state;
+      [...(S.meals || []), ...(S.restMeals || []), ...(S.dayPlan ? [...(S.dayPlan.train || []), ...(S.dayPlan.rest || [])] : [])].forEach(m => { add(m.title); add(m.targetNote); });
+      (S.workoutDays || []).forEach(d => { add(d.name); (d.exercises || []).forEach(e => { add(e.name); add(exNameL(e.name)); add(e.note); }); });
+      mobRoutines().forEach(r => { add(r.name); (r.items || []).forEach(i => { add(i.name); add(i.note); }); });
+      (S.supplementList || []).forEach(x => { add(x.name); add(x.note); add(x.timeLabel); });
+      Object.values(S.customFoods || {}).forEach(f => add(f.name));
+      const db = getFoodDB(); Object.keys(db).forEach(id => { add(db[id].name); add(foodNameL(db[id])); });
+      const US = [...U].filter(x => RX.test(x)).sort((a, b) => b.length - a.length);
+      const strip = x => { for (const u of US) if (x.includes(u)) x = x.split(u).join(' '); return x; };
+      const vis = e => e && e.checkVisibility && e.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+      const hits = [], seen = new Set();
+      const test = (raw, at) => { const x = raw.replace(/\s+/g, ' ').trim(); if (!x || seen.has(x)) return; seen.add(x); if (RX.test(strip(x))) hits.push(x.slice(0, 90) + ' @' + at); };
+      const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = tw.nextNode(); n; n = tw.nextNode()) { const pe = n.parentElement; if (!pe || pe.closest('script,style,#pfMethodBody,#shopModal,[data-units-opt]') || !vis(pe)) continue; test(n.textContent, pe.id || pe.tagName.toLowerCase()); }
+      for (const e of document.querySelectorAll('[aria-label],[placeholder]')) { if (!vis(e) || e.closest('#pfMethodBody,#shopModal,[data-units-opt]')) continue;
+        ['aria-label', 'placeholder'].forEach(a => { const v = e.getAttribute(a); if (v) test(v, (e.id || e.tagName.toLowerCase()) + '@' + a); }); }
+      return hits;
+    }"""
+    def unit_scan(screens, en):
+        c = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="en-GB" if en else "tr-TR")
+        c.add_init_script(K.NO_ANIM); q = c.new_page(); q.on("pageerror", lambda e: errs.append(str(e)))
+        q.goto(URL); boot(q); q.evaluate(K.SEED); q.wait_for_timeout(150)
+        q.evaluate("setUnits('imperial')")
+        if en: q.evaluate("setLang('en')"); q.evaluate("loadFoodsEn()"); q.wait_for_function("typeof USDA_EN !== 'undefined'"); q.wait_for_timeout(200)
+        found = {}
+        for name, js in screens:
+            try: q.evaluate("() => { " + js + " }")
+            except Exception as e: errs.append("%s: %s" % (name, str(e)[:160]))
+            q.wait_for_timeout(120)
+            h = q.evaluate(UNIT_SCAN)
+            if h: found[name] = h
+        c.close(); return found
+    tr_hits = unit_scan(K.SCREENS, False)
+    check(not tr_hits, "4: imperial + Türkçe: %d ekranda kg / cm yok: %s" % (len(K.SCREENS), json.dumps(tr_hits, ensure_ascii=False)[:1500]))
+    en_hits = unit_scan(K.EN_SCREENS, True)
+    check(not en_hits, "4: imperial + İngilizce: EN ekranlarında kg / cm yok: %s" % json.dumps(en_hits, ensure_ascii=False)[:1500])
+    # kurulum 1–7 imperial (en-US → imperial varsayılan), Türkçe ve İngilizce
+    OB_IMP = [("ob-1", ""), ("ob-2", "obNext()"),
+              ("ob-3", "obPick('sex','female'); obInput('age','29'); obInput('heightFt','5'); obInput('heightIn','5'); obInput('weight','160'); obNext()"),
+              ("ob-4", "obPick('goal','lose'); obInput('target','145'); obNext()"),
+              ("ob-5", "obPick('act','mid'); obNext()"), ("ob-6", "obPick('exp','new'); obNext()"), ("ob-7", "obNext()")]
+    for lang in ("tr", "en"):
+        c, q = fresh("en-US"); q.evaluate("obPickLang('%s')" % lang); q.wait_for_timeout(60)
+        ob_hits = {}
+        for name, js in OB_IMP:
+            if js: q.evaluate("() => { " + js + " }")
+            q.wait_for_timeout(100); h = q.evaluate(UNIT_SCAN)
+            if h: ob_hits[name] = h
+        check(q.evaluate("obDraft && obDraft.units") == "imperial" and q.evaluate("document.querySelector('#obSummary') !== null") and not ob_hits, "4: kurulum imperial (%s) 1–7: kg / cm yok: %s" % (lang, ob_hits))
+        c.close()
+    check(len([n for n, _ in K.EN_SCREENS if n.startswith("en-u-")]) >= 5, "4: kontrol aracında en az 5 imperial İngilizce ölçüm ekranı (en-u-*)")
+    # su açıklaması imperial'de lb (formül kg'da yazılmaz), metrikte eskisi gibi
+    c, pg = ctx(); pg.goto(URL); boot(pg)
+    pg.evaluate("switchTab('nutrition'); setNutriView('today')"); pg.wait_for_timeout(60)
+    wm = pg.inner_text("#waterNote")
+    pg.evaluate("setUnits('imperial')"); pg.wait_for_timeout(60)
+    wi = pg.inner_text("#waterNote")
+    pg.evaluate("openProfile()"); pg.wait_for_timeout(60); hi = pg.inner_text("#setWaterHint")
+    pg.evaluate("setUnits('metric')"); pg.wait_for_timeout(60); hm = pg.inner_text("#setWaterHint")
+    check(re.match(r"^Kilona göre: [\d,]+ kg × 35 ml", wm) and re.match(r"^Kilona göre \([\d,]+ lb\)", wi) and "kg" not in wi, "4: su notu metrik kg × 35 ml, imperial lb: %s | %s" % (wm, wi))
+    check(re.match(r"^[\d,]+ kg × 35 ml = ", hm) and hi.startswith("Kilona göre (") and " lb): " in hi and "kg" not in hi, "4: Profil su açıklaması metrik / imperial: %s | %s" % (hm, hi))
+    c.close()
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

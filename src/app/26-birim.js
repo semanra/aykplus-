@@ -154,5 +154,10 @@ Object.assign(EN, {
   "Kilo {a} ile {b} arasında olmalı; kaydedilmedi.": "Weight must be between {a} and {b}; not saved.",
   "Kilonu {a} ile {b} arasında yaz (örn: {ex}).": "Enter your weight between {a} and {b} (e.g. {ex}).",
   "{a} ile {b} arasında bir değer yaz (örn. {ex}).": "Enter a value between {a} and {b} (e.g. {ex}).",
-  "En az bir ölçüyü {a}–{b} arasında gir.": "Enter at least one measurement between {a} and {b}."
+  "En az bir ölçüyü {a}–{b} arasında gir.": "Enter at least one measurement between {a} and {b}.",
+  // v53 Görev 4: su hedefi açıklaması (imperial)
+  "Kilona göre ({w} lb)": "Based on your weight ({w} lb)",
+  "Kilona göre ({w} lb) + 0,5 L kreatin": "Based on your weight ({w} lb) + 0.5 L for creatine",
+  "Kilona göre ({w} lb): {b} L": "Based on your weight ({w} lb): {b} L",
+  "Kilona göre ({w} lb): {b} L + 0,5 L kreatin → {tot} L": "Based on your weight ({w} lb): {b} L + 0.5 L for creatine → {tot} L"
 });

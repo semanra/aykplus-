@@ -155,8 +155,19 @@ EN_SCREENS = [
   # v51: Besin adları (yalnız ölçüm; foods-en.js yüklenmiş olmalı, kontrol.py bekler)
   ("en-n-besin-ara", "closeModal('chartModal'); switchTab('nutrition'); setNutriView('foods'); $('foodSearch').value = 'chicken breast'; foodSearchInput(); renderFoods()"),
   ("en-n-besin-kart", "selectFood('u171474'); renderAll()"),
+  # v53: imperial (lb / ft-in / in) İngilizce ekranlar (yalnız ölçüm; lb ve ft-in etiketleri daha uzun olabilir → taşma)
+  ("en-u-menu", "setUnits('imperial'); setNutriView('menus')"),
+  ("en-u-aktif", "switchTab('gym'); setGymView('today'); startWorkout(); toggleSetDone(0, 0)"),
+  ("en-u-plaka", "openPlateTool(0)"),
+  ("en-u-hareket", "closeModal('chartModal'); openEditExercise(0)"),
+  ("en-u-kilo", "closeModal('exerciseModal'); state.gymActive = false; stopTimer(); switchTab('progress'); setProgressView('kilo')"),
+  ("en-u-guc", "setProgressView('guc')"),
+  ("en-u-olcu", "setProgressView('kilo'); openMeasureModal()"),
+  ("en-u-profil", "closeModal('chartModal'); openProfile()"),
+  ("en-u-profil-orta", PF_SCROLL % 0.45),
 ]
-EN_ROOT = {"en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage", "en-m-seans": "#mobTimer", "en-m-bitis": "#mobTimer"}
+EN_ROOT = {"en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage", "en-m-seans": "#mobTimer", "en-m-bitis": "#mobTimer",
+           "en-u-profil": "#profilePage", "en-u-profil-orta": "#profilePage"}
 # v44: kurulum ekranları. TEST_INIT OLMADAN, temiz depoda açılır (gerçek yeni kurulum yolu). Sırayla; her adım öncekinin üstüne.
 ONBOARD_SCREENS = [
   ("ob-1", ""),

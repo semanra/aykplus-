@@ -375,7 +375,9 @@ function renderWater() {
   $("waterPct").textContent = t("%{p}", { p: String(pct) });
   $("waterRing").style.strokeDashoffset = String(Math.round(WATER_RING_C * (1 - pct / 100) * 100) / 100);
   const a = state.settings.waterAuto !== false ? waterAutoInfo() : null;
-  $("waterNote").textContent = a ? t(a.cr ? "Kilona göre: {w} kg × 35 ml + 0,5 L kreatin" : "Kilona göre: {w} kg × 35 ml", { w: fmtNum(a.w) })
+  $("waterNote").textContent = a ? (isImperial()   // v53: imperial'de kg formülü yerine kilo lb olarak (hesap kg × 35 ml aynı)
+      ? t(a.cr ? "Kilona göre ({w} lb) + 0,5 L kreatin" : "Kilona göre ({w} lb)", { w: fmtNum(num(bodyKgToDisp(a.w))) })
+      : t(a.cr ? "Kilona göre: {w} kg × 35 ml + 0,5 L kreatin" : "Kilona göre: {w} kg × 35 ml", { w: fmtNum(a.w) }))
     : state.settings.waterAuto !== false ? t("Kilo girilmemiş; Profil'deki hedef kullanılıyor.") : t("Hedef Profil'de elle ayarlı.");
 }
 
