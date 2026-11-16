@@ -275,6 +275,7 @@ Bu belge, AYK+ İngilizce arayüzünde kullanılacak **tek ve bağlayıcı** ter
 | Boş başla | **Start empty** | Adım 6 | İşlevi açık. |
 | Yedeğim var, geri yükle | **I have a backup — restore it** | Kurulum adım 1 | Doğal. |
 | İlk öğününü ekle / İlk hareketini ekle | **Add your first meal / Add your first exercise** | `[data-empty-menu]`, `[data-empty-day]` | Boş durum kartları; terimlerle tutarlı. |
+| Örnek öğün ve gün adları | **Breakfast / Lunch / Snack / Dinner; Day 1: Full Body A…, Upper Body / Lower Body; Daily stretching** | `buildSampleMenu`, `samplePrograms`, `sampleMobility` | Kayda o anki dilde yazılır (kayıtlı-metinler a3); gün adında ":" korunur. |
 | Devam et / Bitti | **Continue / Done** | Kurulum düğmeleri | Yaygın kullanım. |
 
 ## 11. Ortak pencere ve düğme kelimeleri

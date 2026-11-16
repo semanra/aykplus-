@@ -118,12 +118,12 @@ function normalizeExercise(ex) {
     if (ex.kind === "cardio") {
       ex.sets = [makeCardioRow(30)];
       ex.targetInfo = "30 dk";
-      if (/^Hedef:/.test(ex.note || "")) ex.note = "";
+      if (/^(Hedef|Target):/.test(ex.note || "")) ex.note = "";
     } else if (ex.kind === "time") {
       const n = Math.max(1, Math.min(10, (ex.sets || []).length || 3));
       ex.sets = makeTimeSets(n, 45);
       ex.targetInfo = n + "x45 sn";
-      if (/^Hedef:/.test(ex.note || "")) ex.note = "";
+      if (/^(Hedef|Target):/.test(ex.note || "")) ex.note = "";
     }
   }
   if (!Array.isArray(ex.sets) || ex.sets.length === 0) {

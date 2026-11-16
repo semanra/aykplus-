@@ -16,7 +16,7 @@ function buildSampleMenu(calTarget) {
   if (typeof USDA_FOODS === "undefined") return [];
   const db = getFoodDB();
   if (SAMPLE_MENU_TEMPLATE.some(m => m.items.some(([id]) => !db[id] || db[id]._lost))) return [];
-  const mk = tpl => tpl.map(m => ({ title: m.title, time: m.time, items: m.items.map(([foodId, amount]) => ({ foodId, amount })) }));
+  const mk = tpl => tpl.map(m => ({ title: t(m.title), time: m.time, items: m.items.map(([foodId, amount]) => ({ foodId, amount })) }));
   const rawMeals = mk(SAMPLE_MENU_TEMPLATE);
   const baseKcal = nutritionTotals(rawMeals).cal;
   const k = baseKcal > 0 && num(calTarget, 0) > 0 ? num(calTarget, 0) / baseKcal : 1;
@@ -82,10 +82,10 @@ function samplePrograms(level) {
   const list = SAMPLE_PROGRAMS[level === "pro" ? "pro" : "new"];
   const tag = Date.now().toString(36) + (++_sampleProgSeq);
   return list.map(([name, exs], di) => ({
-    id: "day_s" + tag + "_" + di, name,
+    id: "day_s" + tag + "_" + di, name: t(name),
     exercises: exs.map(([exName, setCount, target, def]) => target === "t"
       ? { name: exName, kind: "time", targetInfo: setCount + "x" + def + " sn", note: "", sets: makeTimeSets(setCount, def) }
-      : { name: exName, targetInfo: setCount + "x" + target, note: "Hedef: " + setCount + " Set x " + target + " Tekrar", sets: makeSets(setCount, target, 0, def) })
+      : { name: exName, targetInfo: setCount + "x" + target, note: t("Hedef: {n} Set x {hedef} Tekrar", { n: setCount, hedef: target }), sets: makeSets(setCount, target, 0, def) })
   }));
 }
 
@@ -101,7 +101,7 @@ const SAMPLE_MOBILITY_ITEMS = [
 ];
 function sampleMobility() {
   return {
-    id: mobNewRoutineId(), name: "Günlük esneme",
+    id: mobNewRoutineId(), name: t("Günlük esneme"),
     items: SAMPLE_MOBILITY_ITEMS.map(([name, type, region, region2, mode, reps, sec, sets, sides]) =>
       normMobItem({ id: mobNewId(), name, type, region, region2, mode, reps, sec, sets, sides, note: "", rx: "", rxOk: true, done: false }))
   };

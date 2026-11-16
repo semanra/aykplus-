@@ -2591,12 +2591,12 @@ function normalizeExercise(ex) {
     if (ex.kind === "cardio") {
       ex.sets = [makeCardioRow(30)];
       ex.targetInfo = "30 dk";
-      if (/^Hedef:/.test(ex.note || "")) ex.note = "";
+      if (/^(Hedef|Target):/.test(ex.note || "")) ex.note = "";
     } else if (ex.kind === "time") {
       const n = Math.max(1, Math.min(10, (ex.sets || []).length || 3));
       ex.sets = makeTimeSets(n, 45);
       ex.targetInfo = n + "x45 sn";
-      if (/^Hedef:/.test(ex.note || "")) ex.note = "";
+      if (/^(Hedef|Target):/.test(ex.note || "")) ex.note = "";
     }
   }
   if (!Array.isArray(ex.sets) || ex.sets.length === 0) {
@@ -9898,7 +9898,7 @@ function buildSampleMenu(calTarget) {
   if (typeof USDA_FOODS === "undefined") return [];
   const db = getFoodDB();
   if (SAMPLE_MENU_TEMPLATE.some(m => m.items.some(([id]) => !db[id] || db[id]._lost))) return [];
-  const mk = tpl => tpl.map(m => ({ title: m.title, time: m.time, items: m.items.map(([foodId, amount]) => ({ foodId, amount })) }));
+  const mk = tpl => tpl.map(m => ({ title: t(m.title), time: m.time, items: m.items.map(([foodId, amount]) => ({ foodId, amount })) }));
   const rawMeals = mk(SAMPLE_MENU_TEMPLATE);
   const baseKcal = nutritionTotals(rawMeals).cal;
   const k = baseKcal > 0 && num(calTarget, 0) > 0 ? num(calTarget, 0) / baseKcal : 1;
@@ -9964,10 +9964,10 @@ function samplePrograms(level) {
   const list = SAMPLE_PROGRAMS[level === "pro" ? "pro" : "new"];
   const tag = Date.now().toString(36) + (++_sampleProgSeq);
   return list.map(([name, exs], di) => ({
-    id: "day_s" + tag + "_" + di, name,
+    id: "day_s" + tag + "_" + di, name: t(name),
     exercises: exs.map(([exName, setCount, target, def]) => target === "t"
       ? { name: exName, kind: "time", targetInfo: setCount + "x" + def + " sn", note: "", sets: makeTimeSets(setCount, def) }
-      : { name: exName, targetInfo: setCount + "x" + target, note: "Hedef: " + setCount + " Set x " + target + " Tekrar", sets: makeSets(setCount, target, 0, def) })
+      : { name: exName, targetInfo: setCount + "x" + target, note: t("Hedef: {n} Set x {hedef} Tekrar", { n: setCount, hedef: target }), sets: makeSets(setCount, target, 0, def) })
   }));
 }
 
@@ -9983,7 +9983,7 @@ const SAMPLE_MOBILITY_ITEMS = [
 ];
 function sampleMobility() {
   return {
-    id: mobNewRoutineId(), name: "Günlük esneme",
+    id: mobNewRoutineId(), name: t("Günlük esneme"),
     items: SAMPLE_MOBILITY_ITEMS.map(([name, type, region, region2, mode, reps, sec, sets, sides]) =>
       normMobItem({ id: mobNewId(), name, type, region, region2, mode, reps, sec, sets, sides, note: "", rx: "", rxOk: true, done: false }))
   };
@@ -11296,6 +11296,19 @@ Object.assign(EN, {
   "Sesli yönlendirmeyi kapat": "Turn voice guidance off", "Sesli yönlendirmeyi aç": "Turn voice guidance on",
   "Bip sesini kapat": "Turn the beep off", "Bip sesini aç": "Turn the beep on",
   "Sıradaki: {ad}": "Next: {ad}",
+});
+// v50: İngilizce sözlük, İlerleme + kurulum + örnek içerik (terimler: docs/i18n-terimler.md bölüm 8, 10, 11).
+// Örnek içerik kayda o anki dilde yazılır (docs/i18n-kayitli-metinler.md a3); targetInfo/set.target her dilde Türkçe biçim kalır.
+Object.assign(EN, {
+  // --- örnek menü öğün başlıkları
+  "Kahvaltı": "Breakfast", "Öğle yemeği": "Lunch", "Ara öğün": "Snack", "Akşam yemeği": "Dinner",
+  // --- örnek program gün adları (":" ayracı korunur: Antrenman gün çipi name.split(":")[0] kullanır)
+  "1. Gün: Tüm Vücut A": "Day 1: Full Body A", "2. Gün: Tüm Vücut B": "Day 2: Full Body B", "3. Gün: Tüm Vücut C": "Day 3: Full Body C",
+  "1. Gün: Üst Vücut A": "Day 1: Upper Body A", "2. Gün: Alt Vücut A": "Day 2: Lower Body A",
+  "3. Gün: Üst Vücut B": "Day 3: Upper Body B", "4. Gün: Alt Vücut B": "Day 4: Lower Body B",
+  // --- örnek hareket notu ve esneme rutini adı
+  "Hedef: {n} Set x {hedef} Tekrar": "Target: {n} sets x {hedef} reps",
+  "Günlük esneme": "Daily stretching",
 });
 
 </script>
