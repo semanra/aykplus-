@@ -14,6 +14,7 @@
       if (L) document.documentElement.classList.add("light");
       document.querySelector('meta[name="theme-color"]').setAttribute("content", L ? "#F2F2F5" : "#000000");
       document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').setAttribute("content", L ? "default" : "black");
+      if (localStorage.getItem("ayk_lang") === "en") document.documentElement.lang = "en";   /* v53: dil aynası */
     } catch (e) {}</script>
   <link id="appAppleIcon" rel="apple-touch-icon" sizes="180x180" href="icon.png" />
   <link rel="manifest" href="manifest.json" />

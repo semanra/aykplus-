@@ -131,6 +131,9 @@ function setUnits(u) {
 }
 
 Object.assign(EN, {
+  // v53: onarım yedek adları (01-temel repairName)
+  "Adsız hareket|onarım": "Untitled exercise", "Tahmini öğün|onarım": "Estimated meal", "{n}. Öğün|onarım": "Meal {n}",
+  "Antrenman günü|onarım": "Workout day", "Adsız besin|onarım": "Untitled food",
   "Birim": "Units",
   "Boy (ft)": "Height (ft)", "Boy (in)": "Height (in)", "Boy (ft / in)": "Height (ft / in)",
   "Boyunu ft ve in olarak yaz.": "Enter your height in feet and inches.",

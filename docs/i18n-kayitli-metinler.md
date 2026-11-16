@@ -19,6 +19,8 @@ Tablo kısaltması: **K** = kayıt (state/yedek/ayna içine yazılıyor), **C** 
 
 ### a1. Kullanıcıya otomatik verilen varsayılan adlar (normalizeState / DEFAULT_STATE)
 
+> **v53:** `normalizeState` onarımda yazdığı yedek adları (`Adsız hareket`, `Tahmini öğün`, `{n}. Öğün`, `Antrenman günü`, `Adsız besin`) artık `repairName()` ile **okunan kaydın dilinde** yazar (yeni kayıt kuralı); var olan adlar değişmez.
+
 | Konum | Metin | Tür | Çeviride ne yapılmalı |
 |---|---|---|---|
 | src/data.js:590 | `"1. Gün"` (DEFAULT_STATE.workoutDays[0].name; `freshState` → `normalizeState({})` bunu kullanır) | K (+C, bkz. b3: `nextDayIdx` günü ada göre arar) | dile göre üret (yeni kurulumda dil EN ise "Day 1"); var olan kayıt dokunma — **v52 yapıldı**: `finishOnboarding` örnek program seçilmediyse ve gün hâlâ varsayılansa adı `t("1. Gün|varsayılan gün")` yapar (fabrika sıfırlaması da kurulumdan geçer) |

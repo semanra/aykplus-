@@ -1,7 +1,6 @@
 {
-  "name": "AYK+ | Makro, GYM & Mobilite",
+  "name": "AYK+",
   "short_name": "AYK+",
-  "lang": "tr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

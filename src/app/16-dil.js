@@ -51,6 +51,7 @@ function applyStaticI18n(root, rescan) {
   if (curLang() === "tr" && !i18nTouched) return;
   i18nTouched = true;   // DOM çevrildi; Türkçeye dönülünce (yedek, iç yedek, fabrika) eski metin geri yazılmalı
   document.documentElement.lang = curLang();
+  try { localStorage.setItem("ayk_lang", curLang()); } catch (e) { /* ayna yazılamadı: yalnız ilk an etkilenir */ }   // v53: <head> açılışta html lang için okur
   let c;
   if (root && root !== document) { c = i18nCollect(root); i18nNodes = null; }
   else {

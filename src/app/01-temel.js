@@ -110,9 +110,16 @@ const EFFORT_LABELS = { 1: "Kolay", 2: "Orta", 3: "Zor", 4: "Tükeniş" };
 function kindL(kind) { return t(KIND_LABEL[kind] || kind); }
 function effortL(v) { return t(EFFORT_LABELS[v] || ""); }
 const EFFORT_COLORS = { 1: "#4ADE80", 2: "#1FD1C1", 3: "#FBBF24", 4: "#FF5A5F" };
+// v53: onarımda yazılan yedek adlar kaydın dilinde (kayıtlı metinler: yeni kayıt o anki dilde). normalizeState
+// sırasında dil, okunan kaydın ayarından alınır (_normLang); başka yerden çağrılınca arayüz dili.
+let _normLang = null;
+function repairName(key, vars) {
+  const en = (_normLang || curLang()) === "en" && typeof EN !== "undefined" && Object.prototype.hasOwnProperty.call(EN, key);
+  return trFill(en ? EN[key] : String(key).split("|")[0], vars);
+}
 function normalizeExercise(ex) {
   // v35: adı okunamayan hareket silinmez, "Adsız hareket" olur; boş/bozuk set kayıtları atılır
-  if (typeof ex.name !== "string" || !ex.name.trim()) ex.name = String(ex.name == null || typeof ex.name === "object" ? "" : ex.name).trim() || "Adsız hareket";
+  if (typeof ex.name !== "string" || !ex.name.trim()) ex.name = String(ex.name == null || typeof ex.name === "object" ? "" : ex.name).trim() || repairName("Adsız hareket|onarım");
   if (Array.isArray(ex.sets)) ex.sets = ex.sets.filter(isObj);
   if (!ex.kind) {
     ex.kind = detectKind(ex.name);
@@ -144,7 +151,7 @@ function normItems(items) {
     i.amount = num(i.amount, 0);
     if (isObj(i.est)) {
       const e = i.est;
-      i.est = { ...e, name: String(e.name || "Tahmini öğün").slice(0, 60), cal: num(e.cal, 0), p: num(e.p, 0), c: num(e.c, 0), f: num(e.f, 0) };
+      i.est = { ...e, name: String(e.name || repairName("Tahmini öğün|onarım")).slice(0, 60), cal: num(e.cal, 0), p: num(e.p, 0), c: num(e.c, 0), f: num(e.f, 0) };
       if (i.foodId == null || i.foodId === "") i.foodId = "_est";
     } else {
       delete i.est;
@@ -158,7 +165,7 @@ function normMealList(list) {
   return list.filter(isObj).map((m, i) => {
     m.items = normItems(m.items);
     // v35: metin alanları metin olsun (sayı/boş değer ekranları bozmasın); değer uydurulmaz, yalnızca yer tutucu
-    if (typeof m.title !== "string" || !m.title.trim()) m.title = (m.title != null && typeof m.title !== "object" ? String(m.title) : "").trim() || `${i + 1}. Öğün`;
+    if (typeof m.title !== "string" || !m.title.trim()) m.title = (m.title != null && typeof m.title !== "object" ? String(m.title) : "").trim() || repairName("{n}. Öğün|onarım", { n: i + 1 });
     if (m.targetNote != null && typeof m.targetNote !== "string") m.targetNote = typeof m.targetNote === "object" ? "" : String(m.targetNote);
     if (m.time != null && (typeof m.time !== "string" || !/^\d{1,2}:\d{2}$/.test(m.time))) delete m.time;
     return m;
@@ -247,6 +254,10 @@ function migrateState(s, rawHadGoal) {
 }
 
 function normalizeState(raw) {
+  _normLang = raw && isObj(raw.settings) && raw.settings.lang === "en" && langAvailable() ? "en" : "tr";
+  try { return normalizeStateInner(raw); } finally { _normLang = null; }
+}
+function normalizeStateInner(raw) {
   const s = { ...clone(DEFAULT_STATE), ...(raw || {}) };
   s.settings = { ...DEFAULT_SETTINGS, ...((raw && raw.settings) || {}) };
   s.meals = normMealList(s.meals);   // v25
@@ -255,7 +266,7 @@ function normalizeState(raw) {
   s.workoutDays.forEach(day => {
     if (!Array.isArray(day.exercises)) day.exercises = [];
     day.exercises = day.exercises.filter(isObj);   // v35: boş/bozuk hareket kaydı bütün veriyi okunamaz yapmasın
-    if (typeof day.name !== "string" || !day.name.trim()) day.name = (day.name != null && typeof day.name !== "object" ? String(day.name) : "").trim() || "Antrenman günü";
+    if (typeof day.name !== "string" || !day.name.trim()) day.name = (day.name != null && typeof day.name !== "object" ? String(day.name) : "").trim() || repairName("Antrenman günü|onarım");
     day.exercises.forEach(normalizeExercise);
   });
   if (!isObj(s.mobilityRoutine)) s.mobilityRoutine = clone(DEFAULT_STATE.mobilityRoutine);
@@ -314,7 +325,7 @@ function normalizeState(raw) {
   Object.keys(s.customFoods).forEach(id => {
     const f = s.customFoods[id];
     if (!isObj(f)) { delete s.customFoods[id]; return; }
-    f.name = String(f.name || "Adsız besin");
+    f.name = String(f.name || repairName("Adsız besin|onarım"));
     ["p", "c", "f"].forEach(k => { f[k] = num(f[k], 0); });
     if (f.kcal != null) { const k = num(f.kcal, NaN); if (isFinite(k)) f.kcal = k; else delete f.kcal; }
     if (f.def != null) f.def = num(f.def, 100) || 100;

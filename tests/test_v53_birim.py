@@ -570,6 +570,14 @@ try:
     pg.evaluate("setUnits('metric')"); pg.wait_for_timeout(60); hm = pg.inner_text("#setWaterHint")
     check(re.match(r"^Kilona göre: [\d,]+ kg × 35 ml", wm) and re.match(r"^Kilona göre \([\d,]+ lb\)", wi) and "kg" not in wi, "4: su notu metrik kg × 35 ml, imperial lb: %s | %s" % (wm, wi))
     check(re.match(r"^[\d,]+ kg × 35 ml = ", hm) and hi.startswith("Kilona göre (") and " lb): " in hi and "kg" not in hi, "4: Profil su açıklaması metrik / imperial: %s | %s" % (hm, hi))
+    # v53: onarım yedek adları kaydın dilinde (repairName); dil aynası
+    rep = pg.evaluate("""() => { const mk = lang => normalizeState({ settings: { lang }, workoutDays: [{ id: 'd1', name: '', exercises: [{ name: '', sets: [] }] }],
+        meals: [{ id: 'm1', title: '', items: [] }], customFoods: { custom_x: { name: '', p: 1, c: 1, f: 1, unit: 'g' } } });
+      return ['en', 'tr'].map(l => { const s = mk(l); return [s.workoutDays[0].name, s.workoutDays[0].exercises[0].name, s.meals[0].title, s.customFoods.custom_x.name]; }); }""")
+    check(rep == [["Workout day", "Untitled exercise", "Meal 1", "Untitled food"], ["Antrenman günü", "Adsız hareket", "1. Öğün", "Adsız besin"]], "4: onarım adları kaydın dilinde: %s" % rep)
+    pg.evaluate("setLang('en')"); pg.wait_for_timeout(60); l1 = pg.evaluate("localStorage.getItem('ayk_lang')")
+    pg.evaluate("setLang('tr')"); pg.wait_for_timeout(60); l2 = pg.evaluate("localStorage.getItem('ayk_lang')")
+    check([l1, l2] == ["en", "tr"], "4: dil aynası ayk_lang: %s" % [l1, l2])
     c.close()
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
