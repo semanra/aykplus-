@@ -62,26 +62,26 @@ function obTargets(dayType) {
 function obCheck(step) {
   const d = obDraft, v = obVals();
   if (step === 2) {
-    if (!d.sex) return "Cinsiyetini seç; kalori hesabı buna göre yapılır.";
-    if (isNaN(v.age)) return "Yaşını yaz.";
-    if (!(v.age >= 12 && v.age <= 99)) return "Yaş 12 ile 99 arasında olmalı.";
-    if (isNaN(v.height)) return "Boyunu santimetre olarak yaz.";
-    if (!(v.height >= 120 && v.height <= 230)) return "Boy 120 ile 230 cm arasında olmalı.";
-    if (isNaN(v.weight)) return "Kilonu yaz.";
-    if (!(v.weight >= 30 && v.weight <= 300)) return "Kilo 30 ile 300 kg arasında olmalı.";
+    if (!d.sex) return t("Cinsiyetini seç; kalori hesabı buna göre yapılır.");
+    if (isNaN(v.age)) return t("Yaşını yaz.");
+    if (!(v.age >= 12 && v.age <= 99)) return t("Yaş 12 ile 99 arasında olmalı.");
+    if (isNaN(v.height)) return t("Boyunu santimetre olarak yaz.");
+    if (!(v.height >= 120 && v.height <= 230)) return t("Boy 120 ile 230 cm arasında olmalı.");
+    if (isNaN(v.weight)) return t("Kilonu yaz.");
+    if (!(v.weight >= 30 && v.weight <= 300)) return t("Kilo 30 ile 300 kg arasında olmalı.");
   }
   if (step === 3) {
-    if (!d.goal) return "Bir hedef seç.";
-    if (d.goal === "keep" && v.weight > 250) return 'Hedef kilo en çok 250 kg olabilir. Bu kilo için "Kilo vermek" hedefini seç.';
+    if (!d.goal) return t("Bir hedef seç.");
+    if (d.goal === "keep" && v.weight > 250) return t('Hedef kilo en çok 250 kg olabilir. Bu kilo için "Kilo vermek" hedefini seç.');
     if (d.goal === "lose" || d.goal === "gain") {
-      if (isNaN(v.target)) return "Hedef kilonu yaz.";
-      if (!(v.target >= 30 && v.target <= 250)) return "Hedef kilo 30 ile 250 kg arasında olmalı.";
-      if (d.goal === "lose" && !(v.target >= 30 && v.target < v.weight)) return `Kilo vermek için hedef kilo şu anki kilondan (${fmtNum(v.weight)} kg) az olmalı.`;
-      if (d.goal === "gain" && !(v.target > v.weight && v.target <= 250)) return `Kilo almak için hedef kilo şu anki kilondan (${fmtNum(v.weight)} kg) fazla olmalı (en çok 250 kg).`;
+      if (isNaN(v.target)) return t("Hedef kilonu yaz.");
+      if (!(v.target >= 30 && v.target <= 250)) return t("Hedef kilo 30 ile 250 kg arasında olmalı.");
+      if (d.goal === "lose" && !(v.target >= 30 && v.target < v.weight)) return t("Kilo vermek için hedef kilo şu anki kilondan ({w} kg) az olmalı.", { w: fmtNum(v.weight) });
+      if (d.goal === "gain" && !(v.target > v.weight && v.target <= 250)) return t("Kilo almak için hedef kilo şu anki kilondan ({w} kg) fazla olmalı (en çok 250 kg).", { w: fmtNum(v.weight) });
     }
   }
-  if (step === 4 && !d.act) return "Gün içindeki hareketliliğine en yakın olanı seç.";
-  if (step === 5 && !d.exp) return "Birini seç; örnek program buna göre hazırlanır.";
+  if (step === 4 && !d.act) return t("Gün içindeki hareketliliğine en yakın olanı seç.");
+  if (step === 5 && !d.exp) return t("Birini seç; örnek program buna göre hazırlanır.");
   return "";
 }
 function obSetErr(msg) { const e = $("obErr"); if (e) e.textContent = msg || ""; }
@@ -130,18 +130,18 @@ function obKey(e) {
 // Haftalık tahmini değişim (3. adım). 1 kg ≈ 7700 kcal. Hareketlilik henüz seçilmediyse "orta" ile.
 function obWeeklyText() {
   const d = obDraft, v = obVals();
-  if (d.goal === "keep") return "Kilonu korumaya göre hesaplanır; kalori ihtiyacın kadar yersin.";
+  if (d.goal === "keep") return t("Kilonu korumaya göre hesaplanır; kalori ihtiyacın kadar yersin.");
   if (d.goal !== "lose" && d.goal !== "gain") return "";
   // Gerçek ortalama fark: güvenli alt sınır uygulandıktan sonraki hedefle harcama arasındaki fark (antrenman + dinlenme günü ortalaması)
   const a = obTargets("train"), r = obTargets("rest");
   const real = ((a.calTarget - a.tdee) + (r.calTarget - r.tdee)) / 2;
   const kcal = Math.round(d.goal === "lose" ? -real : real);
-  if (kcal <= 0) return d.goal === "lose" ? "Güvenli alt sınır yüzünden bu hızda kilo kaybı olmuyor; kalori hedefin harcamana eşit ya da üstünde kalır." : "Bu seçimle günlük kalori fazlası oluşmuyor.";
+  if (kcal <= 0) return d.goal === "lose" ? t("Güvenli alt sınır yüzünden bu hızda kilo kaybı olmuyor; kalori hedefin harcamana eşit ya da üstünde kalır.") : t("Bu seçimle günlük kalori fazlası oluşmuyor.");
   const kg = kcal * 7 / 7700;
-  let txt = `Haftada yaklaşık ${fmtKg(kg)} kg ${d.goal === "lose" ? "kayıp" : "artış"} (günde ~${fmtInt(kcal)} kcal ${d.goal === "lose" ? "açık" : "fazla"}).`;
+  let txt = d.goal === "lose" ? t("Haftada yaklaşık {kg} kg kayıp (günde ~{kcal} kcal açık).", { kg: fmtKg(kg), kcal: fmtInt(kcal) }) : t("Haftada yaklaşık {kg} kg artış (günde ~{kcal} kcal fazla).", { kg: fmtKg(kg), kcal: fmtInt(kcal) });
   const diff = Math.abs(v.weight - v.target);
   const ok = d.goal === "lose" ? v.target >= 30 && v.target < v.weight : v.target > v.weight && v.target <= 250;
-  if (ok && kg > 0) txt += ` Hedefe yaklaşık ${Math.max(1, Math.round(diff / kg))} haftada ulaşırsın.`;
+  if (ok && kg > 0) txt += " " + tn(Math.max(1, Math.round(diff / kg)), "Hedefe yaklaşık {n} haftada ulaşırsın.");
   return txt;
 }
 function obUpdateWeekly() { const el = $("obWeekly"); if (el) el.textContent = obWeeklyText(); }
@@ -154,7 +154,7 @@ function obOpt(id, on, title, sub, fn) {
 }
 function obField(id, label, key, ph, unit) {
   return `<label class="ob-field" for="${id}"><span class="t-field">${label}</span>
-    <span class="ob-inwrap"><input id="${id}" class="t-in ob-in" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="örn. ${ph}"
+    <span class="ob-inwrap"><input id="${id}" class="t-in ob-in" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="${esc(t("örn. {ph}", { ph }))}"
       value="${esc(obDraft[key])}" oninput="obInput('${key}', this.value)" onkeydown="obKey(event)" />${unit ? `<span class="ob-unit">${unit}</span>` : ""}</span></label>`;
 }
 function obHead(title, sub) {
@@ -168,74 +168,74 @@ function obStepHtml(n) {
   const d = obDraft;
   if (n === 1) return `<div class="ob-hero">
       <img src="icon.png" alt="" class="ob-logo" width="72" height="72" />
-      ${obHead("Hoş geldin", "Beslenme, antrenman ve esneme tek yerde. Birkaç soruyla günlük hedeflerini hesaplayalım; iki dakika sürer.")}
+      ${obHead(t("Hoş geldin"), t("Beslenme, antrenman ve esneme tek yerde. Birkaç soruyla günlük hedeflerini hesaplayalım; iki dakika sürer."))}
     </div>
-    <div id="obHealth" class="ob-note" role="note"><span class="ob-note-t">Sağlık notu</span>${esc(HEALTH_NOTE)}</div>
-    <p class="ob-small">Verilerin yalnızca bu telefonda kalır; hesap açman gerekmez.</p>
+    <div id="obHealth" class="ob-note" role="note"><span class="ob-note-t">${esc(t("Sağlık notu"))}</span>${esc(t(HEALTH_NOTE))}</div>
+    <p class="ob-small">${esc(t("Verilerin yalnızca bu telefonda kalır; hesap açman gerekmez."))}</p>
     ${langAvailable() ? `<div class="t-seg ob-seg2" id="obLang" role="group" aria-label="${esc(t("Dil"))}">
       <button type="button" data-lang-opt="tr" class="${d.lang === "tr" ? "on" : ""}" aria-pressed="${d.lang === "tr"}" onclick="obPickLang('tr')">Türkçe</button>
       <button type="button" data-lang-opt="en" class="${d.lang === "en" ? "on" : ""}" aria-pressed="${d.lang === "en"}" onclick="obPickLang('en')">English</button>
     </div>` : ""}
     <div class="ob-actions">
-      <button id="obStart" type="button" class="ob-main t-btn" onclick="obGo(2)">Başlayalım</button>
-      <button id="obRestore" type="button" class="ob-second" onclick="document.getElementById('obRestoreFile').click()">Yedeğim var, geri yükle</button>
+      <button id="obStart" type="button" class="ob-main t-btn" onclick="obGo(2)">${esc(t("Başlayalım"))}</button>
+      <button id="obRestore" type="button" class="ob-second" onclick="document.getElementById('obRestoreFile').click()">${esc(t("Yedeğim var, geri yükle"))}</button>
     </div>`;
-  if (n === 2) return `${obHead("Seni tanıyalım", "Kalori ihtiyacın bu bilgilerle hesaplanır.")}
-    <div class="ob-group"><span class="t-field">Cinsiyet</span>
+  if (n === 2) return `${obHead(t("Seni tanıyalım"), t("Kalori ihtiyacın bu bilgilerle hesaplanır."))}
+    <div class="ob-group"><span class="t-field">${esc(t("Cinsiyet"))}</span>
       <div class="t-seg ob-seg2">
-        <button id="obSexFemale" type="button" class="${d.sex === "female" ? "on" : ""}" aria-pressed="${d.sex === "female"}" onclick="obPick('sex', 'female')">Kadın</button>
-        <button id="obSexMale" type="button" class="${d.sex === "male" ? "on" : ""}" aria-pressed="${d.sex === "male"}" onclick="obPick('sex', 'male')">Erkek</button>
+        <button id="obSexFemale" type="button" class="${d.sex === "female" ? "on" : ""}" aria-pressed="${d.sex === "female"}" onclick="obPick('sex', 'female')">${esc(t("Kadın"))}</button>
+        <button id="obSexMale" type="button" class="${d.sex === "male" ? "on" : ""}" aria-pressed="${d.sex === "male"}" onclick="obPick('sex', 'male')">${esc(t("Erkek"))}</button>
       </div></div>
-    <div class="ob-grid2">${obField("obAge", "Yaş", "age", "30", "")}${obField("obHeight", "Boy", "height", "170", "cm")}</div>
-    ${obField("obWeight", "Kilo", "weight", "70", "kg")}`;
+    <div class="ob-grid2">${obField("obAge", t("Yaş"), "age", "30", "")}${obField("obHeight", t("Boy"), "height", "170", "cm")}</div>
+    ${obField("obWeight", t("Kilo"), "weight", "70", "kg")}`;
   if (n === 3) {
     const tgt = d.goal === "lose" || d.goal === "gain";
-    const kc = p => d.goal === "lose" ? `${OB_LOSE_PACE[p]} kcal` : `+%${Math.round(GAIN_PACE[p] * 100)}`;
+    const kc = p => d.goal === "lose" ? `${OB_LOSE_PACE[p]} kcal` : t("+%{p}", { p: Math.round(GAIN_PACE[p] * 100) });
     const pace = (id, p, lb) => `<button id="${id}" type="button" class="${d.pace === p ? "on" : ""}" aria-pressed="${d.pace === p}" onclick="obPick('pace', '${p}')"><span class="ob-pace-t">${lb}</span><span class="ob-pace-s">${kc(p)}</span></button>`;
-    return `${obHead("Hedefin ne?", "")}
+    return `${obHead(t("Hedefin ne?"), "")}
     <div class="ob-list">
-      ${obOpt("obGoalLose", d.goal === "lose", "Kilo vermek", "Yağ kaybı, kası koruyarak", "obPick('goal', 'lose')")}
-      ${obOpt("obGoalKeep", d.goal === "keep", "Kilomu korumak", "Aynı kiloda daha fit ve güçlü", "obPick('goal', 'keep')")}
-      ${obOpt("obGoalGain", d.goal === "gain", "Kilo almak", "Kas kazanmak için kalori fazlası", "obPick('goal', 'gain')")}
+      ${obOpt("obGoalLose", d.goal === "lose", t("Kilo vermek"), t("Yağ kaybı, kası koruyarak"), "obPick('goal', 'lose')")}
+      ${obOpt("obGoalKeep", d.goal === "keep", t("Kilomu korumak"), t("Aynı kiloda daha fit ve güçlü"), "obPick('goal', 'keep')")}
+      ${obOpt("obGoalGain", d.goal === "gain", t("Kilo almak"), t("Kas kazanmak için kalori fazlası"), "obPick('goal', 'gain')")}
     </div>
-    ${tgt ? `${obField("obTarget", "Hedef kilo", "target", d.goal === "lose" ? fmtNum(Math.max(30, round1(obVals().weight - 5))) : fmtNum(round1(obVals().weight + 5)), "kg")}
-    <div class="ob-group"><span class="t-field">${d.goal === "lose" ? "Ne kadar hızlı? (günlük kalori açığı)" : "Ne kadar hızlı? (günlük kalori fazlası)"}</span>
-      <div class="t-seg ob-seg3">${pace("obPaceSlow", "slow", "Yavaş")}${pace("obPaceMid", "mid", "Orta")}${pace("obPaceFast", "fast", "Hızlı")}</div></div>` : ""}
+    ${tgt ? `${obField("obTarget", t("Hedef kilo"), "target", d.goal === "lose" ? fmtNum(Math.max(30, round1(obVals().weight - 5))) : fmtNum(round1(obVals().weight + 5)), "kg")}
+    <div class="ob-group"><span class="t-field">${esc(d.goal === "lose" ? t("Ne kadar hızlı? (günlük kalori açığı)") : t("Ne kadar hızlı? (günlük kalori fazlası)"))}</span>
+      <div class="t-seg ob-seg3">${pace("obPaceSlow", "slow", t("Yavaş"))}${pace("obPaceMid", "mid", t("Orta"))}${pace("obPaceFast", "fast", t("Hızlı"))}</div></div>` : ""}
     <p id="obWeekly" class="ob-weekly" aria-live="polite">${esc(obWeeklyText())}</p>`;
   }
-  if (n === 4) return `${obHead("Gün içinde ne kadar hareketlisin?", "Antrenmanı sayma; antrenman günleri ayrıca hesaba katılır.")}
+  if (n === 4) return `${obHead(t("Gün içinde ne kadar hareketlisin?"), t("Antrenmanı sayma; antrenman günleri ayrıca hesaba katılır."))}
     <div class="ob-list">
-      ${obOpt("obActLow", d.act === "low", "Az", "Masa başı iş, günde az yürüyüş", "obPick('act', 'low')")}
-      ${obOpt("obActMid", d.act === "mid", "Orta", "Gün içinde biraz hareket", "obPick('act', 'mid')")}
-      ${obOpt("obActHigh", d.act === "high", "Çok", "Ayakta ya da bedenen çalışılan iş", "obPick('act', 'high')")}
+      ${obOpt("obActLow", d.act === "low", t("Az"), t("Masa başı iş, günde az yürüyüş"), "obPick('act', 'low')")}
+      ${obOpt("obActMid", d.act === "mid", t("Orta"), t("Gün içinde biraz hareket"), "obPick('act', 'mid')")}
+      ${obOpt("obActHigh", d.act === "high", t("Çok"), t("Ayakta ya da bedenen çalışılan iş"), "obPick('act', 'high')")}
     </div>`;
-  if (n === 5) return `${obHead("Antrenman deneyimin", "Örnek program buna göre hazırlanır.")}
+  if (n === 5) return `${obHead(t("Antrenman deneyimin"), t("Örnek program buna göre hazırlanır."))}
     <div class="ob-list">
-      ${obOpt("obExpNew", d.exp === "new", "Yeni başlıyorum", "Makine ve dambılla temel hareketler", "obPick('exp', 'new')")}
-      ${obOpt("obExpPro", d.exp === "pro", "Salonu biliyorum", "Serbest ağırlık, üst/alt vücut bölünmesi", "obPick('exp', 'pro')")}
+      ${obOpt("obExpNew", d.exp === "new", t("Yeni başlıyorum"), t("Makine ve dambılla temel hareketler"), "obPick('exp', 'new')")}
+      ${obOpt("obExpPro", d.exp === "pro", t("Salonu biliyorum"), t("Serbest ağırlık, üst/alt vücut bölünmesi"), "obPick('exp', 'pro')")}
     </div>`;
-  if (n === 6) return `${obHead("Neyle başlayalım?", "Hepsini istediğin zaman değiştirebilir, silebilir ya da kendi menünü ve programını sıfırdan kurabilirsin.")}
+  if (n === 6) return `${obHead(t("Neyle başlayalım?"), t("Hepsini istediğin zaman değiştirebilir, silebilir ya da kendi menünü ve programını sıfırdan kurabilirsin."))}
     <div class="ob-list">
-      ${obCheckRow("obSampleMenu", "menu", "Örnek menü", "4 öğün; gramajlar kalori hedefine göre, antrenman ve dinlenme günü için ayrı")}
-      ${obCheckRow("obSampleProgram", "prog", d.exp === "pro" ? "Örnek program: 4 gün üst/alt vücut" : "Örnek program: 3 gün tüm vücut", "Kilolar boş; ilk antrenmanda kendi kilonu girersin")}
-      ${obCheckRow("obSampleMob", "mob", "Örnek esneme rutini", "Günlük esneme: 7 hareket, yaklaşık 10 dakika")}
+      ${obCheckRow("obSampleMenu", "menu", t("Örnek menü"), t("4 öğün; gramajlar kalori hedefine göre, antrenman ve dinlenme günü için ayrı"))}
+      ${obCheckRow("obSampleProgram", "prog", d.exp === "pro" ? t("Örnek program: 4 gün üst/alt vücut") : t("Örnek program: 3 gün tüm vücut"), t("Kilolar boş; ilk antrenmanda kendi kilonu girersin"))}
+      ${obCheckRow("obSampleMob", "mob", t("Örnek esneme rutini"), t("Günlük esneme: 7 hareket, yaklaşık 10 dakika"))}
     </div>
-    <p class="ob-small">İşareti kaldırdığın bölüm boş başlar.</p>`;
+    <p class="ob-small">${esc(t("İşareti kaldırdığın bölüm boş başlar."))}</p>`;
   if (n === 7) {
     const tr = obTargets("train"), re = obTargets("rest"), wa = waterAutoInfo(obVals().weight);
-    return `${obHead("Hazırsın", "Günlük hedeflerin:")}
+    return `${obHead(t("Hazırsın"), t("Günlük hedeflerin:"))}
     <div id="obSummary" class="ob-sum">
-      <div class="ob-sum-hero"><span class="ob-sum-l">Antrenman günü</span><span class="ob-sum-kcal"><b class="t-display">${fmtInt(tr.calTarget)}</b> kcal</span>
-        <span class="ob-sum-l">Dinlenme günü: <b>${fmtInt(re.calTarget)} kcal</b></span></div>
+      <div class="ob-sum-hero"><span class="ob-sum-l">${esc(t("Antrenman günü"))}</span><span class="ob-sum-kcal"><b class="t-display">${fmtInt(tr.calTarget)}</b> kcal</span>
+        <span class="ob-sum-l">${t("Dinlenme günü: <b>{v} kcal</b>", { v: fmtInt(re.calTarget) })}</span></div>
       <div class="ob-sum-row">
-        <div class="ob-sum-c"><span class="ob-sum-l">Protein</span><b class="t-display">${tr.proTarget}</b><span class="ob-sum-u">g</span></div>
-        <div class="ob-sum-c"><span class="ob-sum-l">Karb</span><b class="t-display">${tr.carbTarget}</b><span class="ob-sum-u">g</span></div>
-        <div class="ob-sum-c"><span class="ob-sum-l">Yağ</span><b class="t-display">${tr.fatTarget}</b><span class="ob-sum-u">g</span></div>
+        <div class="ob-sum-c"><span class="ob-sum-l">${esc(t("Protein"))}</span><b class="t-display">${tr.proTarget}</b><span class="ob-sum-u">g</span></div>
+        <div class="ob-sum-c"><span class="ob-sum-l">${esc(t("Karb"))}</span><b class="t-display">${tr.carbTarget}</b><span class="ob-sum-u">g</span></div>
+        <div class="ob-sum-c"><span class="ob-sum-l">${esc(t("Yağ"))}</span><b class="t-display">${tr.fatTarget}</b><span class="ob-sum-u">g</span></div>
       </div>
-      <div class="ob-sum-water"><span>Su</span><b>${wa ? fmtNum(wa.total) : fmtNum(2.5)} L</b></div>
+      <div class="ob-sum-water"><span>${esc(t("Su"))}</span><b>${wa ? fmtNum(wa.total) : fmtNum(2.5)} L</b></div>
     </div>
-    ${tr.floored || re.floored ? `<p id="obFloor" class="ob-floor">${tr.floored && re.floored ? "Antrenman ve dinlenme günü" : tr.floored ? "Antrenman günü" : "Dinlenme günü"} güvenli alt sınırda (${fmtInt(tr.floor)} kcal); kalori bunun altına indirilmez.</p>` : ""}
-    <p class="ob-small">Hepsini Profil'den istediğin zaman değiştirebilirsin. Hesaplar tahminidir; tartıldıkça uygulama kalorini kilonun gidişine göre ayarlamayı önerir.</p>`;
+    ${tr.floored || re.floored ? `<p id="obFloor" class="ob-floor">${esc(t(tr.floored && re.floored ? "Antrenman ve dinlenme günü güvenli alt sınırda ({k} kcal); kalori bunun altına indirilmez." : tr.floored ? "Antrenman günü güvenli alt sınırda ({k} kcal); kalori bunun altına indirilmez." : "Dinlenme günü güvenli alt sınırda ({k} kcal); kalori bunun altına indirilmez.", { k: fmtInt(tr.floor) }))}</p>` : ""}
+    <p class="ob-small">${t("Hepsini Profil'den istediğin zaman değiştirebilirsin. Hesaplar tahminidir; tartıldıkça uygulama kalorini kilonun gidişine göre ayarlamayı önerir.")}</p>`;
   }
   return "";
 }
@@ -248,7 +248,7 @@ function obRender(keepScroll) {
   const ins = document.querySelectorAll("#obBody input.ob-in");
   if (ins.length) ins[ins.length - 1].setAttribute("enterkeyhint", "done");   // son kutu "Bitti"
   $("obDots").innerHTML = Array.from({ length: OB_STEPS }, (_, i) => `<span class="ob-dot${i + 1 === obStep ? " on" : i + 1 < obStep ? " done" : ""}"></span>`).join("");
-  $("obDots").setAttribute("aria-label", `Adım ${obStep} / ${OB_STEPS}`);
+  $("obDots").setAttribute("aria-label", t("Adım {n} / {m}", { n: obStep, m: OB_STEPS }));
   $("obBack").style.visibility = obStep > 1 ? "visible" : "hidden";
   $("obNext").classList.toggle("hidden", obStep === 1 || obStep === OB_STEPS);
   $("obFinish").classList.toggle("hidden", obStep !== OB_STEPS);
@@ -293,5 +293,5 @@ function finishOnboarding() {
   window.scrollTo(0, 0);
   renderAll();
   updateWakeLock();
-  if (menuFailed) toast("Örnek menü şu an hazırlanamadı; menünü kendin ekleyebilirsin.", "error");
+  if (menuFailed) toast(t("Örnek menü şu an hazırlanamadı; menünü kendin ekleyebilirsin."), "error");
 }

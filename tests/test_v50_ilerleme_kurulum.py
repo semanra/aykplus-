@@ -1,5 +1,6 @@
 # v50 bölüm 1 (görev 1): örnek içerik üreticileri dile göre, kayıt kuralları.
 # v50 bölüm 2 (görev 2): İlerleme (4 alt sekme, grafik penceresi) ve kalori koçu İngilizce.
+# v50 bölüm 3 (görev 3): ilk açılış kurulumu (7 adım) İngilizce, tohumsuz başlatma.
 import os, sys, re, subprocess, time, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ortak_tohum import TEST_INIT
@@ -155,6 +156,93 @@ try:
     check(tr1 == tr2, "tr: İngilizceye geçip dönünce İlerleme çıktısı aynı")
     trt = plain(tr1)
     check(all(x in trt for x in ["Bu hafta, gün gün", "Kalori koçu", "Hareket ilerlemesi", "Haftalık tonaj", "Su ve beslenme geçmişi", "Son tartılar"]) and "Workouts" not in trt and "Weekly" not in trt, "tr: İlerleme Türkçe metinler")
+    # ===== Bölüm 3 (görev 3): ilk açılış kurulumu (tohumsuz başlatma)
+    from ortak_tohum import SPLASH_OFF
+    TRCH = re.compile(r"[çğıöşüÇĞİÖŞÜ]")
+    OBTXT = """() => { const root = document.getElementById('onboard'); const c = root.cloneNode(true);
+      c.querySelectorAll('#obLang').forEach(e => e.remove());
+      const attrs = [...c.querySelectorAll('[aria-label],[placeholder]')].map(e => (e.getAttribute('aria-label') || '') + ' ' + (e.getAttribute('placeholder') || ''));
+      return (c.textContent + ' ' + attrs.join(' ')); }"""
+    def fresh_ob(en):
+        c = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="en-US")
+        c.add_init_script(SPLASH_OFF)
+        if en: c.add_init_script("window.AYK_TEST_EN = true")
+        q = c.new_page(); q.on("pageerror", lambda e: errs.append(str(e)))
+        q.goto(URL); boot(q); return q
+    def obstep(q): return q.get_attribute("#onboard", "data-step")
+    # --- İngilizce akış
+    q = fresh_ob(True)
+    check(q.is_visible("#onboard") and q.is_visible("#obLang"), "ob en: kurulum açık, dil seçici görünür (test bayrağı)")
+    q.click("#obLang [data-lang-opt=en]"); q.wait_for_timeout(100)
+    check(q.evaluate("state.settings.lang") == "en" and "Welcome" in q.inner_text("#onboard"), "ob en: English seçilince 1. adım hemen İngilizce")
+    hn = q.inner_text("#obHealth")
+    check(hn.startswith("Health notice") and "not a substitute for medical advice" in hn and "dietitian" in hn, "ob en: sağlık notu İngilizce: %r" % hn[:60])
+    texts = {}
+    def grab(n): texts[n] = q.evaluate(OBTXT)
+    grab(1); q.click("#obStart")
+    check(obstep(q) == "2", "ob en: 2. adım")
+    q.click("#obNext"); err = q.inner_text("#obErr")
+    check(err == "Select your sex; your calorie calculation depends on it.", "ob en: boş cinsiyet hatası: %r" % err)
+    q.click("#obSexFemale"); q.fill("#obAge", "34"); q.fill("#obHeight", "165"); q.fill("#obWeight", "400"); q.click("#obNext")
+    err = q.inner_text("#obErr")
+    check(obstep(q) == "2" and err == "Weight must be between 30 and 300 kg.", "ob en: sınır dışı kilo hatası: %r" % err)
+    q.fill("#obAge", "8"); q.fill("#obWeight", "72.5"); q.click("#obNext")
+    check("Age must be between 12 and 99." == q.inner_text("#obErr"), "ob en: sınır dışı yaş hatası")
+    q.fill("#obAge", "34"); grab(2); q.click("#obNext")
+    check(obstep(q) == "3", "ob en: 3. adım")
+    q.click("#obNext"); check(q.inner_text("#obErr") == "Choose a goal.", "ob en: hedef seçilmedi hatası")
+    q.click("#obGoalLose"); q.click("#obNext"); check(q.inner_text("#obErr") == "Enter your goal weight.", "ob en: hedef kilo hatası")
+    q.fill("#obTarget", "80"); q.click("#obNext")
+    check("below your current weight (72.5 kg)" in q.inner_text("#obErr"), "ob en: hedef kilo > kilo hatası: %r" % q.inner_text("#obErr"))
+    q.fill("#obTarget", "65"); q.click("#obPaceMid")
+    wk = q.inner_text("#obWeekly")
+    check(re.match(r"^About [\d.]+ kg lost per week \(a deficit of ~[\d,.]+ kcal a day\)\. You will reach your goal in about \d+ weeks?\.$", wk) is not None, "ob en: haftalık tahmin: %r" % wk)
+    check("e.g." in q.get_attribute("#obTarget", "placeholder") and q.inner_text("#obPaceMid").startswith("Moderate"), "ob en: placeholder + hız etiketi")
+    grab(3); q.click("#obNext")
+    q.click("#obActLow"); check("Desk job, little walking each day" in q.inner_text("#onboard") and "Low" in q.inner_text("#obActLow"), "ob en: hareketlilik Low")
+    grab(4); q.click("#obNext")
+    q.click("#obExpNew"); check("New to the gym" in q.inner_text("#obExpNew") and "trained before" in q.inner_text("#obExpPro"), "ob en: deneyim etiketleri")
+    grab(5); q.click("#obNext")
+    t6 = q.inner_text("#onboard")
+    check("Sample meal plan" in t6 and "Sample program: 3-day full body" in t6 and "Sample stretching routine" in t6 and "Anything you untick starts empty." in t6, "ob en: 6. adım örnek kutuları")
+    grab(6); q.click("#obNext")
+    t7 = q.inner_text("#onboard")
+    check(obstep(q) == "7" and "Your daily targets:" in t7 and "Rest day:" in t7 and "Training day" in t7 and "Water" in t7 and "Carbs" in t7 and "Fat" in t7, "ob en: 7. adım özet")
+    grab(7)
+    for n in range(1, 8):
+        m = TRCH.findall(texts[n])
+        check(m == [], "ob en: %d. adımda Türkçe harf yok %s %s" % (n, m[:6], [w for w in texts[n].split() if TRCH.search(w)]))
+    check(q.get_attribute("#obBack", "aria-label") == "Back" and q.get_attribute("#obDots", "aria-label") == "Step 7 of 7", "ob en: Back / Step 7 of 7 etiketleri")
+    check(q.inner_text("#obFinish") == "Open the app", "ob en: son düğme")
+    # güvenli alt sınır notu (küçük kilo, hızlı)
+    q.evaluate("obGo(2)"); q.fill("#obWeight", "45"); q.evaluate("obGo(3)"); q.fill("#obTarget", "40"); q.click("#obPaceFast"); q.evaluate("obGo(7)")
+    fl = q.evaluate("(document.getElementById('obFloor') || {}).innerText || ''")
+    check(fl != "" and fl.endswith("calories are never set below this.") and not TRCH.search(fl), "ob en: alt sınır notu İngilizce: %r" % fl)
+    q.evaluate("obGo(2)"); q.fill("#obWeight", "72.5"); q.evaluate("obGo(3)"); q.fill("#obTarget", "65"); q.click("#obPaceMid"); q.evaluate("obGo(7)")
+    q.click("#obFinish"); q.wait_for_timeout(300)
+    r = q.evaluate("({ lang: state.settings.lang, ob: state.settings.onboarded, meals: state.meals.map(m => m.title), rest: state.restMeals.map(m => m.title), days: state.workoutDays.map(d => d.name), mob: state.mobilityRoutine.routines.map(x => x.name), note: state.workoutDays[0].exercises[0].note })")
+    check(r["lang"] == "en" and r["ob"] is True, "ob en: kayıt lang en, onboarded true")
+    check(r["meals"] == ["Breakfast", "Lunch", "Snack", "Dinner"] and r["rest"] == ["Breakfast", "Lunch", "Snack", "Dinner"], "ob en: örnek öğün başlıkları İngilizce: %s" % r["meals"])
+    check(r["days"] == ["Day 1: Full Body A", "Day 2: Full Body B", "Day 3: Full Body C"] and r["mob"] == ["Daily stretching"] and r["note"] == "Target: 3 sets x 8–12 reps", "ob en: gün adları, rutin, hareket notu İngilizce: %s %s" % (r["days"], r["mob"]))
+    q.context.close()
+    # --- Türkçe akış (bayraksız): bugünkü metinler ve Türkçe örnek içerik
+    q = fresh_ob(False)
+    check(not q.is_visible("#obLang") and "Hoş geldin" in q.inner_text("#onboard") and "tıbbi tavsiye" in q.inner_text("#obHealth"), "ob tr: dil seçici gizli, Türkçe karşılama + sağlık notu")
+    q.click("#obStart"); q.click("#obNext")
+    check(q.inner_text("#obErr") == "Cinsiyetini seç; kalori hesabı buna göre yapılır.", "ob tr: boş cinsiyet hatası")
+    q.click("#obSexMale"); q.fill("#obAge", "30"); q.fill("#obHeight", "180"); q.fill("#obWeight", "400"); q.click("#obNext")
+    check(q.inner_text("#obErr") == "Kilo 30 ile 300 kg arasında olmalı.", "ob tr: sınır dışı kilo hatası")
+    q.fill("#obWeight", "80"); q.click("#obNext"); q.click("#obGoalGain"); q.fill("#obTarget", "70"); q.click("#obNext")
+    check(q.inner_text("#obErr") == "Kilo almak için hedef kilo şu anki kilondan (80 kg) fazla olmalı (en çok 250 kg).", "ob tr: hedef kilo hatası")
+    q.fill("#obTarget", "85"); q.click("#obPaceMid")
+    check(re.match(r"^Haftada yaklaşık [\d,]+ kg artış \(günde ~[\d.]+ kcal fazla\)\. Hedefe yaklaşık \d+ haftada ulaşırsın\.$", q.inner_text("#obWeekly")) is not None, "ob tr: haftalık tahmin: %r" % q.inner_text("#obWeekly"))
+    q.click("#obNext"); q.click("#obActMid"); q.click("#obNext"); q.click("#obExpPro"); q.click("#obNext")
+    check("Örnek program: 4 gün üst/alt vücut" in q.inner_text("#onboard"), "ob tr: 6. adım Türkçe")
+    q.click("#obNext"); check(obstep(q) == "7" and "Günlük hedeflerin:" in q.inner_text("#onboard") and q.get_attribute("#obDots", "aria-label") == "Adım 7 / 7", "ob tr: 7. adım Türkçe")
+    q.click("#obFinish"); q.wait_for_timeout(300)
+    r = q.evaluate("({ lang: state.settings.lang, meals: state.meals.map(m => m.title), days: state.workoutDays.map(d => d.name), mob: state.mobilityRoutine.routines.map(x => x.name) })")
+    check(r["lang"] == "tr" and r["meals"] == ["Kahvaltı", "Öğle yemeği", "Ara öğün", "Akşam yemeği"] and r["days"][0] == "1. Gün: Üst Vücut A" and r["mob"] == ["Günlük esneme"], "ob tr: Türkçe örnek içerik: %s" % r)
+    q.context.close()
     src = open(os.path.join(REPO, "src", "app", "23-en-ilerleme-kurulum.js"), encoding="utf-8").read()
     keys = [k.replace('\\"', '"') for k in re.findall(r'"((?:[^"\\]|\\.)*)":\s*(?:"|\{)', src)]
     bad = pg.evaluate(r"""ks => ks.filter(k => { const v = EN[k]; const vs = typeof v === 'string' ? [v] : v ? [v.one, v.other] : [];
