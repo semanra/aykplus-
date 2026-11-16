@@ -559,10 +559,16 @@ try:
         "Bugün": "GYM_VIEWS etiketleri, gösterimde t(l)", "Programım": "GYM_VIEWS", "Geçmiş": "GYM_VIEWS",
         "Göğüs": "BODY_POLYS anahtarı = MUSCLES kas adı (kayıt anahtarı; gösterimde muscleL)", "Karın": "BODY_POLYS anahtarı", "Ön Bacak": "BODY_POLYS anahtarı", "Sırt": "BODY_POLYS anahtarı", "Arka Bacak & Kalça": "BODY_POLYS anahtarı"},
       "11-mutfak-akilli.js": {"Diğer": "besin kategorisi yedeği (veri, v49)"},
+      "06-mobilite.js": {
+        "Sağ": "tur tarafı kayıt değeri ('Sağ'/'Sol', mobT.rounds; gösterimde mobSideL) ve mobSay Türkçe ses kalıbı 'Sağa geç' (trFill; ses v52'ye kadar Türkçe)",
+        "Sola geç": "mobSay Türkçe ses kalıbı (trFill; ses v52'ye kadar Türkçe)", "Sıradaki set": "mobSay Türkçe ses kalıbı (trFill; ses v52'ye kadar Türkçe)",
+        "Başla": "mobSay Türkçe ses kalıbı (trFill; ses v52'ye kadar Türkçe)",
+        "Isınma": "mobSesStartIds konuşma başlığı: ses v52'ye kadar Türkçe (görünen başlık t('Isınma'))",
+        "Göğüs": "MOB_WARM_REGIONS anahtarı = MUSCLES kas adı (kayıt anahtarı, çeviri yok)", "Sırt": "MOB_WARM_REGIONS anahtarı (kas adı)",
+        "Ön Bacak": "MOB_WARM_REGIONS anahtarı (kas adı)", "Arka Bacak & Kalça": "MOB_WARM_REGIONS anahtarı (kas adı)", "Karın": "MOB_WARM_REGIONS anahtarı (kas adı)"},
       "12-besin-veritabani.js": {}, "13-cizim-baslat.js": {}}
     # kısmen kapsamdaki dosyalar: yalnız bu işlevlerin gövdeleri taranır (kalanı v48: Antrenman/Mobilite/İlerleme)
     KISMI = {
-      "06-mobilite.js": ["warmupCardHtml"],
       "09-kas-plaka-koc-takviye.js": ["muscleL", "libCatL", "targetL", "overloadSuggestion", "deloadInfo", "deloadHtml", "dismissDeload", "suggestionHtml", "applySuggestion", "dismissSuggestion", "weeklyMuscleSets", "plateChips", "warmupSets", "openPlateTool", "renderLevelTool", "renderPlateTool", "offerUndo", "doUndo", "nextDayIdx", "fmtMinutes", "fmtDuration", "renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose", "deleteMeal", "copyMeal", "otherMeals"]}
     bad = []; used = {}
     for f, tbl in IZIN.items():

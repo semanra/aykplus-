@@ -56,7 +56,8 @@ def shoot_fresh(root, out_dir, scheme):
                 if js: pg.evaluate("() => { " + js + " }")
             except Exception as e: errs.append(f"{name}: {str(e)[:160]}")
             pg.wait_for_timeout(250); pg.evaluate("window.scrollTo(0,0)")
-            pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=True)
+            # v49 (b2): #onboard sabit konumlu tam ekran katman; tam sayfa çekimi arkadaki uygulamayı da (1480 px) gösteriyordu → kurulum ekranları yalnız görünür alan (390×844)
+            pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=not name.startswith("ob-"))
             res[name] = pg.evaluate(AUDIT_JS, "#onboard" if name.startswith("ob-") else None)
         b.close()
     return res, errs
@@ -160,7 +161,7 @@ def main():
         print(f"• {tr}: İngilizce ekranlar…"); fe, f2 = shoot_en(REPO, os.path.join(OUT, "simdi", scheme), scheme); audit.update(fe); e1 = e1 + f2
         if scheme == "dark":   # inceleme için İngilizce ekran görüntüleri
             sd = os.path.join(REPO, "tests", "shots"); os.makedirs(sd, exist_ok=True)
-            for n, _ in EN_SCREENS: shutil.copy(os.path.join(OUT, "simdi", scheme, n + ".png"), os.path.join(sd, ("v48_" if n.startswith("en-g-") else "v47_") + n.replace("en-", "en_", 1).replace("-", "_") + ".png"))
+            for n, _ in EN_SCREENS: shutil.copy(os.path.join(OUT, "simdi", scheme, n + ".png"), os.path.join(sd, ("v49_" if n.startswith("en-m-") else "v48_" if n.startswith("en-g-") else "v47_") + n.replace("en-", "en_", 1).replace("-", "_") + ".png"))
         rows = pixdiff(os.path.join(OUT, "onceki", scheme), os.path.join(OUT, "simdi", scheme), os.path.join(OUT, "fark", scheme))
         lines += [f"## Tema: {tr}", "", f"### Görsel farklar ({len(rows)} / {len(SCREENS) + len(FIXED_NAMES)} ekran)", ""]
         lines += [f"- `{n}`: {k} — {d}" for n, k, d in rows] or ["- Fark yok: bütün ekranlar birebir aynı."]

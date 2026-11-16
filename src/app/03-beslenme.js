@@ -274,8 +274,8 @@ function renderWeightBlock(st) {
   $("deficitSlider").value = state.deficit;
   const tg = getTargets();
   const goal = tg.goal;
-  [["goalLose", "lose"], ["goalKeep", "keep"], ["goalGain", "gain"]].forEach(([id, g]) => { $(id).className = goal === g ? "on" : ""; });
-  [["paceSlow", "slow"], ["paceMid", "mid"], ["paceFast", "fast"]].forEach(([id, p]) => { $(id).className = st.gainPace === p ? "on" : ""; });
+  [["goalLose", "lose"], ["goalKeep", "keep"], ["goalGain", "gain"]].forEach(([id, g]) => { $(id).className = goal === g ? "on" : ""; $(id).setAttribute("aria-pressed", goal === g ? "true" : "false"); });
+  [["paceSlow", "slow"], ["paceMid", "mid"], ["paceFast", "fast"]].forEach(([id, p]) => { $(id).className = st.gainPace === p ? "on" : ""; $(id).setAttribute("aria-pressed", st.gainPace === p ? "true" : "false"); });
   $("loseBox").classList.toggle("hidden", goal !== "lose");
   $("gainBox").classList.toggle("hidden", goal !== "gain");
   $("goalVal").textContent = (tg.goalDelta < 0 ? "−" : tg.goalDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.goalDelta));
@@ -316,8 +316,8 @@ function renderHero() {
   $("mmPlanVal").textContent = fmtInt(plan.cal);
   $("mmEatenVal").textContent = fmtInt(eaten.cal);
   $("mmEatenMeals").textContent = `${meals.filter(m => m.done).length}/${meals.length}`;
-  $("mmPlan").className = view === "plan" ? "on" : "";
-  $("mmEaten").className = view === "eaten" ? "on" : "";
+  $("mmPlan").className = view === "plan" ? "on" : ""; $("mmPlan").setAttribute("aria-pressed", view === "plan" ? "true" : "false");
+  $("mmEaten").className = view === "eaten" ? "on" : ""; $("mmEaten").setAttribute("aria-pressed", view === "eaten" ? "true" : "false");
   renderMicroLine(view);
 }
 

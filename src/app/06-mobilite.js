@@ -33,7 +33,7 @@ function mobGuideHtml(name, open = true, id = "") {
   </div>`;
 }
 function mobSummary(it) {
-  const amt = it.mode === "time" ? tn(it.sec, "{n} sn") : tn(it.reps, "{n} tekrar");
+  const amt = it.mode === "time" ? t("{n} sn", { n: it.sec }) : tn(it.reps, "{n} tekrar");
   const body = t("{set} × {amt}", { set: tn(it.sets, "{n} set"), amt });
   return it.sides === 2 ? t("Sağ/sol · {x}", { x: body }) : body;
 }
@@ -46,7 +46,7 @@ function mobCardHtml(it, idx) {
     : `<button data-mob-check onclick="mobToggle(${id})" class="m-chk" aria-pressed="${it.done}" aria-label="${it.done ? t("Yapıldı işaretini kaldır") : t("Yapıldı olarak işaretle")}">${svgI("check", 20, 3)}</button>`;
   const right = ed
     ? `<button data-mob-del onclick="mobRemoveItem(${id})" class="m-del" aria-label="${esc(t("{ad} hareketini kaldır", { ad: it.name }))}">${svgI("trash", 19)}</button>`
-    : it.mode === "time" ? `<button data-mob-timer onclick="mobTimerStart(${id})" class="m-tbtn" aria-label="${tn(it.sec, "{n} saniyelik sayacı başlat")}">${svgI("clock", 18, 2.2)}<span>${tn(it.sec, "{n} sn")}</span></button>` : "";
+    : it.mode === "time" ? `<button data-mob-timer onclick="mobTimerStart(${id})" class="m-tbtn" aria-label="${t("{n} saniyelik sayacı başlat", { n: it.sec })}">${svgI("clock", 18, 2.2)}<span>${t("{n} sn", { n: it.sec })}</span></button>` : "";
   return `<div data-mob-row="${esc(it.id)}" class="m-card ${!ed && it.done ? "done" : ""}">
     ${left}
     <button data-mob-open onclick="mobOpen(${id})" class="flex-1 min-w-0 min-h-[44px] text-left">
@@ -244,7 +244,7 @@ function mobPreviewHtml(it) {
   const tot = tn(Math.max(1, Math.round(mobTotalSec(it) / 60)), "Toplam ≈ {n} dk.");
   return it.sides === 2
     ? tn(it.sets, "Sayaçta: <b>sağ {sn} sn → sol {sn} sn</b>, {n} tur. {toplam}", { sn: it.sec, toplam: tot })
-    : tn(it.sets, "Sayaçta: <b>{n} × {sn} sn</b>. {toplam}", { sn: it.sec, toplam: tot });
+    : t("Sayaçta: <b>{n} × {sn} sn</b>. {toplam}", { n: it.sets, sn: it.sec, toplam: tot });
 }
 function mobDetailHtml() {
   const it = mobFind(mobUI.id);

@@ -137,8 +137,16 @@ EN_SCREENS = [
   ("en-g-gecmis", "selectMuscle(null); setGymView('history')"),
   ("en-g-hareket", "setGymView('today'); openEditExercise(0); const q = document.getElementById('exEquip'); q.value = 'stack'; q.dispatchEvent(new Event('change', { bubbles: true }))"),
   ("en-g-plaka", "closeModal('exerciseModal'); openPlateTool(0)"),
+  # v49: Mobilite (yalnız ölçüm)
+  ("en-m-ana", "closeModal('chartModal'); switchTab('mobility'); mobUI.view = 'home'; renderMobility()"),
+  ("en-m-rutin", "mobOpenRoutine(mobRoutines()[0].id)"),
+  ("en-m-duzenle", "mobEdit(true)"),
+  ("en-m-detay", "mobEdit(false); mobOpen(state.mobilityRoutine.routines[0].items[0].id)"),
+  ("en-m-ekle", "mobBack(); mobEdit(true); mobAddOpen()"),
+  ("en-m-seans", "mobBack(); mobEdit(false); mobSesStart(mobRoutines()[0].id); mobSesLoad(mobRoutines()[0].items.findIndex(i => i.mode === 'time'))"),
+  ("en-m-bitis", "mobSesFinish()"),
 ]
-EN_ROOT = {"en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage"}
+EN_ROOT = {"en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage", "en-m-seans": "#mobTimer", "en-m-bitis": "#mobTimer"}
 # v44: kurulum ekranları. TEST_INIT OLMADAN, temiz depoda açılır (gerçek yeni kurulum yolu). Sırayla; her adım öncekinin üstüne.
 ONBOARD_SCREENS = [
   ("ob-1", ""),
