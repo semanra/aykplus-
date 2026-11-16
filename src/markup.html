@@ -1264,8 +1264,8 @@
   <div id="chartModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
     <div class="card p-5 max-w-lg w-full space-y-3 overflow-y-auto" style="max-height: 90vh;">
       <div class="flex justify-between items-center gap-2">
-        <h3 id="chartTitle" class="font-bold text-base text-[var(--w-acc)] truncate">İlerleme</h3>
-        <button onclick="closeModal('chartModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1">&times;</button>
+        <h3 id="chartTitle" class="font-bold text-base text-[var(--w-acc)] truncate" data-t="İlerleme">İlerleme</h3>
+        <button onclick="closeModal('chartModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1" aria-label="Kapat" data-t-aria="Kapat">&times;</button>
       </div>
       <div id="chartBody"></div>
     </div>

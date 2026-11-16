@@ -446,11 +446,11 @@ function applyCoach() {
   if (!a.ready || a.delta === 0) return;
   state.settings.calAdjust = num(state.settings.calAdjust, 0) + a.delta;
   state.settings.coachAppliedAt = Date.now();
-  toast(`Hedef kalori ${a.delta > 0 ? "+" : ""}${a.delta} kcal ayarlandı`);
+  toast(t("Hedef kalori {v} kcal ayarlandı", { v: (a.delta > 0 ? "+" : "") + a.delta }));
   renderAll();
 }
 async function resetCoachAdjust() {
-  if (!(await askConfirm("Koç düzeltmesi sıfırlansın mı?", "Hedef kalorin formülün hesapladığı değere döner.", "Sıfırla"))) return;
+  if (!(await askConfirm(t("Koç düzeltmesi sıfırlansın mı?"), t("Hedef kalorin formülün hesapladığı değere döner."), t("Sıfırla")))) return;
   state.settings.calAdjust = 0;
   state.settings.coachAppliedAt = 0;
   renderAll();

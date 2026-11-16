@@ -596,7 +596,7 @@ try:
       "restPillLabel": "JS yazar (timerLabelText)", "cfTitle": "JS yazar (openCustomFood/editCustomFood)", "pickerTitle": "JS yazar (openPicker)", "pickerExtraBtn": "JS yazar (openPicker)",
       "mealModalTitle": "JS yazar (openMealModal)", "pfPhotoBtnText": "JS yazar (refreshProfilePhoto)", "lastBackupText": "JS yazar (renderProfile)", "uiDlgCancel": "JS yazar (uiDialog)",
       "pfLang": "dil adı kendi dilinde kalır ('Türkçe' / 'English')", "pfAvatar": "alt metni: görsel yalnızca süs",
-      "exMuscle": "kas seçenekleri: değer = kayıtlı Türkçe kas adı; metni JS her açılışta muscleL ile yazar (openExerciseModal)", "chartModal": "İlerleme grafik penceresi (v48; başlığı JS yazar)",
+      "exMuscle": "kas seçenekleri: değer = kayıtlı Türkçe kas adı; metni JS her açılışta muscleL ile yazar (openExerciseModal)",
       "onboard": "ilk kurulum ekranları (ayrı sürüm)"}
     mk = open(os.path.join(REPO, "src", "markup.html"), encoding="utf-8").read(); mk = mk[mk.index("<body"):]
     mhit = markup_tarama(mk)
