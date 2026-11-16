@@ -142,7 +142,31 @@ try:
     t_ = plain(OUT["fast"]["html"])
     check(OUT["fast"]["a"]["tooFast"] and "You're losing" in t_ and "% of your body weight per week" in t_ and "Suggested target" in t_ and "Apply suggestion" in t_, "en: koç hızlı kilo kaybı: %s" % t_[:200])
     t_ = plain(OUT["notgain"]["html"])
-    check(OUT["notgain"]["a"]["notGaining"] and "not gaining weight even though you're in a calorie surplus" in t_ and "Calorie coach" in t_ and "than expected" in t_, "en: koç kilo almıyor: %s" % t_[:200])
+    check(OUT["notgain"]["a"]["notGaining"] and "not gaining weight even though you're in a calorie surplus" in t_ and "Calorie coach" in t_, "en: koç kilo almıyor: %s" % t_[:200])
+    # v50 düzeltmesi: kilo alamayana azaltma, kilo veremeyene artırma önerilmez (hedefin tersine öneri yok)
+    REV = pg.evaluate("""() => { const r = {}; const DAY = 86400000, now = Date.now();
+      const mk = (w0, pw) => Array.from({ length: 10 }, (_, i) => ({ date: "x", weight: Math.round((w0 + pw * (i * 3 / 7)) * 100) / 100, ts: now - (9 - i) * 3 * DAY }));
+      const logs = {}; for (let i = 0; i < 30; i++) { const d = new Date(now - i * DAY); logs[todayStr(d)] = { kcal: 0, eatenKcal: 0, mealsDone: 0 }; }
+      const run = (goal, w0, pw, eat) => { state.settings.goal = goal; state.weightLogs = mk(w0, pw); state.weight = state.weightLogs[9].weight; state.settings.calAdjust = 0; state.settings.coachAppliedAt = 0;
+        Object.keys(logs).forEach(k => { logs[k] = { kcal: eat, eatenKcal: eat, mealsDone: 3 }; }); state.dailyLogs = { ...logs };
+        const a = coachAnalysis(); return { delta: a.delta, full: a.fullDelta, cal: a.calTarget }; };
+      r.gainUnder = run("gain", 70, 0.0, 1800);   // hedefin çok altında yiyor, kilo almıyor
+      r.loseOver = run("lose", 90, 0.1, 4200);    // hedefin çok üstünde yiyor, kilo vermiyor
+      r.gainOk = run("gain", 70, 0.0, 4200);      // hedefin üstünde yiyor, yine almıyor -> artır serbest
+      return r; }""")
+    check(REV["gainUnder"]["delta"] >= 0 and REV["gainUnder"]["full"] >= 0, "koç: Al hedefinde kilo almayana azaltma önerilmez: %s" % REV["gainUnder"])
+    check(REV["loseOver"]["delta"] <= 0 and REV["loseOver"]["full"] <= 0, "koç: Ver hedefinde kilo vermeyene artırma önerilmez: %s" % REV["loseOver"])
+    check(REV["gainOk"]["delta"] > 0, "koç: Al hedefinde artırma önerisi hâlâ çalışır: %s" % REV["gainOk"])
+    # v50 düzeltmesi: hedefe kalan, hedefin yönüne göre
+    setlang("tr")
+    GL = pg.evaluate(r"""() => { const out = {}; const keep = { g: state.settings.goal, w: state.weight, tw: state.settings.targetWeight };
+      const k = (goal, w, tw) => { state.settings.goal = goal; state.weight = w; state.settings.targetWeight = tw; const h = progKiloHtml().replace(/<[^>]+>/g, " ").replace(/\s+/g, " "); return h; };
+      out.gainBelow = k("gain", 70, 80); out.gainAbove = k("gain", 82, 80); out.loseAbove = k("lose", 90, 80); out.loseBelow = k("lose", 78, 80);
+      state.settings.goal = keep.g; state.weight = keep.w; state.settings.targetWeight = keep.tw; return out; }""")
+    check("10 kg kaldı" in GL["gainBelow"] and "ulaştın" not in GL["gainBelow"] and "Hedefe 10 kg" in GL["gainBelow"], "kilo: Al hedefinde hedefin altında 'kaldı' (ulaştın değil)")
+    check("hedefe ulaştın" in GL["gainAbove"] and "Hedefe 0 kg" in GL["gainAbove"], "kilo: Al hedefinde hedefin üstünde 'ulaştın'")
+    check("10 kg kaldı" in GL["loseAbove"] and "hedefe ulaştın" in GL["loseBelow"], "kilo: Ver hedefinde eski davranış aynı")
+    setlang("en")
     t_ = plain(OUT["drift"]["html"])
     check(OUT["drift"]["a"]["keepDrift"] and "changing by 0.5% per week" in t_ and "You're gaining weight." in t_, "en: koç koruma sapması: %s" % t_[:200])
     check("calorie target by" in OUT["fast"]["hint"], "en: koç ipucu (Beslenme) aynı anahtarlar: %s" % OUT["fast"]["hint"])

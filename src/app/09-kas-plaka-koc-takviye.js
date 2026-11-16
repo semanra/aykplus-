@@ -422,7 +422,11 @@ function coachAnalysis() {
   const goal = targets.goal;
   const gainAdd = goal === "gain" ? Math.round(tdeeEst * (GAIN_PACE[state.settings.gainPace] || GAIN_PACE.mid)) : 0;
   const desired = Math.max(floor, goal === "lose" ? tdeeEst - state.deficit : goal === "gain" ? tdeeEst + gainAdd : tdeeEst);
-  const fullDelta = Math.round((desired - targets.calTarget) / 50) * 50;
+  let fullDelta = Math.round((desired - targets.calTarget) / 50) * 50;
+  // v50: hedefin tersine öneri yok — kilo alamayana "azalt", kilo veremeyene "artır" denmez
+  // (az yiyen kişinin ölçülen harcaması düşük çıkar; çözüm hedefi tutturmak, uyarı ayrıca gösterilir)
+  if (goal === "gain" && weekly < 0.05 && fullDelta < 0) fullDelta = 0;
+  if (goal === "lose" && weekly >= 0 && fullDelta > 0) fullDelta = 0;
   let delta = Math.max(-COACH_MAX_STEP, Math.min(COACH_MAX_STEP, fullDelta));
   const adj = num(state.settings.calAdjust, 0);
   if (adj + delta > 1000) delta = 1000 - adj;
