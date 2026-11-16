@@ -228,8 +228,15 @@ function progWeekly() {
 
 // --- Ortak kartlar
 async function progLogWeight() {
-  const v = await askText(t("Bugünkü tartı"), fmtNum(state.weight), "kg", t("Sabah, aç karnına tartıldığın kilo (kg)"), t("Kaydet"));
+  const v = await askText(t("Bugünkü tartı"), fmtWNum(state.weight, { body: true }), wUnit(), wTxt(t("Sabah, aç karnına tartıldığın kilo (kg)")), t("Kaydet"));
   if (v == null || String(v).trim() === "") return;
+  if (isImperial()) {   // v53: lb girilir, kayıt kg (gösterilen değer yeniden yazılırsa kg aynen)
+    const kg = num(keepBodyKg(v, state.weight), NaN);
+    if (!(kg >= 30 && kg <= 300)) { sayAlert(t("Geçersiz kilo"), t("{a} ile {b} arasında bir değer yaz (örn. {ex}).", { a: fmtW(30, { body: true }), b: fmtW(300, { body: true }), ex: fmtNum(212.5) })); return; }
+    state.weight = kg;
+    logCurrentWeight();
+    return;
+  }
   const n = num(v, NaN);
   if (!(n >= 30 && n <= 300)) { sayAlert(t("Geçersiz kilo"), t("30 ile 300 kg arasında bir değer yaz (örn. 96,4).")); return; }
   state.weight = round1(n);
@@ -248,8 +255,8 @@ function progCoachHtml() {
     return `<div class="p-card" id="pCoach">${head(t("Kalori koçu"), t("Henüz hesap için veri yok"))}
       <p class="p-fine">${a.n >= 2 ? tn(Math.floor(a.spanDays), "Koçun gerçek harcamanı hesaplayabilmesi için son 4 haftada <b>en az 4 tartı</b> ve ilk ile son tartı arasında <b>en az 10 gün</b> olmalı. Şu an: {k} tartı, {n} gün aralık.", { k: String(a.n) }) : tn(a.n, "Koçun gerçek harcamanı hesaplayabilmesi için son 4 haftada <b>en az 4 tartı</b> ve ilk ile son tartı arasında <b>en az 10 gün</b> olmalı. Şu an: {n} tartı.")}</p>${adjLine}</div>`;
   }
-  const fmtW = v => (v > 0 ? "+" : "") + (curLang() === "en" ? v.toFixed(2) : v.toFixed(2).replace(".", ","));
-  const rows = [[t("Gerçek kilo değişimi"), t("{v} kg/hafta", { v: fmtW(a.weekly) })], [t("Hedeflenen değişim"), t("{v} kg/hafta", { v: fmtW(a.expectedWeekly) })],
+  const sgnW = kg => { const v = num(wRaw(kg)); return (v > 0 ? "+" : "") + (curLang() === "en" ? v.toFixed(2) : v.toFixed(2).replace(".", ",")); };   // v53: lb/hafta
+  const rows = [[t("Gerçek kilo değişimi"), wTxt(t("{v} kg/hafta", { v: sgnW(a.weekly) }))], [t("Hedeflenen değişim"), wTxt(t("{v} kg/hafta", { v: sgnW(a.expectedWeekly) }))],
     [t("Ortalama kalori alımı"), a.intakeAssumed ? a.avgIntake + " kcal *" : tn(a.intakeDays, "{v} kcal ({n} gün)", { v: String(a.avgIntake) })], [t("Tahmini gerçek harcaman (TDEE)"), a.tdeeEst + " kcal"], [t("Formülün tahmini"), a.tdeeFormula + " kcal"]]
     .map(([l, v]) => `<div class="p-kv"><span>${l}</span><b>${v}</b></div>`).join("");
   const details = `<details class="p-det"><summary>${t("Hesap ayrıntıları · {k} tartı, {d} gün", { k: String(a.n), d: String(Math.floor(a.spanDays)) })}</summary>${rows}
@@ -280,8 +287,8 @@ function progCoachHtml() {
 function progGenelHtml() {
   const w = progWeekly();
   const wTile = w.w7
-    ? pStat(t("Kilo (7 gün ort.)"), fmtNum(w.w7.avg), "kg", w.wPrev != null ? pDelta(w.w7.avg - w.wPrev, "", progWeightGood(w.w7.avg - w.wPrev)) : tn(w.w7.n, "{n} tartı"), PC.kg)
-    : pStat(t("Kilo"), fmtNum(state.weight), "kg", t("son 7 günde tartı yok"), PC.kg);
+    ? pStat(t("Kilo (7 gün ort.)"), fmtWNum(w.w7.avg, { body: true }), wUnit(), w.wPrev != null ? pDelta(wRaw(w.w7.avg - w.wPrev), "", progWeightGood(w.w7.avg - w.wPrev)) : tn(w.w7.n, "{n} tartı"), PC.kg)
+    : pStat(t("Kilo"), fmtWNum(state.weight, { body: true }), wUnit(), t("son 7 günde tartı yok"), PC.kg);
   const tiles = pStat(t("Antrenman|sayı"), w.n, tn(w.n, "seans|birim"), w.prs ? tn(w.prs, "{n} rekor") : tn(state.workoutDays.length, "programda {n} gün"), PC.tq)
     + wTile
     + pStat(t("Kalori hedefte"), w.hitN ? `${w.hitOk}/${w.hitN}` : "—", w.hitN ? tn(w.hitN, "gün|birim") : "", w.hitN ? t("±%5 · bugün hariç") : t("bu hafta kayıt yok"), PC.gr)
@@ -322,34 +329,35 @@ function progKiloHtml() {
   // v50: hedefe kalan, hedefin yönüne göre (Al hedefinde kilo hedefin altındayken "ulaştın" denmez)
   const gl = getTargets().goal;
   const toGoal = gl === "gain" ? tgt - state.weight : gl === "lose" ? state.weight - tgt : Math.abs(state.weight - tgt);
+  const dP = p => ({ t: p.t, y: wRaw(p.y) });   // v53: grafik gösterim biriminde (hesaplar kg)
   const chips = [[30, tn(30, "{n} gün")], [90, tn(90, "{n} gün")], [0, t("Tümü")]].map(([n, l]) => `<button onclick="setProgWRange(${n})" class="p-chip ${rng === n ? "on" : ""}" aria-pressed="${rng === n}">${l}</button>`).join("");
   const chart = pts.length >= 4
-    ? pLine([{ pts, color: PC.dot, dots: true }, { pts: avg, color: PC.kg, w: 3, name: t("7 gün ort.") }], { unit: "kg", label: t("Tartılar ve 7 günlük ortalama") })
+    ? pLine([{ pts: pts.map(dP), color: PC.dot, dots: true }, { pts: avg.map(dP), color: PC.kg, w: 3, name: t("7 gün ort.") }], { unit: wUnit(), label: t("Tartılar ve 7 günlük ortalama") })
       + pLegend([[`<i class="p-lg-dot"></i>`, t("Günlük tartı")], [`<i class="p-lg-line"></i>`, t("7 gün ortalaması")]])
     : `<div class="p-low">${tn(pts.length, "Bu aralıkta {n} tartı var. Grafik için en az 4 tartı gerekir; o zamana kadar değerler aşağıdaki listede.")}</div>`;
-  const big = w7 ? `<div class="p-k">${t("7 günlük ortalama")}</div><div class="p-big"><b class="t-display">${fmtNum(w7.avg)}</b><span>kg</span>${prev != null ? pDelta(w7.avg - prev, t("geçen haftaya göre"), progWeightGood(w7.avg - prev)) : ""}</div>`
-    : `<div class="p-k">${t("Şu anki kilo")}</div><div class="p-big"><b class="t-display">${fmtNum(state.weight)}</b><span>kg</span></div>`;
+  const big = w7 ? `<div class="p-k">${t("7 günlük ortalama")}</div><div class="p-big"><b class="t-display">${fmtWNum(w7.avg, { body: true })}</b><span>${wUnit()}</span>${prev != null ? pDelta(wRaw(w7.avg - prev), t("geçen haftaya göre"), progWeightGood(w7.avg - prev)) : ""}</div>`
+    : `<div class="p-k">${t("Şu anki kilo")}</div><div class="p-big"><b class="t-display">${fmtWNum(state.weight, { body: true })}</b><span>${wUnit()}</span></div>`;
   const first = wl[0];
   const change = first ? state.weight - num(first.weight) : 0;
   const comp = bodyComp(state.weight, validBf(state.settings.bodyFat));
   const tbf = validBf(state.settings.targetBodyFat);
   const stats = `<div class="p-mini3">
-      <div><span>${t("Şu an")}</span><b>${fmtNum(state.weight)} kg</b></div>
-      <div><span>${t("İlk kayıttan")}</span><b>${(change > 0 ? "+" : "") + fmtNum(change)} kg</b></div>
-      <div><span>${t("Hedefe")}</span><b>${fmtNum(Math.max(0, toGoal))} kg</b></div></div>
-    ${comp ? `<div class="p-mini3"><div><span>${t("Yağ oranı")}</span><b>${t("%{v}", { v: fmtNum(comp.bf) })}</b>${tbf ? `<small>${t("hedef %{v}", { v: fmtNum(tbf) })}</small>` : ""}</div><div><span>${t("Yağsız kütle")}</span><b>${fmtNum(comp.leanKg)} kg</b></div><div><span>${t("Yağ kütlesi")}</span><b>${fmtNum(comp.fatKg)} kg</b></div></div>`
+      <div><span>${t("Şu an")}</span><b>${fmtW(state.weight, { body: true })}</b></div>
+      <div><span>${t("İlk kayıttan")}</span><b>${(change > 0 ? "+" : "") + fmtW(change, { body: true })}</b></div>
+      <div><span>${t("Hedefe")}</span><b>${fmtW(Math.max(0, toGoal), { body: true })}</b></div></div>
+    ${comp ? `<div class="p-mini3"><div><span>${t("Yağ oranı")}</span><b>${t("%{v}", { v: fmtNum(comp.bf) })}</b>${tbf ? `<small>${t("hedef %{v}", { v: fmtNum(tbf) })}</small>` : ""}</div><div><span>${t("Yağsız kütle")}</span><b>${fmtW(comp.leanKg, { body: true })}</b></div><div><span>${t("Yağ kütlesi")}</span><b>${fmtW(comp.fatKg, { body: true })}</b></div></div>`
       : `<button onclick="openSettings()" class="p-btn ghost">${t("Yağ oranını Profil'den gir; yağsız kütlen burada görünür")}</button>`}`;
   // Haftalık ortalama (en az 4 hafta)
   const wk = {};
   timed.forEach(p => { const k = weekStart(new Date(p.t)); (wk[k] = wk[k] || []).push(p.y); });
   const wkPts = Object.keys(wk).map(Number).sort((a, b) => a - b).map(k => ({ t: k, y: wk[k].reduce((a, b) => a + b, 0) / wk[k].length }));
-  const weekly = wkPts.length >= 4 ? `<div class="p-card">${pSec(t("Haftalık ortalama"), PC.kg)}${pLine([{ pts: wkPts.slice(-12), color: PC.kg, name: t("son hafta") }], { unit: "kg", h: 160, label: t("Haftalık kilo ortalaması") })}
+  const weekly = wkPts.length >= 4 ? `<div class="p-card">${pSec(t("Haftalık ortalama"), PC.kg)}${pLine([{ pts: wkPts.slice(-12).map(dP), color: PC.kg, name: t("son hafta") }], { unit: wUnit(), h: 160, label: t("Haftalık kilo ortalaması") })}
       <p class="p-fine">${t("Günlük dalgalanma (su, tuz) gizlenir; asıl eğilim budur.")}</p></div>` : "";
   const rows = wl.map((l, i) => ({ l, i })).reverse().slice(0, 6).map(({ l }) => `<div class="p-row">
-      <span class="p-dim">${esc(l.ts ? fmtDate(l.ts) : l.date)}</span><span class="p-row-r">${l.bf ? `<span class="p-dim">${t("%{v} yağ", { v: fmtNum(num(l.bf)) })}</span>` : ""}<b>${fmtNum(num(l.weight))} kg</b>
+      <span class="p-dim">${esc(l.ts ? fmtDate(l.ts) : l.date)}</span><span class="p-row-r">${l.bf ? `<span class="p-dim">${t("%{v} yağ", { v: fmtNum(num(l.bf)) })}</span>` : ""}<b>${fmtW(num(l.weight), { body: true })}</b>
       <button onclick="deleteWeightLog(${state.weightLogs.indexOf(l)})" aria-label="${t("Tartıyı sil")}" class="p-x">${pI("x", 18, 2.2)}</button></span></div>`).join("");
   return `<div class="p-card" id="pWeight">${big}<div class="p-chips">${chips}</div>${chart}
-      <p class="p-fine">${toGoal > 0 ? t("Hedef {w} kg · {d} kg kaldı. Grafiği ezmemek için hedef çizgisi gösterilmiyor.", { w: fmtNum(tgt), d: fmtNum(toGoal) }) : t("Hedef {w} kg · hedefe ulaştın. Grafiği ezmemek için hedef çizgisi gösterilmiyor.", { w: fmtNum(tgt) })}</p>
+      <p class="p-fine">${wTxt(toGoal > 0 ? t("Hedef {w} kg · {d} kg kaldı. Grafiği ezmemek için hedef çizgisi gösterilmiyor.", { w: fmtWNum(tgt, { body: true }), d: fmtWNum(toGoal, { body: true }) }) : t("Hedef {w} kg · hedefe ulaştın. Grafiği ezmemek için hedef çizgisi gösterilmiyor.", { w: fmtWNum(tgt, { body: true }) }))}</p>
       ${progWeighBtn()}</div>
     <div class="p-card">${stats}</div>
     ${weekly}
@@ -367,14 +375,14 @@ function progMeasureHtml() {
     const l = lastOf(k); if (!l) return "";
     const d = round1(l[k] - firstOf(k)[k]);
     return `<button onclick="measureSel='${k}'; renderProgress();" class="p-ms ${measureSel === k ? "on" : ""}" aria-pressed="${measureSel === k}">
-      <span class="p-k">${t(n)}</span><b class="t-display">${fmtNum(l[k])}</b><span class="p-u">cm</span>${pDelta(d, "", d === 0 ? null : (lowerBetter ? d < 0 : d > 0))}</button>`;
+      <span class="p-k">${t(n)}</span><b class="t-display">${fmtLen(l[k])}</b><span class="p-u">${lenUnit()}</span>${pDelta(lenRaw(d), "", d === 0 ? null : (lowerBetter ? d < 0 : d > 0))}</button>`;
   }).join("");
   const selName = t((MEASURES.find(([k]) => k === measureSel) || ["", ""])[1]);
-  const pts = ms.filter(m => m[measureSel] != null && m.ts).slice(-30).map(m => ({ t: m.ts, y: m[measureSel] }));
-  const chart = pts.length >= 4 ? pLine([{ pts, color: PC.kg, name: selName.split(" ")[0] }], { unit: "cm", h: 160, label: t("{ad} ölçüsü", { ad: selName }) })
+  const pts = ms.filter(m => m[measureSel] != null && m.ts).slice(-30).map(m => ({ t: m.ts, y: lenRaw(m[measureSel]) }));
+  const chart = pts.length >= 4 ? pLine([{ pts, color: PC.kg, name: selName.split(" ")[0] }], { unit: lenUnit(), h: 160, label: t("{ad} ölçüsü", { ad: selName }) })
     : `<p class="p-fine">${tn(pts.length, "{ad}: {n} ölçüm. Çizgi grafiği 4 ölçümden sonra açılır; o zamana kadar sayılar ve değişim yeterli.", { ad: esc(selName) })}</p>`;
   const rows = ms.map((m, i) => ({ m, i })).reverse().slice(0, 4).map(({ m, i }) => `<div class="p-row">
-      <span class="p-dim">${fmtDate(m.ts)}</span><span class="p-row-r p-trunc">${MEASURES.filter(([k]) => m[k] != null).map(([k, n]) => `${t(n).split(" ")[0]} ${fmtNum(m[k])}`).join(" · ")}</span>
+      <span class="p-dim">${fmtDate(m.ts)}</span><span class="p-row-r p-trunc">${MEASURES.filter(([k]) => m[k] != null).map(([k, n]) => `${t(n).split(" ")[0]} ${fmtLen(m[k])}`).join(" · ")}</span>
       <button onclick="deleteMeasurement(${i})" aria-label="${t("Ölçüyü sil")}" class="p-x">${pI("x", 18, 2.2)}</button></div>`).join("");
   return `<div class="p-card" id="pMeasure">${pSec(t("Vücut ölçüleri"), null, add)}<div class="p-ms-g">${cells}</div>${chart}<div class="p-rows mt">${rows}</div></div>`;
 }

@@ -603,8 +603,8 @@ function weekCardHtml() {
         ${w.daysLeft > 0 ? `<p class="text-[12px] n-dim">${tn(w.daysLeft, "Kalan {n} günde (bugün dahil) günde ortalama ~{k} kcal. Geçmiş günlerde öğün tiki yoksa planlanan kalori sayılır.", { k: fmtInt(perDay) })}</p>` : ""}
       </div>
       <div class="pt-3 n-bt flex items-center justify-between gap-2 text-[14px]" id="weightAvgRow">
-        <span class="n-muted">${t("Kilo")}${last ? t(" · son tartı {w}", { w: `<strong class="n-text">${fmtNum(last)} kg</strong>` }) : ""}</span>
-        <span>${wa ? `${t("7 günlük ort. {a}", { a: `<strong class="tabular-nums">${fmtNum(wa.avg)} kg</strong>` })} <span class="text-[12px] n-dim">${tn(wa.n, "({n} tartı)")}</span>` : `<span class="n-dim text-[12px]">${t("Son 7 günde tartı yok")}</span>`}</span>
+        <span class="n-muted">${t("Kilo")}${last ? t(" · son tartı {w}", { w: `<strong class="n-text">${fmtW(last, { body: true })}</strong>` }) : ""}</span>
+        <span>${wa ? `${t("7 günlük ort. {a}", { a: `<strong class="tabular-nums">${fmtW(wa.avg, { body: true })}</strong>` })} <span class="text-[12px] n-dim">${tn(wa.n, "({n} tartı)")}</span>` : `<span class="n-dim text-[12px]">${t("Son 7 günde tartı yok")}</span>`}</span>
       </div>
     </section>`;
 }

@@ -830,7 +830,7 @@
             <span class="n-label" data-t="GÜNCEL KİLO">GÜNCEL KİLO</span>
             <div class="flex items-center gap-1">
               <button onclick="adjustWeight(-0.1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="0,1 kg azalt" data-t-aria="0,1 kg azalt"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
-              <span class="min-w-[84px] text-center whitespace-nowrap"><span id="weightVal" class="t-display text-[26px] leading-none tabular-nums">105</span> <span class="text-[13px] n-muted font-semibold">kg</span></span>
+              <span class="min-w-[84px] text-center whitespace-nowrap"><span id="weightVal" class="t-display text-[26px] leading-none tabular-nums">105</span> <span id="weightUnit" class="text-[13px] n-muted font-semibold">kg</span></span>
               <button onclick="adjustWeight(0.1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="0,1 kg artır" data-t-aria="0,1 kg artır"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
             </div>
           </div>
@@ -1305,7 +1305,7 @@
             <div class="col-span-2"><label for="setSex" class="t-field" data-t="Cinsiyet">Cinsiyet</label>
               <select id="setSex" class="t-in"><option value="male" data-t="Erkek">Erkek</option><option value="female" data-t="Kadın">Kadın</option></select></div>
             <div><label for="setAge" class="t-field" data-t="Yaş">Yaş</label><input id="setAge" type="text" inputmode="numeric" class="t-in text-center font-bold" /></div>
-            <div><label for="setHeight" class="t-field" data-t="Boy (cm)">Boy (cm)</label><input id="setHeight" type="text" inputmode="numeric" class="t-in text-center font-bold" /></div>
+            <div><label for="setHeight" class="t-field" data-t="Boy (cm)">Boy (cm)</label><input id="setHeight" type="text" inputmode="numeric" class="t-in text-center font-bold" /><div id="pfHeightImp" class="hidden"><span class="t-field" data-t="Boy (ft / in)">Boy (ft / in)</span><div class="grid grid-cols-2 gap-1.5"><input id="setHeightFt" type="text" inputmode="numeric" placeholder="ft" aria-label="Boy (ft)" data-t-aria="Boy (ft)" class="t-in text-center font-bold" /><input id="setHeightIn" type="text" inputmode="numeric" placeholder="in" aria-label="Boy (in)" data-t-aria="Boy (in)" class="t-in text-center font-bold" /></div></div></div>
           </div>
         </section>
 
@@ -3550,8 +3550,8 @@ function bodyComp(weight, bf) {
   return { bf, fatKg, leanKg: weight - fatKg };
 }
 function fillTargetFromBf(v) {
-  $("setTarget").value = fmtNum(v);
-  toast(t("Hedef kilo {w} kg olarak dolduruldu, kaydetmeyi unutma", { w: fmtNum(v) }));
+  $("setTarget").value = fmtNum(num(bodyKgToDisp(v)));   // v53: v kg; kutu gösterim biriminde
+  toast(wTxt(t("Hedef kilo {w} kg olarak dolduruldu, kaydetmeyi unutma", { w: fmtWNum(v, { body: true }) })));
 }
 function updateBfHint() {
   const bf = validBf($("setBf").value);
@@ -3559,10 +3559,10 @@ function updateBfHint() {
   const el = $("setBfHint");
   if (!bf) { el.classList.add("hidden"); return; }
   const c = bodyComp(state.weight, bf);
-  let html = t("Yağsız kütlen: {lean} • Yağ kütlen: {fat}", { lean: `<b class="text-[var(--w-acc)]">${fmtNum(c.leanKg)} kg</b>`, fat: `<b class="text-[var(--w-over)]">${fmtNum(c.fatKg)} kg</b>` });
+  let html = t("Yağsız kütlen: {lean} • Yağ kütlen: {fat}", { lean: `<b class="text-[var(--w-acc)]">${fmtW(c.leanKg, { body: true })}</b>`, fat: `<b class="text-[var(--w-over)]">${fmtW(c.fatKg, { body: true })}</b>` });
   if (tbf && tbf < bf) {
     const suggest = round1(c.leanKg / (1 - tbf / 100));
-    html += `<div class="mt-1.5">${t("Kas kütleni koruyarak %{tbf} yağ oranına inersen tahmini kilon: {w}", { tbf: fmtNum(tbf), w: `<b class="text-[var(--w-k)]">${fmtNum(suggest)} kg</b>` })}</div>
+    html += `<div class="mt-1.5">${t("Kas kütleni koruyarak %{tbf} yağ oranına inersen tahmini kilon: {w}", { tbf: fmtNum(tbf), w: `<b class="text-[var(--w-k)]">${fmtW(suggest, { body: true })}</b>` })}</div>
       <button onclick="fillTargetFromBf(${suggest})" class="t-btn-outline mt-2.5 w-full h-11 rounded-xl text-[14px]">${t("Bunu hedef kilom yap")}</button>`;
   }
   html += `<div class="mt-1.5 text-[var(--w-dim)]">${t("Yağ oranı girildiği için kalori hesabı yağsız kütleye göre yapılıyor. Ölçüm değiştikçe (ayda bir gibi) güncelle.")}</div>`;
@@ -3655,7 +3655,7 @@ function toggleWeightScale(on) {
   state.settings.scaleOn = !!on;
   if (on) state.settings.scaleBase = state.weight;
   renderAll();
-  toast(on ? t("Gramajlar artık {w} kg'a göre ayarlanacak", { w: fmtNum(state.weight) }) : t("Kiloya göre gramaj kapatıldı; menü son başlangıç gramajlarına döndü"));
+  toast(on ? wTxt(t("Gramajlar artık {w} kg'a göre ayarlanacak", { w: fmtWNum(state.weight, { body: true }) })) : t("Kiloya göre gramaj kapatıldı; menü son başlangıç gramajlarına döndü"));
 }
 function resetScaleBase() {
   snapshot();   // v26: Geri al
@@ -3668,7 +3668,7 @@ function resetScaleBase() {
   })));
   state.settings.scaleBase = state.weight;
   renderAll();
-  offerUndo(t("Gramajlar {w} kg için yeni başlangıç oldu", { w: fmtNum(state.weight) }));
+  offerUndo(wTxt(t("Gramajlar {w} kg için yeni başlangıç oldu", { w: fmtWNum(state.weight, { body: true }) })));
 }
 
 // ---------------------------------------------------------------------------
@@ -3780,8 +3780,17 @@ function renderWeightBlock(st) {
   const minW = Math.floor(Math.min(num(st.targetWeight, 82) - 5, ...logged.map(w => w - 5), state.weight));
   const maxW = Math.ceil(Math.max(...logged.map(w => w + 10), state.weight + 10, num(st.targetWeight, 82) + 10));
   const slider = $("weightSlider");
-  slider.min = minW; slider.max = maxW; slider.value = state.weight;
-  $("weightVal").textContent = fmtNum(state.weight);
+  if (isImperial()) {   // v53: kaydırıcı lb'de; kaydırılmadıysa kayıttaki kg değişmez (updateProfile)
+    const D = x => num(bodyKgToDisp(x));
+    slider.min = Math.floor(Math.min(D(num(st.targetWeight, 82)) - 10, ...logged.map(w => D(w) - 10), D(state.weight)));
+    slider.max = Math.ceil(Math.max(...logged.map(w => D(w) + 20), D(state.weight) + 20, D(num(st.targetWeight, 82)) + 20));
+    slider.value = D(state.weight);
+  } else { slider.min = minW; slider.max = maxW; slider.value = state.weight; }
+  slider.dataset.shown = slider.value;
+  $("weightVal").textContent = fmtWNum(state.weight, { body: true });
+  if ($("weightUnit").textContent !== wUnit()) $("weightUnit").textContent = wUnit();
+  const wb = $("weightVal").closest(".flex").querySelectorAll("button");
+  [[wb[0], t("0,1 kg azalt")], [wb[1], t("0,1 kg artır")]].forEach(([b, tk]) => { const a = wTxt(tk); if (b && b.getAttribute("aria-label") !== a) b.setAttribute("aria-label", a); });
   $("deficitSlider").value = state.deficit;
   const tg = getTargets();
   const goal = tg.goal;
@@ -3791,23 +3800,24 @@ function renderWeightBlock(st) {
   $("gainBox").classList.toggle("hidden", goal !== "gain");
   $("goalVal").textContent = (tg.goalDelta < 0 ? "−" : tg.goalDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.goalDelta));
   $("weightHistoryText").textContent = state.weightLogs.length > 0
-    ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.ts ? fmtDate(l.ts) : logDateLabel(l.date)})`).join(" → ")
-    : t("Hedef: {w} kg", { w: fmtNum(num(st.targetWeight, 82)) });
+    ? state.weightLogs.slice(-3).map(l => `${fmtW(num(l.weight), { body: true })} (${l.ts ? fmtDate(l.ts) : logDateLabel(l.date)})`).join(" → ")
+    : wTxt(t("Hedef: {w} kg", { w: fmtWNum(num(st.targetWeight, 82), { body: true }) }));
   const wa7 = weightAvg7();
-  $("weightAvgText").textContent = wa7 ? tn(wa7.n, "7 günlük ortalama: {avg} kg ({n} tartı)", { avg: fmtNum(wa7.avg) }) : "";
+  $("weightAvgText").textContent = wa7 ? wTxt(tn(wa7.n, "7 günlük ortalama: {avg} kg ({n} tartı)", { avg: fmtWNum(wa7.avg, { body: true }) })) : "";
   $("weightAvgText").classList.toggle("hidden", !wa7);
   const target = num(st.targetWeight, 82);
   const diffKg = state.weight - target;
   const weeklyLoss = (state.deficit * 7) / 7700;
   const weeklyGain = (tg.goalDelta * 7) / 7700;
   let info;
+  const tw = fmtWNum(target, { body: true });   // v53: hedef ve haftalık hız gösterim biriminde (hesap kg)
   if (goal === "keep") info = t("Kilo koruma: hedef kalorin harcamana eşit");
-  else if (goal === "gain") info = diffKg >= 0 || weeklyGain <= 0 ? t("{w} kg hedefine ulaştın!", { w: fmtNum(target) })
-    : tn(Math.ceil(-diffKg / weeklyGain), "Haftalık ~{r} kg alım → {w} kg hedefine ~{n} hafta", { r: fmtKg(weeklyGain), w: fmtNum(target) });
-  else info = diffKg <= 0 ? t("{w} kg hedefine ulaştın!", { w: fmtNum(target) })
-    : weeklyLoss > 0 ? tn(Math.ceil(diffKg / weeklyLoss), "Haftalık ~{r} kg kayıp → {w} kg hedefine ~{n} hafta", { r: fmtKg(weeklyLoss), w: fmtNum(target) })
+  else if (goal === "gain") info = diffKg >= 0 || weeklyGain <= 0 ? t("{w} kg hedefine ulaştın!", { w: tw })
+    : tn(Math.ceil(-diffKg / weeklyGain), "Haftalık ~{r} kg alım → {w} kg hedefine ~{n} hafta", { r: fmtWNum(weeklyGain, { fine: true }), w: tw });
+  else info = diffKg <= 0 ? t("{w} kg hedefine ulaştın!", { w: tw })
+    : weeklyLoss > 0 ? tn(Math.ceil(diffKg / weeklyLoss), "Haftalık ~{r} kg kayıp → {w} kg hedefine ~{n} hafta", { r: fmtWNum(weeklyLoss, { fine: true }), w: tw })
     : t("Kalori açığı yok: kilo koruma modu");
-  $("timelineInfo").textContent = info;
+  $("timelineInfo").textContent = wTxt(info);
   const hint = coachHintText();
   $("coachHint").classList.toggle("hidden", !hint);
   $("coachHint").textContent = hint;
@@ -4319,11 +4329,11 @@ function renderMenus() {
     </label>
     ${st.scaleOn ? `
       <div class="n-elev rounded-2xl px-3.5 py-3 space-y-1">
-        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Başlangıç kilosu")}</span><strong>${fmtNum(num(st.scaleBase, state.weight))} kg</strong></div>
-        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Şimdiki kilo")}</span><strong>${fmtNum(state.weight)} kg</strong></div>
+        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Başlangıç kilosu")}</span><strong>${fmtW(num(st.scaleBase, state.weight), { body: true })}</strong></div>
+        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Şimdiki kilo")}</span><strong>${fmtW(state.weight, { body: true })}</strong></div>
         <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Gramaj oranı")}</span><strong class="n-accent">${t("%{p}", { p: String(Math.round(k * 100)) })}</strong></div>
       </div>
-      <button onclick="resetScaleBase()" class="n-btn-outline w-full h-11 rounded-full text-[13px]">${t("Bu gramajları yeni başlangıç yap ({w} kg)", { w: fmtNum(state.weight) })}</button>
+      <button onclick="resetScaleBase()" class="n-btn-outline w-full h-11 rounded-full text-[13px]">${wTxt(t("Bu gramajları yeni başlangıç yap ({w} kg)", { w: fmtWNum(state.weight, { body: true }) }))}</button>
       <p class="text-[12px] n-dim">${t("Yalnızca gram ve ml ile ölçülen besinler değişir (tavuk, pirinç, yulaf...). Adet, kase, ölçek gibi besinler aynı kalır. Oran en fazla %70–%130 arasında uygulanır. Ayarı kapatırsan menü son başlangıç yaptığın gramajlara döner.")}</p>
       ${num(st.calAdjust, 0) !== 0 ? `<p id="scaleCoachNote" class="text-[12px] n-k border border-current rounded-2xl px-3 py-2">${t("Kalori koçu hedefini {adj} kcal ayarladı. İkisi aynı düzeltmeyi iki kez yapmaz: gramajlar yalnızca kilona göre değişir, koç yalnızca hedef kaloriyi değiştirir. Bu yüzden koçun düzeltmesi menüye kendiliğinden yansımaz; menü toplamını hedefe uydurmak için öğünlerdeki gramajları ayarla.", { adj: (num(st.calAdjust, 0) > 0 ? "+" : "") + fmtInt(num(st.calAdjust, 0)) })}</p>` : ""}` : ""}`;
 
@@ -4973,7 +4983,9 @@ function pickFoodInFoods(id) {
 document.addEventListener("click", e => { if (e.target && e.target.id === "barcodeModal") closeBarcode(); });
 
 function updateProfile() {
-  state.weight = round1(num($("weightSlider").value, state.weight));
+  const sl = $("weightSlider");
+  if (!isImperial()) state.weight = round1(num(sl.value, state.weight));
+  else if (sl.value !== sl.dataset.shown) state.weight = keepBodyKg(num(sl.value, num(bodyKgToDisp(state.weight))), state.weight);   // v53: lb; kaydırılmadıysa kg aynen
   state.deficit = Math.round(num($("deficitSlider").value, state.deficit));
   renderAll();
 }
@@ -4988,7 +5000,11 @@ function setGainPace(p) {
   state.settings.gainPace = p;
   renderAll();
 }
-function adjustWeight(d) { state.weight = Math.max(30, round1(state.weight + d)); renderAll(); }
+function adjustWeight(d) {
+  if (isImperial()) state.weight = Math.max(30, bodyDispToKg(round1(num(bodyKgToDisp(state.weight)) + d)));   // v53: ±0,1 lb
+  else state.weight = Math.max(30, round1(state.weight + d));
+  renderAll();
+}
 
 function logCurrentWeight() {
   const now = Date.now();
@@ -4997,7 +5013,7 @@ function logCurrentWeight() {
   if (validBf(state.settings.bodyFat)) entry.bf = validBf(state.settings.bodyFat);
   if (last && last.ts && todayStr(new Date(last.ts)) === todayStr()) state.weightLogs[state.weightLogs.length - 1] = entry;
   else state.weightLogs.push(entry);
-  toast(t("{w} kg kaydedildi", { w: fmtNum(state.weight) }));
+  toast(wTxt(t("{w} kg kaydedildi", { w: fmtWNum(state.weight, { body: true }) })));
   renderAll();
 }
 function deleteWeightLog(idx) {
@@ -6614,8 +6630,15 @@ function progWeekly() {
 
 // --- Ortak kartlar
 async function progLogWeight() {
-  const v = await askText(t("Bugünkü tartı"), fmtNum(state.weight), "kg", t("Sabah, aç karnına tartıldığın kilo (kg)"), t("Kaydet"));
+  const v = await askText(t("Bugünkü tartı"), fmtWNum(state.weight, { body: true }), wUnit(), wTxt(t("Sabah, aç karnına tartıldığın kilo (kg)")), t("Kaydet"));
   if (v == null || String(v).trim() === "") return;
+  if (isImperial()) {   // v53: lb girilir, kayıt kg (gösterilen değer yeniden yazılırsa kg aynen)
+    const kg = num(keepBodyKg(v, state.weight), NaN);
+    if (!(kg >= 30 && kg <= 300)) { sayAlert(t("Geçersiz kilo"), t("{a} ile {b} arasında bir değer yaz (örn. {ex}).", { a: fmtW(30, { body: true }), b: fmtW(300, { body: true }), ex: fmtNum(212.5) })); return; }
+    state.weight = kg;
+    logCurrentWeight();
+    return;
+  }
   const n = num(v, NaN);
   if (!(n >= 30 && n <= 300)) { sayAlert(t("Geçersiz kilo"), t("30 ile 300 kg arasında bir değer yaz (örn. 96,4).")); return; }
   state.weight = round1(n);
@@ -6634,8 +6657,8 @@ function progCoachHtml() {
     return `<div class="p-card" id="pCoach">${head(t("Kalori koçu"), t("Henüz hesap için veri yok"))}
       <p class="p-fine">${a.n >= 2 ? tn(Math.floor(a.spanDays), "Koçun gerçek harcamanı hesaplayabilmesi için son 4 haftada <b>en az 4 tartı</b> ve ilk ile son tartı arasında <b>en az 10 gün</b> olmalı. Şu an: {k} tartı, {n} gün aralık.", { k: String(a.n) }) : tn(a.n, "Koçun gerçek harcamanı hesaplayabilmesi için son 4 haftada <b>en az 4 tartı</b> ve ilk ile son tartı arasında <b>en az 10 gün</b> olmalı. Şu an: {n} tartı.")}</p>${adjLine}</div>`;
   }
-  const fmtW = v => (v > 0 ? "+" : "") + (curLang() === "en" ? v.toFixed(2) : v.toFixed(2).replace(".", ","));
-  const rows = [[t("Gerçek kilo değişimi"), t("{v} kg/hafta", { v: fmtW(a.weekly) })], [t("Hedeflenen değişim"), t("{v} kg/hafta", { v: fmtW(a.expectedWeekly) })],
+  const sgnW = kg => { const v = num(wRaw(kg)); return (v > 0 ? "+" : "") + (curLang() === "en" ? v.toFixed(2) : v.toFixed(2).replace(".", ",")); };   // v53: lb/hafta
+  const rows = [[t("Gerçek kilo değişimi"), wTxt(t("{v} kg/hafta", { v: sgnW(a.weekly) }))], [t("Hedeflenen değişim"), wTxt(t("{v} kg/hafta", { v: sgnW(a.expectedWeekly) }))],
     [t("Ortalama kalori alımı"), a.intakeAssumed ? a.avgIntake + " kcal *" : tn(a.intakeDays, "{v} kcal ({n} gün)", { v: String(a.avgIntake) })], [t("Tahmini gerçek harcaman (TDEE)"), a.tdeeEst + " kcal"], [t("Formülün tahmini"), a.tdeeFormula + " kcal"]]
     .map(([l, v]) => `<div class="p-kv"><span>${l}</span><b>${v}</b></div>`).join("");
   const details = `<details class="p-det"><summary>${t("Hesap ayrıntıları · {k} tartı, {d} gün", { k: String(a.n), d: String(Math.floor(a.spanDays)) })}</summary>${rows}
@@ -6666,8 +6689,8 @@ function progCoachHtml() {
 function progGenelHtml() {
   const w = progWeekly();
   const wTile = w.w7
-    ? pStat(t("Kilo (7 gün ort.)"), fmtNum(w.w7.avg), "kg", w.wPrev != null ? pDelta(w.w7.avg - w.wPrev, "", progWeightGood(w.w7.avg - w.wPrev)) : tn(w.w7.n, "{n} tartı"), PC.kg)
-    : pStat(t("Kilo"), fmtNum(state.weight), "kg", t("son 7 günde tartı yok"), PC.kg);
+    ? pStat(t("Kilo (7 gün ort.)"), fmtWNum(w.w7.avg, { body: true }), wUnit(), w.wPrev != null ? pDelta(wRaw(w.w7.avg - w.wPrev), "", progWeightGood(w.w7.avg - w.wPrev)) : tn(w.w7.n, "{n} tartı"), PC.kg)
+    : pStat(t("Kilo"), fmtWNum(state.weight, { body: true }), wUnit(), t("son 7 günde tartı yok"), PC.kg);
   const tiles = pStat(t("Antrenman|sayı"), w.n, tn(w.n, "seans|birim"), w.prs ? tn(w.prs, "{n} rekor") : tn(state.workoutDays.length, "programda {n} gün"), PC.tq)
     + wTile
     + pStat(t("Kalori hedefte"), w.hitN ? `${w.hitOk}/${w.hitN}` : "—", w.hitN ? tn(w.hitN, "gün|birim") : "", w.hitN ? t("±%5 · bugün hariç") : t("bu hafta kayıt yok"), PC.gr)
@@ -6708,34 +6731,35 @@ function progKiloHtml() {
   // v50: hedefe kalan, hedefin yönüne göre (Al hedefinde kilo hedefin altındayken "ulaştın" denmez)
   const gl = getTargets().goal;
   const toGoal = gl === "gain" ? tgt - state.weight : gl === "lose" ? state.weight - tgt : Math.abs(state.weight - tgt);
+  const dP = p => ({ t: p.t, y: wRaw(p.y) });   // v53: grafik gösterim biriminde (hesaplar kg)
   const chips = [[30, tn(30, "{n} gün")], [90, tn(90, "{n} gün")], [0, t("Tümü")]].map(([n, l]) => `<button onclick="setProgWRange(${n})" class="p-chip ${rng === n ? "on" : ""}" aria-pressed="${rng === n}">${l}</button>`).join("");
   const chart = pts.length >= 4
-    ? pLine([{ pts, color: PC.dot, dots: true }, { pts: avg, color: PC.kg, w: 3, name: t("7 gün ort.") }], { unit: "kg", label: t("Tartılar ve 7 günlük ortalama") })
+    ? pLine([{ pts: pts.map(dP), color: PC.dot, dots: true }, { pts: avg.map(dP), color: PC.kg, w: 3, name: t("7 gün ort.") }], { unit: wUnit(), label: t("Tartılar ve 7 günlük ortalama") })
       + pLegend([[`<i class="p-lg-dot"></i>`, t("Günlük tartı")], [`<i class="p-lg-line"></i>`, t("7 gün ortalaması")]])
     : `<div class="p-low">${tn(pts.length, "Bu aralıkta {n} tartı var. Grafik için en az 4 tartı gerekir; o zamana kadar değerler aşağıdaki listede.")}</div>`;
-  const big = w7 ? `<div class="p-k">${t("7 günlük ortalama")}</div><div class="p-big"><b class="t-display">${fmtNum(w7.avg)}</b><span>kg</span>${prev != null ? pDelta(w7.avg - prev, t("geçen haftaya göre"), progWeightGood(w7.avg - prev)) : ""}</div>`
-    : `<div class="p-k">${t("Şu anki kilo")}</div><div class="p-big"><b class="t-display">${fmtNum(state.weight)}</b><span>kg</span></div>`;
+  const big = w7 ? `<div class="p-k">${t("7 günlük ortalama")}</div><div class="p-big"><b class="t-display">${fmtWNum(w7.avg, { body: true })}</b><span>${wUnit()}</span>${prev != null ? pDelta(wRaw(w7.avg - prev), t("geçen haftaya göre"), progWeightGood(w7.avg - prev)) : ""}</div>`
+    : `<div class="p-k">${t("Şu anki kilo")}</div><div class="p-big"><b class="t-display">${fmtWNum(state.weight, { body: true })}</b><span>${wUnit()}</span></div>`;
   const first = wl[0];
   const change = first ? state.weight - num(first.weight) : 0;
   const comp = bodyComp(state.weight, validBf(state.settings.bodyFat));
   const tbf = validBf(state.settings.targetBodyFat);
   const stats = `<div class="p-mini3">
-      <div><span>${t("Şu an")}</span><b>${fmtNum(state.weight)} kg</b></div>
-      <div><span>${t("İlk kayıttan")}</span><b>${(change > 0 ? "+" : "") + fmtNum(change)} kg</b></div>
-      <div><span>${t("Hedefe")}</span><b>${fmtNum(Math.max(0, toGoal))} kg</b></div></div>
-    ${comp ? `<div class="p-mini3"><div><span>${t("Yağ oranı")}</span><b>${t("%{v}", { v: fmtNum(comp.bf) })}</b>${tbf ? `<small>${t("hedef %{v}", { v: fmtNum(tbf) })}</small>` : ""}</div><div><span>${t("Yağsız kütle")}</span><b>${fmtNum(comp.leanKg)} kg</b></div><div><span>${t("Yağ kütlesi")}</span><b>${fmtNum(comp.fatKg)} kg</b></div></div>`
+      <div><span>${t("Şu an")}</span><b>${fmtW(state.weight, { body: true })}</b></div>
+      <div><span>${t("İlk kayıttan")}</span><b>${(change > 0 ? "+" : "") + fmtW(change, { body: true })}</b></div>
+      <div><span>${t("Hedefe")}</span><b>${fmtW(Math.max(0, toGoal), { body: true })}</b></div></div>
+    ${comp ? `<div class="p-mini3"><div><span>${t("Yağ oranı")}</span><b>${t("%{v}", { v: fmtNum(comp.bf) })}</b>${tbf ? `<small>${t("hedef %{v}", { v: fmtNum(tbf) })}</small>` : ""}</div><div><span>${t("Yağsız kütle")}</span><b>${fmtW(comp.leanKg, { body: true })}</b></div><div><span>${t("Yağ kütlesi")}</span><b>${fmtW(comp.fatKg, { body: true })}</b></div></div>`
       : `<button onclick="openSettings()" class="p-btn ghost">${t("Yağ oranını Profil'den gir; yağsız kütlen burada görünür")}</button>`}`;
   // Haftalık ortalama (en az 4 hafta)
   const wk = {};
   timed.forEach(p => { const k = weekStart(new Date(p.t)); (wk[k] = wk[k] || []).push(p.y); });
   const wkPts = Object.keys(wk).map(Number).sort((a, b) => a - b).map(k => ({ t: k, y: wk[k].reduce((a, b) => a + b, 0) / wk[k].length }));
-  const weekly = wkPts.length >= 4 ? `<div class="p-card">${pSec(t("Haftalık ortalama"), PC.kg)}${pLine([{ pts: wkPts.slice(-12), color: PC.kg, name: t("son hafta") }], { unit: "kg", h: 160, label: t("Haftalık kilo ortalaması") })}
+  const weekly = wkPts.length >= 4 ? `<div class="p-card">${pSec(t("Haftalık ortalama"), PC.kg)}${pLine([{ pts: wkPts.slice(-12).map(dP), color: PC.kg, name: t("son hafta") }], { unit: wUnit(), h: 160, label: t("Haftalık kilo ortalaması") })}
       <p class="p-fine">${t("Günlük dalgalanma (su, tuz) gizlenir; asıl eğilim budur.")}</p></div>` : "";
   const rows = wl.map((l, i) => ({ l, i })).reverse().slice(0, 6).map(({ l }) => `<div class="p-row">
-      <span class="p-dim">${esc(l.ts ? fmtDate(l.ts) : l.date)}</span><span class="p-row-r">${l.bf ? `<span class="p-dim">${t("%{v} yağ", { v: fmtNum(num(l.bf)) })}</span>` : ""}<b>${fmtNum(num(l.weight))} kg</b>
+      <span class="p-dim">${esc(l.ts ? fmtDate(l.ts) : l.date)}</span><span class="p-row-r">${l.bf ? `<span class="p-dim">${t("%{v} yağ", { v: fmtNum(num(l.bf)) })}</span>` : ""}<b>${fmtW(num(l.weight), { body: true })}</b>
       <button onclick="deleteWeightLog(${state.weightLogs.indexOf(l)})" aria-label="${t("Tartıyı sil")}" class="p-x">${pI("x", 18, 2.2)}</button></span></div>`).join("");
   return `<div class="p-card" id="pWeight">${big}<div class="p-chips">${chips}</div>${chart}
-      <p class="p-fine">${toGoal > 0 ? t("Hedef {w} kg · {d} kg kaldı. Grafiği ezmemek için hedef çizgisi gösterilmiyor.", { w: fmtNum(tgt), d: fmtNum(toGoal) }) : t("Hedef {w} kg · hedefe ulaştın. Grafiği ezmemek için hedef çizgisi gösterilmiyor.", { w: fmtNum(tgt) })}</p>
+      <p class="p-fine">${wTxt(toGoal > 0 ? t("Hedef {w} kg · {d} kg kaldı. Grafiği ezmemek için hedef çizgisi gösterilmiyor.", { w: fmtWNum(tgt, { body: true }), d: fmtWNum(toGoal, { body: true }) }) : t("Hedef {w} kg · hedefe ulaştın. Grafiği ezmemek için hedef çizgisi gösterilmiyor.", { w: fmtWNum(tgt, { body: true }) }))}</p>
       ${progWeighBtn()}</div>
     <div class="p-card">${stats}</div>
     ${weekly}
@@ -6753,14 +6777,14 @@ function progMeasureHtml() {
     const l = lastOf(k); if (!l) return "";
     const d = round1(l[k] - firstOf(k)[k]);
     return `<button onclick="measureSel='${k}'; renderProgress();" class="p-ms ${measureSel === k ? "on" : ""}" aria-pressed="${measureSel === k}">
-      <span class="p-k">${t(n)}</span><b class="t-display">${fmtNum(l[k])}</b><span class="p-u">cm</span>${pDelta(d, "", d === 0 ? null : (lowerBetter ? d < 0 : d > 0))}</button>`;
+      <span class="p-k">${t(n)}</span><b class="t-display">${fmtLen(l[k])}</b><span class="p-u">${lenUnit()}</span>${pDelta(lenRaw(d), "", d === 0 ? null : (lowerBetter ? d < 0 : d > 0))}</button>`;
   }).join("");
   const selName = t((MEASURES.find(([k]) => k === measureSel) || ["", ""])[1]);
-  const pts = ms.filter(m => m[measureSel] != null && m.ts).slice(-30).map(m => ({ t: m.ts, y: m[measureSel] }));
-  const chart = pts.length >= 4 ? pLine([{ pts, color: PC.kg, name: selName.split(" ")[0] }], { unit: "cm", h: 160, label: t("{ad} ölçüsü", { ad: selName }) })
+  const pts = ms.filter(m => m[measureSel] != null && m.ts).slice(-30).map(m => ({ t: m.ts, y: lenRaw(m[measureSel]) }));
+  const chart = pts.length >= 4 ? pLine([{ pts, color: PC.kg, name: selName.split(" ")[0] }], { unit: lenUnit(), h: 160, label: t("{ad} ölçüsü", { ad: selName }) })
     : `<p class="p-fine">${tn(pts.length, "{ad}: {n} ölçüm. Çizgi grafiği 4 ölçümden sonra açılır; o zamana kadar sayılar ve değişim yeterli.", { ad: esc(selName) })}</p>`;
   const rows = ms.map((m, i) => ({ m, i })).reverse().slice(0, 4).map(({ m, i }) => `<div class="p-row">
-      <span class="p-dim">${fmtDate(m.ts)}</span><span class="p-row-r p-trunc">${MEASURES.filter(([k]) => m[k] != null).map(([k, n]) => `${t(n).split(" ")[0]} ${fmtNum(m[k])}`).join(" · ")}</span>
+      <span class="p-dim">${fmtDate(m.ts)}</span><span class="p-row-r p-trunc">${MEASURES.filter(([k]) => m[k] != null).map(([k, n]) => `${t(n).split(" ")[0]} ${fmtLen(m[k])}`).join(" · ")}</span>
       <button onclick="deleteMeasurement(${i})" aria-label="${t("Ölçüyü sil")}" class="p-x">${pI("x", 18, 2.2)}</button></div>`).join("");
   return `<div class="p-card" id="pMeasure">${pSec(t("Vücut ölçüleri"), null, add)}<div class="p-ms-g">${cells}</div>${chart}<div class="p-rows mt">${rows}</div></div>`;
 }
@@ -6895,15 +6919,17 @@ function renderProgress() {
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 function fillProfileFields() {
   const st = state.settings;
   $("setSex").value = st.sex;
   $("setAge").value = st.age;
   $("setHeight").value = st.height;
-  $("pfWeight").value = fmtNum(num(state.weight, 0));
-  $("setTarget").value = fmtNum(num(st.targetWeight, 82));
+  if (isImperial()) { const [f, i] = cmToFtIn(st.height); $("setHeightFt").value = f; $("setHeightIn").value = i; }   // v53
+  $("pfWeight").value = fmtNum(num(bodyKgToDisp(num(state.weight, 0))));
+  $("setTarget").value = fmtNum(num(bodyKgToDisp(num(st.targetWeight, 82))));
+  profileUnitUI();
   $("setActivity").value = ["low", "mid", "high"].includes(st.activity) ? st.activity : "mid";
   $("setProtein").value = st.proteinHigh === true ? "high" : "std";
   $("setWater").value = fmtNum(num(st.waterTarget, 3.5));
@@ -6971,7 +6997,19 @@ async function closeProfile() {
 }
 function closeSettings() { hideProfile(); }
 
+// v53: Profil kutuları birime göre — imperial'de boy iki kutu (ft, in), kilo etiketleri lb. Metrikte DOM'a dokunulmaz
+// (etiket metni zaten aynıysa yazılmaz; boy kutuları gizli kalır).
+function profileUnitUI() {
+  const imp = isImperial();
+  [$("setHeight"), document.querySelector('label[for="setHeight"]')].forEach(el => { if (el && (el.style.display === "none") !== imp) el.style.display = imp ? "none" : ""; });   // .t-field display:block .hidden'ı ezer
+  const hi = $("pfHeightImp"); if (hi && hi.classList.contains("hidden") === imp) hi.classList.toggle("hidden", !imp);
+  [["pfWeight", t("Güncel kilo (kg)")], ["setTarget", t("Hedef kilo (kg)")]].forEach(([id, tk]) => {
+    const lb = document.querySelector('label[for="' + id + '"]'), want = wTxt(tk);
+    if (lb && lb.textContent !== want) lb.textContent = want;
+  });
+}
 function renderProfile() {
+  profileUnitUI();
   $("pfRescue").classList.toggle("hidden", !rescueText());   // v35
   renderStorageMeter();   // v36
   document.querySelectorAll("[data-theme-opt]").forEach(b => { const on = b.dataset.themeOpt === state.settings.theme; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
@@ -6988,11 +7026,11 @@ function renderProfile() {
   if (wl.length) {
     const d = round1(num(lastW.weight) - num(firstW.weight));
     wh += `<div class="grid grid-cols-3 gap-2">
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Son tartı")}</div><div class="t-display text-[22px]">${fmtNum(num(lastW.weight))}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : logDateLabel(lastW.date || ""))}</div></div>
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Değişim")}</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtNum(d)}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${tn(wl.length, "{n} kayıt")}</div></div>
-      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Hedefe")}</div><div class="t-display text-[22px]">${tW ? fmtNum(Math.abs(left)) : "—"}<span class="t-dim text-sm"> kg</span></div><div class="text-[12px] t-dim">${!tW ? t("hedef yok") : left > 0 ? t("verilecek") : left < 0 ? t("alınacak") : t("hedeftesin")}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Son tartı")}</div><div class="t-display text-[22px]">${fmtWNum(num(lastW.weight), { body: true })}<span class="t-dim text-sm"> ${wUnit()}</span></div><div class="text-[12px] t-dim">${esc(lastW.ts ? fmtDate(lastW.ts) : logDateLabel(lastW.date || ""))}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Değişim")}</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtWNum(d, { body: true })}<span class="t-dim text-sm"> ${wUnit()}</span></div><div class="text-[12px] t-dim">${tn(wl.length, "{n} kayıt")}</div></div>
+      <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Hedefe")}</div><div class="t-display text-[22px]">${tW ? fmtWNum(Math.abs(left), { body: true }) : "—"}<span class="t-dim text-sm"> ${wUnit()}</span></div><div class="text-[12px] t-dim">${!tW ? t("hedef yok") : left > 0 ? t("verilecek") : left < 0 ? t("alınacak") : t("hedeftesin")}</div></div>
     </div>`;
-    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : logDateLabel(l.date || ""))}</span><span class="font-semibold">${fmtNum(num(l.weight))} kg${validBf(l.bf) ? ` <span class="t-dim text-[12px]">${t("· %{p} yağ", { p: fmtNum(validBf(l.bf)) })}</span>` : ""}</span></div>`).join("");
+    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : logDateLabel(l.date || ""))}</span><span class="font-semibold">${fmtW(num(l.weight), { body: true })}${validBf(l.bf) ? ` <span class="t-dim text-[12px]">${t("· %{p} yağ", { p: fmtNum(validBf(l.bf)) })}</span>` : ""}</span></div>`).join("");
     wh += `<div class="mt-2">${rows}</div>`;
   } else {
     wh = `<p class="text-[13px] t-dim">${t("Henüz tartı kaydın yok. Kilonu yazıp \"Tartıyı kaydet\"e dokun; ilerlemen İlerleme sekmesinde grafiğe dönüşür.")}</p>`;
@@ -7014,8 +7052,8 @@ function renderProfile() {
     const good = d === 0 ? null : (lowerBetter ? d < 0 : d > 0);
     return `<div class="bg-[var(--t-surface)] border border-[var(--t-line)] rounded-2xl px-3 py-2.5 min-w-0">
       <div class="text-[12px] t-muted truncate">${t(n)}</div>
-      <div class="t-display text-[22px]">${fmtNum(l[k])}<span class="t-dim text-sm"> cm</span></div>
-      <div class="text-[12px] ${good == null ? "t-dim" : good ? "t-accent" : "text-[var(--t-danger-text)]"}">${d === 0 ? t("değişim yok") : (d > 0 ? "+" : "") + fmtNum(d) + " cm"}</div>
+      <div class="t-display text-[22px]">${fmtLen(l[k])}<span class="t-dim text-sm"> ${lenUnit()}</span></div>
+      <div class="text-[12px] ${good == null ? "t-dim" : good ? "t-accent" : "text-[var(--t-danger-text)]"}">${d === 0 ? t("değişim yok") : (d > 0 ? "+" : "") + fmtLen(d) + " " + lenUnit()}</div>
     </div>`;
   }).join("");
   const lastM = ms[ms.length - 1];
@@ -7036,17 +7074,19 @@ function updateWaterAutoHint() {
     ? (a ? t(a.cr ? "{w} kg × 35 ml = {b} L + 0,5 L kreatin → {tot} L" : "{w} kg × 35 ml = {b} L → {tot} L", { w: fmtNum(a.w), b: fmtNum(a.base), tot: fmtNum(a.total) }) : t("Kilo girilince hesaplanır; şimdilik elle yazdığın hedef kullanılır."))
     : t("Kapalı: yukarıda elle yazdığın hedef kullanılır.");
 }
+// Kutudaki kilo → kg (geçersizse 0). v53: imperial'de lb; gösterilen değer yeniden yazılırsa kayıttaki kg aynen (round1 YOK)
 function readProfileWeight() {
   const raw = $("pfWeight").value.trim();
-  const w = round1(num(raw, 0));
+  let w = isImperial() ? num(keepBodyKg(num(raw, 0), state.weight), 0) : round1(num(raw, 0));
+  if (!isImperial() && w === round1(num(state.weight))) w = num(state.weight);   // lb'de girilmiş 79,832 metrikte 79,8'e yuvarlanmasın
   return w >= 30 && w <= 300 ? w : 0;
 }
 function profileLogWeight() {
   const w = readProfileWeight();
-  if (!w) { uiAlert(t("Kilo geçersiz"), t("Kilonu 30 ile 300 kg arasında yaz (örn: 98,4).")); return; }
+  if (!w) { uiAlert(t("Kilo geçersiz"), isImperial() ? t("Kilonu {a} ile {b} arasında yaz (örn: {ex}).", { a: fmtW(30, { body: true }), b: fmtW(300, { body: true }), ex: fmtNum(216.9) }) : t("Kilonu 30 ile 300 kg arasında yaz (örn: 98,4).")); return; }
   state.weight = w;
   logCurrentWeight();
-  $("pfWeight").value = fmtNum(w);
+  $("pfWeight").value = fmtNum(num(bodyKgToDisp(w)));
 }
 
 // v42: OTOMATİK KAYIT. Alan değişince (yazı kutusunda kutudan çıkınca; anahtar/seçimde hemen) bütün profil alanları
@@ -7069,15 +7109,29 @@ function applyProfileFields(changedId) {
   }
   const wRaw = $("pfWeight").value.trim(), w = readProfileWeight();
   if (wRaw && !w) {   // kutu olduğu gibi kalır ("Tartıyı kaydet" de bu değeri reddeder); kayıtlı kilo değişmez
-    toast(t("Kilo 30 ile 300 kg arasında olmalı; kaydedilmedi."), "error");
+    toast(isImperial() ? t("Kilo {a} ile {b} arasında olmalı; kaydedilmedi.", { a: fmtW(30, { body: true }), b: fmtW(300, { body: true }) }) : t("Kilo 30 ile 300 kg arasında olmalı; kaydedilmedi."), "error");
     return false;
+  }
+  // v53: imperial boy iki kutu (ft tam sayı, in 0–11; boş in = 0). Biçim bozuksa kaydedilmez, kutular eski boya döner.
+  let hImp = null;
+  if (isImperial()) {
+    const fr = $("setHeightFt").value.trim(), ir = $("setHeightIn").value.trim();
+    const f = num(fr, NaN), i = ir === "" ? 0 : num(ir, NaN), [f0, i0] = cmToFtIn(st.height);
+    if (fr !== "" && !(Number.isInteger(f) && f >= 0 && i >= 0 && i < 12)) {
+      $("setHeightFt").value = f0; $("setHeightIn").value = i0;
+      toast(t("Boyda ft tam sayı, in 0 ile 11 arasında olmalı."), "error");
+      return false;
+    }
+    hImp = fr === "" || (f === f0 && i === i0) ? st.height : Math.max(120, Math.min(230, ftInToCm(f, i)));   // ft / in değişmediyse boy aynen (175,3 → 175 olmaz)
   }
   const before = JSON.stringify([state.settings, state.weight]);
   const undo = JSON.stringify(state);
   st.sex = $("setSex").value === "female" ? "female" : "male";
   st.age = Math.max(12, Math.min(99, Math.round(num($("setAge").value, st.age))));
-  st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));
-  st.targetWeight = Math.max(30, Math.min(250, round1(num($("setTarget").value, st.targetWeight))));
+  if (hImp !== null) st.height = hImp;
+  else if (!($("setHeight").value.trim() === String(st.height) && st.height >= 120 && st.height <= 230)) st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));   // v53: kutudaki değer aynıysa (175,3) yuvarlanmaz
+  if (isImperial()) { const tk = num(keepBodyKg($("setTarget").value, st.targetWeight), NaN); if (isFinite(tk)) st.targetWeight = Math.max(30, Math.min(250, tk)); }   // v53: lb; kg 3 ondalık, round1 YOK
+  else { const tw = round1(num($("setTarget").value, st.targetWeight)); if (tw !== round1(num(st.targetWeight)) || !(st.targetWeight >= 30 && st.targetWeight <= 250)) st.targetWeight = Math.max(30, Math.min(250, tw)); }
   st.activity = ["low", "mid", "high"].includes($("setActivity").value) ? $("setActivity").value : "mid";
   st.proteinHigh = $("setProtein").value === "high";
   st.waterTarget = Math.max(0.5, Math.min(10, round1(num($("setWater").value, st.waterTarget))));
@@ -8041,11 +8095,11 @@ let measureSel = "bel";
 
 function openMeasureModal() {
   const last = state.measurements[state.measurements.length - 1] || {};
-  $("chartTitle").textContent = t("Ölçü ekle (cm)");
+  $("chartTitle").textContent = lenTxt(t("Ölçü ekle (cm)"));   // v53: imperial'de in
   $("chartBody").innerHTML = `
     <div class="grid grid-cols-2 gap-2 text-xs">
       ${MEASURES.map(([k, n]) => `<div><label class="block text-[var(--w-muted)] mb-1">${t(n)}</label>
-        <input id="ms_${k}" type="text" inputmode="decimal" placeholder="—" value="${last[k] ? esc(fmtNum(last[k])) : ""}" class="w-full p-2 rounded-lg text-base text-center" /></div>`).join("")}
+        <input id="ms_${k}" type="text" inputmode="decimal" placeholder="—" value="${last[k] ? esc(fmtLen(last[k])) : ""}" class="w-full p-2 rounded-lg text-base text-center" /></div>`).join("")}
     </div>
     <p class="text-[12px] text-[var(--w-dim)] mt-2">${t("İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.")}</p>
     <div class="flex justify-end gap-2 mt-3">
@@ -8057,14 +8111,20 @@ function openMeasureModal() {
 function saveMeasurement() {
   const now = Date.now();
   const entry = { ts: now };
+  const prevM = state.measurements[state.measurements.length - 1] || {};
   let any = false;
   MEASURES.forEach(([k]) => {
     const raw = $("ms_" + k).value.trim();
     if (!raw) return;
+    if (isImperial()) {   // v53: in girilir, kayıt cm (önceki ölçü aynen yeniden yazılırsa cm aynen)
+      const cm = num(keepCm(raw, prevM[k]), 0);
+      if (cm >= 10 && cm <= 250) { entry[k] = cm; any = true; }
+      return;
+    }
     const v = num(raw, 0);
     if (v >= 10 && v <= 250) { entry[k] = round1(v); any = true; }
   });
-  if (!any) { sayAlert(t("Ölçü girilmedi"), t("En az bir ölçüyü 10–250 cm arasında gir.")); return; }
+  if (!any) { sayAlert(t("Ölçü girilmedi"), isImperial() ? t("En az bir ölçüyü {a}–{b} arasında gir.", { a: fmtLen(10), b: fmtLen(250) + " " + lenUnit() }) : t("En az bir ölçüyü 10–250 cm arasında gir.")); return; }
   const last = state.measurements[state.measurements.length - 1];
   if (last && todayStr(new Date(last.ts)) === todayStr()) state.measurements[state.measurements.length - 1] = entry;
   else state.measurements.push(entry);
@@ -9699,8 +9759,8 @@ function weekCardHtml() {
         ${w.daysLeft > 0 ? `<p class="text-[12px] n-dim">${tn(w.daysLeft, "Kalan {n} günde (bugün dahil) günde ortalama ~{k} kcal. Geçmiş günlerde öğün tiki yoksa planlanan kalori sayılır.", { k: fmtInt(perDay) })}</p>` : ""}
       </div>
       <div class="pt-3 n-bt flex items-center justify-between gap-2 text-[14px]" id="weightAvgRow">
-        <span class="n-muted">${t("Kilo")}${last ? t(" · son tartı {w}", { w: `<strong class="n-text">${fmtNum(last)} kg</strong>` }) : ""}</span>
-        <span>${wa ? `${t("7 günlük ort. {a}", { a: `<strong class="tabular-nums">${fmtNum(wa.avg)} kg</strong>` })} <span class="text-[12px] n-dim">${tn(wa.n, "({n} tartı)")}</span>` : `<span class="n-dim text-[12px]">${t("Son 7 günde tartı yok")}</span>`}</span>
+        <span class="n-muted">${t("Kilo")}${last ? t(" · son tartı {w}", { w: `<strong class="n-text">${fmtW(last, { body: true })}</strong>` }) : ""}</span>
+        <span>${wa ? `${t("7 günlük ort. {a}", { a: `<strong class="tabular-nums">${fmtW(wa.avg, { body: true })}</strong>` })} <span class="text-[12px] n-dim">${tn(wa.n, "({n} tartı)")}</span>` : `<span class="n-dim text-[12px]">${t("Son 7 günde tartı yok")}</span>`}</span>
       </div>
     </section>`;
 }
@@ -13133,6 +13193,29 @@ function incDisp(kg) {
   return Math.max(2.5, Math.round(k / LB_KG / 2.5) * 2.5);
 }
 
+// ---------------------------------------------------------------------------
+// v53 Görev 3 — Vücut: kilo, hedef kilo, tartılar (lb 1 ondalık), boy (ft + in), ölçüler (in 1 ondalık).
+// - Hesap formülleri kg / cm üzerinden (hedefler değişmez); yalnız gösterim ve giriş çevrilir.
+// - Giriş: gösterilen değer yeniden yazılırsa kayıttaki kg / cm DEĞİŞMEZ (keepBodyKg / keepCm); yoksa bodyDispToKg
+//   (kg 3 ondalık) / dispToCm (cm 2 ondalık). Boy imperial'de iki kutu; ft / in değişmediyse kayıttaki boy aynen kalır.
+// - Metin: "kg" birimi wTxt, "cm" birimi lenTxt ile değişir; metrikte ikisi de metni aynen döndürür.
+// ---------------------------------------------------------------------------
+function lenRaw(cm) { return isImperial() ? num(cm) / IN_CM : cm; }
+function fmtLen(cm) { return fmtNum(num(cmToDisp(cm))); }
+function lenTxt(s) { return isImperial() ? String(s).replace(/\bcm\b/g, "in") : s; }
+function keepBodyKg(v, origKg) {
+  const n = unitNum(v);
+  if (n === null) return bodyDispToKg(v);
+  if (origKg !== undefined && origKg !== null && origKg !== "" && isFinite(num(origKg, NaN)) && num(bodyKgToDisp(num(origKg))) === n) return num(origKg);
+  return bodyDispToKg(n);
+}
+function keepCm(v, origCm) {
+  const n = unitNum(v);
+  if (n === null) return dispToCm(v);
+  if (origCm !== undefined && origCm !== null && origCm !== "" && isFinite(num(origCm, NaN)) && num(cmToDisp(num(origCm))) === n) return num(origCm);
+  return dispToCm(n);
+}
+
 // Ayar: yalnız gösterim değişir; kayıtlı hiçbir değer çevrilmez
 function setUnits(u) {
   u = u === "imperial" ? "imperial" : "metric";
@@ -13144,7 +13227,7 @@ function setUnits(u) {
 
 Object.assign(EN, {
   "Birim": "Units",
-  "Boy (ft)": "Height (ft)", "Boy (in)": "Height (in)",
+  "Boy (ft)": "Height (ft)", "Boy (in)": "Height (in)", "Boy (ft / in)": "Height (ft / in)",
   "Boyunu ft ve in olarak yaz.": "Enter your height in feet and inches.",
   "Boyda ft tam sayı, in 0 ile 11 arasında olmalı.": "Height: feet must be a whole number and inches between 0 and 11.",
   "Boy {a} ile {b} arasında olmalı.": "Height must be between {a} and {b}.",
@@ -13157,7 +13240,12 @@ Object.assign(EN, {
   "Haftada yaklaşık {w} artış (günde ~{kcal} kcal fazla).": "About {w} gained per week (a surplus of ~{kcal} kcal a day).",
   // v53 Görev 2: antrenman (imperial)
   "45 lb Olimpik bar": "45 lb Olympic bar", "35 lb Bar": "35 lb bar", "15 lb EZ / kısa bar": "15 lb EZ / short bar",
-  "bin lb": "k lb", "Son 8 haftanın tonajı (bin lb)": "Volume for the last 8 weeks (thousand lb)"
+  "bin lb": "k lb", "Son 8 haftanın tonajı (bin lb)": "Volume for the last 8 weeks (thousand lb)",
+  // v53 Görev 3: vücut (imperial)
+  "Kilo {a} ile {b} arasında olmalı; kaydedilmedi.": "Weight must be between {a} and {b}; not saved.",
+  "Kilonu {a} ile {b} arasında yaz (örn: {ex}).": "Enter your weight between {a} and {b} (e.g. {ex}).",
+  "{a} ile {b} arasında bir değer yaz (örn. {ex}).": "Enter a value between {a} and {b} (e.g. {ex}).",
+  "En az bir ölçüyü {a}–{b} arasında gir.": "Enter at least one measurement between {a} and {b}."
 });
 
 </script>

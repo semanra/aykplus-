@@ -830,7 +830,7 @@
             <span class="n-label" data-t="GÜNCEL KİLO">GÜNCEL KİLO</span>
             <div class="flex items-center gap-1">
               <button onclick="adjustWeight(-0.1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="0,1 kg azalt" data-t-aria="0,1 kg azalt"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
-              <span class="min-w-[84px] text-center whitespace-nowrap"><span id="weightVal" class="t-display text-[26px] leading-none tabular-nums">105</span> <span class="text-[13px] n-muted font-semibold">kg</span></span>
+              <span class="min-w-[84px] text-center whitespace-nowrap"><span id="weightVal" class="t-display text-[26px] leading-none tabular-nums">105</span> <span id="weightUnit" class="text-[13px] n-muted font-semibold">kg</span></span>
               <button onclick="adjustWeight(0.1)" class="n-btn-ghost w-11 h-11 rounded-full flex items-center justify-center" aria-label="0,1 kg artır" data-t-aria="0,1 kg artır"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
             </div>
           </div>
@@ -1305,7 +1305,7 @@
             <div class="col-span-2"><label for="setSex" class="t-field" data-t="Cinsiyet">Cinsiyet</label>
               <select id="setSex" class="t-in"><option value="male" data-t="Erkek">Erkek</option><option value="female" data-t="Kadın">Kadın</option></select></div>
             <div><label for="setAge" class="t-field" data-t="Yaş">Yaş</label><input id="setAge" type="text" inputmode="numeric" class="t-in text-center font-bold" /></div>
-            <div><label for="setHeight" class="t-field" data-t="Boy (cm)">Boy (cm)</label><input id="setHeight" type="text" inputmode="numeric" class="t-in text-center font-bold" /></div>
+            <div><label for="setHeight" class="t-field" data-t="Boy (cm)">Boy (cm)</label><input id="setHeight" type="text" inputmode="numeric" class="t-in text-center font-bold" /><div id="pfHeightImp" class="hidden"><span class="t-field" data-t="Boy (ft / in)">Boy (ft / in)</span><div class="grid grid-cols-2 gap-1.5"><input id="setHeightFt" type="text" inputmode="numeric" placeholder="ft" aria-label="Boy (ft)" data-t-aria="Boy (ft)" class="t-in text-center font-bold" /><input id="setHeightIn" type="text" inputmode="numeric" placeholder="in" aria-label="Boy (in)" data-t-aria="Boy (in)" class="t-in text-center font-bold" /></div></div></div>
           </div>
         </section>
 

@@ -102,6 +102,29 @@ function incDisp(kg) {
   return Math.max(2.5, Math.round(k / LB_KG / 2.5) * 2.5);
 }
 
+// ---------------------------------------------------------------------------
+// v53 Görev 3 — Vücut: kilo, hedef kilo, tartılar (lb 1 ondalık), boy (ft + in), ölçüler (in 1 ondalık).
+// - Hesap formülleri kg / cm üzerinden (hedefler değişmez); yalnız gösterim ve giriş çevrilir.
+// - Giriş: gösterilen değer yeniden yazılırsa kayıttaki kg / cm DEĞİŞMEZ (keepBodyKg / keepCm); yoksa bodyDispToKg
+//   (kg 3 ondalık) / dispToCm (cm 2 ondalık). Boy imperial'de iki kutu; ft / in değişmediyse kayıttaki boy aynen kalır.
+// - Metin: "kg" birimi wTxt, "cm" birimi lenTxt ile değişir; metrikte ikisi de metni aynen döndürür.
+// ---------------------------------------------------------------------------
+function lenRaw(cm) { return isImperial() ? num(cm) / IN_CM : cm; }
+function fmtLen(cm) { return fmtNum(num(cmToDisp(cm))); }
+function lenTxt(s) { return isImperial() ? String(s).replace(/\bcm\b/g, "in") : s; }
+function keepBodyKg(v, origKg) {
+  const n = unitNum(v);
+  if (n === null) return bodyDispToKg(v);
+  if (origKg !== undefined && origKg !== null && origKg !== "" && isFinite(num(origKg, NaN)) && num(bodyKgToDisp(num(origKg))) === n) return num(origKg);
+  return bodyDispToKg(n);
+}
+function keepCm(v, origCm) {
+  const n = unitNum(v);
+  if (n === null) return dispToCm(v);
+  if (origCm !== undefined && origCm !== null && origCm !== "" && isFinite(num(origCm, NaN)) && num(cmToDisp(num(origCm))) === n) return num(origCm);
+  return dispToCm(n);
+}
+
 // Ayar: yalnız gösterim değişir; kayıtlı hiçbir değer çevrilmez
 function setUnits(u) {
   u = u === "imperial" ? "imperial" : "metric";
@@ -113,7 +136,7 @@ function setUnits(u) {
 
 Object.assign(EN, {
   "Birim": "Units",
-  "Boy (ft)": "Height (ft)", "Boy (in)": "Height (in)",
+  "Boy (ft)": "Height (ft)", "Boy (in)": "Height (in)", "Boy (ft / in)": "Height (ft / in)",
   "Boyunu ft ve in olarak yaz.": "Enter your height in feet and inches.",
   "Boyda ft tam sayı, in 0 ile 11 arasında olmalı.": "Height: feet must be a whole number and inches between 0 and 11.",
   "Boy {a} ile {b} arasında olmalı.": "Height must be between {a} and {b}.",
@@ -126,5 +149,10 @@ Object.assign(EN, {
   "Haftada yaklaşık {w} artış (günde ~{kcal} kcal fazla).": "About {w} gained per week (a surplus of ~{kcal} kcal a day).",
   // v53 Görev 2: antrenman (imperial)
   "45 lb Olimpik bar": "45 lb Olympic bar", "35 lb Bar": "35 lb bar", "15 lb EZ / kısa bar": "15 lb EZ / short bar",
-  "bin lb": "k lb", "Son 8 haftanın tonajı (bin lb)": "Volume for the last 8 weeks (thousand lb)"
+  "bin lb": "k lb", "Son 8 haftanın tonajı (bin lb)": "Volume for the last 8 weeks (thousand lb)",
+  // v53 Görev 3: vücut (imperial)
+  "Kilo {a} ile {b} arasında olmalı; kaydedilmedi.": "Weight must be between {a} and {b}; not saved.",
+  "Kilonu {a} ile {b} arasında yaz (örn: {ex}).": "Enter your weight between {a} and {b} (e.g. {ex}).",
+  "{a} ile {b} arasında bir değer yaz (örn. {ex}).": "Enter a value between {a} and {b} (e.g. {ex}).",
+  "En az bir ölçüyü {a}–{b} arasında gir.": "Enter at least one measurement between {a} and {b}."
 });

@@ -745,11 +745,11 @@ let measureSel = "bel";
 
 function openMeasureModal() {
   const last = state.measurements[state.measurements.length - 1] || {};
-  $("chartTitle").textContent = t("Ölçü ekle (cm)");
+  $("chartTitle").textContent = lenTxt(t("Ölçü ekle (cm)"));   // v53: imperial'de in
   $("chartBody").innerHTML = `
     <div class="grid grid-cols-2 gap-2 text-xs">
       ${MEASURES.map(([k, n]) => `<div><label class="block text-[var(--w-muted)] mb-1">${t(n)}</label>
-        <input id="ms_${k}" type="text" inputmode="decimal" placeholder="—" value="${last[k] ? esc(fmtNum(last[k])) : ""}" class="w-full p-2 rounded-lg text-base text-center" /></div>`).join("")}
+        <input id="ms_${k}" type="text" inputmode="decimal" placeholder="—" value="${last[k] ? esc(fmtLen(last[k])) : ""}" class="w-full p-2 rounded-lg text-base text-center" /></div>`).join("")}
     </div>
     <p class="text-[12px] text-[var(--w-dim)] mt-2">${t("İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.")}</p>
     <div class="flex justify-end gap-2 mt-3">
@@ -761,14 +761,20 @@ function openMeasureModal() {
 function saveMeasurement() {
   const now = Date.now();
   const entry = { ts: now };
+  const prevM = state.measurements[state.measurements.length - 1] || {};
   let any = false;
   MEASURES.forEach(([k]) => {
     const raw = $("ms_" + k).value.trim();
     if (!raw) return;
+    if (isImperial()) {   // v53: in girilir, kayıt cm (önceki ölçü aynen yeniden yazılırsa cm aynen)
+      const cm = num(keepCm(raw, prevM[k]), 0);
+      if (cm >= 10 && cm <= 250) { entry[k] = cm; any = true; }
+      return;
+    }
     const v = num(raw, 0);
     if (v >= 10 && v <= 250) { entry[k] = round1(v); any = true; }
   });
-  if (!any) { sayAlert(t("Ölçü girilmedi"), t("En az bir ölçüyü 10–250 cm arasında gir.")); return; }
+  if (!any) { sayAlert(t("Ölçü girilmedi"), isImperial() ? t("En az bir ölçüyü {a}–{b} arasında gir.", { a: fmtLen(10), b: fmtLen(250) + " " + lenUnit() }) : t("En az bir ölçüyü 10–250 cm arasında gir.")); return; }
   const last = state.measurements[state.measurements.length - 1];
   if (last && todayStr(new Date(last.ts)) === todayStr()) state.measurements[state.measurements.length - 1] = entry;
   else state.measurements.push(entry);

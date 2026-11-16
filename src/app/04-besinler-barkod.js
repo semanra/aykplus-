@@ -573,7 +573,9 @@ function pickFoodInFoods(id) {
 document.addEventListener("click", e => { if (e.target && e.target.id === "barcodeModal") closeBarcode(); });
 
 function updateProfile() {
-  state.weight = round1(num($("weightSlider").value, state.weight));
+  const sl = $("weightSlider");
+  if (!isImperial()) state.weight = round1(num(sl.value, state.weight));
+  else if (sl.value !== sl.dataset.shown) state.weight = keepBodyKg(num(sl.value, num(bodyKgToDisp(state.weight))), state.weight);   // v53: lb; kaydırılmadıysa kg aynen
   state.deficit = Math.round(num($("deficitSlider").value, state.deficit));
   renderAll();
 }
@@ -588,7 +590,11 @@ function setGainPace(p) {
   state.settings.gainPace = p;
   renderAll();
 }
-function adjustWeight(d) { state.weight = Math.max(30, round1(state.weight + d)); renderAll(); }
+function adjustWeight(d) {
+  if (isImperial()) state.weight = Math.max(30, bodyDispToKg(round1(num(bodyKgToDisp(state.weight)) + d)));   // v53: ±0,1 lb
+  else state.weight = Math.max(30, round1(state.weight + d));
+  renderAll();
+}
 
 function logCurrentWeight() {
   const now = Date.now();
@@ -597,7 +603,7 @@ function logCurrentWeight() {
   if (validBf(state.settings.bodyFat)) entry.bf = validBf(state.settings.bodyFat);
   if (last && last.ts && todayStr(new Date(last.ts)) === todayStr()) state.weightLogs[state.weightLogs.length - 1] = entry;
   else state.weightLogs.push(entry);
-  toast(t("{w} kg kaydedildi", { w: fmtNum(state.weight) }));
+  toast(wTxt(t("{w} kg kaydedildi", { w: fmtWNum(state.weight, { body: true }) })));
   renderAll();
 }
 function deleteWeightLog(idx) {

@@ -39,8 +39,8 @@ function bodyComp(weight, bf) {
   return { bf, fatKg, leanKg: weight - fatKg };
 }
 function fillTargetFromBf(v) {
-  $("setTarget").value = fmtNum(v);
-  toast(t("Hedef kilo {w} kg olarak dolduruldu, kaydetmeyi unutma", { w: fmtNum(v) }));
+  $("setTarget").value = fmtNum(num(bodyKgToDisp(v)));   // v53: v kg; kutu gösterim biriminde
+  toast(wTxt(t("Hedef kilo {w} kg olarak dolduruldu, kaydetmeyi unutma", { w: fmtWNum(v, { body: true }) })));
 }
 function updateBfHint() {
   const bf = validBf($("setBf").value);
@@ -48,10 +48,10 @@ function updateBfHint() {
   const el = $("setBfHint");
   if (!bf) { el.classList.add("hidden"); return; }
   const c = bodyComp(state.weight, bf);
-  let html = t("Yağsız kütlen: {lean} • Yağ kütlen: {fat}", { lean: `<b class="text-[var(--w-acc)]">${fmtNum(c.leanKg)} kg</b>`, fat: `<b class="text-[var(--w-over)]">${fmtNum(c.fatKg)} kg</b>` });
+  let html = t("Yağsız kütlen: {lean} • Yağ kütlen: {fat}", { lean: `<b class="text-[var(--w-acc)]">${fmtW(c.leanKg, { body: true })}</b>`, fat: `<b class="text-[var(--w-over)]">${fmtW(c.fatKg, { body: true })}</b>` });
   if (tbf && tbf < bf) {
     const suggest = round1(c.leanKg / (1 - tbf / 100));
-    html += `<div class="mt-1.5">${t("Kas kütleni koruyarak %{tbf} yağ oranına inersen tahmini kilon: {w}", { tbf: fmtNum(tbf), w: `<b class="text-[var(--w-k)]">${fmtNum(suggest)} kg</b>` })}</div>
+    html += `<div class="mt-1.5">${t("Kas kütleni koruyarak %{tbf} yağ oranına inersen tahmini kilon: {w}", { tbf: fmtNum(tbf), w: `<b class="text-[var(--w-k)]">${fmtW(suggest, { body: true })}</b>` })}</div>
       <button onclick="fillTargetFromBf(${suggest})" class="t-btn-outline mt-2.5 w-full h-11 rounded-xl text-[14px]">${t("Bunu hedef kilom yap")}</button>`;
   }
   html += `<div class="mt-1.5 text-[var(--w-dim)]">${t("Yağ oranı girildiği için kalori hesabı yağsız kütleye göre yapılıyor. Ölçüm değiştikçe (ayda bir gibi) güncelle.")}</div>`;
@@ -144,7 +144,7 @@ function toggleWeightScale(on) {
   state.settings.scaleOn = !!on;
   if (on) state.settings.scaleBase = state.weight;
   renderAll();
-  toast(on ? t("Gramajlar artık {w} kg'a göre ayarlanacak", { w: fmtNum(state.weight) }) : t("Kiloya göre gramaj kapatıldı; menü son başlangıç gramajlarına döndü"));
+  toast(on ? wTxt(t("Gramajlar artık {w} kg'a göre ayarlanacak", { w: fmtWNum(state.weight, { body: true }) })) : t("Kiloya göre gramaj kapatıldı; menü son başlangıç gramajlarına döndü"));
 }
 function resetScaleBase() {
   snapshot();   // v26: Geri al
@@ -157,7 +157,7 @@ function resetScaleBase() {
   })));
   state.settings.scaleBase = state.weight;
   renderAll();
-  offerUndo(t("Gramajlar {w} kg için yeni başlangıç oldu", { w: fmtNum(state.weight) }));
+  offerUndo(wTxt(t("Gramajlar {w} kg için yeni başlangıç oldu", { w: fmtWNum(state.weight, { body: true }) })));
 }
 
 // ---------------------------------------------------------------------------
@@ -269,8 +269,17 @@ function renderWeightBlock(st) {
   const minW = Math.floor(Math.min(num(st.targetWeight, 82) - 5, ...logged.map(w => w - 5), state.weight));
   const maxW = Math.ceil(Math.max(...logged.map(w => w + 10), state.weight + 10, num(st.targetWeight, 82) + 10));
   const slider = $("weightSlider");
-  slider.min = minW; slider.max = maxW; slider.value = state.weight;
-  $("weightVal").textContent = fmtNum(state.weight);
+  if (isImperial()) {   // v53: kaydırıcı lb'de; kaydırılmadıysa kayıttaki kg değişmez (updateProfile)
+    const D = x => num(bodyKgToDisp(x));
+    slider.min = Math.floor(Math.min(D(num(st.targetWeight, 82)) - 10, ...logged.map(w => D(w) - 10), D(state.weight)));
+    slider.max = Math.ceil(Math.max(...logged.map(w => D(w) + 20), D(state.weight) + 20, D(num(st.targetWeight, 82)) + 20));
+    slider.value = D(state.weight);
+  } else { slider.min = minW; slider.max = maxW; slider.value = state.weight; }
+  slider.dataset.shown = slider.value;
+  $("weightVal").textContent = fmtWNum(state.weight, { body: true });
+  if ($("weightUnit").textContent !== wUnit()) $("weightUnit").textContent = wUnit();
+  const wb = $("weightVal").closest(".flex").querySelectorAll("button");
+  [[wb[0], t("0,1 kg azalt")], [wb[1], t("0,1 kg artır")]].forEach(([b, tk]) => { const a = wTxt(tk); if (b && b.getAttribute("aria-label") !== a) b.setAttribute("aria-label", a); });
   $("deficitSlider").value = state.deficit;
   const tg = getTargets();
   const goal = tg.goal;
@@ -280,23 +289,24 @@ function renderWeightBlock(st) {
   $("gainBox").classList.toggle("hidden", goal !== "gain");
   $("goalVal").textContent = (tg.goalDelta < 0 ? "−" : tg.goalDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.goalDelta));
   $("weightHistoryText").textContent = state.weightLogs.length > 0
-    ? state.weightLogs.slice(-3).map(l => `${fmtNum(num(l.weight))} kg (${l.ts ? fmtDate(l.ts) : logDateLabel(l.date)})`).join(" → ")
-    : t("Hedef: {w} kg", { w: fmtNum(num(st.targetWeight, 82)) });
+    ? state.weightLogs.slice(-3).map(l => `${fmtW(num(l.weight), { body: true })} (${l.ts ? fmtDate(l.ts) : logDateLabel(l.date)})`).join(" → ")
+    : wTxt(t("Hedef: {w} kg", { w: fmtWNum(num(st.targetWeight, 82), { body: true }) }));
   const wa7 = weightAvg7();
-  $("weightAvgText").textContent = wa7 ? tn(wa7.n, "7 günlük ortalama: {avg} kg ({n} tartı)", { avg: fmtNum(wa7.avg) }) : "";
+  $("weightAvgText").textContent = wa7 ? wTxt(tn(wa7.n, "7 günlük ortalama: {avg} kg ({n} tartı)", { avg: fmtWNum(wa7.avg, { body: true }) })) : "";
   $("weightAvgText").classList.toggle("hidden", !wa7);
   const target = num(st.targetWeight, 82);
   const diffKg = state.weight - target;
   const weeklyLoss = (state.deficit * 7) / 7700;
   const weeklyGain = (tg.goalDelta * 7) / 7700;
   let info;
+  const tw = fmtWNum(target, { body: true });   // v53: hedef ve haftalık hız gösterim biriminde (hesap kg)
   if (goal === "keep") info = t("Kilo koruma: hedef kalorin harcamana eşit");
-  else if (goal === "gain") info = diffKg >= 0 || weeklyGain <= 0 ? t("{w} kg hedefine ulaştın!", { w: fmtNum(target) })
-    : tn(Math.ceil(-diffKg / weeklyGain), "Haftalık ~{r} kg alım → {w} kg hedefine ~{n} hafta", { r: fmtKg(weeklyGain), w: fmtNum(target) });
-  else info = diffKg <= 0 ? t("{w} kg hedefine ulaştın!", { w: fmtNum(target) })
-    : weeklyLoss > 0 ? tn(Math.ceil(diffKg / weeklyLoss), "Haftalık ~{r} kg kayıp → {w} kg hedefine ~{n} hafta", { r: fmtKg(weeklyLoss), w: fmtNum(target) })
+  else if (goal === "gain") info = diffKg >= 0 || weeklyGain <= 0 ? t("{w} kg hedefine ulaştın!", { w: tw })
+    : tn(Math.ceil(-diffKg / weeklyGain), "Haftalık ~{r} kg alım → {w} kg hedefine ~{n} hafta", { r: fmtWNum(weeklyGain, { fine: true }), w: tw });
+  else info = diffKg <= 0 ? t("{w} kg hedefine ulaştın!", { w: tw })
+    : weeklyLoss > 0 ? tn(Math.ceil(diffKg / weeklyLoss), "Haftalık ~{r} kg kayıp → {w} kg hedefine ~{n} hafta", { r: fmtWNum(weeklyLoss, { fine: true }), w: tw })
     : t("Kalori açığı yok: kilo koruma modu");
-  $("timelineInfo").textContent = info;
+  $("timelineInfo").textContent = wTxt(info);
   const hint = coachHintText();
   $("coachHint").classList.toggle("hidden", !hint);
   $("coachHint").textContent = hint;
@@ -808,11 +818,11 @@ function renderMenus() {
     </label>
     ${st.scaleOn ? `
       <div class="n-elev rounded-2xl px-3.5 py-3 space-y-1">
-        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Başlangıç kilosu")}</span><strong>${fmtNum(num(st.scaleBase, state.weight))} kg</strong></div>
-        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Şimdiki kilo")}</span><strong>${fmtNum(state.weight)} kg</strong></div>
+        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Başlangıç kilosu")}</span><strong>${fmtW(num(st.scaleBase, state.weight), { body: true })}</strong></div>
+        <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Şimdiki kilo")}</span><strong>${fmtW(state.weight, { body: true })}</strong></div>
         <div class="flex items-center justify-between gap-2 text-[14px]"><span class="n-muted">${t("Gramaj oranı")}</span><strong class="n-accent">${t("%{p}", { p: String(Math.round(k * 100)) })}</strong></div>
       </div>
-      <button onclick="resetScaleBase()" class="n-btn-outline w-full h-11 rounded-full text-[13px]">${t("Bu gramajları yeni başlangıç yap ({w} kg)", { w: fmtNum(state.weight) })}</button>
+      <button onclick="resetScaleBase()" class="n-btn-outline w-full h-11 rounded-full text-[13px]">${wTxt(t("Bu gramajları yeni başlangıç yap ({w} kg)", { w: fmtWNum(state.weight, { body: true }) }))}</button>
       <p class="text-[12px] n-dim">${t("Yalnızca gram ve ml ile ölçülen besinler değişir (tavuk, pirinç, yulaf...). Adet, kase, ölçek gibi besinler aynı kalır. Oran en fazla %70–%130 arasında uygulanır. Ayarı kapatırsan menü son başlangıç yaptığın gramajlara döner.")}</p>
       ${num(st.calAdjust, 0) !== 0 ? `<p id="scaleCoachNote" class="text-[12px] n-k border border-current rounded-2xl px-3 py-2">${t("Kalori koçu hedefini {adj} kcal ayarladı. İkisi aynı düzeltmeyi iki kez yapmaz: gramajlar yalnızca kilona göre değişir, koç yalnızca hedef kaloriyi değiştirir. Bu yüzden koçun düzeltmesi menüye kendiliğinden yansımaz; menü toplamını hedefe uydurmak için öğünlerdeki gramajları ayarla.", { adj: (num(st.calAdjust, 0) > 0 ? "+" : "") + fmtInt(num(st.calAdjust, 0)) })}</p>` : ""}` : ""}`;
 
