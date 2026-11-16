@@ -5,7 +5,7 @@
 # Gereksinim: pip install playwright pillow && python -m playwright install chromium
 import os, sys, json, shutil, subprocess, tarfile, io
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
-from ortak import TEST_INIT, SPLASH_ANIM, server, SEED, SCREENS, ONBOARD_SCREENS, FRESH_SCREENS, FIXED_NAMES, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME, EN_INIT, EN_SCREENS, EN_ROOT, EN_ONBOARD_SCREENS, TR_WORD_SCAN_JS
+from ortak import TEST_INIT, SPLASH_ANIM, server, SEED, SCREENS, ONBOARD_SCREENS, FRESH_SCREENS, FIXED_NAMES, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME, EN_INIT, EN_SCREENS, EN_ROOT, EN_ONBOARD_SCREENS, TR_WORD_SCAN_JS, PF_VIEW_ONLY
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(REPO, "build", "kontrol")
 HIZLI = "--hizli" in sys.argv
@@ -35,7 +35,7 @@ def shoot(root, out_dir, scheme):
             try: pg.evaluate("() => { " + js + " }")
             except Exception as e: errs.append(f"{name}: {str(e)[:160]}")
             pg.wait_for_timeout(220); pg.evaluate("window.scrollTo(0,0)")
-            pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=True)
+            pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=not name.startswith(PF_VIEW_ONLY))   # v59: sabit Profil katmanı
             res[name] = pg.evaluate(AUDIT_JS, SCREEN_ROOT.get(name))
         b.close()
     return res, errs
@@ -79,7 +79,7 @@ def shoot_en(root, out_dir, scheme):
             try: pg.evaluate("() => { " + js + " }")
             except Exception as e: errs.append(f"{name}: {str(e)[:160]}")
             pg.wait_for_timeout(220); pg.evaluate("window.scrollTo(0,0)")
-            pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=True)
+            pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=not name.startswith(PF_VIEW_ONLY))
             res[name] = pg.evaluate(AUDIT_JS, EN_ROOT.get(name)); res[name]["trtext"] = pg.evaluate(TR_WORD_SCAN_JS, EN_ROOT.get(name))   # v52
         b.close()
     return res, errs

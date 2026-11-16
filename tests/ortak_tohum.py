@@ -4,12 +4,15 @@ import os, json
 _HERE = os.path.dirname(os.path.abspath(__file__))
 FIXTURE = os.path.join(_HERE, "fixtures", "eski_varsayilan.json")
 # v55: window.AYK_NO_ANIM = true → uygulama içi animasyonlar (halka, sayaç, set tiki, tema geçişi) anında son hâlde
+# v59: window.AYK_PF_FLAT = true → Profil bölümleri alt sayfa yerine eskisi gibi alt alta (eski testler alanları doğrudan
+# doldurur). Gerçek düzen: tests/test_v59_profil_duzen.py ve kontrol aracının profil-ana/-hedef/... ekranları (bayrak false).
+PF_FLAT_FLAG = "window.AYK_PF_FLAT = true;"
 NO_ANIM_FLAG = "window.AYK_NO_ANIM = true;"
-SPLASH_OFF = NO_ANIM_FLAG + "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
+SPLASH_OFF = PF_FLAT_FLAG + NO_ANIM_FLAG + "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 with open(FIXTURE, encoding="utf-8") as _f:
     _SEED = json.load(_f)
 TEST_INIT = "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";\n" + SPLASH_OFF
-SEED_ONLY = NO_ANIM_FLAG + "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";"   # açılış animasyonu kalır (splash testleri)
+SEED_ONLY = PF_FLAT_FLAG + NO_ANIM_FLAG + "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";"   # açılış animasyonu kalır (splash testleri)
 
 def with_defaults(seed):
     """Eski normalizeState davranışı: {...DEFAULT_STATE, ...kayıt}, ayarlar bir seviye derin birleşir.

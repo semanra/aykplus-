@@ -110,8 +110,20 @@ SCREENS = [
   ("profil-alt", PF_SCROLL % 1),
   # v44: Profil → Hakkında (ayrıntı bölümleri açık)
   ("profil-hakkinda", "document.querySelectorAll('#pfMethod, #pfLicenses').forEach(d => d.open = true); " + PF_SCROLL % 1),
+  # v59: gerçek Profil düzeni (testlerdeki AYK_PF_FLAT kapalı): ana ekran, arama ve alt sayfalar. Listenin sonunda kalmalı.
+  ("profil-ana", "window.AYK_PF_FLAT = false; closeProfile(); openProfile()"),
+  ("profil-ara", "$('pfSearch').value = 'yedek'; pfSearchInput()"),
+  ("profil-kisisel", "pfOpen('me')"),
+  ("profil-hedef", "pfOpen('body')"),
+  ("profil-gorunum", "pfOpen('app')"),
+  ("profil-antrenman", "pfOpen('train')"),
+  ("profil-beslenme", "pfOpen('nutri')"),
+  ("profil-veri", "pfOpen('data')"),
+  ("profil-hakkinda2", "pfOpen('about')"),
 ]
-SCREEN_ROOT = {"profil": "#profilePage", "profil-orta": "#profilePage", "profil-alt": "#profilePage", "m-sayac": "#mobTimer",
+# v59: gerçek Profil düzeni ekranları yalnız görünür alan çekilir (sabit katman; arkadaki sayfa tam sayfa çekimine karışır)
+PF_VIEW_ONLY = ("profil-ana", "profil-ara", "profil-kisisel", "profil-hedef", "profil-gorunum", "profil-antrenman", "profil-beslenme", "profil-veri", "profil-hakkinda2", "en-pf-")
+SCREEN_ROOT = {**{k: "#profilePage" for k in ("profil-ana", "profil-ara", "profil-kisisel", "profil-hedef", "profil-gorunum", "profil-antrenman", "profil-beslenme", "profil-veri", "profil-hakkinda2")}, "profil": "#profilePage", "profil-orta": "#profilePage", "profil-alt": "#profilePage", "m-sayac": "#mobTimer",
                "m-seans-tekrar": "#mobTimer", "m-seans-sure": "#mobTimer", "m-bitis": "#mobTimer"}
 
 # v47: İngilizce ölçüm ekranları (piksel karşılaştırması YOK, yalnız taşma / 44 px / okunurluk). setLang('en') ile açılır.
@@ -167,8 +179,13 @@ EN_SCREENS = [
   ("en-u-olcu", "setProgressView('kilo'); openMeasureModal()"),
   ("en-u-profil", "closeModal('chartModal'); openProfile()"),
   ("en-u-profil-orta", PF_SCROLL % 0.45),
+  # v59: gerçek Profil düzeni İngilizce (metrik)
+  ("en-pf-ana", "closeProfile(); window.AYK_PF_FLAT = false; openProfile()"),
+  ("en-pf-hedef", "pfOpen('body')"),
+  ("en-pf-antrenman", "pfOpen('train')"),
+  ("en-pf-veri", "pfOpen('data')"),
 ]
-EN_ROOT = {"en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage", "en-m-seans": "#mobTimer", "en-m-bitis": "#mobTimer",
+EN_ROOT = {"en-pf-ana": "#profilePage", "en-pf-hedef": "#profilePage", "en-pf-antrenman": "#profilePage", "en-pf-veri": "#profilePage", "en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage", "en-m-seans": "#mobTimer", "en-m-bitis": "#mobTimer",
            "en-u-profil": "#profilePage", "en-u-profil-orta": "#profilePage"}
 # v44: kurulum ekranları. TEST_INIT OLMADAN, temiz depoda açılır (gerçek yeni kurulum yolu). Sırayla; her adım öncekinin üstüne.
 ONBOARD_SCREENS = [

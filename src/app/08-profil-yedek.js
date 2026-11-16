@@ -63,7 +63,115 @@ function renderAbout() {
   ].join("");
   $("pfLicList").innerHTML = LICENSES.map(li).join("");
 }
-function openProfile() {
+// v59: PROFİL ANA EKRANI + ALT SAYFALAR. Ana ekran: özet kartı, ayar arama, 7 bölüm. Bölüm açılınca yalnızca o bölüm görünür,
+// başlık bölüm adını yazar, Geri ana ekrana döner. Alan kimlikleri ve otomatik kayıt değişmedi. window.AYK_PF_FLAT (yalnız
+// testler): bütün bölümler eskisi gibi alt alta (eski testler alanları doğrudan doldurur).
+let pfSec = "";
+const PF_SEC_KEYS = ["me", "body", "app", "train", "nutri", "data", "about"];
+function pfSecTitle(k) {
+  return ({ me: t("Kişisel bilgiler"), body: t("Kilo ve hedefler"), app: t("Görünüm ve dil"), train: t("Antrenman ve mobilite"),
+    nutri: t("Beslenme"), data: t("Veri ve yedekleme"), about: t("Hakkında") })[k] || "";
+}
+function pfFlat() { return window.AYK_PF_FLAT === true; }
+function pfApplyView() {
+  const el = $("profilePage"); if (!el) return;
+  const v = pfFlat() ? "flat" : pfSec ? "sec" : "home";
+  if (el.dataset.pfView !== v) el.dataset.pfView = v;
+  el.querySelectorAll("[data-pf-sec]").forEach(x => x.classList.toggle("pf-on", x.dataset.pfSec === pfSec));
+  const tt = v === "sec" ? pfSecTitle(pfSec) : t("Profil");
+  if ($("pfTitle").textContent !== tt) $("pfTitle").textContent = tt;
+}
+function pfOpen(k) {
+  if (!PF_SEC_KEYS.includes(k)) return;
+  pfSec = k; pfApplyView();
+  if (pfFlat()) { const x = document.querySelector('#profilePage [data-pf-sec="' + k + '"]'); if (x) x.scrollIntoView({ block: "start" }); return; }
+  $("pfScroll").scrollTop = 0;
+}
+function pfHome() { pfSec = ""; pfApplyView(); $("pfScroll").scrollTop = 0; }
+function pfBack() {
+  if (!pfSec || pfFlat()) { closeProfile(); return; }
+  const a = document.activeElement;
+  if (a && a.blur && $("profilePage").contains(a)) a.blur();   // yazılmakta olan alan önce kaydedilsin
+  pfHome();
+}
+// Ayar arama: bölümlerdeki [data-pf-row] satırlarının (o anki dildeki) metninde, kelime sırası serbest
+function pfRows() { return [...document.querySelectorAll("#profilePage [data-pf-sec] [data-pf-row]")]; }
+function pfRowTitle(row) {
+  const el = row.querySelector("[data-pf-title]") || row.querySelector(".t-field") || row.querySelector(".font-semibold") || row.querySelector("summary");
+  let x = (el ? el.textContent : row.textContent).trim().replace(/\s+/g, " ");
+  if (el && el.classList.contains("t-label")) x = x.charAt(0) + lowerL(x.slice(1));   // bölüm etiketi büyük harfle yazılı (CSS cümle düzenine çevirir)
+  return x.length > 48 ? x.slice(0, 46) + "…" : x;
+}
+function pfSearchInput() {
+  const inp = $("pfSearch"), res = $("pfSearchRes"), nav = $("pfNav"); if (!inp) return;
+  const words = normSearch(inp.value.trim()).split(/\s+/).filter(Boolean);
+  if (!words.length) { res.classList.add("hidden"); res.innerHTML = ""; nav.classList.remove("hidden"); return; }
+  const hits = [];
+  pfRows().forEach((row, i) => {
+    if (row.closest(".hidden")) return;
+    const txt = normSearch(row.textContent);
+    if (words.every(w => txt.includes(w))) hits.push(i);
+  });
+  const rows = pfRows();
+  res.innerHTML = hits.length ? hits.slice(0, 12).map(i => `<button type="button" class="pf-row" data-pf-hit onclick="pfGo(${i})">
+      <span class="min-w-0 flex-1"><b>${esc(pfRowTitle(rows[i]))}</b><small>${esc(pfSecTitle(rows[i].closest("[data-pf-sec]").dataset.pfSec))}</small></span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-[var(--t-dim)]" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>`).join("")
+    : `<p class="px-4 py-4 text-[14px] text-[var(--t-dim)]">${t("Sonuç yok. Başka bir kelime dene.")}</p>`;
+  res.classList.remove("hidden"); nav.classList.add("hidden");
+}
+function pfGo(i) {
+  const row = pfRows()[i]; if (!row) return;
+  pfOpen(row.closest("[data-pf-sec]").dataset.pfSec);
+  const det = row.tagName === "DETAILS" ? row : row.closest("details"); if (det) det.open = true;
+  requestAnimationFrame(() => {
+    row.scrollIntoView({ block: "center" });
+    row.classList.remove("pf-flash"); void row.offsetWidth; row.classList.add("pf-flash");
+    setTimeout(() => row.classList.remove("pf-flash"), 1700);
+  });
+}
+// Özet kartı: fotoğraf, hedef, kilo → hedef kilo, bugünün kalori/protein hedefi, yedek durumu
+function renderProfileSummary() {
+  const box = $("pfSummary"); if (!box) return;
+  const st = state.settings, g = st.goal === "gain" || st.goal === "keep" ? st.goal : "lose", tg = getTargets(), src = state.customIconDataUrl || "";
+  const gl = g === "gain" ? t("Kilo almak") : g === "keep" ? t("Kilomu korumak") : t("Kilo vermek");
+  const w = num(state.weight, 0), tw = num(st.targetWeight, 0);
+  const wl = w ? (g !== "keep" && tw ? fmtW(w, { body: true }) + " → " + fmtW(tw, { body: true }) : fmtW(w, { body: true })) : "";
+  const d = backupAgeDays();
+  const bk = d < 0 ? t("Telefon dışına hiç yedek alınmadı") : d === 0 ? t("Son yedek: bugün") : tn(d, "Son yedek: {n} gün önce");
+  const kcal = isFinite(tg.calTarget) ? Math.round(tg.calTarget).toLocaleString(locale()) : "—", pro = isFinite(tg.proTarget) ? String(Math.round(tg.proTarget)) : "—";
+  const av = src ? `<img src="${esc(src)}" alt="" class="w-full h-full object-cover" />`
+    : `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>`;
+  const html = `<div class="flex items-center gap-3.5">
+      <button type="button" onclick="pfOpen('me')" aria-label="${esc(t("Kişisel bilgiler"))}" class="w-16 h-16 shrink-0 rounded-full bg-[var(--t-elev)] border border-[var(--t-line)] overflow-hidden flex items-center justify-center text-[var(--t-dim)]">${av}</button>
+      <button type="button" data-pf-sum-goal onclick="pfOpen('body')" class="flex-1 min-w-0 text-left min-h-[44px]">
+        <span class="block t-display text-[24px] leading-none uppercase">${esc(gl)}</span>
+        ${wl ? `<span class="block text-[14px] font-semibold text-[var(--t-text2)] mt-1.5">${esc(wl)}</span>` : ""}
+        <span class="block text-[13px] text-[var(--t-dim)] mt-0.5">${esc(t("Bugünkü hedef: {k} kcal · {p} g protein", { k: kcal, p: pro }))}</span>
+      </button>
+    </div>
+    <button type="button" data-pf-sum-backup onclick="pfOpen('data')" class="mt-3 w-full flex items-center gap-2.5 min-h-[44px] rounded-xl bg-[var(--t-elev)] px-3.5 text-left">
+      <i class="w-2.5 h-2.5 rounded-full shrink-0 ${BK_DOT[backupLevel()]}" aria-hidden="true"></i><span class="flex-1 min-w-0 text-[13px] font-semibold text-[var(--t-text2)]">${esc(bk)}</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-[var(--t-dim)]" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+    </button>`;
+  if (box.dataset.h !== html) { box.innerHTML = html; box.dataset.h = html; }
+  const dot = $("pfNavBkDot"); if (dot) dot.className = "w-2.5 h-2.5 rounded-full shrink-0 " + BK_DOT[backupLevel()];
+}
+// Hedef kartı (Menülerim'deki Ver/Koru/Al ve hız ile aynı ayar; aynı fonksiyonlar)
+function renderPfGoal() {
+  const st = state.settings, g = st.goal === "gain" || st.goal === "keep" ? st.goal : "lose";
+  document.querySelectorAll("[data-pf-goal]").forEach(b => { const on = b.dataset.pfGoal === g; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  document.querySelectorAll("[data-pf-pace]").forEach(b => { const on = b.dataset.pfPace === (st.gainPace || "mid"); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  $("pfLoseBox").classList.toggle("hidden", g !== "lose");
+  $("pfGainBox").classList.toggle("hidden", g !== "gain");
+  $("pfDeficitVal").textContent = String(Math.round(num(state.deficit, 0)));
+}
+function pfDeficit(d) {
+  state.deficit = Math.max(50, Math.min(1000, Math.round((num(state.deficit, 500) + d) / 50) * 50));
+  renderAll();
+}
+function openProfile(sec) {
+  pfSec = PF_SEC_KEYS.includes(sec) ? sec : "";
+  if ($("pfSearch")) { $("pfSearch").value = ""; pfSearchInput(); }
   fillProfileFields();
   renderAbout();
   $("backupText").value = "";   // v58: bütün kaydı metne çevirmek Profil'i yavaşlatıyordu; kod yalnızca "Kodu kopyala"da üretilir
@@ -99,6 +207,9 @@ function profileUnitUI() {
   });
 }
 function renderProfile() {
+  pfApplyView();   // v59
+  renderProfileSummary();
+  renderPfGoal();
   profileUnitUI();
   $("pfRescue").classList.toggle("hidden", !rescueText());   // v35
   renderStorageMeter();   // v36
@@ -154,6 +265,7 @@ function renderProfile() {
   $("lastBackupText").textContent = state.lastBackupAt
     ? tn(Math.floor((Date.now() - state.lastBackupAt) / DAY_MS), "Son yedek: {d} ({n} gün önce)", { d: fmtDate(state.lastBackupAt, true) })
     : t("Henüz yedek alınmadı. Verilerin sadece bu telefonda duruyor; düzenli yedek almanı öneririm.");
+  $("lastBackupText").classList.toggle("hidden", !state.lastBackupAt);   // v59: yedek yokken durum satırı ("Hiç alınmadı") yeterli
 }
 
 // v24: "Su hedefi kiloya göre" açıkken elle hedef kutusu pasif, hesap açıklamada

@@ -348,7 +348,7 @@ function progKiloHtml() {
       <div><span>${t("İlk kayıttan")}</span><b>${(change > 0 ? "+" : "") + fmtW(change, { body: true })}</b></div>
       <div><span>${t("Hedefe")}</span><b>${fmtW(Math.max(0, toGoal), { body: true })}</b></div></div>
     ${comp ? `<div class="p-mini3"><div><span>${t("Yağ oranı")}</span><b>${t("%{v}", { v: fmtNum(comp.bf) })}</b>${tbf ? `<small>${t("hedef %{v}", { v: fmtNum(tbf) })}</small>` : ""}</div><div><span>${t("Yağsız kütle")}</span><b>${fmtW(comp.leanKg, { body: true })}</b></div><div><span>${t("Yağ kütlesi")}</span><b>${fmtW(comp.fatKg, { body: true })}</b></div></div>`
-      : `<button onclick="openSettings()" class="p-btn ghost">${t("Yağ oranını Profil'den gir; yağsız kütlen burada görünür")}</button>`}`;
+      : `<button onclick="openProfile('body')" class="p-btn ghost">${t("Yağ oranını Profil'den gir; yağsız kütlen burada görünür")}</button>`}`;
   // Haftalık ortalama (en az 4 hafta)
   const wk = {};
   timed.forEach(p => { const k = weekStart(new Date(p.t)); (wk[k] = wk[k] || []).push(p.y); });

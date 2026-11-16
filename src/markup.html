@@ -137,6 +137,17 @@
     .w-btn { background-color: var(--w-btn) !important; color: var(--w-btn-text) !important; font-weight: 800 !important; border-color: var(--w-btn-line) !important; }
     #profilePage.tm { background-color: var(--t-bg) !important; }
     #profilePage .pf-top { padding-top: calc(0.5rem + env(safe-area-inset-top, 0px)); }
+    /* v59 Profil: ana ekran + alt sayfalar (data-pf-view = home | sec | flat; flat = hepsi alt alta, yalnız testler: window.AYK_PF_FLAT) */
+    #profilePage[data-pf-view="home"] .pf-sec, #profilePage[data-pf-view="sec"] .pf-sec:not(.pf-on), #profilePage[data-pf-view="sec"] #pfHome, #profilePage[data-pf-view="sec"] #pfFoot { display: none; }
+    #profilePage[data-pf-view="sec"] .pf-sec.pf-on { margin-top: 0 !important; }
+    #profilePage:not([data-pf-view="flat"]) .pf-dup { display: none; }
+    .pf-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 10px 16px; text-align: left; border-top: 1px solid var(--t-line); color: var(--t-text); }
+    .pf-row:first-child { border-top: 0; }
+    .pf-row b { display: block; font-size: 15px; font-weight: 600; }
+    .pf-row small { display: block; font-size: 13px; line-height: 1.3; color: var(--t-dim); margin-top: 1px; }
+    .pf-ic { width: 38px; height: 38px; border-radius: 12px; background: var(--t-elev); display: flex; align-items: center; justify-content: center; color: var(--t-text2); flex-shrink: 0; }
+    .pf-flash { animation: pfFlash 1.6s ease-out; border-radius: 14px; }
+    @keyframes pfFlash { 0%, 55% { box-shadow: 0 0 0 2px var(--t-text); } 100% { box-shadow: 0 0 0 2px transparent; } }
     #pfScroll { padding-bottom: env(safe-area-inset-bottom, 0px); }   /* v42: Kaydet çubuğu kalktı; alt güvenli alan kaydırmada */
     body.pf-open { overflow: hidden; }
     /* Yeni tema: bölümlü seçim düğmeleri */
@@ -1384,20 +1395,61 @@
   </div>
 
   <!-- PROFİL SAYFASI (tam ekran, yeni tema) — eski Ayarlar penceresinin yerini aldı -->
-  <div id="profilePage" class="tm fixed inset-0 z-[47] hidden flex-col text-[var(--t-text)]" role="dialog" aria-modal="true" aria-labelledby="pfTitle">
+  <div id="profilePage" data-pf-view="home" class="tm fixed inset-0 z-[47] hidden flex-col text-[var(--t-text)]" role="dialog" aria-modal="true" aria-labelledby="pfTitle">
     <div class="pf-top shrink-0 bg-[var(--t-bg)] border-b border-[var(--t-elev)] px-4 pb-2">
       <div class="max-w-lg mx-auto flex items-center gap-3 h-12">
-        <button onclick="closeProfile()" aria-label="Geri" data-t-aria="Geri" class="w-11 h-11 rounded-full bg-[var(--t-surface)] flex items-center justify-center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button onclick="pfBack()" aria-label="Geri" data-t-aria="Geri" class="w-11 h-11 rounded-full bg-[var(--t-surface)] flex items-center justify-center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
         <h2 id="pfTitle" class="t-display text-[28px] leading-none uppercase flex-1" data-t="Profil">Profil</h2>
       </div>
     </div>
     <div id="pfScroll" class="flex-1 overflow-y-auto overscroll-contain bg-[var(--t-bg)]">
       <div class="max-w-lg mx-auto px-4 pt-4 pb-32 space-y-6">
 
+        <!-- v59: PROFİL ANA EKRANI (özet + arama + bölümler); bölümler alt sayfa olarak açılır (pfOpen) -->
+        <div id="pfHome" class="space-y-4">
+          <div id="pfSummary" class="t-card rounded-[22px] p-4"></div>
+          <div class="relative">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--t-dim)] pointer-events-none" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>
+            <input id="pfSearch" type="search" autocomplete="off" enterkeyhint="search" oninput="pfSearchInput()" placeholder="Ayar ara" data-t-ph="Ayar ara" aria-label="Ayar ara" data-t-aria="Ayar ara" class="t-in" style="padding-left: 42px;" />
+          </div>
+          <div id="pfSearchRes" class="hidden t-card rounded-[22px] overflow-hidden" aria-live="polite"></div>
+          <nav id="pfNav" class="t-card rounded-[22px] overflow-hidden" aria-label="Profil bölümleri" data-t-aria="Profil bölümleri">
+          <button type="button" class="pf-row" data-pf-open="me" onclick="pfOpen('me')">
+            <span class="pf-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg></span>
+            <span class="min-w-0 flex-1"><b data-t="Kişisel bilgiler">Kişisel bilgiler</b><small data-t="Fotoğraf, cinsiyet, yaş, boy">Fotoğraf, cinsiyet, yaş, boy</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-[var(--t-dim)]" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+          </button>
+          <button type="button" class="pf-row" data-pf-open="body" onclick="pfOpen('body')">
+            <span class="pf-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r="0.8"></circle></svg></span>
+            <span class="min-w-0 flex-1"><b data-t="Kilo ve hedefler">Kilo ve hedefler</b><small data-t="Hedef, kilo, yağ oranı, su, ölçüler">Hedef, kilo, yağ oranı, su, ölçüler</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-[var(--t-dim)]" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+          </button>
+          <button type="button" class="pf-row" data-pf-open="app" onclick="pfOpen('app')">
+            <span class="pf-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 3.5v17M12 7h6M12 11h8.4M12 15h8M12 19h4"></path></svg></span>
+            <span class="min-w-0 flex-1"><b data-t="Görünüm ve dil">Görünüm ve dil</b><small data-t="Tema, dil, birim, animasyonlar">Tema, dil, birim, animasyonlar</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-[var(--t-dim)]" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+          </button>
+          <button type="button" class="pf-row" data-pf-open="train" onclick="pfOpen('train')">
+            <span class="pf-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 7v10M17.5 7v10M3.5 9.5v5M20.5 9.5v5M6.5 12h11"></path></svg></span>
+            <span class="min-w-0 flex-1"><b data-t="Antrenman ve mobilite">Antrenman ve mobilite</b><small data-t="Dinlenme, ses, ekran, ısınma, sesli yönlendirme">Dinlenme, ses, ekran, ısınma, sesli yönlendirme</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-[var(--t-dim)]" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+          </button>
+          <button type="button" class="pf-row" data-pf-open="nutri" onclick="pfOpen('nutri')">
+            <span class="pf-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.5c-1.6-1.9-4.6-2.3-6.1-.8C3.6 9 4.1 14.3 6.6 17.6c1.4 1.9 3.4 2.4 5.4 1.4 2 1 4 .5 5.4-1.4 2.5-3.3 3-8.6.7-10.9-1.5-1.5-4.5-1.1-6.1.8z"></path><path d="M12 7.5c0-2 1-3.6 3-4.3"></path></svg></span>
+            <span class="min-w-0 flex-1"><b data-t="Beslenme">Beslenme</b><small data-t="Gün geçişi, bulunamayan aramalar">Gün geçişi, bulunamayan aramalar</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-[var(--t-dim)]" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+          </button>
+          <button type="button" class="pf-row" data-pf-open="data" onclick="pfOpen('data')">
+            <span class="pf-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.8"></ellipse><path d="M5 6v6c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8V6M5 12v6c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8v-6"></path></svg></span>
+            <span class="min-w-0 flex-1"><b data-t="Veri ve yedekleme">Veri ve yedekleme</b><small data-t="Yedek dosyası, iç yedekler, kayıt alanı">Yedek dosyası, iç yedekler, kayıt alanı</small></span><i id="pfNavBkDot" class="w-2.5 h-2.5 rounded-full shrink-0 bg-[var(--t-line2)]" aria-hidden="true"></i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-[var(--t-dim)]" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+          </button>
+          <button type="button" class="pf-row" data-pf-open="about" onclick="pfOpen('about')">
+            <span class="pf-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5.5M12 7.8v.2"></path></svg></span>
+            <span class="min-w-0 flex-1"><b data-t="Hakkında">Hakkında</b><small data-t="Sağlık notu, gizlilik, hesap yöntemi, lisanslar">Sağlık notu, gizlilik, hesap yöntemi, lisanslar</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-[var(--t-dim)]" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+          </button>
+          </nav>
+        </div>
+
+        <div class="pf-sec space-y-6" data-pf-sec="me">
         <section class="space-y-2.5" aria-labelledby="pfH1">
-          <div id="pfH1" class="t-label" data-t="KİŞİSEL BİLGİLER">KİŞİSEL BİLGİLER</div>
+          <div id="pfH1" class="t-label pf-dup" data-t="KİŞİSEL BİLGİLER">KİŞİSEL BİLGİLER</div>
           <div class="t-card rounded-[22px] p-4 grid grid-cols-2 gap-2.5">
-            <div class="col-span-2 flex items-center gap-4 pb-1">
+            <div class="col-span-2 flex items-center gap-4 pb-1" data-pf-row>
               <div class="w-20 h-20 shrink-0 rounded-full bg-[var(--t-elev)] border border-[var(--t-line)] overflow-hidden flex items-center justify-center text-[var(--t-dim)]">
                 <img id="pfAvatar" alt="Profil fotoğrafı" class="hidden w-full h-full object-cover" />
                 <svg id="pfAvatarIcon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 20.5c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5"></path></svg>
@@ -1413,40 +1465,68 @@
                 </div>
               </div>
             </div>
-            <div class="col-span-2"><label for="setSex" class="t-field" data-t="Cinsiyet">Cinsiyet</label>
+            <div class="col-span-2" data-pf-row><label for="setSex" class="t-field" data-t="Cinsiyet">Cinsiyet</label>
               <select id="setSex" class="t-in"><option value="male" data-t="Erkek">Erkek</option><option value="female" data-t="Kadın">Kadın</option></select></div>
-            <div><label for="setAge" class="t-field" data-t="Yaş">Yaş</label><input id="setAge" type="text" inputmode="numeric" class="t-in text-center font-bold" /></div>
-            <div><label for="setHeight" class="t-field" data-t="Boy (cm)">Boy (cm)</label><input id="setHeight" type="text" inputmode="numeric" class="t-in text-center font-bold" /><div id="pfHeightImp" class="hidden"><span class="t-field" data-t="Boy (ft / in)">Boy (ft / in)</span><div class="grid grid-cols-2 gap-1.5"><input id="setHeightFt" type="text" inputmode="numeric" placeholder="ft" aria-label="Boy (ft)" data-t-aria="Boy (ft)" class="t-in text-center font-bold" /><input id="setHeightIn" type="text" inputmode="numeric" placeholder="in" aria-label="Boy (in)" data-t-aria="Boy (in)" class="t-in text-center font-bold" /></div></div></div>
+            <div data-pf-row><label for="setAge" class="t-field" data-t="Yaş">Yaş</label><input id="setAge" type="text" inputmode="numeric" class="t-in text-center font-bold" /></div>
+            <div data-pf-row><label for="setHeight" class="t-field" data-t="Boy (cm)">Boy (cm)</label><input id="setHeight" type="text" inputmode="numeric" class="t-in text-center font-bold" /><div id="pfHeightImp" class="hidden"><span class="t-field" data-t="Boy (ft / in)">Boy (ft / in)</span><div class="grid grid-cols-2 gap-1.5"><input id="setHeightFt" type="text" inputmode="numeric" placeholder="ft" aria-label="Boy (ft)" data-t-aria="Boy (ft)" class="t-in text-center font-bold" /><input id="setHeightIn" type="text" inputmode="numeric" placeholder="in" aria-label="Boy (in)" data-t-aria="Boy (in)" class="t-in text-center font-bold" /></div></div></div>
           </div>
         </section>
+        </div>
 
+        <div class="pf-sec space-y-6" data-pf-sec="body">
+        <section class="space-y-2.5" aria-labelledby="pfHGoal" data-pf-row>
+          <div id="pfHGoal" data-pf-title class="t-label" data-t="HEDEF">HEDEF</div>
+          <div class="t-card rounded-[22px] p-4 space-y-3">
+            <div class="t-seg grid-cols-3" role="group" aria-label="Hedef" data-t-aria="Hedef">
+              <button type="button" data-pf-goal="lose" onclick="setGoal('lose')" data-t="Ver">Ver</button>
+              <button type="button" data-pf-goal="keep" onclick="setGoal('keep')" data-t="Koru">Koru</button>
+              <button type="button" data-pf-goal="gain" onclick="setGoal('gain')" data-t="Al">Al</button>
+            </div>
+            <div id="pfLoseBox" class="flex items-center justify-between gap-3">
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Günlük kalori açığı">Günlük kalori açığı</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Günlük harcamandan düşülür.">Günlük harcamandan düşülür.</span></span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="pfDeficit(-50)" class="w-11 h-11 rounded-xl bg-[var(--t-elev)] text-[20px] font-bold" aria-label="Açığı azalt" data-t-aria="Açığı azalt">−</button>
+                <span class="w-[68px] text-center"><span id="pfDeficitVal" class="block t-display text-[22px] leading-none tabular-nums">500</span><span class="block text-[12px] text-[var(--t-dim)]">kcal</span></span>
+                <button type="button" onclick="pfDeficit(50)" class="w-11 h-11 rounded-xl bg-[var(--t-elev)] text-[20px] font-bold" aria-label="Açığı artır" data-t-aria="Açığı artır">+</button>
+              </div>
+            </div>
+            <div id="pfGainBox" class="hidden space-y-1.5">
+              <span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Kilo alma hızı">Kilo alma hızı</span>
+              <div class="t-seg grid-cols-3" role="group" aria-label="Kilo alma hızı" data-t-aria="Kilo alma hızı">
+                <button type="button" data-pf-pace="slow" onclick="setGainPace('slow')" data-t="Yavaş">Yavaş</button>
+                <button type="button" data-pf-pace="mid" onclick="setGainPace('mid')" data-t="Orta">Orta</button>
+                <button type="button" data-pf-pace="fast" onclick="setGainPace('fast')" data-t="Hızlı">Hızlı</button>
+              </div>
+            </div>
+            <p class="text-[12px] text-[var(--t-dim)]" data-t="Beslenme → Menülerim'deki hedef kartıyla aynı ayardır.">Beslenme → Menülerim'deki hedef kartıyla aynı ayardır.</p>
+          </div>
+        </section>
         <section class="space-y-2.5" aria-labelledby="pfH2">
           <div id="pfH2" class="t-label" data-t="KİLOM">KİLOM</div>
           <div class="t-card rounded-[22px] p-4 space-y-3">
-            <div class="flex items-end gap-2.5">
+            <div class="flex items-end gap-2.5" data-pf-row>
               <div class="flex-1"><label for="pfWeight" class="t-field" data-t="Güncel kilo (kg)">Güncel kilo (kg)</label><input id="pfWeight" type="text" inputmode="decimal" oninput="updateWaterAutoHint()" class="t-in text-center font-bold text-[20px]" /></div>
               <button onclick="profileLogWeight()" class="t-btn-outline h-12 px-4 rounded-xl text-[14px] shrink-0" data-t="Tartıyı kaydet">Tartıyı kaydet</button>
             </div>
             <div id="pfWeightBox"></div>
           </div>
         </section>
-
         <section class="space-y-2.5" aria-labelledby="pfH3">
           <div id="pfH3" class="t-label" data-t="HEDEFLERİM">HEDEFLERİM</div>
           <div class="t-card rounded-[22px] p-4 space-y-3">
             <div class="grid grid-cols-2 gap-2.5 items-end">
-              <div><label for="setTarget" class="t-field" data-t="Hedef kilo (kg)">Hedef kilo (kg)</label><input id="setTarget" type="text" inputmode="decimal" class="t-in text-center font-bold" /></div>
-              <div><label for="setWater" class="t-field" data-t="Su hedefi (L)">Su hedefi (L)</label><input id="setWater" type="text" inputmode="decimal" class="t-in text-center font-bold" /></div>
-              <div><label for="setBf" class="t-field" data-t="Güncel yağ oranı (%)">Güncel yağ oranı (%)</label><input id="setBf" type="text" inputmode="decimal" placeholder="—" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
-              <div><label for="setTargetBf" class="t-field" data-t="Hedef yağ oranı (%)">Hedef yağ oranı (%)</label><input id="setTargetBf" type="text" inputmode="decimal" placeholder="Örn: 15" data-t-ph="Örn: 15" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
+              <div data-pf-row><label for="setTarget" class="t-field" data-t="Hedef kilo (kg)">Hedef kilo (kg)</label><input id="setTarget" type="text" inputmode="decimal" class="t-in text-center font-bold" /></div>
+              <div data-pf-row><label for="setWater" class="t-field" data-t="Su hedefi (L)">Su hedefi (L)</label><input id="setWater" type="text" inputmode="decimal" class="t-in text-center font-bold" /></div>
+              <div data-pf-row><label for="setBf" class="t-field" data-t="Güncel yağ oranı (%)">Güncel yağ oranı (%)</label><input id="setBf" type="text" inputmode="decimal" placeholder="—" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
+              <div data-pf-row><label for="setTargetBf" class="t-field" data-t="Hedef yağ oranı (%)">Hedef yağ oranı (%)</label><input id="setTargetBf" type="text" inputmode="decimal" placeholder="Örn: 15" data-t-ph="Örn: 15" oninput="updateBfHint()" class="t-in text-center font-bold" /></div>
             </div>
             <p class="text-[12px] text-[var(--t-dim)] -mt-1" data-t="Yağ oranını bilmiyorsan boş bırakabilirsin.">Yağ oranını bilmiyorsan boş bırakabilirsin.</p>
             <div class="space-y-2.5">
-              <div><label for="setActivity" class="t-field" data-t="Hareketlilik">Hareketlilik</label><select id="setActivity" class="t-in font-bold"><option value="low" data-t="Az (masa başı)">Az (masa başı)</option><option value="mid" data-t="Orta">Orta</option><option value="high" data-t="Çok (ayakta iş)">Çok (ayakta iş)</option></select></div>
-              <div><label for="setProtein" class="t-field" data-t="Protein">Protein</label><select id="setProtein" class="t-in font-bold"><option value="std" data-t="Standart">Standart</option><option value="high" data-t="Yüksek">Yüksek</option></select></div>
+              <div data-pf-row><label for="setActivity" class="t-field" data-t="Hareketlilik">Hareketlilik</label><select id="setActivity" class="t-in font-bold"><option value="low" data-t="Az (masa başı)">Az (masa başı)</option><option value="mid" data-t="Orta">Orta</option><option value="high" data-t="Çok (ayakta iş)">Çok (ayakta iş)</option></select></div>
+              <div data-pf-row><label for="setProtein" class="t-field" data-t="Protein">Protein</label><select id="setProtein" class="t-in font-bold"><option value="std" data-t="Standart">Standart</option><option value="high" data-t="Yüksek">Yüksek</option></select></div>
             </div>
             <p class="text-[12px] text-[var(--t-dim)] -mt-1" data-t="Standart, araştırmalara göre yeterli miktardır. Yüksek, daha fazlasını isteyenler için.">Standart, araştırmalara göre yeterli miktardır. Yüksek, daha fazlasını isteyenler için.</p>
-            <label class="flex items-center justify-between gap-3 min-h-[52px]">
+            <label class="flex items-center justify-between gap-3 min-h-[52px]" data-pf-row>
               <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Su hedefi kiloya göre">Su hedefi kiloya göre</span><span id="setWaterHint" class="block text-[13px] text-[var(--t-dim)]">Kilo × 35 ml; listende kreatin varsa +0,5 L.</span></span>
               <input id="setWaterAuto" type="checkbox" class="t-sw" onchange="updateWaterAutoHint()" />
             </label>
@@ -1454,17 +1534,18 @@
             <div id="pfTargetsBox"></div>
           </div>
         </section>
-
         <section class="space-y-2.5" aria-labelledby="pfH4">
-          <div class="flex items-center justify-between"><span id="pfH4" class="t-label" data-t="VÜCUT ÖLÇÜLERİM">VÜCUT ÖLÇÜLERİM</span>
+          <div class="flex items-center justify-between" data-pf-row><span id="pfH4" data-pf-title class="t-label" data-t="VÜCUT ÖLÇÜLERİM">VÜCUT ÖLÇÜLERİM</span>
             <button onclick="openMeasureModal()" class="t-btn-ghost h-11 px-4 rounded-xl text-[13px]" data-t="+ Ölçü ekle">+ Ölçü ekle</button></div>
           <div id="pfMeasureBox"></div>
         </section>
+        </div>
 
-        <section class="space-y-2.5" aria-labelledby="pfH5">
-          <div id="pfH5" class="t-label" data-t="AYARLAR">AYARLAR</div>
+        <div class="pf-sec space-y-6" data-pf-sec="app">
+        <section class="space-y-2.5" aria-labelledby="pfHApp">
+          <div id="pfHApp" class="t-label pf-dup" data-t="GÖRÜNÜM VE DİL">GÖRÜNÜM VE DİL</div>
           <div class="t-card rounded-[22px] overflow-hidden">
-            <div class="px-4 py-3 space-y-2.5" id="pfTheme">
+            <div class="px-4 py-3 space-y-2.5" id="pfTheme" data-pf-row>
               <div><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Görünüm">Görünüm</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Sistem: iPhone'un ayarına uyar (gündüz aydınlık, gece koyu).">Sistem: iPhone'un ayarına uyar (gündüz aydınlık, gece koyu).</span></div>
               <div class="t-seg grid-cols-3" role="group" aria-label="Görünüm" data-t-aria="Görünüm">
                 <button type="button" data-theme-opt="system" onclick="setThemeOpt('system', this)" data-t="Sistem">Sistem</button>
@@ -1472,74 +1553,100 @@
                 <button type="button" data-theme-opt="light" onclick="setThemeOpt('light', this)" data-t="Aydınlık">Aydınlık</button>
               </div>
             </div>
-            <div class="px-4 py-3 space-y-2.5 border-t border-[var(--t-line)] hidden" id="pfLang">
+            <div class="px-4 py-3 space-y-2.5 border-t border-[var(--t-line)] hidden" id="pfLang" data-pf-row>
               <div><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Dil">Dil</span></div>
               <div class="t-seg grid-cols-2" role="group" aria-label="Dil" data-t-aria="Dil">
                 <button type="button" data-lang-opt="tr" onclick="setLang('tr')">Türkçe</button>
                 <button type="button" data-lang-opt="en" onclick="setLang('en')">English</button>
               </div>
             </div>
-            <div class="px-4 py-3 space-y-2.5 border-t border-[var(--t-line)]" id="pfUnits">
+            <div class="px-4 py-3 space-y-2.5 border-t border-[var(--t-line)]" id="pfUnits" data-pf-row>
               <div><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Birim">Birim</span></div>
               <div class="t-seg grid-cols-2" role="group" aria-label="Birim" data-t-aria="Birim">
                 <button type="button" data-units-opt="metric" onclick="setUnits('metric')">kg, cm</button>
                 <button type="button" data-units-opt="imperial" onclick="setUnits('imperial')">lb, ft, in</button>
               </div>
             </div>
-            <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
+            <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Animasyonlar">Animasyonlar</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Halkalar, sayılar, set tiki ve tema geçişi kısa ve hafif hareketle değişir.">Halkalar, sayılar, set tiki ve tema geçişi kısa ve hafif hareketle değişir.</span></span>
+              <input id="setAnim" type="checkbox" class="t-sw" />
+            </label>
+            <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Açılış animasyonu">Açılış animasyonu</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Uygulama açılırken logo kısa bir geçişle görünür.">Uygulama açılırken logo kısa bir geçişle görünür.</span></span>
+              <input id="setSplash" type="checkbox" class="t-sw" />
+            </label>
+          </div>
+        </section>
+        </div>
+
+        <div class="pf-sec space-y-6" data-pf-sec="train">
+        <section class="space-y-2.5" aria-labelledby="pfHTrain">
+          <div id="pfHTrain" class="t-label pf-dup" data-t="ANTRENMAN VE MOBİLİTE">ANTRENMAN VE MOBİLİTE</div>
+          <div class="t-card rounded-[22px] overflow-hidden">
+            <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
               <label for="setRest" class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Varsayılan dinlenme">Varsayılan dinlenme</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Saniye. Hareketin kendi süresi yoksa kullanılır.">Saniye. Hareketin kendi süresi yoksa kullanılır.</span></label>
               <input id="setRest" type="text" inputmode="numeric" class="t-in text-center font-bold" style="width: 84px;" />
             </div>
-        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0">
-          <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Sayaç bitince ses">Sayaç bitince ses</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Telefon sessiz moddaysa ses çıkmaz.">Telefon sessiz moddaysa ses çıkmaz.</span></span>
-          <input id="setSound" type="checkbox" class="t-sw" />
-        </label>
-        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0">
-          <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Antrenmanda ekranı açık tut">Antrenmanda ekranı açık tut</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Antrenman sekmesindeyken ekran kararmaz.">Antrenman sekmesindeyken ekran kararmaz.</span></span>
-          <input id="setAwake" type="checkbox" class="t-sw" />
-        </label>
-        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
-          <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Antrenmanda ısınma kartı">Antrenmanda ısınma kartı</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="O günün kaslarına uygun, mobilite rutinlerindeki dinamik hareketlerden kısa ısınma önerir.">O günün kaslarına uygun, mobilite rutinlerindeki dinamik hareketlerden kısa ısınma önerir.</span></span>
-          <input id="setWarmup" type="checkbox" class="t-sw" />
-        </label>
-        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
-          <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Mobilitede sesli yönlendirme">Mobilitede sesli yönlendirme</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Seansta hareketin adını, tarafı ve süreyi söyler. iPhone'da yalnızca uygulama açıkken ve telefon sessizde değilken konuşur.">Seansta hareketin adını, tarafı ve süreyi söyler. iPhone'da yalnızca uygulama açıkken ve telefon sessizde değilken konuşur.</span></span>
-          <input id="setMobVoice" type="checkbox" class="t-sw" />
-        </label>
-        <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
-          <label for="setDayStart" class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Gün geçişi">Gün geçişi</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.">Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.</span></label>
-          <select id="setDayStart" class="t-in font-bold shrink-0" style="width: 96px;">
-            <option value="0">00:00</option><option value="1">01:00</option><option value="2">02:00</option><option value="3">03:00</option><option value="4">04:00</option><option value="5">05:00</option>
-          </select>
-        </div>
-        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0">
-          <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Açılış animasyonu">Açılış animasyonu</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Uygulama açılırken logo kısa bir geçişle görünür.">Uygulama açılırken logo kısa bir geçişle görünür.</span></span>
-          <input id="setSplash" type="checkbox" class="t-sw" />
-        </label>
-        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
-          <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Animasyonlar">Animasyonlar</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Halkalar, sayılar, set tiki ve tema geçişi kısa ve hafif hareketle değişir.">Halkalar, sayılar, set tiki ve tema geçişi kısa ve hafif hareketle değişir.</span></span>
-          <input id="setAnim" type="checkbox" class="t-sw" />
-        </label>
+            <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Sayaç bitince ses">Sayaç bitince ses</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Telefon sessiz moddaysa ses çıkmaz.">Telefon sessiz moddaysa ses çıkmaz.</span></span>
+              <input id="setSound" type="checkbox" class="t-sw" />
+            </label>
+            <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Antrenmanda ekranı açık tut">Antrenmanda ekranı açık tut</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Antrenman sekmesindeyken ekran kararmaz.">Antrenman sekmesindeyken ekran kararmaz.</span></span>
+              <input id="setAwake" type="checkbox" class="t-sw" />
+            </label>
+            <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Antrenmanda ısınma kartı">Antrenmanda ısınma kartı</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="O günün kaslarına uygun, mobilite rutinlerindeki dinamik hareketlerden kısa ısınma önerir.">O günün kaslarına uygun, mobilite rutinlerindeki dinamik hareketlerden kısa ısınma önerir.</span></span>
+              <input id="setWarmup" type="checkbox" class="t-sw" />
+            </label>
+            <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Mobilitede sesli yönlendirme">Mobilitede sesli yönlendirme</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Seansta hareketin adını, tarafı ve süreyi söyler. iPhone'da yalnızca uygulama açıkken ve telefon sessizde değilken konuşur.">Seansta hareketin adını, tarafı ve süreyi söyler. iPhone'da yalnızca uygulama açıkken ve telefon sessizde değilken konuşur.</span></span>
+              <input id="setMobVoice" type="checkbox" class="t-sw" />
+            </label>
           </div>
         </section>
+        </div>
 
-        <section class="space-y-2.5" aria-labelledby="pfH6">
-          <div id="pfH6" class="t-label" data-t="YEDEKLEME">YEDEKLEME</div>
+        <div class="pf-sec space-y-6" data-pf-sec="nutri">
+        <section class="space-y-2.5" aria-labelledby="pfHNutri">
+          <div id="pfHNutri" class="t-label pf-dup" data-t="BESLENME">BESLENME</div>
+          <div class="t-card rounded-[22px] overflow-hidden">
+            <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <label for="setDayStart" class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Gün geçişi">Gün geçişi</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.">Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.</span></label>
+              <select id="setDayStart" class="t-in font-bold shrink-0" style="width: 96px;">
+                <option value="0">00:00</option><option value="1">01:00</option><option value="2">02:00</option><option value="3">03:00</option><option value="4">04:00</option><option value="5">05:00</option>
+              </select>
+            </div>
+          </div>
+        </section>
+        <section class="space-y-2.5" aria-labelledby="pfH7" data-pf-row>
+          <div id="pfH7" data-pf-title class="t-label" data-t="BULUNAMAYAN ARAMALAR">BULUNAMAYAN ARAMALAR</div>
           <div class="t-card rounded-[22px] p-4 space-y-3">
+            <p class="text-[13px] text-[var(--t-muted)]" data-t="Besinler'de aradığın ama bulamadığın kelimeler burada (yalnızca bu telefonda tutulur). Eksikleri özel besin olarak ekleyebilirsin.">Besinler'de aradığın ama bulamadığın kelimeler burada (yalnızca bu telefonda tutulur). Eksikleri özel besin olarak ekleyebilirsin.</p>
+            <div id="missList" class="flex flex-wrap gap-2"></div>
+            <button id="missClear" onclick="clearMissSearches()" class="t-btn-ghost w-full h-11 rounded-xl text-[14px]" data-t="Listeyi temizle">Listeyi temizle</button>
+          </div>
+        </section>
+        </div>
+
+        <div class="pf-sec space-y-6" data-pf-sec="data">
+        <section class="space-y-2.5" aria-labelledby="pfH6">
+          <div id="pfH6" class="t-label pf-dup" data-t="YEDEKLEME">YEDEKLEME</div>
+          <div class="t-card rounded-[22px] p-4 space-y-3" data-pf-row>
             <div id="pfBackupStatus" class="-my-1"></div>
             <p id="lastBackupText" class="text-[13px] text-[var(--t-muted)]">Henüz yedek alınmadı.</p>
             <p class="text-[12.5px] leading-snug text-[var(--t-dim)]" data-t="İç yedekler bu telefonda durur; telefon kaybolursa ya da uygulama silinirse onlar da gider. Ara sıra yedek dosyası kaydedip iCloud Drive'a koy.">İç yedekler bu telefonda durur; telefon kaybolursa ya da uygulama silinirse onlar da gider. Ara sıra yedek dosyası kaydedip iCloud Drive'a koy.</p>
-            <button onclick="exportBackupFile()" class="t-btn w-full h-[52px] rounded-xl text-[15px]" data-t="Yedek dosyası kaydet">Yedek dosyası kaydet</button>
+            <button onclick="exportBackupFile()" data-pf-title class="t-btn w-full h-[52px] rounded-xl text-[15px]" data-t="Yedek dosyası kaydet">Yedek dosyası kaydet</button>
             <label class="t-btn-ghost w-full h-12 rounded-xl text-[14px] flex items-center justify-center text-center cursor-pointer">
               <span data-t="Dosyadan geri yükle">Dosyadan geri yükle</span>
               <input type="file" accept="application/json,.json,text/plain,.txt" class="hidden" onchange="importBackupFile(event)" />
             </label>
-            <div id="pfStorage">
-              <div class="flex items-baseline justify-between text-[13px]"><span class="text-[var(--t-muted)]" data-t="Telefondaki kayıt alanı">Telefondaki kayıt alanı</span><span id="pfStorageTxt" class="font-semibold tabular-nums">%0 dolu</span></div>
+            <div id="pfStorage" data-pf-row>
+              <div class="flex items-baseline justify-between text-[13px]"><span class="text-[var(--t-muted)]" data-pf-title data-t="Telefondaki kayıt alanı">Telefondaki kayıt alanı</span><span id="pfStorageTxt" class="font-semibold tabular-nums">%0 dolu</span></div>
               <div class="h-1.5 rounded-full bg-[var(--t-elev)] mt-1.5 overflow-hidden" aria-hidden="true"><i id="pfStorageBar" class="block h-full rounded-full bg-[var(--t-text2)]" style="width:0%"></i></div>
               <p id="pfStorageWarn" class="hidden text-[12px] text-[var(--t-warn-text)] mt-1.5"></p>
             </div>
-            <details class="bg-[var(--t-well)] border border-[var(--t-line)] rounded-2xl px-3.5 py-2 text-[13px]">
+            <details data-pf-row class="bg-[var(--t-well)] border border-[var(--t-line)] rounded-2xl px-3.5 py-2 text-[13px]">
               <summary class="text-[var(--t-muted)] cursor-pointer min-h-[40px] flex items-center" data-t="Yedek kodu ile (kopyala / yapıştır)">Yedek kodu ile (kopyala / yapıştır)</summary>
               <textarea id="backupText" rows="4" class="w-full mt-2 p-2.5 text-xs font-mono"></textarea>
               <div class="grid grid-cols-2 gap-2 mt-2 mb-1">
@@ -1547,8 +1654,8 @@
                 <button onclick="restoreBackupFromText()" class="t-btn-outline h-11 rounded-xl" data-t="Kodu yükle">Kodu yükle</button>
               </div>
             </details>
-            <details class="bg-[var(--t-elev)] rounded-2xl px-3.5 py-1">
-              <summary class="min-h-[48px] flex items-center justify-between cursor-pointer text-[14px] font-semibold text-[var(--t-text)]"><span data-t="Otomatik iç yedekler">Otomatik iç yedekler</span><span class="text-[12px] font-normal text-[var(--t-dim)]" data-t="son 7 gece + 4 hafta">son 7 gece + 4 hafta</span></summary>
+            <details data-pf-row class="bg-[var(--t-elev)] rounded-2xl px-3.5 py-1">
+              <summary class="min-h-[48px] flex items-center justify-between cursor-pointer text-[14px] font-semibold text-[var(--t-text)]"><span data-pf-title data-t="Otomatik iç yedekler">Otomatik iç yedekler</span><span class="text-[12px] font-normal text-[var(--t-dim)]" data-t="son 7 gece + 4 hafta">son 7 gece + 4 hafta</span></summary>
               <p class="text-[12.5px] text-[var(--t-dim)] pb-1" data-t="Uygulama her gün bütün verinin bir kopyasını telefonda saklar. Bir şey ters giderse o günkü hâline dönebilirsin.">Uygulama her gün bütün verinin bir kopyasını telefonda saklar. Bir şey ters giderse o günkü hâline dönebilirsin.</p>
               <div id="pfSnaps" class="pb-2"></div>
             </details>
@@ -1562,34 +1669,28 @@
             </div>
           </div>
         </section>
+        </div>
 
-        <section class="space-y-2.5" aria-labelledby="pfH7">
-          <div id="pfH7" class="t-label" data-t="BULUNAMAYAN ARAMALAR">BULUNAMAYAN ARAMALAR</div>
-          <div class="t-card rounded-[22px] p-4 space-y-3">
-            <p class="text-[13px] text-[var(--t-muted)]" data-t="Besinler'de aradığın ama bulamadığın kelimeler burada (yalnızca bu telefonda tutulur). Eksikleri özel besin olarak ekleyebilirsin.">Besinler'de aradığın ama bulamadığın kelimeler burada (yalnızca bu telefonda tutulur). Eksikleri özel besin olarak ekleyebilirsin.</p>
-            <div id="missList" class="flex flex-wrap gap-2"></div>
-            <button id="missClear" onclick="clearMissSearches()" class="t-btn-ghost w-full h-11 rounded-xl text-[14px]" data-t="Listeyi temizle">Listeyi temizle</button>
-          </div>
-        </section>
-
+        <div class="pf-sec space-y-6" data-pf-sec="about">
         <section class="space-y-2.5" aria-labelledby="pfH8">
-          <div id="pfH8" class="t-label" data-t="HAKKINDA">HAKKINDA</div>
+          <div id="pfH8" class="t-label pf-dup" data-t="HAKKINDA">HAKKINDA</div>
           <div id="pfAbout" class="t-card rounded-[22px] p-4 space-y-3">
             <p id="pfAboutHealth" class="text-[13px] leading-snug text-[var(--t-muted)]"></p>
             <p id="pfAboutPrivacy" class="text-[13px] leading-snug text-[var(--t-muted)]"></p>
-            <details id="pfMethod" class="bg-[var(--t-elev)] rounded-2xl px-3.5 py-1">
+            <details id="pfMethod" data-pf-row class="bg-[var(--t-elev)] rounded-2xl px-3.5 py-1">
               <summary class="min-h-[48px] flex items-center cursor-pointer text-[14px] font-semibold text-[var(--t-text)]" data-t="Hesap yöntemi ve kaynaklar">Hesap yöntemi ve kaynaklar</summary>
               <div id="pfMethodBody" class="text-[12.5px] leading-snug text-[var(--t-muted)] space-y-2 pb-3"></div>
             </details>
-            <details id="pfLicenses" class="bg-[var(--t-elev)] rounded-2xl px-3.5 py-1">
+            <details id="pfLicenses" data-pf-row class="bg-[var(--t-elev)] rounded-2xl px-3.5 py-1">
               <summary class="min-h-[48px] flex items-center cursor-pointer text-[14px] font-semibold text-[var(--t-text)]" data-t="Lisanslar">Lisanslar</summary>
               <ul id="pfLicList" class="text-[12.5px] leading-snug text-[var(--t-muted)] space-y-1.5 pb-3 list-disc pl-4"></ul>
             </details>
           </div>
         </section>
+        </div>
 
-        <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v58</span>
+        <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v59</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

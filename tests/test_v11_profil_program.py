@@ -199,6 +199,7 @@ try:
     # Tartı kaydı
     pg.click("#profileBtn"); pg.wait_for_timeout(150)
     nw = len(st(pg)["weightLogs"])
+    pg.evaluate("$('pfWeight').scrollIntoView({ block: 'center' })")   # v59: düz düzende düğme ekranın altında, bildirimin altında kalmasın
     pg.fill("#pfWeight", "100,2"); pg.click("#profilePage >> text=Tartıyı kaydet"); pg.wait_for_timeout(150)
     s = st(pg); check(len(s["weightLogs"]) == nw + 1 and s["weightLogs"][-1]["weight"] == 100.2 and s["weight"] == 100.2, "Profilden tartı kaydı ekleniyor")
     check("100,2 kg" in pg.inner_text("#pfWeightBox"), "son tartı Profilde hemen görünüyor")
