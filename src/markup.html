@@ -169,7 +169,7 @@
        Şekiller: scripts/simge/ayk-yazi.svg (sahibin logosundan izlenmiş; ilk yol harfler, ikinci yol "+"). */
     #splash { position: fixed; inset: 0; z-index: 99999; background: #000; overflow: hidden; animation: aykSpOut .24s linear 1.21s forwards; will-change: opacity; }
     #splash .sp-cam { position: absolute; left: 50%; top: 50%; width: 1600px; height: 1600px; margin: -800px 0 0 -800px; transform-origin: 50% 50%;
-      transform: translate(0, 1.6px) scale(0.1944); animation: aykSpCam 1.45s linear both; will-change: transform, opacity; pointer-events: none; }
+      transform: translate(0, 1.6px) scale(0.1944); animation: aykSpCam 1.45s linear both; pointer-events: none; }
     #splash svg { display: block; width: 1600px; height: 1600px; shape-rendering: geometricPrecision; overflow: visible; }
     #splash .sp-ayk { animation: aykSpLetters .27s cubic-bezier(.33,1,.68,1) .03s both; }
     #splash .sp-plus { animation: aykSpPlus .26s cubic-bezier(.34,1.56,.64,1) .12s both; }
@@ -199,7 +199,7 @@
       94.83% { transform: translate(-239.4px,0.2px) scale(0.5338); }
       96.55% { transform: translate(-324.9px,0.3px) scale(0.7240); }
       98.28% { transform: translate(-536.0px,0.4px) scale(1.1944); }
-      100.00% { transform: translate(-1885.0px,1.5px) scale(4.2000); }
+      100.00% { transform: translate(-898.0px,0.7px) scale(2.0000); }   /* v55 inceleme: 4,2 yerine 2,0 (iPhone bellek; bu anda katman zaten solmuş) */
     }
     @keyframes aykSpLetters { from { opacity: 0; transform: translateY(76px); } to { opacity: 1; transform: none; } }
     @keyframes aykSpPlus { from { opacity: 0; transform: translateX(131px); } 45% { opacity: 1; } to { opacity: 1; transform: none; } }

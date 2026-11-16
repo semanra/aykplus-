@@ -406,8 +406,8 @@ function normalizeStateInner(raw) {
   if (s.settings.units !== "metric" && s.settings.units !== "imperial") s.settings.units = "metric";   // v53
   s.settings.proteinHigh = s.settings.proteinHigh === true;
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
-  s.settings.warmupCard = s.settings.warmupCard !== false;
-  s.settings.anim = s.settings.anim !== false;   // v55: uygulama içi animasyonlar (varsayılan açık)   // v40: antrenmanda ısınma kartı (gizlenebilir)
+  s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
+  s.settings.anim = s.settings.anim !== false;   // v55: uygulama içi animasyonlar (varsayılan açık)
   s.settings.scaleOn = !!s.settings.scaleOn;
   s.settings.scaleBase = num(s.settings.scaleBase, 0);
   if (s.settings.scaleOn && !(s.settings.scaleBase > 0)) s.settings.scaleOn = false;
