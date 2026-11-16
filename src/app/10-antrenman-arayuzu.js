@@ -344,7 +344,7 @@ function gymActiveHtml() {
       <div id="exCard_${exIdx}" class="t-card rounded-[22px] p-4 space-y-3" style="scroll-margin-top: 9rem;">
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0 space-y-1.5">
-            <div class="t-label">${t("HAREKET {n} / {total}", { n: exIdx + 1, total })}${allDone ? ` <span class="t-accent">· ${t("TAMAMLANDI")}</span>` : ""}</div>
+            <div class="t-label">${t("HAREKET {n} / {total}", { n: exIdx + 1, total })}${allDone ? ` <span class="t-accent" data-ex-done>· ${t("TAMAMLANDI")}</span>` : ""}</div>
             <div class="text-[21px] font-bold leading-tight">${esc(exNameL(ex.name))}</div>
             <div class="flex flex-wrap gap-1.5">
               ${ex.targetInfo ? `<span class="t-chip-accent">${esc(targetL(ex.targetInfo))}</span>` : ""}
@@ -615,6 +615,7 @@ function renderGym() {
     : gymSubNav() + (state.gymView === "program" ? gymProgramHtml() : state.gymView === "library" ? gymLibraryHtml() : state.gymView === "history" ? gymHistoryHtml() : gymTodayHtml());
   $("gymRoot").innerHTML = html;
   updateActiveProgress();
+  if (active && typeof animSuggIn === "function") animSuggIn();   // v57 ANİM: kilo önerisi (ilk göründüğünde)
 }
 function updateActiveProgress() {
   const progEl = $("gymProgText");
@@ -627,6 +628,48 @@ function updateActiveProgress() {
   if (el) el.textContent = state.workoutStartedAt ? fmtDuration(Date.now() - state.workoutStartedAt) : "00:00";
 }
 setInterval(() => { if (state.activeTab === "gym" && state.gymActive && document.visibilityState === "visible") { const el = $("gymElapsed"); if (el && state.workoutStartedAt) el.textContent = fmtDuration(Date.now() - state.workoutStartedAt); } }, 1000);
+
+// --- v57: ANTRENMAN ÖZETİ (bitişte alttan pencere; kayıt v56 ile aynı, yalnızca gösterim). Değerler kaydedilen
+// workoutLogs girdisinden; tonaj birim ayarına göre (wRaw / wUnit). Animasyon kapalıyken de açılır, sayılar anında son hâlde.
+function openFinishSummary(li, prList) {
+  const log = state.workoutLogs[li];
+  if (!log) return;
+  const vol = Math.round(wRaw(num(log.volume)));
+  const stats = [
+    { id: "finDur", label: t("Süre"), v: num(log.durationMin), txt: num(log.durationMin) ? fmtMinutes(num(log.durationMin)) : "—", fmt: v => fmtMinutes(v), unit: "" },
+    { id: "finVol", label: t("Tonaj"), v: vol, txt: vol.toLocaleString(locale()), fmt: v => Math.round(v).toLocaleString(locale()), unit: wUnit() },
+    { id: "finSets", label: t("Tamamlanan set"), v: num(log.sets), txt: String(num(log.sets)), fmt: v => String(Math.round(v)), unit: "" }
+  ];
+  if (num(log.cardioMin) > 0) stats.push({ id: "finCardio", label: t("Kardiyo"), v: num(log.cardioMin), txt: fmtNum(num(log.cardioMin)), fmt: v => fmtNum(round1(v)), unit: t("dk") });
+  stats.push({ id: "finPrs", label: t("Rekor"), v: num(log.prs), txt: String(num(log.prs)), fmt: v => String(Math.round(v)), unit: "" });
+  const tiles = stats.map((x, i) => `<div data-fin-stat class="rounded-2xl bg-[var(--w-elev)] px-3.5 py-3 min-w-0 ${stats.length % 2 && i === stats.length - 1 ? "col-span-2" : ""}">
+      <div class="text-[12px] font-semibold text-[var(--w-muted)] truncate">${x.label}</div>
+      <div class="flex items-baseline gap-1 mt-1 min-w-0"><b id="${x.id}" class="t-display text-[28px] leading-none text-[var(--w-text)] tabular-nums truncate">${esc(x.txt)}</b>${x.unit ? `<span class="text-[13px] text-[var(--w-muted)]">${esc(x.unit)}</span>` : ""}</div>
+    </div>`).join("");
+  const prs = (prList || []).map(p => `<div data-fin-pr class="flex items-center gap-2.5 min-h-[44px] border-b border-[var(--w-line)] last:border-0">
+      <span data-fin-star class="text-[var(--t-warn-icon)] text-[16px] leading-none" aria-hidden="true">★</span>
+      <span class="flex-1 min-w-0 truncate text-[15px] font-semibold text-[var(--w-text)]">${esc(exNameL(p.name))}</span>
+      <span class="shrink-0 text-[13px] text-[var(--w-muted)] tabular-nums">${esc(fmtW(p.kg))} × ${p.reps}</span>
+    </div>`).join("");
+  $("finBody").innerHTML = `
+    <div class="w-10 h-1.5 rounded-full bg-[var(--w-line)] mx-auto mb-3"></div>
+    <div class="flex items-center gap-3">
+      <span data-fin-icon class="w-12 h-12 shrink-0 rounded-full grid place-items-center bg-[rgba(var(--t-acc-rgb),0.15)] text-[var(--w-acc)]">${svgI("check", 26, 2.6)}</span>
+      <div class="flex-1 min-w-0">
+        <h3 id="finTitle" class="text-[21px] font-extrabold leading-tight text-[var(--w-text)]">${t("Antrenman tamamlandı")}</h3>
+        <div class="text-[14px] text-[var(--w-muted)] truncate">${esc(log.dayName || "")}</div>
+      </div>
+      <button onclick="closeModal('finishModal')" aria-label="${t("Kapat")}" class="w-11 h-11 shrink-0 rounded-full bg-[var(--w-elev)] text-[var(--w-muted)] flex items-center justify-center">${svgI("x", 20, 2.2)}</button>
+    </div>
+    <div id="finStats" class="grid grid-cols-2 gap-2 mt-4">${tiles}</div>
+    ${prs ? `<div id="finPrList" class="mt-3 rounded-2xl bg-[var(--w-elev)] px-3.5 py-1"><div class="text-[12px] font-semibold text-[var(--w-muted)] pt-2.5">${t("Yeni rekorlar")}</div>${prs}</div>` : ""}
+    <div class="grid grid-cols-2 gap-2.5 mt-5">
+      <button id="finClose" onclick="closeModal('finishModal')" class="h-[52px] rounded-2xl bg-[var(--w-elev)] text-[var(--w-text)] text-[15px] font-bold">${t("Kapat")}</button>
+      <button id="finShare" onclick="closeModal('finishModal'); openShareCard(${li})" class="w-btn h-[52px] rounded-2xl text-[15px]">${t("Paylaş")}</button>
+    </div>`;
+  openModal("finishModal");
+  if (typeof animFinishIn === "function") animFinishIn(stats);   // v57 ANİM: antrenman özeti
+}
 
 // --- Hareket menüsü (alttan açılan) ---
 let sheetIdx = -1;

@@ -144,7 +144,7 @@ try:
     pg.click("#uiDlgCancel"); pg.wait_for_timeout(100)
     check(len(st(pg)["workoutLogs"]) == nl and pg.evaluate("state.gymActive"), "Vazgeç antrenmanı kaydetmiyor")
     pg.locator("button", has_text="Antrenmanı Bitir ve Kaydet").first.click(); pg.wait_for_timeout(100)
-    pg.click("#uiDlgOk"); pg.wait_for_timeout(200)
+    pg.click("#uiDlgOk"); pg.wait_for_timeout(200); pg.evaluate("closeModal('finishModal')")   # v57: bitişte özet penceresi açılır; sonraki dokunuşlar için kapatılır
     check(len(st(pg)["workoutLogs"]) == nl + 1, "Kaydet antrenmanı kaydediyor")
     check(native == [], "antrenman bölümünde hiç sistem kutusu açılmadı " + str(native))
 

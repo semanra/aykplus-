@@ -35,7 +35,7 @@ with sync_playwright() as p:
     print("after finishing ex0 -> ex1 card top:", round(top), "(~150 = scrolled into view)", "ring now in ex1:", pg.locator("#exCard_1 .ring-inset").count())
     print("started:", bool(st(pg)["workoutStartedAt"]), "elapsed text:", pg.inner_text("#gymElapsed"))
     pg.evaluate("()=>{state.workoutStartedAt = Date.now()-45*60000; saveState();}")
-    pg.locator("button", has_text="Antrenmanı Bitir ve Kaydet").first.click(); pg.click("#uiDlgOk"); pg.wait_for_timeout(300)
+    pg.locator("button", has_text="Antrenmanı Bitir ve Kaydet").first.click(); pg.click("#uiDlgOk"); pg.wait_for_timeout(300); pg.evaluate("closeModal('finishModal')")   # v57: bitişte özet penceresi açılır; sonraki dokunuşlar için kapatılır
     s=st(pg); print("log duration:", s["workoutLogs"][-1]["durationMin"], "dayId:", s["workoutLogs"][-1]["dayId"], "startedAt cleared:", s["workoutStartedAt"])
     print("toast has share:", pg.locator("#toastWrap button", has_text="Paylaş").count())
     pg.evaluate("setGymView('history')"); pg.wait_for_timeout(100); print("history:", pg.inner_text("#workoutHistoryList").replace("\n"," | ")[:160])

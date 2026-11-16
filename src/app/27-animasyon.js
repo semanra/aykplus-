@@ -450,3 +450,177 @@ function animUndoReturn(snap) {
   if (!el || !el.matches(r.sel)) return;
   animPlay(el, [{ opacity: 0, transform: "translateX(-40%)" }, { opacity: 1, transform: "none" }], { duration: 240, easing: ANIM_EASE });
 }
+
+// ============================================================================
+// v57 — ANİMASYONLAR 2. TUR (Antrenman, Mobilite, İlerleme). Kurallar aynı: animOK() false → hiçbir şey eklenmez.
+// ============================================================================
+
+/* v57 ANİM: antrenman özeti */
+// Bitiş penceresinde istatistik kutuları sırayla belirir, sayılar 0'dan sayar (animNum; son metin çizimin yazdığı
+// metin), rekor satırlarının yıldızı "pıt" eder. Pencere animasyonsuz da açılır (işlev); burada yalnız süs.
+function animFinishIn(stats) {
+  const box = document.getElementById("finBody");
+  if (!animOK() || !box) return;
+  box.classList.add("ayk-fin-in");
+  const ic = box.querySelector("[data-fin-icon]");
+  animPlay(ic, [{ opacity: 0, transform: "scale(.4)" }, { opacity: 1, transform: "scale(1.12)", offset: 0.6 }, { opacity: 1, transform: "scale(1)" }], { duration: 420, delay: 120, easing: "ease-out", fill: "backwards" });
+  const tiles = [...box.querySelectorAll("[data-fin-stat]")];
+  tiles.forEach((el, i) => {
+    const d = 200 + i * 110;
+    animPlay(el, [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 300, delay: d, easing: ANIM_EASE, fill: "backwards" });
+    const x = stats && stats[i], b = x && document.getElementById(x.id);
+    if (b && x.v > 0) setTimeout(() => { if (!b.isConnected) return; delete animNums[x.id]; animNum(x.id, x.v, x.fmt); }, d);
+  });
+  const base = 200 + tiles.length * 110;
+  box.querySelectorAll("[data-fin-pr]").forEach((row, i) => {
+    animPlay(row, [{ opacity: 0, transform: "translateX(-12px)" }, { opacity: 1, transform: "none" }], { duration: 280, delay: base + i * 90, easing: ANIM_EASE, fill: "backwards" });
+    animPlay(row.querySelector("[data-fin-star]"), [{ transform: "scale(.3) rotate(-40deg)" }, { transform: "scale(1.35) rotate(8deg)", offset: 0.6 }, { transform: "none" }], { duration: 420, delay: base + i * 90 + 80, easing: "ease-out", fill: "backwards" });
+  });
+  setTimeout(() => box.classList.remove("ayk-fin-in"), base + 900);
+}
+
+/* v57 ANİM: hareket tamam */
+// Hareketin son seti tiklenince kart başlığındaki "· tamamlandı" kısa turkuaz parlamayla belirir (CSS ::after + ölçek).
+function animExDone(exIdx) {
+  if (!animOK()) return;
+  const el = document.querySelector(`#exCard_${exIdx} [data-ex-done]`);
+  if (!el) return;
+  el.classList.add("ayk-done");
+  animPlay(el, [{ opacity: 0, transform: "scale(.7)" }, { opacity: 1, transform: "scale(1.1)", offset: 0.55 }, { opacity: 1, transform: "none" }], { duration: 380, easing: "ease-out" });
+  setTimeout(() => el.classList.remove("ayk-done"), 950);
+}
+
+/* v57 ANİM: kilo önerisi */
+// Kilo artırma / aynı kiloda kal / dinlenme haftası notu İLK göründüğünde hafif aşağı kayarak belirir. Görülen öneri
+// (tür + hareket adı + metin) oturum içinde hatırlanır; aynı öneri yeniden çizilince oynamaz.
+const animSuggSeen = new Set();
+function animSuggIn() {
+  const root = document.getElementById("gymRoot");
+  if (!root) return;
+  const exs = activeDay().exercises;
+  root.querySelectorAll("[data-hold], [data-deload], [data-sugg]").forEach(el => {
+    const kind = el.hasAttribute("data-hold") ? "h" : el.hasAttribute("data-deload") ? "d" : "s";
+    const idx = +(el.dataset.hold || el.dataset.deload || el.dataset.sugg);
+    const key = kind + "|" + ((exs[idx] && exs[idx].name) || idx) + "|" + el.textContent.replace(/\s+/g, " ").trim();
+    if (animSuggSeen.has(key)) return;
+    animSuggSeen.add(key);
+    if (!animOK()) return;
+    el.classList.add("ayk-sugg-in");
+    animPlay(el, [{ opacity: 0, transform: "translateY(-8px)" }, { opacity: 1, transform: "none" }], { duration: 320, easing: ANIM_EASE });
+    setTimeout(() => el.classList.remove("ayk-sugg-in"), 340);
+  });
+}
+
+/* v57 ANİM: mobilite seansı */
+// Seansta hareket değişince başlık + daire/tekrar + rehber yana kayar (ileri: sağdan sola, geri: soldan sağa).
+// Bitiş özeti kısa kutlamayla açılır (daire "pıt" + parçacıklar + satırlar sırayla); seans başına bir kez.
+const animMob = { dir: 0, fin: 0 };
+function animMobMark(from, to) { animMob.dir = to > from ? 1 : to < from ? -1 : 0; }
+function animMobApply() {
+  const dir = animMob.dir;
+  animMob.dir = 0;
+  if (!dir || !animOK()) return;
+  const title = document.getElementById("mobTTitle");
+  const reps = document.getElementById("mobTReps");
+  const els = [title && title.parentElement, document.getElementById("mobTCircle") || (reps && reps.parentElement), document.getElementById("mobTGuide")].filter(Boolean);
+  els.forEach((el, i) => {
+    el.classList.add("ayk-slide");
+    animPlay(el, [{ opacity: 0, transform: `translateX(${dir * 48}px)` }, { opacity: 1, transform: "none" }], { duration: 300, delay: i * 30, easing: ANIM_EASE, fill: "backwards" });
+    setTimeout(() => el.classList.remove("ayk-slide"), 360 + i * 30);
+  });
+}
+function animMobFin() {
+  const fin = document.getElementById("mobTFin");
+  const ses = mobT && mobT.ses;
+  if (!fin || !ses || animMob.fin === ses.t0) return;
+  animMob.fin = ses.t0;
+  if (!animOK()) return;
+  fin.classList.add("ayk-fin");
+  const kids = [...fin.children];
+  const circle = kids[0];
+  animPlay(circle, [{ opacity: 0, transform: "scale(.3)" }, { opacity: 1, transform: "scale(1.14)", offset: 0.6 }, { opacity: 1, transform: "none" }], { duration: 480, easing: "ease-out", fill: "backwards" });
+  kids.slice(1).forEach((el, i) => animPlay(el, [{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }], { duration: 320, delay: 220 + i * 70, easing: ANIM_EASE, fill: "backwards" }));
+  setTimeout(() => { if (circle.isConnected) animPrBurst(circle); }, 260);
+  setTimeout(() => fin.classList.remove("ayk-fin"), 1100);
+}
+
+/* v57 ANİM: grafikler */
+// İlerleme: pLine çizgisi soldan sağa çizilir (stroke-dashoffset), pBars çubukları alttan yükselir. Yalnızca alt sekme,
+// aralık (kilo / beslenme), hareket ya da ölçü seçimi değişince ve sekmeye her girişte; diğer çizimlerde oynamaz.
+let animChartKey = null;
+function animChartReset() { animChartKey = null; }
+function animCharts(view) {
+  const key = [view, progUI.wRange, histRange, progressSel, measureSel].join("|");
+  if (key === animChartKey) return;
+  animChartKey = key;
+  if (!animOK()) return;
+  document.querySelectorAll("#progressContent svg.p-chart").forEach(svg => {
+    svg.classList.add("ayk-chart-in");
+    svg.querySelectorAll("polyline").forEach(pl => {
+      let len = 0;
+      try { len = pl.getTotalLength(); } catch (e) { return; }
+      if (!(len > 0)) return;
+      pl.style.strokeDasharray = String(len);
+      const a = animPlay(pl, [{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration: 700, easing: ANIM_EASE, fill: "backwards" });
+      const done = () => { pl.style.strokeDasharray = ""; };
+      if (a) { a.onfinish = done; a.oncancel = done; } else done();
+    });
+    const lineChart = !!svg.querySelector("polyline");
+    svg.querySelectorAll(":scope > circle").forEach(c => animPlay(c, [{ opacity: 0 }, { opacity: 1 }], { duration: 260, delay: lineChart ? 450 : 0, easing: "ease-out", fill: "backwards" }));
+    [...svg.querySelectorAll(":scope > path")].forEach((p, i) => {
+      p.style.transformBox = "fill-box"; p.style.transformOrigin = "50% 100%";
+      const a = animPlay(p, [{ transform: "scaleY(0)" }, { transform: "none" }], { duration: 460, delay: Math.min(i * 22, 400), easing: ANIM_EASE, fill: "backwards" });
+      const done = () => { p.style.transformBox = ""; p.style.transformOrigin = ""; };
+      if (a) { a.onfinish = done; a.oncancel = done; } else done();
+    });
+    svg.querySelectorAll(":scope > text.p-bv, :scope > text.p-vl").forEach(x => animPlay(x, [{ opacity: 0 }, { opacity: 1 }], { duration: 240, delay: 420, easing: "ease-out", fill: "backwards" }));
+    setTimeout(() => svg.classList.remove("ayk-chart-in"), 1000);
+  });
+}
+
+/* v57 ANİM: seri */
+// "Bu hafta, gün gün" şeridi (İlerleme → Genel) ve Mobilite haftası: bugün antrenman / mobilite ilk kez tamamlanınca
+// o günün kutusu bir kez "pıt" ile dolar. Gün başında (günün ilk çiziminde) zaten tamamsa oynamaz. Oturum içi işaret.
+const animStreak = { day: null, base: {}, popped: {}, pend: {} };
+function animStreakNow() {
+  const k = todayStr();
+  let tq = false;
+  for (let i = state.workoutLogs.length - 1; i >= 0 && !tq; i--) { const l = state.workoutLogs[i]; if (l && l.ts && todayStr(new Date(l.ts)) === k) tq = true; }
+  return { tq, lv: mobAllItems().some(i => i.done) };
+}
+function animStreakBase() {
+  const day = todayStr(logicalNow());
+  if (animStreak.day === day) return;
+  animStreak.day = day; animStreak.popped = {};
+  animStreak.base = animStreakNow();
+}
+function animStreakPop(where) {
+  // Bir sonraki karede, o anki (son) DOM'a göre: aynı anda art arda gelen çizimler (ör. seans kapanınca ana ekran, hemen
+  // ardından rutin) görünmeyen bir çizimde işareti harcamasın. Seans / sayaç ya da Profil üstteyken de harcanmaz.
+  if (animStreak.day === null || animStreak.pend[where]) return;
+  animStreak.pend[where] = true;
+  requestAnimationFrame(() => { animStreak.pend[where] = false; animStreakPopNow(where); });
+}
+function animStreakPopNow(where) {
+  if (mobT || (typeof profileIsOpen === "function" && profileIsOpen())) return;
+  if (where === "m" ? !(state.activeTab === "mobility" && mobUI.view === "home") : !(state.activeTab === "progress" && state.progressView === "genel")) return;
+  const now = animStreakNow();
+  (where === "p" ? ["tq", "lv"] : ["lv"]).forEach(k => {
+    const mark = where + k;
+    if (!now[k] || animStreak.base[k] || animStreak.popped[mark]) return;
+    let cell = null;
+    if (where === "m") cell = document.querySelector("#mobHome .m-days i.t");
+    else {
+      const key = k === "tq" ? todayStr() : todayStr(logicalNow());
+      const di = progWeekDays().findIndex(d => todayStr(d) === key);
+      const row = document.querySelectorAll("#pStrip .p-sr:not(.hdr)")[k === "tq" ? 0 : 2];
+      cell = di >= 0 && row ? row.querySelectorAll(".p-sd")[di] : null;
+    }
+    if (!cell) return;
+    animStreak.popped[mark] = true;
+    if (!animOK()) return;
+    cell.classList.add("ayk-pop");
+    animPlay(cell, [{ transform: "scale(.35)", opacity: 0.4 }, { transform: "scale(1.2)", opacity: 1, offset: 0.6 }, { transform: "none", opacity: 1 }], { duration: 440, delay: 120, easing: "ease-out", fill: "backwards" });
+    setTimeout(() => cell.classList.remove("ayk-pop"), 650);
+  });
+}

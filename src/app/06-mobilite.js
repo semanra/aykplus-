@@ -126,6 +126,7 @@ function renderMobility() {
   if (mobUI.view === "detail" && !mobFind(mobUI.id)) mobUI.view = "routine";
   root.innerHTML = mobUI.view === "detail" ? mobDetailHtml() : mobUI.view === "add" ? mobAddHtml() : mobUI.view === "routine" ? mobRoutineHtml() : mobHomeHtml();
   if (mobUI.view === "add") mobRenderAddList();
+  if (mobUI.view === "home" && typeof animStreakPop === "function") animStreakPop("m");   // v57 ANİM: seri
 }
 function mobToggle(id) { const it = mobFind(id); if (!it) return; it.done = !it.done; renderAll(); }
 function mobReset() {
@@ -457,6 +458,7 @@ function mobSesStartIds(title, ids, rid) {
 }
 function mobSesLoad(pos) {
   const S = mobT.ses;
+  if (typeof animMobMark === "function") animMobMark(S.pos, pos);   // v57 ANİM: seans geçişi (ileri / geri)
   S.pos = pos;
   const it = mobFindAny(S.ids[pos]);
   if (!it) { if (pos + 1 < S.ids.length) return mobSesLoad(pos + 1); return mobSesFinish(); }
@@ -618,7 +620,7 @@ function mobSesFinHtml() {
 function mobTimerRender() {
   if (!mobT) return;
   const T = mobT, S = T.ses, snd = state.settings.mobSound !== false;
-  if (T.phase === "fin") { $("mobTimer").innerHTML = mobSesFinHtml(); return; }
+  if (T.phase === "fin") { $("mobTimer").innerHTML = mobSesFinHtml(); if (typeof animMobFin === "function") animMobFin(); return; }   // v57 ANİM: bitiş kutlaması
   const r = T.rounds[T.idx], next = T.rounds[T.idx + 1];
   const reps = T.phase === "reps", prep = T.phase === "prep", work = T.phase === "work";
   const it = mobFindAny(T.id);
@@ -691,6 +693,7 @@ function mobTimerRender() {
       ${ctl}
       <div id="mobTRounds" class="m-rounds mt-3">${boxes}</div>
     </div>`;
+  if (typeof animMobApply === "function") animMobApply();   // v57 ANİM: seans geçişi
 }
 
 // --- v40: ANTRENMANDA ISINMA KARTI (isteğe bağlı: settings.warmupCard). Günün kaslarına uygun bölgelerdeki dinamik

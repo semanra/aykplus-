@@ -372,12 +372,14 @@ try:
         if lang == 'en': check(m.endswith(" · 4 sets completed|Save") and m.startswith("Save this workout?|"), "en: bitir onayı: " + m)
         else: check(m.endswith(" · 4 set tamamlandı|Kaydet") and m.startswith("Antrenman kaydedilsin mi?|"), "tr: bitir onayı: " + m)
         pg.click("#uiDlgOk"); pg.wait_for_timeout(150)
-        x = re.sub(r"\s+", " ", pg.evaluate("$('toastWrap').textContent")).strip()
+        # v57: bitişte kısa bildirim yerine "Antrenman tamamlandı" özet penceresi açılıyor (finishToastText kalıpları
+        # aşağıda doğrudan denetlenmeye devam ediyor); pencerenin içeriği dile göre denetlenir.
+        x = re.sub(r"\s+", " ", pg.evaluate("$('finBody').innerText")).strip()
         if lang == 'en':
-            want = {2: "Well done! Workout saved: 45 min, 1,440 kg volume, 20 min cardio, 2 PRs", 1: "Well done! Workout saved: 45 min, 1,440 kg volume, 20 min cardio, 1 PR", 0: "Well done! Workout saved: 45 min, 1,440 kg volume, 20 min cardio"}[prs]
-            check(x == want + "Share" and "1 PRs" not in x, "en: bitiş bildirimi (%d rekor): %s" % (prs, x))
+            check(x.startswith("Workout complete") and "Time 45 min" in x and "Volume 1,440 kg" in x and "Cardio 20 min" in x and ("PRs %d" % prs) in x and x.endswith("Close Share"), "en: bitiş özeti (%d rekor): %s" % (prs, x))
         else:
-            check(x.startswith("Tebrikler! 45 dk, 1.440 kg tonaj, 20 dk kardiyo, 2 rekor kaydedildi") and x.endswith("Paylaş"), "tr: bitiş bildirimi aynı: " + x)
+            check(x.startswith("Antrenman tamamlandı") and "Süre 45 dk" in x and "Tonaj 1.440 kg" in x and "Kardiyo 20 dk" in x and "Rekor 2" in x and x.endswith("Kapat Paylaş"), "tr: bitiş özeti: " + x)
+        pg.evaluate("closeModal('finishModal')")
         dt = pg.evaluate("state.workoutLogs[state.workoutLogs.length - 1].date")
         check(re.match(r"^\d{1,2} " + MON_TR, dt) is not None, "%s: kayıtlı workoutLogs.date Türkçe ay kısaltmalı: %r" % (lang, dt))
         if lang == 'en':

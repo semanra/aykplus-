@@ -20,6 +20,7 @@ function restorePendingFocus() {
 
 function renderAll() {
   if (typeof syncAnimClass === "function") syncAnimClass();   // v55
+  if (typeof animStreakBase === "function") animStreakBase();   // v57 ANİM: seri (günün ilk çiziminde bugünkü durum)
   invalidateFoodDB();
   refreshFoodSnaps();
   applyCustomIcon();

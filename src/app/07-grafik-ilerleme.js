@@ -513,5 +513,7 @@ function renderProgress() {
   const nav = `<nav id="progNav" class="p-subnav" aria-label="${t("İlerleme bölümleri")}">${PROG_VIEWS.map(([k, l]) => `<button onclick="setProgressView('${k}')" data-pv="${k}" class="${v === k ? "on" : ""}" ${v === k ? 'aria-current="page"' : ""}>${t(l)}</button>`).join("")}</nav>`;
   const body = v === "kilo" ? progKiloHtml() : v === "guc" ? progGucHtml() : v === "beslenme" ? progBeslenmeHtml() : progGenelHtml();
   $("progressContent").innerHTML = nav + `<div id="pv_${v}">${body}</div>`;
+  if (typeof animCharts === "function") animCharts(v);   // v57 ANİM: grafikler (alt sekme / aralık değişince)
+  if (v === "genel" && typeof animStreakPop === "function") animStreakPop("p");   // v57 ANİM: seri
 }
 

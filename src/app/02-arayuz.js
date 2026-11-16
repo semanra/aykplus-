@@ -55,7 +55,7 @@ function openModal(id) {
 function closeModal(id) { const m = $(id); m.classList.add("hidden"); m.classList.remove("flex"); }
 document.addEventListener("click", e => {
   const el = e.target;
-  if (el && el.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "exSheet", "mealModal", "shopModal"].includes(el.id)) closeModal(el.id);
+  if (el && el.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "exSheet", "mealModal", "shopModal", "finishModal"].includes(el.id)) closeModal(el.id);
 });
 
 // Temalı onay / metin penceresi. Sonuç: onay → true (veya yazılan metin), vazgeç → null.
@@ -352,6 +352,7 @@ function switchTab(tab) {
     window.scrollTo(0, 0);
     if (tab === "mobility") { mobUI.view = "home"; mobUI.rid = null; mobUI.edit = false; }   // v39: mobilite her girişte ana ekranla açılır
   }
+  if (changed && tab === "progress" && typeof animChartReset === "function") animChartReset();   // v57 ANİM: grafikler (ilk açılışta çizilir)
   renderAll();
   if (changed && typeof animTabIn === "function") animTabIn(tab);   // v57 ANİM: sekme geçişi
   updateWakeLock();

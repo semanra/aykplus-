@@ -179,7 +179,7 @@ function suggestionHtml(ex, exIdx) {
   const up = sg.type === "up";
   const noLv = usesLevels(ex) && !ex.levels && !inferLevels(ex);
   return `
-    <div class="${up ? "t-panel" : "bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)]"} rounded-2xl pl-3 pr-2 py-2 space-y-2">
+    <div class="${up ? "t-panel" : "bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)]"} rounded-2xl pl-3 pr-2 py-2 space-y-2" data-sugg="${exIdx}">
       <div class="flex items-center justify-between gap-2.5">
         <span class="flex items-center gap-2.5 min-w-0">
           <span style="color:${up ? "var(--t-acc-text)" : "var(--t-warn-icon)"}">${svgI(up ? "up" : "down", 20, 2.2)}</span>

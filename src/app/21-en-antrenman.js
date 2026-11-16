@@ -235,4 +235,6 @@ Object.assign(EN, {
   "20; 27,5; 35; 40; 47,5": "20; 27.5; 35; 40; 47.5",
   "örn: 2,5 — yoksa boş bırak": "e.g. 2.5 — leave empty if none",
   "Hareket taşındı": "Exercise moved",
+  // v57: antrenman özeti penceresi
+  "Tamamlanan set": "Sets done", "Yeni rekorlar": "New PRs",
 });

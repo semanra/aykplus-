@@ -376,6 +376,7 @@ function toggleSetDone(exIdx, sIdx) {
   }
   renderAll();
   if (s.done && typeof animSetTick === "function") animSetTick(exIdx, sIdx, !!s.pr);   // v55 ANİM: set tiki (+ rekor parıltısı)
+  if (s.done && ex.sets.every(x => x.done) && typeof animExDone === "function") animExDone(exIdx);   // v57 ANİM: hareket tamam
   if (s.done && ex.sets.every(x => x.done)) {
     const day = activeDay();
     const j = day.exercises.findIndex((o, i) => i > exIdx && o.sets.some(x => !x.done));
@@ -486,6 +487,15 @@ async function finishAndLogWorkout() {
     summary: `${day.exercises.length} Hareket`
   });
   // v36: eskiden son 400 antrenman tutuluyordu; artık hiç silinmez (Profil → Yedekleme'de kayıt alanı göstergesi)
+  // v57: özet penceresi için rekor hareketleri (her hareketin en iyi rekor seti; kayda yazılmaz)
+  const prList = [];
+  day.exercises.forEach(ex => {
+    if (ex.kind !== "weight") return;
+    const ps = ex.sets.filter(s => s.done && s.pr);
+    if (!ps.length) return;
+    const b = ps.reduce((a, s) => e1rm(s.kg, s.reps) > e1rm(a.kg, a.reps) ? s : a);
+    prList.push({ name: ex.name, kg: num(b.kg), reps: num(b.reps) });
+  });
 
   day.exercises.forEach(ex => ex.sets.forEach(s => { s.done = false; s.pr = false; delete s.e; }));
   if (!workoutInProgress()) state.workoutStartedAt = 0;
@@ -494,7 +504,8 @@ async function finishAndLogWorkout() {
   window.scrollTo(0, 0);
   renderAll();
   const li = state.workoutLogs.length - 1;
-  toast(finishToastText(state.workoutLogs[li].durationMin, vol, cMin, prs), prs ? "pr" : "ok", { label: t("Paylaş"), fn: () => openShareCard(li) });
+  // v57: kısa bildirim yerine "Antrenman tamamlandı" özet penceresi (Paylaş → paylaşım kartı). finishToastText kalıpları duruyor.
+  openFinishSummary(li, prList);
 }
 
 // v48: bitiş bildirimi tek cümle kalıplarıyla (süre / kardiyo / rekor var-yok birleşimleri; rekor sayısı tn)
