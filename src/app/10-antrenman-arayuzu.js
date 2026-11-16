@@ -186,9 +186,11 @@ function svgI(name, size = 20, sw = 2) {
 }
 
 function setGymView(v) {
+  const prev = state.gymView;
   state.gymView = GYM_VIEWS.some(x => x[0] === v) ? v : "today";
   window.scrollTo(0, 0);
   renderAll();
+  if (prev !== state.gymView && typeof animGymViewIn === "function") animGymViewIn();   // v57 ANİM: sekme geçişi
 }
 function startWorkout() {
   state.gymActive = true;

@@ -80,9 +80,11 @@ function calcItemMacros(item) {
 // ============================================================================
 const NUTRI_VIEWS = [["today", "Bugün"], ["menus", "Menülerim"], ["foods", "Besinler"], ["history", "Geçmiş"]];
 function setNutriView(v) {
+  const prev = state.nutriView;
   state.nutriView = NUTRI_VIEWS.some(x => x[0] === v) ? v : "today";
   window.scrollTo(0, 0);
   renderAll();
+  if (prev !== state.nutriView && typeof animViewIn === "function") animViewIn($({ today: "nvToday", menus: "nvMenus", foods: "nvFoods", history: "nvHistory" }[state.nutriView]));   // v57 ANİM: sekme geçişi
 }
 // v31: Görünüm (Sistem / Koyu / Aydınlık). Etkin tema html.light sınıfıyla uygulanır; Beslenme'de nutri-light.
 // Açılışta yanıp sönmesin diye <head> içindeki betik "ayk_theme" aynasını okur (asıl kayıt state.settings.theme).
@@ -232,7 +234,7 @@ function toggleMealOpen(mIdx) {
   const m = dayMeals()[mIdx];
   if (!m) return;
   if (openDoneMeals.has(m.id)) openDoneMeals.delete(m.id); else openDoneMeals.add(m.id);
-  renderAll();
+  if (typeof animMealFlip === "function") animMealFlip(mIdx, renderAll); else renderAll();   // v57 ANİM: öğün yendi
 }
 function toggleMenuMeal(mIdx) {
   const m = curMeals()[mIdx];
@@ -271,6 +273,7 @@ function renderNutrition() {
   else if (view === "menus") renderMenus();
   else if (view === "foods") renderFoods();
   else renderNutriHistory();
+  if (typeof animApplyItemMarks === "function") animApplyItemMarks(view);   // v57 ANİM: besin ekleme
 }
 // Menülerim: güncel kilo, kalori açığı, koç ipucu
 function renderWeightBlock(st) {
@@ -338,6 +341,7 @@ function renderHero() {
   $("mmPlan").className = view === "plan" ? "on" : ""; $("mmPlan").setAttribute("aria-pressed", view === "plan" ? "true" : "false");
   $("mmEaten").className = view === "eaten" ? "on" : ""; $("mmEaten").setAttribute("aria-pressed", view === "eaten" ? "true" : "false");
   renderMicroLine(view);
+  if (typeof animGoalCheck === "function") animGoalCheck(eaten, targets, view);   // v57 ANİM: hedef tamam
 }
 
 function updateMacroCard(prefix, consumed, target, unit) {

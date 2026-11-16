@@ -163,3 +163,290 @@ function animThemeIcon(btn) {
   const svg = btn.querySelector("svg");
   if (svg) svg.classList.add("ayk-spin");
 }
+
+// ============================================================================
+// v57 — ANİMASYONLAR 2. TUR (Beslenme + genel). Kurallar v55 ile aynı: animOK() false iken hiçbir şey oynamaz,
+// DOM son hâlde kalır. Tam yeniden çizim (renderAll) DOM'u yenilediği için giriş/çıkış efektleri kimlikle
+// (öğün dizini, öğün kimliği + besin, yapısal yol) bir kerelik işaretlenip çizimden SONRA uygulanır.
+// Hepsi Web Animations API (el.animate) ile: bitince öğede stil/sınıf kalmaz. Yalnız transform / opacity / clip-path.
+// ============================================================================
+const ANIM_EASE = "cubic-bezier(.22, 1, .36, 1)";
+function animPlay(el, frames, opts) {
+  if (!el || typeof el.animate !== "function") return null;
+  try { return el.animate(frames, opts); } catch (e) { return null; }
+}
+
+/* v57 ANİM: öğün yendi */
+// Bugün'de öğün "yendi" işaretlenince kart tek satıra kapanır, açılınca açılır (FLIP): çizimden önce satırların yeri
+// ölçülür, çizimden sonra aradaki fark transform ile kapatılır; açılan kart clip-path ile eski yüksekliğinden açılır.
+function animMealFlip(mIdx, render) {
+  const box = document.getElementById("todayMeals");
+  if (!animOK() || !box || state.activeTab !== "nutrition" || state.nutriView !== "today" || box.offsetParent === null) { render(); return; }
+  const before = {};
+  box.querySelectorAll("[data-today-meal]").forEach(el => { const r = el.getBoundingClientRect(); before[el.dataset.todayMeal] = { top: r.top, h: r.height }; });
+  render();
+  const D = 300;
+  box.querySelectorAll("[data-today-meal]").forEach(el => {
+    const b = before[el.dataset.todayMeal];
+    if (!b) return;
+    const r = el.getBoundingClientRect();
+    const dy = Math.round(b.top - r.top), dh = Math.round(r.height - b.h);
+    if (String(mIdx) === el.dataset.todayMeal && Math.abs(dh) > 1) {
+      if (dh > 0) animPlay(el, [{ clipPath: `inset(0 0 ${dh}px 0)`, transform: `translateY(${dy}px)` }, { clipPath: "inset(0 0 0px 0)", transform: "none" }], { duration: D, easing: ANIM_EASE });
+      else animPlay(el, [{ opacity: 0.35, transform: `translateY(${dy}px)` }, { opacity: 1, transform: "none" }], { duration: D, easing: ANIM_EASE });
+    } else if (Math.abs(dy) > 0.5) animPlay(el, [{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: D, easing: ANIM_EASE });
+  });
+}
+
+/* v57 ANİM: su damlası */
+// Su eklenince halkanın (yeni) ucunda küçük damla + dalga; halka dolumu (.6 sn) bitmeye yakın, toplam ≤ 600 ms.
+function animWaterDrop() {
+  const ring = document.getElementById("waterRing");
+  if (!animOK() || !ring || ring.getBoundingClientRect().width === 0) return;
+  const svg = ring.ownerSVGElement;
+  const wt = waterTargetL(), w = state.waterLiters || 0;
+  const pct = wt > 0 ? Math.min(100, Math.round(w / wt * 100)) : 0;
+  const a = 2 * Math.PI * pct / 100;
+  const cx = (70 + 58 * Math.cos(a)).toFixed(1), cy = (70 + 58 * Math.sin(a)).toFixed(1);
+  const NS = "http://www.w3.org/2000/svg";
+  const g = document.createElementNS(NS, "g");
+  g.setAttribute("class", "ayk-wdrop");
+  g.innerHTML = `<circle class="d" cx="${cx}" cy="${cy}" r="5"></circle><circle class="w" cx="${cx}" cy="${cy}" r="7"></circle>`;
+  svg.appendChild(g);
+  const dot = g.children[0], wave = g.children[1];
+  animPlay(dot, [{ opacity: 0, transform: "scale(.2)" }, { opacity: 1, transform: "scale(1.15)", offset: 0.55 }, { opacity: 0, transform: "scale(.6)" }], { duration: 380, delay: 200, easing: "ease-out", fill: "both" });
+  animPlay(wave, [{ opacity: 0.85, transform: "scale(.6)" }, { opacity: 0, transform: "scale(2.3)" }], { duration: 340, delay: 260, easing: "ease-out", fill: "both" });
+  setTimeout(() => g.remove(), 620);
+}
+
+/* v57 ANİM: hedef tamam */
+// Günlük kalori veya protein hedefine (yenen) o gün İLK ulaşıldığında halka / çubuk bir kez parlar. Oturum içi işaret:
+// günün ilk çiziminde hedef zaten tamamsa parlamaz (o an ulaşılmadı); gün başına her hedef en fazla bir kez.
+const animGoal = { day: null, prev: {}, fired: {} };
+function animGoalCheck(eaten, targets, view) {
+  const day = dayKey();
+  const now = { cal: targets.calTarget > 0 && Math.round(eaten.cal) >= targets.calTarget, pro: targets.proTarget > 0 && Math.round(eaten.p) >= targets.proTarget };
+  if (animGoal.day !== day) { animGoal.day = day; animGoal.prev = now; animGoal.fired = {}; return; }
+  ["cal", "pro"].forEach(k => {
+    if (now[k] && !animGoal.prev[k] && !animGoal.fired[k]) {
+      animGoal.fired[k] = true;
+      if (animOK() && view === "eaten") animGoalGlow(k);
+    }
+  });
+  animGoal.prev = now;
+}
+function animGoalGlow(k) {
+  if (k === "cal") {
+    const ring = document.getElementById("calRing");
+    const host = ring && ring.closest("div.relative");
+    if (!host) return;
+    const s = document.createElement("span");
+    s.className = "ayk-goal-ring"; s.setAttribute("aria-hidden", "true");
+    host.appendChild(s);
+    animPlay(s, [{ opacity: 0, transform: "scale(.86)" }, { opacity: 1, transform: "scale(1)", offset: 0.35 }, { opacity: 0, transform: "scale(1.14)" }], { duration: 900, delay: 350, easing: "ease-out", fill: "both" });
+    setTimeout(() => s.remove(), 1300);
+    return;
+  }
+  const bar = document.getElementById("proBar");
+  if (!bar) return;
+  const s = document.createElement("span");
+  s.className = "ayk-goal-bar"; s.setAttribute("aria-hidden", "true");
+  bar.appendChild(s);
+  animPlay(s, [{ transform: "translateX(-100%)", opacity: 0 }, { opacity: 1, offset: 0.3 }, { transform: "translateX(100%)", opacity: 0 }], { duration: 800, delay: 400, easing: "ease-in-out", fill: "both" });
+  setTimeout(() => s.remove(), 1250);
+}
+
+/* v57 ANİM: besin ekleme */
+// Öğüne / menüye eklenen kalem bir sonraki çizimde (Bugün veya Menülerim, hangisi önce görünürse) kayarak gelir ve kısa
+// vurgulanır. İşaret öğün kimliği + besin kimliğiyle tutulur; 60 sn içinde görünmezse düşer.
+let animItemMarks = [];
+function animMarkItem(meal, foodId) {
+  if (!animOK() || !meal || !meal.id) return;
+  animItemMarks = animItemMarks.filter(m => !(m.mealId === meal.id && m.foodId === foodId));
+  animItemMarks.push({ mealId: meal.id, foodId, ts: Date.now() });
+}
+function animApplyItemMarks(view) {
+  if (!animItemMarks.length) return;
+  const nowMs = Date.now();
+  animItemMarks = animItemMarks.filter(m => nowMs - m.ts < 60000);
+  if (!animOK()) { animItemMarks = []; return; }
+  if (view !== "today" && view !== "menus") return;
+  const db = getFoodDB();
+  const meals = view === "today" ? dayMeals() : curMeals();
+  animItemMarks = animItemMarks.filter(m => {
+    const mIdx = meals.findIndex(x => x.id === m.mealId);
+    if (mIdx < 0) return true;
+    const items = meals[mIdx].items;
+    const iIdx = items.findIndex(i => i.foodId === m.foodId && !i.est);
+    if (iIdx < 0) return true;
+    const card = document.querySelector(view === "today" ? `#todayMeals [data-today-meal="${mIdx}"]` : `#mealsContainer [data-meal-card="${mIdx}"]`);
+    const list = card && card.querySelector(".n-div");
+    if (!list) return true;
+    let k = 0;
+    for (let i = 0; i < iIdx; i++) if ((view === "today" && items[i].est) || (!items[i].est && db[items[i].foodId])) k++;
+    const row = list.children[k];
+    if (!row) return true;
+    animPlay(row, [{ opacity: 0, transform: "translateX(-14px)" }, { opacity: 1, transform: "none" }], { duration: 280, easing: ANIM_EASE });
+    row.classList.add("ayk-new");
+    setTimeout(() => row.classList.remove("ayk-new"), 1100);
+    return false;
+  });
+}
+
+/* v57 ANİM: pencereler */
+// Alttan açılan pencereler (.sheet) yay eğrisiyle aşağıdan gelir, ortadaki kartlar hafif büyüyerek belirir; arka plan
+// solarak gelir. Tutamaç / üst bölgeden (içerik en üstteyken) aşağı kaydırınca pencere parmağı izler; ~80 px veya hızlı
+// fiske kapanır (mevcut kapatma yoluyla: X düğmesi ya da arka plan dokunuşu), değilse yerine yaylanır.
+const SHEET_EASE = "cubic-bezier(.32, .72, 0, 1)";
+function animSheetIn(overlay) {
+  if (!animOK() || !overlay) return;
+  const box = overlay.firstElementChild;
+  animPlay(overlay, [{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: "ease-out" });
+  if (!box) return;
+  if (box.classList.contains("sheet") && box.getBoundingClientRect().bottom >= innerHeight - 2) {
+    animPlay(box, [{ transform: "translateY(100%)" }, { transform: "none" }], { duration: 360, easing: SHEET_EASE });
+  } else {
+    animPlay(box, [{ opacity: 0, transform: "translateY(8px) scale(.95)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "cubic-bezier(.34, 1.3, .64, 1)" });
+  }
+}
+const SHEET_CLOSE_RX = /^\s*close(Modal\('\w+'\)|Barcode\(\))\s*;?\s*$/;
+function sheetCloseVia(overlay) {
+  if (overlay.id === "uiDialog") { if (uiDlg && uiDlg.dismissable) uiDialogDone(false); return; }
+  const x = [...overlay.querySelectorAll("button[onclick]")].find(b => SHEET_CLOSE_RX.test(b.getAttribute("onclick")));
+  const sw = sheetDrag.swallow;
+  sheetDrag.swallow = 0;   // kendi kapatma tıklamamız yutulmasın
+  if (x) x.click();
+  else overlay.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  sheetDrag.swallow = sw;
+}
+function sheetIsOpen(overlay) { return !!overlay && !overlay.classList.contains("hidden"); }
+const sheetDrag = { on: false, pend: false, sheet: null, ov: null, tg: null, x0: 0, y0: 0, dy: 0, pts: [], swallow: 0 };
+function sheetScrolled(from, sheet) {
+  for (let n = from; n; n = n.parentElement) { if (n.scrollTop > 0) return true; if (n === sheet) break; }
+  return false;
+}
+function sheetTouchStart(e) {
+  sheetDrag.pend = false; sheetDrag.on = false;
+  if (e.touches.length !== 1) return;
+  const tg = e.target instanceof Element ? e.target : null;
+  const sheet = tg && tg.closest(".sheet");
+  const ov = sheet && sheet.parentElement;
+  if (!sheet || !ov || !ov.id || !sheetIsOpen(ov)) return;
+  if (tg.closest("input, textarea, select, [contenteditable], .drag-handle")) return;
+  if (sheet.getBoundingClientRect().bottom < innerHeight - 2) return;   // ortada duran (geniş ekran) pencere
+  if (sheetScrolled(tg, sheet)) return;
+  const p = e.touches[0];
+  Object.assign(sheetDrag, { pend: true, sheet, ov, tg, x0: p.clientX, y0: p.clientY, dy: 0, pts: [[performance.now(), 0]] });
+}
+function sheetTouchMove(e) {
+  if (!sheetDrag.pend && !sheetDrag.on) return;
+  const p = e.touches[0];
+  const dx = p.clientX - sheetDrag.x0, dy = p.clientY - sheetDrag.y0;
+  if (sheetDrag.pend) {
+    if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) { sheetDrag.pend = false; return; }   // yatay kaydırma
+    if (dy < -8) { sheetDrag.pend = false; return; }                                             // içeriği yukarı kaydırma
+    if (!(dy > 8 && dy > Math.abs(dx))) return;
+    if (sheetScrolled(sheetDrag.tg, sheetDrag.sheet)) { sheetDrag.pend = false; return; }
+    sheetDrag.pend = false; sheetDrag.on = true; sheetDrag.y0 = p.clientY;
+    sheetDrag.sheet.style.transition = "none";
+  }
+  if (e.cancelable) e.preventDefault();
+  const d = Math.max(0, p.clientY - sheetDrag.y0);
+  sheetDrag.dy = d;
+  sheetDrag.pts.push([performance.now(), d]);
+  if (sheetDrag.pts.length > 6) sheetDrag.pts.shift();
+  sheetDrag.sheet.style.transform = d ? `translateY(${d}px)` : "";
+}
+function sheetReset(sheet) { sheet.style.transition = ""; sheet.style.transform = ""; }
+function sheetSnapBack(sheet, anim) {
+  if (!anim) { sheetReset(sheet); return; }
+  sheet.style.transition = "transform .28s " + SHEET_EASE;
+  sheet.style.transform = "";
+  setTimeout(() => { if (!sheetDrag.on) sheet.style.transition = ""; }, 300);
+}
+function sheetTouchEnd() {
+  sheetDrag.pend = false;
+  if (!sheetDrag.on) return;
+  sheetDrag.on = false;
+  sheetDrag.swallow = Date.now() + 400;
+  const sheet = sheetDrag.sheet, ov = sheetDrag.ov, dy = sheetDrag.dy, pts = sheetDrag.pts;
+  const nowMs = performance.now();
+  const ref = pts.find(q => nowMs - q[0] <= 90) || pts[pts.length - 1];
+  const v = nowMs > ref[0] ? (dy - ref[1]) / (nowMs - ref[0]) : 0;   // px / ms
+  const close = dy > 80 || (v > 0.5 && dy > 20);
+  const anim = animOK();
+  if (!close) { sheetSnapBack(sheet, anim); return; }
+  const done = () => { sheetCloseVia(ov); if (sheetIsOpen(ov)) sheetSnapBack(sheet, anim); else sheetReset(sheet); };
+  if (!anim) { done(); return; }
+  sheet.style.transition = "transform .2s cubic-bezier(.4, 0, 1, 1)";
+  sheet.style.transform = `translateY(${Math.round(sheet.getBoundingClientRect().height + 40)}px)`;
+  setTimeout(done, 200);
+}
+document.addEventListener("touchstart", sheetTouchStart, { passive: true });
+document.addEventListener("touchmove", sheetTouchMove, { passive: false });
+document.addEventListener("touchend", sheetTouchEnd, { passive: true });
+document.addEventListener("touchcancel", () => { sheetDrag.pend = false; if (sheetDrag.on) { sheetDrag.on = false; sheetSnapBack(sheetDrag.sheet, animOK()); } }, { passive: true });
+document.addEventListener("click", e => { if (Date.now() < sheetDrag.swallow) { sheetDrag.swallow = 0; e.preventDefault(); e.stopPropagation(); } }, true);
+
+/* v57 ANİM: sekme geçişi */
+// Sekme ve alt görünüm değişince içerik ~160 ms'de belirir (+ 6 px yukarı kayma). Yalnızca değişimde, her çizimde değil.
+function animViewIn(els) {
+  if (!animOK()) return;
+  (Array.isArray(els) ? els : [els]).forEach(el => {
+    if (el) animPlay(el, [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 160, easing: "ease-out" });
+  });
+}
+function animTabIn(tab) { animViewIn(document.getElementById({ nutrition: "tabNutrition", gym: "tabGym", mobility: "tabMobility", progress: "tabProgress" }[tab])); }
+function animGymViewIn() { const r = document.getElementById("gymRoot"); if (r) animViewIn([...r.children].filter(c => c.tagName !== "NAV")); }
+
+/* v57 ANİM: silme ve geri al */
+// Geri al'lı (offerUndo) anında silmelerde satır önce ~180 ms sola kayarak kaybolur, sonra mevcut silme akışı aynen
+// çalışır. "Geri al" ile geri gelen satır aynı yoldan girer (yapısal yol: kimlikli en yakın atadan çocuk sıraları;
+// geri alınan durum silmeden önceki durumla aynı olduğu için aynı yer). Onay soran silmeler kapsam dışı.
+const ANIM_DEL_ROWS = {
+  dayRemoveItem: ".n-div > *", removeItem: ".n-div > *", removeSupp: "[data-supp-row]",
+  deleteWeightLog: ".p-row", deleteMeasurement: ".p-row", mobRemoveItem: "[data-mob-row]"
+};
+let animDelBusy = false, animDelRet = null;
+function animPath(el) {
+  const p = [];
+  let n = el;
+  while (n && !n.id && n.parentElement) { p.unshift([...n.parentElement.children].indexOf(n)); n = n.parentElement; }
+  return n && n.id ? { root: n.id, p } : null;
+}
+function animFromPath(path) {
+  let el = document.getElementById(path.root);
+  for (const i of path.p) { if (!el) return null; el = el.children[i]; }
+  return el || null;
+}
+document.addEventListener("click", e => {
+  const btn = e.target instanceof Element ? e.target.closest("button[onclick]") : null;
+  if (!btn) return;
+  const m = /^\s*(\w+)\(/.exec(btn.getAttribute("onclick") || "");
+  const sel = m && ANIM_DEL_ROWS[m[1]];
+  if (!sel || !animOK()) return;
+  const row = btn.closest(sel);
+  if (!row) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  if (animDelBusy) return;   // aynı anda ikinci silme (eski dizinlerle) yanlış satırı silmesin
+  animDelBusy = true;
+  const path = animPath(row), tab = state.activeTab;
+  const a = animPlay(row, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateX(-40%)" }], { duration: 180, easing: "cubic-bezier(.4, 0, 1, 1)", fill: "forwards" });
+  setTimeout(() => {
+    animDelBusy = false;
+    const snapBefore = undoSnap;
+    try { btn.onclick.call(btn, e); }
+    finally {
+      if (row.isConnected && a) a.cancel();   // silme gerçekleşmediyse satır geri görünür
+      animDelRet = path && undoSnap && undoSnap !== snapBefore ? { path, sel, tab, snap: undoSnap } : null;
+    }
+  }, 180);
+}, true);
+function animUndoReturn(snap) {
+  const r = animDelRet;
+  animDelRet = null;
+  if (!r || r.snap !== snap || !animOK() || state.activeTab !== r.tab) return;
+  const el = animFromPath(r.path);
+  if (!el || !el.matches(r.sel)) return;
+  animPlay(el, [{ opacity: 0, transform: "translateX(-40%)" }, { opacity: 1, transform: "none" }], { duration: 240, easing: ANIM_EASE });
+}

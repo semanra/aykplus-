@@ -379,7 +379,9 @@ function openBarcode() {
   $("bcManual").value = "";
   bc.found = null;
   const m = $("barcodeModal");
+  const wasHidden = m.classList.contains("hidden");
   m.classList.remove("hidden"); m.classList.add("flex");
+  if (wasHidden && typeof animSheetIn === "function") animSheetIn(m);   // v57 ANİM: pencereler
   startScan();
 }
 function closeBarcode() { stopScan(); closeModal("barcodeModal"); }
@@ -614,14 +616,18 @@ function deleteWeightLog(idx) {
   offerUndo(t("Tartı kaydı silindi"));
 }
 
-function addWater(delta) { state.waterLiters = Math.max(0, Math.round(((state.waterLiters || 0) + delta) * 100) / 100); renderAll(); }
+function addWater(delta) {
+  state.waterLiters = Math.max(0, Math.round(((state.waterLiters || 0) + delta) * 100) / 100);
+  renderAll();
+  if (delta > 0 && typeof animWaterDrop === "function") animWaterDrop();   // v57 ANİM: su damlası
+}
 function toggleSupp(key) { state.supplements[key] = !state.supplements[key]; renderAll(); }
 function toggleMealDone(mIdx) {
   const m = dayMeals()[mIdx];
   if (!m) return;
   m.done = !m.done;
   openDoneMeals.delete(m.id);
-  renderAll();
+  if (typeof animMealFlip === "function") animMealFlip(mIdx, renderAll); else renderAll();   // v57 ANİM: öğün yendi
 }
 function setDayType(type) { state.dayType = type; renderAll(); }
 
@@ -663,6 +669,7 @@ function quickAdd(mIdx, foodId, amount, meals) {
   const existing = list[mIdx].items.find(i => i.foodId === foodId);
   if (existing) existing.amount = isScalable(f) && scaleK() !== 1 ? existing.amount + raw : round1(existing.amount + raw);
   else list[mIdx].items.push({ foodId, amount: raw });
+  if (typeof animMarkItem === "function") animMarkItem(list[mIdx], foodId);   // v57 ANİM: besin ekleme
   state.recentFoods = [foodId, ...state.recentFoods.filter(id => id !== foodId)].slice(0, 8);
   renderAll();
 }

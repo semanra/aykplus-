@@ -48,7 +48,9 @@ function openModal(id) {
   const nm = !tm && nutriCtx();
   m.classList.toggle("tm", tm);
   m.classList.toggle("nm", nm);
+  const wasHidden = m.classList.contains("hidden");
   m.classList.remove("hidden"); m.classList.add("flex");
+  if (wasHidden && typeof animSheetIn === "function") animSheetIn(m);   // v57 ANİM: pencereler
 }
 function closeModal(id) { const m = $(id); m.classList.add("hidden"); m.classList.remove("flex"); }
 document.addEventListener("click", e => {
@@ -82,7 +84,9 @@ function uiAsk({ title, message = "", input = null, ok = t("Tamam"), cancel = t(
     $("uiDlgCancel").classList.toggle("hidden", !cancel);
     $("uiDlgBtns").className = cancel ? "grid grid-cols-2 gap-2" : "grid grid-cols-1 gap-2";
     const m = $("uiDialog");
+    const wasHidden = m.classList.contains("hidden");
     m.classList.remove("hidden"); m.classList.add("flex");
+    if (wasHidden && typeof animSheetIn === "function") animSheetIn(m);   // v57 ANİM: pencereler
     if (input) { inp.focus(); try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) { /* yoksay */ } }
   });
 }
@@ -342,12 +346,14 @@ async function manualNewDay() {
 const TAB_TITLES = { nutrition: "Beslenme", gym: "Antrenman", mobility: "Mobilite", progress: "İlerleme" };
 function switchTab(tab) {
   if (!TABS.includes(tab)) tab = "nutrition";
-  if (tab !== state.activeTab) {
+  const changed = tab !== state.activeTab;
+  if (changed) {
     state.activeTab = tab;
     window.scrollTo(0, 0);
     if (tab === "mobility") { mobUI.view = "home"; mobUI.rid = null; mobUI.edit = false; }   // v39: mobilite her girişte ana ekranla açılır
   }
   renderAll();
+  if (changed && typeof animTabIn === "function") animTabIn(tab);   // v57 ANİM: sekme geçişi
   updateWakeLock();
 }
 

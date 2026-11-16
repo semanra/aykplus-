@@ -496,9 +496,11 @@ function snapshot() { undoSnap = JSON.stringify(state); }
 function offerUndo(msg) { toast(msg, "ok", { label: t("Geri al"), fn: doUndo }); }
 function doUndo() {
   if (!undoSnap) return;
+  const snapUsed = undoSnap;
   state = normalizeState(JSON.parse(undoSnap));
   undoSnap = null;
   renderAll();
+  if (typeof animUndoReturn === "function") animUndoReturn(snapUsed);   // v57 ANİM: silme ve geri al
   if (profileIsOpen()) fillProfileFields();   // v42: Profil otomatik kaydında Geri al kutuları da geri getirir
   toast(t("Geri alındı"));
 }

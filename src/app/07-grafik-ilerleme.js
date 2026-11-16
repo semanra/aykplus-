@@ -95,9 +95,11 @@ function pI(n, s = 16, w = 2.4) {
   return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${P_ICON[n]}"/></svg>`;
 }
 function setProgressView(v) {
+  const prev = state.progressView;
   state.progressView = PROG_VIEWS.some(x => x[0] === v) ? v : "genel";
   window.scrollTo(0, 0);
   renderAll();
+  if (prev !== state.progressView && typeof animViewIn === "function") animViewIn($("pv_" + state.progressView));   // v57 ANİM: sekme geçişi
 }
 function progWeightGood(d) { const tgt = num(state.settings.targetWeight, 82); return state.weight > tgt ? d <= 0 : d >= 0; }
 function setProgWRange(n) { progUI.wRange = n; renderProgress(); }

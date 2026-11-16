@@ -744,6 +744,20 @@
     html.anim-on #nutriThemeBtn svg.ayk-spin { animation: aykSpin .45s cubic-bezier(.22, 1, .36, 1); }
     @keyframes aykSpin { from { transform: rotate(-90deg) scale(.6); opacity: .3; } to { transform: rotate(0) scale(1); opacity: 1; } }
     @media (prefers-reduced-motion: reduce) { .ayk-burst { display: none; } }
+    /* v57 ANİMASYONLAR (27-animasyon.js, Web Animations API). Öğeler yalnızca animasyon açıkken eklenir. */
+    /* v57 ANİM: su damlası */
+    .ayk-wdrop { pointer-events: none; }
+    .n-wring .ayk-wdrop circle { stroke-width: 0; transform-box: fill-box; transform-origin: center; }
+    .n-wring .ayk-wdrop .d { fill: var(--n-water); }
+    .n-wring .ayk-wdrop .w { fill: none; stroke: var(--n-water); stroke-width: 2.5; }
+    /* v57 ANİM: hedef tamam */
+    .ayk-goal-ring { position: absolute; inset: -4px; border-radius: 9999px; border: 3px solid var(--n-accent); box-shadow: 0 0 18px var(--n-accent-soft); pointer-events: none; }
+    #proBar { position: relative; }
+    .ayk-goal-bar { position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .85), transparent); pointer-events: none; }
+    /* v57 ANİM: besin ekleme */
+    .ayk-new { position: relative; }
+    .ayk-new::after { content: ""; position: absolute; inset: 0 -8px; border-radius: 12px; background: var(--n-accent-soft); pointer-events: none; animation: aykNewHl 1s ease-out forwards; }
+    @keyframes aykNewHl { 0%, 35% { opacity: 1; } 100% { opacity: 0; } }
   </style>
 </head>
 <body class="pb-36">
