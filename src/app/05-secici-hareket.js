@@ -109,7 +109,7 @@ function fillExModalFields(v) {
   $("exName").value = v.name || "";
   $("exSetCount").value = v.count ?? 3;
   $("exRepRange").value = v.target ?? "8–12";
-  $("exStartKg").value = fmtKg(v.kg ?? 0);
+  $("exStartKg").value = fmtWNum(v.kg ?? 0);
   $("exTimeSetCount").value = v.tcount ?? 3;
   $("exTimeSec").value = v.sec ?? 45;
   $("exCardioMin").value = v.min ?? 30;
@@ -117,7 +117,12 @@ function fillExModalFields(v) {
   $("exCardioLvl").value = v.lvl ?? "";
   $("exRest").value = v.rest ?? state.settings.restSec;
   $("exMuscle").value = v.muscle && MUSCLES.includes(v.muscle) ? v.muscle : "auto";
-  $("exInc").value = v.inc ? fmtKg(v.inc) : "";
+  $("exInc").value = v.inc ? fmtKg(incDisp(v.inc)) : "";
+  // v53: imperial'de etiketlerde "kg" → "lb" (metrikte metin aynen kalır, DOM'a dokunulmaz)
+  ["exStartKg", "exInc", "exLvStart", "exLvStep", "exLvAddon"].forEach(id => {
+    const lb = document.querySelector(`label[for="${id}"]`);
+    if (lb && lb.dataset.t) { const v2 = wTxt(t(lb.dataset.t)); if (lb.textContent !== v2) lb.textContent = v2; }
+  });
   updateExMuscleAuto();
   fillExLevels(v);
 }
@@ -127,7 +132,7 @@ function updateExMuscleAuto() {
   const g = autoMuscle(name);
   $("exMuscle").options[0].textContent = g ? t("Otomatik ({e})", { e: muscleL(g) }) : t("Otomatik (belirlenemedi)");
   for (let i = 1; i < $("exMuscle").options.length; i++) $("exMuscle").options[i].textContent = muscleL($("exMuscle").options[i].value);   // v48: değer Türkçe kalır
-  $("exInc").placeholder = t("{n} (otomatik)", { n: fmtNum(autoInc(name)) });
+  $("exInc").placeholder = t("{n} (otomatik)", { n: fmtNum(incDisp(autoInc(name))) });
 }
 
 function openExerciseModal(opts) {
@@ -156,17 +161,36 @@ function openEditExercise(exIdx) {
   openModal("exerciseModal");
 }
 
+// v53: kutudaki kilo → kayıt kg. Metrikte round2 (eskisi gibi); imperial'de lb → kg. Gösterilen değer aynen
+// yeniden yazıldıysa eski kg korunur (düzenleme penceresi açıp kaydetmek kaydı kaydırmaz; lb'de girilmiş
+// 3 ondalıklı kg metrikte de 2 ondalığa yuvarlanmaz).
+function sameKgOrig(orig) { return orig !== undefined && orig !== null && orig !== "" && isFinite(num(orig, NaN)); }
+function exKgIn(val, orig, def) {
+  const n = num(val, def);
+  if (n < 0) return round2(n);
+  if (isImperial()) return keepKg(n, orig);
+  const r = round2(n);
+  return sameKgOrig(orig) && round2(num(orig)) === r ? num(orig) : r;
+}
 function readExLevels() {
   const sel = $("exEquip").value;
   const equip = EQUIP_LABEL[sel] ? sel : "";
-  const addon = Math.max(0, round2(num($("exLvAddon").value, 0)));
+  const oL = (exModal.orig && exModal.orig.levels) || {};
+  const addon = Math.max(0, exKgIn($("exLvAddon").value, oL.addon, 0));
   let levels = null;
   if (exLevelsMode === "step") {
-    const step = round2(num($("exLvStep").value, 0));
-    const start = round2(num($("exLvStart").value, 0));
+    const step = exKgIn($("exLvStep").value, oL.mode === "step" ? oL.step : null, 0);
+    const start = exKgIn($("exLvStart").value, oL.mode === "step" ? oL.start : null, 0);
     if (step > 0) levels = { mode: "step", start: start > 0 ? start : step, step, addon };
   } else {
-    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(tok => round2(num(tok.trim(), -1))).filter(v => v >= 0);
+    const oList = oL.mode === "list" && Array.isArray(oL.list) ? oL.list : [];
+    const listIn = tok => {
+      const n = num(tok, -1);
+      if (n < 0) return round2(n);
+      const o = oList.find(v => (isImperial() ? num(kgToDisp(num(v))) === n : round2(num(v)) === round2(n)));
+      return o !== undefined ? num(o) : isImperial() ? dispToKg(n) : round2(n);
+    };
+    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(tok => listIn(tok.trim())).filter(v => v >= 0);
     const uniq = [...new Set(list)].sort((a, b) => a - b);
     if (uniq.length >= 2) levels = { mode: "list", list: uniq, addon };
   }
@@ -177,7 +201,7 @@ function readExModal() {
     name: $("exName").value.trim(),
     count: Math.max(1, Math.min(12, Math.round(num($("exSetCount").value, 3)))),
     target: $("exRepRange").value.trim().replace(/-/g, "–") || "8–12",
-    kg: Math.max(0, round2(num($("exStartKg").value, 0))),
+    kg: Math.max(0, exKgIn($("exStartKg").value, exModal.orig ? exModal.orig.kg : null, 0)),
     tcount: Math.max(1, Math.min(12, Math.round(num($("exTimeSetCount").value, 3)))),
     sec: Math.max(5, Math.round(num($("exTimeSec").value, 45))),
     min: Math.max(0, round1(num($("exCardioMin").value, 30))),
@@ -185,9 +209,17 @@ function readExModal() {
     lvl: $("exCardioLvl").value.trim(),
     rest: Math.max(0, Math.min(900, Math.round(num($("exRest").value, state.settings.restSec)))),
     muscle: MUSCLES.includes($("exMuscle").value) ? $("exMuscle").value : "",
-    inc: $("exInc").value.trim() === "" ? 0 : Math.max(0, Math.min(50, round2(num($("exInc").value, 0)))),
+    inc: $("exInc").value.trim() === "" ? 0 : Math.max(0, Math.min(50, exIncIn($("exInc").value))),
     ...readExLevels()
   };
+}
+
+// v53: artış adımı kutusu. Imperial'de gösterilen adım (incDisp) aynen yazıldıysa eski kayıt korunur.
+function exIncIn(val) {
+  const n = num(val, 0), o = exModal.orig ? exModal.orig.inc : "";
+  if (!isImperial()) return num(o, 0) > 0 && round2(num(o)) === round2(n) ? num(o) : round2(n);
+  if (num(o, 0) > 0 && incDisp(num(o)) === n) return num(o);
+  return dispToKg(n);
 }
 
 function applyExExtras(ex, v) {
@@ -292,7 +324,7 @@ function sessionSummary(sess) {
     return t("{n} dk", { n: ct.min }) + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : "");
   }
   if (sess.kind === "time") return sets.map(s => t("{n} sn", { n: String(num(s.sec)) })).join(" · ");
-  return sets.map(s => `${fmtKg(num(s.kg))}×${num(s.reps)}`).join(" · ");
+  return sets.map(s => `${fmtWNum(num(s.kg))}×${num(s.reps)}`).join(" · ");
 }
 
 // ---------------------------------------------------------------------------
@@ -307,7 +339,7 @@ function updateSetData(exIdx, sIdx, field, val) {
   if (field === "lvl") s.lvl = String(val).trim();
   else if (field === "km") s.km = String(val).trim() === "" ? "" : Math.max(0, Math.round(num(val) * 100) / 100);
   else if (field === "reps" || field === "sec") s[field] = Math.max(0, Math.round(num(val)));
-  else if (field === "kg") s.kg = Math.max(0, round2(num(val)));
+  else if (field === "kg") s.kg = Math.max(0, exKgIn(val, s.kg, 0));   // v53: lb girişi; gösterilen değer yeniden yazılınca kayıt kaymaz
   else s[field] = Math.max(0, round1(num(val)));
   const ex = activeDay().exercises[exIdx];
   const rEl = $("exRight_" + exIdx);
@@ -333,7 +365,7 @@ function toggleSetDone(exIdx, sIdx) {
         ex.sets.forEach((o, i) => { if (i !== sIdx && o.done) best = Math.max(best, e1rm(o.kg, o.reps)); });
         if (cur > best + 0.01) {
           s.pr = true;
-          toast(t("YENİ REKOR! {name}: {kg} kg × {reps} (1RM ~{rm} kg)", { name: exNameL(ex.name), kg: fmtKg(num(s.kg)), reps: String(num(s.reps)), rm: String(Math.round(cur)) }), "pr");
+          toast(trFill(wTxt(t("YENİ REKOR! {name}: {kg} kg × {reps} (1RM ~{rm} kg)", { kg: fmtWNum(num(s.kg)), reps: String(num(s.reps)), rm: String(Math.round(wRaw(cur))) })), { name: exNameL(ex.name) }), "pr");
         }
       }
     }
@@ -465,8 +497,9 @@ async function finishAndLogWorkout() {
 }
 
 // v48: bitiş bildirimi tek cümle kalıplarıyla (süre / kardiyo / rekor var-yok birleşimleri; rekor sayısı tn)
-function finishToastText(durMin, vol, cMin, prs) {
-  const v = { dur: durMin ? fmtMinutes(durMin) : "", vol: Math.round(vol).toLocaleString(locale()), cmin: cMin };
+function finishToastText(durMin, vol, cMin, prs) { return wTxt(finishToastTextKg(durMin, vol, cMin, prs)); }   // v53: imperial'de lb
+function finishToastTextKg(durMin, vol, cMin, prs) {
+  const v = { dur: durMin ? fmtMinutes(durMin) : "", vol: Math.round(wRaw(vol)).toLocaleString(locale()), cmin: cMin };
   if (durMin) {
     if (cMin > 0) return prs ? tn(prs, "Tebrikler! {dur}, {vol} kg tonaj, {cmin} dk kardiyo, {n} rekor kaydedildi", v) : t("Tebrikler! {dur}, {vol} kg tonaj, {cmin} dk kardiyo kaydedildi", v);
     return prs ? tn(prs, "Tebrikler! {dur}, {vol} kg tonaj, {n} rekor kaydedildi", v) : t("Tebrikler! {dur}, {vol} kg tonaj kaydedildi", v);

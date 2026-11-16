@@ -1,6 +1,6 @@
 # v53 bölüm 1 (görev 1): birim katmanı (settings.units = metric | imperial), göç adımı 6, yeni kurulumda bölgeye göre birim,
 # Profil ve kurulumda "Birim" seçicisi. Kayıt her zaman kg / cm; yalnız gösterim ve giriş çevrilir.
-import os, sys, json, subprocess, time
+import os, sys, json, subprocess, time, re
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ortak_tohum import TEST_INIT, SPLASH_OFF, FIXTURE
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -190,6 +190,161 @@ try:
         q.evaluate("void resetToDefaults()"); q.click("#uiDlgOk"); q.wait_for_timeout(80); q.click("#uiDlgOk"); q.wait_for_timeout(300)
         check(q.evaluate("state.settings.units") == want and q.evaluate("state.settings.onboarded") is False and q.is_visible("#onboard"), "e: fabrika ayarları %s → %s, kurulum açık (%s)" % (loc, want, q.evaluate("state.settings.units")))
         c.close()
+    # ===== BÖLÜM 2 (görev 2): antrenmanda lb — set kilosu, plakalar, kademeler, öneri, 1RM / tonaj, paylaşım kartı
+    SETUP2 = r"""() => {
+      const now = Date.now(), D = 86400000, day = state.workoutDays[0];
+      const bp = day.exercises[0]; bp.sets.forEach(s => { s.kg = 60; s.reps = 6; });
+      const row = day.exercises[1]; row.equip = 'stack'; row.levels = { mode: 'step', start: 5, step: 5, addon: 0 }; row.sets.forEach(s => { s.kg = 45; });
+      state.exerciseHistory = {}; state.workoutLogs = [];
+      const k = exKey(bp.name);
+      state.exerciseHistory[k] = [20, 13, 6, 2].map((b, i) => ({ ts: now - b * D, logId: 'w' + (now - b * D), kind: 'weight', name: bp.name, sets: [0, 1, 2].map(() => ({ kg: 50 + i * 2.5, reps: 8 })) }));
+      state.workoutLogs = [20, 13, 6, 2].map(b => ({ id: 'w' + (now - b * D), ts: now - b * D, date: '1 Kas', dayId: day.id, dayName: day.name, sets: 3, durationMin: 50, volume: 1500, cardioMin: 0, cardioKm: 0, prs: 0, summary: '8 Hareket' }));
+      day.exercises.forEach(e => { if (e.kind !== 'cardio' && e.rest == null) e.rest = state.settings.restSec; });
+      state.settings.barKg = 20; state.gymActive = true; state.activeTab = 'gym'; state.gymView = 'today';
+      renderAll();
+    }"""
+    def set_in(pg, sel, v):   # odak olmadan değer + change (yeniden çizimde odak korumanın ikinci change'ini önler)
+        pg.evaluate("([s, v]) => { const e = document.querySelector(s); e.value = v; e.dispatchEvent(new Event('change')); }", [sel, v])
+    def g_text(pg):
+        out = {}
+        pg.evaluate("switchTab('gym'); setGymView('today'); startWorkout()"); pg.wait_for_timeout(60)
+        out["active"] = re.sub(r"\d+:\d\d", "", pg.inner_text("#gymRoot"))   # geçen süre sayacı hariç
+        pg.evaluate("openPlateTool(0)"); pg.wait_for_timeout(60); out["plate"] = pg.inner_text("#chartBody"); pg.evaluate("closeModal('chartModal')")
+        pg.evaluate("openPlateTool(1)"); pg.wait_for_timeout(60); out["level"] = pg.inner_text("#chartBody"); pg.evaluate("closeModal('chartModal')")
+        out["right"] = pg.evaluate("activeDay().exercises.slice(0, 2).map(e => exRightText(e))")
+        out["sug"] = pg.evaluate("(s => s && [s.type, s.kg, s.text])(overloadSuggestion(activeDay().exercises[0]))")
+        pg.evaluate("setGymView('history')"); pg.wait_for_timeout(60); out["history"] = pg.inner_text("#gymRoot")
+        pg.evaluate("switchTab('progress'); setProgressView('guc')"); pg.wait_for_timeout(100); out["guc"] = pg.inner_text("#progressContent")
+        pg.evaluate("switchTab('gym'); setGymView('today')"); pg.wait_for_timeout(60)
+        return out
+    c, pg = ctx(); pg.goto(URL); boot(pg); pg.evaluate(SETUP2); pg.wait_for_timeout(100)
+    # metrik: bugünkü metinler (v52 ile aynı biçim)
+    m0 = g_text(pg)
+    check(m0["right"] == ["Tahmini 1RM ~72 kg · Tonaj 1.080 kg", "Tahmini 1RM ~57 kg · Tonaj 1.440 kg · Kademe: 5 kg arayla"], "2: metrik exRightText aynı biçim: %s" % m0["right"])
+    msg = pg.evaluate("(() => { const ex = activeDay().exercises[0], o = ex.sets.map(s => s.kg); ex.sets.forEach(s => { s.kg = 57.5; }); const sg = overloadSuggestion(ex); ex.sets.forEach((s, i) => { s.kg = o[i]; }); return sg && [sg.type, sg.kg, sg.text]; })()")
+    check(m0["sug"] is None and msg == ["up", 60, "Geçen sefer tüm setlerde 8+ tekrar yaptın. Kiloyu 57,5 → 60 kg'a çıkar, 5 tekrardan başla."], "2: metrik öneri metni ve artış 2,5 kg: %s" % (msg,))
+    check("(20 kg / taraf)" in m0["plate"] and "20 kg Olimpik bar" in m0["plate"] and "Çalışma kilosu (kg)" in m0["plate"] and " lb" not in m0["plate"], "2: metrik plaka aracı kg (60 kg → 20 kg / taraf)")
+    check("tahmini 1RM, kg" in m0["guc"] and "ton" in m0["guc"] and " lb" not in m0["guc"], "2: metrik Güç kg / ton")
+    check(" lb" not in m0["active"] and "KG" in m0["active"], "2: metrik antrenman başlığı KG")
+    s_before = st(pg)
+    # --- imperial
+    pg.evaluate("setUnits('imperial')"); pg.wait_for_timeout(100)
+    i0 = g_text(pg)
+    vals = pg.evaluate("[...document.querySelectorAll('#exCard_0 input[data-fk$=\"-kg\"]')].map(e => e.value)")
+    check(vals == ["132,5", "132,5", "132,5"] and "LB" in i0["active"] and " KG" not in i0["active"], "2: set kutuları lb (60 kg → 132,5), başlık LB: %s" % vals)
+    s_imp = st(pg)
+    check(all(s_imp.get(k) == s_before.get(k) for k in ("workoutDays", "exerciseHistory", "workoutLogs")) and s_imp["settings"]["barKg"] == 20, "2: birim değişince kayıttaki set / geçmiş / bar aynı")
+    # set kutusu: 135 yaz → 61.235 kg; aynı değeri yeniden yaz → değişmez; gösterilen 132,5'i yeniden yazmak 60 kg'ı kaydırmaz
+    sel0 = "#exCard_0 input[data-fk='w-0-0-kg']"
+    set_in(pg, sel0, "135"); pg.wait_for_timeout(80)
+    check(pg.evaluate("activeDay().exercises[0].sets[0].kg") == 61.235 and st(pg)["workoutDays"][0]["exercises"][0]["sets"][0]["kg"] == 61.235, "2: '135' → kayıt 61.235 kg")
+    pg.evaluate("renderAll()"); pg.wait_for_timeout(60)
+    check(pg.input_value(sel0) == "135", "2: ekranda 135: %r" % pg.input_value(sel0))
+    set_in(pg, sel0, "135"); pg.wait_for_timeout(60)
+    check(pg.evaluate("activeDay().exercises[0].sets[0].kg") == 61.235, "2: aynı kutuya yeniden '135' → kayıt değişmez")
+    sel1 = "#exCard_0 input[data-fk='w-0-1-kg']"
+    set_in(pg, sel1, "132,5"); pg.wait_for_timeout(60)
+    check(pg.evaluate("activeDay().exercises[0].sets[1].kg") == 60, "2: gösterilen 132,5 yeniden yazılınca 60 kg kalır (kayma yok)")
+    set_in(pg, sel1, "225"); pg.wait_for_timeout(60)
+    check(pg.evaluate("activeDay().exercises[0].sets[1].kg") == 102.058, "2: '225' → 102.058 kg")
+    pg.evaluate("activeDay().exercises[0].sets.forEach(s => { s.kg = 61.235; }); renderAll()")
+    # plaka aracı: 135 lb → bar 45 + her yana 45; sahibin bar ayarı (20 kg) 45 lb varsayılır, yazılmaz
+    r = pg.evaluate("[JSON.stringify(platesFor(135, 45)), barDisp(), JSON.stringify(warmupSets(135, 45).map(w => [w.kg, w.reps])), JSON.stringify(warmupSets(315, 45).map(w => w.kg))]")
+    check(r[0] == '{"ok":true,"list":[45],"rem":0,"perSide":45,"achieved":135}' and r[1] == 45, "2: platesFor(135, 45) = her yana 45, bar 45: %s" % r[:2])
+    check(r[2] == "[[45,10],[55,8],[80,5],[110,3]]" and r[3] == "[45,125,190,250,285]", "2: ısınma setleri lb'de 5'in katları: %s %s" % (r[2], r[3]))
+    pg.evaluate("openPlateTool(0)"); pg.wait_for_timeout(60)
+    pt = pg.inner_text("#chartBody")
+    check("Çalışma kilosu (lb)" in pt and "(45 lb / taraf)" in pt and "45 lb Olimpik bar" in pt and pg.input_value("#ptKg") == "135" and pg.input_value("#ptBar") == "45" and " kg" not in pt, "2: plaka aracı lb: 135 → 45 lb / taraf")
+    chips = pg.evaluate("[...document.querySelectorAll('#ptOut span.rounded-md')].map(e => e.textContent)")
+    check(chips[:1] == ["45"], "2: plaka çipi 45: %s" % chips)
+    check(st(pg)["settings"]["barKg"] == 20, "2: bar ayarı açınca yazılmaz (20 kg kalır)")
+    pg.select_option("#ptBar", "35"); pg.wait_for_timeout(60)
+    check(pg.evaluate("state.settings.barKg") == 15.876 and "(50 lb / taraf)" in pg.inner_text("#chartBody"), "2: 35 lb bar seçilince 15.876 kg saklanır, her yana 50 lb")
+    pg.select_option("#ptBar", "45"); pg.wait_for_timeout(40)
+    check(pg.evaluate("state.settings.barKg") == 20.412, "2: 45 lb bar = 20.412 kg")
+    pg.evaluate("closeModal('chartModal')")
+    # artış adımı ve öneri: 5 lb
+    r = pg.evaluate("[incDisp(2.5), incDisp(2), incDisp(5), incDisp(1.25), incDisp(dispToKg(7.5)), incDisp(dispToKg(1)), incDisp(3)]")
+    check(r == [5, 5, 10, 2.5, 7.5, 1, 7.5], "2: artış adımı lb (2,5 kg → 5, 2 → 5, 5 → 10, 1,25 → 2,5; lb'de girilen aynen): %s" % r)
+    r = pg.evaluate("(() => { const ex = activeDay().exercises[0]; return [nextLevel(ex, 61.235), prevLevel(ex, 61.235), kgToDisp(nextLevel(ex, 60))]; })()")
+    check(r == [63.503, 58.967, 137.5], "2: nextLevel / prevLevel lb'de ±5 (135 → 140 / 130; 132,5 → 137,5): %s" % r)
+    pg.evaluate("""(() => { const ex = activeDay().exercises[0]; const h = historyFor(ex.name); h[h.length - 1].sets.forEach(s => { s.kg = 61.235; s.reps = 8; }); ex.sugDismiss = 0; renderAll(); })()""")
+    sg = pg.evaluate("(s => s && [s.type, s.kg, s.text])(overloadSuggestion(activeDay().exercises[0]))")
+    check(sg and sg[0] == "up" and sg[1] == 63.503 and "135 → 140 lb'ye" in sg[2], "2: öneri 135 → 140 lb: %s" % (sg,))
+    btn = pg.evaluate("[...document.querySelectorAll('#exCard_0 button')].map(e => e.textContent.trim()).filter(x => / lb$/.test(x))")
+    check(btn == ["140 lb"], "2: öneri düğmesi '140 lb': %s" % btn)
+    # kademeler: {step, start 5, step 5} kg → lb gösterimi; pencere açıp değiştirmeden kaydetmek kaydı değiştirmez
+    check(pg.evaluate("levelsSummary(activeDay().exercises[1])") == "11 lb arayla" and pg.evaluate("levelListOf(activeDay().exercises[1]).slice(0, 3).map(v => kgToDisp(v))") == [11, 22, 33], "2: kademe özeti '11 lb arayla', liste 11 / 22 / 33")
+    pg.evaluate("openPlateTool(1)"); pg.wait_for_timeout(60)
+    lt = pg.inner_text("#chartBody")
+    check("99" in lt and "99 lb" in lt and " kg" not in lt, "2: kademe aracı lb (45 kg → 99 lb)")
+    pg.evaluate("closeModal('chartModal')")
+    before_ex = pg.evaluate("JSON.stringify(activeDay().exercises)")
+    for i in (0, 1):
+        pg.evaluate("openEditExercise(%d)" % i); pg.wait_for_timeout(60)
+        if i == 1:
+            v = pg.evaluate("['exStartKg', 'exLvStart', 'exLvStep'].map(i => document.getElementById(i).value)")
+            lbl = pg.evaluate("['exStartKg', 'exLvStart', 'exLvStep', 'exLvAddon', 'exInc'].map(i => document.querySelector('label[for=' + i + ']').textContent)")
+            check(v == ["99", "11", "11"] and lbl == ["Başlangıç lb", "En düşük kademe (lb)", "Artış aralığı (lb)", "Ek ara plaka (lb, varsa)", "Kilo artış adımı (lb)"], "2: hareket penceresi lb: %s %s" % (v, lbl))
+        else:
+            check(pg.input_value("#exStartKg") == "135" and pg.get_attribute("#exInc", "placeholder") == "5 (otomatik)", "2: başlangıç 135, artış yer tutucu '5 (otomatik)'")
+        pg.evaluate("saveExerciseModal()"); pg.wait_for_timeout(60)
+    check(pg.evaluate("JSON.stringify(activeDay().exercises)") == before_ex, "2: hareket penceresi açılıp kaydedilince kg / kademeler değişmez")
+    pg.evaluate("openEditExercise(1)"); pg.wait_for_timeout(40); pg.fill("#exLvStep", "10"); pg.evaluate("saveExerciseModal()"); pg.wait_for_timeout(40)
+    check(pg.evaluate("JSON.stringify(activeDay().exercises[1].levels)") == '{"mode":"step","start":5,"step":4.536,"addon":0}' and pg.evaluate("levelListOf(activeDay().exercises[1]).slice(0, 3).map(v => kgToDisp(v))") == [11, 21, 31], "2: kademe adımı 10 lb → 4.536 kg (başlangıç 5 kg korunur)")
+    pg.evaluate("openEditExercise(1)"); pg.wait_for_timeout(40); pg.select_option("#exEquip", "stack"); pg.evaluate("setExLevelsMode('list')"); pg.fill("#exLvList", "10; 20; 30"); pg.evaluate("saveExerciseModal()"); pg.wait_for_timeout(40)
+    check(pg.evaluate("activeDay().exercises[1].levels.list") == [4.536, 9.072, 13.608] and pg.evaluate("levelListOf(activeDay().exercises[1]).map(v => kgToDisp(v))") == [10, 20, 30], "2: kademe listesi lb'de yazılır (10; 20; 30 → kg)")
+    pg.evaluate("openEditExercise(1)"); pg.wait_for_timeout(40)
+    check(pg.input_value("#exLvList") == "10; 20; 30", "2: liste lb'de geri gelir: %r" % pg.input_value("#exLvList"))
+    pg.evaluate("saveExerciseModal()"); pg.wait_for_timeout(40)
+    check(pg.evaluate("activeDay().exercises[1].levels.list") == [4.536, 9.072, 13.608], "2: liste değiştirmeden kaydedilince aynı")
+    pg.evaluate("openEditExercise(0)"); pg.wait_for_timeout(40); pg.fill("#exInc", "10"); pg.evaluate("saveExerciseModal()"); pg.wait_for_timeout(40)
+    check(pg.evaluate("activeDay().exercises[0].inc") == 4.536 and pg.evaluate("kgToDisp(nextLevel(activeDay().exercises[0], 61.235))") == 145, "2: artış adımı 10 lb → 4.536 kg, öneri +10 lb")
+    pg.evaluate("openEditExercise(0)"); pg.wait_for_timeout(40)
+    check(pg.input_value("#exInc") == "10", "2: artış adımı 10 lb geri gelir")
+    pg.evaluate("saveExerciseModal()"); pg.wait_for_timeout(40)
+    check(pg.evaluate("activeDay().exercises[0].inc") == 4.536, "2: artış adımı yeniden kaydedilince aynı")
+    # 1RM / tonaj / Güç / paylaşım kartı
+    i1 = g_text(pg)
+    check(i1["right"][0] == "Tahmini 1RM ~162 lb · Tonaj 2.430 lb", "2: exRightText lb: %s" % i1["right"][0])
+    check("tahmini 1RM, lb" in i1["guc"] and "bin lb" in i1["guc"] and " kg" not in i1["guc"] and "lb ×" in i1["guc"], "2: Güç: 1RM / rekor / tonaj lb")
+    check("3.307 lb" in i1["history"] and "bin lb" in i1["history"], "2: Antrenman geçmişi tonaj lb (1500 kg → 3.307 lb)")
+    toast = pg.evaluate("finishToastText(50, 1500, 0, 0)")
+    check(toast == "Tebrikler! 50 dk, 3.307 lb tonaj kaydedildi", "2: bitiş bildirimi lb: %r" % toast)
+    pr = pg.evaluate("wTxt(t('YENİ REKOR! {name}: {kg} kg × {reps} (1RM ~{rm} kg)', { kg: '135', reps: '5', rm: '158' }))")
+    check(pr == "YENİ REKOR! {name}: 135 lb × 5 (1RM ~158 lb)", "2: rekor kalıbı lb, ad sonradan: %r" % pr)
+    r = pg.evaluate("[wTxt(\"{a} kg'a çıkar\"), wTxt(\"{a} kg'da kal\"), wTxt(\"~{b} kg'ı geçmedi\"), wTxt(\"{c} kg'lık bar\"), wTxt('(kg) kcal kg/taraf --d-kgx')]")
+    check(r == ["{a} lb'ye çıkar", "{a} lb'de kal", "~{b} lb'yi geçmedi", "{c} lb'lik bar", "(lb) kcal lb/taraf --d-kgx"], "2: wTxt Türkçe ekler: %s" % r)
+    share = pg.evaluate("""async () => { const txt = []; const f = CanvasRenderingContext2D.prototype.fillText;
+      CanvasRenderingContext2D.prototype.fillText = function (s, ...a) { txt.push(String(s)); return f.call(this, s, ...a); };
+      try { await buildShareCanvas(state.workoutLogs[state.workoutLogs.length - 1]); } finally { CanvasRenderingContext2D.prototype.fillText = f; }
+      return txt; }""")
+    check("3.307 lb" in share and not any(x.endswith(" kg") for x in share), "2: paylaşım kartı tonaj lb: %s" % [x for x in share if "lb" in x or "kg" in x])
+    check(pg.evaluate("logExerciseLines(state.workoutLogs[state.workoutLogs.length - 1])[0].txt") == "3 set • en iyi 135×8", "2: paylaşım kartı hareket satırı lb (61.235 kg → 135)")
+    pg.evaluate("setLang('en')"); pg.wait_for_timeout(80)
+    e1 = g_text(pg)
+    check(e1["right"][0] == "Estimated 1RM ~162 lb · Volume 2,430 lb" and "estimated 1RM, lb" in e1["guc"] and "k lb" in e1["guc"], "2: İngilizce + lb: %s" % e1["right"][0])
+    pg.evaluate("openPlateTool(0)"); pg.wait_for_timeout(60)
+    check("45 lb Olympic bar" in pg.inner_text("#chartBody") and "(45 lb per side)" in pg.inner_text("#chartBody"), "2: İngilizce plaka aracı lb")
+    pg.evaluate("closeModal('chartModal')")
+    pg.evaluate("setLang('tr')"); pg.wait_for_timeout(60)
+    pg.screenshot(path=os.path.join(SHOTS, "v53_antrenman_lb.png"))
+    c.close()
+    # birim değiştirip geri almak: ekran aynı, kayıt aynı (bölüm 2 metrik ↔ imperial ↔ metrik)
+    c, pg = ctx(); pg.goto(URL); boot(pg); pg.evaluate(SETUP2); pg.wait_for_timeout(100)
+    a0 = g_text(pg); sa = st(pg)
+    pg.evaluate("setUnits('imperial')"); pg.wait_for_timeout(60); g_text(pg)
+    pg.evaluate("openPlateTool(0)"); pg.wait_for_timeout(40); pg.evaluate("closeModal('chartModal')")
+    pg.evaluate("openEditExercise(1); saveExerciseModal()"); pg.wait_for_timeout(40)
+    pg.evaluate("setUnits('metric')"); pg.wait_for_timeout(60)
+    a1 = g_text(pg); sb = st(pg)
+    dif = [k for k in a0 if k != "history" and a0[k] != a1[k]]
+    check(not dif, "2: metrik → imperial → metrik: ekran metinleri aynı: %s" % [(k, str(a0[k])[:200], str(a1[k])[:200]) for k in dif])
+    check(all(sa.get(k) == sb.get(k) for k in ("workoutDays", "exerciseHistory", "workoutLogs")) and sb["settings"]["barKg"] == 20, "2: metrik → imperial → metrik: kayıt aynı")
+    pg.evaluate("setLang('en')"); pg.wait_for_timeout(60)
+    en = g_text(pg)
+    check(en["right"] == ["Estimated 1RM ~72 kg · Volume 1,080 kg", "Estimated 1RM ~57 kg · Volume 1,440 kg · Weight increments: every 5 kg"] and " lb" not in en["guc"] and "(20 kg per side)" in en["plate"], "2: İngilizce + kg aynı biçim: %s" % en["right"])
+    c.close()
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

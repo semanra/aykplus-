@@ -63,6 +63,45 @@ function plateSet() { return isImperial() ? PLATES_LB.slice() : PLATES.slice(); 
 function barOptions() { return isImperial() ? [45, 35, 15, 0] : [20, 15, 10, 0]; }
 function wStep() { return isImperial() ? 5 : 2.5; }
 
+// ---------------------------------------------------------------------------
+// v53 Görev 2 — Antrenman: set kilosu, artış, kademe, plaka, 1RM / tonaj gösterimi.
+// - Giriş: gösterilen değer yeniden yazılırsa (aynı sayı) kayıttaki kg DEĞİŞMEZ (keepKg); yoksa dispToKg (3 ondalık).
+// - Artış adımı (ex.inc, autoInc) kg saklanır; imperial'de lb adımı incDisp: lb'de girilmiş adım (3 ondalık kg,
+//   gidiş-dönüş birebir) aynen; kg kökenli adım en yakın 2,5 lb katına (en az 2,5): 2,5 → 5, 2 → 5, 5 → 10, 1,25 → 2,5.
+// - Plaka aracı ve ısınma imperial'de tamamen lb'de hesaplanır (plateSet, 45 / 35 / 15 lb bar); kademe listeleri kg
+//   saklanır, gösterimde lb'ye çevrilir. Bar ayarı (settings.barKg) seçeneklerden birine uymuyorsa 45 lb varsayılır, yazılmaz.
+// - Metin: Türkçe/İngilizce kalıplardaki "kg" birimi wTxt ile "lb" olur (Türkçe ekler: kg'a → lb'ye, kg'da → lb'de,
+//   kg'ı → lb'yi, kg'lık → lb'lik). Metrikte wTxt metni aynen döndürür (piksel aynı). Kullanıcı metni (hareket adı)
+//   wTxt'ten SONRA trFill ile eklenir.
+// ---------------------------------------------------------------------------
+function round3(n) { return Math.round(n * 1000) / 1000; }
+// 1RM / tonaj gibi yuvarlanmayan büyüklükler: imperial'de lb sayısı, metrikte girdi aynen
+function wRaw(kg) { return isImperial() ? num(kg) / LB_KG : kg; }
+function wTxt(s) {
+  if (!isImperial()) return s;
+  return String(s).replace(/\bkg('a|'da|'ı|'lık)?(?![A-Za-zÀ-ɏ])/g, (m, suf) => {
+    if (!suf) return "lb";
+    if (suf === "'a") return "lb'ye";
+    if (suf === "'da") return "lb'de";
+    if (suf.length === 2) return "lb'yi";
+    return "lb'lik";
+  });
+}
+// Gösterilen set kilosu girişi → kayıt kg. Aynı sayı yeniden yazılırsa eski kg aynen (yuvarlama birikmesi yok).
+function keepKg(v, origKg) {
+  const n = unitNum(v);
+  if (n === null) return dispToKg(v);
+  if (origKg !== undefined && origKg !== null && origKg !== "" && isFinite(num(origKg, NaN)) && num(kgToDisp(num(origKg))) === n) return origKg;
+  return dispToKg(n);
+}
+// Artış adımı gösterimde (kg saklı): metrikte aynen
+function incDisp(kg) {
+  if (!isImperial()) return kg;
+  const k = num(kg), d = num(kgToDisp(k));
+  if (Math.abs(dispToKg(d) - k) < 1e-9) return d;   // lb'de girilmiş
+  return Math.max(2.5, Math.round(k / LB_KG / 2.5) * 2.5);
+}
+
 // Ayar: yalnız gösterim değişir; kayıtlı hiçbir değer çevrilmez
 function setUnits(u) {
   u = u === "imperial" ? "imperial" : "metric";
@@ -84,5 +123,8 @@ Object.assign(EN, {
   "Kilo vermek için hedef kilo şu anki kilondan ({w}) az olmalı.": "To lose weight, your goal weight must be below your current weight ({w}).",
   "Kilo almak için hedef kilo şu anki kilondan ({w}) fazla olmalı (en çok {max}).": "To gain weight, your goal weight must be above your current weight ({w}), up to {max}.",
   "Haftada yaklaşık {w} kayıp (günde ~{kcal} kcal açık).": "About {w} lost per week (a deficit of ~{kcal} kcal a day).",
-  "Haftada yaklaşık {w} artış (günde ~{kcal} kcal fazla).": "About {w} gained per week (a surplus of ~{kcal} kcal a day)."
+  "Haftada yaklaşık {w} artış (günde ~{kcal} kcal fazla).": "About {w} gained per week (a surplus of ~{kcal} kcal a day).",
+  // v53 Görev 2: antrenman (imperial)
+  "45 lb Olimpik bar": "45 lb Olympic bar", "35 lb Bar": "35 lb bar", "15 lb EZ / kısa bar": "15 lb EZ / short bar",
+  "bin lb": "k lb", "Son 8 haftanın tonajı (bin lb)": "Volume for the last 8 weeks (thousand lb)"
 });

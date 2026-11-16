@@ -5232,7 +5232,7 @@ function fillExModalFields(v) {
   $("exName").value = v.name || "";
   $("exSetCount").value = v.count ?? 3;
   $("exRepRange").value = v.target ?? "8–12";
-  $("exStartKg").value = fmtKg(v.kg ?? 0);
+  $("exStartKg").value = fmtWNum(v.kg ?? 0);
   $("exTimeSetCount").value = v.tcount ?? 3;
   $("exTimeSec").value = v.sec ?? 45;
   $("exCardioMin").value = v.min ?? 30;
@@ -5240,7 +5240,12 @@ function fillExModalFields(v) {
   $("exCardioLvl").value = v.lvl ?? "";
   $("exRest").value = v.rest ?? state.settings.restSec;
   $("exMuscle").value = v.muscle && MUSCLES.includes(v.muscle) ? v.muscle : "auto";
-  $("exInc").value = v.inc ? fmtKg(v.inc) : "";
+  $("exInc").value = v.inc ? fmtKg(incDisp(v.inc)) : "";
+  // v53: imperial'de etiketlerde "kg" → "lb" (metrikte metin aynen kalır, DOM'a dokunulmaz)
+  ["exStartKg", "exInc", "exLvStart", "exLvStep", "exLvAddon"].forEach(id => {
+    const lb = document.querySelector(`label[for="${id}"]`);
+    if (lb && lb.dataset.t) { const v2 = wTxt(t(lb.dataset.t)); if (lb.textContent !== v2) lb.textContent = v2; }
+  });
   updateExMuscleAuto();
   fillExLevels(v);
 }
@@ -5250,7 +5255,7 @@ function updateExMuscleAuto() {
   const g = autoMuscle(name);
   $("exMuscle").options[0].textContent = g ? t("Otomatik ({e})", { e: muscleL(g) }) : t("Otomatik (belirlenemedi)");
   for (let i = 1; i < $("exMuscle").options.length; i++) $("exMuscle").options[i].textContent = muscleL($("exMuscle").options[i].value);   // v48: değer Türkçe kalır
-  $("exInc").placeholder = t("{n} (otomatik)", { n: fmtNum(autoInc(name)) });
+  $("exInc").placeholder = t("{n} (otomatik)", { n: fmtNum(incDisp(autoInc(name))) });
 }
 
 function openExerciseModal(opts) {
@@ -5279,17 +5284,36 @@ function openEditExercise(exIdx) {
   openModal("exerciseModal");
 }
 
+// v53: kutudaki kilo → kayıt kg. Metrikte round2 (eskisi gibi); imperial'de lb → kg. Gösterilen değer aynen
+// yeniden yazıldıysa eski kg korunur (düzenleme penceresi açıp kaydetmek kaydı kaydırmaz; lb'de girilmiş
+// 3 ondalıklı kg metrikte de 2 ondalığa yuvarlanmaz).
+function sameKgOrig(orig) { return orig !== undefined && orig !== null && orig !== "" && isFinite(num(orig, NaN)); }
+function exKgIn(val, orig, def) {
+  const n = num(val, def);
+  if (n < 0) return round2(n);
+  if (isImperial()) return keepKg(n, orig);
+  const r = round2(n);
+  return sameKgOrig(orig) && round2(num(orig)) === r ? num(orig) : r;
+}
 function readExLevels() {
   const sel = $("exEquip").value;
   const equip = EQUIP_LABEL[sel] ? sel : "";
-  const addon = Math.max(0, round2(num($("exLvAddon").value, 0)));
+  const oL = (exModal.orig && exModal.orig.levels) || {};
+  const addon = Math.max(0, exKgIn($("exLvAddon").value, oL.addon, 0));
   let levels = null;
   if (exLevelsMode === "step") {
-    const step = round2(num($("exLvStep").value, 0));
-    const start = round2(num($("exLvStart").value, 0));
+    const step = exKgIn($("exLvStep").value, oL.mode === "step" ? oL.step : null, 0);
+    const start = exKgIn($("exLvStart").value, oL.mode === "step" ? oL.start : null, 0);
     if (step > 0) levels = { mode: "step", start: start > 0 ? start : step, step, addon };
   } else {
-    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(tok => round2(num(tok.trim(), -1))).filter(v => v >= 0);
+    const oList = oL.mode === "list" && Array.isArray(oL.list) ? oL.list : [];
+    const listIn = tok => {
+      const n = num(tok, -1);
+      if (n < 0) return round2(n);
+      const o = oList.find(v => (isImperial() ? num(kgToDisp(num(v))) === n : round2(num(v)) === round2(n)));
+      return o !== undefined ? num(o) : isImperial() ? dispToKg(n) : round2(n);
+    };
+    const list = String($("exLvList").value).split(/[;\s]+/).filter(Boolean).map(tok => listIn(tok.trim())).filter(v => v >= 0);
     const uniq = [...new Set(list)].sort((a, b) => a - b);
     if (uniq.length >= 2) levels = { mode: "list", list: uniq, addon };
   }
@@ -5300,7 +5324,7 @@ function readExModal() {
     name: $("exName").value.trim(),
     count: Math.max(1, Math.min(12, Math.round(num($("exSetCount").value, 3)))),
     target: $("exRepRange").value.trim().replace(/-/g, "–") || "8–12",
-    kg: Math.max(0, round2(num($("exStartKg").value, 0))),
+    kg: Math.max(0, exKgIn($("exStartKg").value, exModal.orig ? exModal.orig.kg : null, 0)),
     tcount: Math.max(1, Math.min(12, Math.round(num($("exTimeSetCount").value, 3)))),
     sec: Math.max(5, Math.round(num($("exTimeSec").value, 45))),
     min: Math.max(0, round1(num($("exCardioMin").value, 30))),
@@ -5308,9 +5332,17 @@ function readExModal() {
     lvl: $("exCardioLvl").value.trim(),
     rest: Math.max(0, Math.min(900, Math.round(num($("exRest").value, state.settings.restSec)))),
     muscle: MUSCLES.includes($("exMuscle").value) ? $("exMuscle").value : "",
-    inc: $("exInc").value.trim() === "" ? 0 : Math.max(0, Math.min(50, round2(num($("exInc").value, 0)))),
+    inc: $("exInc").value.trim() === "" ? 0 : Math.max(0, Math.min(50, exIncIn($("exInc").value))),
     ...readExLevels()
   };
+}
+
+// v53: artış adımı kutusu. Imperial'de gösterilen adım (incDisp) aynen yazıldıysa eski kayıt korunur.
+function exIncIn(val) {
+  const n = num(val, 0), o = exModal.orig ? exModal.orig.inc : "";
+  if (!isImperial()) return num(o, 0) > 0 && round2(num(o)) === round2(n) ? num(o) : round2(n);
+  if (num(o, 0) > 0 && incDisp(num(o)) === n) return num(o);
+  return dispToKg(n);
 }
 
 function applyExExtras(ex, v) {
@@ -5415,7 +5447,7 @@ function sessionSummary(sess) {
     return t("{n} dk", { n: ct.min }) + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : "");
   }
   if (sess.kind === "time") return sets.map(s => t("{n} sn", { n: String(num(s.sec)) })).join(" · ");
-  return sets.map(s => `${fmtKg(num(s.kg))}×${num(s.reps)}`).join(" · ");
+  return sets.map(s => `${fmtWNum(num(s.kg))}×${num(s.reps)}`).join(" · ");
 }
 
 // ---------------------------------------------------------------------------
@@ -5430,7 +5462,7 @@ function updateSetData(exIdx, sIdx, field, val) {
   if (field === "lvl") s.lvl = String(val).trim();
   else if (field === "km") s.km = String(val).trim() === "" ? "" : Math.max(0, Math.round(num(val) * 100) / 100);
   else if (field === "reps" || field === "sec") s[field] = Math.max(0, Math.round(num(val)));
-  else if (field === "kg") s.kg = Math.max(0, round2(num(val)));
+  else if (field === "kg") s.kg = Math.max(0, exKgIn(val, s.kg, 0));   // v53: lb girişi; gösterilen değer yeniden yazılınca kayıt kaymaz
   else s[field] = Math.max(0, round1(num(val)));
   const ex = activeDay().exercises[exIdx];
   const rEl = $("exRight_" + exIdx);
@@ -5456,7 +5488,7 @@ function toggleSetDone(exIdx, sIdx) {
         ex.sets.forEach((o, i) => { if (i !== sIdx && o.done) best = Math.max(best, e1rm(o.kg, o.reps)); });
         if (cur > best + 0.01) {
           s.pr = true;
-          toast(t("YENİ REKOR! {name}: {kg} kg × {reps} (1RM ~{rm} kg)", { name: exNameL(ex.name), kg: fmtKg(num(s.kg)), reps: String(num(s.reps)), rm: String(Math.round(cur)) }), "pr");
+          toast(trFill(wTxt(t("YENİ REKOR! {name}: {kg} kg × {reps} (1RM ~{rm} kg)", { kg: fmtWNum(num(s.kg)), reps: String(num(s.reps)), rm: String(Math.round(wRaw(cur))) })), { name: exNameL(ex.name) }), "pr");
         }
       }
     }
@@ -5588,8 +5620,9 @@ async function finishAndLogWorkout() {
 }
 
 // v48: bitiş bildirimi tek cümle kalıplarıyla (süre / kardiyo / rekor var-yok birleşimleri; rekor sayısı tn)
-function finishToastText(durMin, vol, cMin, prs) {
-  const v = { dur: durMin ? fmtMinutes(durMin) : "", vol: Math.round(vol).toLocaleString(locale()), cmin: cMin };
+function finishToastText(durMin, vol, cMin, prs) { return wTxt(finishToastTextKg(durMin, vol, cMin, prs)); }   // v53: imperial'de lb
+function finishToastTextKg(durMin, vol, cMin, prs) {
+  const v = { dur: durMin ? fmtMinutes(durMin) : "", vol: Math.round(wRaw(vol)).toLocaleString(locale()), cmin: cMin };
   if (durMin) {
     if (cMin > 0) return prs ? tn(prs, "Tebrikler! {dur}, {vol} kg tonaj, {cmin} dk kardiyo, {n} rekor kaydedildi", v) : t("Tebrikler! {dur}, {vol} kg tonaj, {cmin} dk kardiyo kaydedildi", v);
     return prs ? tn(prs, "Tebrikler! {dur}, {vol} kg tonaj, {n} rekor kaydedildi", v) : t("Tebrikler! {dur}, {vol} kg tonaj kaydedildi", v);
@@ -6401,7 +6434,7 @@ function exerciseSeries(name) {
   if (kind === "time") {
     return { points: sameKind.map(h => ({ label: fmtDate(h.ts), t: h.ts, y: Math.max(...h.sets.map(s => num(s.sec))) })), unit: "sn", color: "#38bdf8", metric: "En uzun set" };
   }
-  return { points: sameKind.map(h => ({ label: fmtDate(h.ts), t: h.ts, y: round1(Math.max(...h.sets.map(s => e1rm(s.kg, s.reps)))) })), unit: "kg", color: "#f59e0b", metric: "Tahmini 1RM" };
+  return { points: sameKind.map(h => ({ label: fmtDate(h.ts), t: h.ts, y: round1(wRaw(Math.max(...h.sets.map(s => e1rm(s.kg, s.reps))))) })), unit: wUnit(), color: "#f59e0b", metric: "Tahmini 1RM" };
 }
 
 function exerciseChartHtml(name, accent) {
@@ -6770,13 +6803,13 @@ function progGucHtml() {
       (sess.sets || []).forEach(s => { const v = e1rm(s.kg, s.reps); if (v > sb) sb = v; if (v > 0 && (!best || v > best.v)) best = { v, kg: num(s.kg), reps: num(s.reps), ts: sess.ts }; });
       if (sb > 0) perSess.push(sb);
     });
-    if (best) prs.push({ k, name: nm(k), ...best, spark: perSess.slice(-10), d: perSess.length >= 2 ? best.v - perSess[0] : null });
+    if (best) prs.push({ k, name: nm(k), ...best, spark: perSess.slice(-10).map(v => wRaw(v)), d: perSess.length >= 2 ? wRaw(best.v - perSess[0]) : null });   // v53: 1RM gösterim biriminde
   });
   prs.sort((a, b) => b.ts - a.ts);
   const prRows = prs.slice(0, 12).map(p => `<button onclick="progSelectEx(${esc(JSON.stringify(p.k))})" class="p-pr">
-      <span class="p-pr-n"><b>${esc(exNameL(p.name))}</b><span>${fmtDate(p.ts)} · ${fmtNum(p.kg)} kg × ${p.reps}</span></span>${pSpark(p.spark, PC.tq)}
-      <span class="p-pr-v"><b class="t-display">${fmtNum(round1(p.v))}</b>${p.d != null ? pDelta(p.d, "", true) : ""}</span></button>`).join("");
-  const prCard = `<div class="p-card" id="pPrs">${pSec(t("Hareketlerin en iyileri"), PC.tq, `<span class="p-dim p-sm">${t("tahmini 1RM, kg")}</span>`)}
+      <span class="p-pr-n"><b>${esc(exNameL(p.name))}</b><span>${fmtDate(p.ts)} · ${fmtNum(num(kgToDisp(p.kg)))} ${wUnit()} × ${p.reps}</span></span>${pSpark(p.spark, PC.tq)}
+      <span class="p-pr-v"><b class="t-display">${fmtNum(round1(wRaw(p.v)))}</b>${p.d != null ? pDelta(p.d, "", true) : ""}</span></button>`).join("");
+  const prCard = `<div class="p-card" id="pPrs">${pSec(t("Hareketlerin en iyileri"), PC.tq, `<span class="p-dim p-sm">${wTxt(t("tahmini 1RM, kg"))}</span>`)}
     ${prRows ? `<div class="p-prs">${prRows}</div>` : `<p class="p-fine">${t("Henüz kayıt yok. Antrenman kaydettikçe her hareketin en iyi seti (tahmini 1RM) burada listelenir.")}</p>`}</div>`;
   // Kas başına set (bullet, azalan sıra)
   const counts = weeklyMuscleSets(weekStart());
@@ -6793,12 +6826,13 @@ function progGucHtml() {
   const ws = weekStart(), w = progWeekly();
   const ton = Array.from({ length: 8 }, (_, i) => {
     const a = ws - (7 - i) * 7 * DAY_MS, b = a + 7 * DAY_MS;
-    const v = state.workoutLogs.filter(l => l.ts && l.ts >= a && l.ts < b).reduce((s, l) => s + num(l.volume), 0) / 1000;
+    const vKg = state.workoutLogs.filter(l => l.ts && l.ts >= a && l.ts < b).reduce((s, l) => s + num(l.volume), 0);
+    const v = wRaw(vKg) / 1000;   // v53: imperial'de bin lb
     return { label: i === 7 ? t("Bu h.") : i === 0 ? fmtDay(new Date(a), { day: "numeric", month: "short" }) : String(new Date(a).getDate()), v: round1(v), flag: i === 7 ? "now" : "" };
   });
   const hasTon = ton.some(tw => tw.v > 0);
-  const tonCard = `<div class="p-card" id="pTonnage">${pSec(t("Haftalık tonaj"), PC.tq, `<span class="p-dim p-sm">${t("ton")}</span>`)}
-    ${hasTon ? pBars(ton, { color: PC.tq, id: "ton", fmt: v => fmtNum(v), label: t("Son 8 haftanın tonajı (ton)") }) + `<p class="p-fine">${t("Bu hafta sürüyor (yarı saydam); bitmemiş haftayı tam haftalarla karşılaştırma.")}</p>` : `<p class="p-fine">${t("Henüz tonaj yok.")}</p>`}
+  const tonCard = `<div class="p-card" id="pTonnage">${pSec(t("Haftalık tonaj"), PC.tq, `<span class="p-dim p-sm">${isImperial() ? t("bin lb") : t("ton")}</span>`)}
+    ${hasTon ? pBars(ton, { color: PC.tq, id: "ton", fmt: v => fmtNum(v), label: isImperial() ? t("Son 8 haftanın tonajı (bin lb)") : t("Son 8 haftanın tonajı (ton)") }) + `<p class="p-fine">${t("Bu hafta sürüyor (yarı saydam); bitmemiş haftayı tam haftalarla karşılaştırma.")}</p>` : `<p class="p-fine">${t("Henüz tonaj yok.")}</p>`}
     <div class="p-mini3"><div><span>${t("Bu hafta")}</span><b>${tn(w.n, "{n} seans")}</b></div><div><span>${t("Kardiyo")}</span><b>${t("{n} dk", { n: w.min })}${w.km > 0 ? ` · ${fmtNum(w.km)} km` : ""}</b></div><div><span>${t("Rekor")}</span><b>${w.prs}</b></div></div></div>`;
   // Takvim: son 5 hafta (antrenman dolgu + ✓, mobilite alt çizgi, bugün çerçeve)
   const wd = progWorkoutDays(), mob = progMobDays();
@@ -7362,15 +7396,15 @@ function overloadSuggestion(ex) {
     return {
       type: "hold", ts: last.ts, kg: maxKg, reps: range.hi,
       text: lastE === 4
-        ? t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın ama setler çok zor geçti (son sette tükeniş). {kg} kg'da bir seans daha kal; rahatlayınca artır.", { hi: String(range.hi), kg: fmtKg(maxKg) })
-        : t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın ama setler çok zor geçti. {kg} kg'da bir seans daha kal; rahatlayınca artır.", { hi: String(range.hi), kg: fmtKg(maxKg) })
+        ? wTxt(t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın ama setler çok zor geçti (son sette tükeniş). {kg} kg'da bir seans daha kal; rahatlayınca artır.", { hi: String(range.hi), kg: fmtWNum(maxKg) }))
+        : wTxt(t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın ama setler çok zor geçti. {kg} kg'da bir seans daha kal; rahatlayınca artır.", { hi: String(range.hi), kg: fmtWNum(maxKg) }))
     };
   }
   if (!allHit && allEasy && maxKg > 0 && curMax <= maxKg) {
     const next = nextLevel(ex, maxKg);
     return {
       type: "up", ts: last.ts, kg: next, reps: range.lo,
-      text: t("Geçen sefer tüm setleri \"Kolay\" işaretledin. Kiloyu {from} → {to} kg'a çıkarmayı dene, {lo} tekrardan başla.", { from: fmtKg(maxKg), to: fmtKg(next), lo: String(range.lo) })
+      text: wTxt(t("Geçen sefer tüm setleri \"Kolay\" işaretledin. Kiloyu {from} → {to} kg'a çıkarmayı dene, {lo} tekrardan başla.", { from: fmtWNum(maxKg), to: fmtWNum(next), lo: String(range.lo) }))
     };
   }
   if (allHit) {
@@ -7379,8 +7413,8 @@ function overloadSuggestion(ex) {
     return {
       type: "up", ts: last.ts, kg: next, reps: range.lo,
       text: maxKg > 0
-        ? t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın. Kiloyu {from} → {to} kg'a çıkar, {lo} tekrardan başla.", { hi: String(range.hi), from: fmtKg(maxKg), to: fmtKg(next), lo: String(range.lo) })
-        : t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın. {to} kg ek ağırlık dene veya daha zor bir varyasyona geç.", { hi: String(range.hi), to: fmtKg(next) })
+        ? wTxt(t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın. Kiloyu {from} → {to} kg'a çıkar, {lo} tekrardan başla.", { hi: String(range.hi), from: fmtWNum(maxKg), to: fmtWNum(next), lo: String(range.lo) }))
+        : wTxt(t("Geçen sefer tüm setlerde {hi}+ tekrar yaptın. {to} kg ek ağırlık dene veya daha zor bir varyasyona geç.", { hi: String(range.hi), to: fmtWNum(next) }))
     };
   }
   if (maxKg > 0 && misses * 2 >= sets.length) {
@@ -7388,7 +7422,7 @@ function overloadSuggestion(ex) {
     const next = prevLevel(ex, maxKg);
     return {
       type: "down", ts: last.ts, kg: next, reps: range.lo,
-      text: t("Geçen sefer setlerin çoğunda {lo} tekrarın altında kaldın. Aynı kiloyla devam edebilir ya da {to} kg'a düşüp formu sağlamlaştırabilirsin.", { lo: String(range.lo), to: fmtKg(next) })
+      text: wTxt(t("Geçen sefer setlerin çoğunda {lo} tekrarın altında kaldın. Aynı kiloyla devam edebilir ya da {to} kg'a düşüp formu sağlamlaştırabilirsin.", { lo: String(range.lo), to: fmtWNum(next) }))
     };
   }
   return null;
@@ -7411,7 +7445,7 @@ function deloadInfo(ex) {
   if (rated.length < 3 || rated.filter(s => s.e >= 3).length / rated.length < 0.7) return null;
   const lastTs = win[win.length - 1].ts;
   if (ex.deloadDismiss === lastTs) return null;
-  return { ts: lastTs, best: Math.round(bBefore), sessions: win.length };
+  return { ts: lastTs, best: Math.round(bBefore), bestRaw: bBefore, sessions: win.length };
 }
 function deloadHtml(ex, exIdx) {
   if (ex.sets.some(s => s.done)) return "";
@@ -7419,7 +7453,7 @@ function deloadHtml(ex, exIdx) {
   if (!d) return "";
   return `<div class="bg-[var(--t-warn-bg)] border border-[var(--t-warn-line)] rounded-2xl pl-3 pr-2 py-2 space-y-1.5" data-deload="${exIdx}">
       <div class="flex items-start gap-2.5"><span style="color:var(--t-warn-icon)" class="pt-0.5">${svgI("down", 20, 2.2)}</span>
-        <span class="text-[13px] leading-snug text-[var(--t-warn-hi)]">${esc(t("Son 3 haftada {sessions} seansta tahmini 1RM'in ~{best} kg'ı geçmedi ve setler çoğunlukla zor geçti. Bu hareket için bir hafta kiloyu ~%10 hafifletmeyi (dinlenme haftası) düşünebilirsin.", { sessions: String(d.sessions), best: String(d.best) }))}</span></div>
+        <span class="text-[13px] leading-snug text-[var(--t-warn-hi)]">${esc(wTxt(t("Son 3 haftada {sessions} seansta tahmini 1RM'in ~{best} kg'ı geçmedi ve setler çoğunlukla zor geçti. Bu hareket için bir hafta kiloyu ~%10 hafifletmeyi (dinlenme haftası) düşünebilirsin.", { sessions: String(d.sessions), best: String(isImperial() ? Math.round(wRaw(d.bestRaw)) : d.best) })))}</span></div>
       <div class="flex justify-end"><button onclick="dismissDeload(${exIdx})" class="text-[12px] t-muted h-11 px-3">${t("Anladım")}</button></div>
     </div>`;
 }
@@ -7448,7 +7482,7 @@ function suggestionHtml(ex, exIdx) {
           <span class="text-[13px] leading-snug ${up ? "text-[var(--t-panel-text)]" : "text-[var(--t-warn-hi)]"}">${esc(sg.text)}</span>
         </span>
         <span class="flex flex-col gap-1.5 shrink-0">
-          <button onclick="applySuggestion(${exIdx})" class="${up ? "t-btn" : "bg-amber-500 text-black font-extrabold"} h-11 px-3.5 rounded-xl text-[13px]">${fmtKg(sg.kg)} kg</button>
+          <button onclick="applySuggestion(${exIdx})" class="${up ? "t-btn" : "bg-amber-500 text-black font-extrabold"} h-11 px-3.5 rounded-xl text-[13px]">${fmtW(sg.kg)}</button>
         </span>
       </div>
       <div class="flex items-center justify-between gap-2">
@@ -7464,7 +7498,7 @@ function applySuggestion(exIdx) {
   if (!s) return;
   ex.sets.forEach(x => { x.kg = s.kg; x.reps = s.reps; x.pr = false; });
   ex.sugDismiss = s.ts;
-  toast(`${exNameL(ex.name)}: ${fmtKg(s.kg)} kg × ${s.reps}`);
+  toast(`${exNameL(ex.name)}: ${fmtW(s.kg)} × ${s.reps}`);
   renderAll();
 }
 function dismissSuggestion(exIdx) {
@@ -7496,29 +7530,45 @@ function weeklyMuscleSets(fromTs) {
 // ---------------------------------------------------------------------------
 const PLATES = [25, 20, 15, 10, 5, 2.5, 1.25];
 const PLATE_CLS = { 25: "bg-rose-600 text-white", 20: "bg-sky-600 text-white", 15: "bg-amber-500 text-slate-950", 10: "bg-emerald-600 text-white", 5: "bg-slate-100 text-slate-900", 2.5: "bg-slate-600 text-white", 1.25: "bg-slate-500 text-white" };
+// v53: lb plakaları (45 / 35 / 25 / 10 / 5 / 2,5) aynı renk sırasıyla
+const PLATE_CLS_LB = { 45: "bg-rose-600 text-white", 35: "bg-sky-600 text-white", 25: "bg-amber-500 text-slate-950", 10: "bg-emerald-600 text-white", 5: "bg-slate-100 text-slate-900", 2.5: "bg-slate-600 text-white" };
 let plateCtx = { name: "" };
+
+// v53: plaka aracı GÖSTERİM biriminde çalışır (imperial'de lb). Bar: settings.barKg (kg) → seçenek; imperial'de
+// hiçbir seçeneğe uymuyorsa (ör. sahibin 20 kg = 44 lb) ayar yazılmadan 45 lb varsayılır.
+function barDisp() {
+  const kg = num(state.settings.barKg, 20);
+  if (!isImperial()) return kg;
+  const d = num(kgToDisp(kg));
+  return barOptions().includes(d) ? d : 45;
+}
+function setPlateBar(v) {
+  state.settings.barKg = isImperial() ? dispToKg(num(v, 45)) : num(v, 20);
+  saveState(); renderPlateTool();
+}
 
 function platesFor(total, bar) {
   const perSide = (total - bar) / 2;
   if (perSide < -1e-9) return { ok: false, reason: "light" };
   let rem = Math.round(perSide * 100) / 100;
   const list = [];
-  PLATES.forEach(p => { while (rem + 1e-9 >= p) { list.push(p); rem = Math.round((rem - p) * 100) / 100; } });
+  plateSet().forEach(p => { while (rem + 1e-9 >= p) { list.push(p); rem = Math.round((rem - p) * 100) / 100; } });
   return { ok: rem < 0.01, list, rem, perSide, achieved: bar + 2 * list.reduce((a, b) => a + b, 0) };
 }
 
 function plateChips(list) {
   if (!list.length) return `<span class="text-[var(--w-dim)]">${t("Plaka yok (sadece bar)")}</span>`;
-  return list.map(p => `<span class="inline-flex items-center justify-center min-w-[2.25rem] px-1.5 py-1 rounded-md text-[12px] font-bold ${PLATE_CLS[p]}">${fmtKg(p)}</span>`).join("");
+  return list.map(p => `<span class="inline-flex items-center justify-center min-w-[2.25rem] px-1.5 py-1 rounded-md text-[12px] font-bold ${(isImperial() ? PLATE_CLS_LB : PLATE_CLS)[p]}">${fmtKg(p)}</span>`).join("");
 }
 
 function warmupSets(W, bar) {
   if (!(W > 0)) return [];
-  const step = bar > 0 ? 2.5 : 1;
+  const imp = isImperial();   // v53: W ve bar gösterim biriminde (imperial'de lb: 5 lb adım, bar + 45, 225 lb üstü %90)
+  const step = bar > 0 ? (imp ? 5 : 2.5) : (imp ? 2.5 : 1);
   const out = [];
-  if (bar > 0 && W >= bar + 20) out.push({ kg: bar, reps: 10, label: t("Boş bar") });
+  if (bar > 0 && W >= bar + (imp ? 45 : 20)) out.push({ kg: bar, reps: 10, label: t("Boş bar") });
   const steps = [[0.4, 8], [0.6, 5], [0.8, 3]];
-  if (W >= 100) steps.push([0.9, 1]);
+  if (W >= (imp ? 225 : 100)) steps.push([0.9, 1]);
   steps.forEach(([pct, reps]) => {
     const kg = roundTo(W * pct, step);
     const prev = out.length ? out[out.length - 1].kg : 0;
@@ -7534,7 +7584,7 @@ function openPlateTool(exIdx) {
   const lv = usesLevels(ex);
   plateCtx = { name: ex.name, exIdx, levels: lv ? levelListOf(ex) : null, lv };
   $("chartTitle").textContent = exNameL(ex.name);
-  const bar = num(state.settings.barKg, 20);
+  const bar = barDisp();
   if (lv && !plateCtx.levels) {
     $("chartBody").innerHTML = `<div class="text-sm text-[var(--w-muted)] space-y-3">
       <p>${equipOf(ex) === "dumbbell" ? t("Bu hareket için dambıl kademeleri tanımlı değil. Kademeleri girersen ısınma setlerini ve kilo artırma önerilerini makinede gerçekten seçebileceğin kilolara göre hesaplarım.") : t("Bu hareket için makine kademeleri tanımlı değil. Kademeleri girersen ısınma setlerini ve kilo artırma önerilerini makinede gerçekten seçebileceğin kilolara göre hesaplarım.")}</p>
@@ -7544,11 +7594,11 @@ function openPlateTool(exIdx) {
   }
   $("chartBody").innerHTML = `
     <div class="grid ${lv ? "grid-cols-1" : "grid-cols-2"} gap-2 text-xs">
-      <div><label class="block text-[var(--w-muted)] mb-1">${t("Çalışma kilosu (kg)")}</label>
-        <input id="ptKg" type="text" inputmode="decimal" value="${esc(fmtKg(W))}" oninput="renderPlateTool()" class="w-full p-2 rounded-lg text-base text-center font-bold" /></div>
+      <div><label class="block text-[var(--w-muted)] mb-1">${wTxt(t("Çalışma kilosu (kg)"))}</label>
+        <input id="ptKg" type="text" inputmode="decimal" value="${esc(fmtWNum(W))}" oninput="renderPlateTool()" class="w-full p-2 rounded-lg text-base text-center font-bold" /></div>
       ${lv ? "" : `<div><label class="block text-[var(--w-muted)] mb-1">${t("Bar ağırlığı")}</label>
-        <select id="ptBar" onchange="state.settings.barKg = num(this.value, 20); saveState(); renderPlateTool();" class="w-full p-2 rounded-lg text-sm">
-          ${[[20, t("20 kg Olimpik bar")], [15, t("15 kg Bar")], [10, t("10 kg EZ / kısa bar")], [0, t("Bar yok / plakalı makine")]].map(([v, l]) => `<option value="${v}" ${v === bar ? "selected" : ""}>${l}</option>`).join("")}
+        <select id="ptBar" onchange="setPlateBar(this.value)" class="w-full p-2 rounded-lg text-sm">
+          ${(isImperial() ? [[45, t("45 lb Olimpik bar")], [35, t("35 lb Bar")], [15, t("15 lb EZ / kısa bar")], [0, t("Bar yok / plakalı makine")]] : [[20, t("20 kg Olimpik bar")], [15, t("15 kg Bar")], [10, t("10 kg EZ / kısa bar")], [0, t("Bar yok / plakalı makine")]]).map(([v, l]) => `<option value="${v}" ${v === bar ? "selected" : ""}>${l}</option>`).join("")}
         </select></div>`}
     </div>
     <div id="ptOut" class="mt-3 space-y-3"></div>`;
@@ -7558,7 +7608,7 @@ function openPlateTool(exIdx) {
 
 function renderLevelTool() {
   const out = $("ptOut");
-  const list = plateCtx.levels;
+  const list = plateCtx.levels.map(v => num(kgToDisp(v)));   // v53: kademeler kg saklı, araç gösterim biriminde
   const W = Math.max(0, num($("ptKg").value, 0));
   if (W <= 0) {
     out.innerHTML = `<div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
@@ -7582,12 +7632,12 @@ function renderLevelTool() {
     <div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
       <div class="text-[12px] text-[var(--w-muted)] mb-1.5">${t("Bu kiloya yakın kademeler:")}</div>
       <div class="flex flex-wrap gap-1.5">${chips}</div>
-      ${exact ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">${t("{kg} kg bu makinede yok; en yakın alt kademe <b>{near} kg</b>.", { kg: fmtKg(W), near: fmtKg(near) })}</div>`}
+      ${exact ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">${wTxt(t("{kg} kg bu makinede yok; en yakın alt kademe <b>{near} kg</b>.", { kg: fmtKg(W), near: fmtKg(near) }))}</div>`}
     </div>
     <div>
       <div class="text-[12px] font-bold text-[var(--w-dim)] tracking-wide mb-1.5">${t("ISINMA SETLERİ")}</div>
-      ${wu.length ? `<div class="space-y-1">${wu.map(w => `<div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-lg px-2.5 py-1.5"><span class="text-[var(--w-muted)] w-14">${w.label}</span><span class="font-bold text-[var(--w-text1)]">${fmtKg(w.kg)} kg × ${w.reps}</span><span></span></div>`).join("")}
-        <div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-panel)] border border-[var(--w-panel-line)] rounded-lg px-2.5 py-1.5"><span class="text-[var(--w-acc)] w-14">${t("Çalışma")}</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} kg</span><span></span></div></div>
+      ${wu.length ? `<div class="space-y-1">${wu.map(w => `<div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-lg px-2.5 py-1.5"><span class="text-[var(--w-muted)] w-14">${w.label}</span><span class="font-bold text-[var(--w-text1)]">${fmtKg(w.kg)} ${wUnit()} × ${w.reps}</span><span></span></div>`).join("")}
+        <div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-panel)] border border-[var(--w-panel-line)] rounded-lg px-2.5 py-1.5"><span class="text-[var(--w-acc)] w-14">${t("Çalışma")}</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} ${wUnit()}</span><span></span></div></div>
         <p class="text-[12px] text-[var(--w-dim)] mt-1.5">${t("Isınma kiloları makinede var olan kademelere yuvarlandı. Tonaja ve set sayısına dahil edilmez.")}</p>`
       : `<div class="text-xs text-[var(--w-dim)]">${t("Bu kiloda ayrı ısınma setine gerek yok.")}</div>`}
     </div>`;
@@ -7603,12 +7653,12 @@ function renderPlateTool() {
   if (bar > 0) {
     const r = platesFor(W, bar);
     if (!r.ok && r.reason === "light") {
-      html += `<div class="text-xs text-[var(--w-warn-text)] bg-[var(--w-warn-bg)] border border-[var(--w-warn-line)] rounded-lg px-3 py-2">${t("Bu kilo {bar} kg'lık bardan hafif.", { bar: fmtKg(bar) })}</div>`;
+      html += `<div class="text-xs text-[var(--w-warn-text)] bg-[var(--w-warn-bg)] border border-[var(--w-warn-line)] rounded-lg px-3 py-2">${wTxt(t("Bu kilo {bar} kg'lık bardan hafif.", { bar: fmtKg(bar) }))}</div>`;
     } else {
       html += `<div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
-        <div class="text-[12px] text-[var(--w-muted)] mb-1.5">${t("Barın HER İKİ tarafına takılacak plakalar ({n} kg / taraf):", { n: fmtKg(r.perSide) })}</div>
+        <div class="text-[12px] text-[var(--w-muted)] mb-1.5">${wTxt(t("Barın HER İKİ tarafına takılacak plakalar ({n} kg / taraf):", { n: fmtKg(r.perSide) }))}</div>
         <div class="flex flex-wrap gap-1.5">${plateChips(r.list)}</div>
-        ${r.ok ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">${t("Elindeki plakalarla tam {kg} kg yapılamıyor; en yakın: <b>{n} kg</b>", { kg: fmtKg(W), n: fmtKg(r.achieved) })}</div>`}
+        ${r.ok ? "" : `<div class="text-[12px] text-[var(--w-warn-text)] mt-2">${wTxt(t("Elindeki plakalarla tam {kg} kg yapılamıyor; en yakın: <b>{n} kg</b>", { kg: fmtKg(W), n: fmtKg(r.achieved) }))}</div>`}
       </div>`;
     }
   }
@@ -7619,12 +7669,12 @@ function renderPlateTool() {
       const pr = bar > 0 ? platesFor(w.kg, bar) : null;
       return `<div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-lg px-2.5 py-1.5">
         <span class="text-[var(--w-muted)] w-14 shrink-0">${w.label}</span>
-        <span class="font-bold text-[var(--w-text1)]">${fmtKg(w.kg)} kg × ${w.reps}</span>
+        <span class="font-bold text-[var(--w-text1)]">${fmtKg(w.kg)} ${wUnit()} × ${w.reps}</span>
         <span class="text-[11px] text-[var(--w-dim)] text-right truncate">${pr && pr.ok && pr.list.length ? t("taraf: {list}", { list: pr.list.map(fmtKg).join("+") }) : ""}</span>
       </div>`;
     }).join("")}
     <div class="flex items-center justify-between gap-2 text-xs bg-[var(--w-panel)] border border-[var(--w-panel-line)] rounded-lg px-2.5 py-1.5">
-      <span class="text-[var(--w-acc)] w-14 shrink-0">${t("Çalışma")}</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} kg</span><span></span>
+      <span class="text-[var(--w-acc)] w-14 shrink-0">${t("Çalışma")}</span><span class="font-bold text-[var(--w-acc)]">${fmtKg(W)} ${wUnit()}</span><span></span>
     </div></div>
     <p class="text-[12px] text-[var(--w-dim)] mt-1.5">${t("Isınma setleri yorulmadan yapılır, aralarında 1–2 dk dinlen. Tonaja ve set sayısına dahil edilmez.")}</p>`
     : `<div class="text-xs text-[var(--w-dim)]">${t("Isınma önerisi için çalışma kilosu gir (hafif kilolarda ayrı ısınma gerekmez).")}</div>`}
@@ -8045,7 +8095,7 @@ function logExerciseLines(log) {
     else if (sess.kind === "time") txt = t("{c} × {s} sn|kart", { c: String(sess.sets.length), s: String(Math.max(...sess.sets.map(s => num(s.sec)))) });
     else {
       const best = sess.sets.reduce((b, s) => (e1rm(s.kg, s.reps) > e1rm(b.kg, b.reps) ? s : b), sess.sets[0]);
-      txt = num(best.kg) > 0 ? tn(sess.sets.length, "{n} set • en iyi {kg}×{r}", { kg: fmtKg(num(best.kg)), r: String(num(best.reps)) }) : tn(sess.sets.length, "{n} set • {r} tekrar", { r: String(num(best.reps)) });
+      txt = num(best.kg) > 0 ? tn(sess.sets.length, "{n} set • en iyi {kg}×{r}", { kg: fmtWNum(num(best.kg)), r: String(num(best.reps)) }) : tn(sess.sets.length, "{n} set • {r} tekrar", { r: String(num(best.reps)) });
     }
     out.push({ name: exNameL(sess.name || k), txt, order: out.length });
   }));
@@ -8099,7 +8149,7 @@ async function buildShareCanvas(log) {
 
   const stats = [];
   if (num(log.durationMin) > 0) stats.push([t("Süre|kart"), fmtMinutes(num(log.durationMin)), "#FFFFFF"]);
-  stats.push([t("Tonaj|kart"), Math.round(num(log.volume)).toLocaleString(locale()) + " kg", "#FFFFFF"]);
+  stats.push([t("Tonaj|kart"), Math.round(wRaw(num(log.volume))).toLocaleString(locale()) + " " + wUnit(), "#FFFFFF"]);
   if (num(log.prs) > 0) stats.push([t("Rekor|kart"), String(num(log.prs)), ACC]);
   if (num(log.cardioMin) > 0) stats.push([t("Kardiyo|kart"), t("{m} dk", { m: num(log.cardioMin) }) + (num(log.cardioKm) > 0 ? " · " + fmtNum(num(log.cardioKm)) + " km" : ""), "#FFFFFF"]);
   stats.push([t("Set|kart"), String(num(log.sets)), "#FFFFFF"]);
@@ -8238,15 +8288,18 @@ function usesLevels(ex) { const e = equipOf(ex); return e === "stack" || e === "
 // Tanımlı kademelerden sıralı kilo listesi üretir
 function levelsToList(L) {
   if (!L) return null;
+  // v53: imperial'de lb'de girilmiş kademeler 3 ondalık kg; adım birikmesin diye her kademe start + i × step
+  const imp = isImperial(), rr = imp ? round3 : round2;
   let base = [];
-  if (L.mode === "list") base = (L.list || []).map(v => round2(num(v, -1))).filter(v => v >= 0);
+  if (L.mode === "list") base = (L.list || []).map(v => rr(num(v, -1))).filter(v => v >= 0);
   else {
     const st = num(L.start, 0), sp = num(L.step, 0);
-    if (sp > 0) for (let v = st; v <= 500 && base.length < 250; v = round2(v + sp)) base.push(round2(v));
+    if (sp > 0 && imp) for (let i = 0, v = st; v <= 500 && base.length < 250; v = rr(st + ++i * sp)) base.push(rr(v));
+    else if (sp > 0) for (let v = st; v <= 500 && base.length < 250; v = round2(v + sp)) base.push(round2(v));
   }
   const add = num(L.addon, 0);
   let all = base.slice();
-  if (add > 0) base.forEach(v => all.push(round2(v + add)));
+  if (add > 0) base.forEach(v => all.push(rr(v + add)));
   all = [...new Set(all)].sort((a, b) => a - b);
   return all.length >= 2 ? all : null;
 }
@@ -8271,14 +8324,17 @@ function levelListOf(ex) {
   if (!usesLevels(ex)) return null;
   return levelsToList(ex.levels) || levelsToList(inferLevels(ex));
 }
+// v53: imperial'de artış lb'de: gösterilen lb ± incDisp (5 lb gibi) → kg (3 ondalık)
 function nextLevel(ex, kg) {
   const list = levelListOf(ex);
   if (list) { const n = list.find(v => v > kg + 0.01); if (n != null) return n; }
+  if (isImperial()) return dispToKg(num(kgToDisp(kg)) + incDisp(incOf(ex)));
   return round2(kg + incOf(ex));
 }
 function prevLevel(ex, kg) {
   const list = levelListOf(ex);
   if (list) { const p = list.filter(v => v < kg - 0.01).pop(); if (p != null) return p; }
+  if (isImperial()) return Math.max(0, dispToKg(num(kgToDisp(kg)) - incDisp(incOf(ex))));
   return Math.max(0, round2(kg - incOf(ex)));
 }
 function nearestLevelBelow(list, kg) {
@@ -8287,8 +8343,8 @@ function nearestLevelBelow(list, kg) {
 }
 function levelsSummary(ex) {
   const L = ex.levels;
-  if (L && L.mode === "step" && num(L.step) > 0) return num(L.addon) > 0 ? t("{step} kg arayla (+{add} ek plaka)", { step: fmtKg(num(L.step)), add: fmtKg(num(L.addon)) }) : t("{step} kg arayla", { step: fmtKg(num(L.step)) });
-  if (L && L.mode === "list") { const cnt = (L.list || []).length; return num(L.addon) > 0 ? tn(cnt, "{n} kademe (+{add} ek)", { add: fmtKg(num(L.addon)) }) : tn(cnt, "{n} kademe"); }
+  if (L && L.mode === "step" && num(L.step) > 0) return num(L.addon) > 0 ? wTxt(t("{step} kg arayla (+{add} ek plaka)", { step: fmtWNum(num(L.step)), add: fmtWNum(num(L.addon)) })) : wTxt(t("{step} kg arayla", { step: fmtWNum(num(L.step)) }));
+  if (L && L.mode === "list") { const cnt = (L.list || []).length; return num(L.addon) > 0 ? wTxt(tn(cnt, "{n} kademe (+{add} ek)", { add: fmtWNum(num(L.addon)) })) : tn(cnt, "{n} kademe"); }
   return "";
 }
 
@@ -8298,12 +8354,12 @@ function levelsAskHtml(ex, exIdx) {
   const inf = inferLevels(ex);
   if (!inf) return "";
   const list = levelsToList(inf);
-  const around = list.filter(v => v >= num(ex.sets[0] && ex.sets[0].kg) - inf.step * 2).slice(0, 5).map(fmtKg).join(" · ");
+  const around = list.filter(v => v >= num(ex.sets[0] && ex.sets[0].kg) - inf.step * 2).slice(0, 5).map(v => fmtWNum(v)).join(" · ");
   return `
     <div class="t-panel rounded-2xl px-3 py-2.5 text-[13px] space-y-2">
       <div class="text-[var(--t-text2)]">${equipOf(ex) === "dumbbell"
-        ? t("Bu dambılların kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtKg(inf.step), around })
-        : t("Bu makinenin kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtKg(inf.step), around })}</div>
+        ? wTxt(t("Bu dambılların kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtWNum(inf.step), around }))
+        : wTxt(t("Bu makinenin kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtWNum(inf.step), around }))}</div>
       <div class="flex gap-2">
         <button onclick="confirmInferredLevels(${exIdx})" class="t-btn h-11 px-4 rounded-xl text-[13px]">${t("Evet, kaydet")}</button>
         <button onclick="openEditExercise(${exIdx})" class="t-btn-ghost h-11 px-4 rounded-xl text-[13px]">${t("Düzenle")}</button>
@@ -8316,7 +8372,7 @@ function confirmInferredLevels(exIdx) {
   const inf = inferLevels(ex);
   if (!inf) return;
   ex.levels = inf;
-  toast(t("Kademeler kaydedildi: {step} kg arayla", { step: fmtKg(inf.step) }));
+  toast(wTxt(t("Kademeler kaydedildi: {step} kg arayla", { step: fmtWNum(inf.step) })));
   renderAll();
 }
 function dismissLevelsAsk(exIdx) { activeDay().exercises[exIdx].levelsAskDismiss = true; renderAll(); }
@@ -8350,10 +8406,10 @@ function updateExEquipUI() {
 function fillExLevels(v) {
   $("exEquip").value = v.equip && EQUIP_LABEL[v.equip] ? v.equip : "auto";
   const L = v.levels || null;
-  $("exLvStart").value = L && L.mode === "step" ? fmtKg(num(L.start)) : "";
-  $("exLvStep").value = L && L.mode === "step" ? fmtKg(num(L.step)) : "";
-  $("exLvList").value = L && L.mode === "list" ? (L.list || []).map(fmtKg).join("; ") : "";
-  $("exLvAddon").value = L && num(L.addon) > 0 ? fmtKg(num(L.addon)) : "";
+  $("exLvStart").value = L && L.mode === "step" ? fmtWNum(num(L.start)) : "";
+  $("exLvStep").value = L && L.mode === "step" ? fmtWNum(num(L.step)) : "";
+  $("exLvList").value = L && L.mode === "list" ? (L.list || []).map(v => fmtWNum(v)).join("; ") : "";
+  $("exLvAddon").value = L && num(L.addon) > 0 ? fmtWNum(num(L.addon)) : "";
   setExLevelsMode(L && L.mode === "list" ? "list" : "step");
   updateExEquipUI();
 }
@@ -8466,7 +8522,7 @@ function gymTodayHtml() {
       <div class="t-label">${t("BU HAFTA")}</div>
       <div class="grid grid-cols-3 gap-2">
         <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Antrenman|sayı")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg">/${state.workoutDays.length}</span></div></div>
-        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(wVol / 1000)}<span class="t-dim text-lg"> ${t("t|ton")}</span></div></div>
+        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(wRaw(wVol) / 1000)}<span class="t-dim text-lg"> ${isImperial() ? t("bin lb") : t("t|ton")}</span></div></div>
         <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Süre")}</div><div class="t-display text-[26px]">${Math.floor(wMin / 60)}:${String(Math.round(wMin % 60)).padStart(2, "0")}<span class="t-dim text-lg"> ${t("sa")}</span></div></div>
       </div>
       ${last ? `<button onclick="setGymView('history')" class="t-card-flat w-full min-h-[60px] rounded-2xl px-3.5 flex items-center justify-between text-left">
@@ -8520,7 +8576,7 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   return `<div class="rounded-2xl ${rowCls}"><div class="grid items-center gap-2 h-14 px-1" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px">
     <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-[var(--t-warn-icon)] text-sm">★</span>' : ""}${effLbl}</span>
     <span class="text-[13px] t-dim truncate">${prev}</span>
-    <input type="text" inputmode="decimal" aria-label="${t("{n}. set kilo", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtKg(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
+    <input type="text" inputmode="decimal" aria-label="${t("{n}. set kilo", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtWNum(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
     <input type="text" inputmode="numeric" aria-label="${t("{n}. set tekrar", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-reps" value="${num(s.reps)}" onchange="updateSetData(${exIdx}, ${i}, 'reps', this.value)" class="t-input w-full" />
     ${check}
   </div>${s.done && i === lastDone ? effortRowHtml(exIdx, s, i) : ""}</div>`;
@@ -8537,10 +8593,10 @@ function gymActiveHtml() {
     const allDone = ex.sets.length && ex.sets.every(s => s.done);
     const prevOf = i => {
       const ps = last && last.kind === "weight" && last.sets[i];
-      return ps ? `${fmtKg(num(ps.kg))}×${num(ps.reps)}` : "—";
+      return ps ? `${fmtWNum(num(ps.kg))}×${num(ps.reps)}` : "—";
     };
     const head = ex.kind === "weight"
-      ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">${t("SET")}</span><span class="truncate">${t("ÖNCEKİ")}</span><span class="text-center">${t("KG")}</span><span class="text-center">${t("TEKRAR")}</span><span></span></div>`
+      ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">${t("SET")}</span><span class="truncate">${t("ÖNCEKİ")}</span><span class="text-center">${isImperial() ? "LB" : t("KG")}</span><span class="text-center">${t("TEKRAR")}</span><span></span></div>`
       : ex.kind === "time" ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px"><span class="text-center">${t("SET")}</span><span>${t("SÜRE")}</span><span></span><span></span></div>` : "";
     return `
       <div id="exCard_${exIdx}" class="t-card rounded-[22px] p-4 space-y-3" style="scroll-margin-top: 9rem;">
@@ -8595,7 +8651,7 @@ function exRightText(ex) {
   ex.sets.forEach(s => { vol += num(s.kg) * num(s.reps); best = Math.max(best, e1rm(s.kg, s.reps)); });
   const lv = usesLevels(ex) ? levelsSummary(ex) : "";
   if (best <= 0 && vol <= 0) return lv ? t("Kademe: {lv}", { lv }) : "";   // v32: kilo girilmeden "~0 kg" gösterme
-  return `${t("Tahmini 1RM ~{best} kg · Tonaj {vol} kg", { best: String(Math.round(best)), vol: Math.round(vol).toLocaleString(locale()) })}${lv ? " · " + t("Kademe: {lv}", { lv }) : ""}`;
+  return `${wTxt(t("Tahmini 1RM ~{best} kg · Tonaj {vol} kg", { best: String(Math.round(wRaw(best))), vol: Math.round(wRaw(vol)).toLocaleString(locale()) }))}${lv ? " · " + t("Kademe: {lv}", { lv }) : ""}`;
 }
 
 function gymProgramHtml() {
@@ -8795,7 +8851,7 @@ function gymHistoryHtml() {
       <div class="flex-1 min-w-0">
         <div class="text-xs t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date)}</div>
         <div class="text-[15px] font-semibold truncate">${esc(l.dayName)}</div>
-        <div class="text-xs t-muted mt-0.5">${tn(num(l.sets), "{n} set")} · ${num(l.volume).toLocaleString(locale())} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + t("{n} dk kardiyo", { n: num(l.cardioMin) }) : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${tn(num(l.prs), "{n} rekor")}</span>` : ""}</div>
+        <div class="text-xs t-muted mt-0.5">${tn(num(l.sets), "{n} set")} · ${isImperial() ? Math.round(wRaw(num(l.volume))).toLocaleString(locale()) : num(l.volume).toLocaleString(locale())} ${wUnit()}${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + t("{n} dk kardiyo", { n: num(l.cardioMin) }) : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${tn(num(l.prs), "{n} rekor")}</span>` : ""}</div>
       </div>
       <button onclick="openShareCard(${i})" aria-label="${t("Paylaş")}" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("share", 20)}</button>
       <button onclick="deleteWorkoutLog(${i})" aria-label="${t("Kaydı sil")}" class="w-11 h-11 rounded-xl flex items-center justify-center t-dim">${svgI("trash", 19)}</button>
@@ -8803,7 +8859,7 @@ function gymHistoryHtml() {
   return `
     <div class="grid grid-cols-3 gap-2">
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Bu hafta")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg"> ${tn(weekLogs.length, "antr.")}</span></div></div>
-      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(weekLogs.reduce((a, l) => a + num(l.volume), 0) / 1000)}<span class="t-dim text-lg"> ${t("t|ton")}</span></div></div>
+      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(wRaw(weekLogs.reduce((a, l) => a + num(l.volume), 0)) / 1000)}<span class="t-dim text-lg"> ${isImperial() ? t("bin lb") : t("t|ton")}</span></div></div>
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Toplam")}</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> ${tn(state.workoutLogs.length, "antr.")}</span></div></div>
     </div>
     <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">${t("Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.")}</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">${t("Bugünün antrenmanına git")}</button></div>`}</div>
@@ -8841,8 +8897,8 @@ function openExSheet(exIdx) {
   const W = Math.max(0, ...ex.sets.map(s => num(s.kg)));
   let plateSub = "";
   if (ex.kind === "weight" && eq === "plates" && W > 0) {
-    const r = platesFor(W, num(state.settings.barKg, 20));
-    plateSub = r.ok && r.list.length ? t("{w} kg: her tarafa {list}", { w: fmtKg(W), list: r.list.map(fmtKg).join(" + ") }) : t("Isınma setleri ve plaka dağılımı");
+    const Wd = num(kgToDisp(W)), r = platesFor(Wd, barDisp());   // v53: gösterim biriminde (imperial'de lb plakalar)
+    plateSub = r.ok && r.list.length ? wTxt(t("{w} kg: her tarafa {list}", { w: fmtKg(Wd), list: r.list.map(fmtKg).join(" + ") })) : t("Isınma setleri ve plaka dağılımı");
   } else if (ex.kind === "weight" && usesLevels(ex)) plateSub = levelListOf(ex) ? t("Isınma setleri ve makine kademeleri") : t("Önce kademeleri tanımla");
   const item = (fn, icon, label, sub, extra = "") => `<button onclick="closeModal('exSheet'); ${fn}" class="w-full min-h-[60px] rounded-2xl px-2.5 flex items-center gap-3.5 bg-[var(--t-elev0)] text-left ${extra}">
       <span class="w-10 h-10 shrink-0 rounded-xl bg-[var(--t-elev2)] flex items-center justify-center" style="color:#1FD1C1">${svgI(icon, 20, 1.9)}</span>
@@ -13038,6 +13094,45 @@ function plateSet() { return isImperial() ? PLATES_LB.slice() : PLATES.slice(); 
 function barOptions() { return isImperial() ? [45, 35, 15, 0] : [20, 15, 10, 0]; }
 function wStep() { return isImperial() ? 5 : 2.5; }
 
+// ---------------------------------------------------------------------------
+// v53 Görev 2 — Antrenman: set kilosu, artış, kademe, plaka, 1RM / tonaj gösterimi.
+// - Giriş: gösterilen değer yeniden yazılırsa (aynı sayı) kayıttaki kg DEĞİŞMEZ (keepKg); yoksa dispToKg (3 ondalık).
+// - Artış adımı (ex.inc, autoInc) kg saklanır; imperial'de lb adımı incDisp: lb'de girilmiş adım (3 ondalık kg,
+//   gidiş-dönüş birebir) aynen; kg kökenli adım en yakın 2,5 lb katına (en az 2,5): 2,5 → 5, 2 → 5, 5 → 10, 1,25 → 2,5.
+// - Plaka aracı ve ısınma imperial'de tamamen lb'de hesaplanır (plateSet, 45 / 35 / 15 lb bar); kademe listeleri kg
+//   saklanır, gösterimde lb'ye çevrilir. Bar ayarı (settings.barKg) seçeneklerden birine uymuyorsa 45 lb varsayılır, yazılmaz.
+// - Metin: Türkçe/İngilizce kalıplardaki "kg" birimi wTxt ile "lb" olur (Türkçe ekler: kg'a → lb'ye, kg'da → lb'de,
+//   kg'ı → lb'yi, kg'lık → lb'lik). Metrikte wTxt metni aynen döndürür (piksel aynı). Kullanıcı metni (hareket adı)
+//   wTxt'ten SONRA trFill ile eklenir.
+// ---------------------------------------------------------------------------
+function round3(n) { return Math.round(n * 1000) / 1000; }
+// 1RM / tonaj gibi yuvarlanmayan büyüklükler: imperial'de lb sayısı, metrikte girdi aynen
+function wRaw(kg) { return isImperial() ? num(kg) / LB_KG : kg; }
+function wTxt(s) {
+  if (!isImperial()) return s;
+  return String(s).replace(/\bkg('a|'da|'ı|'lık)?(?![A-Za-zÀ-ɏ])/g, (m, suf) => {
+    if (!suf) return "lb";
+    if (suf === "'a") return "lb'ye";
+    if (suf === "'da") return "lb'de";
+    if (suf.length === 2) return "lb'yi";
+    return "lb'lik";
+  });
+}
+// Gösterilen set kilosu girişi → kayıt kg. Aynı sayı yeniden yazılırsa eski kg aynen (yuvarlama birikmesi yok).
+function keepKg(v, origKg) {
+  const n = unitNum(v);
+  if (n === null) return dispToKg(v);
+  if (origKg !== undefined && origKg !== null && origKg !== "" && isFinite(num(origKg, NaN)) && num(kgToDisp(num(origKg))) === n) return origKg;
+  return dispToKg(n);
+}
+// Artış adımı gösterimde (kg saklı): metrikte aynen
+function incDisp(kg) {
+  if (!isImperial()) return kg;
+  const k = num(kg), d = num(kgToDisp(k));
+  if (Math.abs(dispToKg(d) - k) < 1e-9) return d;   // lb'de girilmiş
+  return Math.max(2.5, Math.round(k / LB_KG / 2.5) * 2.5);
+}
+
 // Ayar: yalnız gösterim değişir; kayıtlı hiçbir değer çevrilmez
 function setUnits(u) {
   u = u === "imperial" ? "imperial" : "metric";
@@ -13059,7 +13154,10 @@ Object.assign(EN, {
   "Kilo vermek için hedef kilo şu anki kilondan ({w}) az olmalı.": "To lose weight, your goal weight must be below your current weight ({w}).",
   "Kilo almak için hedef kilo şu anki kilondan ({w}) fazla olmalı (en çok {max}).": "To gain weight, your goal weight must be above your current weight ({w}), up to {max}.",
   "Haftada yaklaşık {w} kayıp (günde ~{kcal} kcal açık).": "About {w} lost per week (a deficit of ~{kcal} kcal a day).",
-  "Haftada yaklaşık {w} artış (günde ~{kcal} kcal fazla).": "About {w} gained per week (a surplus of ~{kcal} kcal a day)."
+  "Haftada yaklaşık {w} artış (günde ~{kcal} kcal fazla).": "About {w} gained per week (a surplus of ~{kcal} kcal a day).",
+  // v53 Görev 2: antrenman (imperial)
+  "45 lb Olimpik bar": "45 lb Olympic bar", "35 lb Bar": "35 lb bar", "15 lb EZ / kısa bar": "15 lb EZ / short bar",
+  "bin lb": "k lb", "Son 8 haftanın tonajı (bin lb)": "Volume for the last 8 weeks (thousand lb)"
 });
 
 </script>

@@ -25,15 +25,18 @@ function usesLevels(ex) { const e = equipOf(ex); return e === "stack" || e === "
 // Tanımlı kademelerden sıralı kilo listesi üretir
 function levelsToList(L) {
   if (!L) return null;
+  // v53: imperial'de lb'de girilmiş kademeler 3 ondalık kg; adım birikmesin diye her kademe start + i × step
+  const imp = isImperial(), rr = imp ? round3 : round2;
   let base = [];
-  if (L.mode === "list") base = (L.list || []).map(v => round2(num(v, -1))).filter(v => v >= 0);
+  if (L.mode === "list") base = (L.list || []).map(v => rr(num(v, -1))).filter(v => v >= 0);
   else {
     const st = num(L.start, 0), sp = num(L.step, 0);
-    if (sp > 0) for (let v = st; v <= 500 && base.length < 250; v = round2(v + sp)) base.push(round2(v));
+    if (sp > 0 && imp) for (let i = 0, v = st; v <= 500 && base.length < 250; v = rr(st + ++i * sp)) base.push(rr(v));
+    else if (sp > 0) for (let v = st; v <= 500 && base.length < 250; v = round2(v + sp)) base.push(round2(v));
   }
   const add = num(L.addon, 0);
   let all = base.slice();
-  if (add > 0) base.forEach(v => all.push(round2(v + add)));
+  if (add > 0) base.forEach(v => all.push(rr(v + add)));
   all = [...new Set(all)].sort((a, b) => a - b);
   return all.length >= 2 ? all : null;
 }
@@ -58,14 +61,17 @@ function levelListOf(ex) {
   if (!usesLevels(ex)) return null;
   return levelsToList(ex.levels) || levelsToList(inferLevels(ex));
 }
+// v53: imperial'de artış lb'de: gösterilen lb ± incDisp (5 lb gibi) → kg (3 ondalık)
 function nextLevel(ex, kg) {
   const list = levelListOf(ex);
   if (list) { const n = list.find(v => v > kg + 0.01); if (n != null) return n; }
+  if (isImperial()) return dispToKg(num(kgToDisp(kg)) + incDisp(incOf(ex)));
   return round2(kg + incOf(ex));
 }
 function prevLevel(ex, kg) {
   const list = levelListOf(ex);
   if (list) { const p = list.filter(v => v < kg - 0.01).pop(); if (p != null) return p; }
+  if (isImperial()) return Math.max(0, dispToKg(num(kgToDisp(kg)) - incDisp(incOf(ex))));
   return Math.max(0, round2(kg - incOf(ex)));
 }
 function nearestLevelBelow(list, kg) {
@@ -74,8 +80,8 @@ function nearestLevelBelow(list, kg) {
 }
 function levelsSummary(ex) {
   const L = ex.levels;
-  if (L && L.mode === "step" && num(L.step) > 0) return num(L.addon) > 0 ? t("{step} kg arayla (+{add} ek plaka)", { step: fmtKg(num(L.step)), add: fmtKg(num(L.addon)) }) : t("{step} kg arayla", { step: fmtKg(num(L.step)) });
-  if (L && L.mode === "list") { const cnt = (L.list || []).length; return num(L.addon) > 0 ? tn(cnt, "{n} kademe (+{add} ek)", { add: fmtKg(num(L.addon)) }) : tn(cnt, "{n} kademe"); }
+  if (L && L.mode === "step" && num(L.step) > 0) return num(L.addon) > 0 ? wTxt(t("{step} kg arayla (+{add} ek plaka)", { step: fmtWNum(num(L.step)), add: fmtWNum(num(L.addon)) })) : wTxt(t("{step} kg arayla", { step: fmtWNum(num(L.step)) }));
+  if (L && L.mode === "list") { const cnt = (L.list || []).length; return num(L.addon) > 0 ? wTxt(tn(cnt, "{n} kademe (+{add} ek)", { add: fmtWNum(num(L.addon)) })) : tn(cnt, "{n} kademe"); }
   return "";
 }
 
@@ -85,12 +91,12 @@ function levelsAskHtml(ex, exIdx) {
   const inf = inferLevels(ex);
   if (!inf) return "";
   const list = levelsToList(inf);
-  const around = list.filter(v => v >= num(ex.sets[0] && ex.sets[0].kg) - inf.step * 2).slice(0, 5).map(fmtKg).join(" · ");
+  const around = list.filter(v => v >= num(ex.sets[0] && ex.sets[0].kg) - inf.step * 2).slice(0, 5).map(v => fmtWNum(v)).join(" · ");
   return `
     <div class="t-panel rounded-2xl px-3 py-2.5 text-[13px] space-y-2">
       <div class="text-[var(--t-text2)]">${equipOf(ex) === "dumbbell"
-        ? t("Bu dambılların kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtKg(inf.step), around })
-        : t("Bu makinenin kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtKg(inf.step), around })}</div>
+        ? wTxt(t("Bu dambılların kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtWNum(inf.step), around }))
+        : wTxt(t("Bu makinenin kademeleri <b class=\"text-[var(--t-text)]\">{step} kg</b> arayla mı gidiyor? <span class=\"t-dim\">({around} …)</span>", { step: fmtWNum(inf.step), around }))}</div>
       <div class="flex gap-2">
         <button onclick="confirmInferredLevels(${exIdx})" class="t-btn h-11 px-4 rounded-xl text-[13px]">${t("Evet, kaydet")}</button>
         <button onclick="openEditExercise(${exIdx})" class="t-btn-ghost h-11 px-4 rounded-xl text-[13px]">${t("Düzenle")}</button>
@@ -103,7 +109,7 @@ function confirmInferredLevels(exIdx) {
   const inf = inferLevels(ex);
   if (!inf) return;
   ex.levels = inf;
-  toast(t("Kademeler kaydedildi: {step} kg arayla", { step: fmtKg(inf.step) }));
+  toast(wTxt(t("Kademeler kaydedildi: {step} kg arayla", { step: fmtWNum(inf.step) })));
   renderAll();
 }
 function dismissLevelsAsk(exIdx) { activeDay().exercises[exIdx].levelsAskDismiss = true; renderAll(); }
@@ -137,10 +143,10 @@ function updateExEquipUI() {
 function fillExLevels(v) {
   $("exEquip").value = v.equip && EQUIP_LABEL[v.equip] ? v.equip : "auto";
   const L = v.levels || null;
-  $("exLvStart").value = L && L.mode === "step" ? fmtKg(num(L.start)) : "";
-  $("exLvStep").value = L && L.mode === "step" ? fmtKg(num(L.step)) : "";
-  $("exLvList").value = L && L.mode === "list" ? (L.list || []).map(fmtKg).join("; ") : "";
-  $("exLvAddon").value = L && num(L.addon) > 0 ? fmtKg(num(L.addon)) : "";
+  $("exLvStart").value = L && L.mode === "step" ? fmtWNum(num(L.start)) : "";
+  $("exLvStep").value = L && L.mode === "step" ? fmtWNum(num(L.step)) : "";
+  $("exLvList").value = L && L.mode === "list" ? (L.list || []).map(v => fmtWNum(v)).join("; ") : "";
+  $("exLvAddon").value = L && num(L.addon) > 0 ? fmtWNum(num(L.addon)) : "";
   setExLevelsMode(L && L.mode === "list" ? "list" : "step");
   updateExEquipUI();
 }
@@ -253,7 +259,7 @@ function gymTodayHtml() {
       <div class="t-label">${t("BU HAFTA")}</div>
       <div class="grid grid-cols-3 gap-2">
         <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Antrenman|sayı")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg">/${state.workoutDays.length}</span></div></div>
-        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(wVol / 1000)}<span class="t-dim text-lg"> ${t("t|ton")}</span></div></div>
+        <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(wRaw(wVol) / 1000)}<span class="t-dim text-lg"> ${isImperial() ? t("bin lb") : t("t|ton")}</span></div></div>
         <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Süre")}</div><div class="t-display text-[26px]">${Math.floor(wMin / 60)}:${String(Math.round(wMin % 60)).padStart(2, "0")}<span class="t-dim text-lg"> ${t("sa")}</span></div></div>
       </div>
       ${last ? `<button onclick="setGymView('history')" class="t-card-flat w-full min-h-[60px] rounded-2xl px-3.5 flex items-center justify-between text-left">
@@ -307,7 +313,7 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   return `<div class="rounded-2xl ${rowCls}"><div class="grid items-center gap-2 h-14 px-1" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px">
     <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-[var(--t-warn-icon)] text-sm">★</span>' : ""}${effLbl}</span>
     <span class="text-[13px] t-dim truncate">${prev}</span>
-    <input type="text" inputmode="decimal" aria-label="${t("{n}. set kilo", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtKg(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
+    <input type="text" inputmode="decimal" aria-label="${t("{n}. set kilo", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtWNum(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
     <input type="text" inputmode="numeric" aria-label="${t("{n}. set tekrar", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-reps" value="${num(s.reps)}" onchange="updateSetData(${exIdx}, ${i}, 'reps', this.value)" class="t-input w-full" />
     ${check}
   </div>${s.done && i === lastDone ? effortRowHtml(exIdx, s, i) : ""}</div>`;
@@ -324,10 +330,10 @@ function gymActiveHtml() {
     const allDone = ex.sets.length && ex.sets.every(s => s.done);
     const prevOf = i => {
       const ps = last && last.kind === "weight" && last.sets[i];
-      return ps ? `${fmtKg(num(ps.kg))}×${num(ps.reps)}` : "—";
+      return ps ? `${fmtWNum(num(ps.kg))}×${num(ps.reps)}` : "—";
     };
     const head = ex.kind === "weight"
-      ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">${t("SET")}</span><span class="truncate">${t("ÖNCEKİ")}</span><span class="text-center">${t("KG")}</span><span class="text-center">${t("TEKRAR")}</span><span></span></div>`
+      ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">${t("SET")}</span><span class="truncate">${t("ÖNCEKİ")}</span><span class="text-center">${isImperial() ? "LB" : t("KG")}</span><span class="text-center">${t("TEKRAR")}</span><span></span></div>`
       : ex.kind === "time" ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px"><span class="text-center">${t("SET")}</span><span>${t("SÜRE")}</span><span></span><span></span></div>` : "";
     return `
       <div id="exCard_${exIdx}" class="t-card rounded-[22px] p-4 space-y-3" style="scroll-margin-top: 9rem;">
@@ -382,7 +388,7 @@ function exRightText(ex) {
   ex.sets.forEach(s => { vol += num(s.kg) * num(s.reps); best = Math.max(best, e1rm(s.kg, s.reps)); });
   const lv = usesLevels(ex) ? levelsSummary(ex) : "";
   if (best <= 0 && vol <= 0) return lv ? t("Kademe: {lv}", { lv }) : "";   // v32: kilo girilmeden "~0 kg" gösterme
-  return `${t("Tahmini 1RM ~{best} kg · Tonaj {vol} kg", { best: String(Math.round(best)), vol: Math.round(vol).toLocaleString(locale()) })}${lv ? " · " + t("Kademe: {lv}", { lv }) : ""}`;
+  return `${wTxt(t("Tahmini 1RM ~{best} kg · Tonaj {vol} kg", { best: String(Math.round(wRaw(best))), vol: Math.round(wRaw(vol)).toLocaleString(locale()) }))}${lv ? " · " + t("Kademe: {lv}", { lv }) : ""}`;
 }
 
 function gymProgramHtml() {
@@ -582,7 +588,7 @@ function gymHistoryHtml() {
       <div class="flex-1 min-w-0">
         <div class="text-xs t-muted">${esc(l.ts ? fmtDate(l.ts, true) : l.date)}</div>
         <div class="text-[15px] font-semibold truncate">${esc(l.dayName)}</div>
-        <div class="text-xs t-muted mt-0.5">${tn(num(l.sets), "{n} set")} · ${num(l.volume).toLocaleString(locale())} kg${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + t("{n} dk kardiyo", { n: num(l.cardioMin) }) : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${tn(num(l.prs), "{n} rekor")}</span>` : ""}</div>
+        <div class="text-xs t-muted mt-0.5">${tn(num(l.sets), "{n} set")} · ${isImperial() ? Math.round(wRaw(num(l.volume))).toLocaleString(locale()) : num(l.volume).toLocaleString(locale())} ${wUnit()}${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + t("{n} dk kardiyo", { n: num(l.cardioMin) }) : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${tn(num(l.prs), "{n} rekor")}</span>` : ""}</div>
       </div>
       <button onclick="openShareCard(${i})" aria-label="${t("Paylaş")}" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("share", 20)}</button>
       <button onclick="deleteWorkoutLog(${i})" aria-label="${t("Kaydı sil")}" class="w-11 h-11 rounded-xl flex items-center justify-center t-dim">${svgI("trash", 19)}</button>
@@ -590,7 +596,7 @@ function gymHistoryHtml() {
   return `
     <div class="grid grid-cols-3 gap-2">
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Bu hafta")}</div><div class="t-display text-[26px]">${weekLogs.length}<span class="t-dim text-lg"> ${tn(weekLogs.length, "antr.")}</span></div></div>
-      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(weekLogs.reduce((a, l) => a + num(l.volume), 0) / 1000)}<span class="t-dim text-lg"> ${t("t|ton")}</span></div></div>
+      <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(wRaw(weekLogs.reduce((a, l) => a + num(l.volume), 0)) / 1000)}<span class="t-dim text-lg"> ${isImperial() ? t("bin lb") : t("t|ton")}</span></div></div>
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Toplam")}</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> ${tn(state.workoutLogs.length, "antr.")}</span></div></div>
     </div>
     <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">${t("Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.")}</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">${t("Bugünün antrenmanına git")}</button></div>`}</div>
@@ -628,8 +634,8 @@ function openExSheet(exIdx) {
   const W = Math.max(0, ...ex.sets.map(s => num(s.kg)));
   let plateSub = "";
   if (ex.kind === "weight" && eq === "plates" && W > 0) {
-    const r = platesFor(W, num(state.settings.barKg, 20));
-    plateSub = r.ok && r.list.length ? t("{w} kg: her tarafa {list}", { w: fmtKg(W), list: r.list.map(fmtKg).join(" + ") }) : t("Isınma setleri ve plaka dağılımı");
+    const Wd = num(kgToDisp(W)), r = platesFor(Wd, barDisp());   // v53: gösterim biriminde (imperial'de lb plakalar)
+    plateSub = r.ok && r.list.length ? wTxt(t("{w} kg: her tarafa {list}", { w: fmtKg(Wd), list: r.list.map(fmtKg).join(" + ") })) : t("Isınma setleri ve plaka dağılımı");
   } else if (ex.kind === "weight" && usesLevels(ex)) plateSub = levelListOf(ex) ? t("Isınma setleri ve makine kademeleri") : t("Önce kademeleri tanımla");
   const item = (fn, icon, label, sub, extra = "") => `<button onclick="closeModal('exSheet'); ${fn}" class="w-full min-h-[60px] rounded-2xl px-2.5 flex items-center gap-3.5 bg-[var(--t-elev0)] text-left ${extra}">
       <span class="w-10 h-10 shrink-0 rounded-xl bg-[var(--t-elev2)] flex items-center justify-center" style="color:#1FD1C1">${svgI(icon, 20, 1.9)}</span>

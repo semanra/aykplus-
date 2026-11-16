@@ -48,7 +48,7 @@ function exerciseSeries(name) {
   if (kind === "time") {
     return { points: sameKind.map(h => ({ label: fmtDate(h.ts), t: h.ts, y: Math.max(...h.sets.map(s => num(s.sec))) })), unit: "sn", color: "#38bdf8", metric: "En uzun set" };
   }
-  return { points: sameKind.map(h => ({ label: fmtDate(h.ts), t: h.ts, y: round1(Math.max(...h.sets.map(s => e1rm(s.kg, s.reps)))) })), unit: "kg", color: "#f59e0b", metric: "Tahmini 1RM" };
+  return { points: sameKind.map(h => ({ label: fmtDate(h.ts), t: h.ts, y: round1(wRaw(Math.max(...h.sets.map(s => e1rm(s.kg, s.reps))))) })), unit: wUnit(), color: "#f59e0b", metric: "Tahmini 1RM" };
 }
 
 function exerciseChartHtml(name, accent) {
@@ -417,13 +417,13 @@ function progGucHtml() {
       (sess.sets || []).forEach(s => { const v = e1rm(s.kg, s.reps); if (v > sb) sb = v; if (v > 0 && (!best || v > best.v)) best = { v, kg: num(s.kg), reps: num(s.reps), ts: sess.ts }; });
       if (sb > 0) perSess.push(sb);
     });
-    if (best) prs.push({ k, name: nm(k), ...best, spark: perSess.slice(-10), d: perSess.length >= 2 ? best.v - perSess[0] : null });
+    if (best) prs.push({ k, name: nm(k), ...best, spark: perSess.slice(-10).map(v => wRaw(v)), d: perSess.length >= 2 ? wRaw(best.v - perSess[0]) : null });   // v53: 1RM gösterim biriminde
   });
   prs.sort((a, b) => b.ts - a.ts);
   const prRows = prs.slice(0, 12).map(p => `<button onclick="progSelectEx(${esc(JSON.stringify(p.k))})" class="p-pr">
-      <span class="p-pr-n"><b>${esc(exNameL(p.name))}</b><span>${fmtDate(p.ts)} · ${fmtNum(p.kg)} kg × ${p.reps}</span></span>${pSpark(p.spark, PC.tq)}
-      <span class="p-pr-v"><b class="t-display">${fmtNum(round1(p.v))}</b>${p.d != null ? pDelta(p.d, "", true) : ""}</span></button>`).join("");
-  const prCard = `<div class="p-card" id="pPrs">${pSec(t("Hareketlerin en iyileri"), PC.tq, `<span class="p-dim p-sm">${t("tahmini 1RM, kg")}</span>`)}
+      <span class="p-pr-n"><b>${esc(exNameL(p.name))}</b><span>${fmtDate(p.ts)} · ${fmtNum(num(kgToDisp(p.kg)))} ${wUnit()} × ${p.reps}</span></span>${pSpark(p.spark, PC.tq)}
+      <span class="p-pr-v"><b class="t-display">${fmtNum(round1(wRaw(p.v)))}</b>${p.d != null ? pDelta(p.d, "", true) : ""}</span></button>`).join("");
+  const prCard = `<div class="p-card" id="pPrs">${pSec(t("Hareketlerin en iyileri"), PC.tq, `<span class="p-dim p-sm">${wTxt(t("tahmini 1RM, kg"))}</span>`)}
     ${prRows ? `<div class="p-prs">${prRows}</div>` : `<p class="p-fine">${t("Henüz kayıt yok. Antrenman kaydettikçe her hareketin en iyi seti (tahmini 1RM) burada listelenir.")}</p>`}</div>`;
   // Kas başına set (bullet, azalan sıra)
   const counts = weeklyMuscleSets(weekStart());
@@ -440,12 +440,13 @@ function progGucHtml() {
   const ws = weekStart(), w = progWeekly();
   const ton = Array.from({ length: 8 }, (_, i) => {
     const a = ws - (7 - i) * 7 * DAY_MS, b = a + 7 * DAY_MS;
-    const v = state.workoutLogs.filter(l => l.ts && l.ts >= a && l.ts < b).reduce((s, l) => s + num(l.volume), 0) / 1000;
+    const vKg = state.workoutLogs.filter(l => l.ts && l.ts >= a && l.ts < b).reduce((s, l) => s + num(l.volume), 0);
+    const v = wRaw(vKg) / 1000;   // v53: imperial'de bin lb
     return { label: i === 7 ? t("Bu h.") : i === 0 ? fmtDay(new Date(a), { day: "numeric", month: "short" }) : String(new Date(a).getDate()), v: round1(v), flag: i === 7 ? "now" : "" };
   });
   const hasTon = ton.some(tw => tw.v > 0);
-  const tonCard = `<div class="p-card" id="pTonnage">${pSec(t("Haftalık tonaj"), PC.tq, `<span class="p-dim p-sm">${t("ton")}</span>`)}
-    ${hasTon ? pBars(ton, { color: PC.tq, id: "ton", fmt: v => fmtNum(v), label: t("Son 8 haftanın tonajı (ton)") }) + `<p class="p-fine">${t("Bu hafta sürüyor (yarı saydam); bitmemiş haftayı tam haftalarla karşılaştırma.")}</p>` : `<p class="p-fine">${t("Henüz tonaj yok.")}</p>`}
+  const tonCard = `<div class="p-card" id="pTonnage">${pSec(t("Haftalık tonaj"), PC.tq, `<span class="p-dim p-sm">${isImperial() ? t("bin lb") : t("ton")}</span>`)}
+    ${hasTon ? pBars(ton, { color: PC.tq, id: "ton", fmt: v => fmtNum(v), label: isImperial() ? t("Son 8 haftanın tonajı (bin lb)") : t("Son 8 haftanın tonajı (ton)") }) + `<p class="p-fine">${t("Bu hafta sürüyor (yarı saydam); bitmemiş haftayı tam haftalarla karşılaştırma.")}</p>` : `<p class="p-fine">${t("Henüz tonaj yok.")}</p>`}
     <div class="p-mini3"><div><span>${t("Bu hafta")}</span><b>${tn(w.n, "{n} seans")}</b></div><div><span>${t("Kardiyo")}</span><b>${t("{n} dk", { n: w.min })}${w.km > 0 ? ` · ${fmtNum(w.km)} km` : ""}</b></div><div><span>${t("Rekor")}</span><b>${w.prs}</b></div></div></div>`;
   // Takvim: son 5 hafta (antrenman dolgu + ✓, mobilite alt çizgi, bugün çerçeve)
   const wd = progWorkoutDays(), mob = progMobDays();
