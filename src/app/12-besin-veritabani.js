@@ -35,13 +35,17 @@ function searchIndex() {
   Object.keys(db).forEach(id => {
     const f = db[id];
     if (isHiddenFood(f)) return;
-    const src = f.name + "|" + (f.cat || "") + "|" + (f.aliases || []).join(" ");
+    // v51: İngilizcede besinin İngilizce adı da aranır (Türkçe ad + eş anlamlılar kalır); Türkçede enName "" → eski kayıtla aynı
+    const dn = foodNameL(f), enName = dn !== f.name ? dn : "";
+    const src = f.name + "|" + (f.cat || "") + "|" + (f.aliases || []).join(" ") + (enName ? "|en:" + enName : "");
     const old = _sEntry.get(f);
     if (old && old.src === src) { _sIdx[id] = old; return; }   // özel besin yerinde düzenlenirse src değişir → yeniden hesaplanır
-    const name = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
+    const trName = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
+    const name = enName ? normSearch(stripEmoji(enName).replace(/^⭐\s*/, "")) : trName;
+    const name2 = enName ? trName : "";   // İngilizcede Türkçe ad ikinci ad (Türk yemekleri Türkçe kalır; "kıyma" da bulunur)
     const extra = normSearch((f.aliases || []).join(" ") + " " + stripEmoji(f.cat || ""));
-    const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(tk => tk.length > 1);
-    const e = { src, name, nameTok: name.split(/[^a-z0-9%]+/).filter(Boolean), extra, tokens };
+    const tokens = (name + " " + name2 + " " + extra).split(/[^a-z0-9%]+/).filter(tk => tk.length > 1);
+    const e = { src, name, name2, nameTok: (name + " " + name2).split(/[^a-z0-9%]+/).filter(Boolean), extra, tokens };
     _sEntry.set(f, e);
     _sIdx[id] = e;
   });
@@ -54,7 +58,7 @@ function wordScore(w, e, fuzzy = true) {
   let best = 0;
   for (const a of alts) {
     if (e.nameTok.some(tk => tk.startsWith(a))) best = Math.max(best, 150);
-    else if (e.name.includes(a)) best = Math.max(best, 100);
+    else if (e.name.includes(a) || (e.name2 && e.name2.includes(a))) best = Math.max(best, 100);
     else if (e.extra.includes(a)) best = Math.max(best, 60);
   }
   if (best || !fuzzy || w.length < 4) return best;
@@ -94,8 +98,8 @@ function searchFoodsPass(ids, q, fuzzy) {
     if (!e) return;
     let sc = 0, inName = true;
     for (const w of words) { const s = wordScore(w, e, fuzzy); if (!s) return; sc += s; if (s < 100) inName = false; }
-    if (e.name === q) sc += 600;
-    else if (e.name.startsWith(q)) sc += 300;
+    if (e.name === q || e.name2 === q) sc += 600;
+    else if (e.name.startsWith(q) || (e.name2 && e.name2.startsWith(q))) sc += 300;
     if (freq.has(id) && inName) sc += 1000;   // sık kullanılan önceliği yalnızca adı eşleşince (kategori/eş anlamlıyla değil)
     if (!USDA_DB[id]) sc += 40;            // uygulamanın kendi listesi ve özel besinler önce
     sc -= e.name.length * 0.3;

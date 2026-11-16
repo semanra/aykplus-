@@ -199,8 +199,8 @@ function openSwap(mIdx, iIdx, dest) {
   const f0 = getFoodDB()[item.foodId];
   const opts = swapOptions(item);
   if (!opts.length) return;
-  const items = opts.map(o => ({ id: o.id, eff: o.eff, label: o.f.name, sub: `${fmtNum(o.eff)} ${unitL(o.eff, o.f.unit)} · ${o.kcal} kcal · ${Math.round(o.p)}${t("P|makro")} ${Math.round(o.c)}${t("K|makro")} ${Math.round(o.fat)}${t("Y|makro")}` }));
-  openPicker(t("{ad} yerine", { ad: f0.name }), [{ label: t("Şu an: {a} {u} · {k} kcal", { a: fmtNum(effAmount(item)), u: unitL(effAmount(item), f0.unit), k: String(Math.round(kcalPerUnit(f0) * effAmount(item))) }), short: t("Alternatifler"), items }], it => {
+  const items = opts.map(o => ({ id: o.id, eff: o.eff, label: foodNameL(o.f), sub: `${fmtNum(o.eff)} ${unitL(o.eff, o.f.unit)} · ${o.kcal} kcal · ${Math.round(o.p)}${t("P|makro")} ${Math.round(o.c)}${t("K|makro")} ${Math.round(o.fat)}${t("Y|makro")}` }));
+  openPicker(t("{ad} yerine", { ad: foodNameL(f0) }), [{ label: t("Şu an: {a} {u} · {k} kcal", { a: fmtNum(effAmount(item)), u: unitL(effAmount(item), f0.unit), k: String(Math.round(kcalPerUnit(f0) * effAmount(item))) }), short: t("Alternatifler"), items }], it => {
     snapshot();
     const l2 = dest === "day" ? ensureDayCopy() : curMeals();
     const cur = l2[mIdx] && l2[mIdx].items[iIdx];
@@ -209,7 +209,7 @@ function openSwap(mIdx, iIdx, dest) {
     cur.foodId = it.id;
     cur.amount = rawFromEff(nf, it.eff);
     renderAll();
-    const sw = { a: f0.name, b: nf.name, q: fmtNum(it.eff), u: unitL(it.eff, nf.unit) };
+    const sw = { a: foodNameL(f0), b: foodNameL(nf), q: fmtNum(it.eff), u: unitL(it.eff, nf.unit) };
     offerUndo(dest === "day" ? t("{a} → {b} ({q} {u}) · yalnızca bugün", sw) : t("{a} → {b} ({q} {u})", sw));
   });
 }
@@ -443,21 +443,21 @@ function renderTodayMeals() {
       if (editing) {
         return `<div class="py-2">
             <div class="flex items-center gap-1 min-h-[24px]">
-              <div class="flex-1 min-w-0 text-[14px] font-semibold truncate">${esc(f.name)}</div>
+              <div class="flex-1 min-w-0 text-[14px] font-semibold truncate">${esc(foodNameL(f))}</div>
               <div class="shrink-0 text-[13px] font-bold tabular-nums">${Math.round(mac.cal)} <span class="text-[12px] font-semibold n-dim">kcal</span></div>
-              <button onclick="dayRemoveItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} bugünden çıkar", { ad: f.name }))}">${svgI("x", 18, 2.2)}</button>
+              <button onclick="dayRemoveItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} bugünden çıkar", { ad: foodNameL(f) }))}">${svgI("x", 18, 2.2)}</button>
             </div>
             <div class="flex items-center justify-end gap-1 mt-1.5">
-              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: f.name }))}">${svgI("minus", 18, 2.4)}</button>
-              <input type="text" inputmode="decimal" data-fk="damt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="daySetAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} bugünkü miktarı", { ad: f.name }))}" />
+              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: foodNameL(f) }))}">${svgI("minus", 18, 2.4)}</button>
+              <input type="text" inputmode="decimal" data-fk="damt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="daySetAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} bugünkü miktarı", { ad: foodNameL(f) }))}" />
               <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(unitL(effAmount(item), f.unit))}</span>
-              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: f.name }))}">${svgI("plus", 18, 2.4)}</button>
+              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: foodNameL(f) }))}">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>`;
       }
       return `<div class="flex items-center justify-between gap-2 min-h-[44px] py-1">
-          <div class="min-w-0 flex-1 text-[14px] leading-snug"><span class="font-semibold">${esc(f.name)}</span> <span class="n-muted whitespace-nowrap">· ${fmtNum(effAmount(item))} ${esc(unitL(effAmount(item), f.unit))}</span></div>
-          ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx}, 'day')" class="n-chip swap text-[12px]" aria-label="${esc(t("{ad} için ikame seç", { ad: f.name }))}">⇄<span class="swap-txt"> ${t("İkame")}</span></button>` : ""}
+          <div class="min-w-0 flex-1 text-[14px] leading-snug"><span class="font-semibold">${esc(foodNameL(f))}</span> <span class="n-muted whitespace-nowrap">· ${fmtNum(effAmount(item))} ${esc(unitL(effAmount(item), f.unit))}</span></div>
+          ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx}, 'day')" class="n-chip swap text-[12px]" aria-label="${esc(t("{ad} için ikame seç", { ad: foodNameL(f) }))}">⇄<span class="swap-txt"> ${t("İkame")}</span></button>` : ""}
           <span class="text-[13px] font-semibold n-muted tabular-nums w-10 text-right shrink-0">${Math.round(mac.cal)}</span>
         </div>`;
     }).join("");
@@ -582,7 +582,7 @@ function dayRemoveItem(mIdx, iIdx) {
   const it = c[mIdx].items.splice(iIdx, 1)[0];
   const f = it.est ? null : getFoodDB()[it.foodId];
   renderAll();
-  offerUndo(t("{ad} bugünden çıkarıldı", { ad: it.est ? it.est.name : f ? f.name : t("Besin") }));
+  offerUndo(t("{ad} bugünden çıkarıldı", { ad: it.est ? it.est.name : f ? foodNameL(f) : t("Besin") }));
 }
 // Öğünün yarısı yendi: bugünkü miktarlar yarıya iner, öğün yendi işaretlenir
 function halfMeal(mIdx) {
@@ -841,18 +841,18 @@ function renderMenus() {
       const canSwap = !!swapGroup(item.foodId);
       return `<div class="py-2.5">
           <div class="flex items-center gap-1 min-h-[24px]">
-            <div class="flex-1 min-w-0 text-[15px] font-semibold truncate">${esc(f.name)}</div>
+            <div class="flex-1 min-w-0 text-[15px] font-semibold truncate">${esc(foodNameL(f))}</div>
             <div class="shrink-0 text-[14px] font-bold tabular-nums">${Math.round(mac.cal)} <span class="text-[12px] font-semibold n-dim">kcal</span></div>
-            ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 shrink-0 rounded-full flex items-center justify-center n-accent text-[18px] font-bold" aria-label="${esc(t("{ad} için ikame seç", { ad: f.name }))}">⇄</button>` : ""}
-            <button onclick="removeItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: f.name }))}">${svgI("x", 18, 2.2)}</button>
+            ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 shrink-0 rounded-full flex items-center justify-center n-accent text-[18px] font-bold" aria-label="${esc(t("{ad} için ikame seç", { ad: foodNameL(f) }))}">⇄</button>` : ""}
+            <button onclick="removeItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: foodNameL(f) }))}">${svgI("x", 18, 2.2)}</button>
           </div>
           <div class="flex items-center justify-between gap-2 mt-2">
             <div class="text-[12px] font-semibold tabular-nums leading-tight min-w-0">${macroLine(mac.p, mac.c, mac.f, true)}</div>
             <div class="flex items-center gap-1 shrink-0">
-              <button onclick="changeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: f.name }))}">${svgI("minus", 18, 2.4)}</button>
-              <input type="text" inputmode="decimal" data-fk="amt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="setAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt" aria-label="${esc(t("{ad} miktarı", { ad: f.name }))}" />
+              <button onclick="changeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: foodNameL(f) }))}">${svgI("minus", 18, 2.4)}</button>
+              <input type="text" inputmode="decimal" data-fk="amt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="setAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt" aria-label="${esc(t("{ad} miktarı", { ad: foodNameL(f) }))}" />
               <span class="text-[12px] n-muted w-12 truncate">${esc(unitL(effAmount(item), f.unit))}</span>
-              <button onclick="changeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: f.name }))}">${svgI("plus", 18, 2.4)}</button>
+              <button onclick="changeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: foodNameL(f) }))}">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>
         </div>`;

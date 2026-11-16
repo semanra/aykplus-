@@ -94,7 +94,7 @@ function foodSelMacros() {
 function foodPresets(f) {
   const def = num(f.def, 1);
   if (Array.isArray(f.portions) && f.portions.length) {
-    const list = f.portions.map(([n, g]) => ({ v: round1(g), label: `${n} · ${fmtNum(g)} g` }));
+    const list = f.portions.map(([n, g], i) => ({ v: round1(g), label: `${portionL(f, i, n)} · ${fmtNum(g)} g` }));
     if (!list.some(x => x.v === 100)) list.push({ v: 100, label: "100 g" });
     return { list, plus: 50 };
   }
@@ -142,7 +142,7 @@ function renderFoodList() {
     const def = num(f.def, 1);
     if (id !== foodUI.sel) {
       return `<button onclick='selectFood(${esc(JSON.stringify(id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-food="${esc(id)}">
-          <span class="min-w-0"><span class="block text-[15px] font-bold leading-snug">${esc(f.name)}</span>
+          <span class="min-w-0"><span class="block text-[15px] font-bold leading-snug">${esc(foodNameL(f))}</span>
             <span class="block text-[12px] n-muted mt-0.5 tabular-nums">${esc(t("{n} {u} · {k} kcal · {p} g protein", { n: fmtNum(def), u: unitL(def, f.unit), k: String(Math.round(kcalPerUnit(f) * def)), p: String(Math.round(f.p * def)) }))}</span></span>
           <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
         </button>`;
@@ -151,7 +151,7 @@ function renderFoodList() {
     const custom = id.startsWith("custom_");
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3.5 my-2" data-food="${esc(id)}" id="foodSelCard">
         <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(f.name)}</h3>
+          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(foodNameL(f))}</h3>
             <div class="text-[12px] n-muted mt-0.5">${esc(t(stripEmoji(f.cat || "")))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
             ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
@@ -161,7 +161,7 @@ function renderFoodList() {
         <div class="flex items-center justify-between px-1">
           <button onclick="foodStep(-1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Azalt"))}">${svgI("minus", 20, 2.4)}</button>
           <div class="flex items-baseline justify-center gap-1 min-w-0">
-            <input id="foodAmt" type="text" inputmode="decimal" data-fk="food-amt" value="${esc(fmtNum(foodUI.amt))}" oninput="foodAmtInput(this.value)" class="n-amt big t-display" aria-label="${esc(t("{ad} miktarı", { ad: f.name }))}" />
+            <input id="foodAmt" type="text" inputmode="decimal" data-fk="food-amt" value="${esc(fmtNum(foodUI.amt))}" oninput="foodAmtInput(this.value)" class="n-amt big t-display" aria-label="${esc(t("{ad} miktarı", { ad: foodNameL(f) }))}" />
             <span class="text-[14px] font-semibold n-muted">${esc(unitL(2, f.unit))}</span>
           </div>
           <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Artır"))}">${svgI("plus", 20, 2.4)}</button>
@@ -231,10 +231,10 @@ function selectFood(id) {
 const NATURAL_RX = /^1 (adet|dilim|parça|fileto|göğüs|baget|kanat|pirzola|köfte|yaprak|diş|sap|baş|koçan|çubuk|şerit|üst but)/;
 function naturalUnit(f) {
   if (!f || f.unit !== "g" || !Array.isArray(f.portions)) return null;
-  const nat = f.portions.filter(([n, g]) => NATURAL_RX.test(n) && g > 0);
+  const nat = f.portions.map((p, i) => [p[0], p[1], i]).filter(([n, g]) => NATURAL_RX.test(n) && g > 0);
   if (!nat.length) return null;
   const p = nat.find(([, g]) => round1(g) === round1(num(f.def, 0))) || nat[0];
-  return { label: p[0].replace(/^1 /, ""), g: num(p[1], 0) };
+  return { label: portionL(f, p[2], p[0]).replace(/^1 /, ""), g: num(p[1], 0) };
 }
 function foodUnitStep(dir) {
   const f = foodUI.sel && getFoodDB()[foodUI.sel];
@@ -302,13 +302,13 @@ function addSelectedFood() {
   if (foodUI.dest === "menu") {
     const mealTitle = curMeals()[tIdx].title;
     quickAdd(tIdx, fid, amt, curMeals());
-    toast(t("{a} {u} {f} → {m} (menüne, her gün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: s.f.name, m: mealTitle }));
+    toast(t("{a} {u} {f} → {m} (menüne, her gün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: foodNameL(s.f), m: mealTitle }));
   } else {
     const list = ensureDayCopy();
     const meal = list[tIdx];
     quickAdd(tIdx, fid, amt, list);
     const mid = meal.id;
-    toast(t("{a} {u} {f} → {m} (yalnızca bugün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: s.f.name, m: meal.title }), "ok", { label: t("Menüye de kaydet"), fn: () => addToMenuById(mid, fid, amt) });
+    toast(t("{a} {u} {f} → {m} (yalnızca bugün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: foodNameL(s.f), m: meal.title }), "ok", { label: t("Menüye de kaydet"), fn: () => addToMenuById(mid, fid, amt) });
   }
   foodUI.sel = null;
   renderFoods();
@@ -644,7 +644,7 @@ function removeItem(mIdx, iIdx) {
   const it = curMeals()[mIdx].items.splice(iIdx, 1)[0];
   const f = it ? getFoodDB()[it.foodId] : null;
   renderAll();
-  offerUndo(t("{f} çıkarıldı", { f: f ? f.name : t("Besin") }));
+  offerUndo(t("{f} çıkarıldı", { f: f ? foodNameL(f) : t("Besin") }));
 }
 
 // amount: ekranda görünen miktar (ölçek açıksa saklanacak miktara çevrilir)

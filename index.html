@@ -3698,8 +3698,8 @@ function openSwap(mIdx, iIdx, dest) {
   const f0 = getFoodDB()[item.foodId];
   const opts = swapOptions(item);
   if (!opts.length) return;
-  const items = opts.map(o => ({ id: o.id, eff: o.eff, label: o.f.name, sub: `${fmtNum(o.eff)} ${unitL(o.eff, o.f.unit)} · ${o.kcal} kcal · ${Math.round(o.p)}${t("P|makro")} ${Math.round(o.c)}${t("K|makro")} ${Math.round(o.fat)}${t("Y|makro")}` }));
-  openPicker(t("{ad} yerine", { ad: f0.name }), [{ label: t("Şu an: {a} {u} · {k} kcal", { a: fmtNum(effAmount(item)), u: unitL(effAmount(item), f0.unit), k: String(Math.round(kcalPerUnit(f0) * effAmount(item))) }), short: t("Alternatifler"), items }], it => {
+  const items = opts.map(o => ({ id: o.id, eff: o.eff, label: foodNameL(o.f), sub: `${fmtNum(o.eff)} ${unitL(o.eff, o.f.unit)} · ${o.kcal} kcal · ${Math.round(o.p)}${t("P|makro")} ${Math.round(o.c)}${t("K|makro")} ${Math.round(o.fat)}${t("Y|makro")}` }));
+  openPicker(t("{ad} yerine", { ad: foodNameL(f0) }), [{ label: t("Şu an: {a} {u} · {k} kcal", { a: fmtNum(effAmount(item)), u: unitL(effAmount(item), f0.unit), k: String(Math.round(kcalPerUnit(f0) * effAmount(item))) }), short: t("Alternatifler"), items }], it => {
     snapshot();
     const l2 = dest === "day" ? ensureDayCopy() : curMeals();
     const cur = l2[mIdx] && l2[mIdx].items[iIdx];
@@ -3708,7 +3708,7 @@ function openSwap(mIdx, iIdx, dest) {
     cur.foodId = it.id;
     cur.amount = rawFromEff(nf, it.eff);
     renderAll();
-    const sw = { a: f0.name, b: nf.name, q: fmtNum(it.eff), u: unitL(it.eff, nf.unit) };
+    const sw = { a: foodNameL(f0), b: foodNameL(nf), q: fmtNum(it.eff), u: unitL(it.eff, nf.unit) };
     offerUndo(dest === "day" ? t("{a} → {b} ({q} {u}) · yalnızca bugün", sw) : t("{a} → {b} ({q} {u})", sw));
   });
 }
@@ -3942,21 +3942,21 @@ function renderTodayMeals() {
       if (editing) {
         return `<div class="py-2">
             <div class="flex items-center gap-1 min-h-[24px]">
-              <div class="flex-1 min-w-0 text-[14px] font-semibold truncate">${esc(f.name)}</div>
+              <div class="flex-1 min-w-0 text-[14px] font-semibold truncate">${esc(foodNameL(f))}</div>
               <div class="shrink-0 text-[13px] font-bold tabular-nums">${Math.round(mac.cal)} <span class="text-[12px] font-semibold n-dim">kcal</span></div>
-              <button onclick="dayRemoveItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} bugünden çıkar", { ad: f.name }))}">${svgI("x", 18, 2.2)}</button>
+              <button onclick="dayRemoveItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} bugünden çıkar", { ad: foodNameL(f) }))}">${svgI("x", 18, 2.2)}</button>
             </div>
             <div class="flex items-center justify-end gap-1 mt-1.5">
-              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: f.name }))}">${svgI("minus", 18, 2.4)}</button>
-              <input type="text" inputmode="decimal" data-fk="damt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="daySetAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} bugünkü miktarı", { ad: f.name }))}" />
+              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: foodNameL(f) }))}">${svgI("minus", 18, 2.4)}</button>
+              <input type="text" inputmode="decimal" data-fk="damt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="daySetAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} bugünkü miktarı", { ad: foodNameL(f) }))}" />
               <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(unitL(effAmount(item), f.unit))}</span>
-              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: f.name }))}">${svgI("plus", 18, 2.4)}</button>
+              <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: foodNameL(f) }))}">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>`;
       }
       return `<div class="flex items-center justify-between gap-2 min-h-[44px] py-1">
-          <div class="min-w-0 flex-1 text-[14px] leading-snug"><span class="font-semibold">${esc(f.name)}</span> <span class="n-muted whitespace-nowrap">· ${fmtNum(effAmount(item))} ${esc(unitL(effAmount(item), f.unit))}</span></div>
-          ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx}, 'day')" class="n-chip swap text-[12px]" aria-label="${esc(t("{ad} için ikame seç", { ad: f.name }))}">⇄<span class="swap-txt"> ${t("İkame")}</span></button>` : ""}
+          <div class="min-w-0 flex-1 text-[14px] leading-snug"><span class="font-semibold">${esc(foodNameL(f))}</span> <span class="n-muted whitespace-nowrap">· ${fmtNum(effAmount(item))} ${esc(unitL(effAmount(item), f.unit))}</span></div>
+          ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx}, 'day')" class="n-chip swap text-[12px]" aria-label="${esc(t("{ad} için ikame seç", { ad: foodNameL(f) }))}">⇄<span class="swap-txt"> ${t("İkame")}</span></button>` : ""}
           <span class="text-[13px] font-semibold n-muted tabular-nums w-10 text-right shrink-0">${Math.round(mac.cal)}</span>
         </div>`;
     }).join("");
@@ -4081,7 +4081,7 @@ function dayRemoveItem(mIdx, iIdx) {
   const it = c[mIdx].items.splice(iIdx, 1)[0];
   const f = it.est ? null : getFoodDB()[it.foodId];
   renderAll();
-  offerUndo(t("{ad} bugünden çıkarıldı", { ad: it.est ? it.est.name : f ? f.name : t("Besin") }));
+  offerUndo(t("{ad} bugünden çıkarıldı", { ad: it.est ? it.est.name : f ? foodNameL(f) : t("Besin") }));
 }
 // Öğünün yarısı yendi: bugünkü miktarlar yarıya iner, öğün yendi işaretlenir
 function halfMeal(mIdx) {
@@ -4340,18 +4340,18 @@ function renderMenus() {
       const canSwap = !!swapGroup(item.foodId);
       return `<div class="py-2.5">
           <div class="flex items-center gap-1 min-h-[24px]">
-            <div class="flex-1 min-w-0 text-[15px] font-semibold truncate">${esc(f.name)}</div>
+            <div class="flex-1 min-w-0 text-[15px] font-semibold truncate">${esc(foodNameL(f))}</div>
             <div class="shrink-0 text-[14px] font-bold tabular-nums">${Math.round(mac.cal)} <span class="text-[12px] font-semibold n-dim">kcal</span></div>
-            ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 shrink-0 rounded-full flex items-center justify-center n-accent text-[18px] font-bold" aria-label="${esc(t("{ad} için ikame seç", { ad: f.name }))}">⇄</button>` : ""}
-            <button onclick="removeItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: f.name }))}">${svgI("x", 18, 2.2)}</button>
+            ${canSwap ? `<button onclick="openSwap(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 shrink-0 rounded-full flex items-center justify-center n-accent text-[18px] font-bold" aria-label="${esc(t("{ad} için ikame seç", { ad: foodNameL(f) }))}">⇄</button>` : ""}
+            <button onclick="removeItem(${mIdx}, ${iIdx})" class="w-11 h-11 -my-2.5 -mr-2 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: foodNameL(f) }))}">${svgI("x", 18, 2.2)}</button>
           </div>
           <div class="flex items-center justify-between gap-2 mt-2">
             <div class="text-[12px] font-semibold tabular-nums leading-tight min-w-0">${macroLine(mac.p, mac.c, mac.f, true)}</div>
             <div class="flex items-center gap-1 shrink-0">
-              <button onclick="changeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: f.name }))}">${svgI("minus", 18, 2.4)}</button>
-              <input type="text" inputmode="decimal" data-fk="amt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="setAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt" aria-label="${esc(t("{ad} miktarı", { ad: f.name }))}" />
+              <button onclick="changeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: foodNameL(f) }))}">${svgI("minus", 18, 2.4)}</button>
+              <input type="text" inputmode="decimal" data-fk="amt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="setAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt" aria-label="${esc(t("{ad} miktarı", { ad: foodNameL(f) }))}" />
               <span class="text-[12px] n-muted w-12 truncate">${esc(unitL(effAmount(item), f.unit))}</span>
-              <button onclick="changeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: f.name }))}">${svgI("plus", 18, 2.4)}</button>
+              <button onclick="changeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: foodNameL(f) }))}">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>
         </div>`;
@@ -4482,7 +4482,7 @@ function foodSelMacros() {
 function foodPresets(f) {
   const def = num(f.def, 1);
   if (Array.isArray(f.portions) && f.portions.length) {
-    const list = f.portions.map(([n, g]) => ({ v: round1(g), label: `${n} · ${fmtNum(g)} g` }));
+    const list = f.portions.map(([n, g], i) => ({ v: round1(g), label: `${portionL(f, i, n)} · ${fmtNum(g)} g` }));
     if (!list.some(x => x.v === 100)) list.push({ v: 100, label: "100 g" });
     return { list, plus: 50 };
   }
@@ -4530,7 +4530,7 @@ function renderFoodList() {
     const def = num(f.def, 1);
     if (id !== foodUI.sel) {
       return `<button onclick='selectFood(${esc(JSON.stringify(id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-food="${esc(id)}">
-          <span class="min-w-0"><span class="block text-[15px] font-bold leading-snug">${esc(f.name)}</span>
+          <span class="min-w-0"><span class="block text-[15px] font-bold leading-snug">${esc(foodNameL(f))}</span>
             <span class="block text-[12px] n-muted mt-0.5 tabular-nums">${esc(t("{n} {u} · {k} kcal · {p} g protein", { n: fmtNum(def), u: unitL(def, f.unit), k: String(Math.round(kcalPerUnit(f) * def)), p: String(Math.round(f.p * def)) }))}</span></span>
           <span class="w-10 h-10 rounded-full n-btn flex items-center justify-center shrink-0" aria-hidden="true">${svgI("plus", 20, 2.4)}</span>
         </button>`;
@@ -4539,7 +4539,7 @@ function renderFoodList() {
     const custom = id.startsWith("custom_");
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3.5 my-2" data-food="${esc(id)}" id="foodSelCard">
         <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(f.name)}</h3>
+          <div class="min-w-0"><h3 class="text-[17px] font-extrabold leading-snug break-words">${esc(foodNameL(f))}</h3>
             <div class="text-[12px] n-muted mt-0.5">${esc(t(stripEmoji(f.cat || "")))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
             ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(f.note)}</div>` : ""}
@@ -4549,7 +4549,7 @@ function renderFoodList() {
         <div class="flex items-center justify-between px-1">
           <button onclick="foodStep(-1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Azalt"))}">${svgI("minus", 20, 2.4)}</button>
           <div class="flex items-baseline justify-center gap-1 min-w-0">
-            <input id="foodAmt" type="text" inputmode="decimal" data-fk="food-amt" value="${esc(fmtNum(foodUI.amt))}" oninput="foodAmtInput(this.value)" class="n-amt big t-display" aria-label="${esc(t("{ad} miktarı", { ad: f.name }))}" />
+            <input id="foodAmt" type="text" inputmode="decimal" data-fk="food-amt" value="${esc(fmtNum(foodUI.amt))}" oninput="foodAmtInput(this.value)" class="n-amt big t-display" aria-label="${esc(t("{ad} miktarı", { ad: foodNameL(f) }))}" />
             <span class="text-[14px] font-semibold n-muted">${esc(unitL(2, f.unit))}</span>
           </div>
           <button onclick="foodStep(1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Artır"))}">${svgI("plus", 20, 2.4)}</button>
@@ -4619,10 +4619,10 @@ function selectFood(id) {
 const NATURAL_RX = /^1 (adet|dilim|parça|fileto|göğüs|baget|kanat|pirzola|köfte|yaprak|diş|sap|baş|koçan|çubuk|şerit|üst but)/;
 function naturalUnit(f) {
   if (!f || f.unit !== "g" || !Array.isArray(f.portions)) return null;
-  const nat = f.portions.filter(([n, g]) => NATURAL_RX.test(n) && g > 0);
+  const nat = f.portions.map((p, i) => [p[0], p[1], i]).filter(([n, g]) => NATURAL_RX.test(n) && g > 0);
   if (!nat.length) return null;
   const p = nat.find(([, g]) => round1(g) === round1(num(f.def, 0))) || nat[0];
-  return { label: p[0].replace(/^1 /, ""), g: num(p[1], 0) };
+  return { label: portionL(f, p[2], p[0]).replace(/^1 /, ""), g: num(p[1], 0) };
 }
 function foodUnitStep(dir) {
   const f = foodUI.sel && getFoodDB()[foodUI.sel];
@@ -4690,13 +4690,13 @@ function addSelectedFood() {
   if (foodUI.dest === "menu") {
     const mealTitle = curMeals()[tIdx].title;
     quickAdd(tIdx, fid, amt, curMeals());
-    toast(t("{a} {u} {f} → {m} (menüne, her gün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: s.f.name, m: mealTitle }));
+    toast(t("{a} {u} {f} → {m} (menüne, her gün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: foodNameL(s.f), m: mealTitle }));
   } else {
     const list = ensureDayCopy();
     const meal = list[tIdx];
     quickAdd(tIdx, fid, amt, list);
     const mid = meal.id;
-    toast(t("{a} {u} {f} → {m} (yalnızca bugün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: s.f.name, m: meal.title }), "ok", { label: t("Menüye de kaydet"), fn: () => addToMenuById(mid, fid, amt) });
+    toast(t("{a} {u} {f} → {m} (yalnızca bugün)", { a: fmtNum(amt), u: unitL(amt, s.f.unit), f: foodNameL(s.f), m: meal.title }), "ok", { label: t("Menüye de kaydet"), fn: () => addToMenuById(mid, fid, amt) });
   }
   foodUI.sel = null;
   renderFoods();
@@ -5032,7 +5032,7 @@ function removeItem(mIdx, iIdx) {
   const it = curMeals()[mIdx].items.splice(iIdx, 1)[0];
   const f = it ? getFoodDB()[it.foodId] : null;
   renderAll();
-  offerUndo(t("{f} çıkarıldı", { f: f ? f.name : t("Besin") }));
+  offerUndo(t("{f} çıkarıldı", { f: f ? foodNameL(f) : t("Besin") }));
 }
 
 // amount: ekranda görünen miktar (ölçek açıksa saklanacak miktara çevrilir)
@@ -9094,12 +9094,12 @@ function deleteCombo(id) {
 function comboRowHtml(c) {
   const db = getFoodDB();
   const ct = itemsTotals(c.items);
-  const names = c.items.filter(i => db[i.foodId]).map(i => stripEmoji(db[i.foodId].name).replace(/^⭐\s*/, "")).join(", ");
+  const names = c.items.filter(i => db[i.foodId]).map(i => stripEmoji(foodNameL(db[i.foodId])).replace(/^⭐\s*/, "")).join(", ");
   if (foodUI.sel === "combo:" + c.id) {
     const rows = c.items.map(i => {
       const f = db[i.foodId];
       if (!f) return "";
-      return `<div class="flex items-center justify-between gap-2 py-1.5 text-[14px]"><span class="min-w-0 truncate">${esc(f.name)}</span><span class="n-muted whitespace-nowrap tabular-nums">${fmtNum(effAmount(i))} ${esc(unitL(effAmount(i), f.unit))} · ${Math.round(calcItemMacros(i).cal)} kcal</span></div>`;
+      return `<div class="flex items-center justify-between gap-2 py-1.5 text-[14px]"><span class="min-w-0 truncate">${esc(foodNameL(f))}</span><span class="n-muted whitespace-nowrap tabular-nums">${fmtNum(effAmount(i))} ${esc(unitL(effAmount(i), f.unit))} · ${Math.round(calcItemMacros(i).cal)} kcal</span></div>`;
     }).join("");
     const tIdx = foodTargetIdx();
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3 my-2" id="comboSelCard" data-combo="${esc(c.id)}">
@@ -9155,10 +9155,10 @@ function renderRecipe() {
     const fd = db[it.foodId];
     if (!fd) return "";
     return `<div class="flex items-center gap-1.5 py-1.5" data-rc-item="${i}">
-        <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(fd.name)}</div><div id="rcK${i}" class="text-[12px] n-muted tabular-nums">${Math.round(kcalPerUnit(fd) * num(it.amount))} kcal</div></div>
-        <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} miktarı", { ad: fd.name }))}" />
+        <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(foodNameL(fd))}</div><div id="rcK${i}" class="text-[12px] n-muted tabular-nums">${Math.round(kcalPerUnit(fd) * num(it.amount))} kcal</div></div>
+        <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} miktarı", { ad: foodNameL(fd) }))}" />
         <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(unitL(2, fd.unit))}</span>
-        <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: fd.name }))}">${svgI("x", 18, 2.2)}</button>
+        <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: foodNameL(fd) }))}">${svgI("x", 18, 2.2)}</button>
       </div>`;
   }).join("") || `<p class="text-[13px] n-dim py-2">${t("Henüz malzeme yok. Aşağıdan ekle.")}</p>`;
   updateRecipeSummary();
@@ -9191,7 +9191,7 @@ function rcAddIngredient() {
     const f = db[id];
     if (isHiddenFood(f)) return;
     const cat = t(stripEmoji(f.cat || "Diğer"));
-    (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: t("{n} {u} · {k} kcal", { n: fmtNum(f.def), u: unitL(f.def, f.unit), k: String(Math.round(kcalPerUnit(f) * num(f.def, 1))) }) });
+    (cats[cat] = cats[cat] || []).push({ id, label: foodNameL(f), sub: t("{n} {u} · {k} kcal", { n: fmtNum(f.def), u: unitL(f.def, f.unit), k: String(Math.round(kcalPerUnit(f) * num(f.def, 1))) }) });
   });
   const groups = Object.keys(cats).map(c => ({ label: c, short: c.replace(/\s*[&/].*$/, ""), items: cats[c] }));
   // Seçici, tarif penceresinin üstünde açılır; seçince tarif penceresi yerinde kalır
@@ -9287,7 +9287,7 @@ function shopList() {
     ms.forEach(m => m.items.forEach(i => { if (!i.est) expand(i.foodId, effAmount(i) * n, 0); }));
   });
   return Object.keys(acc).map(id => ({ id, f: db[id], amt: acc[id] }))
-    .sort((a, b) => stripEmoji(a.f.cat || "").localeCompare(stripEmoji(b.f.cat || ""), locale()) || stripEmoji(a.f.name).localeCompare(stripEmoji(b.f.name), locale()));
+    .sort((a, b) => stripEmoji(a.f.cat || "").localeCompare(stripEmoji(b.f.cat || ""), locale()) || stripEmoji(foodNameL(a.f)).localeCompare(stripEmoji(foodNameL(b.f)), locale()));
 }
 function fmtShopAmt(f, a) {
   if (f.unit === "g") return a >= 1000 ? fmtKg(round2(a / 1000)) + " kg" : (Math.ceil(a / 10) * 10) + " g";
@@ -9295,7 +9295,7 @@ function fmtShopAmt(f, a) {
   if (f.unit === "adet") { const n = Math.ceil(a - 1e-9); return n + " " + unitL(n, "adet"); }
   { const n = Math.ceil(a * 2 - 1e-9) / 2; return fmtNum(n) + " " + unitL(n, f.unit); }
 }
-function shopName(f) { return stripEmoji(f.name).replace(/^⭐\s*/, ""); }
+function shopName(f) { return stripEmoji(foodNameL(f)).replace(/^⭐\s*/, ""); }
 function openShopList() { renderShopList(); openModal("shopModal"); }
 function setShopDays(d) {
   state.shopTrainDays = Math.max(0, Math.min(7, shopTrainDays() + d));
@@ -9475,7 +9475,7 @@ function renderFoodSuggest() {
   el.innerHTML = `<div class="n-label mb-2">${t("KALAN HEDEFİNİ KAPATAN SEÇENEKLER")}</div>
     <p class="text-[12px] n-muted mb-2">${t("Kalan: {k} · {p}. Sık yediğin besinlerden:", { k: `<strong class="n-text tabular-nums">${fmtInt(remK)} kcal</strong>`, p: `<strong class="n-p tabular-nums">${fmtInt(remP)} g protein</strong>` })}</p>
     <div class="space-y-2">${foodSuggestCache.map((o, i) => {
-      const label = o.parts.map(p => `${fmtNum(p.a)} ${unitL(p.a, db[p.id].unit)} ${stripEmoji(db[p.id].name).replace(/^⭐\s*/, "")}`).join(" + ");
+      const label = o.parts.map(p => `${fmtNum(p.a)} ${unitL(p.a, db[p.id].unit)} ${stripEmoji(foodNameL(db[p.id])).replace(/^⭐\s*/, "")}`).join(" + ");
       const lk = Math.round(remK - o.K), lp = Math.round(remP - o.P);
       const kTxt = lk >= 0 ? t("{n} kcal kalır", { n: fmtInt(lk) }) : t("{n} kcal aşar", { n: fmtInt(-lk) });
       const pTxt = lp > 0 ? t("{n} g P kalır", { n: fmtInt(lp) }) : t("protein tamam");
@@ -9660,13 +9660,17 @@ function searchIndex() {
   Object.keys(db).forEach(id => {
     const f = db[id];
     if (isHiddenFood(f)) return;
-    const src = f.name + "|" + (f.cat || "") + "|" + (f.aliases || []).join(" ");
+    // v51: İngilizcede besinin İngilizce adı da aranır (Türkçe ad + eş anlamlılar kalır); Türkçede enName "" → eski kayıtla aynı
+    const dn = foodNameL(f), enName = dn !== f.name ? dn : "";
+    const src = f.name + "|" + (f.cat || "") + "|" + (f.aliases || []).join(" ") + (enName ? "|en:" + enName : "");
     const old = _sEntry.get(f);
     if (old && old.src === src) { _sIdx[id] = old; return; }   // özel besin yerinde düzenlenirse src değişir → yeniden hesaplanır
-    const name = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
+    const trName = normSearch(stripEmoji(f.name).replace(/^⭐\s*/, ""));
+    const name = enName ? normSearch(stripEmoji(enName).replace(/^⭐\s*/, "")) : trName;
+    const name2 = enName ? trName : "";   // İngilizcede Türkçe ad ikinci ad (Türk yemekleri Türkçe kalır; "kıyma" da bulunur)
     const extra = normSearch((f.aliases || []).join(" ") + " " + stripEmoji(f.cat || ""));
-    const tokens = (name + " " + extra).split(/[^a-z0-9%]+/).filter(tk => tk.length > 1);
-    const e = { src, name, nameTok: name.split(/[^a-z0-9%]+/).filter(Boolean), extra, tokens };
+    const tokens = (name + " " + name2 + " " + extra).split(/[^a-z0-9%]+/).filter(tk => tk.length > 1);
+    const e = { src, name, name2, nameTok: (name + " " + name2).split(/[^a-z0-9%]+/).filter(Boolean), extra, tokens };
     _sEntry.set(f, e);
     _sIdx[id] = e;
   });
@@ -9679,7 +9683,7 @@ function wordScore(w, e, fuzzy = true) {
   let best = 0;
   for (const a of alts) {
     if (e.nameTok.some(tk => tk.startsWith(a))) best = Math.max(best, 150);
-    else if (e.name.includes(a)) best = Math.max(best, 100);
+    else if (e.name.includes(a) || (e.name2 && e.name2.includes(a))) best = Math.max(best, 100);
     else if (e.extra.includes(a)) best = Math.max(best, 60);
   }
   if (best || !fuzzy || w.length < 4) return best;
@@ -9719,8 +9723,8 @@ function searchFoodsPass(ids, q, fuzzy) {
     if (!e) return;
     let sc = 0, inName = true;
     for (const w of words) { const s = wordScore(w, e, fuzzy); if (!s) return; sc += s; if (s < 100) inName = false; }
-    if (e.name === q) sc += 600;
-    else if (e.name.startsWith(q)) sc += 300;
+    if (e.name === q || e.name2 === q) sc += 600;
+    else if (e.name.startsWith(q) || (e.name2 && e.name2.startsWith(q))) sc += 300;
     if (freq.has(id) && inName) sc += 1000;   // sık kullanılan önceliği yalnızca adı eşleşince (kategori/eş anlamlıyla değil)
     if (!USDA_DB[id]) sc += 40;            // uygulamanın kendi listesi ve özel besinler önce
     sc -= e.name.length * 0.3;

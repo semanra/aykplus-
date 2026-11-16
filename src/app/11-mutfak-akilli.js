@@ -80,12 +80,12 @@ function deleteCombo(id) {
 function comboRowHtml(c) {
   const db = getFoodDB();
   const ct = itemsTotals(c.items);
-  const names = c.items.filter(i => db[i.foodId]).map(i => stripEmoji(db[i.foodId].name).replace(/^⭐\s*/, "")).join(", ");
+  const names = c.items.filter(i => db[i.foodId]).map(i => stripEmoji(foodNameL(db[i.foodId])).replace(/^⭐\s*/, "")).join(", ");
   if (foodUI.sel === "combo:" + c.id) {
     const rows = c.items.map(i => {
       const f = db[i.foodId];
       if (!f) return "";
-      return `<div class="flex items-center justify-between gap-2 py-1.5 text-[14px]"><span class="min-w-0 truncate">${esc(f.name)}</span><span class="n-muted whitespace-nowrap tabular-nums">${fmtNum(effAmount(i))} ${esc(unitL(effAmount(i), f.unit))} · ${Math.round(calcItemMacros(i).cal)} kcal</span></div>`;
+      return `<div class="flex items-center justify-between gap-2 py-1.5 text-[14px]"><span class="min-w-0 truncate">${esc(foodNameL(f))}</span><span class="n-muted whitespace-nowrap tabular-nums">${fmtNum(effAmount(i))} ${esc(unitL(effAmount(i), f.unit))} · ${Math.round(calcItemMacros(i).cal)} kcal</span></div>`;
     }).join("");
     const tIdx = foodTargetIdx();
     return `<div class="n-elev n-sel rounded-[24px] p-4 space-y-3 my-2" id="comboSelCard" data-combo="${esc(c.id)}">
@@ -141,10 +141,10 @@ function renderRecipe() {
     const fd = db[it.foodId];
     if (!fd) return "";
     return `<div class="flex items-center gap-1.5 py-1.5" data-rc-item="${i}">
-        <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(fd.name)}</div><div id="rcK${i}" class="text-[12px] n-muted tabular-nums">${Math.round(kcalPerUnit(fd) * num(it.amount))} kcal</div></div>
-        <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} miktarı", { ad: fd.name }))}" />
+        <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(foodNameL(fd))}</div><div id="rcK${i}" class="text-[12px] n-muted tabular-nums">${Math.round(kcalPerUnit(fd) * num(it.amount))} kcal</div></div>
+        <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} miktarı", { ad: foodNameL(fd) }))}" />
         <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(unitL(2, fd.unit))}</span>
-        <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: fd.name }))}">${svgI("x", 18, 2.2)}</button>
+        <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: foodNameL(fd) }))}">${svgI("x", 18, 2.2)}</button>
       </div>`;
   }).join("") || `<p class="text-[13px] n-dim py-2">${t("Henüz malzeme yok. Aşağıdan ekle.")}</p>`;
   updateRecipeSummary();
@@ -177,7 +177,7 @@ function rcAddIngredient() {
     const f = db[id];
     if (isHiddenFood(f)) return;
     const cat = t(stripEmoji(f.cat || "Diğer"));
-    (cats[cat] = cats[cat] || []).push({ id, label: f.name, sub: t("{n} {u} · {k} kcal", { n: fmtNum(f.def), u: unitL(f.def, f.unit), k: String(Math.round(kcalPerUnit(f) * num(f.def, 1))) }) });
+    (cats[cat] = cats[cat] || []).push({ id, label: foodNameL(f), sub: t("{n} {u} · {k} kcal", { n: fmtNum(f.def), u: unitL(f.def, f.unit), k: String(Math.round(kcalPerUnit(f) * num(f.def, 1))) }) });
   });
   const groups = Object.keys(cats).map(c => ({ label: c, short: c.replace(/\s*[&/].*$/, ""), items: cats[c] }));
   // Seçici, tarif penceresinin üstünde açılır; seçince tarif penceresi yerinde kalır
@@ -273,7 +273,7 @@ function shopList() {
     ms.forEach(m => m.items.forEach(i => { if (!i.est) expand(i.foodId, effAmount(i) * n, 0); }));
   });
   return Object.keys(acc).map(id => ({ id, f: db[id], amt: acc[id] }))
-    .sort((a, b) => stripEmoji(a.f.cat || "").localeCompare(stripEmoji(b.f.cat || ""), locale()) || stripEmoji(a.f.name).localeCompare(stripEmoji(b.f.name), locale()));
+    .sort((a, b) => stripEmoji(a.f.cat || "").localeCompare(stripEmoji(b.f.cat || ""), locale()) || stripEmoji(foodNameL(a.f)).localeCompare(stripEmoji(foodNameL(b.f)), locale()));
 }
 function fmtShopAmt(f, a) {
   if (f.unit === "g") return a >= 1000 ? fmtKg(round2(a / 1000)) + " kg" : (Math.ceil(a / 10) * 10) + " g";
@@ -281,7 +281,7 @@ function fmtShopAmt(f, a) {
   if (f.unit === "adet") { const n = Math.ceil(a - 1e-9); return n + " " + unitL(n, "adet"); }
   { const n = Math.ceil(a * 2 - 1e-9) / 2; return fmtNum(n) + " " + unitL(n, f.unit); }
 }
-function shopName(f) { return stripEmoji(f.name).replace(/^⭐\s*/, ""); }
+function shopName(f) { return stripEmoji(foodNameL(f)).replace(/^⭐\s*/, ""); }
 function openShopList() { renderShopList(); openModal("shopModal"); }
 function setShopDays(d) {
   state.shopTrainDays = Math.max(0, Math.min(7, shopTrainDays() + d));
@@ -461,7 +461,7 @@ function renderFoodSuggest() {
   el.innerHTML = `<div class="n-label mb-2">${t("KALAN HEDEFİNİ KAPATAN SEÇENEKLER")}</div>
     <p class="text-[12px] n-muted mb-2">${t("Kalan: {k} · {p}. Sık yediğin besinlerden:", { k: `<strong class="n-text tabular-nums">${fmtInt(remK)} kcal</strong>`, p: `<strong class="n-p tabular-nums">${fmtInt(remP)} g protein</strong>` })}</p>
     <div class="space-y-2">${foodSuggestCache.map((o, i) => {
-      const label = o.parts.map(p => `${fmtNum(p.a)} ${unitL(p.a, db[p.id].unit)} ${stripEmoji(db[p.id].name).replace(/^⭐\s*/, "")}`).join(" + ");
+      const label = o.parts.map(p => `${fmtNum(p.a)} ${unitL(p.a, db[p.id].unit)} ${stripEmoji(foodNameL(db[p.id])).replace(/^⭐\s*/, "")}`).join(" + ");
       const lk = Math.round(remK - o.K), lp = Math.round(remP - o.P);
       const kTxt = lk >= 0 ? t("{n} kcal kalır", { n: fmtInt(lk) }) : t("{n} kcal aşar", { n: fmtInt(-lk) });
       const pTxt = lp > 0 ? t("{n} g P kalır", { n: fmtInt(lp) }) : t("protein tamam");
