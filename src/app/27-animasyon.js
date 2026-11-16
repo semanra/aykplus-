@@ -309,6 +309,7 @@ function animSheetIn(overlay) {
     animPlay(box, [{ opacity: 0, transform: "translateY(8px) scale(.95)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "cubic-bezier(.34, 1.3, .64, 1)" });
   }
 }
+const SHEET_NOSWIPE = new Set(["recipeModal", "freeMealModal"]);   // dışına dokununca da kapanmayan, kaydedilmemiş giriş tutan pencereler
 const SHEET_CLOSE_RX = /^\s*close(Modal\('\w+'\)|Barcode\(\))\s*;?\s*$/;
 function sheetCloseVia(overlay) {
   if (overlay.id === "uiDialog") { if (uiDlg && uiDlg.dismissable) uiDialogDone(false); return; }
@@ -332,6 +333,7 @@ function sheetTouchStart(e) {
   const sheet = tg && tg.closest(".sheet");
   const ov = sheet && sheet.parentElement;
   if (!sheet || !ov || !ov.id || !sheetIsOpen(ov)) return;
+  if (SHEET_NOSWIPE.has(ov.id) || ov.hasAttribute("data-noswipe")) return;   // v57 inceleme: yazılmış ama kaydedilmemiş form kaybolmasın
   if (tg.closest("input, textarea, select, [contenteditable], .drag-handle")) return;
   if (sheet.getBoundingClientRect().bottom < innerHeight - 2) return;   // ortada duran (geniş ekran) pencere
   if (sheetScrolled(tg, sheet)) return;
@@ -434,6 +436,9 @@ document.addEventListener("click", e => {
   const a = animPlay(row, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateX(-40%)" }], { duration: 180, easing: "cubic-bezier(.4, 0, 1, 1)", fill: "forwards" });
   setTimeout(() => {
     animDelBusy = false;
+    // v57 inceleme: bu arada ekran yeniden çizildiyse (Geri al, gün dönümü, başka silme) düğmedeki dizin eskimiş
+    // olabilir → yanlış satır silinmesin, hiçbir şey yapma
+    if (!btn.isConnected) { if (a) try { a.cancel(); } catch (er) {} return; }
     const snapBefore = undoSnap;
     try { btn.onclick.call(btn, e); }
     finally {

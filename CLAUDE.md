@@ -42,7 +42,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 46 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 47 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 pip install pillow   # ilk seferde (kontrol aracı için)
 npm run kontrol      # son commit ile karşılaştırma: 53 ekran × 2 tema piksel farkı + okunurluk/44 px/taşma + hız; v47–v53: ayrıca 51 İngilizce ekran (v53: 9 imperial `en-u-*`) yalnız ölçülür, piksel karşılaştırması yok (`-- --hizli` hızsız)
 ```

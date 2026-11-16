@@ -153,6 +153,11 @@ try:
     check(pg.evaluate("curMeals()[0].items.length") == n0 - 1, "13) silme sürerken ikinci dokunuş yanlış satırı silmiyor")
     pg.evaluate("doUndo()"); pg.wait_for_timeout(300)
     check(pg.evaluate("JSON.stringify(curMeals()[0].items)") == items0, "13) geri al sonrası yine birebir")
+    # v57 inceleme M1: kayma sürerken ekran yeniden çizilirse (ör. Geri al, gün dönümü) silme yapılmaz (eski dizin)
+    pg.evaluate("toggleMenuMeal(0); toggleMenuMeal(0)"); pg.wait_for_timeout(50)
+    pg.locator('#mealsContainer [data-meal-card="0"] .n-div button[onclick^="removeItem"]').nth(0).click()
+    pg.evaluate("renderAll()"); pg.wait_for_timeout(350)
+    check(pg.evaluate("JSON.stringify(curMeals()[0].items)") == items0, "13) kayma sırasında yeniden çizim: yanlış/eski dizinle silme yapılmadı")
     # Bugün düzenleme: dayRemoveItem
     pg.evaluate("setNutriView('today'); openEditMeals.add(dayMeals()[1].id); renderAll()"); pg.wait_for_timeout(200)
     d0 = pg.evaluate("JSON.stringify(dayMeals()[1].items)")
@@ -189,6 +194,15 @@ try:
     swipe(pg, "#exSheet > .sheet", 140)
     pg.wait_for_timeout(400)
     check(not pg.is_visible("#exSheet"), "11) 140 px kaydırma: pencere kapandı")
+    # v57 inceleme M2: kaydedilmemiş giriş tutan tarif penceresi aşağı kaydırmayla KAPANMAZ
+    pg.evaluate("switchTab('nutrition'); openRecipeModal()"); pg.wait_for_timeout(450)
+    if pg.is_visible("#recipeModal"):
+        swipe(pg, "#recipeModal > .sheet", 160); pg.wait_for_timeout(400)
+        check(pg.is_visible("#recipeModal"), "11) tarif penceresi aşağı kaydırmayla kapanmadı (yazılanlar kaybolmasın)")
+        pg.evaluate("closeModal('recipeModal')"); pg.wait_for_timeout(300)
+    else:
+        check(False, "11) tarif penceresi açılamadı")
+    pg.evaluate("switchTab('gym')"); pg.wait_for_timeout(200)
     check(pg.evaluate("document.querySelector('#exSheet > .sheet').style.transform") == "", "11) kapanınca stil temizlendi")
     # hızlı fiske (eşik altı mesafe ama hızlı)
     pg.evaluate("openExSheet(0)"); pg.wait_for_timeout(450)
