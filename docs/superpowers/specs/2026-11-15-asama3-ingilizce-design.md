@@ -125,3 +125,9 @@ Her sürüm ayrı spec bölümü değil, ayrı plan (`docs/superpowers/plans/`).
 2. **Plakalar:** lb seçiliyse plaka takımı 45/35/25/10/5/2,5 lb ve boş bar 45 lb; kg'da bugünkü takım. Kademeler ve artış adımı (2,5 kg ↔ 5 lb) birime göre.
 3. **Ayar:** birim dilden bağımsız ayrı ayar (`settings.units = metric | imperial`); İngilizce seçen İngiliz kullanıcı kg'da kalabilir. Varsayılan metrik; Profil ve kurulumda seçilir. Göç adımı + DATA_VER.
 4. **Kapsam:** vücut kilosu, hedef kilo, tartılar, set kilosu, plaka/kademe, tonaj (volume), boy (ft/in), ölçüler (in), su (fl oz mu, L mi — öneri: L kalır). Besin gramajı g kalır (beslenme takibinde yaygın).
+
+### §10 kararları (kullanıcı onayı, 16 Kasım 2026)
+- Öneriler 1–4 olduğu gibi onaylandı (kayıt kg/cm, gösterim/giriş çevrilir; lb plaka takımı + 45 lb bar, adım 5 lb; kapsam yukarıdaki gibi, besin g ve su L kalır; ayrı ayar `settings.units`).
+- Yeni kurulumda birim **telefonun bölgesine göre**: ABD bölgesi (`navigator.language` / `Intl` bölgesi `US`) → `imperial`, diğer her yer `metric`; kurulumda ve Profil'de değiştirilebilir. Var olan kayıt göçte `metric` alır.
+- Makine kademe listesi (`ex.levels`) lb seçiliyse lb'ye çevrilerek gösterilir; kullanıcı listeyi lb olarak düzenleyebilir (kayıt kg).
+
