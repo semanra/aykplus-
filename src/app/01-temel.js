@@ -231,7 +231,7 @@ function migrateState(s, rawHadGoal) {
     const mr = s.mobilityRoutine;
     if (!Array.isArray(mr.routines)) {
       const items = Array.isArray(mr.items) ? mr.items : [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
-      mr.routines = [{ id: "mr_main", name: "Rutinim", items }];
+      mr.routines = [{ id: "mr_main", name: t("Rutinim"), items }];
     }
   }
   if (v < 2) {   // v26: kalori halkası bir kereliğine "Yenen"e (eskiden varsayılan "Plan" da kaydediliyordu)
@@ -266,7 +266,7 @@ function normalizeState(raw) {
   delete mr.items;
   mr.routines = mr.routines.filter(isObj).map(r => ({
     id: typeof r.id === "string" && r.id ? r.id : "mr_" + Math.random().toString(36).slice(2, 9),
-    name: (r.name != null && typeof r.name !== "object" ? String(r.name) : "").trim().slice(0, 40) || "Rutin",
+    name: (r.name != null && typeof r.name !== "object" ? String(r.name) : "").trim().slice(0, 40) || t("Rutin"),
     items: Array.isArray(r.items) ? r.items.map(normMobItem).filter(Boolean) : []
   }));
   // v40: yinelenen rutin/hareket kimlikleri (elle düzenlenmiş yedek) ayrıştırılır; işlemler kimlikle çalışır

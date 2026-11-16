@@ -29,8 +29,8 @@ Tablo kısaltması: **K** = kayıt (state/yedek/ayna içine yazılıyor), **C** 
 | src/app/01-temel.js:306 | `"Adsız besin"` (özel besin yedek adı) | K | dile göre üret |
 | src/app/01-temel.js:350 | `"Kombo"` (kombo yedek adı) | K | dile göre üret |
 | src/app/11-mutfak-akilli.js:40 | `"Kombo"` (boş ad girilirse) | K | dile göre üret |
-| src/app/01-temel.js:226 | `"Rutinim"` (eski mobilite listelerinden göçte oluşan rutin, id `mr_main`) | K | göç tek seferlik: göç sırasında dile göre üret; var olan kayıt dokunma |
-| src/app/01-temel.js:260 | `"Rutin"` (adı bozuk rutin yedek adı) | K | dile göre üret |
+| src/app/01-temel.js:226 | `"Rutinim"` (eski mobilite listelerinden göçte oluşan rutin, id `mr_main`) | K | göç tek seferlik: göç sırasında dile göre üret; var olan kayıt dokunma (v49 yapıldı) |
+| src/app/01-temel.js:260 | `"Rutin"` (adı bozuk rutin yedek adı) | K | dile göre üret (v49 yapıldı) |
 | src/app/01-temel.js:322 | `"Özel"` (`timeLabel` yedek değeri, takviye zamanı custom iken) | K | dile göre üret |
 | src/app/09-kas-plaka-koc-takviye.js:686 | `"Özel"` (kullanıcı etiket girmezse `s.timeLabel = ... || "Özel"`) | K | dile göre üret |
 | src/app/02-arayuz.js:163, 174, 180 | `"Dinlenme"` (`timer.label`; `ayk_timer` anahtarına `JSON.stringify({endAt,label})` olarak yazılır, açılışta geri okunur) | K (kısa ömürlü, localStorage `ayk_timer`) | gösterirken t() (`restPillLabel`, 02:232; toast 02:212) ya da etiketi saklama |
@@ -45,7 +45,7 @@ Tablo kısaltması: **K** = kayıt (state/yedek/ayna içine yazılıyor), **C** 
 | src/app/05-secici-hareket.js:390 | `` `${n}. GÜN: ` `` (yeni antrenman günü ad kutusu varsayılanı; kullanıcı yazıp Ekle der → `state.workoutDays[].name`) | K | **KARAR (v48):** dile göre üret: Türkçe `${n}. GÜN: ` aynen, İngilizce `DAY ${n}: `; yer tutucu örneği de çevrilir; ":" ayracı korunur (`split(":")[0]` kısa etiketi) |
 | src/app/10-antrenman-arayuzu.js:657 | `` `${n}. Öğün: ` `` (yeni öğün ad kutusu varsayılanı → `meal.title`) | K | dile göre üret ("Meal n: ") |
 | src/app/09-kas-plaka-koc-takviye.js `copyMeal` | `src.title + " (kopya)"` (öğün kopyalanınca yeni öğün başlığı) | K | dile göre üret (" (copy)"); Türkçede tam " (kopya)" (v47 yapıldı) |
-| src/app/06-mobilite.js:99 | `r.name + " (kopya)"` (rutin kopyalanınca yeni rutin adı) | K | dile göre üret (" (copy)") |
+| src/app/06-mobilite.js:99 | `r.name + " (kopya)"` (rutin kopyalanınca yeni rutin adı) | K | dile göre üret (" (copy)") (v49 yapıldı) |
 | src/app/04-besinler-barkod.js:539, 711, 712 | `name: "⭐ " + ad`, `cat: "⭐ Özel Eklediklerim"` (özel besin / barkodlu ürün; `state.customFoods`, ayrıca `foodSnap`) | K + C (cat anahtar: `foodCatKey`) | `name` ön eki ⭐ emojidir, dokunma. **`cat` kayıtta Türkçe kalır**; gösterirken `t(stripEmoji(f.cat))` (04:155, 11:179, 11:309) |
 | src/app/11-mutfak-akilli.js:201 | `name: "🍲 " + ad`, `cat: "🍲 Tariflerim"` (tarif; `state.customFoods["custom_recipe_<id>"]`) | K + C | `cat` aynı şekilde; `🍲` ön eki dokunma |
 | src/app/01-temel.js:489 | `"⚠ " + (x.n \| "Bulunamayan besin")`, `cat: "⚠ Bulunamayan"` | çalışma anı (kayda yazılmaz; `lostFood`, `_lost`) | gösterirken t() |

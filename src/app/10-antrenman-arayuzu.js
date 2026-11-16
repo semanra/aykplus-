@@ -756,7 +756,7 @@ function endMealDrag() {
     const [x] = list.splice(from, 1);
     list.splice(to, 0, x);
     renderAll();
-    toast(t("Hareket taşındı"));
+    toast(t("Hareket taşındı|mobilite"));
     return;
   }
   if (kind === "ex") {

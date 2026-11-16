@@ -5,6 +5,10 @@
 let mobUI = { view: "home", rid: null, edit: false, id: null, q: "", filter: "all" };
 const MOB_REGION_LABEL = Object.fromEntries(MOB_REGIONS);
 const MOB_TYPE_LABEL = Object.fromEntries(MOB_TYPES);
+// v49: gösterim yardımcıları. Kayıtta Türkçe anahtar/değer kalır; yalnızca ekrana basarken çevrilir (t() çağrı anında çalışır).
+function mobRegionL(key) { return MOB_REGION_LABEL[key] ? t(MOB_REGION_LABEL[key]) : ""; }
+function mobTypeL(key) { return MOB_TYPE_LABEL[key] ? t(MOB_TYPE_LABEL[key]) : ""; }
+function mobSideL(side) { return side ? t(side) : ""; }   // side kayıtta "Sağ" | "Sol" (karşılaştırmalar Türkçe değerle yapılır)
 // v39: rutinler (state.mobilityRoutine.routines = [{ id, name, items }]); mobUI.rid = açık rutin
 function mobRoutines() { return state.mobilityRoutine.routines; }
 function mobAllItems() { return mobRoutines().flatMap(r => r.items); }
@@ -45,7 +49,7 @@ function mobCardHtml(it, idx) {
   return `<div data-mob-row="${esc(it.id)}" class="m-card ${!ed && it.done ? "done" : ""}">
     ${left}
     <button data-mob-open onclick="mobOpen(${id})" class="flex-1 min-w-0 min-h-[44px] text-left">
-      <span class="m-kind ${it.type === "dynamic" ? "" : "s"}">${MOB_TYPE_LABEL[it.type]}</span>
+      <span class="m-kind ${it.type === "dynamic" ? "" : "s"}">${mobTypeL(it.type)}</span>
       <span class="m-name block">${esc(it.name)}</span>
       <span class="m-rx block">${esc(mobSummary(it))}</span>
     </button>
@@ -96,7 +100,7 @@ function mobRemoveItem(id) {
 }
 function mobCopyRoutine() {
   const r = mobRoutine(mobUI.rid); if (!r) return;
-  const c = { id: mobNewRoutineId(), name: (r.name + " (kopya)").slice(0, 40), items: r.items.map(x => ({ ...clone(x), id: mobNewId(), done: false })) };
+  const c = { id: mobNewRoutineId(), name: t("{ad} (kopya)", { ad: r.name }).slice(0, 40), items: r.items.map(x => ({ ...clone(x), id: mobNewId(), done: false })) };
   mobRoutines().splice(mobRoutines().indexOf(r) + 1, 0, c);
   mobUI.rid = c.id; mobUI.view = "routine"; mobUI.edit = true;
   window.scrollTo(0, 0);
@@ -192,7 +196,7 @@ function mobRoutineCardHtml(r) {
         <div class="m-rt-meta">${n ? `${n} hareket · ~${mobRoutineMin(r)} dk` : "Henüz hareket yok"}</div></div>
       ${last == null ? "" : `<span class="m-rt-last ${last === 0 ? "on" : ""}">${mobAgoText(last)}${last <= 1 ? " yapıldı" : ""}</span>`}
     </div>
-    ${regs.length ? `<div class="flex flex-wrap gap-1.5 mt-2.5">${regs.map(k => `<span class="m-tag">${esc(MOB_REGION_LABEL[k])}</span>`).join("")}</div>` : ""}
+    ${regs.length ? `<div class="flex flex-wrap gap-1.5 mt-2.5">${regs.map(k => `<span class="m-tag">${esc(mobRegionL(k))}</span>`).join("")}</div>` : ""}
     <div class="grid ${n ? "grid-cols-[1fr_auto]" : "grid-cols-1"} gap-2.5 mt-3.5">
       ${n ? `<button data-mob-start onclick="mobSesStart(${id})" class="m-btn pri">${svgI("play", 18, 2.4)}Başlat</button>` : ""}
       <button data-mob-openr onclick="mobOpenRoutine(${id})" class="m-btn ghost">${n ? "Aç" : "Aç ve hareket ekle"}</button>
@@ -245,7 +249,7 @@ function mobDetailHtml() {
   const it = mobFind(mobUI.id);
   const idx = mobItems().indexOf(it);
   const id = mobArg(it.id);
-  const crumb = (MOB_REGION_LABEL[it.region] || "Bölgesiz") + " · " + (idx + 1) + ". hareket";
+  const crumb = (mobRegionL(it.region) || "Bölgesiz") + " · " + (idx + 1) + ". hareket";
   const time = it.mode === "time";
   const stepper = (label, field, val, valId, minD, maxD) => `<div class="m-st"><div class="k">${label}</div><div class="v">
       <button class="m-pm" data-mob-step="${field}:-1" onclick="mobStep(${id}, '${field}', -1)" ${minD ? "disabled" : ""} aria-label="${label} azalt">${svgI("minus", 18, 2.6)}</button>
@@ -263,7 +267,7 @@ function mobDetailHtml() {
       <span class="w-11 shrink-0"></span>
     </div>
     <button id="mobDtTitle" onclick="mobRename(${id})" class="t-display text-[32px] leading-[1.02] text-[var(--t-text)] text-left mt-3 min-h-[44px] w-full break-words" aria-label="Adı değiştir">${esc(it.name)}</button>
-    <div class="text-[13px] font-semibold ${it.type === "dynamic" ? "text-[var(--t-dim)]" : "text-[var(--t-acc-text)]"} mt-1">${MOB_TYPE_LABEL[it.type]}</div>
+    <div class="text-[13px] font-semibold ${it.type === "dynamic" ? "text-[var(--t-dim)]" : "text-[var(--t-acc-text)]"} mt-1">${mobTypeL(it.type)}</div>
     ${it.rxOk ? "" : `<div id="mobDtRx" class="mt-3 text-[13.5px] text-[var(--t-warn-text)] bg-[var(--t-elev)] rounded-2xl px-3.5 py-2.5">Eski yazım: ${esc(it.rx)}<br><span class="text-[var(--t-muted)]">Okunamadı; değerleri kontrol et.</span></div>`}
     <div class="m-lbl">Uygulama</div>
     ${seg("mode", "mode", [["reps", "Tekrar"], ["time", "Süre"]], it.mode)}
@@ -363,12 +367,12 @@ function mobRenderAddList() {
   box.innerHTML = order.map(rk => {
     const rows = list.filter(x => x.region === rk);
     if (!rows.length) return "";
-    return `<div data-mob-group class="text-[13px] font-semibold text-[var(--t-muted)] mt-4 mb-2 px-0.5">${esc(MOB_REGION_LABEL[rk] || "Diğer (bilek, ön kol)")}</div>
+    return `<div data-mob-group class="text-[13px] font-semibold text-[var(--t-muted)] mt-4 mb-2 px-0.5">${esc(mobRegionL(rk) || "Diğer (bilek, ön kol)")}</div>
       <div class="space-y-2">${rows.map(x => {
         const sum = mobSummary(normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription }, x.type)));
         const has = inRoutine.has(x.m.name);
         return `<div data-mob-lib="${x.key}" class="m-card">
-          <div class="flex-1 min-w-0"><span class="m-kind ${x.type === "dynamic" ? "" : "s"}">${MOB_TYPE_LABEL[x.type]}${has ? ` · <span class="text-[var(--t-text)]">Rutinde</span>` : ""}</span>
+          <div class="flex-1 min-w-0"><span class="m-kind ${x.type === "dynamic" ? "" : "s"}">${mobTypeL(x.type)}${has ? ` · <span class="text-[var(--t-text)]">Rutinde</span>` : ""}</span>
             <span class="m-name block">${esc(x.m.name)}</span><span class="m-rx block">${esc(sum)}</span></div>
           <button data-mob-add onclick="mobAddLib('${x.key}')" class="m-add mr-1.5 ${has ? "in" : ""}" aria-label="${esc(x.m.name)} ${has ? "zaten rutinde, yine de ekle" : "ekle"}">${svgI(has ? "check" : "plus", 20, 2.6)}</button>
         </div>`;
@@ -427,22 +431,22 @@ function mobTimerStart(id) {
   undoSnap = null;   // v40
   if (mobT) clearInterval(mobT.iv);
   const now = Date.now();
-  mobT = { ses: null, id: it.id, name: it.name, region: MOB_REGION_LABEL[it.region] || "", sec: it.sec, sets: it.sets, rounds: mobRoundsOf(it), idx: 0, phase: "work", endAt: now + it.sec * 1000, t0: now, iv: 0, quiet: false };
+  mobT = { ses: null, id: it.id, name: it.name, region: mobRegionL(it.region), sec: it.sec, sets: it.sets, rounds: mobRoundsOf(it), idx: 0, phase: "work", endAt: now + it.sec * 1000, t0: now, iv: 0, quiet: false };
   mobTimerOpen();
 }
 // Seans
 function mobSesStart(rid) {
   const r = mobRoutine(rid);
   if (!r || !r.items.length) { toast("Rutinde hareket yok"); return; }
-  mobSesStartIds(r.name, r.items.map(i => i.id), r.id);
+  mobSesStartIds(r.name, r.items.map(i => i.id), r.id, r.name);
 }
 // v40: seans herhangi bir hareket listesiyle (ısınma: rid = null, hareketler kendi rutinlerinde tiklenir)
-function mobSesStartIds(title, ids, rid) {
+function mobSesStartIds(title, ids, rid, sayTitle) {   // v49: sayTitle = konuşulan başlık (Türkçe kaynak; ses v52'ye dek Türkçe)
   if (!ids.length) return;
   unlockAudio();
   undoSnap = null;   // v40: seanstan önce çıkmış "Geri al" seansın kaydettiği tikleri geri almasın
   if (mobT) clearInterval(mobT.iv);
-  mobT = { ses: { rid, title, ids: ids.slice(), pos: 0, skipped: [], doneIds: [], t0: Date.now(), guideOpen: true }, iv: 0, t0: Date.now() };
+  mobT = { ses: { rid, title, sayTitle: sayTitle || title, ids: ids.slice(), pos: 0, skipped: [], doneIds: [], t0: Date.now(), guideOpen: true }, iv: 0, t0: Date.now() };
   mobSesLoad(0);
   mobTimerOpen();
 }
@@ -452,7 +456,7 @@ function mobSesLoad(pos) {
   const it = mobFindAny(S.ids[pos]);
   if (!it) { if (pos + 1 < S.ids.length) return mobSesLoad(pos + 1); return mobSesFinish(); }
   const time = it.mode === "time";
-  Object.assign(mobT, { id: it.id, name: it.name, region: MOB_REGION_LABEL[it.region] || "", sec: it.sec, sets: it.sets, reps: it.reps, rounds: mobRoundsOf(it), idx: 0,
+  Object.assign(mobT, { id: it.id, name: it.name, region: mobRegionL(it.region), sec: it.sec, sets: it.sets, reps: it.reps, rounds: mobRoundsOf(it), idx: 0,
     phase: time ? "prep" : "reps", endAt: time ? Date.now() + MOB_SWITCH_SEC * 1000 : 0, quiet: false, s10: -1 });
   if (!mobT.iv) mobT.iv = setInterval(mobTimerTick, 250);
   mobTimerRender();
@@ -484,7 +488,7 @@ function mobSesGuide() { if (!mobT || !mobT.ses) return; mobT.ses.guideOpen = !m
 function mobSesFinish() {
   clearInterval(mobT.iv); mobT.iv = 0;
   mobT.phase = "fin";
-  mobSay(mobT.ses.title + " bitti. Tebrikler.");
+  mobSay(trFill("{ad} bitti. Tebrikler.", { ad: mobT.ses.sayTitle || mobT.ses.title }));
   renderAll();
   mobTimerRender();
 }
@@ -499,7 +503,7 @@ function mobTimerTick() {
   let changed = false;
   while (mobT && mobT.phase !== "reps" && mobT.phase !== "fin" && Date.now() >= mobT.endAt) {
     const late = Date.now() - mobT.endAt;
-    if (mobT.phase === "prep") { mobT.phase = "work"; mobT.endAt += mobT.sec * 1000; if (late < 2000) mobSay("Başla"); }
+    if (mobT.phase === "prep") { mobT.phase = "work"; mobT.endAt += mobT.sec * 1000; if (late < 2000) mobSay(trFill("Başla")); }
     else if (mobT.phase === "work") {
       if (!mobT.quiet && late < 2000) mobBeep();
       if (mobT.idx >= mobT.rounds.length - 1) {
@@ -507,10 +511,10 @@ function mobTimerTick() {
         mobTimerFinish(); return;
       }
       mobT.phase = "switch"; mobT.endAt += MOB_SWITCH_SEC * 1000;
-      if (late < 2000) { const nx = mobT.rounds[mobT.idx + 1]; mobSay(nx && nx.side === "Sol" ? "Sola geç" : nx && nx.side === "Sağ" ? "Sağa geç" : "Sıradaki set"); }
+      if (late < 2000) { const nx = mobT.rounds[mobT.idx + 1]; mobSay(trFill(nx && nx.side === "Sol" ? "Sola geç" : nx && nx.side === "Sağ" ? "Sağa geç" : "Sıradaki set")); }
     } else {
       mobT.idx++; mobT.phase = "work"; mobT.endAt += mobT.sec * 1000;
-      if (late < 2000) mobSay("Başla");
+      if (late < 2000) mobSay(trFill("Başla"));
     }
     mobT.quiet = false;
     changed = true;
@@ -547,8 +551,8 @@ function mobSay(text) {
     if (!ss || typeof SpeechSynthesisUtterance === "undefined") return;
     ss.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = locale();
-    const v = (ss.getVoices() || []).find(x => String(x.lang).toLowerCase().startsWith(locale().slice(0, 2)));
+    u.lang = "tr-TR";   // v49: konuşulan metin v52'ye dek her dilde Türkçe
+    const v = (ss.getVoices() || []).find(x => String(x.lang).toLowerCase().startsWith("tr"));
     if (v) u.voice = v;
     ss.speak(u);
   } catch (e) { /* ses yok */ }
@@ -556,12 +560,19 @@ function mobSay(text) {
 function mobSayRound() {
   if (!mobT || !mobT.rounds) return;
   const r = mobT.rounds[mobT.idx];
-  mobSay((mobT.sets > 1 ? `Set ${r.set}. ` : "") + (r.side ? `${r.side} taraf.` : ""));
+  const n = String(r.set);
+  if (mobT.sets > 1) mobSay(r.side ? trFill("Set {n}. {taraf} taraf.", { n, taraf: r.side }) : trFill("Set {n}.", { n }));
+  else if (r.side) mobSay(trFill("{taraf} taraf.", { taraf: r.side }));
 }
 function mobSayItem() {
   if (!mobT || !mobT.rounds) return;
   const r = mobT.rounds[mobT.idx], time = mobT.phase !== "reps";
-  mobSay(`${mobT.name}. ${r.side ? r.side + " taraf. " : ""}${mobT.sets > 1 ? mobT.sets + " set, " : ""}${time ? mobT.sec + " saniye." : mobT.reps + " tekrar."}`);
+  const v = { ad: mobT.name, taraf: r.side || "", sets: String(mobT.sets), sn: String(mobT.sec), tekrar: String(mobT.reps) };
+  const sd = !!r.side, many = mobT.sets > 1;
+  const key = time
+    ? (sd ? (many ? "{ad}. {taraf} taraf. {sets} set, {sn} saniye." : "{ad}. {taraf} taraf. {sn} saniye.") : (many ? "{ad}. {sets} set, {sn} saniye." : "{ad}. {sn} saniye."))
+    : (sd ? (many ? "{ad}. {taraf} taraf. {sets} set, {tekrar} tekrar." : "{ad}. {taraf} taraf. {tekrar} tekrar.") : (many ? "{ad}. {sets} set, {tekrar} tekrar." : "{ad}. {tekrar} tekrar."));
+  mobSay(trFill(key, v));
 }
 function mobTimerVoice() {
   state.settings.mobVoice = !state.settings.mobVoice;
@@ -573,11 +584,11 @@ function mobBreathLabel() { return ((Date.now() - mobT.t0) % 10000) < 4000 ? "Ne
 function mobTimerUpdate() {
   if (!mobT) return;
   const left = (mobT.endAt - Date.now()) / 1000;
-  if (mobT.phase === "work" && mobT.sec >= 20 && left <= 10 && left > 8 && mobT.s10 !== mobT.idx) { mobT.s10 = mobT.idx; mobSay("Son 10 saniye"); }
+  if (mobT.phase === "work" && mobT.sec >= 20 && left <= 10 && left > 8 && mobT.s10 !== mobT.idx) { mobT.s10 = mobT.idx; mobSay(trFill("Son 10 saniye")); }
   const el = $("mobTTime"); if (el) el.textContent = mobFmt(left);
   const b = $("mobTBreath"); if (b && mobT.phase === "work") b.textContent = mobBreathLabel();
 }
-function mobRoundLabel(x) { return x.side ? x.side + " " + x.set : "Set " + x.set; }
+function mobRoundLabel(x) { return x.side ? mobSideL(x.side) + " " + x.set : "Set " + x.set; }
 function mobSesFinHtml() {
   const S = mobT.ses, w = mobWeekStats();
   const min = Math.max(1, Math.round((Date.now() - S.t0) / 60000));
@@ -609,7 +620,7 @@ function mobTimerRender() {
   if (reps) sub = (r.side ? `${r.side} taraf · ` : "") + `Set ${r.set} / ${T.sets}`;
   else if (prep) sub = "Hazırlan · " + (r.side ? r.side + " taraf, " : "") + `${T.sets} set × ${T.sec} sn`;
   else if (work) sub = r.side ? `${r.side} taraf · ${r.set}. tur / ${T.sets}` : `Set ${r.set} / ${T.sets}`;
-  else sub = (next && next.side === "Sol" ? "Sola geç" : next && next.side === "Sağ" ? "Sağa geç" : "Sıradaki set") + ` · ${next ? mobRoundLabel(next) : ""}`;
+  else sub = t(next && next.side === "Sol" ? "Sola geç" : next && next.side === "Sağ" ? "Sağa geç" : "Sıradaki set") + ` · ${next ? mobRoundLabel(next) : ""}`;
   const boxes = T.rounds.map((x, i) => {
     const cls = i < T.idx || (i === T.idx && T.phase === "switch") ? "d" : i === T.idx ? "n" : "";
     return `<i class="${cls}">${mobRoundLabel(x)}</i>`;
@@ -699,7 +710,7 @@ function warmupCardHtml(day, inProg) {
   if (items.every(i => i.done)) return `<div id="gymWarmup" class="m-warm flex items-center gap-3 !py-2">
       <span class="text-[var(--d-lv)]">${svgI("check", 20, 2.6)}</span>
       <span class="flex-1 min-w-0 text-[15px] font-semibold">${t("Isınma yapıldı")} <span class="font-normal text-[var(--t-muted)]">· ${tn(items.length, "{n} hareket|ısınma")}</span></span>${hide}</div>`;
-  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => lowerL(t(MOB_REGION_LABEL[k])));
+  const regs = [...new Set(items.map(i => i.region).filter(Boolean))].map(k => lowerL(mobRegionL(k)));
   const min = Math.max(1, Math.round(items.reduce((a, it) => a + mobItemSec(it), 0) / 60));
   return `<div id="gymWarmup" class="m-warm">
     <div class="flex items-start justify-between gap-2">
@@ -711,7 +722,7 @@ function warmupCardHtml(day, inProg) {
     <button id="gymWarmupStart" onclick="mobWarmupStart()" class="m-warm-go w-full justify-center mt-3">${svgI("play", 16, 2.4)}${t("Isınmayı başlat")}</button>
   </div>`;
 }
-function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds(t("Isınma"), items.map(i => i.id), null); }
+function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds(t("Isınma"), items.map(i => i.id), null, "Isınma"); }
 function mobWarmupHide() {
   snapshot();
   state.settings.warmupCard = false;
