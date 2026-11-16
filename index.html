@@ -730,9 +730,9 @@
 
     <!-- ===================== BUGÜN ===================== -->
     <div id="nvToday" class="space-y-4">
-      <div class="n-seg grid-cols-2" role="tablist" aria-label="Gün tipi" data-t-aria="Gün tipi">
-        <button id="btnTrain" onclick="setDayType('train')" data-t="Antrenman günü">Antrenman günü</button>
-        <button id="btnRest" onclick="setDayType('rest')" data-t="Dinlenme günü">Dinlenme günü</button>
+      <div class="n-seg grid-cols-2" role="group" aria-label="Gün tipi" data-t-aria="Gün tipi">
+        <button id="btnTrain" aria-pressed="false" onclick="setDayType('train')" data-t="Antrenman günü">Antrenman günü</button>
+        <button id="btnRest" aria-pressed="false" onclick="setDayType('rest')" data-t="Dinlenme günü">Dinlenme günü</button>
       </div>
 
       <!-- Kalori halkası + makrolar -->
@@ -769,8 +769,8 @@
         </div>
         <div id="microLine" class="hidden flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-white/75" aria-label="Lif ve tuz" data-t-aria="Lif ve tuz"></div>
         <div class="n-seg grid-cols-2" aria-label="Gösterilen değerler" data-t-aria="Gösterilen değerler">
-          <button id="mmPlan" onclick="setMacroView('plan')"><span data-t="Menü ·">Menü ·</span> <span id="mmPlanVal">0</span> kcal</button>
-          <button id="mmEaten" onclick="setMacroView('eaten')"><span data-t="Yenen ·">Yenen ·</span> <span id="mmEatenVal">0</span> · <span id="mmEatenMeals">0/0</span></button>
+          <button id="mmPlan" aria-pressed="false" onclick="setMacroView('plan')"><span data-t="Menü ·">Menü ·</span> <span id="mmPlanVal">0</span> kcal</button>
+          <button id="mmEaten" aria-pressed="false" onclick="setMacroView('eaten')"><span data-t="Yenen ·">Yenen ·</span> <span id="mmEatenVal">0</span> · <span id="mmEatenMeals">0/0</span></button>
         </div>
       </section>
 
@@ -817,9 +817,9 @@
 
     <!-- ===================== MENÜLERİM ===================== -->
     <div id="nvMenus" class="hidden space-y-4">
-      <div class="n-seg grid-cols-2" role="tablist" aria-label="Menü" data-t-aria="Menü">
-        <button id="mnTrain" onclick="setDayType('train')" data-t="Antrenman menüsü">Antrenman menüsü</button>
-        <button id="mnRest" onclick="setDayType('rest')" data-t="Dinlenme menüsü">Dinlenme menüsü</button>
+      <div class="n-seg grid-cols-2" role="group" aria-label="Menü" data-t-aria="Menü">
+        <button id="mnTrain" aria-pressed="false" onclick="setDayType('train')" data-t="Antrenman menüsü">Antrenman menüsü</button>
+        <button id="mnRest" aria-pressed="false" onclick="setDayType('rest')" data-t="Dinlenme menüsü">Dinlenme menüsü</button>
       </div>
 
       <section id="menuTotal" class="n-card rounded-[24px] p-4 space-y-3" aria-label="Menü toplamı" data-t-aria="Menü toplamı"></section>
@@ -848,18 +848,18 @@
             <span class="whitespace-nowrap n-k"><span id="goalVal" class="t-display text-[26px] leading-none tabular-nums">−700</span> <span class="text-[13px] font-semibold">kcal</span></span>
           </div>
           <div class="n-seg grid-cols-3 mb-1" role="group" aria-label="Hedef" data-t-aria="Hedef">
-            <button id="goalLose" onclick="setGoal('lose')" data-t="Ver">Ver</button>
-            <button id="goalKeep" onclick="setGoal('keep')" data-t="Koru">Koru</button>
-            <button id="goalGain" onclick="setGoal('gain')" data-t="Al">Al</button>
+            <button id="goalLose" aria-pressed="false" onclick="setGoal('lose')" data-t="Ver">Ver</button>
+            <button id="goalKeep" aria-pressed="false" onclick="setGoal('keep')" data-t="Koru">Koru</button>
+            <button id="goalGain" aria-pressed="false" onclick="setGoal('gain')" data-t="Al">Al</button>
           </div>
           <div id="loseBox">
             <input id="deficitSlider" type="range" min="50" max="1000" step="50" value="700" oninput="updateProfile()" class="w-full h-11" aria-label="Kalori açığı" data-t-aria="Kalori açığı" />
           </div>
           <div id="gainBox" class="hidden my-1">
             <div class="n-seg grid-cols-3" role="group" aria-label="Kilo alma hızı" data-t-aria="Kilo alma hızı">
-              <button id="paceSlow" onclick="setGainPace('slow')" data-t="Yavaş">Yavaş</button>
-              <button id="paceMid" onclick="setGainPace('mid')" data-t="Orta">Orta</button>
-              <button id="paceFast" onclick="setGainPace('fast')" data-t="Hızlı">Hızlı</button>
+              <button id="paceSlow" aria-pressed="false" onclick="setGainPace('slow')" data-t="Yavaş">Yavaş</button>
+              <button id="paceMid" aria-pressed="false" onclick="setGainPace('mid')" data-t="Orta">Orta</button>
+              <button id="paceFast" aria-pressed="false" onclick="setGainPace('fast')" data-t="Hızlı">Hızlı</button>
             </div>
           </div>
           <div id="timelineInfo" class="text-[12px] n-muted">-</div>
@@ -1475,7 +1475,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v53</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v54</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -3777,8 +3777,8 @@ function renderNutrition() {
   if (view === "menus") renderWeightBlock(st);
 
   const isRest = state.dayType === "rest";
-  ["btnTrain", "mnTrain"].forEach(id => { $(id).className = isRest ? "" : "on"; });
-  ["btnRest", "mnRest"].forEach(id => { $(id).className = isRest ? "on" : ""; });
+  ["btnTrain", "mnTrain"].forEach(id => { $(id).className = isRest ? "" : "on"; $(id).setAttribute("aria-pressed", isRest ? "false" : "true"); });
+  ["btnRest", "mnRest"].forEach(id => { $(id).className = isRest ? "on" : ""; $(id).setAttribute("aria-pressed", isRest ? "true" : "false"); });
   $("planSub").textContent = t(isRest ? "Dinlenme menüsü · hedef {kcal} kcal" : "Antrenman menüsü · hedef {kcal} kcal", { kcal: fmtInt(getTargets().calTarget) });
 
   if (view === "today") { renderWater(); renderSupps(); renderHero(); renderTodayMeals(); }

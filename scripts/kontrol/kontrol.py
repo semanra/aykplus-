@@ -178,6 +178,7 @@ def main():
     for scheme in ["dark", "light"]:
         tr = "koyu" if scheme == "dark" else "aydınlık"
         print(f"• {tr}: ekranlar (önce)…"); _, e0 = shoot(old, os.path.join(OUT, "onceki", scheme), scheme)
+        shoot_fresh(old, os.path.join(OUT, "onceki", scheme), scheme)   # v54: kurulum ve boş başlangıç ekranlarının önceki hâli de çekilir
         print(f"• {tr}: ekranlar (şimdi)…"); audit, e1 = shoot(REPO, os.path.join(OUT, "simdi", scheme), scheme)
         fa, f1 = shoot_fresh(REPO, os.path.join(OUT, "simdi", scheme), scheme); audit.update(fa); e1 = e1 + f1
         print(f"• {tr}: İngilizce ekranlar…"); fe, f2 = shoot_en(REPO, os.path.join(OUT, "simdi", scheme), scheme); audit.update(fe); e1 = e1 + f2

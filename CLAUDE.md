@@ -41,7 +41,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 44 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 45 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 pip install pillow   # ilk seferde (kontrol aracı için)
 npm run kontrol      # son commit ile karşılaştırma: 53 ekran × 2 tema piksel farkı + okunurluk/44 px/taşma + hız; v47–v53: ayrıca 51 İngilizce ekran (v53: 9 imperial `en-u-*`) yalnız ölçülür, piksel karşılaştırması yok (`-- --hizli` hızsız)
 ```
@@ -227,3 +227,5 @@ Sıradaki adaylar (kullanıcı onayı gerekir):
 Tasarım taslağı (claude.ai tuvali): https://claude.ai/artifact/D1oHvwvwnFMnJULVg2fHhz
 
 **v49 (16 Kasım 2026):** Mobilite İngilizcesi (herkese hâlâ kapalı, yalnızca test bayrağı). Sözlük `src/app/22-en-mobilite.js` (`Object.assign(EN, {…})`); gösterim yardımcıları `mobRegionL(key)` / `mobTypeL(key)` / `mobSideL(side)`; kayıtlı değerler (rutin/hareket adları, `MOB_REGIONS`/`MOB_TYPES` anahtarları, tur tarafı "Sağ"/"Sol", `mobilityLog`) Türkçe kalır, yeni rutin kopyası/yedek adlar o anki dilde yazılır (`(copy)`, `Routine`, `My routine`; var olan kayıt değişmez). **Ses kuralı (v52'ye kadar):** konuşulan metin her zaman Türkçe (`trFill`, `tr-TR`); `22`'deki İngilizce ses anahtarları henüz tüketicisiz, v52'de `t()` + en-GB sese geçilir. Hareket adları İngilizce kalır; "nasıl yapılır" adımları (`MOB_GUIDE`/`MOB_LIB_V39`) v52, İlerleme mobilite şeridi v50. Statik bekçi: `06` tam dosya gerekçeli izin listesinde (`KISMI`'den çıktı). Bekleyenler: `.n-seg` düğmelerinde `aria-pressed` (Nereye eklensin?, takvim aralığı, hedef/hız, makro görünümü), kontrol aracı kurulum ekranı çekimi. Test: `tests/test_v49_mobilite.py` (port 8807).
+
+**v54 (16 Kasım 2026):** Beslenme seçim düğmesi gruplarında (gün tipi, menü, hedef, kilo alma hızı, makro görünümü, Nereye eklensin?, takvim aralığı) `aria-pressed` her seçimde senkron (yalnız nitelik, görünüm aynı; gün tipi grupları `role="group"`). Kontrol aracı: önceki commit için de `shoot_fresh` çekilir, kurulum 1–7 ve boş başlangıç ekranları artık piksel karşılaştırılır. Test: `tests/test_v54_kucuk.py` (port 8812).

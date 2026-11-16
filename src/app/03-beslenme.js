@@ -254,8 +254,8 @@ function renderNutrition() {
   if (view === "menus") renderWeightBlock(st);
 
   const isRest = state.dayType === "rest";
-  ["btnTrain", "mnTrain"].forEach(id => { $(id).className = isRest ? "" : "on"; });
-  ["btnRest", "mnRest"].forEach(id => { $(id).className = isRest ? "on" : ""; });
+  ["btnTrain", "mnTrain"].forEach(id => { $(id).className = isRest ? "" : "on"; $(id).setAttribute("aria-pressed", isRest ? "false" : "true"); });
+  ["btnRest", "mnRest"].forEach(id => { $(id).className = isRest ? "on" : ""; $(id).setAttribute("aria-pressed", isRest ? "true" : "false"); });
   $("planSub").textContent = t(isRest ? "Dinlenme menüsü · hedef {kcal} kcal" : "Antrenman menüsü · hedef {kcal} kcal", { kcal: fmtInt(getTargets().calTarget) });
 
   if (view === "today") { renderWater(); renderSupps(); renderHero(); renderTodayMeals(); }
