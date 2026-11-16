@@ -28,24 +28,25 @@ function mobGuide(name) {
 function mobGuideHtml(name, open = true, id = "") {
   const g = mobGuide(name); if (!g) return "";
   return `<div ${id ? `id="${id}"` : ""} class="m-guide">
-    <div class="m-guide-h">Nasıl yapılır</div>
-    ${open ? `<ol>${g.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="m-guide-w">Dikkat: ${esc(g.warn)}</p>` : ""}
+    <div class="m-guide-h">${t("Nasıl yapılır")}</div>
+    ${open ? `<ol>${g.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="m-guide-w">${esc(t("Dikkat: {uyari}", { uyari: g.warn }))}</p>` : ""}
   </div>`;
 }
 function mobSummary(it) {
-  const amt = it.mode === "time" ? it.sec + " sn" : it.reps + " tekrar";
-  return (it.sides === 2 ? "Sağ/sol · " : "") + it.sets + " set × " + amt;
+  const amt = it.mode === "time" ? tn(it.sec, "{n} sn") : tn(it.reps, "{n} tekrar");
+  const body = t("{set} × {amt}", { set: tn(it.sets, "{n} set"), amt });
+  return it.sides === 2 ? t("Sağ/sol · {x}", { x: body }) : body;
 }
 // v39: rutinin içi. Düzenle kapalıyken: tik, tek hareket sayacı, dokununca detay. Düzenle açıkken: tutamaç (sürükle-bırak)
 // ve çöp kutusu; tik ve sayaç yok.
 function mobCardHtml(it, idx) {
   const id = mobArg(it.id), ed = mobUI.edit;
   const left = ed
-    ? `<span class="drag-handle m-grip" data-mobidx="${idx}" role="img" aria-label="Sürükleyerek sırala">${svgI("grip", 18)}</span>`
-    : `<button data-mob-check onclick="mobToggle(${id})" class="m-chk" aria-pressed="${it.done}" aria-label="${it.done ? "Yapıldı işaretini kaldır" : "Yapıldı olarak işaretle"}">${svgI("check", 20, 3)}</button>`;
+    ? `<span class="drag-handle m-grip" data-mobidx="${idx}" role="img" aria-label="${t("Sürükleyerek sırala")}">${svgI("grip", 18)}</span>`
+    : `<button data-mob-check onclick="mobToggle(${id})" class="m-chk" aria-pressed="${it.done}" aria-label="${it.done ? t("Yapıldı işaretini kaldır") : t("Yapıldı olarak işaretle")}">${svgI("check", 20, 3)}</button>`;
   const right = ed
-    ? `<button data-mob-del onclick="mobRemoveItem(${id})" class="m-del" aria-label="${esc(it.name)} hareketini kaldır">${svgI("trash", 19)}</button>`
-    : it.mode === "time" ? `<button data-mob-timer onclick="mobTimerStart(${id})" class="m-tbtn" aria-label="${it.sec} saniyelik sayacı başlat">${svgI("clock", 18, 2.2)}<span>${it.sec} sn</span></button>` : "";
+    ? `<button data-mob-del onclick="mobRemoveItem(${id})" class="m-del" aria-label="${esc(t("{ad} hareketini kaldır", { ad: it.name }))}">${svgI("trash", 19)}</button>`
+    : it.mode === "time" ? `<button data-mob-timer onclick="mobTimerStart(${id})" class="m-tbtn" aria-label="${tn(it.sec, "{n} saniyelik sayacı başlat")}">${svgI("clock", 18, 2.2)}<span>${tn(it.sec, "{n} sn")}</span></button>` : "";
   return `<div data-mob-row="${esc(it.id)}" class="m-card ${!ed && it.done ? "done" : ""}">
     ${left}
     <button data-mob-open onclick="mobOpen(${id})" class="flex-1 min-w-0 min-h-[44px] text-left">
@@ -60,26 +61,26 @@ function mobRoutineHtml() {
   const r = mobRoutine(mobUI.rid), ed = mobUI.edit, items = r.items, id = mobArg(r.id);
   const head = ed
     ? `<div class="flex items-center gap-2.5">
-        <input id="mobRName" data-fk="mob-rname" type="text" value="${esc(r.name)}" maxlength="40" aria-label="Rutinin adı" placeholder="Rutinin adı"
+        <input id="mobRName" data-fk="mob-rname" type="text" value="${esc(r.name)}" maxlength="40" aria-label="${t("Rutinin adı")}" placeholder="${t("Rutinin adı")}"
           onchange="mobRenameRoutine(this.value)" onkeydown="if(event.key==='Enter')this.blur()" class="m-in flex-1 min-w-0 !h-[52px] !text-[17px] font-semibold" />
-        <button id="mobEditDone" onclick="mobEdit(false)" class="m-btn pri shrink-0">Bitti</button>
+        <button id="mobEditDone" onclick="mobEdit(false)" class="m-btn pri shrink-0">${t("Bitti")}</button>
       </div>
-      <p class="text-[12.5px] text-[var(--t-dim)] mt-2 mb-2.5 px-0.5">Sıralamak için tutamaçtan sürükle. Ayarlar için harekete dokun.</p>`
+      <p class="text-[12.5px] text-[var(--t-dim)] mt-2 mb-2.5 px-0.5">${t("Sıralamak için tutamaçtan sürükle. Ayarlar için harekete dokun.")}</p>`
     : `<div class="flex items-center gap-2.5 mb-3">
-        <button id="mobBackBtn" onclick="mobBack()" class="m-round" aria-label="Rutinlere dön">${svgI("chevL", 20, 2.2)}</button>
+        <button id="mobBackBtn" onclick="mobBack()" class="m-round" aria-label="${t("Rutinlere dön")}">${svgI("chevL", 20, 2.2)}</button>
         <h3 id="mobListTitle" class="t-display text-[28px] leading-[1.02] text-[var(--t-text)] flex-1 min-w-0 uppercase break-words">${esc(r.name)}</h3>
-        <button id="mobEditBtn" onclick="mobEdit(true)" class="m-pill shrink-0 flex items-center gap-1.5 !text-[var(--t-text)] !border-[var(--t-acc-text)]">${svgI("edit", 16)}Düzenle</button>
+        <button id="mobEditBtn" onclick="mobEdit(true)" class="m-pill shrink-0 flex items-center gap-1.5 !text-[var(--t-text)] !border-[var(--t-acc-text)]">${svgI("edit", 16)}${t("Düzenle")}</button>
       </div>`;
   const list = items.map((it, i) => mobCardHtml(it, i)).join("")
-    || `<div class="text-[14px] text-[var(--t-dim)] py-6 text-center">Bu rutinde hareket yok. ${ed ? "Aşağıdan" : "Düzenle'den"} hareket ekle.</div>`;
+    || `<div class="text-[14px] text-[var(--t-dim)] py-6 text-center">${ed ? t("Bu rutinde hareket yok. Aşağıdan hareket ekle.") : t("Bu rutinde hareket yok. Düzenle'den hareket ekle.")}</div>`;
   const foot = ed
-    ? `<button id="mobAddBtn" onclick="mobAddOpen()" class="m-btn pri w-full mt-3">${svgI("plus", 20, 2.4)}Hareket ekle</button>
+    ? `<button id="mobAddBtn" onclick="mobAddOpen()" class="m-btn pri w-full mt-3">${svgI("plus", 20, 2.4)}${t("Hareket ekle")}</button>
       <div class="grid grid-cols-2 gap-2.5 mt-2.5">
-        <button id="mobCopyRoutine" onclick="mobCopyRoutine()" class="m-btn ghost">${svgI("copy", 18)}Kopyala</button>
-        <button id="mobResetBtn" onclick="mobReset()" class="m-btn ghost">${svgI("undo", 18)}Tikleri sıfırla</button>
+        <button id="mobCopyRoutine" onclick="mobCopyRoutine()" class="m-btn ghost">${svgI("copy", 18)}${t("Kopyala")}</button>
+        <button id="mobResetBtn" onclick="mobReset()" class="m-btn ghost">${svgI("undo", 18)}${t("Tikleri sıfırla|mobilite")}</button>
       </div>
-      <button id="mobDeleteRoutine" onclick="mobDeleteRoutine()" class="m-btn del w-full mt-2.5">${svgI("trash", 18)}Rutini sil</button>`
-    : items.length ? `<div class="m-startbar"><button data-mob-start onclick="mobSesStart(${id})" class="m-btn pri w-full !min-h-[58px] !text-[17px]">${svgI("play", 18, 2.4)}Başlat · ${items.length} hareket · ~${mobRoutineMin(r)} dk</button></div>` : "";
+      <button id="mobDeleteRoutine" onclick="mobDeleteRoutine()" class="m-btn del w-full mt-2.5">${svgI("trash", 18)}${t("Rutini sil")}</button>`
+    : items.length ? `<div class="m-startbar"><button data-mob-start onclick="mobSesStart(${id})" class="m-btn pri w-full !min-h-[58px] !text-[17px]">${svgI("play", 18, 2.4)}${tn(items.length, "Başlat · {n} hareket · ~{min} dk", { min: mobRoutineMin(r) })}</button></div>` : "";
   return `<div id="mobRoutine">${head}<div id="mobList" class="space-y-2">${list}</div>${foot}</div>`;
 }
 function mobEdit(on) { mobUI.edit = !!on; mobUI.view = "routine"; renderMobility(); }
@@ -96,7 +97,7 @@ function mobRemoveItem(id) {
   const [it] = r.items.splice(i, 1);
   mobUI.view = "routine"; mobUI.id = null;
   renderAll();
-  offerUndo(`${it.name} kaldırıldı`);
+  offerUndo(t("{ad} kaldırıldı", { ad: it.name }));
 }
 function mobCopyRoutine() {
   const r = mobRoutine(mobUI.rid); if (!r) return;
@@ -105,18 +106,18 @@ function mobCopyRoutine() {
   mobUI.rid = c.id; mobUI.view = "routine"; mobUI.edit = true;
   window.scrollTo(0, 0);
   renderAll();
-  toast("Rutin kopyalandı");
+  toast(t("Rutin kopyalandı"));
 }
 async function mobDeleteRoutine() {
   const r = mobRoutine(mobUI.rid); if (!r) return;
-  if (!(await askConfirm("Rutin silinsin mi?", `${r.name} ve içindeki ${r.items.length} hareket silinecek.`, "Sil", true))) return;
+  if (!(await askConfirm(t("Rutin silinsin mi?"), tn(r.items.length, "{ad} ve içindeki {n} hareket silinecek.", { ad: r.name }), t("Sil"), true))) return;
   const i = mobRoutines().findIndex(x => x.id === r.id); if (i < 0) return;
   snapshot();
   mobRoutines().splice(i, 1);
   mobUI.view = "home"; mobUI.rid = null; mobUI.edit = false;
   window.scrollTo(0, 0);
   renderAll();
-  offerUndo(`${r.name} silindi`);
+  offerUndo(t("{ad} silindi", { ad: r.name }));
 }
 function renderMobility() {
   const root = $("mobRoot");
@@ -128,11 +129,11 @@ function renderMobility() {
 }
 function mobToggle(id) { const it = mobFind(id); if (!it) return; it.done = !it.done; renderAll(); }
 function mobReset() {
-  if (!mobItems().some(i => i.done)) { toast("Tikli hareket yok"); return; }
+  if (!mobItems().some(i => i.done)) { toast(t("Tikli hareket yok")); return; }
   snapshot();
   mobItems().forEach(i => { i.done = false; });
   renderAll();
-  offerUndo("Tikler sıfırlandı");
+  offerUndo(t("Tikler sıfırlandı"));
 }
 // --- v39: ANA EKRAN (bu hafta, rutin kartları, bölgeler · son çalışma) ---
 function mobTodayKey() { return todayStr(logicalNow()); }
@@ -186,47 +187,47 @@ function mobLastDone(r) {
   });
   return best;
 }
-function mobAgoText(ago) { return ago === 0 ? "Bugün" : ago === 1 ? "Dün" : ago + " gün önce"; }
+function mobAgoText(ago) { return ago === 0 ? t("Bugün") : ago === 1 ? t("Dün") : tn(ago, "{n} gün önce"); }
 function mobRoutineCardHtml(r) {
   const id = mobArg(r.id), n = r.items.length, last = mobLastDone(r);
   const regs = [...new Set(r.items.map(i => i.region).filter(Boolean))].slice(0, 3);
   return `<div data-mob-routine="${esc(r.id)}" class="m-rt">
     <div class="flex items-start justify-between gap-2">
       <div class="min-w-0"><h3 class="m-rt-name t-display">${esc(r.name)}</h3>
-        <div class="m-rt-meta">${n ? `${n} hareket · ~${mobRoutineMin(r)} dk` : "Henüz hareket yok"}</div></div>
-      ${last == null ? "" : `<span class="m-rt-last ${last === 0 ? "on" : ""}">${mobAgoText(last)}${last <= 1 ? " yapıldı" : ""}</span>`}
+        <div class="m-rt-meta">${n ? tn(n, "{n} hareket · ~{min} dk|mobilite", { min: mobRoutineMin(r) }) : t("Henüz hareket yok")}</div></div>
+      ${last == null ? "" : `<span class="m-rt-last ${last === 0 ? "on" : ""}">${last === 0 ? t("Bugün yapıldı") : last === 1 ? t("Dün yapıldı") : mobAgoText(last)}</span>`}
     </div>
     ${regs.length ? `<div class="flex flex-wrap gap-1.5 mt-2.5">${regs.map(k => `<span class="m-tag">${esc(mobRegionL(k))}</span>`).join("")}</div>` : ""}
     <div class="grid ${n ? "grid-cols-[1fr_auto]" : "grid-cols-1"} gap-2.5 mt-3.5">
-      ${n ? `<button data-mob-start onclick="mobSesStart(${id})" class="m-btn pri">${svgI("play", 18, 2.4)}Başlat</button>` : ""}
-      <button data-mob-openr onclick="mobOpenRoutine(${id})" class="m-btn ghost">${n ? "Aç" : "Aç ve hareket ekle"}</button>
+      ${n ? `<button data-mob-start onclick="mobSesStart(${id})" class="m-btn pri">${svgI("play", 18, 2.4)}${t("Başlat")}</button>` : ""}
+      <button data-mob-openr onclick="mobOpenRoutine(${id})" class="m-btn ghost">${n ? t("Aç") : t("Aç ve hareket ekle")}</button>
     </div>
   </div>`;
 }
 function mobHomeHtml() {
   const w = mobWeekStats(), last = mobRegionLast();
-  const regs = MOB_REGIONS.map(([k, label]) => {
+  const regs = MOB_REGIONS.map(([k]) => {
     const a = last[k], warn = a != null && a >= 7;
-    const txt = a == null ? "Henüz yok" : warn ? a + " gündür yok" : mobAgoText(a);
-    return `<div data-mob-reg="${k}" class="m-rg ${a === 0 ? "ok" : ""} ${warn ? "warn" : ""}"><b class="t-display">${mobUpper(label)}</b><span>${txt}</span></div>`;
+    const txt = a == null ? t("Henüz yok") : warn ? tn(a, "{n} gündür yok") : mobAgoText(a);
+    return `<div data-mob-reg="${k}" class="m-rg ${a === 0 ? "ok" : ""} ${warn ? "warn" : ""}"><b class="t-display">${mobUpper(mobRegionL(k))}</b><span>${txt}</span></div>`;
   }).join("");
   return `<div id="mobHome">
     <div class="grid grid-cols-2 gap-2">
-      <div class="m-wk"><b class="t-display">${w.count}</b><span>gün bu hafta</span></div>
-      <div class="m-wk"><b class="t-display">${w.streak}</b><span>gün üst üste</span></div>
+      <div class="m-wk"><b class="t-display">${w.count}</b><span>${tn(w.count, "gün bu hafta")}</span></div>
+      <div class="m-wk"><b class="t-display">${w.streak}</b><span>${tn(w.streak, "gün üst üste")}</span></div>
     </div>
-    <div class="m-days" aria-label="Bu hafta mobilite yapılan günler">${dayShort().map((l, i) =>
-      `<i class="${w.days[i] ? "d" : ""} ${i === w.dow ? "t" : ""}" aria-label="${l}${w.days[i] ? " yapıldı" : ""}">${l}</i>`).join("")}</div>
-    <div class="m-lbl">Rutinlerin</div>
+    <div class="m-days" aria-label="${t("Bu hafta mobilite yapılan günler")}">${dayShort().map((l, i) =>
+      `<i class="${w.days[i] ? "d" : ""} ${i === w.dow ? "t" : ""}" aria-label="${w.days[i] ? t("{gun} yapıldı", { gun: l }) : l}">${l}</i>`).join("")}</div>
+    <div class="m-lbl">${t("Rutinlerin")}</div>
     <div class="space-y-2.5">${mobRoutines().map(mobRoutineCardHtml).join("")}</div>
-    <button id="mobNewRoutine" onclick="mobNewRoutine()" class="m-btn ghost w-full mt-2.5 !border-dashed">${svgI("plus", 18, 2.4)}Yeni rutin</button>
-    <div class="m-lbl">Bölgeler · son çalışma</div>
+    <button id="mobNewRoutine" onclick="mobNewRoutine()" class="m-btn ghost w-full mt-2.5 !border-dashed">${svgI("plus", 18, 2.4)}${t("Yeni rutin")}</button>
+    <div class="m-lbl">${t("Bölgeler · son çalışma")}</div>
     <div class="grid grid-cols-3 gap-2">${regs}</div>
   </div>`;
 }
 function mobOpenRoutine(rid) { if (!mobRoutine(rid)) return; mobUI.view = "routine"; mobUI.rid = rid; mobUI.edit = false; window.scrollTo(0, 0); renderMobility(); }
 async function mobNewRoutine() {
-  const v = await askText("Yeni rutin", "", "Örn. Sabah rutini", "", "Oluştur");
+  const v = await askText(t("Yeni rutin"), "", t("Örn. Sabah rutini"), "", t("Oluştur"));
   if (v == null || !String(v).trim()) return;
   const r = { id: mobNewRoutineId(), name: String(v).trim().slice(0, 40), items: [] };
   mobRoutines().push(r);
@@ -239,22 +240,22 @@ const MOB_SWITCH_SEC = 5;   // turlar arası "taraf değiştir" arası
 function mobRounds(it) { return it.sets * it.sides; }
 function mobTotalSec(it) { const r = mobRounds(it); return r * it.sec + (r - 1) * MOB_SWITCH_SEC; }
 function mobPreviewHtml(it) {
-  if (it.mode === "reps") return `Her sette <b>${it.reps} tekrar</b>${it.sides === 2 ? " (her taraf)" : ""}. Sayaç yok; yapınca tikle.`;
-  const tot = `Toplam ≈ ${Math.max(1, Math.round(mobTotalSec(it) / 60))} dk.`;
+  if (it.mode === "reps") return tn(it.reps, it.sides === 2 ? "Her sette <b>{n} tekrar</b> (her taraf). Sayaç yok; yapınca tikle." : "Her sette <b>{n} tekrar</b>. Sayaç yok; yapınca tikle.");
+  const tot = tn(Math.max(1, Math.round(mobTotalSec(it) / 60)), "Toplam ≈ {n} dk.");
   return it.sides === 2
-    ? `Sayaçta: <b>sağ ${it.sec} sn → sol ${it.sec} sn</b>, ${it.sets} tur. ${tot}`
-    : `Sayaçta: <b>${it.sets} × ${it.sec} sn</b>. ${tot}`;
+    ? tn(it.sets, "Sayaçta: <b>sağ {sn} sn → sol {sn} sn</b>, {n} tur. {toplam}", { sn: it.sec, toplam: tot })
+    : tn(it.sets, "Sayaçta: <b>{n} × {sn} sn</b>. {toplam}", { sn: it.sec, toplam: tot });
 }
 function mobDetailHtml() {
   const it = mobFind(mobUI.id);
   const idx = mobItems().indexOf(it);
   const id = mobArg(it.id);
-  const crumb = (mobRegionL(it.region) || "Bölgesiz") + " · " + (idx + 1) + ". hareket";
+  const crumb = t("{bolge} · {n}. hareket", { bolge: mobRegionL(it.region) || t("Bölgesiz"), n: idx + 1 });
   const time = it.mode === "time";
   const stepper = (label, field, val, valId, minD, maxD) => `<div class="m-st"><div class="k">${label}</div><div class="v">
-      <button class="m-pm" data-mob-step="${field}:-1" onclick="mobStep(${id}, '${field}', -1)" ${minD ? "disabled" : ""} aria-label="${label} azalt">${svgI("minus", 18, 2.6)}</button>
+      <button class="m-pm" data-mob-step="${field}:-1" onclick="mobStep(${id}, '${field}', -1)" ${minD ? "disabled" : ""} aria-label="${esc(t("{ad} azalt", { ad: label }))}">${svgI("minus", 18, 2.6)}</button>
       <b id="${valId}" class="t-display">${val}</b>
-      <button class="m-pm" data-mob-step="${field}:1" onclick="mobStep(${id}, '${field}', 1)" ${maxD ? "disabled" : ""} aria-label="${label} artır">${svgI("plus", 18, 2.6)}</button></div></div>`;
+      <button class="m-pm" data-mob-step="${field}:1" onclick="mobStep(${id}, '${field}', 1)" ${maxD ? "disabled" : ""} aria-label="${esc(t("{ad} artır", { ad: label }))}">${svgI("plus", 18, 2.6)}</button></div></div>`;
   const seg = (attr, field, opts, cur) => `<div class="m-seg" style="grid-template-columns:repeat(${opts.length},minmax(0,1fr))">${opts.map(([k, l]) =>
     `<button data-mob-${attr}="${k}" onclick="mobSet(${id}, '${field}', '${k}')" class="${String(cur) === String(k) ? "on" : ""}" aria-pressed="${String(cur) === String(k)}">${l}</button>`).join("")}</div>`;
   const chips = (attr, field, opts, cur) => `<div class="flex flex-wrap gap-2">${opts.map(([k, l]) =>
@@ -262,36 +263,36 @@ function mobDetailHtml() {
   const vMin = time ? it.sec <= 5 : it.reps <= 1, vMax = time ? it.sec >= 600 : it.reps >= 100;
   return `<div id="mobDetail">
     <div class="flex items-center justify-between gap-2 -mx-1">
-      <button id="mobDtBack" onclick="mobBack()" class="m-round" aria-label="Geri">${svgI("chevL", 20, 2.2)}</button>
+      <button id="mobDtBack" onclick="mobBack()" class="m-round" aria-label="${t("Geri")}">${svgI("chevL", 20, 2.2)}</button>
       <span id="mobDtCrumb" class="text-[15px] text-[var(--t-muted)] truncate">${esc(crumb)}</span>
       <span class="w-11 shrink-0"></span>
     </div>
-    <button id="mobDtTitle" onclick="mobRename(${id})" class="t-display text-[32px] leading-[1.02] text-[var(--t-text)] text-left mt-3 min-h-[44px] w-full break-words" aria-label="Adı değiştir">${esc(it.name)}</button>
+    <button id="mobDtTitle" onclick="mobRename(${id})" class="t-display text-[32px] leading-[1.02] text-[var(--t-text)] text-left mt-3 min-h-[44px] w-full break-words" aria-label="${t("Adı değiştir")}">${esc(it.name)}</button>
     <div class="text-[13px] font-semibold ${it.type === "dynamic" ? "text-[var(--t-dim)]" : "text-[var(--t-acc-text)]"} mt-1">${mobTypeL(it.type)}</div>
-    ${it.rxOk ? "" : `<div id="mobDtRx" class="mt-3 text-[13.5px] text-[var(--t-warn-text)] bg-[var(--t-elev)] rounded-2xl px-3.5 py-2.5">Eski yazım: ${esc(it.rx)}<br><span class="text-[var(--t-muted)]">Okunamadı; değerleri kontrol et.</span></div>`}
-    <div class="m-lbl">Uygulama</div>
-    ${seg("mode", "mode", [["reps", "Tekrar"], ["time", "Süre"]], it.mode)}
+    ${it.rxOk ? "" : `<div id="mobDtRx" class="mt-3 text-[13.5px] text-[var(--t-warn-text)] bg-[var(--t-elev)] rounded-2xl px-3.5 py-2.5">${t("Eski yazım")}: ${esc(it.rx)}<br><span class="text-[var(--t-muted)]">${t("Okunamadı; değerleri kontrol et.")}</span></div>`}
+    <div class="m-lbl">${t("Uygulama")}</div>
+    ${seg("mode", "mode", [["reps", t("Tekrar")], ["time", t("Süre")]], it.mode)}
     <div class="grid grid-cols-2 gap-2.5 mt-2.5">
-      ${stepper("Set", "sets", it.sets, "mobDtSets", it.sets <= 1, it.sets >= 10)}
-      ${stepper(time ? "Süre (sn)" : "Tekrar", "val", time ? it.sec : it.reps, "mobDtVal", vMin, vMax)}
+      ${stepper(t("Set"), "sets", it.sets, "mobDtSets", it.sets <= 1, it.sets >= 10)}
+      ${stepper(time ? t("Süre (sn)") : t("Tekrar"), "val", time ? it.sec : it.reps, "mobDtVal", vMin, vMax)}
     </div>
-    <div class="m-lbl">Taraf</div>
-    ${seg("sides", "sides", [[1, "Tek"], [2, "Sağ ve sol"]], it.sides)}
+    <div class="m-lbl">${t("Taraf")}</div>
+    ${seg("sides", "sides", [[1, t("Tek")], [2, t("Sağ ve sol")]], it.sides)}
     <div id="mobDtPreview" class="m-preview">${mobPreviewHtml(it)}</div>
-    <div class="m-lbl">Tür</div>
-    ${seg("type", "type", MOB_TYPES, it.type)}
-    <div class="m-lbl">Ana bölge</div>
-    ${chips("r1", "region", MOB_REGIONS, it.region)}
-    <div class="m-lbl">İkincil bölge <span class="font-normal text-[var(--t-dim)]">(isteğe bağlı, yarım sayılır)</span></div>
-    ${chips("r2", "region2", [["", "Yok"], ...MOB_REGIONS.filter(r => r[0] !== it.region)], it.region2)}
+    <div class="m-lbl">${t("Tür")}</div>
+    ${seg("type", "type", MOB_TYPES.map(([k]) => [k, mobTypeL(k)]), it.type)}
+    <div class="m-lbl">${t("Ana bölge")}</div>
+    ${chips("r1", "region", MOB_REGIONS.map(([k]) => [k, mobRegionL(k)]), it.region)}
+    <div class="m-lbl">${t("İkincil bölge")} <span class="font-normal text-[var(--t-dim)]">${t("(isteğe bağlı, yarım sayılır)")}</span></div>
+    ${chips("r2", "region2", [["", t("Yok")], ...MOB_REGIONS.filter(r => r[0] !== it.region).map(([k]) => [k, mobRegionL(k)])], it.region2)}
     ${mobGuideHtml(it.name, true, "mobDtGuide")}
-    <div class="m-lbl">Not</div>
-    <textarea id="mobDtNote" data-fk="mob-note" rows="2" class="m-in" placeholder="Not ekle…" onchange="mobSet(${id}, 'note', this.value)">${esc(it.note)}</textarea>
+    <div class="m-lbl">${t("Not")}</div>
+    <textarea id="mobDtNote" data-fk="mob-note" rows="2" class="m-in" placeholder="${t("Not ekle…")}" onchange="mobSet(${id}, 'note', this.value)">${esc(it.note)}</textarea>
     <div class="grid grid-cols-[1fr_1.6fr] gap-2.5 mt-5">
-      <button id="mobDtRemove" onclick="mobRemove(${id})" class="m-btn del">${svgI("trash", 19)}Kaldır</button>
+      <button id="mobDtRemove" onclick="mobRemove(${id})" class="m-btn del">${svgI("trash", 19)}${t("Kaldır")}</button>
       ${time
-        ? `<button id="mobDtStart" onclick="mobTimerStart(${id})" class="m-btn pri">${svgI("clock", 20, 2.2)}Sayacı başlat</button>`
-        : `<button id="mobDtDone" onclick="mobToggle(${id})" class="m-btn ${it.done ? "ghost" : "pri"}">${svgI("check", 20, 2.6)}${it.done ? "Yapıldı (geri al)" : "Yapıldı"}</button>`}
+        ? `<button id="mobDtStart" onclick="mobTimerStart(${id})" class="m-btn pri">${svgI("clock", 20, 2.2)}${t("Sayacı başlat")}</button>`
+        : `<button id="mobDtDone" onclick="mobToggle(${id})" class="m-btn ${it.done ? "ghost" : "pri"}">${svgI("check", 20, 2.6)}${it.done ? t("Yapıldı (geri al)") : t("Yapıldı")}</button>`}
     </div>
   </div>`;
 }
@@ -325,7 +326,7 @@ function mobSet(id, field, val) {
 }
 async function mobRename(id) {
   const it = mobFind(id); if (!it) return;
-  const v = await askText("Hareketin adı", it.name, "Örn. Couch Stretch");
+  const v = await askText(t("Hareketin adı"), it.name, t("Örn. Couch Stretch"));
   if (v == null || !String(v).trim()) return;
   const cur = mobFind(id); if (!cur) return;
   cur.name = String(v).trim().slice(0, 80);
@@ -346,15 +347,15 @@ function mobAddHtml() {
   const f = mobUI.filter;
   return `<div id="mobAdd">
     <div class="flex items-center justify-between gap-2">
-      <h3 class="t-display text-[30px] text-[var(--t-text)]">HAREKET EKLE</h3>
-      <button id="mobAddClose" onclick="mobBack()" class="m-round" aria-label="Kapat">${svgI("x", 20, 2.2)}</button>
+      <h3 class="t-display text-[30px] text-[var(--t-text)]">${t("HAREKET EKLE")}</h3>
+      <button id="mobAddClose" onclick="mobBack()" class="m-round" aria-label="${t("Kapat")}">${svgI("x", 20, 2.2)}</button>
     </div>
     <label class="flex items-center gap-2.5 h-[50px] rounded-2xl bg-[var(--t-surface)] px-3.5 mt-3 text-[var(--t-dim)]">${svgI("search", 20)}
-      <input id="mobSearch" type="search" value="${esc(mobUI.q)}" placeholder="Hareket ara" autocomplete="off" oninput="mobAddSearch(this.value)" class="t-search flex-1 min-w-0 h-full !text-[16px]" /></label>
-    <div class="flex gap-2 mt-3 overflow-x-auto no-scrollbar -mx-4 px-4">${[["all", "Tümü"], ...MOB_TYPES].map(([k, l]) =>
+      <input id="mobSearch" type="search" value="${esc(mobUI.q)}" placeholder="${t("Hareket ara|mobilite")}" autocomplete="off" oninput="mobAddSearch(this.value)" class="t-search flex-1 min-w-0 h-full !text-[16px]" /></label>
+    <div class="flex gap-2 mt-3 overflow-x-auto no-scrollbar -mx-4 px-4">${[["all", t("Tümü")], ...MOB_TYPES.map(([k]) => [k, mobTypeL(k)])].map(([k, l]) =>
       `<button data-mob-filter="${k}" onclick="mobAddFilter('${k}')" class="m-chip ${f === k ? "on" : ""}" aria-pressed="${f === k}">${l}</button>`).join("")}</div>
     <div id="mobAddList"></div>
-    <button id="mobAddCustom" onclick="mobAddCustom()" class="m-btn w-full mt-4">${svgI("edit", 19)}Listede yok mu? Elle ekle</button>
+    <button id="mobAddCustom" onclick="mobAddCustom()" class="m-btn w-full mt-4">${svgI("edit", 19)}${t("Listede yok mu? Elle ekle")}</button>
   </div>`;
 }
 function mobRenderAddList() {
@@ -367,17 +368,17 @@ function mobRenderAddList() {
   box.innerHTML = order.map(rk => {
     const rows = list.filter(x => x.region === rk);
     if (!rows.length) return "";
-    return `<div data-mob-group class="text-[13px] font-semibold text-[var(--t-muted)] mt-4 mb-2 px-0.5">${esc(mobRegionL(rk) || "Diğer (bilek, ön kol)")}</div>
+    return `<div data-mob-group class="text-[13px] font-semibold text-[var(--t-muted)] mt-4 mb-2 px-0.5">${esc(mobRegionL(rk) || t("Diğer (bilek, ön kol)"))}</div>
       <div class="space-y-2">${rows.map(x => {
         const sum = mobSummary(normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription }, x.type)));
         const has = inRoutine.has(x.m.name);
         return `<div data-mob-lib="${x.key}" class="m-card">
-          <div class="flex-1 min-w-0"><span class="m-kind ${x.type === "dynamic" ? "" : "s"}">${mobTypeL(x.type)}${has ? ` · <span class="text-[var(--t-text)]">Rutinde</span>` : ""}</span>
+          <div class="flex-1 min-w-0"><span class="m-kind ${x.type === "dynamic" ? "" : "s"}">${mobTypeL(x.type)}${has ? ` · <span class="text-[var(--t-text)]">${t("Rutinde")}</span>` : ""}</span>
             <span class="m-name block">${esc(x.m.name)}</span><span class="m-rx block">${esc(sum)}</span></div>
-          <button data-mob-add onclick="mobAddLib('${x.key}')" class="m-add mr-1.5 ${has ? "in" : ""}" aria-label="${esc(x.m.name)} ${has ? "zaten rutinde, yine de ekle" : "ekle"}">${svgI(has ? "check" : "plus", 20, 2.6)}</button>
+          <button data-mob-add onclick="mobAddLib('${x.key}')" class="m-add mr-1.5 ${has ? "in" : ""}" aria-label="${esc(t(has ? "{ad} zaten rutinde, yine de ekle" : "{ad} ekle", { ad: x.m.name }))}">${svgI(has ? "check" : "plus", 20, 2.6)}</button>
         </div>`;
       }).join("")}</div>`;
-  }).join("") || `<div class="text-[14px] text-[var(--t-dim)] py-6 text-center">Hareket bulunamadı. Aşağıdan elle ekleyebilirsin.</div>`;
+  }).join("") || `<div class="text-[14px] text-[var(--t-dim)] py-6 text-center">${t("Hareket bulunamadı. Aşağıdan elle ekleyebilirsin.")}</div>`;
 }
 function mobAddOpen() { mobUI.view = "add"; mobUI.q = ""; window.scrollTo(0, 0); renderMobility(); }
 function mobAddSearch(v) { mobUI.q = String(v || ""); mobRenderAddList(); }
@@ -386,14 +387,14 @@ async function mobAddLib(key) {
   const x = mobLibAll().find(e => e.key === key); if (!x) return;
   // v28: rutinde zaten varsa yanlışlıkla ikinci kez eklenmesin
   if (mobItems().some(i => i.name === x.m.name)
-    && !(await askConfirm("Zaten rutinde", x.m.name + " rutininde var. Bir kez daha eklensin mi?", "Yine de ekle"))) return;
+    && !(await askConfirm(t("Zaten rutinde"), t("{ad} rutininde var. Bir kez daha eklensin mi?", { ad: x.m.name }), t("Yine de ekle")))) return;
   const it = normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription, note: x.m.note }, x.type));
   mobItems().push(it);
   renderAll();
-  toast(it.name + " eklendi");
+  toast(t("{ad} eklendi", { ad: it.name }));
 }
 async function mobAddCustom() {
-  const v = await askText("Hareketin adı", "", "Örn. Duvarda göğüs esnetme");
+  const v = await askText(t("Hareketin adı"), "", t("Örn. Duvarda göğüs esnetme"));
   if (v == null || !String(v).trim()) return;
   const type = mobUI.filter === "all" ? "static" : mobUI.filter;
   const dyn = type === "dynamic";
@@ -634,7 +635,7 @@ function mobTimerRender() {
   const guide = g
     ? `<div id="mobTGuide" class="m-guide w-full max-w-lg !mt-3 text-left">
         <button id="mobTGuideBtn" onclick="mobSesGuide()" class="w-full min-h-[44px] flex items-center justify-between m-guide-h" aria-expanded="${S.guideOpen}">Nasıl yapılır<span class="text-[var(--t-dim)]">${svgI(S.guideOpen ? "up" : "down", 18)}</span></button>
-        ${S.guideOpen ? `<ol>${g.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="m-guide-w">Dikkat: ${esc(g.warn)}</p>` : ""}
+        ${S.guideOpen ? `<ol>${g.steps.map(x => `<li>${esc(x)}</li>`).join("")}</ol><p class="m-guide-w">${esc(t("Dikkat: {uyari}", { uyari: g.warn }))}</p>` : ""}
       </div>`
     : S && it && it.note ? `<div class="m-guide w-full max-w-lg !mt-3 text-left text-[14px] text-[var(--t-text1)]">${esc(it.note)}</div>` : "";
   const nextName = S && S.pos + 1 < n ? (mobFindAny(S.ids[S.pos + 1]) || {}).name : "";

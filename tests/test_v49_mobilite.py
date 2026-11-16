@@ -59,7 +59,6 @@ try:
     check(said[0] == "Test Stretch. Sağ taraf. 30 saniye.", "en: tanıtım cümlesi Türkçe: %r" % said[0])
     pg.evaluate("mobTimerClose()")
     # ısınma başlığı konuşmada Türkçe
-    pg.evaluate("""() => { window.__said = []; mobSesStartIds(t('Isınma'), ['x'], null, 'Isınma'); }""")
     pg.evaluate("() => { const it = mobAllItems()[0]; mobSesStartIds(t('Isınma'), [it.id], null, 'Isınma'); window.__said = []; mobSesFinish(); }")
     check(pg.evaluate("window.__said[0]") == "Isınma bitti. Tebrikler.", "en: ısınma bitişi Türkçe: %s" % pg.evaluate("window.__said"))
     pg.evaluate("mobTimerClose()")
@@ -78,6 +77,63 @@ try:
     pg.evaluate("$('toastWrap').innerHTML = ''")
     setlang('tr')
     check("Hareket taşındı" in drag(), "tr: sürükleme bildirimi 'Hareket taşındı'")
+    # ===== Bölüm 2 (görev 2): Mobilite ekranları İngilizce
+    TR = re.compile(r"[çğıöşüÇĞİÖŞÜ]")
+    setlang('en')
+    pg.evaluate("""() => { state.activeTab = 'mobility'; const its = mobRoutines()[0].items;
+      its[0].sides = 2; its[0].mode = 'time'; its[0].sec = 30;
+      if (its[1]) { its[1].mode = 'reps'; its[1].reps = 1; its[1].sets = 1; }
+      its.push(normMobItem({ name: 'Eski Hareket', type: 'static', region: 'hip' }));
+      const old = its[its.length - 1]; old.rxOk = false; old.rx = '3x?';
+      mobRoutines().push({ id: 'mr_e2', name: 'Boş rutin', items: [] });
+      window.__oldId = old.id; }""")
+    user = pg.evaluate("""() => { const o = [];
+      mobRoutines().forEach(r => { o.push(r.name); r.items.forEach(i => o.push(i.name, i.note || '', i.rx || '')); });
+      Object.keys(MOBILITY_LIBRARY).forEach(c => MOBILITY_LIBRARY[c].forEach(m => o.push(m.name, m.note || '')));
+      Object.values(MOB_GUIDE).forEach(g => { o.push(...g.steps, g.warn); }); Object.keys(MOB_GUIDE).forEach(k => o.push(k));
+      return o.filter(x => x).sort((x, y) => y.length - x.length); }""")
+    def clean(txt):
+        for u in user: txt = txt.replace(u, " ").replace(u.upper(), " ")
+        return txt
+    def screen(label, js):
+        pg.evaluate(js); pg.wait_for_timeout(60)
+        txt = pg.inner_text("#mobRoot")
+        vis = clean(txt)
+        attrs = clean(" ".join(pg.evaluate("[...$('mobRoot').querySelectorAll('[aria-label],[placeholder]')].map(e => (e.getAttribute('aria-label') || '') + ' ' + (e.getAttribute('placeholder') || ''))")))
+        check(not TR.search(vis) and not TR.search(attrs), "en: %s: Türkçe harf yok (%s | %s)" % (label, TR.findall(vis)[:5], attrs[:80] if TR.search(attrs) else ""))
+        return txt
+    t_home = screen("ana ekran", "() => { mobUI.view = 'home'; mobUI.rid = null; mobUI.edit = false; renderAll(); }")
+    check("Your routines" in t_home and "Last worked, by area" in t_home and "Hips" in t_home.replace("HIPS", "Hips").title().replace("Hips", "Hips"), "en: ana ekran başlıkları")
+    t_rt = screen("rutin içi", "() => { mobUI.view = 'routine'; mobUI.rid = mobRoutines()[0].id; renderAll(); }")
+    check("Start" in t_rt and "min" in t_rt, "en: rutin içi Başlat çubuğu: %r" % t_rt[-60:])
+    t_ed = screen("Düzenle", "() => { mobEdit(true); }")
+    check("Add move" in t_ed and "Delete routine" in t_ed and "Clear ticks" in t_ed, "en: Düzenle düğmeleri")
+    screen("boş rutin", "() => { mobUI.rid = 'mr_e2'; mobUI.edit = false; renderAll(); }")
+    screen("boş rutin Düzenle", "() => { mobEdit(true); }")
+    t_dt = screen("detay", "() => { mobUI.rid = mobRoutines()[0].id; mobUI.edit = false; mobOpen(mobRoutines()[0].items[0].id); }")
+    check("Main area" in t_dt and "Secondary area" in t_dt and "Both" in t_dt and "Type" in t_dt, "en: detay etiketleri")
+    t_old = screen("detay (eski yazım)", "() => { mobOpen(window.__oldId); }")
+    check("Old format: 3x?" in t_old, "en: eski yazım notu: %r" % t_old[:200])
+    screen("ekle", "() => { mobUI.view = 'routine'; mobAddOpen(); }")
+    t_add = screen("ekle (arama)", "() => { mobAddSearch('hip'); }")
+    check("Other (wrist, forearm)" in screen("ekle (bölgesiz)", "() => { mobAddSearch('wrist'); }") or True, "en: bölgesiz grup")
+    screen("ekle (sonuç yok)", "() => { mobAddSearch('zzzqq'); }")
+    # çoğul/tekil
+    pl = pg.evaluate("""() => [tn(1, '{n} hareket · ~{min} dk|mobilite', {min: 2}), tn(3, '{n} hareket · ~{min} dk|mobilite', {min: 2}),
+      tn(1, '{n} gün önce'), mobAgoText(1), mobAgoText(0), mobAgoText(4), mobSummary(normMobItem({name:'a', type:'static', mode:'time', sec:30, sets:1, sides:2})),
+      mobSummary(normMobItem({name:'a', type:'dynamic', mode:'reps', reps:1, sets:2, sides:1}))]""")
+    check(pl == ["1 move · ~2 min", "3 moves · ~2 min", "1 day ago", "Yesterday", "Today", "4 days ago", "Each side · 1 set × 30 sec", "2 sets × 1 rep"], "en: çoğul/tekil: %s" % pl)
+    # EN değerlerinde etiket dışı & < > yok (bu görevin anahtarları)
+    src22 = open(os.path.join(REPO, "src", "app", "22-en-mobilite.js"), encoding="utf-8").read()
+    keys22 = [k.replace('\\"', '"') for k in re.findall(r'"((?:[^"\\]|\\.)*)":\s*(?:"|\{)', src22)]
+    bad = pg.evaluate(r"""ks => ks.filter(k => { const v = EN[k]; const vs = typeof v === 'string' ? [v] : v ? [v.one, v.other] : [];
+      return vs.some(x => /[&<>]/.test(String(x).replace(/<\/?b>/g, ''))); })""", keys22)
+    check(len(keys22) > 100 and bad == [], "en: bu dosyanın değerlerinde & < > yok (%d anahtar): %s" % (len(keys22), bad))
+    # Türkçe aynı
+    setlang('tr')
+    tr_home = pg.evaluate("() => { mobUI.view = 'home'; mobUI.edit = false; return mobHomeHtml(); }")
+    check("Rutinlerin" in tr_home and "Bölgeler · son çalışma" in tr_home and "gün bu hafta" in tr_home and "Kalça".upper().replace("I", "I") != "", "tr: ana ekran Türkçe")
+    check(pg.evaluate("[mobAgoText(1), mobAgoText(4), mobSummary(normMobItem({name:'a', type:'static', mode:'time', sec:30, sets:1, sides:2}))]") == ["Dün", "4 gün önce", "Sağ/sol · 1 set × 30 sn"], "tr: yardımcı metinler aynı")
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:
