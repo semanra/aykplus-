@@ -314,7 +314,7 @@ function setRowHtml(ex, exIdx, s, i, ptr, prev) {
   ex.sets.forEach((x, j) => { if (x.done) lastDone = j; });
   const effLbl = s.done && EFFORT_LABELS[s.e] ? `<span class="block font-sans text-[11px] font-bold leading-none mt-0.5" style="color:${EFFORT_COLORS[s.e]}">${effortL(s.e)}</span>` : "";
   return `<div class="rounded-2xl ${rowCls}"><div class="grid items-center gap-2 h-14 px-1" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px">
-    <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${i + 1}${s.pr ? '<span class="text-[var(--t-warn-icon)] text-sm">★</span>' : ""}${effLbl}</span>
+    <span class="t-display text-[22px] text-center leading-none ${s.done || isNext ? "text-[var(--t-text)]" : "t-dim"}">${s.pr ? `<span class="inline-flex items-center justify-center gap-[3px]">${i + 1}<span class="text-[var(--t-warn-icon)] text-[12px] leading-none" aria-hidden="true">★</span></span>` : i + 1}${effLbl}</span>
     <span class="text-[13px] t-dim truncate">${prev}</span>
     <input type="text" inputmode="decimal" aria-label="${t("{n}. set kilo", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-kg" value="${esc(fmtWNum(num(s.kg)))}" onchange="updateSetData(${exIdx}, ${i}, 'kg', this.value)" class="t-input w-full" />
     <input type="text" inputmode="numeric" aria-label="${t("{n}. set tekrar", { n: i + 1 })}" data-fk="w-${exIdx}-${i}-reps" value="${num(s.reps)}" onchange="updateSetData(${exIdx}, ${i}, 'reps', this.value)" class="t-input w-full" />
