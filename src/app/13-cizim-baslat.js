@@ -47,7 +47,9 @@ function bootApp() {
     const sp = document.getElementById("splash");
     if (!sp) return;
     if (state.settings.splash === false) { sp.remove(); return; }
-    setTimeout(() => { if (sp.parentNode) sp.remove(); }, 1300);
+    // v55: açılış kendi süresinde (Portal Zoom ~1,45 sn, animationend) / markup'taki 3 sn güvenlik sayacıyla kalkar;
+    // açılışı (veri yüklemesini) beklemez, burada yalnızca ek güvenlik.
+    setTimeout(() => { if (sp.parentNode) sp.remove(); }, 3000);
   })();
   checkNewDay();
   autoSelectNextDay();
