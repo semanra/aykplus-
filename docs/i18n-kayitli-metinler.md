@@ -29,7 +29,8 @@ Tablo kısaltması: **K** = kayıt (state/yedek/ayna içine yazılıyor), **C** 
 | src/app/01-temel.js:306 | `"Adsız besin"` (özel besin yedek adı) | K | dile göre üret |
 | src/app/01-temel.js:350 | `"Kombo"` (kombo yedek adı) | K | dile göre üret |
 | src/app/11-mutfak-akilli.js:40 | `"Kombo"` (boş ad girilirse) | K | dile göre üret |
-| src/app/01-temel.js:226 | `"Rutinim"` (eski mobilite listelerinden göçte oluşan rutin, id `mr_main`) | K | göç tek seferlik: göç sırasında dile göre üret; var olan kayıt dokunma (v49 yapıldı) |
+| src/app/01-temel.js:234 | `"Rutinim"` (eski mobilite listelerinden göçte oluşan rutin, id `mr_main`) | K | **v52 karar 4:** dilden bağımsız sabit "Rutinim" (göç edilen kayıt v39 öncesi, yani Türkçe dönemden; İngilizce açıkken eski yedek geri yüklense de "Rutinim"); var olan kayıt dokunma |
+| src/app/06-mobilite.js:393 (`mobAddLib`) | Kütüphaneden eklenen hareketin notu (`it.note`, `MOBILITY_LIBRARY[].note`) | K | **v52 karar 2:** yeni kayıt o anki dilde (`mobNoteL(x.m.note)`; İngilizcede `MOB_NOTE_EN`). Var olan notlar değişmez; gösterimde kütüphane notuyla birebir eşleşen Türkçe not `mobNoteL` ile çevrilir, kullanıcının kendi notu çevrilmez. Ad (`it.name`) ham kalır |
 | src/app/01-temel.js:260 | `"Rutin"` (adı bozuk rutin yedek adı) | K | dile göre üret (v49 yapıldı) |
 | src/app/01-temel.js:322 | `"Özel"` (`timeLabel` yedek değeri, takviye zamanı custom iken) | K | dile göre üret |
 | src/app/09-kas-plaka-koc-takviye.js:686 | `"Özel"` (kullanıcı etiket girmezse `s.timeLabel = ... || "Özel"`) | K | dile göre üret |

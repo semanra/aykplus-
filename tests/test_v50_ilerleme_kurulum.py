@@ -188,7 +188,8 @@ try:
       const attrs = [...c.querySelectorAll('[aria-label],[placeholder]')].map(e => (e.getAttribute('aria-label') || '') + ' ' + (e.getAttribute('placeholder') || ''));
       return (c.textContent + ' ' + attrs.join(' ')); }"""
     def fresh_ob(en):
-        c = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="en-US")
+        # v52: İngilizce herkese açık, yeni kurulum dili telefondan → Türkçe akış Türkçe telefonla (tr-TR)
+        c = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="en-US" if en else "tr-TR")
         c.add_init_script(SPLASH_OFF)
         if en: c.add_init_script("window.AYK_TEST_EN = true")
         q = c.new_page(); q.on("pageerror", lambda e: errs.append(str(e)))
@@ -251,7 +252,7 @@ try:
     q.context.close()
     # --- Türkçe akış (bayraksız): bugünkü metinler ve Türkçe örnek içerik
     q = fresh_ob(False)
-    check(not q.is_visible("#obLang") and "Hoş geldin" in q.inner_text("#onboard") and "tıbbi tavsiye" in q.inner_text("#obHealth"), "ob tr: dil seçici gizli, Türkçe karşılama + sağlık notu")
+    check(q.is_visible("#obLang") and "Hoş geldin" in q.inner_text("#onboard") and "tıbbi tavsiye" in q.inner_text("#obHealth"), "ob tr: dil seçici görünür (v52: İngilizce herkese açık), Türkçe karşılama + sağlık notu")
     q.click("#obStart"); q.click("#obNext")
     check(q.inner_text("#obErr") == "Cinsiyetini seç; kalori hesabı buna göre yapılır.", "ob tr: boş cinsiyet hatası")
     q.click("#obSexMale"); q.fill("#obAge", "30"); q.fill("#obHeight", "180"); q.fill("#obWeight", "400"); q.click("#obNext")

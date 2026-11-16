@@ -8,7 +8,7 @@ Object.assign(EN, {
   // --- sayaç geçişi (ekranda; konuşma v52'ye dek Türkçe)
   "Sola geç": "Switch to left", "Sağa geç": "Switch to right", "Sıradaki set": "Next set",
   // --- kayıt adları (yeni kopya/göç/onarım adı o anki dilde yazılır)
-  "{ad} (kopya)": "{ad} (copy)", "Rutinim": "My routine", "Rutin": "Routine",
+  "{ad} (kopya)": "{ad} (copy)", "Rutin": "Routine",
   // --- sürükleme bildirimi (mobiliteye özgü)
   "Hareket taşındı|mobilite": "Move reordered",
   // --- sesli yönlendirme kalıpları (v52'ye dek konuşma Türkçe; trFill ile Türkçe doldurulur, İngilizce girişler v52 için)
@@ -51,7 +51,8 @@ Object.assign(EN, {
   "Sayaçta: <b>sağ {sn} sn → sol {sn} sn</b>, {n} tur. {toplam}": { one: "On the timer: <b>right {sn} sec → left {sn} sec</b>, {n} round. {toplam}", other: "On the timer: <b>right {sn} sec → left {sn} sec</b>, {n} rounds. {toplam}" },
   "Sayaçta: <b>{n} × {sn} sn</b>. {toplam}": "On the timer: <b>{n} × {sn} sec</b>. {toplam}",
   "{bolge} · {n}. hareket": "{bolge} · move {n}", "Bölgesiz": "No area",
-  "{ad} azalt": "Decrease {ad}", "{ad} artır": "Increase {ad}", "Adı değiştir": "Rename",
+  "Set azalt": "Decrease sets", "Set artır": "Increase sets", "Tekrar azalt": "Decrease reps", "Tekrar artır": "Increase reps",
+  "Süre (sn) azalt": "Decrease time", "Süre (sn) artır": "Increase time", "Adı değiştir": "Rename",
   "Eski yazım": "Old format", "Okunamadı; değerleri kontrol et.": "Could not be read; check the values.",
   "Uygulama": "Format", "Tekrar": "Reps", "Set": "Sets", "Süre (sn)": "Time (sec)",
   "Taraf": "Sides", "Tek": "One", "Sağ ve sol": "Both", "Tür": "Type",

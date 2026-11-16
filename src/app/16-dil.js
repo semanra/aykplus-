@@ -1,6 +1,6 @@
 // v46: dil altyapısı. Anahtar = Türkçe metin ("metin|bağlam" biçiminde bağlam Türkçe gösterimde atılır).
 // Türkçe seçiliyken t() metni olduğu gibi döndürür; İngilizce EN sözlüğünden (17-sozluk-en.js), yoksa Türkçe.
-const EN_PUBLIC = false;   // İngilizce herkese açıldığında true
+const EN_PUBLIC = true;   // v52: İngilizce herkese açık (AYK_TEST_EN bayrağı artık etkisiz ama zararsız)
 function langAvailable() { return EN_PUBLIC || (typeof window !== "undefined" && window.AYK_TEST_EN === true); }
 function curLang() {
   try { return state && state.settings && state.settings.lang === "en" && langAvailable() ? "en" : "tr"; } catch (e) { return "tr"; }

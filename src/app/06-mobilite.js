@@ -252,10 +252,10 @@ function mobDetailHtml() {
   const id = mobArg(it.id);
   const crumb = t("{bolge} · {n}. hareket", { bolge: mobRegionL(it.region) || t("Bölgesiz"), n: idx + 1 });
   const time = it.mode === "time";
-  const stepper = (label, field, val, valId, minD, maxD) => `<div class="m-st"><div class="k">${label}</div><div class="v">
-      <button class="m-pm" data-mob-step="${field}:-1" onclick="mobStep(${id}, '${field}', -1)" ${minD ? "disabled" : ""} aria-label="${esc(t("{ad} azalt", { ad: label }))}">${svgI("minus", 18, 2.6)}</button>
+  const stepper = (label, field, val, valId, minD, maxD, decL, incL) => `<div class="m-st"><div class="k">${label}</div><div class="v">
+      <button class="m-pm" data-mob-step="${field}:-1" onclick="mobStep(${id}, '${field}', -1)" ${minD ? "disabled" : ""} aria-label="${esc(decL)}">${svgI("minus", 18, 2.6)}</button>
       <b id="${valId}" class="t-display">${val}</b>
-      <button class="m-pm" data-mob-step="${field}:1" onclick="mobStep(${id}, '${field}', 1)" ${maxD ? "disabled" : ""} aria-label="${esc(t("{ad} artır", { ad: label }))}">${svgI("plus", 18, 2.6)}</button></div></div>`;
+      <button class="m-pm" data-mob-step="${field}:1" onclick="mobStep(${id}, '${field}', 1)" ${maxD ? "disabled" : ""} aria-label="${esc(incL)}">${svgI("plus", 18, 2.6)}</button></div></div>`;
   const seg = (attr, field, opts, cur) => `<div class="m-seg" style="grid-template-columns:repeat(${opts.length},minmax(0,1fr))">${opts.map(([k, l]) =>
     `<button data-mob-${attr}="${k}" onclick="mobSet(${id}, '${field}', '${k}')" class="${String(cur) === String(k) ? "on" : ""}" aria-pressed="${String(cur) === String(k)}">${l}</button>`).join("")}</div>`;
   const chips = (attr, field, opts, cur) => `<div class="flex flex-wrap gap-2">${opts.map(([k, l]) =>
@@ -273,8 +273,9 @@ function mobDetailHtml() {
     <div class="m-lbl">${t("Uygulama")}</div>
     ${seg("mode", "mode", [["reps", t("Tekrar")], ["time", t("Süre")]], it.mode)}
     <div class="grid grid-cols-2 gap-2.5 mt-2.5">
-      ${stepper(t("Set"), "sets", it.sets, "mobDtSets", it.sets <= 1, it.sets >= 10)}
-      ${stepper(time ? t("Süre (sn)") : t("Tekrar"), "val", time ? it.sec : it.reps, "mobDtVal", vMin, vMax)}
+      ${stepper(t("Set"), "sets", it.sets, "mobDtSets", it.sets <= 1, it.sets >= 10, t("Set azalt"), t("Set artır"))}
+      ${stepper(time ? t("Süre (sn)") : t("Tekrar"), "val", time ? it.sec : it.reps, "mobDtVal", vMin, vMax,
+        time ? t("Süre (sn) azalt") : t("Tekrar azalt"), time ? t("Süre (sn) artır") : t("Tekrar artır"))}
     </div>
     <div class="m-lbl">${t("Taraf")}</div>
     ${seg("sides", "sides", [[1, t("Tek")], [2, t("Sağ ve sol")]], it.sides)}

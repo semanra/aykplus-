@@ -1,6 +1,7 @@
 # v52 bölüm 1 (görev 1): Mobilite rehberleri ("Nasıl yapılır"), kütüphane notları ve Türkçe parantezli hareket adları İngilizce.
 # Kayıtlı değerler (it.name, rehber anahtarı, mobilityLog) Türkçe/ham kalır; yalnız İngilizcede yeni eklenen kütüphane notu İngilizce (karar 2).
-import os, sys, re, subprocess, time
+# Bölüm 2 (görev 2): Hakkında, paylaşım kartı, ses. Bölüm 3 (görev 3): İngilizce bayraksız açık, Türkçe kelime taraması, göç adı "Rutinim", sahibin hedefleri.
+import os, sys, re, json, subprocess, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ortak_tohum import TEST_INIT
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -198,6 +199,82 @@ try:
     check(a and a[0] == ["Arm Circles. " + sd + " side. 2 sets, 30 seconds.", "en-GB", "en-GB"], "en: ilk hareket cümlesi İngilizce, en-GB sesi: %s" % a)
     check(b2 and b2[0][0] == ("Switch to left" if nxt == "Sol" else "Switch to right") and b2[0][1] == "en-GB", "en: geçiş cümlesi: %s" % b2)
     check(c and c[0][0] == "T52 finished. Well done." and c[0][1] == "en-GB" and not TR_CH.search(c[0][0]), "en: bitiş cümlesi: %s" % c)
+    # ================= BÖLÜM 3 (görev 3): İngilizce herkese açık (bayraksız), Türkçe kelime taraması, göç adı, sahibin hedefleri
+    sys.path.insert(0, os.path.join(REPO, "scripts", "kontrol"))
+    from ortak import SEED as K_SEED, EN_SCREENS, EN_ROOT, EN_ONBOARD_SCREENS, NO_ANIM, SPLASH_ANIM, FIXED_TIME, TR_WORD_SCAN_JS
+    from ortak_tohum import SPLASH_OFF
+    def ctx3(locale="en-US", init=TEST_INIT):
+        c = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale=locale)
+        c.add_init_script(init)   # AYK_TEST_EN bayrağı YOK
+        q = c.new_page(); q.on("pageerror", lambda e: errs.append(str(e))); return c, q
+    # (a) bayraksız: dil seçici görünür, İngilizce ve geri Türkçe
+    c3, q = ctx3(); q.goto(URL); boot(q)
+    check(q.evaluate("langAvailable()") is True and q.evaluate("window.AYK_TEST_EN") is None and q.evaluate("curLang()") == "tr", "a: bayraksız langAvailable true, sahibin kaydı Türkçe")
+    q.evaluate("openProfile()"); q.wait_for_timeout(150)
+    check(q.is_visible("#pfLang") and q.is_visible("#pfLang [data-lang-opt=en]"), "a: Profil'de dil satırı görünür")
+    bx = q.evaluate("[...document.querySelectorAll('#pfLang [data-lang-opt]')].map(e => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; })")
+    check(len(bx) == 2 and all(w >= 44 and h >= 44 for w, h in bx), "a: dil düğmeleri ≥ 44 px: %s" % bx)
+    q.click("#pfLang [data-lang-opt=en]"); q.wait_for_timeout(200)
+    check(q.evaluate("curLang()") == "en" and q.evaluate("aykStoredState().then(s => s.settings.lang)") == "en", "a: English seçilince dil en, kayda yazıldı")
+    q.evaluate("void closeProfile()"); q.wait_for_timeout(100); q.evaluate("switchTab('nutrition')"); q.wait_for_timeout(100)
+    nav = q.inner_text(".bottom-nav")
+    check("Nutrition" in nav and "Beslenme" not in nav and q.evaluate("document.documentElement.lang") == "en", "a: arayüz İngilizce: %r" % nav.replace("\n", " "))
+    q.reload(); boot(q)
+    check(q.evaluate("curLang()") == "en", "a: yeniden açılışta İngilizce kalır (bayraksız)")
+    q.evaluate("openProfile()"); q.wait_for_timeout(150); q.click("#pfLang [data-lang-opt=tr]"); q.wait_for_timeout(200)
+    q.evaluate("void closeProfile()"); q.wait_for_timeout(100)
+    nav = q.inner_text(".bottom-nav")
+    check(q.evaluate("curLang()") == "tr" and "Beslenme" in nav and q.evaluate("document.documentElement.lang") == "tr", "a: Türkçeye dönünce Türkçe: %r" % nav.replace("\n", " "))
+    # (d) sahibin kaydı Türkçede aynı hedefler
+    tg = q.evaluate("getTargets()")
+    check([tg["calTarget"], tg["proTarget"], tg["fatTarget"], tg["carbTarget"]] == [2478, 180, 69, 284], "d: sahibin hedefleri Türkçede 2478/180/69/284: %s" % [tg["calTarget"], tg["proTarget"], tg["fatTarget"], tg["carbTarget"]])
+    # (c) v39 öncesi kayıt İngilizce açıkken (ör. eski yedeğin geri yüklenmesi) göç edilince rutin adı "Rutinim"
+    OWN = json.load(open(os.path.join(REPO, "tests", "fixtures", "eski_varsayilan.json"), encoding="utf-8"))
+    legacy = {k: v for k, v in OWN.items() if k != "dataVer"}
+    legacy["mobilityRoutine"] = {"dynamic": OWN["mobilityRoutine"]["dynamic"], "static": OWN["mobilityRoutine"]["static"]}
+    legacy["settings"] = dict(OWN["settings"], lang="en")
+    q.evaluate("setLang('en')"); q.wait_for_timeout(100)
+    r = q.evaluate("(raw) => { const s = normalizeState(raw); return { cur: curLang(), names: s.mobilityRoutine.routines.map(x => x.name), n: s.mobilityRoutine.routines[0].items.length }; }", legacy)
+    check(r["cur"] == "en" and r["names"] == ["Rutinim"] and r["n"] == 10, "c: v39 öncesi kayıt İngilizcede göç: rutin adı 'Rutinim' (%s)" % r)
+    q.evaluate("setLang('tr')")
+    c3.close()
+    # yeni kurulum: İngilizce telefonda kurulum İngilizce açılır ve dil seçici görünür; Türkçe telefonda Türkçe
+    def fresh(locale):
+        c, q = ctx3(locale, SPLASH_OFF); q.goto(URL); boot(q)
+        q.evaluate("() => { localStorage.clear(); void indexedDB.deleteDatabase('aykplus'); }"); q.reload(); boot(q); return c, q
+    c, q = fresh("en-US")
+    check(q.evaluate("state.settings.lang") == "en" and q.is_visible("#obLang") and "Welcome" in q.inner_text("#onboard"), "a: İngilizce telefonda yeni kurulum İngilizce, #obLang görünür")
+    c.close()
+    c, q = fresh("tr-TR")
+    check(q.evaluate("state.settings.lang") == "tr" and q.is_visible("#obLang") and "Hoş geldin" in q.inner_text("#onboard"), "a: Türkçe telefonda yeni kurulum Türkçe, #obLang görünür")
+    c.close()
+    # (b) Türkçe kelime taraması: kontrol aracının bütün İngilizce ekranları (bayraksız)
+    c, q = ctx3("en-GB", NO_ANIM); q.clock.set_fixed_time(FIXED_TIME); q.goto(URL); boot(q)
+    q.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); q.reload(); boot(q)
+    q.evaluate(K_SEED); q.wait_for_timeout(250)
+    hits = []
+    for name, js in EN_SCREENS:
+        if name == "en-n-bugun":
+            q.evaluate("setLang('en')"); q.evaluate("loadFoodsEn()"); q.wait_for_function("typeof USDA_EN !== 'undefined'"); q.wait_for_timeout(300)
+            # tarayıcının kendi sınaması: harfsiz Türkçe kelime ve Türkçe harf yakalanır, kullanıcı içeriği yakalanmaz
+            pr = q.evaluate("""(js) => { const box = document.createElement('div'); box.id = 't52probe'; box.style.cssText = 'position:fixed;top:0;left:0;z-index:99999';
+              box.innerHTML = '<p>Show Tumu</p><p>10 dk rest</p><p>yeni çay</p><p>1. GÜN: Üst Vücut A</p><p>Sushi Kaydet Rutinim</p>'; document.body.appendChild(box);
+              const h = eval(js)('#t52probe'); box.remove(); return h.map(x => x.m); }""", TR_WORD_SCAN_JS)
+            check(pr == ["Tumu", "dk", "ç", "Kaydet"], "b: tarayıcı öz-sınaması (Tumu, dk, ç, Kaydet yakalanır; fikstür gün adı ve rutin adı hariç): %s" % pr)
+        q.evaluate("() => { " + js + " }"); q.wait_for_timeout(200)
+        if name in ("en-n-bugun", "en-p-genel"): check(q.evaluate("curLang()") == "en", "b: %s İngilizce" % name)
+        hits += [(name, h["t"], h["m"]) for h in q.evaluate(TR_WORD_SCAN_JS, EN_ROOT.get(name))]
+    check(not hits, "b: %d İngilizce ekranda Türkçe harf/kelime yok: %s" % (len(EN_SCREENS), hits[:8]))
+    c.close()
+    c, q = ctx3("en-GB", SPLASH_ANIM); q.clock.set_fixed_time(FIXED_TIME); q.goto(URL); boot(q)
+    q.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); q.reload(); boot(q)
+    hits = []
+    for name, js in EN_ONBOARD_SCREENS:
+        if js: q.evaluate("() => { " + js + " }")
+        q.wait_for_timeout(150)
+        hits += [(name, h["t"], h["m"]) for h in q.evaluate(TR_WORD_SCAN_JS, "#onboard")]
+    check(not hits and q.get_attribute("#onboard", "data-step") == "7", "b: İngilizce kurulum 1–7'de Türkçe harf/kelime yok (dil seçicideki 'Türkçe' hariç): %s" % hits[:8])
+    c.close()
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

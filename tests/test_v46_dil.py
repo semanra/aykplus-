@@ -43,14 +43,14 @@ try:
     # 2) telefon en-US + bayrak açıkken sahibin kaydı Türkçe
     pg = page("en-US", flag=True)
     check(pg.evaluate("curLang()") == "tr", "telefon İngilizce, eski kayıt Türkçe kalır")
-    # 4) kayıtta lang en ama bayrak yok
+    # 4) kayıtta lang en, bayrak yok — v52: İngilizce herkese açık (EN_PUBLIC = true), bayraksız da en
     pg.context.close()
     pg = page("en-US", flag=False)
     pg.evaluate("state.settings.lang = 'en'")
-    check(pg.evaluate("curLang()") == "tr" and pg.evaluate("langAvailable()") is False, "kayıtta en ama İngilizce yayında değil: tr")
+    check(pg.evaluate("curLang()") == "en" and pg.evaluate("langAvailable()") is True, "v52: kayıtta en, bayraksız da en (İngilizce yayında)")
     pg.context.close()
     # 3) yeni kurulum
-    check(fresh_lang("en-US", False) == ["tr", "tr"], "İngilizce gizliyken yeni kurulum tr")
+    check(fresh_lang("en-US", False) == ["en", "en"], "v52: bayraksız yeni kurulum telefon diline göre en (İngilizce herkese açık)")
     check(fresh_lang("en-US", True) == ["en", "en"], "bayrakla yeni kurulum telefon diline göre en")
     check(fresh_lang("tr-TR", True) == ["tr", "tr"], "Türkçe telefonda tr")
     # 5) geçersiz lang
@@ -115,14 +115,14 @@ try:
     check(pg.evaluate("tn('1', '{n} z')") == "1 z1" and pg.evaluate("tn('3', '{n} y')") == "3 ys", "tn: sayısal metin n")
     check(pg.evaluate("t('{n} y', {n: 2})") == "2 ys", "t: nesne girişi other ile")
     pg.context.close()
-    # bayraksız: dil satırı ve kurulum seçimi görünmez
+    # bayraksız: v52'den beri İngilizce herkese açık → dil satırı ve kurulum seçimi GÖRÜNÜR (eskiden gizliydi)
     pg = page("en-US", flag=False)
     pg.evaluate("openProfile()")
-    check(pg.evaluate("document.getElementById('pfLang').classList.contains('hidden')") and not pg.is_visible("[data-lang-opt]"), "bayraksız: Profil'de dil satırı yok")
+    check(not pg.evaluate("document.getElementById('pfLang').classList.contains('hidden')") and pg.is_visible("#pfLang [data-lang-opt]"), "v52 bayraksız: Profil'de dil satırı görünür")
     pg.context.close()
     pg = page("tr-TR", flag=False, seeded=False)
     pg.evaluate("() => { localStorage.clear(); void indexedDB.deleteDatabase('aykplus'); }"); pg.reload(); boot(pg)
-    check(pg.locator("#onboard [data-lang-opt]").count() == 0, "bayraksız: kurulum adım 1'de dil seçimi yok")
+    check(pg.locator("#onboard [data-lang-opt]").count() == 2, "v52 bayraksız: kurulum adım 1'de dil seçimi var")
     pg.context.close()
     # bayraklı: Profil → Dil → English
     pg = page("tr-TR", flag=True)

@@ -112,8 +112,9 @@ SCREENS = [
 SCREEN_ROOT = {"profil": "#profilePage", "profil-orta": "#profilePage", "profil-alt": "#profilePage", "m-sayac": "#mobTimer",
                "m-seans-tekrar": "#mobTimer", "m-seans-sure": "#mobTimer", "m-bitis": "#mobTimer"}
 
-# v47: İngilizce ölçüm ekranları (piksel karşılaştırması YOK, yalnız taşma / 44 px / okunurluk). setLang('en') ile açılır (AYK_TEST_EN).
-EN_INIT = NO_ANIM + ";window.AYK_TEST_EN = true"
+# v47: İngilizce ölçüm ekranları (piksel karşılaştırması YOK, yalnız taşma / 44 px / okunurluk). setLang('en') ile açılır.
+# v52: İngilizce herkese açık (EN_PUBLIC) → test bayrağı AYK_TEST_EN gerekmez; ayrıca TR_WORD_SCAN_JS ile Türkçe metin taranır.
+EN_INIT = NO_ANIM
 EN_SCREENS = [
   ("en-n-bugun", "setLang('en'); switchTab('nutrition'); setNutriView('today')"),
   ("en-n-menu", "setNutriView('menus')"),
@@ -216,4 +217,41 @@ for (const e of ROOT.querySelectorAll('button, a[href], input:not([type=hidden])
   if (r.width < 44 || r.height < 44) out.small.push({ t: ((e.getAttribute('aria-label') || e.textContent || e.getAttribute('placeholder') || e.tagName) + '').replace(/\s+/g,' ').trim().slice(0, 30), w: Math.round(r.width), h: Math.round(r.height), at: path(e) });
 }
 return out;
+}"""
+
+# v52: İngilizce ekranlarda Türkçe metin taraması (görünen metin + aria-label/placeholder).
+# Türkçe harf ya da Türkçe harfsiz Türkçe kelime ("dk", "sn", "kez", "Tumu"…) yakalanır. Kullanıcı içeriği hariç:
+# kayıttaki öğün/gün/hareket/rutin/takviye/kombo/özel besin adları ve notları, Türk yemekleri (r_…) ve
+# BASE_EN'de Türkçe adıyla kalan Türkiye'ye özgü ürünler, dil seçicideki "Türkçe".
+TR_WORD_SCAN_JS = r"""(rootSel) => {
+const TR = /[çğıöşüÇĞİÖŞÜ]/, W = /\b(dk|sn|kez|tekrar|gun|Tumu|Kaydet|Geri|Ekle|Sil|Hedef|Bugun)\b/;
+const U = new Set(["Türkçe"]);
+const add = s => { if (typeof s !== 'string') return; s = s.trim(); if (!s) return; U.add(s); try { U.add(upperL(s)); U.add(lowerL(s)); } catch (e) {}
+  if (s.includes(':')) s.split(':').forEach(p => { p = p.trim(); if (p.length > 2) { U.add(p); try { U.add(upperL(p)); } catch (e) {} } }); };
+const S = state;
+const meals = [...(S.meals || []), ...(S.restMeals || []), ...(S.dayPlan ? [...(S.dayPlan.train || []), ...(S.dayPlan.rest || [])] : [])];
+meals.forEach(m => { add(m.title); add(m.targetNote); (m.items || []).forEach(i => { if (i.est) add(i.est.name); }); });
+(S.workoutDays || []).forEach(d => { add(d.name); (d.exercises || []).forEach(e => { add(e.name); add(exNameL(e.name)); add(e.note); }); });
+Object.values(S.exerciseHistory || {}).forEach(l => (l || []).forEach(x => { add(x.name); add(exNameL(x.name)); }));
+(S.workoutLogs || []).forEach(l => add(l.dayName));
+mobRoutines().forEach(r => { add(r.name); (r.items || []).forEach(i => { add(i.name); add(mobNameL(i.name)); if (mobNoteL(i.note) === i.note) add(i.note); }); });
+(S.supplementList || []).forEach(s => { add(s.name); add(s.timeLabel); add(s.note); });
+(S.combos || []).forEach(c => add(c.name));
+Object.values(S.customFoods || {}).forEach(f => add(f.name));
+(S.missSearches || []).forEach(x => add(typeof x === 'string' ? x : x && x.q));
+const db = getFoodDB();
+Object.keys(db).forEach(id => { const f = db[id]; const b = baseIdOf(f);
+  if (id.startsWith('r_') || id.startsWith('custom') || (b && Object.prototype.hasOwnProperty.call(BASE_EN, b))) { add(foodNameL(f)); add(f.name); } });
+const US = [...U].sort((a, b) => b.length - a.length);
+const strip = s => { for (const u of US) if (s.includes(u)) s = s.split(u).join(' '); return s; };
+const ROOT = rootSel ? document.querySelector(rootSel) : document.body;
+const vis = e => e && e.checkVisibility && e.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+const hits = [], seen = new Set();
+const test = (raw, where) => { const s = raw.replace(/\s+/g, ' ').trim(); if (!s || seen.has(s)) return; seen.add(s);
+  const r = strip(s); const m = r.match(TR) || r.match(W); if (m) hits.push({ t: s.slice(0, 70), m: m[0], at: where }); };
+const tw = document.createTreeWalker(ROOT, NodeFilter.SHOW_TEXT);
+for (let n = tw.nextNode(); n; n = tw.nextNode()) { const p = n.parentElement; if (!p || p.closest('script,style,svg') || !vis(p)) continue; test(n.textContent, p.id || p.tagName.toLowerCase()); }
+for (const e of ROOT.querySelectorAll('[aria-label],[placeholder]')) { if (!vis(e)) continue;
+  ['aria-label', 'placeholder'].forEach(a => { const v = e.getAttribute(a); if (v) test(v, (e.id || e.tagName.toLowerCase()) + '@' + a); }); }
+return hits;
 }"""

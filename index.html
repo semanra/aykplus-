@@ -1467,7 +1467,7 @@
         </section>
 
         <div class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v51</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v52</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -2705,7 +2705,7 @@ function migrateState(s, rawHadGoal) {
     const mr = s.mobilityRoutine;
     if (!Array.isArray(mr.routines)) {
       const items = Array.isArray(mr.items) ? mr.items : [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
-      mr.routines = [{ id: "mr_main", name: t("Rutinim"), items }];
+      mr.routines = [{ id: "mr_main", name: "Rutinim", items }];   // v52 karar 4: göç edilen kayıt v39 öncesi (Türkçe dönem) → dilden bağımsız sabit ad
     }
   }
   if (v < 2) {   // v26: kalori halkası bir kereliğine "Yenen"e (eskiden varsayılan "Plan" da kaydediliyordu)
@@ -5856,10 +5856,10 @@ function mobDetailHtml() {
   const id = mobArg(it.id);
   const crumb = t("{bolge} · {n}. hareket", { bolge: mobRegionL(it.region) || t("Bölgesiz"), n: idx + 1 });
   const time = it.mode === "time";
-  const stepper = (label, field, val, valId, minD, maxD) => `<div class="m-st"><div class="k">${label}</div><div class="v">
-      <button class="m-pm" data-mob-step="${field}:-1" onclick="mobStep(${id}, '${field}', -1)" ${minD ? "disabled" : ""} aria-label="${esc(t("{ad} azalt", { ad: label }))}">${svgI("minus", 18, 2.6)}</button>
+  const stepper = (label, field, val, valId, minD, maxD, decL, incL) => `<div class="m-st"><div class="k">${label}</div><div class="v">
+      <button class="m-pm" data-mob-step="${field}:-1" onclick="mobStep(${id}, '${field}', -1)" ${minD ? "disabled" : ""} aria-label="${esc(decL)}">${svgI("minus", 18, 2.6)}</button>
       <b id="${valId}" class="t-display">${val}</b>
-      <button class="m-pm" data-mob-step="${field}:1" onclick="mobStep(${id}, '${field}', 1)" ${maxD ? "disabled" : ""} aria-label="${esc(t("{ad} artır", { ad: label }))}">${svgI("plus", 18, 2.6)}</button></div></div>`;
+      <button class="m-pm" data-mob-step="${field}:1" onclick="mobStep(${id}, '${field}', 1)" ${maxD ? "disabled" : ""} aria-label="${esc(incL)}">${svgI("plus", 18, 2.6)}</button></div></div>`;
   const seg = (attr, field, opts, cur) => `<div class="m-seg" style="grid-template-columns:repeat(${opts.length},minmax(0,1fr))">${opts.map(([k, l]) =>
     `<button data-mob-${attr}="${k}" onclick="mobSet(${id}, '${field}', '${k}')" class="${String(cur) === String(k) ? "on" : ""}" aria-pressed="${String(cur) === String(k)}">${l}</button>`).join("")}</div>`;
   const chips = (attr, field, opts, cur) => `<div class="flex flex-wrap gap-2">${opts.map(([k, l]) =>
@@ -5877,8 +5877,9 @@ function mobDetailHtml() {
     <div class="m-lbl">${t("Uygulama")}</div>
     ${seg("mode", "mode", [["reps", t("Tekrar")], ["time", t("Süre")]], it.mode)}
     <div class="grid grid-cols-2 gap-2.5 mt-2.5">
-      ${stepper(t("Set"), "sets", it.sets, "mobDtSets", it.sets <= 1, it.sets >= 10)}
-      ${stepper(time ? t("Süre (sn)") : t("Tekrar"), "val", time ? it.sec : it.reps, "mobDtVal", vMin, vMax)}
+      ${stepper(t("Set"), "sets", it.sets, "mobDtSets", it.sets <= 1, it.sets >= 10, t("Set azalt"), t("Set artır"))}
+      ${stepper(time ? t("Süre (sn)") : t("Tekrar"), "val", time ? it.sec : it.reps, "mobDtVal", vMin, vMax,
+        time ? t("Süre (sn) azalt") : t("Tekrar azalt"), time ? t("Süre (sn) artır") : t("Tekrar artır"))}
     </div>
     <div class="m-lbl">${t("Taraf")}</div>
     ${seg("sides", "sides", [[1, t("Tek")], [2, t("Sağ ve sol")]], it.sides)}
@@ -10308,7 +10309,7 @@ function finishOnboarding() {
 }
 // v46: dil altyapısı. Anahtar = Türkçe metin ("metin|bağlam" biçiminde bağlam Türkçe gösterimde atılır).
 // Türkçe seçiliyken t() metni olduğu gibi döndürür; İngilizce EN sözlüğünden (17-sozluk-en.js), yoksa Türkçe.
-const EN_PUBLIC = false;   // İngilizce herkese açıldığında true
+const EN_PUBLIC = true;   // v52: İngilizce herkese açık (AYK_TEST_EN bayrağı artık etkisiz ama zararsız)
 function langAvailable() { return EN_PUBLIC || (typeof window !== "undefined" && window.AYK_TEST_EN === true); }
 function curLang() {
   try { return state && state.settings && state.settings.lang === "en" && langAvailable() ? "en" : "tr"; } catch (e) { return "tr"; }
@@ -11241,7 +11242,7 @@ Object.assign(EN, {
   // --- sayaç geçişi (ekranda; konuşma v52'ye dek Türkçe)
   "Sola geç": "Switch to left", "Sağa geç": "Switch to right", "Sıradaki set": "Next set",
   // --- kayıt adları (yeni kopya/göç/onarım adı o anki dilde yazılır)
-  "{ad} (kopya)": "{ad} (copy)", "Rutinim": "My routine", "Rutin": "Routine",
+  "{ad} (kopya)": "{ad} (copy)", "Rutin": "Routine",
   // --- sürükleme bildirimi (mobiliteye özgü)
   "Hareket taşındı|mobilite": "Move reordered",
   // --- sesli yönlendirme kalıpları (v52'ye dek konuşma Türkçe; trFill ile Türkçe doldurulur, İngilizce girişler v52 için)
@@ -11284,7 +11285,8 @@ Object.assign(EN, {
   "Sayaçta: <b>sağ {sn} sn → sol {sn} sn</b>, {n} tur. {toplam}": { one: "On the timer: <b>right {sn} sec → left {sn} sec</b>, {n} round. {toplam}", other: "On the timer: <b>right {sn} sec → left {sn} sec</b>, {n} rounds. {toplam}" },
   "Sayaçta: <b>{n} × {sn} sn</b>. {toplam}": "On the timer: <b>{n} × {sn} sec</b>. {toplam}",
   "{bolge} · {n}. hareket": "{bolge} · move {n}", "Bölgesiz": "No area",
-  "{ad} azalt": "Decrease {ad}", "{ad} artır": "Increase {ad}", "Adı değiştir": "Rename",
+  "Set azalt": "Decrease sets", "Set artır": "Increase sets", "Tekrar azalt": "Decrease reps", "Tekrar artır": "Increase reps",
+  "Süre (sn) azalt": "Decrease time", "Süre (sn) artır": "Increase time", "Adı değiştir": "Rename",
   "Eski yazım": "Old format", "Okunamadı; değerleri kontrol et.": "Could not be read; check the values.",
   "Uygulama": "Format", "Tekrar": "Reps", "Set": "Sets", "Süre (sn)": "Time (sec)",
   "Taraf": "Sides", "Tek": "One", "Sağ ve sol": "Both", "Tür": "Type",

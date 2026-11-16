@@ -5,7 +5,7 @@
 # Gereksinim: pip install playwright pillow && python -m playwright install chromium
 import os, sys, json, shutil, subprocess, tarfile, io
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
-from ortak import TEST_INIT, SPLASH_ANIM, server, SEED, SCREENS, ONBOARD_SCREENS, FRESH_SCREENS, FIXED_NAMES, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME, EN_INIT, EN_SCREENS, EN_ROOT, EN_ONBOARD_SCREENS
+from ortak import TEST_INIT, SPLASH_ANIM, server, SEED, SCREENS, ONBOARD_SCREENS, FRESH_SCREENS, FIXED_NAMES, SCREEN_ROOT, AUDIT_JS, NO_ANIM, FIXED_TIME, EN_INIT, EN_SCREENS, EN_ROOT, EN_ONBOARD_SCREENS, TR_WORD_SCAN_JS
 REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
 OUT = os.path.join(REPO, "build", "kontrol")
 HIZLI = "--hizli" in sys.argv
@@ -25,7 +25,7 @@ def shoot(root, out_dir, scheme):
     os.makedirs(out_dir, exist_ok=True); res = {}; errs = []
     with server(root) as url, sync_playwright() as p:
         b = p.chromium.launch()
-        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True, color_scheme=scheme)
+        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True, color_scheme=scheme, locale="tr-TR")   # v52: Türkçe telefon
         ctx.add_init_script(NO_ANIM)
         pg = ctx.new_page(); pg.clock.set_fixed_time(FIXED_TIME)
         pg.on("pageerror", lambda e: errs.append(str(e)))
@@ -46,7 +46,7 @@ def shoot_fresh(root, out_dir, scheme):
     os.makedirs(out_dir, exist_ok=True); res = {}; errs = []
     with server(root) as url, sync_playwright() as p:
         b = p.chromium.launch()
-        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True, color_scheme=scheme)
+        ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True, color_scheme=scheme, locale="tr-TR")   # v52: yeni kurulum dili telefondan; Türkçe kurulum ekranları
         ctx.add_init_script(SPLASH_ANIM)
         pg = ctx.new_page(); pg.clock.set_fixed_time(FIXED_TIME)
         pg.on("pageerror", lambda e: errs.append(str(e)))
@@ -80,7 +80,7 @@ def shoot_en(root, out_dir, scheme):
             except Exception as e: errs.append(f"{name}: {str(e)[:160]}")
             pg.wait_for_timeout(220); pg.evaluate("window.scrollTo(0,0)")
             pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=True)
-            res[name] = pg.evaluate(AUDIT_JS, EN_ROOT.get(name))
+            res[name] = pg.evaluate(AUDIT_JS, EN_ROOT.get(name)); res[name]["trtext"] = pg.evaluate(TR_WORD_SCAN_JS, EN_ROOT.get(name))   # v52
         b.close()
     return res, errs
 
@@ -91,7 +91,7 @@ def shoot_en_fresh(root, out_dir, scheme):
     with server(root) as url, sync_playwright() as p:
         b = p.chromium.launch()
         ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True, color_scheme=scheme, locale="en-GB")
-        ctx.add_init_script(SPLASH_ANIM + ";window.AYK_TEST_EN = true")
+        ctx.add_init_script(SPLASH_ANIM)   # v52: bayraksız (İngilizce herkese açık)
         pg = ctx.new_page(); pg.clock.set_fixed_time(FIXED_TIME)
         pg.on("pageerror", lambda e: errs.append(str(e)))
         pg.goto(url); pg.wait_for_timeout(400); pg.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); pg.reload(); pg.wait_for_timeout(700)
@@ -101,7 +101,7 @@ def shoot_en_fresh(root, out_dir, scheme):
             except Exception as e: errs.append(f"{name}: {str(e)[:160]}")
             pg.wait_for_timeout(250); pg.evaluate("window.scrollTo(0,0)")
             pg.screenshot(path=os.path.join(out_dir, name + ".png"), full_page=False)
-            res[name] = pg.evaluate(AUDIT_JS, "#onboard")
+            res[name] = pg.evaluate(AUDIT_JS, "#onboard"); res[name]["trtext"] = pg.evaluate(TR_WORD_SCAN_JS, "#onboard")   # v52
         b.close()
     return res, errs
 
@@ -194,10 +194,11 @@ def main():
             items = []
             if a["overflow"] > 0: items.append(f"yatay taşma {a['overflow']} px")
             items += [f"okunurluk {c['r']}/{c['need']} “{c['t']}” ({c['at']})" for c in {(c['t'], c['at']): c for c in a["contrast"]}.values()]
+            items += [f"Türkçe metin “{h['t']}” ({h['m']}, {h['at']})" for h in a.get("trtext", [])[:3]]   # v52: yalnız İngilizce ekranlarda
             items += [f"küçük yazı {t['fs']} px “{t['t']}”" for t in a["tiny"][:3]]
             items += [f"dokunma alanı {s['w']}×{s['h']} “{s['t']}”" for s in a["small"] if not s["at"].endswith("polygon")][:4]
             if items: bad += 1; lines.append(f"- `{name}`: " + "; ".join(items[:6]))
-        if not bad: lines.append("- Sorun yok (okunurluk, 44 px, 11 px altı yazı, yatay taşma).")
+        if not bad: lines.append("- Sorun yok (okunurluk, 44 px, 11 px altı yazı, yatay taşma; İngilizce ekranlarda Türkçe metin).")
         if e1: lines += ["", "### Sayfa hataları", ""] + [f"- {e}" for e in e1]; problem = True
         problem = problem or bad > 0
         lines.append("")

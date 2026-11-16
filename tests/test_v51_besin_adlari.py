@@ -72,7 +72,8 @@ try:
     check(pg.evaluate(NAME) == TR_NAME, "tr: foodNameL Türkçe: %r" % pg.evaluate(NAME))
     check(pg.evaluate("portionL(getFoodDB()['u175139'], 1, 'X')") == "X", "tr: portionL etiketi aynen")
     pg.evaluate("setLang('en')"); pg.wait_for_timeout(300)
-    check(not any("foods-en.js" in u for u in reqs), "tr (bayraksız): setLang('en') sonrası da istek yok")
+    # v52: İngilizce herkese açık → bayraksız da setLang('en') foods-en.js'i yükler (eskiden İngilizce gizliyken istek yoktu)
+    check(any("foods-en.js" in u for u in reqs), "v52 bayraksız: setLang('en') sonrası foods-en.js yüklenir")
     ctx.close()
     # ===== İngilizce açılış (kayıtlı dil en): yüklenir
     ctx, pg, reqs = newctx(True)

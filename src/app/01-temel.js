@@ -231,7 +231,7 @@ function migrateState(s, rawHadGoal) {
     const mr = s.mobilityRoutine;
     if (!Array.isArray(mr.routines)) {
       const items = Array.isArray(mr.items) ? mr.items : [...mr.dynamic.map(x => mobFromLegacy(x, "dynamic")), ...mr.static.map(x => mobFromLegacy(x, "static"))];
-      mr.routines = [{ id: "mr_main", name: t("Rutinim"), items }];
+      mr.routines = [{ id: "mr_main", name: "Rutinim", items }];   // v52 karar 4: göç edilen kayıt v39 öncesi (Türkçe dönem) → dilden bağımsız sabit ad
     }
   }
   if (v < 2) {   // v26: kalori halkası bir kereliğine "Yenen"e (eskiden varsayılan "Plan" da kaydediliyordu)
