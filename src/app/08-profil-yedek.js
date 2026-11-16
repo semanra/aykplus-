@@ -8,7 +8,7 @@ function fillProfileFields() {
   const st = state.settings;
   $("setSex").value = st.sex;
   $("setAge").value = st.age;
-  $("setHeight").value = st.height;
+  $("setHeight").value = fmtNum(st.height);
   if (isImperial()) { const [f, i] = cmToFtIn(st.height); $("setHeightFt").value = f; $("setHeightIn").value = i; }   // v53
   $("pfWeight").value = fmtNum(num(bodyKgToDisp(num(state.weight, 0))));
   $("setTarget").value = fmtNum(num(bodyKgToDisp(num(st.targetWeight, 82))));
@@ -215,7 +215,7 @@ function applyProfileFields(changedId) {
   st.sex = $("setSex").value === "female" ? "female" : "male";
   st.age = Math.max(12, Math.min(99, Math.round(num($("setAge").value, st.age))));
   if (hImp !== null) st.height = hImp;
-  else if (!($("setHeight").value.trim() === String(st.height) && st.height >= 120 && st.height <= 230)) st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));   // v53: kutudaki değer aynıysa (175,3) yuvarlanmaz
+  else if (!(round1(num($("setHeight").value, NaN)) === round1(st.height) && st.height >= 120 && st.height <= 230)) st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));   // v53: kutudaki değer aynıysa (175,3) yuvarlanmaz
   if (isImperial()) { const tk = num(keepBodyKg($("setTarget").value, st.targetWeight), NaN); if (isFinite(tk)) st.targetWeight = Math.max(30, Math.min(250, tk)); }   // v53: lb; kg 3 ondalık, round1 YOK
   else { const tw = round1(num($("setTarget").value, st.targetWeight)); if (tw !== round1(num(st.targetWeight)) || !(st.targetWeight >= 30 && st.targetWeight <= 250)) st.targetWeight = Math.max(30, Math.min(250, tw)); }
   st.activity = ["low", "mid", "high"].includes($("setActivity").value) ? $("setActivity").value : "mid";

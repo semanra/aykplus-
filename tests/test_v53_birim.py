@@ -263,6 +263,30 @@ try:
     pg.select_option("#ptBar", "45"); pg.wait_for_timeout(40)
     check(pg.evaluate("state.settings.barKg") == 20.412, "2: 45 lb bar = 20.412 kg")
     pg.evaluate("closeModal('chartModal')")
+    # I1: bar birim değişince en yakın seçeneğe eşlenir, ayar yazılmaz
+    pg.evaluate("setPlateBar(35)"); pg.evaluate("setUnits('metric')"); pg.wait_for_timeout(60)
+    check(pg.evaluate("barDisp()") == 15 and pg.evaluate("platesFor(100, barDisp()).ok") is True and pg.evaluate("state.settings.barKg") == 15.876, "2: imperial 35 lb bar → metrik: barDisp 15, ayar yazılmaz")
+    pg.evaluate("openPlateTool(0)"); pg.wait_for_timeout(60)
+    check(pg.input_value("#ptBar") == "15", "2: metrik plaka aracında 15 kg bar seçili")
+    pg.evaluate("closeModal('chartModal')")
+    pg.evaluate("state.settings.barKg = 20.412"); check(pg.evaluate("barDisp()") == 20, "2: 20.412 kg → metrikte 20")
+    pg.evaluate("state.settings.barKg = 15"); pg.evaluate("setUnits('imperial')"); pg.wait_for_timeout(60)
+    check(pg.evaluate("barDisp()") == 35, "2: metrik 15 kg bar → imperial 35 lb")
+    pg.evaluate("state.settings.barKg = 20; renderAll()")
+    # M3: lb'de girilen makine ağırlıkları tam adım çıkarır
+    r = pg.evaluate("""(() => { const ex = { name: 'ZZ Test Makine', kind: 'weight', equip: 'stack', sets: [100, 150, 250, 400].map(l => ({ kg: dispToKg(l), reps: 8 })) };
+      const L = inferLevels(ex); const list = levelListOf(ex); return [kgToDisp(L.step), kgToDisp(L.start), list.map(v => kgToDisp(v)).slice(0, 3), list.map(v => kgToDisp(v)).includes(400), list.includes(0)]; })()""")
+    check(r[0] == 50 and r[1] == 50 and r[2][:2] == [50, 100] and r[3] is True and r[4] is False, "2: inferLevels lb: adım / başlangıç tam, 400 lb 400, sıfır kademe yok: %s" % (r,))
+    # M1: wTxt ekleri + CSS değişkeni + statik anahtar kontrolü
+    r = pg.evaluate("[wTxt(\"100 kg'dan\"), wTxt(\"kg'ın\"), wTxt(\"kg'la\"), wTxt('var(--d-kg) kg')]")
+    check(r == ["100 lb'den", "lb'nin", "lb'yle", "var(--d-kg) lb"], "2: wTxt yeni ekler, --d-kg bozulmaz: %s" % r)
+    import glob as _g
+    bad = []
+    for f in _g.glob(os.path.join(REPO, "src", "app", "*.js")):
+        for m in re.finditer(r'wTxt\((?:t|tn)\(\s*("(?:[^"\\]|\\.)*")', open(f, encoding="utf-8").read()):
+            for suf in re.findall(r"(?<![\w-])kg('[^\s\d{}.,;:)]*)?", m.group(1)):
+                if suf and suf not in ("'a", "'da", "'ı", "'lık"): bad.append(m.group(1)[:50])
+    check(not bad, "2: wTxt'e giden anahtarlar yalnız kg / kg'a / kg'da / kg'ı / kg'lık: %s" % bad)
     # artış adımı ve öneri: 5 lb
     r = pg.evaluate("[incDisp(2.5), incDisp(2), incDisp(5), incDisp(1.25), incDisp(dispToKg(7.5)), incDisp(dispToKg(1)), incDisp(3)]")
     check(r == [5, 5, 10, 2.5, 7.5, 1, 7.5], "2: artış adımı lb (2,5 kg → 5, 2 → 5, 5 → 10, 1,25 → 2,5; lb'de girilen aynen): %s" % r)

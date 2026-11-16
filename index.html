@@ -6927,7 +6927,7 @@ function fillProfileFields() {
   const st = state.settings;
   $("setSex").value = st.sex;
   $("setAge").value = st.age;
-  $("setHeight").value = st.height;
+  $("setHeight").value = fmtNum(st.height);
   if (isImperial()) { const [f, i] = cmToFtIn(st.height); $("setHeightFt").value = f; $("setHeightIn").value = i; }   // v53
   $("pfWeight").value = fmtNum(num(bodyKgToDisp(num(state.weight, 0))));
   $("setTarget").value = fmtNum(num(bodyKgToDisp(num(st.targetWeight, 82))));
@@ -7134,7 +7134,7 @@ function applyProfileFields(changedId) {
   st.sex = $("setSex").value === "female" ? "female" : "male";
   st.age = Math.max(12, Math.min(99, Math.round(num($("setAge").value, st.age))));
   if (hImp !== null) st.height = hImp;
-  else if (!($("setHeight").value.trim() === String(st.height) && st.height >= 120 && st.height <= 230)) st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));   // v53: kutudaki değer aynıysa (175,3) yuvarlanmaz
+  else if (!(round1(num($("setHeight").value, NaN)) === round1(st.height) && st.height >= 120 && st.height <= 230)) st.height = Math.max(120, Math.min(230, Math.round(num($("setHeight").value, st.height))));   // v53: kutudaki değer aynıysa (175,3) yuvarlanmaz
   if (isImperial()) { const tk = num(keepBodyKg($("setTarget").value, st.targetWeight), NaN); if (isFinite(tk)) st.targetWeight = Math.max(30, Math.min(250, tk)); }   // v53: lb; kg 3 ondalık, round1 YOK
   else { const tw = round1(num($("setTarget").value, st.targetWeight)); if (tw !== round1(num(st.targetWeight)) || !(st.targetWeight >= 30 && st.targetWeight <= 250)) st.targetWeight = Math.max(30, Math.min(250, tw)); }
   st.activity = ["low", "mid", "high"].includes($("setActivity").value) ? $("setActivity").value : "mid";
@@ -7594,12 +7594,12 @@ const PLATE_CLS_LB = { 45: "bg-rose-600 text-white", 35: "bg-sky-600 text-white"
 let plateCtx = { name: "" };
 
 // v53: plaka aracı GÖSTERİM biriminde çalışır (imperial'de lb). Bar: settings.barKg (kg) → seçenek; imperial'de
-// hiçbir seçeneğe uymuyorsa (ör. sahibin 20 kg = 44 lb) ayar yazılmadan 45 lb varsayılır.
+// her iki yönde en yakın seçenek gösterilir (20 kg → 45 lb, 35 lb → 15 kg); ayar yazılmaz.
 function barDisp() {
   const kg = num(state.settings.barKg, 20);
-  if (!isImperial()) return kg;
-  const d = num(kgToDisp(kg));
-  return barOptions().includes(d) ? d : 45;
+  if (!(kg > 0)) return 0;
+  const d = isImperial() ? kg / LB_KG : kg;   // kayıtlı kg → gösterim birimi
+  return barOptions().filter(o => o > 0).reduce((x, o) => Math.abs(o - d) < Math.abs(x - d) ? o : x);   // en yakın seçenek, ayar yazılmaz
 }
 function setPlateBar(v) {
   state.settings.barKg = isImperial() ? dispToKg(num(v, 45)) : num(v, 20);
@@ -8372,18 +8372,21 @@ function levelsToList(L) {
 // Geçmişte girilen kilolardan makinenin kademe aralığını tahmin eder
 function inferLevels(ex) {
   if (!usesLevels(ex)) return null;
+  // v53: imperial'de gösterim biriminde (lb) çıkarım; kg yuvarlama kalıntısı (4,53 / 0,06) oluşmasın
+  const imp = isImperial(), toD = v => imp ? num(kgToDisp(v)) : round2(num(v)), fromD = v => imp ? dispToKg(v) : v;
+  const lo = imp ? 2 : 1, hi = imp ? 55 : 25;
   const vals = new Set();
-  historyFor(ex.name).forEach(h => (h.sets || []).forEach(s => { const v = round2(num(s.kg)); if (v > 0) vals.add(v); }));
-  ex.sets.forEach(s => { const v = round2(num(s.kg)); if (v > 0) vals.add(v); });
+  historyFor(ex.name).forEach(h => (h.sets || []).forEach(s => { const v = toD(s.kg); if (v > 0) vals.add(v); }));
+  ex.sets.forEach(s => { const v = toD(s.kg); if (v > 0) vals.add(v); });
   const arr = [...vals].sort((a, b) => a - b);
   if (arr.length < 3) return null;
   const diffs = arr.slice(1).map((v, i) => round2(v - arr[i]));
   const d = Math.min(...diffs);
-  if (d < 1 || d > 25) return null;
+  if (d < lo || d > hi) return null;
   if (!diffs.every(x => Math.abs(x / d - Math.round(x / d)) < 0.02)) return null;
   let start = round2(arr[0] - Math.floor(arr[0] / d + 1e-9) * d);
   if (start <= 0) start = d;
-  return { mode: "step", start, step: d, addon: 0 };
+  return { mode: "step", start: fromD(start), step: fromD(d), addon: 0 };
 }
 function levelListOf(ex) {
   if (!usesLevels(ex)) return null;
@@ -13173,15 +13176,11 @@ function wStep() { return isImperial() ? 5 : 2.5; }
 function round3(n) { return Math.round(n * 1000) / 1000; }
 // 1RM / tonaj gibi yuvarlanmayan büyüklükler: imperial'de lb sayısı, metrikte girdi aynen
 function wRaw(kg) { return isImperial() ? num(kg) / LB_KG : kg; }
+const KG_SUF = { "'a": "'ye", "'da": "'de", "'dan": "'den", "'ı": "'yi", "'ın": "'nin", "'la": "'yle", "'lık": "'lik" };
 function wTxt(s) {
   if (!isImperial()) return s;
-  return String(s).replace(/\bkg('a|'da|'ı|'lık)?(?![A-Za-zÀ-ɏ])/g, (m, suf) => {
-    if (!suf) return "lb";
-    if (suf === "'a") return "lb'ye";
-    if (suf === "'da") return "lb'de";
-    if (suf.length === 2) return "lb'yi";
-    return "lb'lik";
-  });
+  // Başta harf / rakam / tire olmamalı (var(--d-kg) bozulmasın); lookbehind yok (eski iOS)
+  return String(s).replace(/(^|[^\w-])kg('(?:a|da|dan|ı|ın|la|lık))?(?![A-Za-zÀ-ɏ])/g, (m, pre, suf) => pre + "lb" + (suf ? KG_SUF[suf] : ""));
 }
 // Gösterilen set kilosu girişi → kayıt kg. Aynı sayı yeniden yazılırsa eski kg aynen (yuvarlama birikmesi yok).
 function keepKg(v, origKg) {

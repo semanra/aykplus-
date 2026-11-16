@@ -77,15 +77,11 @@ function wStep() { return isImperial() ? 5 : 2.5; }
 function round3(n) { return Math.round(n * 1000) / 1000; }
 // 1RM / tonaj gibi yuvarlanmayan büyüklükler: imperial'de lb sayısı, metrikte girdi aynen
 function wRaw(kg) { return isImperial() ? num(kg) / LB_KG : kg; }
+const KG_SUF = { "'a": "'ye", "'da": "'de", "'dan": "'den", "'ı": "'yi", "'ın": "'nin", "'la": "'yle", "'lık": "'lik" };
 function wTxt(s) {
   if (!isImperial()) return s;
-  return String(s).replace(/\bkg('a|'da|'ı|'lık)?(?![A-Za-zÀ-ɏ])/g, (m, suf) => {
-    if (!suf) return "lb";
-    if (suf === "'a") return "lb'ye";
-    if (suf === "'da") return "lb'de";
-    if (suf.length === 2) return "lb'yi";
-    return "lb'lik";
-  });
+  // Başta harf / rakam / tire olmamalı (var(--d-kg) bozulmasın); lookbehind yok (eski iOS)
+  return String(s).replace(/(^|[^\w-])kg('(?:a|da|dan|ı|ın|la|lık))?(?![A-Za-zÀ-ɏ])/g, (m, pre, suf) => pre + "lb" + (suf ? KG_SUF[suf] : ""));
 }
 // Gösterilen set kilosu girişi → kayıt kg. Aynı sayı yeniden yazılırsa eski kg aynen (yuvarlama birikmesi yok).
 function keepKg(v, origKg) {

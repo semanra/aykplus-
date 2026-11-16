@@ -239,12 +239,12 @@ const PLATE_CLS_LB = { 45: "bg-rose-600 text-white", 35: "bg-sky-600 text-white"
 let plateCtx = { name: "" };
 
 // v53: plaka aracı GÖSTERİM biriminde çalışır (imperial'de lb). Bar: settings.barKg (kg) → seçenek; imperial'de
-// hiçbir seçeneğe uymuyorsa (ör. sahibin 20 kg = 44 lb) ayar yazılmadan 45 lb varsayılır.
+// her iki yönde en yakın seçenek gösterilir (20 kg → 45 lb, 35 lb → 15 kg); ayar yazılmaz.
 function barDisp() {
   const kg = num(state.settings.barKg, 20);
-  if (!isImperial()) return kg;
-  const d = num(kgToDisp(kg));
-  return barOptions().includes(d) ? d : 45;
+  if (!(kg > 0)) return 0;
+  const d = isImperial() ? kg / LB_KG : kg;   // kayıtlı kg → gösterim birimi
+  return barOptions().filter(o => o > 0).reduce((x, o) => Math.abs(o - d) < Math.abs(x - d) ? o : x);   // en yakın seçenek, ayar yazılmaz
 }
 function setPlateBar(v) {
   state.settings.barKg = isImperial() ? dispToKg(num(v, 45)) : num(v, 20);

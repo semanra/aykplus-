@@ -44,18 +44,21 @@ function levelsToList(L) {
 // Geçmişte girilen kilolardan makinenin kademe aralığını tahmin eder
 function inferLevels(ex) {
   if (!usesLevels(ex)) return null;
+  // v53: imperial'de gösterim biriminde (lb) çıkarım; kg yuvarlama kalıntısı (4,53 / 0,06) oluşmasın
+  const imp = isImperial(), toD = v => imp ? num(kgToDisp(v)) : round2(num(v)), fromD = v => imp ? dispToKg(v) : v;
+  const lo = imp ? 2 : 1, hi = imp ? 55 : 25;
   const vals = new Set();
-  historyFor(ex.name).forEach(h => (h.sets || []).forEach(s => { const v = round2(num(s.kg)); if (v > 0) vals.add(v); }));
-  ex.sets.forEach(s => { const v = round2(num(s.kg)); if (v > 0) vals.add(v); });
+  historyFor(ex.name).forEach(h => (h.sets || []).forEach(s => { const v = toD(s.kg); if (v > 0) vals.add(v); }));
+  ex.sets.forEach(s => { const v = toD(s.kg); if (v > 0) vals.add(v); });
   const arr = [...vals].sort((a, b) => a - b);
   if (arr.length < 3) return null;
   const diffs = arr.slice(1).map((v, i) => round2(v - arr[i]));
   const d = Math.min(...diffs);
-  if (d < 1 || d > 25) return null;
+  if (d < lo || d > hi) return null;
   if (!diffs.every(x => Math.abs(x / d - Math.round(x / d)) < 0.02)) return null;
   let start = round2(arr[0] - Math.floor(arr[0] / d + 1e-9) * d);
   if (start <= 0) start = d;
-  return { mode: "step", start, step: d, addon: 0 };
+  return { mode: "step", start: fromD(start), step: fromD(d), addon: 0 };
 }
 function levelListOf(ex) {
   if (!usesLevels(ex)) return null;
