@@ -132,6 +132,72 @@ try:
     pg.evaluate("() => { mobRoutine('mr_t52').items = []; }")
     add_lib(ARM)
     check(pg.evaluate("mobRoutine('mr_t52').items[0].note") == ARM_NOTE_TR, "tr: kütüphaneden eklenen hareketin notu Türkçe")
+    # ================= BÖLÜM 2 (görev 2): Hakkında, paylaşım kartı, sesli yönlendirme
+    ABOUT_TR = {"pfAboutHealth": None, "pfAboutPrivacy": None, "pfMethodBody": None, "pfLicList": None}
+    pg.evaluate("setLang('en')"); pg.wait_for_timeout(100); pg.evaluate("openProfile()"); pg.wait_for_timeout(150)
+    for i in ABOUT_TR:
+        tx = pg.evaluate("document.getElementById('%s').textContent" % i)
+        ABOUT_TR[i] = tx
+        check(tx.strip() != "" and not TR_CH.search(tx) and "{" not in tx, "en: #%s Türkçe harfsiz, yer tutucu kalmadı: %r" % (i, tx[:60]))
+    mb = ABOUT_TR["pfMethodBody"]
+    check("1.55" in mb and "1.43" in mb and "1.70" in mb and "1,55" not in mb and "1,400" in mb and "1,750" in mb and "2.5 g" in mb and "2.2 times" in mb, "en: çarpanlar 1.55 biçiminde, 1,400/1,750, ondalık nokta")
+    check("Open Food Facts data" in ABOUT_TR["pfLicList"] and "Barlow Condensed (SIL OFL 1.1)" in ABOUT_TR["pfLicList"] and "Mifflin et al." in mb, "en: kaynak/lisans adları özel ad olarak kalır, açıklama çevrilir")
+    pg.evaluate("closeProfile()")
+    pg.evaluate("setLang('tr')"); pg.wait_for_timeout(100); pg.evaluate("openProfile()"); pg.wait_for_timeout(150)
+    mb = pg.evaluate("document.getElementById('pfMethodBody').textContent")
+    check("1,55" in mb and "1.400" in mb and "1.750" in mb and "Kilo korurken: 1,6 g." in mb and "Toplam, mevcut kilonun 2,2 katını geçmez." in mb and "Mifflin ve ark. (1990)" in mb, "tr: Hesap yöntemi metni eski haliyle aynı")
+    pg.evaluate("closeProfile()")
+    # --- paylaşım kartı
+    pg.evaluate("""() => { state.workoutLogs.push({ id: 'l52', ts: Date.now(), dayName: 'Push', durationMin: 50, volume: 1234, prs: 1, sets: 10, cardioMin: 0 });
+      state.exerciseHistory['bench52'] = [{ logId: 'l52', name: 'Bench Press', kind: 'weight', sets: [{ kg: 60, reps: 8 }] }]; }""")
+    def card(lang):
+        pg.evaluate("setLang('%s')" % lang); pg.wait_for_timeout(100)
+        pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#chartBody img", timeout=8000)
+        r = {"title": pg.inner_text("#chartTitle"), "alt": pg.get_attribute("#chartBody img", "alt"), "body": pg.inner_text("#chartBody"),
+             "ex": pg.evaluate("logExerciseLines(state.workoutLogs[state.workoutLogs.length - 1])[0].txt")}
+        pg.evaluate("closeModal('chartModal')") if pg.evaluate("typeof closeModal === 'function'") else None
+        return r
+    r = card("en")
+    check(r["title"] == "Workout summary" and r["alt"] == "Workout summary" and not TR_CH.search(r["body"]) and "Share / Save to Photos" in r["body"], "en: paylaşım kartı penceresi İngilizce: %r %r" % (r["title"], r["body"][:60]))
+    check(r["ex"] == "1 set • best 60×8", "en: kart hareket satırı: %r" % r["ex"])
+    r = card("tr")
+    check(r["title"] == "Antrenman Özeti" and r["alt"] == "Antrenman özeti" and "Paylaş / Fotoğraflara Kaydet" in r["body"] and r["ex"] == "1 set • en iyi 60×8", "tr: paylaşım kartı penceresi eski metinle: %r" % r)
+    # tuval metinleri: fillText çağrılarını yakala
+    def canvas_texts(lang):
+        pg.evaluate("setLang('%s')" % lang); pg.wait_for_timeout(100)
+        return pg.evaluate("""async () => { const out = []; const o = CanvasRenderingContext2D.prototype.fillText;
+          CanvasRenderingContext2D.prototype.fillText = function (tx) { out.push(String(tx)); return o.apply(this, arguments); };
+          try { await buildShareCanvas(state.workoutLogs[state.workoutLogs.length - 1]); } finally { CanvasRenderingContext2D.prototype.fillText = o; }
+          return out; }""")
+    ce = canvas_texts("en"); ct = canvas_texts("tr")
+    check("Workout complete" in ce and "Logged with AYK+" in ce and "Time" in ce and "Volume" in ce and "Exercises" in ce and not [x for x in ce if TR_CH.search(x)], "en: tuval metinleri İngilizce: %s" % ce)
+    check("Antrenman tamamlandı" in ct and "AYK+ ile kaydedildi" in ct and "Süre" in ct and "Tonaj" in ct and "Hareketler" in ct and "Set" in ct, "tr: tuval metinleri eski: %s" % ct)
+    # --- sesli yönlendirme
+    STUB = """() => { window.__sp = []; Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { cancel() {}, getVoices() { return [{ lang: 'tr-TR' }, { lang: 'en-GB' }]; },
+        speak(u) { window.__sp.push([u.text, u.lang, u.voice ? u.voice.lang : null]); } } }); window.SpeechSynthesisUtterance = function (tx) { this.text = tx; };
+      state.settings.mobVoice = true;
+      const r = mobRoutine('mr_t52'); const it = r.items[0]; Object.assign(it, { sets: 2, mode: 'time', sec: 30, sides: 2, done: false }); r.name = 'T52'; r.items = [it]; renderAll(); }"""
+    pg.evaluate(STUB)
+    def speak(lang):
+        pg.evaluate("setLang('%s')" % lang); pg.wait_for_timeout(100)
+        pg.evaluate("window.__sp = []; mobSesStart('mr_t52')"); pg.wait_for_timeout(60)
+        a = pg.evaluate("window.__sp.slice()")
+        side0 = pg.evaluate("mobT.rounds[0].side"); nxt = pg.evaluate("mobT.rounds[1].side")
+        pg.evaluate("window.__sp = []; mobT.phase = 'work'; mobT.endAt = Date.now() - 50; mobTimerTick()"); pg.wait_for_timeout(20)
+        b2 = pg.evaluate("window.__sp.slice()")
+        pg.evaluate("window.__sp = []; mobTimerClose(); mobSesStart('mr_t52'); window.__sp = []; mobSesFinish()"); pg.wait_for_timeout(20)
+        c = pg.evaluate("window.__sp.slice()")
+        pg.evaluate("mobTimerClose()")
+        return a, side0, nxt, b2, c
+    a, side0, nxt, b2, c = speak("tr")
+    check(a and a[0] == [ARM + ". " + side0 + " taraf. 2 set, 30 saniye.", "tr-TR", "tr-TR"], "tr: ilk hareket cümlesi eskisiyle aynı, tr-TR: %s" % a)
+    check(b2 and b2[0][0] == ("Sola geç" if nxt == "Sol" else "Sağa geç" if nxt == "Sağ" else "Sıradaki set") and b2[0][1] == "tr-TR", "tr: geçiş cümlesi: %s" % b2)
+    check(c and c[0][0] == "T52 bitti. Tebrikler." and c[0][1] == "tr-TR", "tr: bitiş cümlesi: %s" % c)
+    a, side0, nxt, b2, c = speak("en")
+    sd = {"Sağ": "Right", "Sol": "Left"}[side0]
+    check(a and a[0] == ["Arm Circles. " + sd + " side. 2 sets, 30 seconds.", "en-GB", "en-GB"], "en: ilk hareket cümlesi İngilizce, en-GB sesi: %s" % a)
+    check(b2 and b2[0][0] == ("Switch to left" if nxt == "Sol" else "Switch to right") and b2[0][1] == "en-GB", "en: geçiş cümlesi: %s" % b2)
+    check(c and c[0][0] == "T52 finished. Well done." and c[0][1] == "en-GB" and not TR_CH.search(c[0][0]), "en: bitiş cümlesi: %s" % c)
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

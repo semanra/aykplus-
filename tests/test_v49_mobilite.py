@@ -53,14 +53,15 @@ try:
     check(ph[0] == "switch" and ph[1] == ["Sağ", "Sol"], "en: tur kaydı Türkçe kalır, tur geçişi çalışır: %s" % ph)
     pg.evaluate("() => { mobSesFinish(); }")
     said = pg.evaluate("window.__said")
-    check("Sola geç" in said, "en: konuşulan 'Sola geç': %s" % said)
-    check(not any(EN_WORDS.search(x) for x in said), "en: konuşulan metinlerde İngilizce kelime yok: %s" % said)
-    check(said[-1] == "T49 bitti. Tebrikler.", "en: son konuşma Türkçe: %r" % said[-1])
-    check(said[0] == "Test Stretch. Sağ taraf. 30 saniye.", "en: tanıtım cümlesi Türkçe: %r" % said[0])
+    # v52: konuşma dile göre (İngilizcede İngilizce)
+    check("Switch to left" in said, "en: konuşulan 'Switch to left': %s" % said)
+    check(not any(re.search(r"[çğıöşüÇĞİÖŞÜ]|(taraf|saniye|bitti)", x) for x in said), "en: konuşulan metinlerde Türkçe yok: %s" % said)
+    check(said[-1] == "T49 finished. Well done.", "en: son konuşma İngilizce: %r" % said[-1])
+    check(said[0] == "Test Stretch. Right side. 30 seconds.", "en: tanıtım cümlesi İngilizce: %r" % said[0])
     pg.evaluate("mobTimerClose()")
-    # ısınma başlığı konuşmada Türkçe
-    pg.evaluate("() => { const it = mobAllItems()[0]; mobSesStartIds(t('Isınma'), [it.id], null, 'Isınma'); window.__said = []; mobSesFinish(); }")
-    check(pg.evaluate("window.__said[0]") == "Isınma bitti. Tebrikler.", "en: ısınma bitişi Türkçe: %s" % pg.evaluate("window.__said"))
+    # ısınma başlığı konuşmada dile göre
+    pg.evaluate("() => { const it = mobAllItems()[0]; mobSesStartIds(t('Isınma'), [it.id], null); window.__said = []; mobSesFinish(); }")
+    check(pg.evaluate("window.__said[0]") == "Warm-up finished. Well done.", "en: ısınma bitişi İngilizce: %s" % pg.evaluate("window.__said"))
     pg.evaluate("mobTimerClose()")
     # Türkçe konuşma aynı
     setlang('tr')

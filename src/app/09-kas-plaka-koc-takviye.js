@@ -779,13 +779,13 @@ function logExerciseLines(log) {
   Object.keys(state.exerciseHistory).forEach(k => state.exerciseHistory[k].forEach(sess => {
     if (sess.logId !== log.id) return;
     let txt;
-    if (sess.kind === "cardio") { const ct = cardioTotals(sess.sets, false); txt = `${fmtNum(ct.min)} dk` + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : ""); }
-    else if (sess.kind === "time") txt = `${sess.sets.length} × ${Math.max(...sess.sets.map(s => num(s.sec)))} sn`;
+    if (sess.kind === "cardio") { const ct = cardioTotals(sess.sets, false); txt = t("{m} dk", { m: ct.min }) + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : ""); }
+    else if (sess.kind === "time") txt = t("{c} × {s} sn|kart", { c: String(sess.sets.length), s: String(Math.max(...sess.sets.map(s => num(s.sec)))) });
     else {
       const best = sess.sets.reduce((b, s) => (e1rm(s.kg, s.reps) > e1rm(b.kg, b.reps) ? s : b), sess.sets[0]);
-      txt = num(best.kg) > 0 ? `${sess.sets.length} set • en iyi ${fmtKg(num(best.kg))}×${num(best.reps)}` : `${sess.sets.length} set • ${num(best.reps)} tekrar`;
+      txt = num(best.kg) > 0 ? tn(sess.sets.length, "{n} set • en iyi {kg}×{r}", { kg: fmtKg(num(best.kg)), r: String(num(best.reps)) }) : tn(sess.sets.length, "{n} set • {r} tekrar", { r: String(num(best.reps)) });
     }
-    out.push({ name: sess.name || k, txt, order: out.length });
+    out.push({ name: exNameL(sess.name || k), txt, order: out.length });
   }));
   return out;
 }
@@ -832,17 +832,17 @@ async function buildShareCanvas(log) {
   ctx.fillText(log.ts ? fmtDay(new Date(log.ts), { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 130);
   ctx.textAlign = "left";
 
-  ctx.fillStyle = ACC; ctx.font = `700 32px ${F}`; ctx.fillText("Antrenman tamamlandı", 72, 286);
-  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, upperL(log.dayName || "Antrenman"), W - 144), 68, 372);
+  ctx.fillStyle = ACC; ctx.font = `700 32px ${F}`; ctx.fillText(t("Antrenman tamamlandı"), 72, 286);
+  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, upperL(log.dayName || t("Antrenman|kart")), W - 144), 68, 372);
 
   const stats = [];
-  if (num(log.durationMin) > 0) stats.push(["Süre", fmtMinutes(num(log.durationMin)), "#FFFFFF"]);
-  stats.push(["Tonaj", Math.round(num(log.volume)).toLocaleString(locale()) + " kg", "#FFFFFF"]);
-  if (num(log.prs) > 0) stats.push(["Rekor", String(num(log.prs)), ACC]);
-  if (num(log.cardioMin) > 0) stats.push(["Kardiyo", fmtNum(num(log.cardioMin)) + " dk" + (num(log.cardioKm) > 0 ? " · " + fmtNum(num(log.cardioKm)) + " km" : ""), "#FFFFFF"]);
-  stats.push(["Set", String(num(log.sets)), "#FFFFFF"]);
+  if (num(log.durationMin) > 0) stats.push([t("Süre|kart"), fmtMinutes(num(log.durationMin)), "#FFFFFF"]);
+  stats.push([t("Tonaj|kart"), Math.round(num(log.volume)).toLocaleString(locale()) + " kg", "#FFFFFF"]);
+  if (num(log.prs) > 0) stats.push([t("Rekor|kart"), String(num(log.prs)), ACC]);
+  if (num(log.cardioMin) > 0) stats.push([t("Kardiyo|kart"), t("{m} dk", { m: num(log.cardioMin) }) + (num(log.cardioKm) > 0 ? " · " + fmtNum(num(log.cardioKm)) + " km" : ""), "#FFFFFF"]);
+  stats.push([t("Set|kart"), String(num(log.sets)), "#FFFFFF"]);
   const exLines = logExerciseLines(log);
-  if (exLines.length) stats.push(["Hareket", String(exLines.length), "#FFFFFF"]);
+  if (exLines.length) stats.push([t("Hareket|kart"), String(exLines.length), "#FFFFFF"]);
   const shown = stats.slice(0, 4);
   const cardW = (W - 144 - 24) / 2, cardH = 184;
   shown.forEach((s, i) => {
@@ -857,7 +857,7 @@ async function buildShareCanvas(log) {
   const lines = exLines.slice(0, 7);
   let y = 452 + Math.ceil(shown.length / 2) * (cardH + 24) + 44;
   if (lines.length) {
-    ctx.fillStyle = "#8B8B93"; ctx.font = `700 28px ${F}`; ctx.fillText("Hareketler", 72, y); y += 56;
+    ctx.fillStyle = "#8B8B93"; ctx.font = `700 28px ${F}`; ctx.fillText(t("Hareketler|kart"), 72, y); y += 56;
     lines.forEach(l => {
       ctx.fillStyle = "#E4E4E7"; ctx.font = `600 32px ${F}`;
       ctx.fillText(fitText(ctx, l.name, 560), 72, y);
@@ -868,7 +868,7 @@ async function buildShareCanvas(log) {
     });
   }
   ctx.fillStyle = "#52525B"; ctx.font = `500 26px ${F}`; ctx.textAlign = "center";
-  ctx.fillText("AYK+ ile kaydedildi", W / 2, H - 56);
+  ctx.fillText(t("AYK+ ile kaydedildi"), W / 2, H - 56);
   ctx.textAlign = "left";
   return cv;
 }
@@ -876,8 +876,8 @@ async function buildShareCanvas(log) {
 async function openShareCard(logIdx) {
   const log = state.workoutLogs[logIdx];
   if (!log) return;
-  $("chartTitle").textContent = "Antrenman Özeti";
-  $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-muted)] text-center py-10">Kart hazırlanıyor...</div>`;
+  $("chartTitle").textContent = t("Antrenman Özeti");
+  $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-muted)] text-center py-10">${t("Kart hazırlanıyor...")}</div>`;
   openModal("chartModal");
   try {
     const cv = await buildShareCanvas(log);
@@ -887,11 +887,11 @@ async function openShareCard(logIdx) {
     try { shareFile = new File([blob], name, { type: "image/png" }); } catch (e) { shareFile = blob; shareFile.name = name; }
     const url = URL.createObjectURL(blob);
     $("chartBody").innerHTML = `
-      <img src="${url}" alt="Antrenman özeti" class="w-full rounded-xl border border-[var(--w-line)]" />
-      <button onclick="shareWorkoutCard()" class="w-full mt-3 w-btn text-sm font-semibold py-2.5 rounded-lg">Paylaş / Fotoğraflara Kaydet</button>
-      <p class="text-[12px] text-[var(--w-dim)] mt-2 text-center">Paylaş menüsünden Instagram, WhatsApp veya "Görüntüyü Kaydet"i seçebilirsin.</p>`;
+      <img src="${url}" alt="${t("Antrenman özeti")}" class="w-full rounded-xl border border-[var(--w-line)]" />
+      <button onclick="shareWorkoutCard()" class="w-full mt-3 w-btn text-sm font-semibold py-2.5 rounded-lg">${t("Paylaş / Fotoğraflara Kaydet")}</button>
+      <p class="text-[12px] text-[var(--w-dim)] mt-2 text-center">${t("Paylaş menüsünden Instagram, WhatsApp veya \"Görüntüyü Kaydet\"i seçebilirsin.")}</p>`;
   } catch (e) {
-    $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-over)] text-center py-8">Kart oluşturulamadı.</div>`;
+    $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-over)] text-center py-8">${t("Kart oluşturulamadı.")}</div>`;
   }
 }
 
@@ -899,7 +899,7 @@ async function shareWorkoutCard() {
   if (!shareFile) return;
   const file = shareFile;
   if (navigator.canShare && file instanceof File && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: "AYK+ Antrenman" }); return; }
+    try { await navigator.share({ files: [file], title: t("AYK+ Antrenman") }); return; }
     catch (e) { if (e && e.name === "AbortError") return; }
   }
   try {
@@ -908,8 +908,8 @@ async function shareWorkoutCard() {
     a.href = url; a.download = file.name || "AYK-antrenman.png";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
-    toast("Görsel indirildi");
-  } catch (e) { toast("Paylaşılamadı. Görsele basılı tutup kaydedebilirsin.", "error"); }
+    toast(t("Görsel indirildi"));
+  } catch (e) { toast(t("Paylaşılamadı. Görsele basılı tutup kaydedebilirsin."), "error"); }
 }
 
 // ============================================================================

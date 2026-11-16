@@ -440,15 +440,15 @@ function mobTimerStart(id) {
 function mobSesStart(rid) {
   const r = mobRoutine(rid);
   if (!r || !r.items.length) { toast(t("Rutinde hareket yok")); return; }
-  mobSesStartIds(r.name, r.items.map(i => i.id), r.id, r.name);
+  mobSesStartIds(r.name, r.items.map(i => i.id), r.id);
 }
 // v40: seans herhangi bir hareket listesiyle (ısınma: rid = null, hareketler kendi rutinlerinde tiklenir)
-function mobSesStartIds(title, ids, rid, sayTitle) {   // v49: sayTitle = konuşulan başlık (Türkçe kaynak; ses v52'ye dek Türkçe)
+function mobSesStartIds(title, ids, rid) {
   if (!ids.length) return;
   unlockAudio();
   undoSnap = null;   // v40: seanstan önce çıkmış "Geri al" seansın kaydettiği tikleri geri almasın
   if (mobT) clearInterval(mobT.iv);
-  mobT = { ses: { rid, title, sayTitle: sayTitle || title, ids: ids.slice(), pos: 0, skipped: [], doneIds: [], t0: Date.now(), guideOpen: true }, iv: 0, t0: Date.now() };
+  mobT = { ses: { rid, title, ids: ids.slice(), pos: 0, skipped: [], doneIds: [], t0: Date.now(), guideOpen: true }, iv: 0, t0: Date.now() };
   mobSesLoad(0);
   mobTimerOpen();
 }
@@ -490,7 +490,7 @@ function mobSesGuide() { if (!mobT || !mobT.ses) return; mobT.ses.guideOpen = !m
 function mobSesFinish() {
   clearInterval(mobT.iv); mobT.iv = 0;
   mobT.phase = "fin";
-  mobSay(trFill("{ad} bitti. Tebrikler.", { ad: mobT.ses.sayTitle || mobT.ses.title }));
+  mobSay(t("{ad} bitti. Tebrikler.", { ad: mobT.ses.title }));
   renderAll();
   mobTimerRender();
 }
@@ -505,7 +505,7 @@ function mobTimerTick() {
   let changed = false;
   while (mobT && mobT.phase !== "reps" && mobT.phase !== "fin" && Date.now() >= mobT.endAt) {
     const late = Date.now() - mobT.endAt;
-    if (mobT.phase === "prep") { mobT.phase = "work"; mobT.endAt += mobT.sec * 1000; if (late < 2000) mobSay(trFill("Başla")); }
+    if (mobT.phase === "prep") { mobT.phase = "work"; mobT.endAt += mobT.sec * 1000; if (late < 2000) mobSay(t("Başla")); }
     else if (mobT.phase === "work") {
       if (!mobT.quiet && late < 2000) mobBeep();
       if (mobT.idx >= mobT.rounds.length - 1) {
@@ -513,10 +513,10 @@ function mobTimerTick() {
         mobTimerFinish(); return;
       }
       mobT.phase = "switch"; mobT.endAt += MOB_SWITCH_SEC * 1000;
-      if (late < 2000) { const nx = mobT.rounds[mobT.idx + 1]; mobSay(trFill(nx && nx.side === "Sol" ? "Sola geç" : nx && nx.side === "Sağ" ? "Sağa geç" : "Sıradaki set")); }
+      if (late < 2000) { const nx = mobT.rounds[mobT.idx + 1]; mobSay(nx && nx.side === "Sol" ? t("Sola geç") : nx && nx.side === "Sağ" ? t("Sağa geç") : t("Sıradaki set")); }
     } else {
       mobT.idx++; mobT.phase = "work"; mobT.endAt += mobT.sec * 1000;
-      if (late < 2000) mobSay(trFill("Başla"));
+      if (late < 2000) mobSay(t("Başla"));
     }
     mobT.quiet = false;
     changed = true;
@@ -553,8 +553,9 @@ function mobSay(text) {
     if (!ss || typeof SpeechSynthesisUtterance === "undefined") return;
     ss.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "tr-TR";   // v49: konuşulan metin v52'ye dek her dilde Türkçe
-    const v = (ss.getVoices() || []).find(x => String(x.lang).toLowerCase().startsWith("tr"));
+    const en = curLang() === "en";   // v52: konuşma dile göre (Türkçe davranış aynen)
+    u.lang = en ? "en-GB" : "tr-TR";
+    const v = (ss.getVoices() || []).find(x => String(x.lang).toLowerCase().startsWith(en ? "en" : "tr"));
     if (v) u.voice = v;
     ss.speak(u);
   } catch (e) { /* ses yok */ }
@@ -563,18 +564,18 @@ function mobSayRound() {
   if (!mobT || !mobT.rounds) return;
   const r = mobT.rounds[mobT.idx];
   const n = String(r.set);
-  if (mobT.sets > 1) mobSay(r.side ? trFill("Set {n}. {taraf} taraf.", { n, taraf: r.side }) : trFill("Set {n}.", { n }));
-  else if (r.side) mobSay(trFill("{taraf} taraf.", { taraf: r.side }));
+  if (mobT.sets > 1) mobSay(r.side ? t("Set {n}. {taraf} taraf.", { n, taraf: mobSideL(r.side) }) : t("Set {n}.", { n }));
+  else if (r.side) mobSay(t("{taraf} taraf.", { taraf: mobSideL(r.side) }));
 }
 function mobSayItem() {
   if (!mobT || !mobT.rounds) return;
   const r = mobT.rounds[mobT.idx], time = mobT.phase !== "reps";
-  const v = { ad: mobT.name, taraf: r.side || "", sets: String(mobT.sets), sn: String(mobT.sec), tekrar: String(mobT.reps) };
+  const v = { ad: mobNameL(mobT.name), taraf: mobSideL(r.side), sets: String(mobT.sets), sn: String(mobT.sec), tekrar: String(mobT.reps) };
   const sd = !!r.side, many = mobT.sets > 1;
   const key = time
     ? (sd ? (many ? "{ad}. {taraf} taraf. {sets} set, {sn} saniye." : "{ad}. {taraf} taraf. {sn} saniye.") : (many ? "{ad}. {sets} set, {sn} saniye." : "{ad}. {sn} saniye."))
     : (sd ? (many ? "{ad}. {taraf} taraf. {sets} set, {tekrar} tekrar." : "{ad}. {taraf} taraf. {tekrar} tekrar.") : (many ? "{ad}. {sets} set, {tekrar} tekrar." : "{ad}. {tekrar} tekrar."));
-  mobSay(trFill(key, v));
+  mobSay(t(key, v));
 }
 function mobTimerVoice() {
   state.settings.mobVoice = !state.settings.mobVoice;
@@ -586,7 +587,7 @@ function mobBreathLabel() { return ((Date.now() - mobT.t0) % 10000) < 4000 ? t("
 function mobTimerUpdate() {
   if (!mobT) return;
   const left = (mobT.endAt - Date.now()) / 1000;
-  if (mobT.phase === "work" && mobT.sec >= 20 && left <= 10 && left > 8 && mobT.s10 !== mobT.idx) { mobT.s10 = mobT.idx; mobSay(trFill("Son 10 saniye")); }
+  if (mobT.phase === "work" && mobT.sec >= 20 && left <= 10 && left > 8 && mobT.s10 !== mobT.idx) { mobT.s10 = mobT.idx; mobSay(t("Son 10 saniye")); }
   const el = $("mobTTime"); if (el) el.textContent = mobFmt(left);
   const b = $("mobTBreath"); if (b && mobT.phase === "work") b.textContent = mobBreathLabel();
 }
@@ -725,7 +726,7 @@ function warmupCardHtml(day, inProg) {
     <button id="gymWarmupStart" onclick="mobWarmupStart()" class="m-warm-go w-full justify-center mt-3">${svgI("play", 16, 2.4)}${t("Isınmayı başlat")}</button>
   </div>`;
 }
-function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds(t("Isınma"), items.map(i => i.id), null, "Isınma"); }
+function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds(t("Isınma"), items.map(i => i.id), null); }
 function mobWarmupHide() {
   snapshot();
   state.settings.warmupCard = false;

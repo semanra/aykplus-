@@ -6044,15 +6044,15 @@ function mobTimerStart(id) {
 function mobSesStart(rid) {
   const r = mobRoutine(rid);
   if (!r || !r.items.length) { toast(t("Rutinde hareket yok")); return; }
-  mobSesStartIds(r.name, r.items.map(i => i.id), r.id, r.name);
+  mobSesStartIds(r.name, r.items.map(i => i.id), r.id);
 }
 // v40: seans herhangi bir hareket listesiyle (ısınma: rid = null, hareketler kendi rutinlerinde tiklenir)
-function mobSesStartIds(title, ids, rid, sayTitle) {   // v49: sayTitle = konuşulan başlık (Türkçe kaynak; ses v52'ye dek Türkçe)
+function mobSesStartIds(title, ids, rid) {
   if (!ids.length) return;
   unlockAudio();
   undoSnap = null;   // v40: seanstan önce çıkmış "Geri al" seansın kaydettiği tikleri geri almasın
   if (mobT) clearInterval(mobT.iv);
-  mobT = { ses: { rid, title, sayTitle: sayTitle || title, ids: ids.slice(), pos: 0, skipped: [], doneIds: [], t0: Date.now(), guideOpen: true }, iv: 0, t0: Date.now() };
+  mobT = { ses: { rid, title, ids: ids.slice(), pos: 0, skipped: [], doneIds: [], t0: Date.now(), guideOpen: true }, iv: 0, t0: Date.now() };
   mobSesLoad(0);
   mobTimerOpen();
 }
@@ -6094,7 +6094,7 @@ function mobSesGuide() { if (!mobT || !mobT.ses) return; mobT.ses.guideOpen = !m
 function mobSesFinish() {
   clearInterval(mobT.iv); mobT.iv = 0;
   mobT.phase = "fin";
-  mobSay(trFill("{ad} bitti. Tebrikler.", { ad: mobT.ses.sayTitle || mobT.ses.title }));
+  mobSay(t("{ad} bitti. Tebrikler.", { ad: mobT.ses.title }));
   renderAll();
   mobTimerRender();
 }
@@ -6109,7 +6109,7 @@ function mobTimerTick() {
   let changed = false;
   while (mobT && mobT.phase !== "reps" && mobT.phase !== "fin" && Date.now() >= mobT.endAt) {
     const late = Date.now() - mobT.endAt;
-    if (mobT.phase === "prep") { mobT.phase = "work"; mobT.endAt += mobT.sec * 1000; if (late < 2000) mobSay(trFill("Başla")); }
+    if (mobT.phase === "prep") { mobT.phase = "work"; mobT.endAt += mobT.sec * 1000; if (late < 2000) mobSay(t("Başla")); }
     else if (mobT.phase === "work") {
       if (!mobT.quiet && late < 2000) mobBeep();
       if (mobT.idx >= mobT.rounds.length - 1) {
@@ -6117,10 +6117,10 @@ function mobTimerTick() {
         mobTimerFinish(); return;
       }
       mobT.phase = "switch"; mobT.endAt += MOB_SWITCH_SEC * 1000;
-      if (late < 2000) { const nx = mobT.rounds[mobT.idx + 1]; mobSay(trFill(nx && nx.side === "Sol" ? "Sola geç" : nx && nx.side === "Sağ" ? "Sağa geç" : "Sıradaki set")); }
+      if (late < 2000) { const nx = mobT.rounds[mobT.idx + 1]; mobSay(nx && nx.side === "Sol" ? t("Sola geç") : nx && nx.side === "Sağ" ? t("Sağa geç") : t("Sıradaki set")); }
     } else {
       mobT.idx++; mobT.phase = "work"; mobT.endAt += mobT.sec * 1000;
-      if (late < 2000) mobSay(trFill("Başla"));
+      if (late < 2000) mobSay(t("Başla"));
     }
     mobT.quiet = false;
     changed = true;
@@ -6157,8 +6157,9 @@ function mobSay(text) {
     if (!ss || typeof SpeechSynthesisUtterance === "undefined") return;
     ss.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "tr-TR";   // v49: konuşulan metin v52'ye dek her dilde Türkçe
-    const v = (ss.getVoices() || []).find(x => String(x.lang).toLowerCase().startsWith("tr"));
+    const en = curLang() === "en";   // v52: konuşma dile göre (Türkçe davranış aynen)
+    u.lang = en ? "en-GB" : "tr-TR";
+    const v = (ss.getVoices() || []).find(x => String(x.lang).toLowerCase().startsWith(en ? "en" : "tr"));
     if (v) u.voice = v;
     ss.speak(u);
   } catch (e) { /* ses yok */ }
@@ -6167,18 +6168,18 @@ function mobSayRound() {
   if (!mobT || !mobT.rounds) return;
   const r = mobT.rounds[mobT.idx];
   const n = String(r.set);
-  if (mobT.sets > 1) mobSay(r.side ? trFill("Set {n}. {taraf} taraf.", { n, taraf: r.side }) : trFill("Set {n}.", { n }));
-  else if (r.side) mobSay(trFill("{taraf} taraf.", { taraf: r.side }));
+  if (mobT.sets > 1) mobSay(r.side ? t("Set {n}. {taraf} taraf.", { n, taraf: mobSideL(r.side) }) : t("Set {n}.", { n }));
+  else if (r.side) mobSay(t("{taraf} taraf.", { taraf: mobSideL(r.side) }));
 }
 function mobSayItem() {
   if (!mobT || !mobT.rounds) return;
   const r = mobT.rounds[mobT.idx], time = mobT.phase !== "reps";
-  const v = { ad: mobT.name, taraf: r.side || "", sets: String(mobT.sets), sn: String(mobT.sec), tekrar: String(mobT.reps) };
+  const v = { ad: mobNameL(mobT.name), taraf: mobSideL(r.side), sets: String(mobT.sets), sn: String(mobT.sec), tekrar: String(mobT.reps) };
   const sd = !!r.side, many = mobT.sets > 1;
   const key = time
     ? (sd ? (many ? "{ad}. {taraf} taraf. {sets} set, {sn} saniye." : "{ad}. {taraf} taraf. {sn} saniye.") : (many ? "{ad}. {sets} set, {sn} saniye." : "{ad}. {sn} saniye."))
     : (sd ? (many ? "{ad}. {taraf} taraf. {sets} set, {tekrar} tekrar." : "{ad}. {taraf} taraf. {tekrar} tekrar.") : (many ? "{ad}. {sets} set, {tekrar} tekrar." : "{ad}. {tekrar} tekrar."));
-  mobSay(trFill(key, v));
+  mobSay(t(key, v));
 }
 function mobTimerVoice() {
   state.settings.mobVoice = !state.settings.mobVoice;
@@ -6190,7 +6191,7 @@ function mobBreathLabel() { return ((Date.now() - mobT.t0) % 10000) < 4000 ? t("
 function mobTimerUpdate() {
   if (!mobT) return;
   const left = (mobT.endAt - Date.now()) / 1000;
-  if (mobT.phase === "work" && mobT.sec >= 20 && left <= 10 && left > 8 && mobT.s10 !== mobT.idx) { mobT.s10 = mobT.idx; mobSay(trFill("Son 10 saniye")); }
+  if (mobT.phase === "work" && mobT.sec >= 20 && left <= 10 && left > 8 && mobT.s10 !== mobT.idx) { mobT.s10 = mobT.idx; mobSay(t("Son 10 saniye")); }
   const el = $("mobTTime"); if (el) el.textContent = mobFmt(left);
   const b = $("mobTBreath"); if (b && mobT.phase === "work") b.textContent = mobBreathLabel();
 }
@@ -6329,7 +6330,7 @@ function warmupCardHtml(day, inProg) {
     <button id="gymWarmupStart" onclick="mobWarmupStart()" class="m-warm-go w-full justify-center mt-3">${svgI("play", 16, 2.4)}${t("Isınmayı başlat")}</button>
   </div>`;
 }
-function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds(t("Isınma"), items.map(i => i.id), null, "Isınma"); }
+function mobWarmupStart() { const items = mobWarmupItems(activeDay()); if (items.length) mobSesStartIds(t("Isınma"), items.map(i => i.id), null); }
 function mobWarmupHide() {
   snapshot();
   state.settings.warmupCard = false;
@@ -6875,23 +6876,28 @@ const PRIVACY_NOTE = "Verilerin yalnızca bu telefonda. Barkod okuttuğunda yaln
 const LICENSES = ["Barlow Condensed (SIL OFL 1.1)", "@zxing/library (Apache-2.0)", "Open Food Facts verisi (ODbL; ürün verisi katkıcılara ait)", "USDA FoodData Central (kamu malı / CC0)", "Tailwind CSS (MIT)", "Vücut haritası görseli (uygulama sahibinin kendi görseli)"];
 const METHOD_SOURCES = ["Mifflin ve ark. (1990), Mifflin-St Jeor denklemi", "Katch-McArdle denklemi (yağsız kütleye dayalı)", "Morton ve ark. 2018, Br J Sports Med (protein ve kas)", "Nunes ve ark. 2022, J Cachexia Sarcopenia Muscle (protein ve kas)", "ISSN Pozisyon Bildirisi 2017 (Jäger ve ark.)", "Helms ve ark. 2014 (kilo verirken protein)", "Iraki ve ark. 2019 (kilo alırken beslenme)", "Joslin Klinik Beslenme Rehberi", "AMDR: yağ kalorinin %20–35'i", "Whittaker ve Wu 2021 (bazal metabolizma denklemleri)"];
 function renderAbout() {
-  const tr = n => n.toFixed(2).replace(".", ",");
+  const en = curLang() === "en";
+  const dec = (n, d) => n.toFixed(d).replace(".", en ? "." : ",");   // ondalık ayırıcı dile göre (Türkçe "1,55", İngilizce "1.55")
   const A = ACTIVITY_MULT, G = GAIN_PACE;
-  $("pfAboutHealth").textContent = HEALTH_NOTE;
-  $("pfAboutPrivacy").textContent = PRIVACY_NOTE;
+  const li = x => "<li>" + esc(t(x)) + "</li>";
+  $("pfAboutHealth").textContent = t(HEALTH_NOTE);
+  $("pfAboutPrivacy").textContent = t(PRIVACY_NOTE);
   $("pfMethodBody").innerHTML = [
-    "<p><b>Günlük harcama.</b> Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.</p>",
-    `<p><b>Hareketlilik çarpanları</b> (antrenman günü · dinlenme günü): az hareketli ${tr(A.low[0])} · ${tr(A.low[1])}, orta ${tr(A.mid[0])} · ${tr(A.mid[1])}, çok hareketli ${tr(A.high[0])} · ${tr(A.high[1])}.</p>`,
-    `<p><b>Hedef kalori.</b> Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %${Math.round(G.slow * 100)} (yavaş), %${Math.round(G.mid * 100)} (orta) ya da %${Math.round(G.fast * 100)} (hızlı) kadarı eklenir. Korurken harcamana eşittir. Hedef kalori güvenli alt sınırın altına inmez: kadında 1.400, erkekte 1.750 kcal.</p>`,
-    "<p><b>Protein.</b> Kilo başına hesaplanır. Hesapta kullanılan kilo, mevcut kilonla hedef kilonun küçüğüdür; böylece kilolu biri gereğinden fazla protein almaz.</p>",
-    "<ul class=\"list-disc pl-4 space-y-1\"><li>Kilo verirken: yağ oranın biliniyorsa yağsız kütlenin her kilosu için 2,5 g, bilinmiyorsa 2,2 g.</li><li>Kilo korurken: 1,6 g.</li><li>Kilo alırken: 1,8 g.</li></ul>",
-    "<p>Toplam, mevcut kilonun 2,2 katını geçmez. \"Yüksek\" seçeneğini açarsan en az mevcut kilonun 2 katı olur.</p>",
-    "<p><b>Yağ ve karbonhidrat.</b> Yağ kalorinin %25'i, karbonhidrat kalan kaloridir; en az 60 g olur.</p>",
-    "<p>Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.</p>",
-    "<p class=\"font-semibold text-[var(--t-text)]\">Kaynaklar</p>",
-    "<ul class=\"list-disc pl-4 space-y-1\">" + METHOD_SOURCES.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul>"
+    "<p><b>" + t("Günlük harcama.") + "</b> " + t("Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.") + "</p>",
+    "<p><b>" + t("Hareketlilik çarpanları") + "</b> " + t("(antrenman günü · dinlenme günü): az hareketli {l0} · {l1}, orta {m0} · {m1}, çok hareketli {h0} · {h1}.", {
+      l0: dec(A.low[0], 2), l1: dec(A.low[1], 2), m0: dec(A.mid[0], 2), m1: dec(A.mid[1], 2), h0: dec(A.high[0], 2), h1: dec(A.high[1], 2) }) + "</p>",
+    "<p><b>" + t("Hedef kalori.") + "</b> " + t("Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %{s} (yavaş), %{m} (orta) ya da %{f} (hızlı) kadarı eklenir. Korurken harcamana eşittir. Hedef kalori güvenli alt sınırın altına inmez: kadında {kadin}, erkekte {erkek} kcal.", {
+      s: String(Math.round(G.slow * 100)), m: String(Math.round(G.mid * 100)), f: String(Math.round(G.fast * 100)), kadin: en ? "1,400" : "1.400", erkek: en ? "1,750" : "1.750" }) + "</p>",
+    "<p><b>" + t("Protein.") + "</b> " + t("Kilo başına hesaplanır. Hesapta kullanılan kilo, mevcut kilonla hedef kilonun küçüğüdür; böylece kilolu biri gereğinden fazla protein almaz.") + "</p>",
+    "<ul class=\"list-disc pl-4 space-y-1\"><li>" + t("Kilo verirken: yağ oranın biliniyorsa yağsız kütlenin her kilosu için {a} g, bilinmiyorsa {b} g.", { a: dec(2.5, 1), b: dec(2.2, 1) }) + "</li><li>"
+      + t("Kilo korurken: {a} g.", { a: dec(1.6, 1) }) + "</li><li>" + t("Kilo alırken: {a} g.", { a: dec(1.8, 1) }) + "</li></ul>",
+    "<p>" + t("Toplam, mevcut kilonun {a} katını geçmez. \"Yüksek\" seçeneğini açarsan en az mevcut kilonun 2 katı olur.", { a: dec(2.2, 1) }) + "</p>",
+    "<p><b>" + t("Yağ ve karbonhidrat.") + "</b> " + t("Yağ kalorinin %25'i, karbonhidrat kalan kaloridir; en az 60 g olur.") + "</p>",
+    "<p>" + t("Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.") + "</p>",
+    "<p class=\"font-semibold text-[var(--t-text)]\">" + t("Kaynaklar") + "</p>",
+    "<ul class=\"list-disc pl-4 space-y-1\">" + METHOD_SOURCES.map(li).join("") + "</ul>"
   ].join("");
-  $("pfLicList").innerHTML = LICENSES.map(x => "<li>" + esc(x) + "</li>").join("");
+  $("pfLicList").innerHTML = LICENSES.map(li).join("");
 }
 function openProfile() {
   fillProfileFields();
@@ -8017,13 +8023,13 @@ function logExerciseLines(log) {
   Object.keys(state.exerciseHistory).forEach(k => state.exerciseHistory[k].forEach(sess => {
     if (sess.logId !== log.id) return;
     let txt;
-    if (sess.kind === "cardio") { const ct = cardioTotals(sess.sets, false); txt = `${fmtNum(ct.min)} dk` + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : ""); }
-    else if (sess.kind === "time") txt = `${sess.sets.length} × ${Math.max(...sess.sets.map(s => num(s.sec)))} sn`;
+    if (sess.kind === "cardio") { const ct = cardioTotals(sess.sets, false); txt = t("{m} dk", { m: ct.min }) + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : ""); }
+    else if (sess.kind === "time") txt = t("{c} × {s} sn|kart", { c: String(sess.sets.length), s: String(Math.max(...sess.sets.map(s => num(s.sec)))) });
     else {
       const best = sess.sets.reduce((b, s) => (e1rm(s.kg, s.reps) > e1rm(b.kg, b.reps) ? s : b), sess.sets[0]);
-      txt = num(best.kg) > 0 ? `${sess.sets.length} set • en iyi ${fmtKg(num(best.kg))}×${num(best.reps)}` : `${sess.sets.length} set • ${num(best.reps)} tekrar`;
+      txt = num(best.kg) > 0 ? tn(sess.sets.length, "{n} set • en iyi {kg}×{r}", { kg: fmtKg(num(best.kg)), r: String(num(best.reps)) }) : tn(sess.sets.length, "{n} set • {r} tekrar", { r: String(num(best.reps)) });
     }
-    out.push({ name: sess.name || k, txt, order: out.length });
+    out.push({ name: exNameL(sess.name || k), txt, order: out.length });
   }));
   return out;
 }
@@ -8070,17 +8076,17 @@ async function buildShareCanvas(log) {
   ctx.fillText(log.ts ? fmtDay(new Date(log.ts), { day: "numeric", month: "long", year: "numeric" }) : (log.date || ""), W - 72, 130);
   ctx.textAlign = "left";
 
-  ctx.fillStyle = ACC; ctx.font = `700 32px ${F}`; ctx.fillText("Antrenman tamamlandı", 72, 286);
-  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, upperL(log.dayName || "Antrenman"), W - 144), 68, 372);
+  ctx.fillStyle = ACC; ctx.font = `700 32px ${F}`; ctx.fillText(t("Antrenman tamamlandı"), 72, 286);
+  ctx.fillStyle = "#FFFFFF"; ctx.font = disp(104); ctx.fillText(fitText(ctx, upperL(log.dayName || t("Antrenman|kart")), W - 144), 68, 372);
 
   const stats = [];
-  if (num(log.durationMin) > 0) stats.push(["Süre", fmtMinutes(num(log.durationMin)), "#FFFFFF"]);
-  stats.push(["Tonaj", Math.round(num(log.volume)).toLocaleString(locale()) + " kg", "#FFFFFF"]);
-  if (num(log.prs) > 0) stats.push(["Rekor", String(num(log.prs)), ACC]);
-  if (num(log.cardioMin) > 0) stats.push(["Kardiyo", fmtNum(num(log.cardioMin)) + " dk" + (num(log.cardioKm) > 0 ? " · " + fmtNum(num(log.cardioKm)) + " km" : ""), "#FFFFFF"]);
-  stats.push(["Set", String(num(log.sets)), "#FFFFFF"]);
+  if (num(log.durationMin) > 0) stats.push([t("Süre|kart"), fmtMinutes(num(log.durationMin)), "#FFFFFF"]);
+  stats.push([t("Tonaj|kart"), Math.round(num(log.volume)).toLocaleString(locale()) + " kg", "#FFFFFF"]);
+  if (num(log.prs) > 0) stats.push([t("Rekor|kart"), String(num(log.prs)), ACC]);
+  if (num(log.cardioMin) > 0) stats.push([t("Kardiyo|kart"), t("{m} dk", { m: num(log.cardioMin) }) + (num(log.cardioKm) > 0 ? " · " + fmtNum(num(log.cardioKm)) + " km" : ""), "#FFFFFF"]);
+  stats.push([t("Set|kart"), String(num(log.sets)), "#FFFFFF"]);
   const exLines = logExerciseLines(log);
-  if (exLines.length) stats.push(["Hareket", String(exLines.length), "#FFFFFF"]);
+  if (exLines.length) stats.push([t("Hareket|kart"), String(exLines.length), "#FFFFFF"]);
   const shown = stats.slice(0, 4);
   const cardW = (W - 144 - 24) / 2, cardH = 184;
   shown.forEach((s, i) => {
@@ -8095,7 +8101,7 @@ async function buildShareCanvas(log) {
   const lines = exLines.slice(0, 7);
   let y = 452 + Math.ceil(shown.length / 2) * (cardH + 24) + 44;
   if (lines.length) {
-    ctx.fillStyle = "#8B8B93"; ctx.font = `700 28px ${F}`; ctx.fillText("Hareketler", 72, y); y += 56;
+    ctx.fillStyle = "#8B8B93"; ctx.font = `700 28px ${F}`; ctx.fillText(t("Hareketler|kart"), 72, y); y += 56;
     lines.forEach(l => {
       ctx.fillStyle = "#E4E4E7"; ctx.font = `600 32px ${F}`;
       ctx.fillText(fitText(ctx, l.name, 560), 72, y);
@@ -8106,7 +8112,7 @@ async function buildShareCanvas(log) {
     });
   }
   ctx.fillStyle = "#52525B"; ctx.font = `500 26px ${F}`; ctx.textAlign = "center";
-  ctx.fillText("AYK+ ile kaydedildi", W / 2, H - 56);
+  ctx.fillText(t("AYK+ ile kaydedildi"), W / 2, H - 56);
   ctx.textAlign = "left";
   return cv;
 }
@@ -8114,8 +8120,8 @@ async function buildShareCanvas(log) {
 async function openShareCard(logIdx) {
   const log = state.workoutLogs[logIdx];
   if (!log) return;
-  $("chartTitle").textContent = "Antrenman Özeti";
-  $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-muted)] text-center py-10">Kart hazırlanıyor...</div>`;
+  $("chartTitle").textContent = t("Antrenman Özeti");
+  $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-muted)] text-center py-10">${t("Kart hazırlanıyor...")}</div>`;
   openModal("chartModal");
   try {
     const cv = await buildShareCanvas(log);
@@ -8125,11 +8131,11 @@ async function openShareCard(logIdx) {
     try { shareFile = new File([blob], name, { type: "image/png" }); } catch (e) { shareFile = blob; shareFile.name = name; }
     const url = URL.createObjectURL(blob);
     $("chartBody").innerHTML = `
-      <img src="${url}" alt="Antrenman özeti" class="w-full rounded-xl border border-[var(--w-line)]" />
-      <button onclick="shareWorkoutCard()" class="w-full mt-3 w-btn text-sm font-semibold py-2.5 rounded-lg">Paylaş / Fotoğraflara Kaydet</button>
-      <p class="text-[12px] text-[var(--w-dim)] mt-2 text-center">Paylaş menüsünden Instagram, WhatsApp veya "Görüntüyü Kaydet"i seçebilirsin.</p>`;
+      <img src="${url}" alt="${t("Antrenman özeti")}" class="w-full rounded-xl border border-[var(--w-line)]" />
+      <button onclick="shareWorkoutCard()" class="w-full mt-3 w-btn text-sm font-semibold py-2.5 rounded-lg">${t("Paylaş / Fotoğraflara Kaydet")}</button>
+      <p class="text-[12px] text-[var(--w-dim)] mt-2 text-center">${t("Paylaş menüsünden Instagram, WhatsApp veya \"Görüntüyü Kaydet\"i seçebilirsin.")}</p>`;
   } catch (e) {
-    $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-over)] text-center py-8">Kart oluşturulamadı.</div>`;
+    $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-over)] text-center py-8">${t("Kart oluşturulamadı.")}</div>`;
   }
 }
 
@@ -8137,7 +8143,7 @@ async function shareWorkoutCard() {
   if (!shareFile) return;
   const file = shareFile;
   if (navigator.canShare && file instanceof File && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: "AYK+ Antrenman" }); return; }
+    try { await navigator.share({ files: [file], title: t("AYK+ Antrenman") }); return; }
     catch (e) { if (e && e.name === "AbortError") return; }
   }
   try {
@@ -8146,8 +8152,8 @@ async function shareWorkoutCard() {
     a.href = url; a.download = file.name || "AYK-antrenman.png";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
-    toast("Görsel indirildi");
-  } catch (e) { toast("Paylaşılamadı. Görsele basılı tutup kaydedebilirsin.", "error"); }
+    toast(t("Görsel indirildi"));
+  } catch (e) { toast(t("Paylaşılamadı. Görsele basılı tutup kaydedebilirsin."), "error"); }
 }
 
 // ============================================================================
@@ -12837,6 +12843,58 @@ function mobNoteL(note) {
   const k = String(note == null ? "" : note).trim();
   return Object.prototype.hasOwnProperty.call(MOB_NOTE_EN, k) ? MOB_NOTE_EN[k] : note;
 }
+
+// ---------------------------------------------------------------------------
+// v52 görev 2 — Hakkında (Hesap yöntemi, kaynaklar, lisanslar, gizlilik), antrenman paylaşım kartı. Sesli yönlendirme anahtarları 22'de.
+// Sayılar yer tutucuyla gelir (renderAbout: Türkçe "1,55", İngilizce "1.55"); etiketler/kaynak adları özel ad olarak kalır.
+// ---------------------------------------------------------------------------
+Object.assign(EN, {
+  // --- Hakkında
+  "Verilerin yalnızca bu telefonda. Barkod okuttuğunda yalnızca barkod numarası Open Food Facts'e gönderilir.": "Your data stays on this phone only. When you scan a barcode, only the barcode number is sent to Open Food Facts.",
+  "Günlük harcama.": "Daily energy use.",
+  "Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.": "The energy you burn at rest comes from the Mifflin-St Jeor equation. If you entered your body fat, the Katch-McArdle equation, which is based on lean mass, is used instead. The result is then multiplied by your activity factor.",
+  "Hareketlilik çarpanları": "Activity factors",
+  "(antrenman günü · dinlenme günü): az hareketli {l0} · {l1}, orta {m0} · {m1}, çok hareketli {h0} · {h1}.": "(workout day · rest day): low activity {l0} · {l1}, moderate {m0} · {m1}, high {h0} · {h1}.",
+  "Hedef kalori.": "Calorie target.",
+  "Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %{s} (yavaş), %{m} (orta) ya da %{f} (hızlı) kadarı eklenir. Korurken harcamana eşittir. Hedef kalori güvenli alt sınırın altına inmez: kadında {kadin}, erkekte {erkek} kcal.": "When losing weight, the deficit you chose is subtracted. When gaining, {s}% (slow), {m}% (moderate) or {f}% (fast) of your energy use is added. When maintaining, it equals your energy use. The calorie target never goes below the safe minimum: {kadin} kcal for women, {erkek} kcal for men.",
+  "Protein.": "Protein.",
+  "Kilo başına hesaplanır. Hesapta kullanılan kilo, mevcut kilonla hedef kilonun küçüğüdür; böylece kilolu biri gereğinden fazla protein almaz.": "It is calculated per kilogram of body weight. The weight used is the smaller of your current weight and your target weight, so someone carrying extra weight does not get more protein than needed.",
+  "Kilo verirken: yağ oranın biliniyorsa yağsız kütlenin her kilosu için {a} g, bilinmiyorsa {b} g.": "When losing weight: {a} g per kilogram of lean mass if your body fat is known, otherwise {b} g per kilogram of body weight.",
+  "Kilo korurken: {a} g.": "When maintaining: {a} g.",
+  "Kilo alırken: {a} g.": "When gaining: {a} g.",
+  "Toplam, mevcut kilonun {a} katını geçmez. \"Yüksek\" seçeneğini açarsan en az mevcut kilonun 2 katı olur.": "The total never exceeds {a} times your current weight. If you turn on \"High\", it is at least 2 times your current weight.",
+  "Yağ ve karbonhidrat.": "Fat and carbohydrate.",
+  "Yağ kalorinin %25'i, karbonhidrat kalan kaloridir; en az 60 g olur.": "Fat is 25% of the calories and carbohydrate is whatever remains; it is at least 60 g.",
+  "Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.": "These are estimates for average people; adjust them to your own results.",
+  "Kaynaklar": "Sources",
+  "Mifflin ve ark. (1990), Mifflin-St Jeor denklemi": "Mifflin et al. (1990), Mifflin-St Jeor equation",
+  "Katch-McArdle denklemi (yağsız kütleye dayalı)": "Katch-McArdle equation (based on lean mass)",
+  "Morton ve ark. 2018, Br J Sports Med (protein ve kas)": "Morton et al. 2018, Br J Sports Med (protein and muscle)",
+  "Nunes ve ark. 2022, J Cachexia Sarcopenia Muscle (protein ve kas)": "Nunes et al. 2022, J Cachexia Sarcopenia Muscle (protein and muscle)",
+  "ISSN Pozisyon Bildirisi 2017 (Jäger ve ark.)": "ISSN Position Stand 2017 (Jäger et al.)",
+  "Helms ve ark. 2014 (kilo verirken protein)": "Helms et al. 2014 (protein while losing weight)",
+  "Iraki ve ark. 2019 (kilo alırken beslenme)": "Iraki et al. 2019 (nutrition while gaining weight)",
+  "Joslin Klinik Beslenme Rehberi": "Joslin Clinical Nutrition Guideline",
+  "AMDR: yağ kalorinin %20–35'i": "AMDR: fat is 20–35% of calories",
+  "Whittaker ve Wu 2021 (bazal metabolizma denklemleri)": "Whittaker and Wu 2021 (basal metabolic rate equations)",
+  "Open Food Facts verisi (ODbL; ürün verisi katkıcılara ait)": "Open Food Facts data (ODbL; product data belongs to its contributors)",
+  "USDA FoodData Central (kamu malı / CC0)": "USDA FoodData Central (public domain / CC0)",
+  "Vücut haritası görseli (uygulama sahibinin kendi görseli)": "Body map image (the app owner's own artwork)",
+  // --- antrenman paylaşım kartı (tuval + pencere)
+  "Antrenman tamamlandı": "Workout complete", "Antrenman|kart": "Workout",
+  "Süre|kart": "Time", "Tonaj|kart": "Volume", "Rekor|kart": "PRs", "Kardiyo|kart": "Cardio", "Set|kart": "Sets", "Hareket|kart": "Exercises", "Hareketler|kart": "Exercises",
+  "AYK+ ile kaydedildi": "Logged with AYK+",
+  "{c} × {s} sn|kart": "{c} × {s} sec",
+  "{n} set • en iyi {kg}×{r}": { one: "{n} set • best {kg}×{r}", other: "{n} sets • best {kg}×{r}" },
+  "{n} set • {r} tekrar": { one: "{n} set • {r} reps", other: "{n} sets • {r} reps" },
+  "Antrenman Özeti": "Workout summary", "Antrenman özeti": "Workout summary",
+  "Kart hazırlanıyor...": "Preparing card...",
+  "Paylaş / Fotoğraflara Kaydet": "Share / Save to Photos",
+  "Paylaş menüsünden Instagram, WhatsApp veya \"Görüntüyü Kaydet\"i seçebilirsin.": "From the share menu you can pick Instagram, WhatsApp or \"Save Image\".",
+  "Kart oluşturulamadı.": "Could not create the card.",
+  "AYK+ Antrenman": "AYK+ Workout", "Görsel indirildi": "Image downloaded",
+  "Paylaşılamadı. Görsele basılı tutup kaydedebilirsin.": "Could not share. Press and hold the image to save it."
+});
 
 </script>
 </body>

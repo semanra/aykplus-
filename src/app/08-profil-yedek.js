@@ -31,23 +31,28 @@ const PRIVACY_NOTE = "Verilerin yalnızca bu telefonda. Barkod okuttuğunda yaln
 const LICENSES = ["Barlow Condensed (SIL OFL 1.1)", "@zxing/library (Apache-2.0)", "Open Food Facts verisi (ODbL; ürün verisi katkıcılara ait)", "USDA FoodData Central (kamu malı / CC0)", "Tailwind CSS (MIT)", "Vücut haritası görseli (uygulama sahibinin kendi görseli)"];
 const METHOD_SOURCES = ["Mifflin ve ark. (1990), Mifflin-St Jeor denklemi", "Katch-McArdle denklemi (yağsız kütleye dayalı)", "Morton ve ark. 2018, Br J Sports Med (protein ve kas)", "Nunes ve ark. 2022, J Cachexia Sarcopenia Muscle (protein ve kas)", "ISSN Pozisyon Bildirisi 2017 (Jäger ve ark.)", "Helms ve ark. 2014 (kilo verirken protein)", "Iraki ve ark. 2019 (kilo alırken beslenme)", "Joslin Klinik Beslenme Rehberi", "AMDR: yağ kalorinin %20–35'i", "Whittaker ve Wu 2021 (bazal metabolizma denklemleri)"];
 function renderAbout() {
-  const tr = n => n.toFixed(2).replace(".", ",");
+  const en = curLang() === "en";
+  const dec = (n, d) => n.toFixed(d).replace(".", en ? "." : ",");   // ondalık ayırıcı dile göre (Türkçe "1,55", İngilizce "1.55")
   const A = ACTIVITY_MULT, G = GAIN_PACE;
-  $("pfAboutHealth").textContent = HEALTH_NOTE;
-  $("pfAboutPrivacy").textContent = PRIVACY_NOTE;
+  const li = x => "<li>" + esc(t(x)) + "</li>";
+  $("pfAboutHealth").textContent = t(HEALTH_NOTE);
+  $("pfAboutPrivacy").textContent = t(PRIVACY_NOTE);
   $("pfMethodBody").innerHTML = [
-    "<p><b>Günlük harcama.</b> Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.</p>",
-    `<p><b>Hareketlilik çarpanları</b> (antrenman günü · dinlenme günü): az hareketli ${tr(A.low[0])} · ${tr(A.low[1])}, orta ${tr(A.mid[0])} · ${tr(A.mid[1])}, çok hareketli ${tr(A.high[0])} · ${tr(A.high[1])}.</p>`,
-    `<p><b>Hedef kalori.</b> Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %${Math.round(G.slow * 100)} (yavaş), %${Math.round(G.mid * 100)} (orta) ya da %${Math.round(G.fast * 100)} (hızlı) kadarı eklenir. Korurken harcamana eşittir. Hedef kalori güvenli alt sınırın altına inmez: kadında 1.400, erkekte 1.750 kcal.</p>`,
-    "<p><b>Protein.</b> Kilo başına hesaplanır. Hesapta kullanılan kilo, mevcut kilonla hedef kilonun küçüğüdür; böylece kilolu biri gereğinden fazla protein almaz.</p>",
-    "<ul class=\"list-disc pl-4 space-y-1\"><li>Kilo verirken: yağ oranın biliniyorsa yağsız kütlenin her kilosu için 2,5 g, bilinmiyorsa 2,2 g.</li><li>Kilo korurken: 1,6 g.</li><li>Kilo alırken: 1,8 g.</li></ul>",
-    "<p>Toplam, mevcut kilonun 2,2 katını geçmez. \"Yüksek\" seçeneğini açarsan en az mevcut kilonun 2 katı olur.</p>",
-    "<p><b>Yağ ve karbonhidrat.</b> Yağ kalorinin %25'i, karbonhidrat kalan kaloridir; en az 60 g olur.</p>",
-    "<p>Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.</p>",
-    "<p class=\"font-semibold text-[var(--t-text)]\">Kaynaklar</p>",
-    "<ul class=\"list-disc pl-4 space-y-1\">" + METHOD_SOURCES.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul>"
+    "<p><b>" + t("Günlük harcama.") + "</b> " + t("Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.") + "</p>",
+    "<p><b>" + t("Hareketlilik çarpanları") + "</b> " + t("(antrenman günü · dinlenme günü): az hareketli {l0} · {l1}, orta {m0} · {m1}, çok hareketli {h0} · {h1}.", {
+      l0: dec(A.low[0], 2), l1: dec(A.low[1], 2), m0: dec(A.mid[0], 2), m1: dec(A.mid[1], 2), h0: dec(A.high[0], 2), h1: dec(A.high[1], 2) }) + "</p>",
+    "<p><b>" + t("Hedef kalori.") + "</b> " + t("Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %{s} (yavaş), %{m} (orta) ya da %{f} (hızlı) kadarı eklenir. Korurken harcamana eşittir. Hedef kalori güvenli alt sınırın altına inmez: kadında {kadin}, erkekte {erkek} kcal.", {
+      s: String(Math.round(G.slow * 100)), m: String(Math.round(G.mid * 100)), f: String(Math.round(G.fast * 100)), kadin: en ? "1,400" : "1.400", erkek: en ? "1,750" : "1.750" }) + "</p>",
+    "<p><b>" + t("Protein.") + "</b> " + t("Kilo başına hesaplanır. Hesapta kullanılan kilo, mevcut kilonla hedef kilonun küçüğüdür; böylece kilolu biri gereğinden fazla protein almaz.") + "</p>",
+    "<ul class=\"list-disc pl-4 space-y-1\"><li>" + t("Kilo verirken: yağ oranın biliniyorsa yağsız kütlenin her kilosu için {a} g, bilinmiyorsa {b} g.", { a: dec(2.5, 1), b: dec(2.2, 1) }) + "</li><li>"
+      + t("Kilo korurken: {a} g.", { a: dec(1.6, 1) }) + "</li><li>" + t("Kilo alırken: {a} g.", { a: dec(1.8, 1) }) + "</li></ul>",
+    "<p>" + t("Toplam, mevcut kilonun {a} katını geçmez. \"Yüksek\" seçeneğini açarsan en az mevcut kilonun 2 katı olur.", { a: dec(2.2, 1) }) + "</p>",
+    "<p><b>" + t("Yağ ve karbonhidrat.") + "</b> " + t("Yağ kalorinin %25'i, karbonhidrat kalan kaloridir; en az 60 g olur.") + "</p>",
+    "<p>" + t("Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.") + "</p>",
+    "<p class=\"font-semibold text-[var(--t-text)]\">" + t("Kaynaklar") + "</p>",
+    "<ul class=\"list-disc pl-4 space-y-1\">" + METHOD_SOURCES.map(li).join("") + "</ul>"
   ].join("");
-  $("pfLicList").innerHTML = LICENSES.map(x => "<li>" + esc(x) + "</li>").join("");
+  $("pfLicList").innerHTML = LICENSES.map(li).join("");
 }
 function openProfile() {
   fillProfileFields();

@@ -1069,3 +1069,55 @@ function mobNoteL(note) {
   const k = String(note == null ? "" : note).trim();
   return Object.prototype.hasOwnProperty.call(MOB_NOTE_EN, k) ? MOB_NOTE_EN[k] : note;
 }
+
+// ---------------------------------------------------------------------------
+// v52 görev 2 — Hakkında (Hesap yöntemi, kaynaklar, lisanslar, gizlilik), antrenman paylaşım kartı. Sesli yönlendirme anahtarları 22'de.
+// Sayılar yer tutucuyla gelir (renderAbout: Türkçe "1,55", İngilizce "1.55"); etiketler/kaynak adları özel ad olarak kalır.
+// ---------------------------------------------------------------------------
+Object.assign(EN, {
+  // --- Hakkında
+  "Verilerin yalnızca bu telefonda. Barkod okuttuğunda yalnızca barkod numarası Open Food Facts'e gönderilir.": "Your data stays on this phone only. When you scan a barcode, only the barcode number is sent to Open Food Facts.",
+  "Günlük harcama.": "Daily energy use.",
+  "Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.": "The energy you burn at rest comes from the Mifflin-St Jeor equation. If you entered your body fat, the Katch-McArdle equation, which is based on lean mass, is used instead. The result is then multiplied by your activity factor.",
+  "Hareketlilik çarpanları": "Activity factors",
+  "(antrenman günü · dinlenme günü): az hareketli {l0} · {l1}, orta {m0} · {m1}, çok hareketli {h0} · {h1}.": "(workout day · rest day): low activity {l0} · {l1}, moderate {m0} · {m1}, high {h0} · {h1}.",
+  "Hedef kalori.": "Calorie target.",
+  "Kilo verirken seçtiğin açık kadar düşülür. Kilo alırken harcamanın %{s} (yavaş), %{m} (orta) ya da %{f} (hızlı) kadarı eklenir. Korurken harcamana eşittir. Hedef kalori güvenli alt sınırın altına inmez: kadında {kadin}, erkekte {erkek} kcal.": "When losing weight, the deficit you chose is subtracted. When gaining, {s}% (slow), {m}% (moderate) or {f}% (fast) of your energy use is added. When maintaining, it equals your energy use. The calorie target never goes below the safe minimum: {kadin} kcal for women, {erkek} kcal for men.",
+  "Protein.": "Protein.",
+  "Kilo başına hesaplanır. Hesapta kullanılan kilo, mevcut kilonla hedef kilonun küçüğüdür; böylece kilolu biri gereğinden fazla protein almaz.": "It is calculated per kilogram of body weight. The weight used is the smaller of your current weight and your target weight, so someone carrying extra weight does not get more protein than needed.",
+  "Kilo verirken: yağ oranın biliniyorsa yağsız kütlenin her kilosu için {a} g, bilinmiyorsa {b} g.": "When losing weight: {a} g per kilogram of lean mass if your body fat is known, otherwise {b} g per kilogram of body weight.",
+  "Kilo korurken: {a} g.": "When maintaining: {a} g.",
+  "Kilo alırken: {a} g.": "When gaining: {a} g.",
+  "Toplam, mevcut kilonun {a} katını geçmez. \"Yüksek\" seçeneğini açarsan en az mevcut kilonun 2 katı olur.": "The total never exceeds {a} times your current weight. If you turn on \"High\", it is at least 2 times your current weight.",
+  "Yağ ve karbonhidrat.": "Fat and carbohydrate.",
+  "Yağ kalorinin %25'i, karbonhidrat kalan kaloridir; en az 60 g olur.": "Fat is 25% of the calories and carbohydrate is whatever remains; it is at least 60 g.",
+  "Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.": "These are estimates for average people; adjust them to your own results.",
+  "Kaynaklar": "Sources",
+  "Mifflin ve ark. (1990), Mifflin-St Jeor denklemi": "Mifflin et al. (1990), Mifflin-St Jeor equation",
+  "Katch-McArdle denklemi (yağsız kütleye dayalı)": "Katch-McArdle equation (based on lean mass)",
+  "Morton ve ark. 2018, Br J Sports Med (protein ve kas)": "Morton et al. 2018, Br J Sports Med (protein and muscle)",
+  "Nunes ve ark. 2022, J Cachexia Sarcopenia Muscle (protein ve kas)": "Nunes et al. 2022, J Cachexia Sarcopenia Muscle (protein and muscle)",
+  "ISSN Pozisyon Bildirisi 2017 (Jäger ve ark.)": "ISSN Position Stand 2017 (Jäger et al.)",
+  "Helms ve ark. 2014 (kilo verirken protein)": "Helms et al. 2014 (protein while losing weight)",
+  "Iraki ve ark. 2019 (kilo alırken beslenme)": "Iraki et al. 2019 (nutrition while gaining weight)",
+  "Joslin Klinik Beslenme Rehberi": "Joslin Clinical Nutrition Guideline",
+  "AMDR: yağ kalorinin %20–35'i": "AMDR: fat is 20–35% of calories",
+  "Whittaker ve Wu 2021 (bazal metabolizma denklemleri)": "Whittaker and Wu 2021 (basal metabolic rate equations)",
+  "Open Food Facts verisi (ODbL; ürün verisi katkıcılara ait)": "Open Food Facts data (ODbL; product data belongs to its contributors)",
+  "USDA FoodData Central (kamu malı / CC0)": "USDA FoodData Central (public domain / CC0)",
+  "Vücut haritası görseli (uygulama sahibinin kendi görseli)": "Body map image (the app owner's own artwork)",
+  // --- antrenman paylaşım kartı (tuval + pencere)
+  "Antrenman tamamlandı": "Workout complete", "Antrenman|kart": "Workout",
+  "Süre|kart": "Time", "Tonaj|kart": "Volume", "Rekor|kart": "PRs", "Kardiyo|kart": "Cardio", "Set|kart": "Sets", "Hareket|kart": "Exercises", "Hareketler|kart": "Exercises",
+  "AYK+ ile kaydedildi": "Logged with AYK+",
+  "{c} × {s} sn|kart": "{c} × {s} sec",
+  "{n} set • en iyi {kg}×{r}": { one: "{n} set • best {kg}×{r}", other: "{n} sets • best {kg}×{r}" },
+  "{n} set • {r} tekrar": { one: "{n} set • {r} reps", other: "{n} sets • {r} reps" },
+  "Antrenman Özeti": "Workout summary", "Antrenman özeti": "Workout summary",
+  "Kart hazırlanıyor...": "Preparing card...",
+  "Paylaş / Fotoğraflara Kaydet": "Share / Save to Photos",
+  "Paylaş menüsünden Instagram, WhatsApp veya \"Görüntüyü Kaydet\"i seçebilirsin.": "From the share menu you can pick Instagram, WhatsApp or \"Save Image\".",
+  "Kart oluşturulamadı.": "Could not create the card.",
+  "AYK+ Antrenman": "AYK+ Workout", "Görsel indirildi": "Image downloaded",
+  "Paylaşılamadı. Görsele basılı tutup kaydedebilirsin.": "Could not share. Press and hold the image to save it."
+});

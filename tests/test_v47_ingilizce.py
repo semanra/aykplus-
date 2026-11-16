@@ -549,7 +549,7 @@ try:
         "⭐ Özel Eklediklerim": "özel besin cat değeri: kayıtta Türkçe, gösterimde t(stripEmoji(cat)) (kayıtlı-metinler a2)"},
       "08-profil-yedek.js": {
         "Verilerin yalnızca bu telefonda": "PRIVACY_NOTE: Hakkında v49", "Open Food Facts verisi": "LICENSES: Hakkında v49", "USDA FoodData Central": "LICENSES v49", "Vücut haritası görseli": "LICENSES v49",
-        "Katch-McArdle": "METHOD_SOURCES v49", "Iraki ve ark.": "METHOD_SOURCES v49", "AMDR": "METHOD_SOURCES v49", "<p>": "renderAbout gövdesi (Hakkında) v49", "<ul": "renderAbout v49",
+        "Katch-McArdle": "METHOD_SOURCES v49", "Iraki ve ark.": "METHOD_SOURCES v49", "AMDR": "METHOD_SOURCES v49",
         "Yağ": "pfTargetsBox etiketleri ['Kalori','Protein','Karb','Yağ'], gösterimde t(l)",
         "Gece yedeği": "SNAP_KIND_LABEL, gösterimde t(..)", "Haftalık yedek": "SNAP_KIND_LABEL", "Geçiş öncesi": "SNAP_KIND_LABEL", "İçe alma öncesi": "SNAP_KIND_LABEL", "Değişiklik öncesi": "SNAP_KIND_LABEL"},
       "05-secici-hareket.js": {"${}. GÜN: ": "yeni gün varsayılan adı: kayıtlı metin (Türkçe dal; İngilizce dal 'DAY n: '), kayıtlı-metinler"},
@@ -560,10 +560,7 @@ try:
         "Göğüs": "BODY_POLYS anahtarı = MUSCLES kas adı (kayıt anahtarı; gösterimde muscleL)", "Karın": "BODY_POLYS anahtarı", "Ön Bacak": "BODY_POLYS anahtarı", "Sırt": "BODY_POLYS anahtarı", "Arka Bacak & Kalça": "BODY_POLYS anahtarı"},
       "11-mutfak-akilli.js": {},
       "06-mobilite.js": {
-        "Sağ": "tur tarafı kayıt değeri ('Sağ'/'Sol', mobT.rounds; gösterimde mobSideL) ve mobSay Türkçe ses kalıbı 'Sağa geç' (trFill; ses v52'ye kadar Türkçe)",
-        "Sola geç": "mobSay Türkçe ses kalıbı (trFill; ses v52'ye kadar Türkçe)", "Sıradaki set": "mobSay Türkçe ses kalıbı (trFill; ses v52'ye kadar Türkçe)",
-        "Başla": "mobSay Türkçe ses kalıbı (trFill; ses v52'ye kadar Türkçe)",
-        "Isınma": "mobSesStartIds konuşma başlığı: ses v52'ye kadar Türkçe (görünen başlık t('Isınma'))",
+        "Sağ": "tur tarafı kayıt değeri ('Sağ'/'Sol', mobT.rounds; gösterimde mobSideL)",
         "Göğüs": "MOB_WARM_REGIONS anahtarı = MUSCLES kas adı (kayıt anahtarı, çeviri yok)", "Sırt": "MOB_WARM_REGIONS anahtarı (kas adı)",
         "Ön Bacak": "MOB_WARM_REGIONS anahtarı (kas adı)", "Arka Bacak & Kalça": "MOB_WARM_REGIONS anahtarı (kas adı)", "Karın": "MOB_WARM_REGIONS anahtarı (kas adı)"},
       "12-besin-veritabani.js": {}, "13-cizim-baslat.js": {},
@@ -575,7 +572,7 @@ try:
       "15-kurulum.js": {"<div class=\"t-seg ob-seg2\" id=\"obLang\"": "dil seçici işaretlemesi: aria-label t() ile, düğme adları kendi dilinde (Türkçe/English)"}}
     # kısmen kapsamdaki dosyalar: yalnız bu işlevlerin gövdeleri taranır (kalanı v48: Antrenman/Mobilite/İlerleme)
     KISMI = {
-      "09-kas-plaka-koc-takviye.js": ["muscleL", "libCatL", "targetL", "overloadSuggestion", "deloadInfo", "deloadHtml", "dismissDeload", "suggestionHtml", "applySuggestion", "dismissSuggestion", "weeklyMuscleSets", "plateChips", "warmupSets", "openPlateTool", "renderLevelTool", "renderPlateTool", "offerUndo", "doUndo", "nextDayIdx", "fmtMinutes", "fmtDuration", "renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose", "deleteMeal", "copyMeal", "otherMeals", "coachAnalysis", "applyCoach", "resetCoachAdjust", "dayIntake", "historySeries", "setHistRange"]}
+      "09-kas-plaka-koc-takviye.js": ["muscleL", "libCatL", "targetL", "overloadSuggestion", "deloadInfo", "deloadHtml", "dismissDeload", "suggestionHtml", "applySuggestion", "dismissSuggestion", "weeklyMuscleSets", "plateChips", "warmupSets", "openPlateTool", "renderLevelTool", "renderPlateTool", "offerUndo", "doUndo", "nextDayIdx", "fmtMinutes", "fmtDuration", "renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose", "deleteMeal", "copyMeal", "otherMeals", "coachAnalysis", "applyCoach", "resetCoachAdjust", "dayIntake", "historySeries", "setHistRange", "logExerciseLines", "buildShareCanvas", "openShareCard", "shareWorkoutCard"]}
     bad = []; used = {}
     for f, tbl in IZIN.items():
         for (ln, txt, wr, raw) in tarama(rd(f)):
