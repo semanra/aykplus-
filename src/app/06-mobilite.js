@@ -360,10 +360,11 @@ function mobAddHtml() {
 }
 function mobRenderAddList() {
   const box = $("mobAddList"); if (!box) return;
-  const q = mobNorm(mobUI.q).trim().split(/\s+/).filter(Boolean);
+  const en = curLang() === "en", nz = s => en ? mobNorm(s).replace(/ı/g, "i") : mobNorm(s);   // v52: İngilizcede "Inner" → "ınner" olmasın
+  const q = nz(mobUI.q).trim().split(/\s+/).filter(Boolean);
   const inRoutine = new Set(mobItems().map(i => i.name));
   const list = mobLibAll().filter(x => (mobUI.filter === "all" || x.type === mobUI.filter)
-    && q.every(w => mobNorm(x.m.name + " " + x.m.note + (curLang() === "en" ? " " + mobNameL(x.m.name) + " " + mobNoteL(x.m.note) : "")).includes(w)));
+    && q.every(w => nz(x.m.name + " " + x.m.note + (en ? " " + mobNameL(x.m.name) + " " + mobNoteL(x.m.note) : "")).includes(w)));
   const order = [...MOB_REGION_KEYS, ""];
   box.innerHTML = order.map(rk => {
     const rows = list.filter(x => x.region === rk);

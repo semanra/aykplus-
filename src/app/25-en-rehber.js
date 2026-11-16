@@ -982,7 +982,7 @@ const MOB_NOTE_EN = {
   "Göğüs ve omuz önü gevşetme": "Chest and front shoulder release",
   "Üst trapez ve boyun-omuz arası": "Upper traps and neck-shoulder area",
   "Omurga yanı (üst sırt) gevşetme": "Release along the spine (upper back)",
-  "Arka omuz ve kürek kemiği üstü": "Rear shoulder and top of the shoulder blade",
+  "Arka omuz ve kürek kemiği üstü": "Rear shoulder and back of the shoulder blade",
   "Kaval kemiği yanı kaslar": "Muscles beside the shinbone",
   "Ön kol ve kavrama kasları": "Forearm and grip muscles"
 };
