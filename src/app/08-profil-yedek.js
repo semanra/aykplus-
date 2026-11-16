@@ -2,7 +2,7 @@
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setAnim", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 function fillProfileFields() {
   const st = state.settings;
@@ -26,6 +26,7 @@ function fillProfileFields() {
   $("setWarmup").checked = st.warmupCard !== false;
   $("setMobVoice").checked = st.mobVoice === true;
   $("setSplash").checked = st.splash !== false;
+  $("setAnim").checked = st.anim !== false;   // v55
   $("setDayStart").value = String(dayStartHour());
   updateBfHint();
 }
@@ -230,6 +231,7 @@ function applyProfileFields(changedId) {
   st.warmupCard = $("setWarmup").checked;
   st.mobVoice = $("setMobVoice").checked;
   st.splash = $("setSplash").checked;
+  st.anim = $("setAnim").checked;   // v55
   st.dayStartHour = Math.max(0, Math.min(5, parseInt($("setDayStart").value, 10) || 0));
   if (w) state.weight = w;
   if (JSON.stringify([state.settings, state.weight]) === before) { fillProfileFields(); return true; }

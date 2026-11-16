@@ -375,6 +375,7 @@ function toggleSetDone(exIdx, sIdx) {
     }
   }
   renderAll();
+  if (s.done && typeof animSetTick === "function") animSetTick(exIdx, sIdx, !!s.pr);   // v55 ANİM: set tiki (+ rekor parıltısı)
   if (s.done && ex.sets.every(x => x.done)) {
     const day = activeDay();
     const j = day.exercises.findIndex((o, i) => i > exIdx && o.sets.some(x => !x.done));

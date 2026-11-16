@@ -216,6 +216,7 @@ function finishTimer() {
   $("restPillTime").textContent = t("BİTTİ!");
   $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums text-[var(--d-over)]";
   $("restPillInner").classList.add("timer-flash");
+  if (typeof animRestPulse === "function") animRestPulse(0);   // v55 ANİM: dinlenme nabzı (0'da durur)
   toast(t("{ad} bitti!", { ad: timerLabelText(timer.label) }));
   setTimeout(() => { if (!timer.running) resetTimerUI(); }, 4500);
 }
@@ -239,11 +240,13 @@ function renderTimerUI(rem) {
   $("restPillLabel").textContent = timerLabelText(timer.label);
   $("restPillTime").textContent = fmtClock(rem);
   $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums " + (rem <= 10 ? "text-[var(--d-over)]" : "text-[var(--t-acc-text)]");
+  if (typeof animRestPulse === "function") animRestPulse(rem);   // v55 ANİM: dinlenme nabzı
 }
 
 function resetTimerUI() {
   $("restPill").classList.add("hidden");
   $("restPillInner").classList.remove("timer-flash");
+  if (typeof animRestPulse === "function") animRestPulse(0);   // v55
 }
 
 // ---------------------------------------------------------------------------
@@ -373,6 +376,7 @@ function applyTabVisibility() {
     tb.innerHTML = light
       ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>'
       : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
+    if (typeof animThemeIcon === "function") animThemeIcon(tb);   // v55 ANİM: tema geçişi (simge döner)
   }
   tb.setAttribute("aria-label", light ? t("Koyu temaya geç") : t("Aydınlık temaya geç"));
   const tt = $("tabTitle");

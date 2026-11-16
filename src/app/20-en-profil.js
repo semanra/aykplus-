@@ -73,6 +73,8 @@ Object.assign(EN, {
   "Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.": "Your nutrition day resets at this time. Move it later if you want late-night meals counted towards the previous day.",
   "Açılış animasyonu": "Launch animation",
   "Uygulama açılırken logo kısa bir geçişle görünür.": "The logo appears with a short transition when the app opens.",
+  "Animasyonlar": "Animations",   // v55
+  "Halkalar, sayılar, set tiki ve tema geçişi kısa ve hafif hareketle değişir.": "Rings, numbers, set ticks and theme changes move briefly and subtly.",
 
   // --- Yedekleme
   "Telefondaki kayıt alanı": "Storage on this phone",

@@ -3,11 +3,13 @@
 import os, json
 _HERE = os.path.dirname(os.path.abspath(__file__))
 FIXTURE = os.path.join(_HERE, "fixtures", "eski_varsayilan.json")
-SPLASH_OFF = "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
+# v55: window.AYK_NO_ANIM = true → uygulama içi animasyonlar (halka, sayaç, set tiki, tema geçişi) anında son hâlde
+NO_ANIM_FLAG = "window.AYK_NO_ANIM = true;"
+SPLASH_OFF = NO_ANIM_FLAG + "document.addEventListener('DOMContentLoaded',()=>{const s=document.getElementById('splash'); if(s) s.remove();})"
 with open(FIXTURE, encoding="utf-8") as _f:
     _SEED = json.load(_f)
 TEST_INIT = "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";\n" + SPLASH_OFF
-SEED_ONLY = "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";"   # açılış animasyonu kalır (splash testleri)
+SEED_ONLY = NO_ANIM_FLAG + "window.AYK_TEST_SEED = " + json.dumps(_SEED, ensure_ascii=False) + ";"   # açılış animasyonu kalır (splash testleri)
 
 def with_defaults(seed):
     """Eski normalizeState davranışı: {...DEFAULT_STATE, ...kayıt}, ayarlar bir seviye derin birleşir.

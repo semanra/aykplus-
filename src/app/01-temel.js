@@ -15,7 +15,7 @@ const DEFAULT_SETTINGS = {
   sex: "male", height: 170, age: 30, targetWeight: 70,
   waterTarget: 2.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
-  macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
+  macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true, anim: true,
   nutriLight: false, scaleOn: false, scaleBase: 0,
   goal: "keep", gainPace: "mid", activity: "mid", proteinHigh: false,   // v43: hedef Ver/Koru/Al, hız, hareketlilik, yüksek protein
   theme: "system"   // v31: system | dark | light (nutriLight eski alan, artık kullanılmıyor ama silinmez)
@@ -406,7 +406,8 @@ function normalizeStateInner(raw) {
   if (s.settings.units !== "metric" && s.settings.units !== "imperial") s.settings.units = "metric";   // v53
   s.settings.proteinHigh = s.settings.proteinHigh === true;
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
-  s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
+  s.settings.warmupCard = s.settings.warmupCard !== false;
+  s.settings.anim = s.settings.anim !== false;   // v55: uygulama içi animasyonlar (varsayılan açık)   // v40: antrenmanda ısınma kartı (gizlenebilir)
   s.settings.scaleOn = !!s.settings.scaleOn;
   s.settings.scaleBase = num(s.settings.scaleBase, 0);
   if (s.settings.scaleOn && !(s.settings.scaleBase > 0)) s.settings.scaleOn = false;

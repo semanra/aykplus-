@@ -19,6 +19,7 @@ function restorePendingFocus() {
 }
 
 function renderAll() {
+  if (typeof syncAnimClass === "function") syncAnimClass();   // v55
   invalidateFoodDB();
   refreshFoodSnaps();
   applyCustomIcon();

@@ -5,6 +5,8 @@ import os, sys, subprocess, time, socket, contextlib, datetime
 FIXED_TIME = datetime.datetime(2026, 11, 14, 10, 30, 0)   # ekranlar her çalıştırmada aynı çıksın diye sabit saat
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tests"))
 from ortak_tohum import TEST_INIT, SPLASH_OFF   # v44: açılış animasyonu kaldırma + eski varsayılan tohum (kurulum ekranı çıkmasın)
+# v55: SPLASH_OFF (dolayısıyla TEST_INIT, NO_ANIM, SPLASH_ANIM, EN_INIT) window.AYK_NO_ANIM = true taşır: uygulama içi
+# animasyonlar (halka, sayaç, set tiki, tema geçişi) kapalı, ekranlar son hâlde çekilir.
 NO_ANIM = (TEST_INIT + ";" + "document.addEventListener('DOMContentLoaded',()=>{"
            "const st=document.createElement('style'); st.textContent='*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}';"
            "document.head.appendChild(st);})")

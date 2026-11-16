@@ -97,7 +97,11 @@ function applyTheme() {
   try { if (localStorage.getItem("ayk_theme") !== state.settings.theme) localStorage.setItem("ayk_theme", state.settings.theme); } catch (e) {}
 }
 function setTheme(mode) { state.settings.theme = ["system", "dark", "light"].includes(mode) ? mode : "system"; renderAll(); }
-function toggleTheme() { setTheme(themeIsLight() ? "dark" : "light"); }
+function toggleTheme() {
+  const mode = themeIsLight() ? "dark" : "light";
+  if (typeof animThemeSwitch === "function") animThemeSwitch(() => setTheme(mode));   // v55 ANİM: tema geçişi
+  else setTheme(mode);
+}
 const toggleNutriLight = toggleTheme;   // eski ad (başlıktaki düğme)
 // Sistem teması değişince: olay + yedek olarak uygulamaya dönüşte yeniden bak (iOS arka plandayken olayı kaçırabilir)
 function onSystemTheme() { try { if (state.settings.theme === "system" && themeIsLight() !== document.documentElement.classList.contains("light")) applyTabVisibility(); } catch (e) {} }
@@ -337,14 +341,17 @@ function updateMacroCard(prefix, consumed, target, unit) {
   const over = diff < 0;
   const pct = target > 0 ? Math.min(100, Math.round((cRound / target) * 100)) : 0;
   $(`${prefix}Consumed`).textContent = fmtInt(cRound);
+  if (typeof animNum === "function") animNum(`${prefix}Consumed`, cRound, fmtInt);   // v55 ANİM: sayı
   $(`${prefix}Target`).textContent = fmtInt(target);
   const st = $(`${prefix}Status`);
   if (prefix === "cal") {
     st.innerHTML = `<div class="text-[12px] font-semibold ${over ? "text-[#FB7185]" : "text-white/70"}">${t(over ? "Aşım" : "Kalan")}</div>
-      <div class="flex items-baseline gap-1 whitespace-nowrap"><span class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-white"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
+      <div class="flex items-baseline gap-1 whitespace-nowrap"><span id="calLeft" class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-white"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
+    if (typeof animNum === "function") animNum("calLeft", diff, v => (v < -0.5 ? "+" : "") + fmtInt(Math.abs(v)));   // v55 ANİM: sayı
     const ring = $("calRing");
     const C = 301.59;
-    ring.style.strokeDashoffset = String(C - (C * pct) / 100);
+    if (typeof animRing === "function") animRing(ring, String(C - (C * pct) / 100));   // v55 ANİM: halka
+    else ring.style.strokeDashoffset = String(C - (C * pct) / 100);
     ring.setAttribute("stroke", over ? "#FB7185" : "#22C55E");
     return;
   }
@@ -373,7 +380,9 @@ function renderWater() {
   $("waterVal").textContent = fmtKg(w);
   $("waterTarget").textContent = fmtNum(wt);
   $("waterPct").textContent = t("%{p}", { p: String(pct) });
-  $("waterRing").style.strokeDashoffset = String(Math.round(WATER_RING_C * (1 - pct / 100) * 100) / 100);
+  const wOff = String(Math.round(WATER_RING_C * (1 - pct / 100) * 100) / 100);
+  if (typeof animRing === "function") animRing($("waterRing"), wOff);   // v55 ANİM: halka
+  else $("waterRing").style.strokeDashoffset = wOff;
   const a = state.settings.waterAuto !== false ? waterAutoInfo() : null;
   $("waterNote").textContent = a ? (isImperial()   // v53: imperial'de kg formülü yerine kilo lb olarak (hesap kg × 35 ml aynı)
       ? t(a.cr ? "Kilona göre ({w} lb) + 0,5 L kreatin" : "Kilona göre ({w} lb)", { w: fmtNum(num(bodyKgToDisp(a.w))) })

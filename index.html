@@ -520,7 +520,7 @@
     .n-wring { transform: rotate(-90deg); }
     .n-wring circle { fill: none; stroke-width: 12; }
     .n-wring .bg { stroke: var(--n-elev2); }
-    .n-wring .fg { stroke: var(--n-water); stroke-linecap: round; stroke-dasharray: 364.42; stroke-dashoffset: 364.42; transition: stroke-dashoffset .4s cubic-bezier(.4, 0, .2, 1); }
+    .n-wring .fg { stroke: var(--n-water); stroke-linecap: round; stroke-dasharray: 364.42; stroke-dashoffset: 364.42; }
     .n-sbar { height: 6px; background: var(--n-elev2); border-radius: 99px; overflow: hidden; }
     .n-sbar > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--n-btn), var(--n-accent)); transition: width .3s ease; }
     .n-sgroup { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--n-muted); padding-top: 4px; }
@@ -668,6 +668,36 @@
       .ob-opt, .ob-check { min-height: 56px; padding: 9px 14px; } .ob-opt-s { font-size: 13px; }
     }
     @media (min-width: 768px) { .ob-title { font-size: 40px; } .ob-hero .ob-title { font-size: 52px; } .ob-body { padding-top: 32px; } }
+    /* v55 ANİMASYONLAR (27-animasyon.js). Geçişler yalnızca html.anim-on varken (animOK: Hareketi azalt kapalı,
+       Profil → Animasyonlar açık, testlerde AYK_NO_ANIM yok); sınıf yokken her şey anında son hâlde. */
+    /* v55 ANİM: halka */
+    html.anim-on #calRing { transition: stroke-dashoffset .6s cubic-bezier(.22, 1, .36, 1), stroke .3s; }
+    html.anim-on .n-wring .fg { transition: stroke-dashoffset .6s cubic-bezier(.22, 1, .36, 1); }
+    html.anim-on .n-sbar > i { transition: width .6s cubic-bezier(.22, 1, .36, 1); }
+    html:not(.anim-on) .n-sbar > i, html:not(.anim-on) #proBar, html:not(.anim-on) #carbBar, html:not(.anim-on) #fatBar { transition: none; }
+    /* v55 ANİM: set tiki */
+    html.anim-on .ayk-tick svg { animation: aykTick .26s cubic-bezier(.3, 1.4, .5, 1); }
+    @keyframes aykTick { 0% { transform: scale(.6); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+    html.anim-on .ayk-glow { position: relative; }
+    html.anim-on .ayk-glow::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgba(var(--t-acc-rgb), .18); pointer-events: none; animation: aykGlow .5s ease-out forwards; }
+    @keyframes aykGlow { from { opacity: 1; } to { opacity: 0; } }
+    /* v55 ANİM: rekor parıltısı */
+    .ayk-burst { position: fixed; width: 0; height: 0; z-index: 85; pointer-events: none; }
+    .ayk-burst i { position: absolute; left: -3px; top: -3px; width: 6px; height: 6px; border-radius: 99px; background: var(--t-acc); opacity: 0;
+      transform: rotate(var(--a)) translateY(0) scale(.4); animation: aykSpark .8s cubic-bezier(.2, .8, .3, 1) forwards; will-change: transform, opacity; }
+    .ayk-burst i:nth-child(even) { background: var(--t-warn-icon); }
+    .ayk-burst b { position: absolute; left: -26px; top: -26px; width: 52px; height: 52px; border-radius: 99px; border: 2px solid var(--t-acc); opacity: 0; animation: aykRing .6s ease-out forwards; }
+    @keyframes aykSpark { 0% { opacity: 0; transform: rotate(var(--a)) translateY(0) scale(.4); } 20% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) scale(1); } }
+    @keyframes aykRing { 0% { opacity: .9; transform: scale(.5); } 100% { opacity: 0; transform: scale(1.5); } }
+    /* v55 ANİM: dinlenme nabzı */
+    html.anim-on #restPillInner.ayk-pulse { animation: aykPulse 1s ease-in-out infinite; }
+    @keyframes aykPulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--t-acc-rgb), 0); } 50% { transform: scale(1.04); box-shadow: 0 0 0 6px rgba(var(--t-acc-rgb), .22); } }
+    /* v55 ANİM: tema geçişi */
+    html.anim-on::view-transition-old(root), html.anim-on::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+    html.anim-on.theme-fade body, html.anim-on.theme-fade body * { transition: background-color .25s ease, border-color .25s ease, color .25s ease, fill .25s ease, stroke .25s ease !important; }
+    html.anim-on #nutriThemeBtn svg.ayk-spin { animation: aykSpin .45s cubic-bezier(.22, 1, .36, 1); }
+    @keyframes aykSpin { from { transform: rotate(-90deg) scale(.6); opacity: .3; } to { transform: rotate(0) scale(1); opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .ayk-burst { display: none; } }
   </style>
 </head>
 <body class="pb-36">
@@ -741,7 +771,7 @@
           <div class="relative w-[124px] h-[124px] shrink-0">
             <svg class="w-full h-full -rotate-90" viewBox="0 0 112 112" aria-hidden="true">
               <circle cx="56" cy="56" r="48" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="10"></circle>
-              <circle id="calRing" cx="56" cy="56" r="48" fill="none" stroke="#22C55E" stroke-width="10" stroke-linecap="round" stroke-dasharray="301.59" stroke-dashoffset="301.59" style="transition: stroke-dashoffset .5s ease, stroke .3s;"></circle>
+              <circle id="calRing" cx="56" cy="56" r="48" fill="none" stroke="#22C55E" stroke-width="10" stroke-linecap="round" stroke-dasharray="301.59" stroke-dashoffset="301.59"></circle>
             </svg>
             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
               <span id="calConsumed" class="t-display text-[30px] leading-none text-white tabular-nums">0</span>
@@ -1405,6 +1435,10 @@
         <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0">
           <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Açılış animasyonu">Açılış animasyonu</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Uygulama açılırken logo kısa bir geçişle görünür.">Uygulama açılırken logo kısa bir geçişle görünür.</span></span>
           <input id="setSplash" type="checkbox" class="t-sw" />
+        </label>
+        <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
+          <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Animasyonlar">Animasyonlar</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Halkalar, sayılar, set tiki ve tema geçişi kısa ve hafif hareketle değişir.">Halkalar, sayılar, set tiki ve tema geçişi kısa ve hafif hareketle değişir.</span></span>
+          <input id="setAnim" type="checkbox" class="t-sw" />
         </label>
           </div>
         </section>
@@ -2497,7 +2531,7 @@ const DEFAULT_SETTINGS = {
   sex: "male", height: 170, age: 30, targetWeight: 70,
   waterTarget: 2.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
-  macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true,
+  macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true, anim: true,
   nutriLight: false, scaleOn: false, scaleBase: 0,
   goal: "keep", gainPace: "mid", activity: "mid", proteinHigh: false,   // v43: hedef Ver/Koru/Al, hız, hareketlilik, yüksek protein
   theme: "system"   // v31: system | dark | light (nutriLight eski alan, artık kullanılmıyor ama silinmez)
@@ -2888,7 +2922,8 @@ function normalizeStateInner(raw) {
   if (s.settings.units !== "metric" && s.settings.units !== "imperial") s.settings.units = "metric";   // v53
   s.settings.proteinHigh = s.settings.proteinHigh === true;
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
-  s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
+  s.settings.warmupCard = s.settings.warmupCard !== false;
+  s.settings.anim = s.settings.anim !== false;   // v55: uygulama içi animasyonlar (varsayılan açık)   // v40: antrenmanda ısınma kartı (gizlenebilir)
   s.settings.scaleOn = !!s.settings.scaleOn;
   s.settings.scaleBase = num(s.settings.scaleBase, 0);
   if (s.settings.scaleOn && !(s.settings.scaleBase > 0)) s.settings.scaleOn = false;
@@ -3269,6 +3304,7 @@ function finishTimer() {
   $("restPillTime").textContent = t("BİTTİ!");
   $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums text-[var(--d-over)]";
   $("restPillInner").classList.add("timer-flash");
+  if (typeof animRestPulse === "function") animRestPulse(0);   // v55 ANİM: dinlenme nabzı (0'da durur)
   toast(t("{ad} bitti!", { ad: timerLabelText(timer.label) }));
   setTimeout(() => { if (!timer.running) resetTimerUI(); }, 4500);
 }
@@ -3292,11 +3328,13 @@ function renderTimerUI(rem) {
   $("restPillLabel").textContent = timerLabelText(timer.label);
   $("restPillTime").textContent = fmtClock(rem);
   $("restPillTime").className = "t-display text-[30px] leading-none tabular-nums " + (rem <= 10 ? "text-[var(--d-over)]" : "text-[var(--t-acc-text)]");
+  if (typeof animRestPulse === "function") animRestPulse(rem);   // v55 ANİM: dinlenme nabzı
 }
 
 function resetTimerUI() {
   $("restPill").classList.add("hidden");
   $("restPillInner").classList.remove("timer-flash");
+  if (typeof animRestPulse === "function") animRestPulse(0);   // v55
 }
 
 // ---------------------------------------------------------------------------
@@ -3426,6 +3464,7 @@ function applyTabVisibility() {
     tb.innerHTML = light
       ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>'
       : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>';
+    if (typeof animThemeIcon === "function") animThemeIcon(tb);   // v55 ANİM: tema geçişi (simge döner)
   }
   tb.setAttribute("aria-label", light ? t("Koyu temaya geç") : t("Aydınlık temaya geç"));
   const tt = $("tabTitle");
@@ -3620,7 +3659,11 @@ function applyTheme() {
   try { if (localStorage.getItem("ayk_theme") !== state.settings.theme) localStorage.setItem("ayk_theme", state.settings.theme); } catch (e) {}
 }
 function setTheme(mode) { state.settings.theme = ["system", "dark", "light"].includes(mode) ? mode : "system"; renderAll(); }
-function toggleTheme() { setTheme(themeIsLight() ? "dark" : "light"); }
+function toggleTheme() {
+  const mode = themeIsLight() ? "dark" : "light";
+  if (typeof animThemeSwitch === "function") animThemeSwitch(() => setTheme(mode));   // v55 ANİM: tema geçişi
+  else setTheme(mode);
+}
 const toggleNutriLight = toggleTheme;   // eski ad (başlıktaki düğme)
 // Sistem teması değişince: olay + yedek olarak uygulamaya dönüşte yeniden bak (iOS arka plandayken olayı kaçırabilir)
 function onSystemTheme() { try { if (state.settings.theme === "system" && themeIsLight() !== document.documentElement.classList.contains("light")) applyTabVisibility(); } catch (e) {} }
@@ -3860,14 +3903,17 @@ function updateMacroCard(prefix, consumed, target, unit) {
   const over = diff < 0;
   const pct = target > 0 ? Math.min(100, Math.round((cRound / target) * 100)) : 0;
   $(`${prefix}Consumed`).textContent = fmtInt(cRound);
+  if (typeof animNum === "function") animNum(`${prefix}Consumed`, cRound, fmtInt);   // v55 ANİM: sayı
   $(`${prefix}Target`).textContent = fmtInt(target);
   const st = $(`${prefix}Status`);
   if (prefix === "cal") {
     st.innerHTML = `<div class="text-[12px] font-semibold ${over ? "text-[#FB7185]" : "text-white/70"}">${t(over ? "Aşım" : "Kalan")}</div>
-      <div class="flex items-baseline gap-1 whitespace-nowrap"><span class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-white"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
+      <div class="flex items-baseline gap-1 whitespace-nowrap"><span id="calLeft" class="t-display text-[34px] leading-none tabular-nums ${over ? "text-[#FB7185]" : "text-white"}">${over ? "+" : ""}${fmtInt(Math.abs(diff))}</span><span class="text-[12px] font-semibold text-white/80">kcal</span></div>`;
+    if (typeof animNum === "function") animNum("calLeft", diff, v => (v < -0.5 ? "+" : "") + fmtInt(Math.abs(v)));   // v55 ANİM: sayı
     const ring = $("calRing");
     const C = 301.59;
-    ring.style.strokeDashoffset = String(C - (C * pct) / 100);
+    if (typeof animRing === "function") animRing(ring, String(C - (C * pct) / 100));   // v55 ANİM: halka
+    else ring.style.strokeDashoffset = String(C - (C * pct) / 100);
     ring.setAttribute("stroke", over ? "#FB7185" : "#22C55E");
     return;
   }
@@ -3896,7 +3942,9 @@ function renderWater() {
   $("waterVal").textContent = fmtKg(w);
   $("waterTarget").textContent = fmtNum(wt);
   $("waterPct").textContent = t("%{p}", { p: String(pct) });
-  $("waterRing").style.strokeDashoffset = String(Math.round(WATER_RING_C * (1 - pct / 100) * 100) / 100);
+  const wOff = String(Math.round(WATER_RING_C * (1 - pct / 100) * 100) / 100);
+  if (typeof animRing === "function") animRing($("waterRing"), wOff);   // v55 ANİM: halka
+  else $("waterRing").style.strokeDashoffset = wOff;
   const a = state.settings.waterAuto !== false ? waterAutoInfo() : null;
   $("waterNote").textContent = a ? (isImperial()   // v53: imperial'de kg formülü yerine kilo lb olarak (hesap kg × 35 ml aynı)
       ? t(a.cr ? "Kilona göre ({w} lb) + 0,5 L kreatin" : "Kilona göre ({w} lb)", { w: fmtNum(num(bodyKgToDisp(a.w))) })
@@ -5528,6 +5576,7 @@ function toggleSetDone(exIdx, sIdx) {
     }
   }
   renderAll();
+  if (s.done && typeof animSetTick === "function") animSetTick(exIdx, sIdx, !!s.pr);   // v55 ANİM: set tiki (+ rekor parıltısı)
   if (s.done && ex.sets.every(x => x.done)) {
     const day = activeDay();
     const j = day.exercises.findIndex((o, i) => i > exIdx && o.sets.some(x => !x.done));
@@ -6933,7 +6982,7 @@ function renderProgress() {
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setAnim", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 function fillProfileFields() {
   const st = state.settings;
@@ -6957,6 +7006,7 @@ function fillProfileFields() {
   $("setWarmup").checked = st.warmupCard !== false;
   $("setMobVoice").checked = st.mobVoice === true;
   $("setSplash").checked = st.splash !== false;
+  $("setAnim").checked = st.anim !== false;   // v55
   $("setDayStart").value = String(dayStartHour());
   updateBfHint();
 }
@@ -7161,6 +7211,7 @@ function applyProfileFields(changedId) {
   st.warmupCard = $("setWarmup").checked;
   st.mobVoice = $("setMobVoice").checked;
   st.splash = $("setSplash").checked;
+  st.anim = $("setAnim").checked;   // v55
   st.dayStartHour = Math.max(0, Math.min(5, parseInt($("setDayStart").value, 10) || 0));
   if (w) state.weight = w;
   if (JSON.stringify([state.settings, state.weight]) === before) { fillProfileFields(); return true; }
@@ -9975,6 +10026,7 @@ function restorePendingFocus() {
 }
 
 function renderAll() {
+  if (typeof syncAnimClass === "function") syncAnimClass();   // v55
   invalidateFoodDB();
   refreshFoodSnaps();
   applyCustomIcon();
@@ -11140,6 +11192,8 @@ Object.assign(EN, {
   "Beslenme günü bu saatte yenilenir. Geç saatte yediklerin önceki güne yazılsın istersen ileri al.": "Your nutrition day resets at this time. Move it later if you want late-night meals counted towards the previous day.",
   "Açılış animasyonu": "Launch animation",
   "Uygulama açılırken logo kısa bir geçişle görünür.": "The logo appears with a short transition when the app opens.",
+  "Animasyonlar": "Animations",   // v55
+  "Halkalar, sayılar, set tiki ve tema geçişi kısa ve hafif hareketle değişir.": "Rings, numbers, set ticks and theme changes move briefly and subtly.",
 
   // --- Yedekleme
   "Telefondaki kayıt alanı": "Storage on this phone",
@@ -13272,6 +13326,165 @@ Object.assign(EN, {
   "Kilona göre ({w} lb): {b} L": "Based on your weight ({w} lb): {b} L",
   "Kilona göre ({w} lb): {b} L + 0,5 L kreatin → {tot} L": "Based on your weight ({w} lb): {b} L + 0.5 L for creatine → {tot} L"
 });
+// ============================================================================
+// v55 — UYGULAMA İÇİ ANİMASYONLAR (halkalar, sayılar, set tiki, rekor parıltısı, dinlenme nabzı, tema geçişi)
+// Kurallar: yalnızca transform / opacity / clip-path / stroke; renderAll süresini artırmaz (iş rAF'te);
+// animOK() false iken (Hareketi azalt, Profil → Animasyonlar kapalı, testlerde window.AYK_NO_ANIM) her şey anında
+// son hâlde görünür: geçiş sınıfı (html.anim-on) yok, rAF yok. Her animasyon ayrı, "v55 ANİM: <ad>" etiketli blok;
+// bir blok silinirse çağrı yeri typeof denetimiyle sessizce son hâli gösterir. CSS karşılıkları src/markup.html
+// "v55 ANİMASYONLAR" bloğunda.
+// ============================================================================
+const ANIM_RM = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+function animOK() {
+  if (window.AYK_NO_ANIM === true) return false;
+  if (ANIM_RM && ANIM_RM.matches) return false;
+  return !(state && state.settings && state.settings.anim === false);
+}
+// html.anim-on: CSS geçişleri (halkalar, çubuklar) yalnızca bu sınıf varken çalışır
+function syncAnimClass() {
+  const on = animOK();
+  const root = document.documentElement;
+  if (root.classList.contains("anim-on") !== on) root.classList.toggle("anim-on", on);
+}
+
+/* v55 ANİM: halka */
+// Halka (kalori, su): stroke-dashoffset CSS geçişiyle önceki değerden yeniye (aynı değer → geçiş yok).
+// İlk görünüş 0'dan: işaretlemede halka boş başlar; açılış ekranı (splash) üstteyse ilk dolum o kalkınca oynar.
+const animRingPending = {};
+function animRing(el, offset) {
+  if (!el) return;
+  const v = String(offset);
+  const id = el.id;
+  if (!animOK() || !id) { delete animRingPending[id]; el.style.strokeDashoffset = v; return; }
+  if (id in animRingPending) { animRingPending[id] = v; return; }
+  if (!el.dataset.animSeen && document.getElementById("splash")) {
+    animRingPending[id] = v;
+    const started = Date.now();
+    const wait = () => {
+      if (document.getElementById("splash") && Date.now() - started < 4000) { setTimeout(wait, 100); return; }
+      const val = animRingPending[id]; delete animRingPending[id];
+      const cur = document.getElementById(id);
+      if (cur && val != null) { cur.dataset.animSeen = "1"; requestAnimationFrame(() => { cur.style.strokeDashoffset = val; }); }
+    };
+    setTimeout(wait, 100);
+    return;
+  }
+  el.dataset.animSeen = "1";
+  if (el.style.strokeDashoffset !== v) el.style.strokeDashoffset = v;
+}
+
+/* v55 ANİM: sayı */
+// Sayının sayarak değişmesi. Çizim son metni ZATEN yazmıştır (o metin doğrudur); animasyon yalnız ara kareleri
+// yazar ve sonunda çizimin yazdığı metni BİREBİR geri koyar. Öğe her karede kimliğiyle aranır (innerHTML ile
+// yeniden çizilen kutularda eski öğeye yazılmaz). Aynı değer tekrar çizilirse yeniden oynamaz.
+const animNums = {};
+function countTo(el, from, to, fmt) {
+  if (!el || !el.id) return;
+  const id = el.id;
+  const st = animNums[id] || (animNums[id] = { val: undefined, cur: 0, raf: 0, final: "" });
+  st.final = el.textContent;
+  st.val = to;
+  if (!animOK() || !isFinite(from) || !isFinite(to) || from === to) {
+    if (st.raf) { cancelAnimationFrame(st.raf); st.raf = 0; }
+    st.cur = to;
+    return;
+  }
+  if (st.raf) cancelAnimationFrame(st.raf);
+  const t0 = performance.now(), dur = 450;
+  const step = now => {
+    const node = document.getElementById(id);
+    const k = Math.min(1, (now - t0) / dur);
+    if (!node) { st.raf = 0; st.cur = to; return; }
+    if (k >= 1) { st.raf = 0; st.cur = to; if (node.textContent !== st.final) node.textContent = st.final; return; }
+    const e = 1 - Math.pow(1 - k, 3);
+    st.cur = from + (to - from) * e;
+    node.textContent = fmt(st.cur);
+    st.raf = requestAnimationFrame(step);
+  };
+  el.textContent = fmt(from);
+  st.cur = from;
+  st.raf = requestAnimationFrame(step);
+}
+// Çizimden çağrılır: o anki gösterilen değerden (ilk açılışta 0'dan) yeni değere sayar.
+function animNum(id, value, fmt) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const st = animNums[id];
+  if (st && st.val === value) { st.final = el.textContent; return; }   // aynı değer: oynamaz (sürüyorsa son metin güncellenir)
+  const from = st ? (st.raf ? st.cur : st.val) : 0;
+  countTo(el, from, value, fmt);
+}
+
+/* v55 ANİM: set tiki */
+// Set tamamlanınca onay işareti "pıt" (0,6 → 1,12 → 1) ve satırda kısa vurgu parıltısı. Kayda dokunmaz.
+function animSetTick(exIdx, sIdx, isPr) {
+  if (!animOK()) return;
+  const btn = document.querySelector(`#gymRoot button[onclick="toggleSetDone(${exIdx}, ${sIdx})"]`);
+  if (!btn) return;
+  btn.classList.remove("ayk-tick"); void btn.offsetWidth; btn.classList.add("ayk-tick");
+  const row = btn.closest(".rounded-2xl");
+  if (row) { row.classList.remove("ayk-glow"); void row.offsetWidth; row.classList.add("ayk-glow"); }
+  setTimeout(() => { btn.classList.remove("ayk-tick"); if (row) row.classList.remove("ayk-glow"); }, 560);
+  if (isPr && typeof animPrBurst === "function") animPrBurst(btn);
+}
+
+/* v55 ANİM: rekor parıltısı */
+// Yeni rekorda onay düğmesinin çevresinde kısa CSS parçacık patlaması (≤ 900 ms), sonra DOM'dan kalkar.
+function animPrBurst(anchor) {
+  if (!animOK() || !anchor) return;
+  const r = anchor.getBoundingClientRect();
+  const wrap = document.createElement("div");
+  wrap.className = "ayk-burst";
+  wrap.setAttribute("aria-hidden", "true");
+  wrap.style.left = Math.round(r.left + r.width / 2) + "px";
+  wrap.style.top = Math.round(r.top + r.height / 2) + "px";
+  let html = "";
+  for (let i = 0; i < 10; i++) html += `<i style="--a:${i * 36}deg;--d:${i % 2 ? 30 : 42}px"></i>`;
+  wrap.innerHTML = html + "<b></b>";
+  document.body.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 900);
+}
+
+/* v55 ANİM: dinlenme nabzı */
+// Dinlenme sayacının son 3 saniyesinde hafif nabız; 0'da (bitti) durur.
+function animRestPulse(rem) {
+  const el = document.getElementById("restPillInner");
+  if (!el) return;
+  const on = animOK() && rem > 0 && rem <= 3;
+  if (el.classList.contains("ayk-pulse") !== on) el.classList.toggle("ayk-pulse", on);
+}
+
+/* v55 ANİM: tema geçişi */
+// Başlıktaki güneş/ay düğmesi: View Transitions varsa (Safari 18+) düğmeden dairesel açılış, yoksa kısa çapraz solma.
+function animThemeSwitch(apply) {
+  if (!animOK()) { apply(); return; }
+  const btn = document.getElementById("nutriThemeBtn");
+  const root = document.documentElement;
+  if (typeof document.startViewTransition === "function" && document.visibilityState === "visible") {
+    const r = btn ? btn.getBoundingClientRect() : { left: innerWidth - 40, top: 20, width: 0, height: 0 };
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const rad = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    let vt;
+    try { vt = document.startViewTransition(() => { apply(); }); } catch (e) { apply(); return; }
+    vt.ready.then(() => {
+      try {
+        root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${rad}px at ${x}px ${y}px)`] },
+          { duration: 400, easing: "cubic-bezier(.22, 1, .36, 1)", pseudoElement: "::view-transition-new(root)" });
+      } catch (e) { /* yoksay: tarayıcı varsayılan solmasını yapar */ }
+    }).catch(() => {});
+    return;
+  }
+  root.classList.add("theme-fade");
+  apply();
+  clearTimeout(animThemeSwitch.tm);
+  animThemeSwitch.tm = setTimeout(() => root.classList.remove("theme-fade"), 300);
+}
+// Tema düğmesindeki simge değişince hafif döner (ilk çizimde değil).
+function animThemeIcon(btn) {
+  if (!animOK() || !btn || !btn.dataset.animIcon) { if (btn) btn.dataset.animIcon = "1"; return; }
+  const svg = btn.querySelector("svg");
+  if (svg) svg.classList.add("ayk-spin");
+}
 
 </script>
 </body>
