@@ -398,7 +398,7 @@ function progGucHtml() {
     const pts = ser.points.filter(p => p.t).slice(-30);
     const best = pts.length ? Math.max(...pts.map(p => p.y)) : 0;
     const chart = pts.length >= 4
-      ? pLine([{ pts, color: PC.tq, name: ser.metric === "Tahmini 1RM" ? t("tahmini 1RM") : ser.metric === "Toplam mesafe" ? t("toplam mesafe") : ser.metric === "Toplam süre" ? t("toplam süre") : t("en uzun set") }], { unit: t(ser.unit), h: 170, label: t("{ad} {metrik}|grafik etiketi", { ad: name, metrik: t(ser.metric) }) })
+      ? pLine([{ pts, color: PC.tq, name: ser.metric === "Tahmini 1RM" ? t("tahmini 1RM") : ser.metric === "Toplam mesafe" ? t("toplam mesafe") : ser.metric === "Toplam süre" ? t("toplam süre") : t("en uzun set") }], { unit: t(ser.unit), h: 170, label: t("{ad} {metrik}|grafik etiketi", { ad: exNameL(name), metrik: t(ser.metric) }) })
       : `<div class="p-lowd"><div><b>${esc(exNameL(name))}</b><span>${tn(pts.length, "{n} seans · grafik için en az 4 gerekir")}</span></div>
           <div class="p-lowd-v"><b class="t-display">${fmtNum(best)}</b><span>${esc(t(ser.unit))}</span>${pts.length >= 2 ? pDelta(pts[pts.length - 1].y - pts[0].y, "", pts[pts.length - 1].y >= pts[0].y) : ""}</div></div>`;
     const recentRows = hist.slice().reverse().slice(0, 5).map(h => `<div class="p-row"><span class="p-dim">${fmtDate(h.ts)}</span><span class="p-row-r p-trunc">${esc(sessionSummary(h))}</span></div>`).join("");

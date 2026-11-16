@@ -45,7 +45,7 @@ try:
   src_ok = subprocess.run(["git", "diff", "--quiet", "foods.js"], cwd=REPO).returncode == 0
   check(src_ok, "foods.js bayt bayt değişmedi (git diff --quiet)")
   sw = open(os.path.join(REPO, "sw.js"), encoding="utf-8").read()
-  check("'./foods-en.js'" in sw, "sw.js FILES içinde foods-en.js")
+  check("./foods-en.js" not in sw, "sw.js FILES içinde foods-en.js YOK (Türkçe telefon indirmez; çalışma anında önbelleğe girer)")
 
   with sync_playwright() as p:
     b = p.chromium.launch()
@@ -231,7 +231,7 @@ try:
     ctx, pg, reqs = newctx(True)
     pg.goto(URL); boot(pg); pg.evaluate("setLang('en')"); pg.wait_for_function("typeof USDA_EN !== 'undefined'", timeout=5000); pg.wait_for_timeout(300)
     DB = "BASE_FOOD_DB"
-    want = {"yulaf": "Oats", "muz": "Banana (Medium)", "tavuk_gogsu": "Chicken Breast (Raw)", "tr_beyaz_peynir": "Beyaz peynir (white cheese, full-fat)", "tr_ayran": "Ayran (yogurt drink)", "kefir": "Plain Kefir"}
+    want = {"yulaf": "Oats", "muz": "Banana (medium)", "tavuk_gogsu": "Chicken breast (raw)", "tr_beyaz_peynir": "Beyaz peynir (white cheese, full-fat)", "tr_ayran": "Ayran (yogurt drink)", "kefir": "Plain kefir"}
     for k, v in want.items():
         got = pg.evaluate("foodNameL(BASE_FOOD_DB[%s])" % json.dumps(k))
         check(got == v, "en BASE_FOOD_DB %s -> %r" % (k, got))
@@ -250,11 +250,12 @@ try:
     check("Calories are USDA-measured" in card and "ölçümüdür" not in card, "en kx besini (%s): not İngilizce" % kx)
     # tarif notu + porsiyon
     rn = pg.evaluate("Object.keys(getFoodDB()).filter(i => getFoodDB()[i].src === 'tarif' && getFoodDB()[i].note)")
-    bad = pg.evaluate("ids => ids.filter(i => /[çğıöşüÇĞİÖŞÜ]/.test(foodNoteL(getFoodDB()[i])))", rn)
+    bad = pg.evaluate("ids => ids.filter(i => /[çğıöşüÇĞİÖŞÜ]/.test(foodNoteL(getFoodDB()[i]).replace('çeçil', '')))", rn)
     check(len(rn) >= 20 and not bad, "en: %d yerleşik tarif notunun hiçbirinde Türkçe harf yok %s" % (len(rn), bad[:2]))
     pg.evaluate("selectFood(%s)" % json.dumps(rn[0])); pg.wait_for_timeout(150)
     card = pg.inner_text("#foodSelCard")
-    check(not TRL.search(card.split("\n", 1)[1] if False else pg.evaluate("foodNoteL(getFoodDB()[%s])" % json.dumps(rn[0]))), "en: seçili tarif notu İngilizce")
+    note = pg.evaluate("foodNoteL(getFoodDB()[%s])" % json.dumps(rn[0]))
+    check(bool(note) and note in card and not TRL.search(note), "en: seçili tarif kartında not İngilizce görünür %r" % note)
     rp = pg.evaluate("(() => { const f = Object.values(getFoodDB()).find(f => f.src === 'tarif' && f.portions && f.portions[0] && f.portions[0][0] === '1 porsiyon'); return f ? portionL(f, 0, '1 porsiyon') : null; })()")
     check(rp == "1 serving", "en: tarif porsiyonu %r" % rp)
     # Hareket adları

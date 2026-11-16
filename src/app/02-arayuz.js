@@ -181,7 +181,7 @@ function resumeTimer() {
 function timerLabelText(label) {
   const L = String(label == null ? "" : label);
   if (L === "Dinlenme") return t("Dinlenme");
-  if (L.startsWith("Dinlenme • ")) return t("Dinlenme • {ad}", { ad: L.slice(11) });
+  if (L.startsWith("Dinlenme • ")) return t("Dinlenme • {ad}", { ad: exNameL(L.slice(11)) });
   return L;
 }
 function startTimer(sec, label = "Dinlenme") {

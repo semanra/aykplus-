@@ -153,7 +153,7 @@ EN_SCREENS = [
   ("en-p-grafik", "setProgressView('guc'); openExerciseChart(0)"),
   # v51: Besin adları (yalnız ölçüm; foods-en.js yüklenmiş olmalı, kontrol.py bekler)
   ("en-n-besin-ara", "closeModal('chartModal'); switchTab('nutrition'); setNutriView('foods'); $('foodSearch').value = 'chicken breast'; foodSearchInput(); renderFoods()"),
-  ("en-n-besin-kart", "selectFood([...document.querySelectorAll('#foodList [data-food]')].find(b => /broilers or fryers, breast, meat and skin, raw/.test(b.textContent)).dataset.food)"),
+  ("en-n-besin-kart", "selectFood('u171474'); renderAll()"),
 ]
 EN_ROOT = {"en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage", "en-m-seans": "#mobTimer", "en-m-bitis": "#mobTimer"}
 # v44: kurulum ekranları. TEST_INIT OLMADAN, temiz depoda açılır (gerçek yeni kurulum yolu). Sırayla; her adım öncekinin üstüne.

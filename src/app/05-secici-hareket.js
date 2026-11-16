@@ -333,7 +333,7 @@ function toggleSetDone(exIdx, sIdx) {
         ex.sets.forEach((o, i) => { if (i !== sIdx && o.done) best = Math.max(best, e1rm(o.kg, o.reps)); });
         if (cur > best + 0.01) {
           s.pr = true;
-          toast(t("YENİ REKOR! {name}: {kg} kg × {reps} (1RM ~{rm} kg)", { name: ex.name, kg: fmtKg(num(s.kg)), reps: String(num(s.reps)), rm: String(Math.round(cur)) }), "pr");
+          toast(t("YENİ REKOR! {name}: {kg} kg × {reps} (1RM ~{rm} kg)", { name: exNameL(ex.name), kg: fmtKg(num(s.kg)), reps: String(num(s.reps)), rm: String(Math.round(cur)) }), "pr");
         }
       }
     }
@@ -384,7 +384,7 @@ function removeExercise(exIdx) {
   activeDay().exercises.splice(exIdx, 1);
   if (!workoutInProgress()) state.workoutStartedAt = 0;
   renderAll();
-  offerUndo(t("\"{name}\" kaldırıldı", { name: ex.name }));
+  offerUndo(t("\"{name}\" kaldırıldı", { name: exNameL(ex.name) }));
 }
 
 async function addWorkoutDay() {
