@@ -1,6 +1,8 @@
 // v50: İngilizce sözlük, İlerleme + kurulum + örnek içerik (terimler: docs/i18n-terimler.md bölüm 8, 10, 11).
 // Örnek içerik kayda o anki dilde yazılır (docs/i18n-kayitli-metinler.md a3); targetInfo/set.target her dilde Türkçe biçim kalır.
 Object.assign(EN, {
+  // --- boş başlangıç: varsayılan gün adı (docs/i18n-kayitli-metinler.md a-tablosu)
+  "1. Gün|varsayılan gün": "Day 1",
   // --- örnek menü öğün başlıkları
   "Kahvaltı": "Breakfast", "Öğle yemeği": "Lunch", "Ara öğün": "Snack", "Akşam yemeği": "Dinner",
   // --- örnek program gün adları (":" ayracı korunur: Antrenman gün çipi name.split(":")[0] kullanır)

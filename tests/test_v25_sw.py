@@ -18,6 +18,9 @@ class H(SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")   # tarayıcı önbelleği değil, service worker sınansın
         super().end_headers()
     def do_GET(self):
+        if MODE.get("sw") and self.path.split("?")[0] == "/sw.js":
+            body = MODE["sw"].encode(); self.send_response(200); self.send_header("Content-Type", "application/javascript"); self.send_header("Content-Length", str(len(body)))
+            self.end_headers(); self.wfile.write(body); return
         m = MODE["m"]
         if m in ("404", "503"):
             body = ("<html><body><h1>" + m + " Hata sayfası</h1></body></html>").encode()
@@ -88,6 +91,24 @@ try:
     # 6) Sunucu normale döndükten sonra uygulama çalışır
     reload_ok(pg, "sunucu normal")
     check(not errs, f"sayfa hatası yok {errs[:1]}")
+    ctx.close()
+
+    # 6b) v52: foods-en.js sürüm yükseltmesinde eski önbellekten yenisine taşınır (çevrimdışı İngilizce besin adları)
+    ctx = b.new_context(); ctx.add_init_script(TEST_INIT)
+    pg = ctx.new_page(); pg.goto(URL); pg.wait_for_function(APP_OK)
+    pg.evaluate("navigator.serviceWorker.ready.then(() => true)")
+    pg.wait_for_function(f"""caches.keys().then(k => window.__k = k) && (window.__k || []).includes('{CACHE}')""", timeout=15000, polling=200)
+    pg.evaluate("fetch('foods-en.js').then(r => r.text())")   # çalışma anında önbelleğe girer
+    pg.wait_for_function(f"caches.open('{CACHE}').then(c => c.match('./foods-en.js', {{ignoreSearch: true}})).then(r => window.__fe = !!r) && window.__fe", timeout=10000, polling=200)
+    sw_src = open(os.path.join(REPO, "sw.js"), encoding="utf-8").read()
+    NEW = CACHE + "-x"
+    SW_MODE = {"src": sw_src.replace("const CACHE = '" + CACHE + "'", "const CACHE = '" + NEW + "'")}
+    MODE["sw"] = SW_MODE["src"]
+    pg.evaluate("navigator.serviceWorker.getRegistration().then(r => r.update())")
+    pg.wait_for_function(f"""caches.keys().then(k => window.__k = k) && (window.__k || []).includes('{NEW}') && !window.__k.includes('{CACHE}')""", timeout=15000, polling=200)
+    MODE.pop("sw")
+    has = pg.evaluate(f"caches.open('{NEW}').then(c => c.match('./foods-en.js', {{ignoreSearch: true}})).then(r => !!r)")
+    check(has, "yeni önbellekte foods-en.js eskisinden taşındı")
     ctx.close()
 
     # 7) Önbellek yokken (ilk kurulum) 404: sunucunun yanıtı gösterilir (sonsuza dek beklemez)

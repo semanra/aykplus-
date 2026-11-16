@@ -45,7 +45,7 @@ try:
   src_ok = subprocess.run(["git", "diff", "--quiet", "foods.js"], cwd=REPO).returncode == 0
   check(src_ok, "foods.js bayt bayt değişmedi (git diff --quiet)")
   sw = open(os.path.join(REPO, "sw.js"), encoding="utf-8").read()
-  check("./foods-en.js" not in sw, "sw.js FILES içinde foods-en.js YOK (Türkçe telefon indirmez; çalışma anında önbelleğe girer)")
+  check("./foods-en.js" not in re.search(r"const FILES = \[[^\]]*\]", sw).group(0), "sw.js FILES içinde foods-en.js YOK (Türkçe telefon indirmez; çalışma anında önbelleğe girer)")
 
   with sync_playwright() as p:
     b = p.chromium.launch()

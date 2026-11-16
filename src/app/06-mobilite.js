@@ -327,9 +327,11 @@ function mobSet(id, field, val) {
 }
 async function mobRename(id) {
   const it = mobFind(id); if (!it) return;
-  const v = await askText(t("Hareketin adı"), it.name, t("Örn. Couch Stretch"));
+  const shown = mobNameL(it.name);
+  const v = await askText(t("Hareketin adı"), shown, t("Örn. Couch Stretch"));
   if (v == null || !String(v).trim()) return;
   const cur = mobFind(id); if (!cur) return;
+  if (String(v).trim() === shown) return;   // v52: gösterilen ad değişmediyse kayıtlı ad aynen kalır
   cur.name = String(v).trim().slice(0, 80);
   renderAll();
 }

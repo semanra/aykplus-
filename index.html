@@ -5931,9 +5931,11 @@ function mobSet(id, field, val) {
 }
 async function mobRename(id) {
   const it = mobFind(id); if (!it) return;
-  const v = await askText(t("Hareketin adı"), it.name, t("Örn. Couch Stretch"));
+  const shown = mobNameL(it.name);
+  const v = await askText(t("Hareketin adı"), shown, t("Örn. Couch Stretch"));
   if (v == null || !String(v).trim()) return;
   const cur = mobFind(id); if (!cur) return;
+  if (String(v).trim() === shown) return;   // v52: gösterilen ad değişmediyse kayıtlı ad aynen kalır
   cur.name = String(v).trim().slice(0, 80);
   renderAll();
 }
@@ -7153,6 +7155,7 @@ async function aykSnapRestore(key) {
   state = next;
   checkNewDay();
   renderAll();
+  loadFoodsEn();   // v52: dil İngilizceyse besin adları dosyası
   renderSnapList();
   offerUndo(t("Yedekteki hâle dönüldü"));
 }
@@ -7190,6 +7193,7 @@ async function restoreFromText(text, opts = {}) {
   checkNewDay();
   closeSettings();
   renderAll();
+  loadFoodsEn();   // v52: dil İngilizceyse besin adları dosyası
   slimOldPhoto();   // v37: eski yedekteki küçültülmemiş fotoğraf
   toast(t("Yedek başarıyla geri yüklendi"));
   return true;
@@ -7227,6 +7231,7 @@ async function resetToDefaults() {
   closeSettings();
   stopTimer();
   renderAll();
+  loadFoodsEn();   // v52: dil İngilizceyse besin adları dosyası
   toast(t("Uygulama sıfırlandı"));
 }
 
@@ -10297,6 +10302,7 @@ function finishOnboarding() {
     if (m1.length && m2.length) { state.meals = m1; state.restMeals = m2; state.dayPlan = null; } else menuFailed = true;
   }
   if (d.prog) { state.workoutDays = samplePrograms(d.exp); state.activeWorkoutDayIdx = 0; }
+  else if (state.workoutDays.length === 1 && state.workoutDays[0].name === "1. Gün" && !state.workoutDays[0].exercises.length) state.workoutDays[0].name = t("1. Gün|varsayılan gün");   // v52: yeni kayıt o anki dilde
   if (d.mob) state.mobilityRoutine.routines = [sampleMobility()];
   st.onboarded = true;
   state.activeTab = "nutrition";
@@ -11324,6 +11330,8 @@ Object.assign(EN, {
 // v50: İngilizce sözlük, İlerleme + kurulum + örnek içerik (terimler: docs/i18n-terimler.md bölüm 8, 10, 11).
 // Örnek içerik kayda o anki dilde yazılır (docs/i18n-kayitli-metinler.md a3); targetInfo/set.target her dilde Türkçe biçim kalır.
 Object.assign(EN, {
+  // --- boş başlangıç: varsayılan gün adı (docs/i18n-kayitli-metinler.md a-tablosu)
+  "1. Gün|varsayılan gün": "Day 1",
   // --- örnek menü öğün başlıkları
   "Kahvaltı": "Breakfast", "Öğle yemeği": "Lunch", "Ara öğün": "Snack", "Akşam yemeği": "Dinner",
   // --- örnek program gün adları (":" ayracı korunur: Antrenman gün çipi name.split(":")[0] kullanır)

@@ -9,7 +9,10 @@ const SLOW_WINDOW_MS = 30000;
 let netSlowUntil = 0;
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
+  // v52: foods-en.js yalnızca çalışma anında önbelleğe girer; eski önbellek silinmeden önce yenisine taşınır
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)
+    .then(() => caches.match('./foods-en.js', { ignoreSearch: true }))
+    .then(r => r ? c.put('./foods-en.js', r) : null)));
   self.skipWaiting();
 });
 

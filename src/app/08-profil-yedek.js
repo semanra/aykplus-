@@ -307,6 +307,7 @@ async function aykSnapRestore(key) {
   state = next;
   checkNewDay();
   renderAll();
+  loadFoodsEn();   // v52: dil İngilizceyse besin adları dosyası
   renderSnapList();
   offerUndo(t("Yedekteki hâle dönüldü"));
 }
@@ -344,6 +345,7 @@ async function restoreFromText(text, opts = {}) {
   checkNewDay();
   closeSettings();
   renderAll();
+  loadFoodsEn();   // v52: dil İngilizceyse besin adları dosyası
   slimOldPhoto();   // v37: eski yedekteki küçültülmemiş fotoğraf
   toast(t("Yedek başarıyla geri yüklendi"));
   return true;
@@ -381,6 +383,7 @@ async function resetToDefaults() {
   closeSettings();
   stopTimer();
   renderAll();
+  loadFoodsEn();   // v52: dil İngilizceyse besin adları dosyası
   toast(t("Uygulama sıfırlandı"));
 }
 

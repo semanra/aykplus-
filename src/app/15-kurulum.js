@@ -286,6 +286,7 @@ function finishOnboarding() {
     if (m1.length && m2.length) { state.meals = m1; state.restMeals = m2; state.dayPlan = null; } else menuFailed = true;
   }
   if (d.prog) { state.workoutDays = samplePrograms(d.exp); state.activeWorkoutDayIdx = 0; }
+  else if (state.workoutDays.length === 1 && state.workoutDays[0].name === "1. Gün" && !state.workoutDays[0].exercises.length) state.workoutDays[0].name = t("1. Gün|varsayılan gün");   // v52: yeni kayıt o anki dilde
   if (d.mob) state.mobilityRoutine.routines = [sampleMobility()];
   st.onboarded = true;
   state.activeTab = "nutrition";

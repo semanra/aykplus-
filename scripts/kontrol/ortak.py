@@ -231,7 +231,7 @@ const add = s => { if (typeof s !== 'string') return; s = s.trim(); if (!s) retu
 const S = state;
 const meals = [...(S.meals || []), ...(S.restMeals || []), ...(S.dayPlan ? [...(S.dayPlan.train || []), ...(S.dayPlan.rest || [])] : [])];
 meals.forEach(m => { add(m.title); add(m.targetNote); (m.items || []).forEach(i => { if (i.est) add(i.est.name); }); });
-(S.workoutDays || []).forEach(d => { add(d.name); (d.exercises || []).forEach(e => { add(e.name); add(exNameL(e.name)); add(e.note); }); });
+(S.workoutDays || []).forEach(d => { if (d.name !== '1. Gün' && d.name !== 'Antrenman günü') add(d.name); (d.exercises || []).forEach(e => { add(e.name); add(exNameL(e.name)); add(e.note); }); });
 Object.values(S.exerciseHistory || {}).forEach(l => (l || []).forEach(x => { add(x.name); add(exNameL(x.name)); }));
 (S.workoutLogs || []).forEach(l => add(l.dayName));
 mobRoutines().forEach(r => { add(r.name); (r.items || []).forEach(i => { add(i.name); add(mobNameL(i.name)); if (mobNoteL(i.note) === i.note) add(i.note); }); });

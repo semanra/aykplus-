@@ -275,6 +275,14 @@ try:
         hits += [(name, h["t"], h["m"]) for h in q.evaluate(TR_WORD_SCAN_JS, "#onboard")]
     check(not hits and q.get_attribute("#onboard", "data-step") == "7", "b: İngilizce kurulum 1–7'de Türkçe harf/kelime yok (dil seçicideki 'Türkçe' hariç): %s" % hits[:8])
     c.close()
+    # I1: örnek programsız kurulumda varsayılan gün adı o anki dilde (en: "Day 1", tr: "1. Gün")
+    for lang, loc, want in (("en", "en-GB", "Day 1"), ("tr", "tr-TR", "1. Gün")):
+        c, q = ctx3(loc, SPLASH_ANIM); q.goto(URL); boot(q)
+        q.evaluate("(localStorage.clear(), void indexedDB.deleteDatabase('aykplus'))"); q.reload(); boot(q)
+        nm = q.evaluate("""(lang) => { openOnboarding(); Object.assign(obDraft, { sex: 'male', age: '30', height: '175', weight: '75', goal: 'keep', act: 'mid', exp: 'new', prog: false, lang });
+          finishOnboarding(); return state.workoutDays.map(d => d.name); }""", lang)
+        check(nm == [want], "I1: %s kurulum, örnek programsız gün adı %r: %s" % (lang, want, nm))
+        c.close()
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()
 finally:

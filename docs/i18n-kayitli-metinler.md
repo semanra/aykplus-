@@ -21,7 +21,7 @@ Tablo kısaltması: **K** = kayıt (state/yedek/ayna içine yazılıyor), **C** 
 
 | Konum | Metin | Tür | Çeviride ne yapılmalı |
 |---|---|---|---|
-| src/data.js:590 | `"1. Gün"` (DEFAULT_STATE.workoutDays[0].name; `freshState` → `normalizeState({})` bunu kullanır) | K (+C, bkz. b3: `nextDayIdx` günü ada göre arar) | dile göre üret (yeni kurulumda dil EN ise "Day 1"); var olan kayıt dokunma |
+| src/data.js:590 | `"1. Gün"` (DEFAULT_STATE.workoutDays[0].name; `freshState` → `normalizeState({})` bunu kullanır) | K (+C, bkz. b3: `nextDayIdx` günü ada göre arar) | dile göre üret (yeni kurulumda dil EN ise "Day 1"); var olan kayıt dokunma — **v52 yapıldı**: `finishOnboarding` örnek program seçilmediyse ve gün hâlâ varsayılansa adı `t("1. Gün|varsayılan gün")` yapar (fabrika sıfırlaması da kurulumdan geçer) |
 | src/app/01-temel.js:247 | `"Antrenman günü"` (adı bozuk günün yedek adı) | K | dile göre üret |
 | src/app/01-temel.js:106 | `"Adsız hareket"` (adı okunamayan hareket) | K | dile göre üret |
 | src/app/01-temel.js:152 | `` `${i+1}. Öğün` `` (başlığı bozuk öğün) | K | dile göre üret (ama bkz. b4: ":" ayracı kısa başlık için aranır) |
