@@ -37,7 +37,7 @@ try:
 
     # 1) sahibin kaydı göçten geçer
     pg = page("tr-TR")
-    check(st(pg)["settings"]["lang"] == "tr" and st(pg)["dataVer"] == 5, "göç adım 5: lang tr, dataVer 5")
+    check(st(pg)["settings"]["lang"] == "tr" and st(pg)["dataVer"] == 6, "göç adım 5: lang tr, dataVer 6 (v53)")
     check(pg.evaluate("curLang()") == "tr" and pg.evaluate("locale()") == "tr-TR", "tr: curLang/locale")
     pg.context.close()
     # 2) telefon en-US + bayrak açıkken sahibin kaydı Türkçe

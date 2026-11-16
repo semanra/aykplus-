@@ -84,6 +84,7 @@ function renderProfile() {
   document.querySelectorAll("[data-theme-opt]").forEach(b => { const on = b.dataset.themeOpt === state.settings.theme; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
   const lr = $("pfLang"); if (lr) lr.classList.toggle("hidden", !langAvailable());   // v46
   document.querySelectorAll("[data-lang-opt]").forEach(b => { const on = b.dataset.langOpt === curLang(); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  document.querySelectorAll("#pfUnits [data-units-opt]").forEach(b => { const on = b.dataset.unitsOpt === state.settings.units; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });   // v53
   renderMissList();
   // Kilo kayıtları
   const wl = state.weightLogs.filter(l => num(l.weight) > 0);

@@ -1368,6 +1368,13 @@
                 <button type="button" data-lang-opt="en" onclick="setLang('en')">English</button>
               </div>
             </div>
+            <div class="px-4 py-3 space-y-2.5 border-t border-[var(--t-line)]" id="pfUnits">
+              <div><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Birim">Birim</span></div>
+              <div class="t-seg grid-cols-2" role="group" aria-label="Birim" data-t-aria="Birim">
+                <button type="button" data-units-opt="metric" onclick="setUnits('metric')">kg, cm</button>
+                <button type="button" data-units-opt="imperial" onclick="setUnits('imperial')">lb, ft, in</button>
+              </div>
+            </div>
             <div class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)]">
               <label for="setRest" class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Varsayılan dinlenme">Varsayılan dinlenme</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Saniye. Hareketin kendi süresi yoksa kullanılır.">Saniye. Hareketin kendi süresi yoksa kullanılır.</span></label>
               <input id="setRest" type="text" inputmode="numeric" class="t-in text-center font-bold" style="width: 84px;" />

@@ -2,14 +2,15 @@
 // v44: İLK AÇILIŞ KURULUMU (#onboard, 7 adım)
 // ---------------------------------------------------------------------------
 // Yalnızca yeni kurulumda (settings.onboarded === false) açılır. Girilenler obDraft'ta tutulur; state'e HİÇBİR ŞEY
-// yazılmaz (TEK İSTİSNA: obPickLang dil seçilince state.settings.lang'i hemen yazar; yarıda kalan kurulum baştan açıldığı için zararsız). finishOnboarding hepsini tek seferde yazar. Yarıda kapatılırsa onboarded false kalır → sonraki açılışta baştan.
+// yazılmaz (İSTİSNALAR: obPickLang dil seçilince state.settings.lang'i, v53 obPickUnits birim seçilince state.settings.units'i hemen yazar; yarıda kalan kurulum baştan açıldığı için zararsız). finishOnboarding hepsini tek seferde yazar. Yarıda kapatılırsa onboarded false kalır → sonraki açılışta baştan.
 // Sınırlar Profil'deki ile aynı (applyProfileFields / readProfileWeight): yaş 12–99, boy 120–230, kilo 30–300, hedef 30–250.
+// v53: imperial'de kilo/hedef lb, boy ft + in kutularına yazılır; obVals her zaman kg / cm verir, sınırlar kg / cm üzerinden.
 const OB_STEPS = 7;
 const OB_LOSE_PACE = { slow: 300, mid: 500, fast: 700 };   // kcal açık
 let obDraft = null, obStep = 1;
 
 function obNewDraft() {
-  return { sex: "", age: "", height: "", weight: "", goal: "", target: "", pace: "mid", act: "", exp: "", menu: true, prog: true, mob: true, lang: curLang() };
+  return { sex: "", age: "", height: "", weight: "", goal: "", target: "", pace: "mid", act: "", exp: "", menu: true, prog: true, mob: true, lang: curLang(), units: isImperial() ? "imperial" : "metric", heightFt: "", heightIn: "" };
 }
 function obIsOpen() { const el = $("onboard"); return !!el && !el.classList.contains("hidden"); }
 function openOnboarding() {
@@ -33,11 +34,14 @@ function syncOnboarding() {
   else if (!want && obIsOpen()) closeOnboarding();
 }
 
-// Sayılar (geçersiz → NaN)
+// Sayılar (geçersiz → NaN). v53: her zaman kg / cm (imperial'de kutulardaki lb / ft + in çevrilir).
 function obVals() {
   const d = obDraft, n = v => String(v).trim() === "" ? NaN : num(v, NaN);
+  if (d.units === "imperial") return { age: n(d.age), height: String(d.heightFt).trim() === "" ? NaN : ftInToCm(d.heightFt, d.heightIn), weight: bodyDispToKg(n(d.weight)), target: bodyDispToKg(n(d.target)) };
   return { age: n(d.age), height: n(d.height), weight: round1(n(d.weight)), target: round1(n(d.target)) };
 }
+// Kayda yazılan boy: metrikte tam cm (eskisi gibi), imperial'de ft + in'in cm karşılığı (1 ondalık; geri çevrilince aynı ft/in)
+function obHeightCm(v) { return obDraft && obDraft.units === "imperial" ? round1(v.height) : Math.round(v.height); }
 // Taslakla hedefler: getTargets() geçici bir durum üzerinde çalışır; asıl state'e dokunulmaz, kaydedilmez.
 function obTargets(dayType) {
   const d = obDraft, v = obVals(), saved = state;
@@ -45,7 +49,7 @@ function obTargets(dayType) {
     weight: v.weight, dayType,
     deficit: d.goal === "lose" ? OB_LOSE_PACE[d.pace] : 0,
     settings: Object.assign({}, saved.settings, {
-      sex: d.sex === "female" ? "female" : "male", age: Math.round(v.age), height: Math.round(v.height),
+      sex: d.sex === "female" ? "female" : "male", age: Math.round(v.age), height: obHeightCm(v),
       goal: d.goal || "keep", gainPace: d.pace, activity: d.act || "mid",
       targetWeight: d.goal === "lose" || d.goal === "gain" ? v.target : v.weight,
       bodyFat: "", calAdjust: 0, proteinHigh: false
@@ -60,17 +64,35 @@ function obTargets(dayType) {
 }
 // Adımın eksik/hatalı alanı (boşsa geçerli)
 function obCheck(step) {
-  const d = obDraft, v = obVals();
+  const d = obDraft, v = obVals(), imp = d.units === "imperial";
   if (step === 2) {
     if (!d.sex) return t("Cinsiyetini seç; kalori hesabı buna göre yapılır.");
     if (isNaN(v.age)) return t("Yaşını yaz.");
     if (!(v.age >= 12 && v.age <= 99)) return t("Yaş 12 ile 99 arasında olmalı.");
+    if (imp) {
+      if (isNaN(v.height)) return t("Boyunu ft ve in olarak yaz.");
+      if (!(v.height >= 120 && v.height <= 230)) return t("Boy {a} ile {b} arasında olmalı.", { a: fmtHeight(48 * IN_CM), b: fmtHeight(90 * IN_CM) });   // 4'0" = 121,9 cm, 7'6" = 228,6 cm
+      if (isNaN(v.weight)) return t("Kilonu yaz.");
+      if (!(v.weight >= 30 && v.weight <= 300)) return t("Kilo {a} ile {b} arasında olmalı.", { a: fmtW(30, { body: true }), b: fmtW(300, { body: true }) });
+      return "";
+    }
     if (isNaN(v.height)) return t("Boyunu santimetre olarak yaz.");
     if (!(v.height >= 120 && v.height <= 230)) return t("Boy 120 ile 230 cm arasında olmalı.");
     if (isNaN(v.weight)) return t("Kilonu yaz.");
     if (!(v.weight >= 30 && v.weight <= 300)) return t("Kilo 30 ile 300 kg arasında olmalı.");
   }
-  if (step === 3) {
+  if (step === 3 && imp) {   // v53: aynı kurallar, lb ile
+    const bw = x => fmtW(x, { body: true }), wTyped = fmtNum(round1(num(d.weight))) + " lb";   // şu anki kilo yazıldığı gibi
+    if (!d.goal) return t("Bir hedef seç.");
+    if (d.goal === "keep" && v.weight > 250) return t('Hedef kilo en çok {max} olabilir. Bu kilo için "Kilo vermek" hedefini seç.', { max: bw(250) });
+    if (d.goal === "lose" || d.goal === "gain") {
+      if (isNaN(v.target)) return t("Hedef kilonu yaz.");
+      if (!(v.target >= 30 && v.target <= 250)) return t("Hedef kilo {a} ile {b} arasında olmalı.", { a: bw(30), b: bw(250) });
+      if (d.goal === "lose" && !(v.target >= 30 && v.target < v.weight)) return t("Kilo vermek için hedef kilo şu anki kilondan ({w}) az olmalı.", { w: wTyped });
+      if (d.goal === "gain" && !(v.target > v.weight && v.target <= 250)) return t("Kilo almak için hedef kilo şu anki kilondan ({w}) fazla olmalı (en çok {max}).", { w: wTyped, max: bw(250) });
+    }
+  }
+  else if (step === 3) {
     if (!d.goal) return t("Bir hedef seç.");
     if (d.goal === "keep" && v.weight > 250) return t('Hedef kilo en çok 250 kg olabilir. Bu kilo için "Kilo vermek" hedefini seç.');
     if (d.goal === "lose" || d.goal === "gain") {
@@ -112,6 +134,21 @@ function obPickLang(l) {   // v46: ekran hemen yeni dile geçer
   obRender(true);
   loadFoodsEn();   // v51
 }
+function obPickUnits(u) {   // v53: yazılmış kilo / boy / hedef yeni birime çevrilir (kayıt kurulum bitince, kg / cm)
+  if (!obDraft) return;
+  u = u === "imperial" ? "imperial" : "metric";
+  if (obDraft.units === u) return;
+  const d = obDraft, v = obVals();
+  d.units = u; state.settings.units = u;
+  if (!isNaN(v.weight)) d.weight = fmtNum(bodyKgToDisp(v.weight));
+  if (!isNaN(v.target)) d.target = fmtNum(bodyKgToDisp(v.target));
+  if (!isNaN(v.height)) {
+    if (u === "imperial") { const [f, i] = cmToFtIn(v.height); d.heightFt = String(f); d.heightIn = String(i); }
+    else d.height = String(Math.round(v.height));
+  }
+  obSetErr("");
+  obRender(true);
+}
 function obPick(key, val) {
   if (!obDraft) return;
   obDraft[key] = val;
@@ -139,7 +176,8 @@ function obWeeklyText() {
   const kcal = Math.round(d.goal === "lose" ? -real : real);
   if (kcal <= 0) return d.goal === "lose" ? t("Güvenli alt sınır yüzünden bu hızda kilo kaybı olmuyor; kalori hedefin harcamana eşit ya da üstünde kalır.") : t("Bu seçimle günlük kalori fazlası oluşmuyor.");
   const kg = kcal * 7 / 7700;
-  let txt = d.goal === "lose" ? t("Haftada yaklaşık {kg} kg kayıp (günde ~{kcal} kcal açık).", { kg: fmtKg(kg), kcal: fmtInt(kcal) }) : t("Haftada yaklaşık {kg} kg artış (günde ~{kcal} kcal fazla).", { kg: fmtKg(kg), kcal: fmtInt(kcal) });
+  let txt = d.units === "imperial" ? (d.goal === "lose" ? t("Haftada yaklaşık {w} kayıp (günde ~{kcal} kcal açık).", { w: fmtW(kg, { fine: true }), kcal: fmtInt(kcal) }) : t("Haftada yaklaşık {w} artış (günde ~{kcal} kcal fazla).", { w: fmtW(kg, { fine: true }), kcal: fmtInt(kcal) }))
+    : d.goal === "lose" ? t("Haftada yaklaşık {kg} kg kayıp (günde ~{kcal} kcal açık).", { kg: fmtKg(kg), kcal: fmtInt(kcal) }) : t("Haftada yaklaşık {kg} kg artış (günde ~{kcal} kcal fazla).", { kg: fmtKg(kg), kcal: fmtInt(kcal) });
   const diff = Math.abs(v.weight - v.target);
   const ok = d.goal === "lose" ? v.target >= 30 && v.target < v.weight : v.target > v.weight && v.target <= 250;
   if (ok && kg > 0) txt += " " + tn(Math.max(1, Math.round(diff / kg)), "Hedefe yaklaşık {n} haftada ulaşırsın.");
@@ -157,6 +195,17 @@ function obField(id, label, key, ph, unit) {
   return `<label class="ob-field" for="${id}"><span class="t-field">${label}</span>
     <span class="ob-inwrap"><input id="${id}" class="t-in ob-in" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="${esc(t("örn. {ph}", { ph }))}"
       value="${esc(obDraft[key])}" oninput="obInput('${key}', this.value)" onkeydown="obKey(event)" />${unit ? `<span class="ob-unit">${unit}</span>` : ""}</span></label>`;
+}
+function obBox(id, aria, key, ph, unit) {   // v53: etiketsiz kutu (boy ft + in)
+  return `<span class="ob-inwrap"><input id="${id}" class="t-in ob-in" type="text" inputmode="numeric" autocomplete="off" enterkeyhint="next" aria-label="${esc(aria)}" placeholder="${esc(t("örn. {ph}", { ph }))}"
+      value="${esc(obDraft[key])}" oninput="obInput('${key}', this.value)" onkeydown="obKey(event)" /><span class="ob-unit">${unit}</span></span>`;
+}
+function obUnitsSeg(d) {   // v53: birim seçici (Profil #pfUnits ile aynı bileşen; düğme adları dilden bağımsız)
+  return `<div class="ob-group"><span class="t-field">${esc(t("Birim"))}</span>
+      <div class="t-seg ob-seg2" id="obUnits" role="group" aria-label="${esc(t("Birim"))}">
+        <button type="button" data-units-opt="metric" class="${d.units !== "imperial" ? "on" : ""}" aria-pressed="${d.units !== "imperial"}" onclick="obPickUnits('metric')">kg, cm</button>
+        <button type="button" data-units-opt="imperial" class="${d.units === "imperial" ? "on" : ""}" aria-pressed="${d.units === "imperial"}" onclick="obPickUnits('imperial')">lb, ft, in</button>
+      </div></div>`;
 }
 function obHead(title, sub) {
   return `<h2 id="obTitle" class="ob-title t-display" tabindex="-1">${title}</h2>${sub ? `<p class="ob-sub">${sub}</p>` : ""}`;
@@ -187,8 +236,11 @@ function obStepHtml(n) {
         <button id="obSexFemale" type="button" class="${d.sex === "female" ? "on" : ""}" aria-pressed="${d.sex === "female"}" onclick="obPick('sex', 'female')">${esc(t("Kadın"))}</button>
         <button id="obSexMale" type="button" class="${d.sex === "male" ? "on" : ""}" aria-pressed="${d.sex === "male"}" onclick="obPick('sex', 'male')">${esc(t("Erkek"))}</button>
       </div></div>
-    <div class="ob-grid2">${obField("obAge", t("Yaş"), "age", "30", "")}${obField("obHeight", t("Boy"), "height", "170", "cm")}</div>
-    ${obField("obWeight", t("Kilo"), "weight", "70", "kg")}`;
+    ${obUnitsSeg(d)}
+    ${d.units === "imperial" ? `<div class="ob-grid2">${obField("obAge", t("Yaş"), "age", "30", "")}${obField("obWeight", t("Kilo"), "weight", "154", "lb")}</div>
+    <div class="ob-group"><span class="t-field">${esc(t("Boy"))}</span><div class="ob-grid2">${obBox("obHeightFt", t("Boy (ft)"), "heightFt", "5", "ft")}${obBox("obHeightIn", t("Boy (in)"), "heightIn", "7", "in")}</div></div>`
+    : `<div class="ob-grid2">${obField("obAge", t("Yaş"), "age", "30", "")}${obField("obHeight", t("Boy"), "height", "170", "cm")}</div>
+    ${obField("obWeight", t("Kilo"), "weight", "70", "kg")}`}`;
   if (n === 3) {
     const tgt = d.goal === "lose" || d.goal === "gain";
     const kc = p => d.goal === "lose" ? `${OB_LOSE_PACE[p]} kcal` : t("+%{p}", { p: Math.round(GAIN_PACE[p] * 100) });
@@ -199,7 +251,8 @@ function obStepHtml(n) {
       ${obOpt("obGoalKeep", d.goal === "keep", t("Kilomu korumak"), t("Aynı kiloda daha fit ve güçlü"), "obPick('goal', 'keep')")}
       ${obOpt("obGoalGain", d.goal === "gain", t("Kilo almak"), t("Kas kazanmak için kalori fazlası"), "obPick('goal', 'gain')")}
     </div>
-    ${tgt ? `${obField("obTarget", t("Hedef kilo"), "target", d.goal === "lose" ? fmtNum(Math.max(30, round1(obVals().weight - 5))) : fmtNum(round1(obVals().weight + 5)), "kg")}
+    ${tgt ? `${d.units === "imperial" ? obField("obTarget", t("Hedef kilo"), "target", fmtNum(Math.round(num(d.weight)) + (d.goal === "lose" ? -10 : 10)), "lb")
+      : obField("obTarget", t("Hedef kilo"), "target", d.goal === "lose" ? fmtNum(Math.max(30, round1(obVals().weight - 5))) : fmtNum(round1(obVals().weight + 5)), "kg")}
     <div class="ob-group"><span class="t-field">${esc(d.goal === "lose" ? t("Ne kadar hızlı? (günlük kalori açığı)") : t("Ne kadar hızlı? (günlük kalori fazlası)"))}</span>
       <div class="t-seg ob-seg3">${pace("obPaceSlow", "slow", t("Yavaş"))}${pace("obPaceMid", "mid", t("Orta"))}${pace("obPaceFast", "fast", t("Hızlı"))}</div></div>` : ""}
     <p id="obWeekly" class="ob-weekly" aria-live="polite">${esc(obWeeklyText())}</p>`;
@@ -269,9 +322,10 @@ function finishOnboarding() {
   const v = obVals(), tr = obTargets("train"), re = obTargets("rest");
   const st = state.settings;
   if (d.lang === "tr" || d.lang === "en") st.lang = d.lang;   // v46
+  st.units = d.units === "imperial" ? "imperial" : "metric";   // v53
   st.sex = d.sex === "female" ? "female" : "male";
   st.age = Math.round(v.age);
-  st.height = Math.round(v.height);
+  st.height = obHeightCm(v);
   st.goal = d.goal;
   st.activity = d.act;
   if (d.goal === "gain") st.gainPace = d.pace;

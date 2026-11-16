@@ -189,7 +189,7 @@ try:
       return (c.textContent + ' ' + attrs.join(' ')); }"""
     def fresh_ob(en):
         # v52: İngilizce herkese açık, yeni kurulum dili telefondan → Türkçe akış Türkçe telefonla (tr-TR)
-        c = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="en-US" if en else "tr-TR")
+        c = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="en-GB" if en else "tr-TR")   # v53: en-US yeni kurulumu imperial açar; bu akış metrik İngilizce
         c.add_init_script(SPLASH_OFF)
         if en: c.add_init_script("window.AYK_TEST_EN = true")
         q = c.new_page(); q.on("pageerror", lambda e: errs.append(str(e)))
