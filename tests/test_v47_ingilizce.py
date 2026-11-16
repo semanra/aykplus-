@@ -536,7 +536,7 @@ try:
     IZIN = {
       "00-depolama.js": {"zaman aşımı": HATA, "depolama doğrulaması": HATA, "bağlantı yok": HATA},
       "01-temel.js": {
-        "AYK+ genel bilgi amaçlıdır": "HEALTH_NOTE: Hakkında gövdesi v49",
+        "AYK+ genel bilgi amaçlıdır": "HEALTH_NOTE: gösterimde t(HEALTH_NOTE) (kurulum, v50; Hakkında gövdesi v52)",
         "damla/kapsül": "SUPP_PRESETS veri (kayıt/gösterim t(p.unit), t(p.name) ile, Task 3b)", "Tok karnına": "SUPP_PRESETS notu (addPresetSupp t(note))",
         "ölçek": "SUPP_PRESETS birimi", "Antrenman sonrası": "SUPP_PRESETS notu", "Uykudan 1 saat önce": "SUPP_PRESETS notu", "Çinko": "SUPP_PRESETS adı", "Akşam": "SUPP_PRESETS notu",
         "🏋️ Ağırlık": "KIND_LABEL: kayıt değeri, gösterimde kindL (v48)", "⏱️ Süreli": "KIND_LABEL: gösterimde kindL", "Tükeniş": "EFFORT_LABELS: gösterimde effortL",
@@ -566,10 +566,16 @@ try:
         "Isınma": "mobSesStartIds konuşma başlığı: ses v52'ye kadar Türkçe (görünen başlık t('Isınma'))",
         "Göğüs": "MOB_WARM_REGIONS anahtarı = MUSCLES kas adı (kayıt anahtarı, çeviri yok)", "Sırt": "MOB_WARM_REGIONS anahtarı (kas adı)",
         "Ön Bacak": "MOB_WARM_REGIONS anahtarı (kas adı)", "Arka Bacak & Kalça": "MOB_WARM_REGIONS anahtarı (kas adı)", "Karın": "MOB_WARM_REGIONS anahtarı (kas adı)"},
-      "12-besin-veritabani.js": {}, "13-cizim-baslat.js": {}}
+      "12-besin-veritabani.js": {}, "13-cizim-baslat.js": {},
+      "07-grafik-ilerleme.js": {"Toplam süre": "seri metriği anahtarı (kod karşılaştırır; gösterim t(ser.metric), v50)", "Güç": "PROG_VIEWS etiketi, gösterimde t(l)"},
+      "14-ornek-icerik.js": {
+        "Kahvaltı": "SAMPLE_MEAL başlığı: kayıtlı metin, üretimde t(m.title) (kayıtlı-metinler a3, v50)", "Öğle yemeği": "örnek öğün başlığı (t)", "Ara öğün": "örnek öğün başlığı (t)", "Akşam yemeği": "örnek öğün başlığı (t)",
+        "1. Gün: ": "SAMPLE_PROGRAMS gün adı, üretimde t(name) (a3)", "2. Gün: ": "SAMPLE_PROGRAMS gün adı (t)", "3. Gün: ": "SAMPLE_PROGRAMS gün adı (t)", "4. Gün: ": "SAMPLE_PROGRAMS gün adı (t)",
+        "Lat Pulldown (": "hareket kütüphanesi adı (veri; çevrilmez)", "Pull-up (": "hareket kütüphanesi adı", "Leg Extension (": "hareket kütüphanesi adı", "Leg Swings (": "mobilite kütüphanesi adı (veri; çevrilmez)"},
+      "15-kurulum.js": {"<div class=\"t-seg ob-seg2\" id=\"obLang\"": "dil seçici işaretlemesi: aria-label t() ile, düğme adları kendi dilinde (Türkçe/English)"}}
     # kısmen kapsamdaki dosyalar: yalnız bu işlevlerin gövdeleri taranır (kalanı v48: Antrenman/Mobilite/İlerleme)
     KISMI = {
-      "09-kas-plaka-koc-takviye.js": ["muscleL", "libCatL", "targetL", "overloadSuggestion", "deloadInfo", "deloadHtml", "dismissDeload", "suggestionHtml", "applySuggestion", "dismissSuggestion", "weeklyMuscleSets", "plateChips", "warmupSets", "openPlateTool", "renderLevelTool", "renderPlateTool", "offerUndo", "doUndo", "nextDayIdx", "fmtMinutes", "fmtDuration", "renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose", "deleteMeal", "copyMeal", "otherMeals"]}
+      "09-kas-plaka-koc-takviye.js": ["muscleL", "libCatL", "targetL", "overloadSuggestion", "deloadInfo", "deloadHtml", "dismissDeload", "suggestionHtml", "applySuggestion", "dismissSuggestion", "weeklyMuscleSets", "plateChips", "warmupSets", "openPlateTool", "renderLevelTool", "renderPlateTool", "offerUndo", "doUndo", "nextDayIdx", "fmtMinutes", "fmtDuration", "renderSupps", "suppTimeLabel", "addPresetSupp", "editSuppDose", "setSuppTime", "addSupp", "removeSupp", "coachHintText", "openMeasureModal", "saveMeasurement", "deleteMeasurement", "changeSuppDose", "deleteMeal", "copyMeal", "otherMeals", "coachAnalysis", "applyCoach", "resetCoachAdjust", "dayIntake", "historySeries", "setHistRange"]}
     bad = []; used = {}
     for f, tbl in IZIN.items():
         for (ln, txt, wr, raw) in tarama(rd(f)):
@@ -595,9 +601,8 @@ try:
       "nutriThemeBtn": "aria-label her renderda JS yazar", "backupBannerText": "JS her renderda yazar (renderBanner)", "suppCounter": "JS yazar (renderSupps)",
       "restPillLabel": "JS yazar (timerLabelText)", "cfTitle": "JS yazar (openCustomFood/editCustomFood)", "pickerTitle": "JS yazar (openPicker)", "pickerExtraBtn": "JS yazar (openPicker)",
       "mealModalTitle": "JS yazar (openMealModal)", "pfPhotoBtnText": "JS yazar (refreshProfilePhoto)", "lastBackupText": "JS yazar (renderProfile)", "uiDlgCancel": "JS yazar (uiDialog)",
-      "pfLang": "dil adı kendi dilinde kalır ('Türkçe' / 'English')", "pfAvatar": "alt metni: görsel yalnızca süs",
-      "exMuscle": "kas seçenekleri: değer = kayıtlı Türkçe kas adı; metni JS her açılışta muscleL ile yazar (openExerciseModal)",
-      "onboard": "ilk kurulum ekranları (ayrı sürüm)"}
+      "pfLang": "dil adı kendi dilinde kalır ('Türkçe' / 'English')", "pfAvatar": "alt metni: görsel yalnızca süs", "obDots": "aria-label her adımda JS yazar (obRender, t(\"Adım {n} / {m}\"))",
+      "exMuscle": "kas seçenekleri: değer = kayıtlı Türkçe kas adı; metni JS her açılışta muscleL ile yazar (openExerciseModal)"}
     mk = open(os.path.join(REPO, "src", "markup.html"), encoding="utf-8").read(); mk = mk[mk.index("<body"):]
     mhit = markup_tarama(mk)
     mbad = [(k, x[:40], ids[-1] if ids else None) for (k, x, ids, ln) in mhit if not any(i in MK_IZIN for i in ids)]

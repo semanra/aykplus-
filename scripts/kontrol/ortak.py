@@ -145,6 +145,12 @@ EN_SCREENS = [
   ("en-m-ekle", "mobBack(); mobEdit(true); mobAddOpen()"),
   ("en-m-seans", "mobBack(); mobEdit(false); mobSesStart(mobRoutines()[0].id); mobSesLoad(mobRoutines()[0].items.findIndex(i => i.mode === 'time'))"),
   ("en-m-bitis", "mobSesFinish()"),
+  # v50: İlerleme (yalnız ölçüm)
+  ("en-p-genel", "mobTimerClose(); switchTab('progress'); setProgressView('genel')"),
+  ("en-p-kilo", "setProgressView('kilo')"),
+  ("en-p-guc", "setProgressView('guc')"),
+  ("en-p-beslenme", "setProgressView('beslenme')"),
+  ("en-p-grafik", "setProgressView('guc'); openExerciseChart(0)"),
 ]
 EN_ROOT = {"en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage", "en-m-seans": "#mobTimer", "en-m-bitis": "#mobTimer"}
 # v44: kurulum ekranları. TEST_INIT OLMADAN, temiz depoda açılır (gerçek yeni kurulum yolu). Sırayla; her adım öncekinin üstüne.
@@ -157,6 +163,8 @@ ONBOARD_SCREENS = [
   ("ob-6", "obPick('exp','new'); obNext()"),
   ("ob-7", "obNext()"),
 ]
+# v50: İngilizce kurulum 1–7 (tohumsuz, temiz depoda, dil seçilerek); ONBOARD_SCREENS adımlarıyla aynı, görünür alan çekimi
+EN_ONBOARD_SCREENS = [("en-" + n, ("obPickLang('en')" if n == "ob-1" else js)) for n, js in ONBOARD_SCREENS]
 # Kurulum üç örnek kutusu işaretsiz bitirilince: boş başlangıç ekranları
 FRESH_SCREENS = [
   ("bos-menu", "obDraft.menu = false; obDraft.prog = false; obDraft.mob = false; finishOnboarding(); switchTab('nutrition'); setNutriView('menus')"),
