@@ -52,7 +52,7 @@ Her aşama ayrı sürüm(ler)dir. Her aşamanın başında plan sunulur ve onay 
 - Set tamamlama, sayaç bitişi gibi anlarda titreşim (haptics).
 
 ### Aşama 6 — Mağaza başvurusu
-- Gizlilik politikası ve destek sayfası (GitHub Pages, TR + EN). App Privacy formu: "veri toplanmıyor" + barkodun Open Food Facts'e gönderildiği notu.
+- Gizlilik politikası ve destek sayfası (GitHub Pages, TR + EN). **Yapıldı (v61):** `privacy.html`, `support.html`; iletişim şimdilik GitHub Issues (ayrı bir destek e-postası eklenebilir). App Privacy formu: "veri toplanmıyor" + barkodun Open Food Facts'e gönderildiği notu.
 - Mağaza sayfası TR + EN: ad, açıklama, anahtar kelimeler, ekran görüntüleri (iPhone 6,9" / 6,5", iPad 13"), yaş derecelendirmesi.
 - "AYK+" adının mağazada uygunluğu, `anatomy.jpg` üretim aracının ticari kullanım şartları kontrolü.
 - İnceleme → yayın (ücretsiz).
@@ -63,4 +63,4 @@ Her aşama ayrı sürüm(ler)dir. Her aşamanın başında plan sunulur ve onay 
 ### Sonra (karar verildiğinde)
 - Abonelik (Apple uygulama içi satın alma, "satın alımı geri yükle", Pro özellik seçimi).
 - iPhone–iPad eşitleme (iCloud).
-- "Daha Büyük Yazı" desteği, VoiceOver baştan sona deneme.
+- "Daha Büyük Yazı" desteği, VoiceOver baştan sona deneme. **Yapıldı (v61):** Yazı boyutu ayarı (Sistem / Normal / Büyük / En büyük) ve VoiceOver adlandırma düzeltmeleri; gerçek iPhone'da VoiceOver ile elden deneme kullanıcıda.

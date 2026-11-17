@@ -69,7 +69,7 @@ function setLang(l) {
   i18nTouched = true;
   try { if (typeof uiDlg !== "undefined" && uiDlg) uiDialogDone(false); } catch (e) { /* yoksay */ }
   applyStaticI18n(null, true);
-  try { if (typeof profileIsOpen === "function" && profileIsOpen()) { fillProfileFields(); updateWaterAutoHint(); updateBfHint(); if ($("pfSnaps").closest("details").open) renderSnapList(); } } catch (e) { /* yoksay */ }   // v47: kutulardaki sayılar (80,5 / 80.5) yeni dile göre
+  try { if (typeof profileIsOpen === "function" && profileIsOpen()) { fillProfileFields(); renderAbout(); /* v61: Hakkında metni ve bağlantılar da yeni dilde */ updateWaterAutoHint(); updateBfHint(); if ($("pfSnaps").closest("details").open) renderSnapList(); } } catch (e) { /* yoksay */ }   // v47: kutulardaki sayılar (80,5 / 80.5) yeni dile göre
   renderAll();   // Profil açıksa renderAll içinde yeniden çizilir
   loadFoodsEn();   // v51: İngilizce besin adları (yalnızca İngilizcede; bitince yeniden çizer)
 }

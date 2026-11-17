@@ -299,9 +299,9 @@ function openPlateTool(exIdx) {
   }
   $("chartBody").innerHTML = `
     <div class="grid ${lv ? "grid-cols-1" : "grid-cols-2"} gap-2 text-xs">
-      <div><label class="block text-[var(--w-muted)] mb-1">${wTxt(t("Çalışma kilosu (kg)"))}</label>
+      <div><label for="ptKg" class="block text-[var(--w-muted)] mb-1">${wTxt(t("Çalışma kilosu (kg)"))}</label>
         <input id="ptKg" type="text" inputmode="decimal" value="${esc(fmtWNum(W))}" oninput="renderPlateTool()" class="w-full p-2 rounded-lg text-base text-center font-bold" /></div>
-      ${lv ? "" : `<div><label class="block text-[var(--w-muted)] mb-1">${t("Bar ağırlığı")}</label>
+      ${lv ? "" : `<div><label for="ptBar" class="block text-[var(--w-muted)] mb-1">${t("Bar ağırlığı")}</label>
         <select id="ptBar" onchange="setPlateBar(this.value)" class="w-full p-2 rounded-lg text-sm">
           ${(isImperial() ? [[45, t("45 lb Olimpik bar")], [35, t("35 lb Bar")], [15, t("15 lb EZ / kısa bar")], [0, t("Bar yok / plakalı makine")]] : [[20, t("20 kg Olimpik bar")], [15, t("15 kg Bar")], [10, t("10 kg EZ / kısa bar")], [0, t("Bar yok / plakalı makine")]]).map(([v, l]) => `<option value="${v}" ${v === bar ? "selected" : ""}>${l}</option>`).join("")}
         </select></div>`}

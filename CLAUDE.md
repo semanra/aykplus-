@@ -19,12 +19,13 @@ AYK+, kişisel fitness uygulamasıdır (önce sahibinin kendisi için; v44'ten b
 index.html          ← DERLENMİŞ ÇIKTI. ASLA ELLE DÜZENLEME.
 sw.js               ← Service worker (önbellek sürümü burada)
 manifest.json, icon*.png, anatomy.jpg, anatomy-light.webp   ← Statik dosyalar
+privacy.html, support.html   ← v61 gizlilik ve destek sayfaları (TR + EN, App Store için; elle düzenlenir)
 src/markup.html     ← HTML iskeleti + özel CSS + gömülü yazı tipi (AYKDisplay = Barlow Condensed 800 italik, OFL)
 src/app/            ← Uygulama mantığı, bölümlere ayrılmış (v34). Derlemede AD SIRASIYLA birleştirilir:
                       00-depolama (v41: IndexedDB, ayna, iç yedekler) · 01-temel (yardımcılar, durum) · 02-arayuz (bildirim, pencere, ses, sayaç, gün dönümü, sekmeler, tema)
                       03-beslenme · 04-besinler-barkod · 05-secici-hareket · 06-mobilite · 07-grafik-ilerleme
                       08-profil-yedek · 09-kas-plaka-koc-takviye · 10-antrenman-arayuzu · 11-mutfak-akilli
-                      12-besin-veritabani · 13-cizim-baslat (renderAll + başlat) · 14-ornek-icerik · 15-kurulum · 16-dil · 17-sozluk-en · 18-en-ortak · 19-en-beslenme · 20-en-profil · 21-en-antrenman · 22-en-mobilite · 23-en-ilerleme-kurulum · 24-en-besin · 25-en-rehber · 27-animasyon (v55) · 26-birim (v53: lb / in gösterim yardımcıları)
+                      12-besin-veritabani · 13-cizim-baslat (renderAll + başlat) · 14-ornek-icerik · 15-kurulum · 16-dil · 17-sozluk-en · 18-en-ortak · 19-en-beslenme · 20-en-profil · 21-en-antrenman · 22-en-mobilite · 23-en-ilerleme-kurulum · 24-en-besin · 25-en-rehber · 27-animasyon (v55) · 26-birim (v53: lb / in gösterim yardımcıları) · 28-yazi-boyutu (v61) · 29-csv (v61)
                       (NOT: t()/applyStaticI18n üst düzey değerlendirme sırasında ÇALIŞMAZ; açılış async, EN sabiti sonradan tanımlı)
 src/data.js         ← Uygulamanın kendi besin listesi (BASE_FOOD_DB), hareket ve mobilite kütüphaneleri, varsayılan durum
 foods-en.js         ← v51 İngilizce besin adları/porsiyonlar (USDA `desc`); YALNIZCA dil İngilizceyken yüklenir; `build_foods.py` üretir, elle düzenleme
@@ -42,7 +43,7 @@ tests/              ← Playwright (Python) test paketleri
 npm install          # ilk seferde (tailwindcss 3.4.17)
 npm run build        # src/* → index.html  (Tailwind sınıfları build/pre.html taranarak derlenir)
 pip install playwright && python3 -m playwright install chromium   # ilk seferde
-npm test             # 50 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
+npm test             # 51 test paketi, gerçek Chromium'da iPhone boyutunda; hepsi geçmeli
 pip install pillow   # ilk seferde (kontrol aracı için)
 npm run kontrol      # son commit ile karşılaştırma: 53 ekran × 2 tema piksel farkı + okunurluk/44 px/taşma + hız; v47–v53: ayrıca 51 İngilizce ekran (v53: 9 imperial `en-u-*`) yalnız ölçülür, piksel karşılaştırması yok (`-- --hizli` hızsız)
 ```
@@ -126,9 +127,9 @@ npm run kontrol      # son commit ile karşılaştırma: 53 ekran × 2 tema piks
 
 ## 9. Yol haritası
 
-Bütün sürüm geçmişi (v6–v60; her sürümün kararları, kullanıcı tercihleri, gerekçeler): **`docs/SURUM-GECMISI.md`**. Bir özelliğin neden öyle olduğunu ararken önce oraya bak; yeni sürüm notunu oraya ekle.
+Bütün sürüm geçmişi (v6–v61; her sürümün kararları, kullanıcı tercihleri, gerekçeler): **`docs/SURUM-GECMISI.md`**. Bir özelliğin neden öyle olduğunu ararken önce oraya bak; yeni sürüm notunu oraya ekle.
 
-Son durum: **v60 (17 Kasım 2026):** dış inceleme (Gemini) düzeltmeleri: plaka/başlangıç kilosu geçmişten (`lastWorkKg`), kademe sorusu yalnız sıradaki harekette, profil fotoğrafı ayrı depolama parçası, Kilom'da "Tüm tartı geçmişi" bağlantısı, Hakkında kaynakları tıklanabilir (`METHOD_LINKS`). Test: `tests/test_v60_duzeltmeler.py` (port 8817). Kalan: yazı boyutu, VoiceOver, gizlilik/destek sayfası, CSV dışa aktarma (isteğe bağlı). Not: telefon dışına OTOMATİK yedek PWA'da mümkün değil; iCloud Aşama 4–5'te.
+Son durum: **v61 (17 Kasım 2026):** App Store öncesi A grubu: yazı boyutu (`28-yazi-boyutu.js`, derlemede `--fs` çarpanı; JS'te satır içi font-size yazma), VoiceOver düzeltmeleri, Tabloya aktar (CSV, `29-csv.js`), gizlilik ve destek sayfaları (`privacy.html`, `support.html`, Hakkında'dan bağlantı; yeni ağ isteği eklenirse gizlilik sayfasını güncelle). Test: `tests/test_v61_erisim.py` (port 8818). Sıradaki: Aşama 4 (Capacitor). Not: telefon dışına OTOMATİK yedek PWA'da mümkün değil; iCloud Aşama 4–5'te.
 
 **App Store (14 Kasım 2026 kararı):** uygulama herkese açık App Store'a çıkacak (TR + EN, önce ücretsiz, abonelik sonra, geliştirici hesabı alındı). Sıra ve kararlar: `docs/YOL-HARITASI-appstore.md` (Aşama 1: depolama temeli). Durum raporu: `docs/ANALIZ-appstore.md`.
 

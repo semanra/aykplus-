@@ -59,6 +59,8 @@ function renderAbout() {
   const li = x => "<li>" + esc(t(x)) + "</li>";
   $("pfAboutHealth").textContent = t(HEALTH_NOTE);
   $("pfAboutPrivacy").textContent = t(PRIVACY_NOTE);
+  $("pfPrivacyLink").setAttribute("href", en ? "privacy.html#en" : "privacy.html");   // v61: gizlilik / destek sayfaları (depoda, GitHub Pages)
+  $("pfSupportLink").setAttribute("href", en ? "support.html#en" : "support.html");
   $("pfMethodBody").innerHTML = [
     "<p><b>" + t("Günlük harcama.") + "</b> " + t("Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.") + "</p>",
     "<p><b>" + t("Hareketlilik çarpanları") + "</b> " + t("(antrenman günü · dinlenme günü): az hareketli {l0} · {l1}, orta {m0} · {m1}, çok hareketli {h0} · {h1}.", {
@@ -443,15 +445,15 @@ async function askConfirm(title, message, ok = t("Devam et"), danger = false) {
 function markBackup() { state.lastBackupAt = Date.now(); state.backupSnoozeUntil = 0; saveState(); renderBanner(); }
 
 // v35: metni dosya olarak paylaş (iPhone: Dosyalar'a Kaydet) veya indir — yedek ve kurtarma kopyası ortak
-async function saveTextFile(text, name, title) {
+async function saveTextFile(text, name, title, type = "application/json") {   // v61: CSV için tür
   let file = null;
-  try { file = new File([text], name, { type: "application/json" }); } catch (e) { file = null; }
+  try { file = new File([text], name, { type }); } catch (e) { file = null; }
   if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
     try { await navigator.share({ files: [file], title }); return "shared"; }
     catch (e) { if (e && e.name === "AbortError") return "aborted"; }
   }
   try {
-    const url = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+    const url = URL.createObjectURL(new Blob([text], { type }));
     const a = document.createElement("a");
     a.href = url; a.download = name;
     document.body.appendChild(a); a.click(); a.remove();

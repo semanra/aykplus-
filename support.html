@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>AYK+ · Destek / Support</title>
+<meta name="description" content="AYK+ destek ve sık sorulan sorular · AYK+ support and FAQ" />
+<link rel="icon" type="image/png" href="icon.png" />
+<style>
+  :root { --bg: #000; --card: #141416; --line: #2A2A2E; --text: #F4F4F5; --muted: #A1A1AA; --acc: #1FD1C1; --on-acc: #00201D; color-scheme: dark light; }
+  @media (prefers-color-scheme: light) { :root { --bg: #F2F2F5; --card: #FFFFFF; --line: #E4E4E7; --text: #09090B; --muted: #52525B; --acc: #0E7C72; --on-acc: #FFFFFF; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-text-size-adjust: 100%; }
+  main { max-width: 720px; margin: 0 auto; padding: max(20px, env(safe-area-inset-top)) 16px 48px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  header img { width: 44px; height: 44px; border-radius: 11px; }
+  h1 { font-size: 26px; line-height: 1.2; margin: 0; }
+  h2 { font-size: 18px; margin: 28px 0 6px; }
+  p, li { color: var(--muted); }
+  b, strong { color: var(--text); }
+  a { color: var(--acc); }
+  .lang { display: flex; gap: 8px; margin: 16px 0 8px; }
+  .lang a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: var(--text); background: var(--card); font-weight: 600; }
+  .cta { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 20px; border-radius: 14px; background: var(--acc); color: var(--on-acc); font-weight: 700; text-decoration: none; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 0 16px; margin: 10px 0; }
+  summary { min-height: 52px; display: flex; align-items: center; font-weight: 600; cursor: pointer; }
+  details p { margin: 0 0 14px; }
+  section + section { border-top: 1px solid var(--line); margin-top: 48px; padding-top: 24px; }
+</style>
+</head>
+<body>
+<main>
+  <header><img src="icon.png" alt="" /><h1>AYK+</h1></header>
+  <nav class="lang" aria-label="Dil / Language"><a href="#tr" lang="tr">Türkçe</a><a href="#en" lang="en">English</a></nav>
+
+  <section id="tr" lang="tr">
+    <h1>Destek</h1>
+    <h2>Bize ulaş</h2>
+    <p>Bir hata bulduysan ya da bir önerin varsa GitHub üzerinden yaz. Ekran görüntüsü eklersen daha hızlı çözeriz. Kişisel verilerini (yedek dosyası gibi) paylaşma.</p>
+    <p><a class="cta" href="https://github.com/semanra/aykplus-/issues/new" rel="noopener">Hata bildir / öneri gönder</a></p>
+
+    <h2>Sık sorulan sorular</h2>
+    <details><summary>Verilerim nerede? Kaybolabilir mi?</summary>
+      <p>Bütün verilerin yalnızca cihazında durur. Uygulama her gün kendi içinde yedek alır. Ama telefon kaybolursa ya da uygulamayı silersen bu yedekler de gider. Bu yüzden ara sıra <b>Profil → Veri ve yedekleme → Yedek dosyası kaydet</b> ile bir dosya kaydet ve iCloud Drive'a koy.</p></details>
+    <details><summary>Yeni telefona nasıl taşırım?</summary>
+      <p>Eski telefonda yedek dosyası kaydet. Yeni telefonda AYK+'yı aç, <b>Profil → Veri ve yedekleme → Dosyadan geri yükle</b>'ye dokun ve dosyayı seç. İlk kurulum ekranındaki "Yedeğim var, geri yükle" düğmesi de aynı işi yapar.</p></details>
+    <details><summary>Güncelleme gelmedi</summary>
+      <p>Uygulamayı iki kez tamamen kapatıp aç (uygulama değiştiricide yukarı kaydır). Sürüm numarası Profil'in en altında yazar.</p></details>
+    <details><summary>Telefon kilitliyken dinlenme sayacı ses çıkarmıyor</summary>
+      <p>Ana ekrana eklenen web uygulamalarında iOS buna izin vermiyor. Sayaç sürmeye devam eder; uygulamaya dönünce kalan süreyi görürsün. Sessiz moddayken de ses çıkmaz.</p></details>
+    <details><summary>Barkodu okuttum ama ürün bulunamadı</summary>
+      <p>Ürün Open Food Facts veritabanında yoksa etiketteki değerlerle <b>özel besin</b> olarak ekleyebilirsin. Bir kez ekledikten sonra listende kalır.</p></details>
+    <details><summary>Yazılar küçük</summary>
+      <p><b>Profil → Görünüm ve dil → Yazı boyutu</b>'ndan Büyük ya da En büyük'ü seç. "Sistem" seçiliyse iPhone'daki Metin Boyutu ayarına uyar.</p></details>
+    <details><summary>kg yerine lb kullanmak istiyorum</summary>
+      <p><b>Profil → Görünüm ve dil → Birim</b>'den "lb, ft, in"i seç. Kayıtların değişmez, yalnızca gösterim değişir.</p></details>
+    <details><summary>Verilerimi Excel'de görmek istiyorum</summary>
+      <p><b>Profil → Veri ve yedekleme → Tabloya aktar (CSV)</b>. Antrenman, kilo ve ölçü, beslenme için ayrı dosya alırsın.</p></details>
+    <details><summary>Bütün verilerimi silmek istiyorum</summary>
+      <p>Profil'in en altındaki <b>Fabrika ayarlarına sıfırla</b> düğmesini kullan ya da uygulamayı ana ekrandan kaldır. Ayrıntılar <a href="privacy.html">gizlilik politikasında</a>.</p></details>
+  </section>
+
+  <section id="en" lang="en">
+    <h1>Support</h1>
+    <h2>Contact us</h2>
+    <p>Found a bug or have an idea? Write to us on GitHub. A screenshot helps us fix things faster. Please don't share personal data such as backup files.</p>
+    <p><a class="cta" href="https://github.com/semanra/aykplus-/issues/new" rel="noopener">Report a bug / send an idea</a></p>
+
+    <h2>Frequently asked questions</h2>
+    <details><summary>Where is my data? Can I lose it?</summary>
+      <p>All of your data stays only on your device. The app makes an internal backup every day, but those are lost too if you lose the phone or delete the app. So now and then use <b>Profile → Data and backup → Save backup file</b> and keep the file in iCloud Drive.</p></details>
+    <details><summary>How do I move to a new phone?</summary>
+      <p>Save a backup file on the old phone. On the new phone, open AYK+, tap <b>Profile → Data and backup → Restore from file</b> and pick the file. The "I have a backup — restore it" button on the first setup screen does the same.</p></details>
+    <details><summary>The update hasn't arrived</summary>
+      <p>Fully close and reopen the app twice (swipe it up in the app switcher). The version number is shown at the bottom of Profile.</p></details>
+    <details><summary>The rest timer makes no sound when the phone is locked</summary>
+      <p>iOS doesn't allow this for web apps added to the Home Screen. The timer keeps running and shows the remaining time when you come back. There's no sound in silent mode either.</p></details>
+    <details><summary>I scanned a barcode but the product wasn't found</summary>
+      <p>If the product isn't in the Open Food Facts database, add it as a <b>custom food</b> using the values on the label. Once added, it stays in your list.</p></details>
+    <details><summary>The text is too small</summary>
+      <p>Go to <b>Profile → Appearance and language → Text size</b> and pick Large or Largest. "System" follows your iPhone's Text Size setting.</p></details>
+    <details><summary>I want to use lb instead of kg</summary>
+      <p>Go to <b>Profile → Appearance and language → Units</b> and pick "lb, ft, in". Your records don't change, only how they're shown.</p></details>
+    <details><summary>I want to see my data in Excel</summary>
+      <p><b>Profile → Data and backup → Export to spreadsheet (CSV)</b>. You get separate files for workouts, weight and sizes, and nutrition.</p></details>
+    <details><summary>I want to delete all my data</summary>
+      <p>Use the <b>Erase all data</b> button at the bottom of Profile, or remove the app from your Home Screen. See the <a href="privacy.html#en">privacy policy</a> for details.</p></details>
+  </section>
+</main>
+</body>
+</html>

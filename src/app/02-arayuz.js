@@ -373,6 +373,7 @@ function applyTabVisibility() {
   const nutri = state.activeTab === "nutrition";
   document.body.classList.toggle("theme-nutri", nutri);
   applyTheme();
+  applyTextSize();   // v61
   // v31: güneş/ay düğmesi her sekmede; tüm uygulamanın temasını değiştirir
   const tb = $("nutriThemeBtn");
   tb.classList.remove("hidden"); tb.classList.add("flex");
@@ -395,6 +396,7 @@ function applyTabVisibility() {
     $(tabId).classList.toggle("hidden", !on);
     if (headId) { $(headId).classList.toggle("hidden", !on); $(headId).classList.toggle(disp, on); }
     $(btnId).className = on ? activeCls : idleCls;
+    if (on) $(btnId).setAttribute("aria-current", "page"); else $(btnId).removeAttribute("aria-current");   // v61: VoiceOver seçili sekmeyi söyler
   });
 }
 

@@ -203,7 +203,7 @@ function exitActiveWorkout() { state.gymActive = false; window.scrollTo(0, 0); r
 
 function gymSubNav() {
   return `<nav class="gym-subnav flex gap-5 border-b border-[var(--t-line)] -mx-0.5 px-0.5 overflow-x-auto no-scrollbar" aria-label="${t("Antrenman bölümleri")}">
-    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" class="shrink-0 h-11 min-w-[44px] text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${t(l)}</button>`).join("")}
+    ${GYM_VIEWS.map(([k, l]) => `<button onclick="setGymView('${k}')" ${state.gymView === k ? 'aria-current="page"' : ""} class="shrink-0 h-11 min-w-[44px] text-[15px] ${state.gymView === k ? "font-bold text-[var(--t-text)] border-b-2 border-[var(--t-acc-text)] -mb-px" : "font-medium t-muted"}">${t(l)}</button>`).join("")}
   </nav>`;
 }
 
@@ -517,8 +517,10 @@ function gymLibraryHtml() {
   let polys = "", sels = "";
   Object.keys(BODY_POLYS).forEach(m => {
     const c = heatColor(counts[m] || 0);
-    BODY_POLYS[m].forEach(p => {
-      polys += `<polygon points="${p}" fill="${c}" onclick="selectMuscle('${m}')" style="cursor:pointer"></polygon>`;
+    BODY_POLYS[m].forEach((p, pi) => {
+      // v61: VoiceOver her kası bir kez okur (ilk parça düğme, diğerleri gizli)
+      const a11y = pi === 0 ? `role="button" aria-label="${esc(muscleL(m))}"${m === sel ? ' aria-pressed="true"' : ""}` : 'aria-hidden="true"';
+      polys += `<polygon points="${p}" fill="${c}" onclick="selectMuscle('${m}')" ${a11y} style="cursor:pointer"></polygon>`;
       if (m === sel) sels += `<polygon points="${p}" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="7 5" stroke-linejoin="round"></polygon>`;
     });
   });

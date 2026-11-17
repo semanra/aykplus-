@@ -84,7 +84,7 @@ Object.assign(EN, {
   // v59: Profil ana ekranı ve bölümleri
   "Kişisel bilgiler": "Personal details", "Fotoğraf, cinsiyet, yaş, boy": "Photo, sex, age, height",
   "Kilo ve hedefler": "Weight and goals", "Hedef, kilo, yağ oranı, su, ölçüler": "Goal, weight, body fat, water, measurements",
-  "Görünüm ve dil": "Appearance and language", "Tema, dil, birim, animasyonlar": "Theme, language, units, animations",
+  "Görünüm ve dil": "Appearance and language", "Gizlilik politikası": "Privacy policy", "Destek ve iletişim": "Support and contact", "Tema, dil, birim, yazı boyutu, animasyonlar": "Theme, language, units, text size, animations",
   "Antrenman ve mobilite": "Training and mobility", "Dinlenme, ses, ekran, ısınma, sesli yönlendirme": "Rest, sound, screen, warm-up, voice guidance",
   "Gün geçişi, bulunamayan aramalar": "Day change, searches with no results",
   "Veri ve yedekleme": "Data and backup", "Yedek dosyası, iç yedekler, kayıt alanı": "Backup file, internal backups, storage",

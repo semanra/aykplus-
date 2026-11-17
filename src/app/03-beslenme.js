@@ -834,7 +834,7 @@ function renderMenus() {
     <label class="flex items-center justify-between gap-3 cursor-pointer min-h-[44px]">
       <span class="min-w-0"><span class="block text-[15px] font-bold">${t("Kiloya göre gramaj")}</span>
         <span class="block text-[12px] n-muted">${t("Kilon değişince menüdeki gramajlar da orantılı değişir.")}</span></span>
-      <input id="scaleToggle" type="checkbox" class="n-sw" ${st.scaleOn ? "checked" : ""} onchange="toggleWeightScale(this.checked)" />
+      <input id="scaleToggle" type="checkbox" role="switch" class="n-sw" ${st.scaleOn ? "checked" : ""} onchange="toggleWeightScale(this.checked)" />
     </label>
     ${st.scaleOn ? `
       <div class="n-elev rounded-2xl px-3.5 py-3 space-y-1">

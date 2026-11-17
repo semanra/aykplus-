@@ -33,11 +33,18 @@ for (const ph of ["/*__TAILWIND__*/", "/*__DATA__*/", "/*__APP__*/"]) {
 }
 
 fs.mkdirSync(p("build"), { recursive: true });
-const pre = markup.replace("/*__DATA__*/", () => data).replace("/*__APP__*/", () => app);
+// v61: yazı boyutu. Bütün font-size / line-height (px, rem) değerleri --fs çarpanıyla ölçeklenir (Profil → Yazı boyutu);
+// 24 px (1,5 rem) ve üstü başlık/sayılar --fs-d (yarı oran). --fs = 1 iken çıktı birebir aynı boyuttur.
+const scaleFonts = css => css.replace(/(font-size|line-height)(\s*:\s*)(\d*\.?\d+)(px|rem)\b/g, (m, prop, sep, n, u) => {
+  const px = u === "rem" ? +n * 16 : +n;
+  return `${prop}${sep}calc(${n}${u} * var(${px >= 24 ? "--fs-d" : "--fs"}, 1))`;
+});
+const markupScaled = scaleFonts(markup);
+const pre = markupScaled.replace("/*__DATA__*/", () => data).replace("/*__APP__*/", () => app);
 fs.writeFileSync(p("build", "pre.html"), pre);
 
 execSync(`npx tailwindcss -c tailwind.config.cjs -i src/tailwind.css -o build/tw.css --minify`, { cwd: root, stdio: "inherit" });
-const css = fs.readFileSync(p("build", "tw.css"), "utf8");
+const css = scaleFonts(fs.readFileSync(p("build", "tw.css"), "utf8"));
 fs.writeFileSync(p("index.html"), pre.replace("/*__TAILWIND__*/", () => css));
 
 const kb = (fs.statSync(p("index.html")).size / 1024).toFixed(0);
