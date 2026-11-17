@@ -136,9 +136,11 @@ function updateExMuscleAuto() {
 }
 
 function openExerciseModal(opts) {
-  exModal = { mode: "add", idx: -1, kind: opts.kind || "weight", orig: null };
+  // v60: bu hareket daha önce yapıldıysa başlangıç kilosu geçmişteki son çalışma kilosuyla dolar (kutuda görünür, değiştirilebilir)
+  const prefKg = opts.name ? lastWorkKg(opts.name) : 0;
+  exModal = { mode: "add", idx: -1, kind: opts.kind || "weight", orig: null, prefKg };
   $("exModalTitle").textContent = t("Hareket Ekle");
-  fillExModalFields({ name: opts.name || "" });
+  fillExModalFields({ name: opts.name || "", kg: prefKg });
   setExModalKind(exModal.kind);
   openModal("exerciseModal");
 }
@@ -201,7 +203,7 @@ function readExModal() {
     name: $("exName").value.trim(),
     count: Math.max(1, Math.min(12, Math.round(num($("exSetCount").value, 3)))),
     target: $("exRepRange").value.trim().replace(/-/g, "–") || "8–12",
-    kg: Math.max(0, exKgIn($("exStartKg").value, exModal.orig ? exModal.orig.kg : null, 0)),
+    kg: Math.max(0, exKgIn($("exStartKg").value, exModal.orig ? exModal.orig.kg : (exModal.prefKg || null), 0)),
     tcount: Math.max(1, Math.min(12, Math.round(num($("exTimeSetCount").value, 3)))),
     sec: Math.max(5, Math.round(num($("exTimeSec").value, 45))),
     min: Math.max(0, round1(num($("exCardioMin").value, 30))),
@@ -300,6 +302,17 @@ function e1rm(kg, reps) {
   return reps === 1 ? kg : kg * (1 + reps / 30);
 }
 function historyFor(name) { return state.exerciseHistory[exKey(name)] || []; }
+// v60: geçmişte bu hareketle kaldırılan son çalışma kilosu (en son ağırlık seansının en büyük kilosu; yoksa 0)
+function lastWorkKg(name) {
+  const h = historyFor(name);
+  for (let i = h.length - 1; i >= 0; i--) {
+    const s = h[i];
+    if (!isObj(s) || s.kind === "cardio" || s.kind === "time" || !Array.isArray(s.sets)) continue;
+    const m = Math.max(0, ...s.sets.map(x => num(x && x.kg, 0)));
+    if (m > 0) return m;
+  }
+  return 0;
+}
 function bestHistE1RM(name) {
   let best = 0;
   historyFor(name).forEach(s => (s.sets || []).forEach(x => { const v = e1rm(x.kg, x.reps); if (v > best) best = v; }));

@@ -1,7 +1,7 @@
 # v59: Profil yeniden düzeni — ana ekran (özet kartı, ayar arama, 7 bölüm), bölümler alt sayfa, Geri ana ekrana döner,
 # Profil'de hedef (Ver/Koru/Al, açık, hız), arama sonucuna dokununca ilgili satıra gider. Eski testler window.AYK_PF_FLAT
 # ile bütün bölümleri alt alta açar; bu test gerçek düzeni (bayrak kapalı) dener.
-import os, sys, subprocess, time
+import os, re, sys, subprocess, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ortak_tohum import TEST_INIT
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -36,7 +36,7 @@ try:
     check("Kilo vermek" in pg.text_content("#pfSummary"), "özet: hedef yazıyor")
     check("kcal" in summ and "protein" in summ and "→" in summ, "özet: kilo → hedef kilo ve bugünün kalori/protein hedefi")
     check(pg.evaluate("document.documentElement.scrollWidth <= innerWidth && $('pfScroll').scrollWidth <= $('pfScroll').clientWidth"), "ana ekranda yatay taşma yok")
-    check(vis(pg, "#pfFoot") and "v59" in pg.inner_text("#pfFoot"), "alt satır (sürüm + fabrika ayarları) ana ekranda")
+    check(vis(pg, "#pfFoot") and re.search(r"AYK\+ v\d+", pg.inner_text("#pfFoot")), "alt satır (sürüm + fabrika ayarları) ana ekranda")
     pg.screenshot(path=os.path.join(SHOTS, "v59_profil_ana.png"))
 
     # 2) Bölüm aç / Geri

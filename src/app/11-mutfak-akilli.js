@@ -143,7 +143,7 @@ function renderRecipe() {
     return `<div class="flex items-center gap-1.5 py-1.5" data-rc-item="${i}">
         <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(foodNameL(fd))}</div><div id="rcK${i}" class="text-[12px] n-muted tabular-nums">${Math.round(kcalPerUnit(fd) * num(it.amount))} kcal</div></div>
         <input type="text" inputmode="decimal" data-fk="rc-${i}" value="${esc(fmtNum(it.amount))}" oninput="rcAmount(${i}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} miktarı", { ad: foodNameL(fd) }))}" />
-        <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(unitL(2, fd.unit))}</span>
+        <span class="text-[12px] n-muted min-w-[40px] max-w-[76px] shrink-0 truncate">${esc(unitL(2, fd.unit))}</span>
         <button onclick="rcRemove(${i})" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-over" aria-label="${esc(t("{ad} çıkar", { ad: foodNameL(fd) }))}">${svgI("x", 18, 2.2)}</button>
       </div>`;
   }).join("") || `<p class="text-[13px] n-dim py-2">${t("Henüz malzeme yok. Aşağıdan ekle.")}</p>`;

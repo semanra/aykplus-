@@ -101,7 +101,7 @@ Object.assign(EN, {
   "Beslenme → Menülerim'deki hedef kartıyla aynı ayardır.": "This is the same setting as the goal card in Nutrition → Plans.",
   // v58: yedek durumu
   "İç yedekler bu telefonda durur; telefon kaybolursa ya da uygulama silinirse onlar da gider. Ara sıra yedek dosyası kaydedip iCloud Drive'a koy.": "Internal backups stay on this phone; if you lose the phone or delete the app, they go too. Now and then, save a backup file and put it in iCloud Drive.",
-  "Telefon dışı yedek (dosya)": "Off-phone backup (file)", "Otomatik iç yedek": "Automatic internal backup",
+  "Telefon dışı yedek (dosya)": "Backup file (Files / iCloud)", "Otomatik iç yedek": "On-device auto backup",   // v60: daha anlaşılır
   "Hiç alınmadı": "Never", "Bu cihazda yok": "Not on this device",
   "Bugün alındı": "Taken today", "Dün alındı": "Taken yesterday", "İlk açılışta oluşur": "Made on next launch",
   "Son yedek: {d} ({n} gün önce)": { one: "Last backup: {d} ({n} day ago)", other: "Last backup: {d} ({n} days ago)" },
@@ -162,4 +162,6 @@ Object.assign(EN, {
   "Ara...": "Search...",
   "{n} sonuç daha var; aramayı daralt.": { one: "{n} more result; narrow your search.", other: "{n} more results; narrow your search." },
   "Sonuç bulunamadı.": "No results found.",
+  // v60
+  "Tüm tartı geçmişi": "Full weigh-in history",
 });

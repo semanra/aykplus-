@@ -480,7 +480,7 @@ function renderTodayMeals() {
             <div class="flex items-center justify-end gap-1 mt-1.5">
               <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: foodNameL(f) }))}">${svgI("minus", 18, 2.4)}</button>
               <input type="text" inputmode="decimal" data-fk="damt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="daySetAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt shrink-0" aria-label="${esc(t("{ad} bugünkü miktarı", { ad: foodNameL(f) }))}" />
-              <span class="text-[12px] n-muted w-10 min-w-0 truncate">${esc(unitL(effAmount(item), f.unit))}</span>
+              <span class="text-[12px] n-muted min-w-[40px] max-w-[76px] shrink-0 truncate">${esc(unitL(effAmount(item), f.unit))}</span>
               <button onclick="dayChangeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 shrink-0 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: foodNameL(f) }))}">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>`;
@@ -881,7 +881,7 @@ function renderMenus() {
             <div class="flex items-center gap-1 shrink-0">
               <button onclick="changeAmount(${mIdx}, ${iIdx}, -1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} azalt", { ad: foodNameL(f) }))}">${svgI("minus", 18, 2.4)}</button>
               <input type="text" inputmode="decimal" data-fk="amt-${mIdx}-${iIdx}" value="${esc(fmtNum(effAmount(item)))}" onchange="setAmount(${mIdx}, ${iIdx}, this.value)" class="n-amt" aria-label="${esc(t("{ad} miktarı", { ad: foodNameL(f) }))}" />
-              <span class="text-[12px] n-muted w-12 truncate">${esc(unitL(effAmount(item), f.unit))}</span>
+              <span class="text-[12px] n-muted min-w-[40px] max-w-[76px] shrink-0 truncate">${esc(unitL(effAmount(item), f.unit))}</span>
               <button onclick="changeAmount(${mIdx}, ${iIdx}, 1)" class="n-btn-ghost w-11 h-11 rounded-xl flex items-center justify-center" aria-label="${esc(t("{ad} artır", { ad: foodNameL(f) }))}">${svgI("plus", 18, 2.4)}</button>
             </div>
           </div>

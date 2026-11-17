@@ -38,7 +38,20 @@ function fillProfileFields(skipId) {
 }
 const PRIVACY_NOTE = "Verilerin yalnızca bu telefonda; uygulamanın bir sunucusu yok. Barkod okuttuğunda barkod numarası Open Food Facts'e gönderilir; bu istekle telefonun internet adresi (IP) de onlara ulaşır.";   // v58
 const LICENSES = ["Barlow Condensed (SIL OFL 1.1)", "@zxing/library (Apache-2.0)", "Open Food Facts verisi (ODbL; ürün verisi katkıcılara ait)", "USDA FoodData Central (kamu malı / CC0)", "Tailwind CSS (MIT)", "Vücut haritası görseli (uygulama sahibinin kendi görseli)"];
-const METHOD_SOURCES = ["Mifflin ve ark. (1990), Mifflin-St Jeor denklemi", "Katch-McArdle denklemi (yağsız kütleye dayalı)", "Morton ve ark. 2018, Br J Sports Med (protein ve kas)", "Nunes ve ark. 2022, J Cachexia Sarcopenia Muscle (protein ve kas)", "ISSN Pozisyon Bildirisi 2017 (Jäger ve ark.)", "Helms ve ark. 2014 (kilo verirken protein)", "Iraki ve ark. 2019 (kilo alırken beslenme)", "Joslin Klinik Beslenme Rehberi", "AMDR: yağ kalorinin %20–35'i", "Whittaker ve Wu 2021 (bazal metabolizma denklemleri)"];
+const METHOD_SOURCES = ["Mifflin ve ark. (1990), Mifflin-St Jeor denklemi", "Katch-McArdle denklemi (yağsız kütleye dayalı)", "Morton ve ark. 2018, Br J Sports Med (protein ve kas)", "Nunes ve ark. 2022, J Cachexia Sarcopenia Muscle (protein ve kas)", "ISSN Pozisyon Bildirisi 2017 (Jäger ve ark.)", "Helms ve ark. 2014 (kilo verirken protein)", "Iraki ve ark. 2019 (kilo alırken beslenme)", "Joslin Klinik Beslenme Rehberi", "AMDR: yağ kalorinin %20–35'i", "Whittaker ve Wu 2021 (az yağlı beslenme ve testosteron)"];
+// v60: kaynaklara tıklanabilir bağlantı (Apple 1.4.1: sağlık hesabında kaynaklar kolay bulunmalı). Hepsi PubMed / DOI / yayıncı;
+// Katch-McArdle tek bir makale değil (ders kitabı denklemi), bağlantısız kalır.
+const METHOD_LINKS = {
+  "Mifflin ve ark. (1990), Mifflin-St Jeor denklemi": "https://pubmed.ncbi.nlm.nih.gov/2305711/",
+  "Morton ve ark. 2018, Br J Sports Med (protein ve kas)": "https://pubmed.ncbi.nlm.nih.gov/28698222/",
+  "Nunes ve ark. 2022, J Cachexia Sarcopenia Muscle (protein ve kas)": "https://pubmed.ncbi.nlm.nih.gov/35187864/",
+  "ISSN Pozisyon Bildirisi 2017 (Jäger ve ark.)": "https://pubmed.ncbi.nlm.nih.gov/28642676/",
+  "Helms ve ark. 2014 (kilo verirken protein)": "https://pubmed.ncbi.nlm.nih.gov/24092765/",
+  "Iraki ve ark. 2019 (kilo alırken beslenme)": "https://pubmed.ncbi.nlm.nih.gov/31247944/",
+  "Joslin Klinik Beslenme Rehberi": "https://joslin.org/-/media/files/joslin/joslin-clinical-nutrition-guideline-for-overweight-and-obese-adults.pdf",
+  "AMDR: yağ kalorinin %20–35'i": "https://doi.org/10.17226/10490",
+  "Whittaker ve Wu 2021 (az yağlı beslenme ve testosteron)": "https://doi.org/10.1016/j.jsbmb.2021.105878"
+};
 function renderAbout() {
   const en = curLang() === "en";
   const dec = (n, d) => n.toFixed(d).replace(".", en ? "." : ",");   // ondalık ayırıcı dile göre (Türkçe "1,55", İngilizce "1.55")
@@ -59,7 +72,9 @@ function renderAbout() {
     "<p><b>" + t("Yağ ve karbonhidrat.") + "</b> " + t("Yağ kalorinin %25'i, karbonhidrat kalan kaloridir; en az 60 g olur.") + "</p>",
     "<p>" + t("Bunlar ortalama kişiler için tahminlerdir; kendi sonuçlarına göre ayarla.") + "</p>",
     "<p class=\"font-semibold text-[var(--t-text)]\">" + t("Kaynaklar") + "</p>",
-    "<ul class=\"list-disc pl-4 space-y-1\">" + METHOD_SOURCES.map(li).join("") + "</ul>"
+    "<ul class=\"list-disc pl-4 space-y-1\">" + METHOD_SOURCES.map(x => METHOD_LINKS[x]
+      ? "<li><a href=\"" + esc(METHOD_LINKS[x]) + "\" target=\"_blank\" rel=\"noopener\" class=\"underline underline-offset-2 inline-flex items-center min-h-[44px] py-1\" data-method-link>" + esc(t(x)) + "</a></li>"
+      : li(x)).join("") + "</ul>"
   ].join("");
   $("pfLicList").innerHTML = LICENSES.map(li).join("");
 }
@@ -194,6 +209,12 @@ async function closeProfile() {
   hideProfile();
 }
 function closeSettings() { hideProfile(); }
+// v60: Profil → Kilom "Tüm tartı geçmişi" → İlerleme sekmesi, Kilo görünümü
+function pfGoWeightHistory() {
+  closeProfile();
+  state.progressView = "kilo";
+  switchTab("progress");
+}
 
 // v53: Profil kutuları birime göre — imperial'de boy iki kutu (ft, in), kilo etiketleri lb. Metrikte DOM'a dokunulmaz
 // (etiket metni zaten aynıysa yazılmaz; boy kutuları gizli kalır).
@@ -231,8 +252,11 @@ function renderProfile() {
       <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Değişim")}</div><div class="t-display text-[22px] ${d < 0 ? "t-accent" : ""}">${d > 0 ? "+" : ""}${fmtWNum(d, { body: true })}<span class="t-dim text-sm"> ${wUnit()}</span></div><div class="text-[12px] t-dim">${tn(wl.length, "{n} kayıt")}</div></div>
       <div class="bg-[var(--t-elev)] rounded-2xl px-3 py-2.5"><div class="text-[12px] t-muted">${t("Hedefe")}</div><div class="t-display text-[22px]">${tW ? fmtWNum(Math.abs(left), { body: true }) : "—"}<span class="t-dim text-sm"> ${wUnit()}</span></div><div class="text-[12px] t-dim">${!tW ? t("hedef yok") : left > 0 ? t("verilecek") : left < 0 ? t("alınacak") : t("hedeftesin")}</div></div>
     </div>`;
-    const rows = wl.slice(-4).reverse().map(l => `<div class="flex items-center justify-between min-h-[40px] border-t border-[var(--t-line)] first:border-t-0 text-[14px]"><span class="t-muted">${esc(l.ts ? fmtDate(l.ts, true) : logDateLabel(l.date || ""))}</span><span class="font-semibold">${fmtW(num(l.weight), { body: true })}${validBf(l.bf) ? ` <span class="t-dim text-[12px]">${t("· %{p} yağ", { p: fmtNum(validBf(l.bf)) })}</span>` : ""}</span></div>`).join("");
-    wh += `<div class="mt-2">${rows}</div>`;
+    // v60: son 4 tartı listesi yerine İlerleme → Kilo bağlantısı (bütün geçmiş ve grafik orada)
+    wh += `<button type="button" onclick="pfGoWeightHistory()" data-pf-weight-hist class="mt-2 w-full min-h-[44px] flex items-center justify-between gap-2 px-1 text-[14px] text-left">
+      <span class="font-semibold">${t("Tüm tartı geçmişi")}</span>
+      <span class="flex items-center gap-1 t-muted">${t("İlerleme")}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+    </button>`;
   } else {
     wh = `<p class="text-[13px] t-dim">${t("Henüz tartı kaydın yok. Kilonu yazıp \"Tartıyı kaydet\"e dokun; ilerlemen İlerleme sekmesinde grafiğe dönüşür.")}</p>`;
   }

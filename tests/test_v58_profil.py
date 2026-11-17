@@ -79,7 +79,7 @@ try:
 
     # 7) İngilizce
     pg.evaluate("setLang('en'); openProfile()"); pg.wait_for_timeout(200)
-    check(pg.inner_text("#pfBkOff") == "3 days ago" and "Off-phone backup" in pg.inner_text("#pfBackupStatus"), "en: yedek durumu İngilizce")
+    check(pg.inner_text("#pfBkOff") == "3 days ago" and "Backup file (Files / iCloud)" in pg.inner_text("#pfBackupStatus"), "en: yedek durumu İngilizce")
     pg.evaluate("setLang('tr')"); pg.wait_for_timeout(100)
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()

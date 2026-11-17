@@ -284,7 +284,8 @@ function warmupSets(W, bar) {
 function openPlateTool(exIdx) {
   const ex = activeDay().exercises[exIdx];
   const next = ex.sets.find(s => !s.done) || ex.sets[0];
-  const W = num(next && next.kg) || Math.max(...ex.sets.map(s => num(s.kg)), 0);
+  // v60: setlerde kilo yoksa geçmişteki son çalışma kilosu (eskiden 0 → "bardan hafif")
+  const W = num(next && next.kg) || Math.max(...ex.sets.map(s => num(s.kg)), 0) || lastWorkKg(ex.name);
   const lv = usesLevels(ex);
   plateCtx = { name: ex.name, exIdx, levels: lv ? levelListOf(ex) : null, lv };
   $("chartTitle").textContent = exNameL(ex.name);
@@ -407,7 +408,11 @@ const COACH_MAX_STEP = 250; // tek seferde en fazla ±250 kcal (kademeli düzelt
 function coachAnalysis() {
   const now = Date.now();
   const from = now - COACH_WINDOW_DAYS * DAY_MS;
-  const pts = state.weightLogs.filter(l => l.ts && l.ts >= from && num(l.weight) > 0).map(l => ({ t: l.ts, w: num(l.weight) }));
+  // v60: zamana göre sıralı, her günden yalnız son tartı (eski yedeklerden gelen aynı gün çift kayıt regresyonu ağırlaştırmasın)
+  const byDay = {};
+  state.weightLogs.filter(l => num(l.ts) > 0 && l.ts >= from && num(l.weight) > 0).sort((a, b) => a.ts - b.ts)
+    .forEach(l => { byDay[todayStr(new Date(l.ts))] = { t: l.ts, w: num(l.weight) }; });
+  const pts = Object.values(byDay).sort((a, b) => a.t - b.t);
   const res = { ready: false, n: pts.length, spanDays: 0 };
   if (pts.length >= 2) res.spanDays = (pts[pts.length - 1].t - pts[0].t) / DAY_MS;
   if (pts.length < 4 || res.spanDays < 10) return res;

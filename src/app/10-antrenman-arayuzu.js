@@ -359,7 +359,7 @@ function gymActiveHtml() {
         </div>
         ${last ? `<div class="text-[13px] t-muted">${t("Geçen sefer ({date}):", { date: fmtDate(last.ts) })} <span class="text-[var(--t-text2)] font-semibold">${esc(sessionSummary(last))}</span></div>` : ""}
         <div id="exRight_${exIdx}" class="text-[12px] t-dim">${exRightText(ex)}</div>
-        ${levelsAskHtml(ex, exIdx)}
+        ${(ptr && ptr.e === exIdx) || ex.sets.some(s => s.done) ? levelsAskHtml(ex, exIdx) : ""}
         ${suggestionHtml(ex, exIdx)}
         <input type="text" value="${esc(ex.note || "")}" placeholder="${t("Not ekle (koltuk ayarı, tutuş...)")}" onchange="updateExerciseNote(${exIdx}, this.value)" class="t-note w-full text-[13px]" />
         ${head}

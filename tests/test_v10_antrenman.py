@@ -49,6 +49,8 @@ with sync_playwright() as p:
       {"ts":now-3*DAY,"logId":"c","kind":"weight","name":"Lat Pulldown","sets":[{"kg":35,"reps":8}]}]}}
     pg.evaluate("s=>localStorage.setItem('ayk_plus_v5_state', s)", json.dumps(with_defaults(seed2))); pg.reload(); pg.wait_for_timeout(300)
     print("inferred:", pg.evaluate(f"JSON.stringify(inferLevels(activeDay().exercises[{li}]))"))
+    # v60: kademe sorusu yalnızca sıradaki harekette: önceki hareketler tamamlanmış say
+    pg.evaluate(f"()=>{{activeDay().exercises.forEach((e,i)=>{{ if(i<{li}) e.sets.forEach(s=>s.done=true); }}); renderAll();}}")
     print("ask banner:", pg.locator(f"#exCard_{li}", has_text="arayla mı gidiyor").count())
     pg.locator(f'[onclick="confirmInferredLevels({li})"]').click(); pg.wait_for_timeout(150)
     print("saved levels:", st(pg)["workoutDays"][0]["exercises"][li].get("levels"))

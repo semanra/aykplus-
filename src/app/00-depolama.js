@@ -12,7 +12,9 @@
 // Bu dosya yalnızca tanımlar içerir; başlatma 13-cizim-baslat.js → storageInit().then(bootApp).
 // ---------------------------------------------------------------------------
 const IDB_NAME = "aykplus";
-const STORE_PARTS = ["dailyLogs", "exerciseHistory", "workoutLogs", "weightLogs", "mobilityLog", "mobilityRoutineLog", "measurements", "foodSnap"];
+// v60: profil fotoğrafı (customIconDataUrl, ~30–150 bin karakter) ayrı parça: her dokunuşta "core" ile yeniden yazılmasın.
+// Eski depoda bu parça yoktur; fotoğraf core içindedir ve açılışta oradan okunur (ilk kayıtta ikisi birlikte yazılır).
+const STORE_PARTS = ["dailyLogs", "exerciseHistory", "workoutLogs", "weightLogs", "mobilityLog", "mobilityRoutineLog", "measurements", "foodSnap", "customIconDataUrl"];
 const MIRROR_DELAY_MS = 2000;
 const LS_SIG_KEY = "ayk_plus_v5_imza";          // localStorage'a bizim son yazdığımız metnin imzası
 const LS_GEN_KEY = "ayk_plus_v5_sira";          // localStorage aynasının sıra numarası
@@ -143,6 +145,9 @@ async function storageInit() {
       storeGen = Math.max(storeMeta.gen || 0, lg);
       storeLast = stateParts(state);
       bad.forEach(k => { delete storeLast[k]; });   // kurtarılan parçalar ilk kayıtta yeniden yazılır
+      // v60: depoda henüz olmayan parça (yeni eklenen bölüm): değeri hâlâ core'da. Parça ve core ilk kayıtta AYNI işlemde
+      // yazılsın; yoksa core'dan çıkarılan değer hiçbir yere yazılmadan kaybolurdu.
+      if (STORE_PARTS.some(k => parts[k] == null)) { STORE_PARTS.forEach(k => { if (parts[k] == null) delete storeLast[k]; }); delete storeLast.core; }
     }
     storeReady = true;
     if (lsGet(MIRROR_OFF_KEY) === "1") { mirrorDirty = true; writeMirror(true); }   // yer açıldıysa ayna yeniden çalışsın
@@ -216,7 +221,7 @@ async function storageRecoverParts(raw, bad, parts, lsStr) {
     for (const s of snaps) { try { const o = JSON.parse(s.json); if (isObj(o)) { src = o; break; } } catch (e) {} }
   }
   bad.forEach(k => {
-    if (k === "core") { Object.keys(src || {}).forEach(f => { if (!STORE_PARTS.includes(f)) raw[f] = src[f]; }); }
+    if (k === "core") { Object.keys(src || {}).forEach(f => { if (!STORE_PARTS.includes(f) || parts[f] == null) raw[f] = src[f]; }); }   // v60: depoda henüz parçası olmayan alan da core ile gelir
     else if (src && src[k] !== undefined) raw[k] = src[k];
   });
   loadFailed = true;

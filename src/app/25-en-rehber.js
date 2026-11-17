@@ -1102,7 +1102,7 @@ Object.assign(EN, {
   "Iraki ve ark. 2019 (kilo alırken beslenme)": "Iraki et al. 2019 (nutrition while gaining weight)",
   "Joslin Klinik Beslenme Rehberi": "Joslin Clinical Nutrition Guideline",
   "AMDR: yağ kalorinin %20–35'i": "AMDR: fat is 20–35% of calories",
-  "Whittaker ve Wu 2021 (bazal metabolizma denklemleri)": "Whittaker and Wu 2021 (basal metabolic rate equations)",
+  "Whittaker ve Wu 2021 (az yağlı beslenme ve testosteron)": "Whittaker and Wu 2021 (low-fat diets and testosterone)",   // v60: konu düzeltildi
   "Open Food Facts verisi (ODbL; ürün verisi katkıcılara ait)": "Open Food Facts data (ODbL; product data belongs to its contributors)",
   "USDA FoodData Central (kamu malı / CC0)": "USDA FoodData Central (public domain / CC0)",
   "Vücut haritası görseli (uygulama sahibinin kendi görseli)": "Body map image (the app owner's own artwork)",

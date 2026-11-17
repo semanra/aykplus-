@@ -146,8 +146,11 @@
     .pf-row b { display: block; font-size: 15px; font-weight: 600; }
     .pf-row small { display: block; font-size: 13px; line-height: 1.3; color: var(--t-dim); margin-top: 1px; }
     .pf-ic { width: 38px; height: 38px; border-radius: 12px; background: var(--t-elev); display: flex; align-items: center; justify-content: center; color: var(--t-text2); flex-shrink: 0; }
-    .pf-flash { animation: pfFlash 1.6s ease-out; border-radius: 14px; }
-    @keyframes pfFlash { 0%, 55% { box-shadow: 0 0 0 2px var(--t-text); } 100% { box-shadow: 0 0 0 2px transparent; } }
+    /* v60: arama sonucu vurgusu: sert çizgi yerine satırın 10 px dışına taşan yumuşak zemin (yazı/düğme üstüne çizgi binmez) */
+    .pf-flash { animation: pfFlash 1.6s ease-out; border-radius: 12px; }
+    @keyframes pfFlash {
+      0%, 50% { background-color: rgba(var(--t-acc-rgb), .14); box-shadow: 0 0 0 10px rgba(var(--t-acc-rgb), .14); }
+      100% { background-color: rgba(var(--t-acc-rgb), 0); box-shadow: 0 0 0 10px rgba(var(--t-acc-rgb), 0); } }
     #pfScroll { padding-bottom: env(safe-area-inset-bottom, 0px); }   /* v42: Kaydet çubuğu kalktı; alt güvenli alan kaydırmada */
     body.pf-open { overflow: hidden; }
     /* Yeni tema: bölümlü seçim düğmeleri */
@@ -1690,7 +1693,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v59</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v60</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

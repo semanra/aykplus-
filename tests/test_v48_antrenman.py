@@ -148,7 +148,9 @@ try:
     gym("startWorkout()"); gym("toggleSetDone(0, 0)")
     x = tr_free2("aktif antrenman", must=("PREVIOUS", "REPS", "How did set 1 go?", "(optional)", "Easy", "Moderate", "Hard", "Failure", "Complete set", "Finish and save workout", "Uncheck all sets", "EXERCISE 1 /", "Weight increments:"))
     check(pg.evaluate("!!document.querySelector('[data-effort-row]')"), "en: zorluk satırı görünür")
-    check("Do the weights on this machine go up in 5 kg increments?" in x or "increments?" in x, "en: kademe sorusu: " + x[x.find("Do the"):x.find("Do the") + 90])
+    # v60: kademe sorusu yalnız sıradaki harekette görünür; metnin İngilizcesi doğrudan işlevden denetlenir
+    lq = pg.evaluate("(() => { const d = activeDay(); for (let i = 0; i < d.exercises.length; i++) { const h = levelsAskHtml(d.exercises[i], i); if (h) { const e = document.createElement('div'); e.innerHTML = h; return e.textContent.replace(/\s+/g, ' ').trim(); } } return ''; })()")
+    check("increments?" in lq and not TR_CH.search(lq), "en: kademe sorusu: " + lq[:90])
     check(pg.evaluate("document.querySelector('[data-effort-row] [role=group]').getAttribute('aria-label')") == "Set 1 effort", "en: zorluk grubu aria-label")
     gym("setEffort(0, 0, 2)"); x = grab()
     check("Moderate" in x and "Total" in x and "min" in x and "sec" in x, "en: set zorluğu seçilince etiket; süre/kardiyo toplamı")

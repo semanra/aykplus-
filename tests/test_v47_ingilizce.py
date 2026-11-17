@@ -343,7 +343,7 @@ try:
     check(pg.evaluate("[$('pfTitle').textContent, $('pfH1').textContent, $('pfH6').textContent, document.querySelector('label[for=setSex]').textContent, $('setActivity').options[0].textContent, $('setProtein').options[1].textContent]") == ["Profil", "KİŞİSEL BİLGİLER", "YEDEKLEME", "Cinsiyet", "Az (masa başı)", "Yüksek"], "tr: Profil başlıkları ve seçenekleri aynı")
     check(re.fullmatch(r"Son yedek: \d{2} \S+ \d{2}:\d{2} \(3 gün önce\)", pg.evaluate("$('lastBackupText').textContent")) is not None, "tr: son yedek satırı: " + pg.evaluate("$('lastBackupText').textContent"))
     wb = re.sub(r"\s+", " ", pg.evaluate("$('pfWeightBox').textContent"))
-    check("Son tartı" in wb and "2 kayıt" in wb and "· %18,5 yağ" in wb and "Başlangıç" in wb, "tr: tartı kutusu metinleri aynı: " + wb)
+    check("Son tartı" in wb and "2 kayıt" in wb and "Tüm tartı geçmişi" in wb, "tr: tartı kutusu metinleri aynı: " + wb)   # v60: son 4 tartı listesi yerine İlerleme bağlantısı
     check("Bugünün hedefleri:" in pg.evaluate("$('pfTargetsBox').textContent") and pg.evaluate("$('pfTargetsBox').textContent").count("Karb") == 1, "tr: hedef kutusu aynı")
     check(pg.evaluate("$('pfMeasureBox').textContent").strip().startswith("Henüz ölçü eklemedin."), "tr: ölçü boş durumu aynı")
     check(pg.evaluate("$('setWaterHint').textContent").startswith(("80,5 kg × 35 ml", "Kilo")), "tr: su ipucu: " + pg.evaluate("$('setWaterHint').textContent"))
@@ -364,7 +364,7 @@ try:
     check(pg.evaluate("[$('pfTitle').textContent, $('pfH1').textContent, $('pfH3').textContent, $('pfH6').textContent, document.querySelector('label[for=setSex]').textContent, $('setActivity').options[0].textContent, $('setActivity').options[1].textContent, $('setProtein').options[0].textContent, $('setProtein').options[1].textContent]") == ["Profile", "PERSONAL DETAILS", "TARGETS", "BACKUP", "Sex", "Low (desk job)", "Moderate", "Standard", "High"], "en: Profil başlıkları ve seçenekleri")
     check(pg.evaluate("[...document.querySelectorAll('#pfTheme [data-theme-opt]')].map(b => b.textContent)") == ["System", "Dark", "Light"], "en: Görünüm düğmeleri")
     wb = re.sub(r"\s+", " ", pg.evaluate("$('pfWeightBox').textContent"))
-    check("Last weigh-in" in wb and "2 entries" in wb and "· 18.5% body fat" in wb and "Start" in wb and "to gain" in wb, "en: tartı kutusu: " + wb)
+    check("Last weigh-in" in wb and "2 entries" in wb and "Full weigh-in history" in wb and "Progress" in wb and "to gain" in wb, "en: tartı kutusu: " + wb)   # v60
     tb = re.sub(r"\s+", " ", pg.evaluate("$('pfTargetsBox').textContent"))
     check("Calories" in tb and "Carbs" in tb and "Fat" in tb and "Today's targets are based on" in tb, "en: hedef kutusu: " + tb[:80])
     cal_ = pg.evaluate("[getTargets().calTarget, $('pfTargetsBox').querySelector('.t-display').textContent]")
@@ -549,7 +549,7 @@ try:
         "⭐ Özel Eklediklerim": "özel besin cat değeri: kayıtta Türkçe, gösterimde t(stripEmoji(cat)) (kayıtlı-metinler a2)"},
       "08-profil-yedek.js": {
         "Verilerin yalnızca bu telefonda": "PRIVACY_NOTE: Hakkında v49", "Open Food Facts verisi": "LICENSES: Hakkında v49", "USDA FoodData Central": "LICENSES v49", "Vücut haritası görseli": "LICENSES v49",
-        "Katch-McArdle": "METHOD_SOURCES v49", "Iraki ve ark.": "METHOD_SOURCES v49", "AMDR": "METHOD_SOURCES v49",
+        "Katch-McArdle": "METHOD_SOURCES v49", "Iraki ve ark.": "METHOD_SOURCES v49", "Whittaker ve Wu 2021": "METHOD_SOURCES / METHOD_LINKS anahtarı (v60), gösterimde t(x)", "AMDR": "METHOD_SOURCES v49",
         "Yağ": "pfTargetsBox etiketleri ['Kalori','Protein','Karb','Yağ'], gösterimde t(l)",
         "Gece yedeği": "SNAP_KIND_LABEL, gösterimde t(..)", "Haftalık yedek": "SNAP_KIND_LABEL", "Geçiş öncesi": "SNAP_KIND_LABEL", "İçe alma öncesi": "SNAP_KIND_LABEL", "Değişiklik öncesi": "SNAP_KIND_LABEL"},
       "05-secici-hareket.js": {"${}. GÜN: ": "yeni gün varsayılan adı: kayıtlı metin (Türkçe dal; İngilizce dal 'DAY n: '), kayıtlı-metinler"},
