@@ -228,7 +228,10 @@ const EX_EN = {
   "Preacher Curl (EZ-Bar / Makine)": "Preacher Curl (EZ-Bar / Machine)",
   "Bayesian Cable Curl (Arkadan Kablo Curl)": "Bayesian Cable Curl",
   "Reverse Barbell / Cable Curl (Ön Kol)": "Reverse Barbell / Cable Curl (Forearm)",
+  // v62: eski birleşik ad listeden çıktı (ikiye ayrıldı); kayıtta kalmışsa İngilizce gösterimi için duruyor
   "Wrist Curl / Reverse Wrist Curl (Bilek)": "Wrist Curl / Reverse Wrist Curl",
+  "Wrist Curl (Bilek)": "Wrist Curl",
+  "Reverse Wrist Curl (Bilek)": "Reverse Wrist Curl",
   "Skullcrusher (EZ-Bar / Dumbbell Alna Triceps)": "Skullcrusher (EZ-Bar / Dumbbell)",
   "Kneeling Cable Crunch (Halatla)": "Kneeling Cable Crunch (Rope)",
   "Pallof Press (Anti-Rotasyon)": "Pallof Press (Anti-Rotation)",

@@ -1718,7 +1718,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v61</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v62</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -1879,7 +1879,6 @@ const EXERCISE_LIBRARY = {
     "Weighted Dips (Göğüs Odaklı)",
     "Assisted Chest Dips",
     "Pec Deck Fly (Butterfly)",
-    "Pec Deck Fly VEYA Cable Crossover",
     "Cable Crossover (High-to-Low)",
     "Cable Fly (Mid-Pulley)",
     "Low-to-High Cable Fly (Üst Göğüs)",
@@ -1936,7 +1935,6 @@ const EXERCISE_LIBRARY = {
     "Machine Lateral Raise",
     "Chest-Supported / Incline Lateral Raise",
     "Egyptian Cable Lateral Raise",
-    "Reverse Pec Deck veya Face Pull",
     "Reverse Pec Deck (Arka Omuz Makinesi)",
     "Face Pull (Rope)",
     "Bent-Over Dumbbell Reverse Fly (Rear Delt)",
@@ -1957,10 +1955,12 @@ const EXERCISE_LIBRARY = {
     "Single-Leg Press",
     "Bulgarian Split Squat (Dumbbell / Barbell)",
     "Smith Machine Squat",
-    "Pendulum Squat / Belt Squat",
+    "Pendulum Squat",
+    "Belt Squat",
     "Goblet Squat",
     "Sissy Squat",
-    "Walking Lunges / Reverse Lunges",
+    "Walking Lunges",
+    "Reverse Lunges",
     "Leg Extension (Çift Bacak)",
     "Single-Leg Extension (Tek Bacak)",
     "Step-Up (Dumbbell / Box)"
@@ -2008,7 +2008,8 @@ const EXERCISE_LIBRARY = {
     "Concentration Curl",
     "Reverse Barbell / Cable Curl (Ön Kol)",
     "Zottman Curl",
-    "Wrist Curl / Reverse Wrist Curl (Bilek)"
+    "Wrist Curl (Bilek)",
+    "Reverse Wrist Curl (Bilek)"
   ],
   "9. Kol - Triceps (Arka Kol)": [
     "Overhead Cable Triceps Extension (Rope / Bar)",
@@ -2020,7 +2021,8 @@ const EXERCISE_LIBRARY = {
     "Single-Arm Reverse/Underhand Cable Pushdown",
     "JM Press",
     "Close-Grip Barbell Bench Press",
-    "Triceps Dip Machine / Bench Dips",
+    "Triceps Dip Machine",
+    "Bench Dips",
     "Dumbbell / Cable Triceps Kickback",
     "Diamond Push-Up"
   ],
@@ -2029,14 +2031,16 @@ const EXERCISE_LIBRARY = {
     "Hanging Leg Raise",
     "Captain's Chair Knee / Leg Raise",
     "Kneeling Cable Crunch (Halatla)",
-    "Decline Bench Crunch / Sit-Up",
+    "Decline Bench Crunch",
+    "Sit-Up",
     "Ab Wheel Rollout",
     "Plank / RKC Plank",
     "Side Plank",
     "Russian Twist (Medicine Ball / Plate)",
     "Pallof Press (Anti-Rotasyon)",
     "Woodchopper (Cable)",
-    "Deadbug / Bird-Dog",
+    "Deadbug",
+    "Bird-Dog",
     "Stomach Vacuum"
   ],
   "11. Kardiyo & Kondisyon (Cardio & Conditioning)": [
@@ -2963,7 +2967,27 @@ function normMobItem(x) {
 // çalışmaz. normalizeState yalnızca doğrulama/temizlik yapar. Yeni bir biçim değişikliği = yeni adım + DATA_VER + 1.
 // (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
 // ---------------------------------------------------------------------------
-const DATA_VER = 6;
+const DATA_VER = 7;
+// v62: yapay zekânın önerdiği birleşik "X VEYA Y" kütüphane adları iki ayrı hareketti; ayrı hâlleri listede zaten var.
+// Sahibin seçimi (18 Kasım 2026): salonda Pec Deck ve Face Pull yapıldı → program ve geçmiş o harekete taşınır.
+const EX_RENAME_V62 = [
+  ["Pec Deck Fly VEYA Cable Crossover", "Pec Deck Fly (Butterfly)"],
+  ["Reverse Pec Deck veya Face Pull", "Face Pull (Rope)"]
+];
+// Hareket adını programda ve geçmişte değiştirir. Hedefin geçmişi varsa seanslar birleşir (zamana göre sıralı); hiçbir seans silinmez.
+function renameExerciseData(s, from, to) {
+  const fk = exKey(from), tk = exKey(to);
+  if (fk === tk) return;
+  if (Array.isArray(s.workoutDays)) s.workoutDays.forEach(d => {
+    if (isObj(d) && Array.isArray(d.exercises)) d.exercises.forEach(ex => { if (isObj(ex) && exKey(ex.name) === fk) ex.name = to; });
+  });
+  const h = s.exerciseHistory;
+  if (!isObj(h) || !Array.isArray(h[fk])) return;
+  const moved = h[fk].map(x => { if (isObj(x) && exKey(x.name) === fk) x.name = to; return x; });
+  const into = Array.isArray(h[tk]) ? h[tk] : [];
+  h[tk] = into.length ? into.concat(moved).sort((a, b) => num(isObj(a) ? a.ts : 0, 0) - num(isObj(b) ? b.ts : 0, 0)) : moved;
+  delete h[fk];
+}
 function migrateState(s, rawHadGoal) {
   const v = Number.isInteger(s.dataVer) && s.dataVer >= 0 ? s.dataVer : 0;
   if (v < 1) {   // v27 + v39: mobilitenin eski listeleri (dynamic/static, sonra tek items) → rutinler; eski diziler yedek olarak kalır
@@ -2981,6 +3005,7 @@ function migrateState(s, rawHadGoal) {
   if (v < 4) s.settings.onboarded = true;   // v44: var olan kayıt kurulum ekranını görmez
   if (v < 5) s.settings.lang = "tr";   // v46: var olan kayıt Türkçe kalır
   if (v < 6) s.settings.units = "metric";   // v53: var olan kayıt (ve eski yedek) kg / cm kalır
+  if (v < 7) EX_RENAME_V62.forEach(([from, to]) => renameExerciseData(s, from, to));   // v62: birleşik hareket adları → gerçek hareket
   s.dataVer = Math.max(v, DATA_VER);
 }
 
@@ -12582,7 +12607,10 @@ const EX_EN = {
   "Preacher Curl (EZ-Bar / Makine)": "Preacher Curl (EZ-Bar / Machine)",
   "Bayesian Cable Curl (Arkadan Kablo Curl)": "Bayesian Cable Curl",
   "Reverse Barbell / Cable Curl (Ön Kol)": "Reverse Barbell / Cable Curl (Forearm)",
+  // v62: eski birleşik ad listeden çıktı (ikiye ayrıldı); kayıtta kalmışsa İngilizce gösterimi için duruyor
   "Wrist Curl / Reverse Wrist Curl (Bilek)": "Wrist Curl / Reverse Wrist Curl",
+  "Wrist Curl (Bilek)": "Wrist Curl",
+  "Reverse Wrist Curl (Bilek)": "Reverse Wrist Curl",
   "Skullcrusher (EZ-Bar / Dumbbell Alna Triceps)": "Skullcrusher (EZ-Bar / Dumbbell)",
   "Kneeling Cable Crunch (Halatla)": "Kneeling Cable Crunch (Rope)",
   "Pallof Press (Anti-Rotasyon)": "Pallof Press (Anti-Rotation)",

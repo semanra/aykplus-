@@ -233,7 +233,27 @@ function normMobItem(x) {
 // çalışmaz. normalizeState yalnızca doğrulama/temizlik yapar. Yeni bir biçim değişikliği = yeni adım + DATA_VER + 1.
 // (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
 // ---------------------------------------------------------------------------
-const DATA_VER = 6;
+const DATA_VER = 7;
+// v62: yapay zekânın önerdiği birleşik "X VEYA Y" kütüphane adları iki ayrı hareketti; ayrı hâlleri listede zaten var.
+// Sahibin seçimi (18 Kasım 2026): salonda Pec Deck ve Face Pull yapıldı → program ve geçmiş o harekete taşınır.
+const EX_RENAME_V62 = [
+  ["Pec Deck Fly VEYA Cable Crossover", "Pec Deck Fly (Butterfly)"],
+  ["Reverse Pec Deck veya Face Pull", "Face Pull (Rope)"]
+];
+// Hareket adını programda ve geçmişte değiştirir. Hedefin geçmişi varsa seanslar birleşir (zamana göre sıralı); hiçbir seans silinmez.
+function renameExerciseData(s, from, to) {
+  const fk = exKey(from), tk = exKey(to);
+  if (fk === tk) return;
+  if (Array.isArray(s.workoutDays)) s.workoutDays.forEach(d => {
+    if (isObj(d) && Array.isArray(d.exercises)) d.exercises.forEach(ex => { if (isObj(ex) && exKey(ex.name) === fk) ex.name = to; });
+  });
+  const h = s.exerciseHistory;
+  if (!isObj(h) || !Array.isArray(h[fk])) return;
+  const moved = h[fk].map(x => { if (isObj(x) && exKey(x.name) === fk) x.name = to; return x; });
+  const into = Array.isArray(h[tk]) ? h[tk] : [];
+  h[tk] = into.length ? into.concat(moved).sort((a, b) => num(isObj(a) ? a.ts : 0, 0) - num(isObj(b) ? b.ts : 0, 0)) : moved;
+  delete h[fk];
+}
 function migrateState(s, rawHadGoal) {
   const v = Number.isInteger(s.dataVer) && s.dataVer >= 0 ? s.dataVer : 0;
   if (v < 1) {   // v27 + v39: mobilitenin eski listeleri (dynamic/static, sonra tek items) → rutinler; eski diziler yedek olarak kalır
@@ -251,6 +271,7 @@ function migrateState(s, rawHadGoal) {
   if (v < 4) s.settings.onboarded = true;   // v44: var olan kayıt kurulum ekranını görmez
   if (v < 5) s.settings.lang = "tr";   // v46: var olan kayıt Türkçe kalır
   if (v < 6) s.settings.units = "metric";   // v53: var olan kayıt (ve eski yedek) kg / cm kalır
+  if (v < 7) EX_RENAME_V62.forEach(([from, to]) => renameExerciseData(s, from, to));   // v62: birleşik hareket adları → gerçek hareket
   s.dataVer = Math.max(v, DATA_VER);
 }
 

@@ -59,7 +59,7 @@ try:
     # ===== (b) göç ve bozuk değer
     leg = {k: v for k, v in OWN.items()}; leg["dataVer"] = 5; leg["settings"] = dict(OWN["settings"], units="imperial")
     seed(pg, leg); s = st(pg)
-    check(s["settings"]["units"] == "metric" and s["dataVer"] == 6, "b: dataVer 5 kaydı → units metric, dataVer 6 (%s, %s)" % (s["settings"].get("units"), s.get("dataVer")))
+    check(s["settings"]["units"] == "metric" and s["dataVer"] == 7, "b: dataVer 5 kaydı → units metric, dataVer 6 (%s, %s)" % (s["settings"].get("units"), s.get("dataVer")))
     check(s["weight"] == OWN["weight"] and s["weightLogs"] == OWN["weightLogs"] and s["settings"]["height"] == OWN["settings"]["height"], "b: göçte kilo/tartı/boy aynı")
     seed(pg, {**OWN, "dataVer": 6, "settings": dict(OWN["settings"], units="bozuk")})
     check(st(pg)["settings"]["units"] == "metric", "b: bozuk units → metric")
@@ -75,7 +75,7 @@ try:
     for loc, want in (("en-US", "imperial"), ("es-US", "imperial"), ("en-GB", "metric"), ("tr-TR", "metric"), ("en", "metric")):
         c, q = fresh(loc)
         s = q.evaluate("state.settings")
-        check(s["units"] == want and s["onboarded"] is False and q.evaluate("state.dataVer") == 6, "c: yeni kurulum %s → %s (%s)" % (loc, want, s["units"]))
+        check(s["units"] == want and s["onboarded"] is False and q.evaluate("state.dataVer") == 7, "c: yeni kurulum %s → %s (%s)" % (loc, want, s["units"]))
         c.close()
     # ===== (d) Profil seçici
     c, pg = ctx(); pg.goto(URL); boot(pg)
