@@ -21,7 +21,7 @@ legacy = {
 }
 with sync_playwright() as p:
     b=p.chromium.launch()
-    ctx=b.new_context(color_scheme="dark", viewport={"width":390,"height":844},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script(TEST_INIT)
+    ctx=b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width":390,"height":844},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script(TEST_INIT)
     pg=ctx.new_page()
     pg.on("console", lambda m: errors.append("console:"+m.text) if m.type=="error" else None)
     pg.on("pageerror", lambda e: errors.append("pageerror:"+str(e)))

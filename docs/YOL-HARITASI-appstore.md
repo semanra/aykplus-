@@ -43,7 +43,8 @@ Her aşama ayrı sürüm(ler)dir. Her aşamanın başında plan sunulur ve onay 
 
 ### Aşama 4 — Gerçek iPhone uygulaması (öncelik 1)
 - Capacitor ile paketleme. Simge, açılış ekranı, güvenli alan, klavye, geri hareketi, durum çubuğu ayarları.
-- Bulutta derleme: GitHub Actions'ın macOS makinesi + Fastlane → TestFlight. Mac gerekmez; Windows'tan yönetilir.
+- Bulutta derleme (18 Kasım 2026 kararı): **Codemagic** (kişisel hesapta aylık ücretsiz macOS dakikası; App Store Connect API anahtarıyla imzalama ve TestFlight'a gönderme). Mac gerekmez; Windows'tan tarayıcıyla yönetilir. GitHub Actions'ın macOS makinesi yalnızca yedek seçenek: hesabın geçmişi nedeniyle GitHub'da yoğun derleme yükü istenmiyor, depo gizlenirse Mac dakikası da hızla biter. Codemagic depoyu yalnızca okur.
+- Testler bilgisayarın dilinden bağımsız (her tarayıcı açılışında `locale` açık; 18 Kasım 2026). Python tarafı tarih kullandığı için saat dilimi bilinçli olarak sabitlenmedi: bulut makinesi UTC ise tarayıcı ile Python aynı günü görür.
 - Kamera (barkod) ve fotoğraf izin metinleri.
 - TestFlight ile kullanıcının kendi iPhone/iPad'inde günlük kullanım denemesi; PWA verisinin uygulamaya taşınması (yedek dosyasıyla veya otomatik).
 

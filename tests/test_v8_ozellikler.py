@@ -12,7 +12,7 @@ def st(pg): return pg.evaluate("aykStoredState()")
 def ov(pg,tag):
     w=pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]"); print(tag,"overflow" if w[0]>w[1] else "ok",w)
 with sync_playwright() as p:
-    b=p.chromium.launch(); ctx=b.new_context(color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script(TEST_INIT)
+    b=p.chromium.launch(); ctx=b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width":375,"height":812},device_scale_factor=2,is_mobile=True,has_touch=True); ctx.add_init_script(TEST_INIT)
     pg=ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
     def on_dialog(d):
         if d.type=="prompt" and prompts: d.accept(prompts.pop(0))

@@ -17,7 +17,7 @@ def check(cond, label):
 def st(pg): return pg.evaluate(f"aykStoredState()")
 def undo(pg): pg.locator("#toastWrap button", has_text="Geri al").last.click(); pg.wait_for_timeout(100)
 def new_page(b, clock=None, raw=None):
-    ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
     native = []; pg.on("dialog", lambda d: (native.append(d.message), d.accept()))

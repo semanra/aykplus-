@@ -18,7 +18,7 @@ VISIT = """() => { const out = []; for (const s of ["switchTab('nutrition'); set
   try { new Function(s)(); } catch (e) { out.push(s + ' → ' + e.message); } } return out; }"""
 
 def new_page(b, clock=None):
-    ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, accept_downloads=True)
+    ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 390, "height": 844}, accept_downloads=True)
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
     if clock: pg.clock.set_fixed_time(datetime.datetime.fromisoformat(clock))

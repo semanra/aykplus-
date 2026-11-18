@@ -14,7 +14,7 @@ def check(cond, label):
     if not cond: fails.append(label)
 def st(pg): return pg.evaluate("aykStoredState()")
 def new_page(b, clock=None, state=None):
-    ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
     native = []; pg.on("dialog", lambda d: (native.append(d.message), d.accept()))

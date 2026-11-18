@@ -55,7 +55,7 @@ def reload_ok(pg, label, max_s=8):
 try:
   with sync_playwright() as p:
     b = p.chromium.launch()
-    ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, is_mobile=True, has_touch=True)
+    ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
 
@@ -94,7 +94,7 @@ try:
     ctx.close()
 
     # 6b) v52: foods-en.js sürüm yükseltmesinde eski önbellekten yenisine taşınır (çevrimdışı İngilizce besin adları)
-    ctx = b.new_context(); ctx.add_init_script(TEST_INIT)
+    ctx = b.new_context(locale="tr-TR"); ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.goto(URL); pg.wait_for_function(APP_OK)
     pg.evaluate("navigator.serviceWorker.ready.then(() => true)")
     pg.wait_for_function(f"""caches.keys().then(k => window.__k = k) && (window.__k || []).includes('{CACHE}')""", timeout=15000, polling=200)
@@ -113,7 +113,7 @@ try:
 
     # 7) Önbellek yokken (ilk kurulum) 404: sunucunun yanıtı gösterilir (sonsuza dek beklemez)
     MODE["m"] = "404"
-    ctx = b.new_context(); pg = ctx.new_page()
+    ctx = b.new_context(locale="tr-TR"); pg = ctx.new_page()
     r = pg.goto(URL)
     check(r is not None and r.status == 404, "önbellek yokken sunucunun 404 yanıtı geliyor")
     ctx.close()

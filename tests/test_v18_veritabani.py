@@ -23,7 +23,7 @@ SMALL_JS = """(sel) => [...document.querySelectorAll(sel)]
 
 try:
   with sync_playwright() as p:
-    b = p.chromium.launch(); ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    b = p.chromium.launch(); ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
     pg.goto("http://localhost:8771/index.html"); pg.wait_for_timeout(400)
@@ -170,7 +170,7 @@ try:
     check(s["missSearches"] == [] and abs(pg.evaluate("nutritionTotals(curMeals()).cal") - exp_old) < 0.01, "eski menü ve özel besin aynı değerlerle hesaplanıyor; bozuk alan sıfırlandı")
 
     # ---------- 8) foods.js yüklenemezse uygulama yine açılıyor (eski listeyle)
-    ctx2 = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812})
+    ctx2 = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812})
     ctx2.add_init_script(TEST_INIT)
     ctx2.route("**/foods.js", lambda route: route.abort())
     pg2 = ctx2.new_page(); e2 = []; pg2.on("pageerror", lambda e: e2.append(str(e)))

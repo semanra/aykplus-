@@ -77,7 +77,7 @@ SCREENS = [
 ]
 
 def ctx_page(b, scheme, init_theme=None):
-    ctx = b.new_context(color_scheme=scheme, viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True)
+    ctx = b.new_context(locale="tr-TR", color_scheme=scheme, viewport={"width": 390, "height": 844}, device_scale_factor=1, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
     return ctx, pg

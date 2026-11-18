@@ -32,7 +32,7 @@ def seed(pg, data):
 try:
   with sync_playwright() as p:
     b = p.chromium.launch()
-    ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
+    ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 390, "height": 844})
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
 
@@ -91,7 +91,7 @@ try:
     check(not lib["badRx"] and not lib["badReg"], f"her hareketin uygulaması okunuyor ve bölgesi tanımlı (okunamayan {lib['badRx'][:3]}, bölgesi hatalı {lib['badReg'][:3]})")
 
     # ================= 3) ANA EKRAN =================
-    ctx3 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
+    ctx3 = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 390, "height": 844})
     ctx3.add_init_script(TEST_INIT)
     p3 = ctx3.new_page(); p3.on("pageerror", lambda e: errs.append(str(e)))
     p3.clock.install(time=datetime.datetime.fromisoformat("2026-11-13T10:00:00"))   # Cuma
@@ -194,7 +194,7 @@ try:
     pg.screenshot(path=os.path.join(SHOTS, "v39_rutin.png"), full_page=True)
 
     # ================= 5) SEANS (BAŞLAT) + BİTİŞ =================
-    ctx5 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
+    ctx5 = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 390, "height": 844})
     ctx5.add_init_script(TEST_INIT)
     p5 = ctx5.new_page(); p5.on("pageerror", lambda e: errs.append(str(e)))
     p5.clock.install(time=datetime.datetime.fromisoformat("2026-11-13T10:00:00"))

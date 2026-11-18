@@ -25,7 +25,7 @@ try:
   with sync_playwright() as p:
     b = p.chromium.launch()
     def page(t0="2026-11-13T10:00:00"):
-        ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
+        ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 390, "height": 844})
         ctx.add_init_script(TEST_INIT)
         ctx.add_init_script(SPEECH)
         pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))

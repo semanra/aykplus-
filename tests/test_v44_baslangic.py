@@ -20,7 +20,7 @@ try:
   with sync_playwright() as p:
     b = p.chromium.launch()
     def page_fresh():   # TEST_INIT YOK: yalnızca açılış animasyonu kaldırılır
-        ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844})
+        ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 390, "height": 844})
         ctx.add_init_script(SPLASH_OFF)
         ctx.add_init_script(STUB)
         pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e)))
@@ -65,7 +65,7 @@ try:
     pg.evaluate("void resetToDefaults()"); pg.click("#uiDlgOk"); pg.wait_for_timeout(80); pg.click("#uiDlgOk"); pg.wait_for_timeout(300)
     check(pg.evaluate("state.settings.onboarded") is False, "fabrika ayarları: kurulum yeniden açılacak")
     # kanca: aynı tarayıcıda TEST_INIT'li yeni bağlam
-    ctx2 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}); ctx2.add_init_script(TEST_INIT)
+    ctx2 = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 390, "height": 844}); ctx2.add_init_script(TEST_INIT)
     pg2 = ctx2.new_page(); pg2.on("pageerror", lambda e: errs.append(str(e)))
     pg2.goto(URL); boot(pg2)
     check(pg2.evaluate("state.settings.onboarded") is True and pg2.evaluate("state.weight") == 105, "test kancası: eski varsayılanlarla, kurulumsuz")
@@ -200,7 +200,7 @@ try:
     pg.reload(); boot(pg); check(not pg.is_visible("#onboard"), "bir daha çıkmaz")
     check(errs == [], "tamamlama akışı sayfa hatası yok: " + str(errs[:3]))
     # boş başla + Salonu biliyorum (aydınlık tema, 375 px; aydınlık ekran görüntüleri)
-    ctx3 = b.new_context(color_scheme="light", viewport={"width": 375, "height": 667}); ctx3.add_init_script(SPLASH_OFF)
+    ctx3 = b.new_context(locale="tr-TR", color_scheme="light", viewport={"width": 375, "height": 667}); ctx3.add_init_script(SPLASH_OFF)
     pg = ctx3.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.goto(URL); boot(pg)
     walk(pg, boxes=(False, False, False), shot="acik", measure=True, exp="#obExpPro")
     pg.click("#obFinish"); pg.wait_for_timeout(150); s = st(pg)
@@ -268,7 +268,7 @@ try:
         state.today = y; checkNewDay(); return !!state.dailyLogs[y]; }""")
     check(r6b, "kurulumdan sonra gün arşivi normal")
     # iPad boyutu: taşmasız
-    ctx4 = b.new_context(color_scheme="dark", viewport={"width": 820, "height": 1180}); ctx4.add_init_script(SPLASH_OFF)
+    ctx4 = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 820, "height": 1180}); ctx4.add_init_script(SPLASH_OFF)
     pg = ctx4.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.goto(URL); boot(pg)
     pg.click("#obStart"); check(no_overflow(pg) and tall_ok(pg), "iPad: taşma yok, düğmeler ≥ 44 px")
     pg.wait_for_timeout(350); pg.screenshot(path=os.path.join(SHOTS, "v44_kurulum_ipad_koyu.png")); ctx4.close()
@@ -326,7 +326,7 @@ try:
     check(errs == [], "bölüm 4b sayfa hatası yok: " + str(errs[:3]))
     # ---- Bölüm 5: Profil → Hakkında ----
     for scheme in ("dark", "light"):
-        ctx5 = b.new_context(color_scheme=scheme, viewport={"width": 390, "height": 844}); ctx5.add_init_script(SPLASH_OFF)
+        ctx5 = b.new_context(locale="tr-TR", color_scheme=scheme, viewport={"width": 390, "height": 844}); ctx5.add_init_script(SPLASH_OFF)
         pg = ctx5.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.goto(URL); boot(pg)
         seed(pg, OWNER43)
         pg.evaluate("openProfile()"); pg.wait_for_timeout(150)

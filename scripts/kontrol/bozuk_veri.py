@@ -76,7 +76,7 @@ def main():
     fallback = collections.Counter(); crash = collections.defaultdict(list); total = 0
     with server(REPO) as url, sync_playwright() as p:
         b = p.chromium.launch()
-        ctx = b.new_context(viewport={"width": 390, "height": 844}, color_scheme="dark")
+        ctx = b.new_context(locale="tr-TR", viewport={"width": 390, "height": 844}, color_scheme="dark")
         ctx.add_init_script(TEST_INIT)
         pg = ctx.new_page(); perr = []
         pg.on("pageerror", lambda e: perr.append(str(e)[:160]))

@@ -24,7 +24,7 @@ LEGACY = {
 }
 
 def new_ctx(b, block=False):
-    ctx = b.new_context(color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     if block: ctx.route("**/foods.js", lambda route: route.abort())
     return ctx

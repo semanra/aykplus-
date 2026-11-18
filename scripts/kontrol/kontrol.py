@@ -149,7 +149,7 @@ def perf(root):
     with server(root) as url, sync_playwright() as p:
         b = p.chromium.launch()
         for rate in (1, 4):
-            ctx = b.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True, color_scheme="dark")
+            ctx = b.new_context(locale="tr-TR", viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True, color_scheme="dark")
             ctx.add_init_script(TEST_INIT)
             pg = ctx.new_page(); cdp = ctx.new_cdp_session(pg)
             pg.goto(url); pg.wait_for_timeout(400); pg.evaluate(PERF_SEED); pg.wait_for_timeout(200)
