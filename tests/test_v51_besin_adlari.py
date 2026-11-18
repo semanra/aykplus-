@@ -1,4 +1,5 @@
 # v51 bölüm 1 (görev 1): İngilizce besin verisi (foods-en.js) ve yükleyici.
+# service_workers="block": ağ taklidi (route) WebKit'te service worker'ın gönderdiği istekleri görmez; bu testte SW denenmiyor (bkz. test_v25_sw.py)
 import os, sys, re, json, subprocess, time, random
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ortak_tohum import TEST_INIT
@@ -50,7 +51,7 @@ try:
   with sync_playwright() as p:
     b = p.chromium.launch()
     def newctx(en, block=False):
-        ctx = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="en-US")
+        ctx = b.new_context(service_workers="block", color_scheme="dark", viewport={"width": 390, "height": 844}, locale="en-US")
         ctx.add_init_script(TEST_INIT)
         if en: ctx.add_init_script("window.AYK_TEST_EN = true")
         reqs = []

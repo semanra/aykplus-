@@ -136,7 +136,7 @@ try:
     # ---- Bölüm 4: kurulum ekranı ----
     SHOTS = os.path.join(REPO, "tests", "shots")
     def obstep(pg): return pg.get_attribute("#onboard", "data-step")
-    def tall_ok(pg): return pg.evaluate("[...document.querySelectorAll('#onboard button')].filter(b => b.offsetParent).every(b => b.getBoundingClientRect().height >= 44)")
+    def tall_ok(pg): return pg.evaluate("[...document.querySelectorAll('#onboard button')].filter(b => b.offsetParent).every(b => Math.round(b.getBoundingClientRect().height) >= 44)")   # WebKit bazen 43,99998 ölçer (kesirli piksel)
     def no_overflow(pg): return pg.evaluate("document.documentElement.scrollWidth <= innerWidth && [...document.querySelectorAll('#onboard *')].filter(e => e.offsetParent).every(e => e.getBoundingClientRect().right <= innerWidth + 0.5)")
     def walk(pg, boxes=(True, True, True), shot=None, measure=False, exp="#obExpNew"):
         """Kurulumu adım adım doldurur (kadın, 34, 165, 72,5, Ver, 65, orta, Az, deneyim); 7. adımda durur."""

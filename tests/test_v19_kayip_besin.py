@@ -1,4 +1,5 @@
 import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
+# service_workers="block": ağ taklidi (route) WebKit'te service worker'ın gönderdiği istekleri görmez; bu testte SW denenmiyor (bkz. test_v25_sw.py)
 # v19: Bulunamayan besin sessizce 0 kcal sayılmaz. Kullanılan besinlerin değerleri state.foodSnap'te yedeklenir;
 # foods.js yüklenemezse veya besin kaldırılırsa "⚠" işaretiyle son kayıtlı değerleriyle hesaplanır ve uyarı çıkar.
 import os, sys, json, subprocess, time
@@ -24,7 +25,7 @@ LEGACY = {
 }
 
 def new_ctx(b, block=False):
-    ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    ctx = b.new_context(service_workers="block", locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     if block: ctx.route("**/foods.js", lambda route: route.abort())
     return ctx

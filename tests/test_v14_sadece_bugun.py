@@ -1,4 +1,5 @@
 import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
+# service_workers="block": ağ taklidi (route) WebKit'te service worker'ın gönderdiği istekleri görmez; bu testte SW denenmiyor (bkz. test_v25_sw.py)
 # v14 (1. paket): "Sadece bugün" / "Menüye de kaydet" ayrımı, Dışarıda yedim + Günü dengele,
 # barkod bulunamayınca etiket formu (100 g / porsiyon, kalori), kiloya göre gramaj ↔ kalori koçu.
 import os, sys
@@ -23,7 +24,7 @@ SMALL_JS = """[...document.querySelectorAll('#tabNutrition button, #tabNutrition
 
 try:
   with sync_playwright() as p:
-    b = p.chromium.launch(); ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    b = p.chromium.launch(); ctx = b.new_context(service_workers="block", locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
     ctx.route("**/world.openfoodfacts.org/**", lambda route: route.fulfill(status=404, content_type="application/json", body='{"status":0}', headers={"Access-Control-Allow-Origin": "*"}))

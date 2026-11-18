@@ -96,7 +96,8 @@ try:
     txt = pg.inner_text("#pfStorageTxt")
     check(txt.startswith("%") and "dolu" in txt and not pg.is_visible("#pfStorageWarn"), f"Profil → Yedekleme: kayıt alanı gösteriliyor ({txt})")
     # v41: kayıt IndexedDB'de; doluluk tarayıcının ayırdığı alana göre (navigator.storage.estimate) — %80 dolu taklidi
-    FULL = "Object.defineProperty(navigator.storage, 'estimate', { value: async () => ({ usage: 80e6, quota: 100e6 }), configurable: true })"
+    # prototipte: WebKit'te açılış betiği anında navigator.storage nesnesine yazılan özellik tutmuyor
+    FULL = "Object.defineProperty(StorageManager.prototype, 'estimate', { value: async () => ({ usage: 80e6, quota: 100e6 }), configurable: true })"
     pg.context.add_init_script(FULL); pg.evaluate(FULL)
     pg.evaluate("hideProfile(); openProfile()"); pg.wait_for_timeout(150)
     check(pg.is_visible("#pfStorageWarn") and int(pg.inner_text("#pfStorageTxt")[1:].split()[0]) >= 70, "%70 üstünde uyarı çıkıyor")
@@ -110,7 +111,7 @@ try:
     ctx, pg = page("2026-03-09T18:00:00")
     pg.evaluate("startTimer(120)"); pg.clock.run_for(30000)
     pg.reload(); pg.wait_for_timeout(300)
-    check(pg.is_visible("#restPill") and pg.inner_text("#restPillTime") in ("1:30", "01:30", "1:29", "01:29"), f"yeniden açılınca sayaç sürüyor ({pg.inner_text('#restPillTime')})")
+    check(pg.is_visible("#restPill") and pg.inner_text("#restPillTime") in ("1:30", "01:30", "1:29", "01:29", "1:28", "01:28"), f"yeniden açılınca sayaç sürüyor ({pg.inner_text('#restPillTime')})")   # 1:28: WebKit açılışı ~0,5 sn yavaş
     pg.evaluate("stopTimer()"); pg.reload(); pg.wait_for_timeout(300)
     check(not pg.is_visible("#restPill"), "durdurulan sayaç geri gelmiyor")
     pg.evaluate("startTimer(60)"); pg.clock.set_system_time(T("2026-03-09T18:05:00")); pg.reload(); pg.wait_for_timeout(300)

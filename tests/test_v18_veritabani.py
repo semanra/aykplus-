@@ -1,4 +1,5 @@
 import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
+# service_workers="block": ağ taklidi (route) WebKit'te service worker'ın gönderdiği istekleri görmez; bu testte SW denenmiyor (bkz. test_v25_sw.py)
 # v18 (5. paket): USDA besin veritabanı (foods.js), akıllı arama, USDA porsiyonları, bulunamayan aramalar.
 import os, sys, re
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -23,7 +24,7 @@ SMALL_JS = """(sel) => [...document.querySelectorAll(sel)]
 
 try:
   with sync_playwright() as p:
-    b = p.chromium.launch(); ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    b = p.chromium.launch(); ctx = b.new_context(service_workers="block", locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
     pg.goto("http://localhost:8771/index.html"); pg.wait_for_timeout(400)
@@ -170,7 +171,7 @@ try:
     check(s["missSearches"] == [] and abs(pg.evaluate("nutritionTotals(curMeals()).cal") - exp_old) < 0.01, "eski menü ve özel besin aynı değerlerle hesaplanıyor; bozuk alan sıfırlandı")
 
     # ---------- 8) foods.js yüklenemezse uygulama yine açılıyor (eski listeyle)
-    ctx2 = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812})
+    ctx2 = b.new_context(service_workers="block", locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812})
     ctx2.add_init_script(TEST_INIT)
     ctx2.route("**/foods.js", lambda route: route.abort())
     pg2 = ctx2.new_page(); e2 = []; pg2.on("pageerror", lambda e: e2.append(str(e)))

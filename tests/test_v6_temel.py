@@ -64,7 +64,7 @@ with sync_playwright() as p:
     pg.locator("button", has_text="Antrenmanı Bitir ve Kaydet").first.click(); pg.click("#uiDlgOk"); pg.wait_for_timeout(300)
     pg.evaluate("setGymView('history')"); print("history:", pg.inner_text("#workoutHistoryList").replace("\n"," | ")[:300])
     # PR test
-    pg.evaluate("startWorkout()"); pg.wait_for_timeout(150)
+    pg.evaluate("closeModal('finishModal'); startWorkout()"); pg.wait_for_timeout(150)   # özet penceresi açık kalırsa sonraki dokunuşu kapatır (WebKit bunu yakalar)
     kg=pg.locator('[onchange="updateSetData(0, 0, \'kg\', this.value)"]'); kg.fill("90"); pg.locator("body").tap(position={"x":5,"y":400})
     pg.locator('[onclick="toggleSetDone(0, 0)"]').tap(); pg.wait_for_timeout(200)
     print("toasts:", pg.inner_text("#toastWrap").replace("\n"," | "))

@@ -21,3 +21,17 @@ def with_defaults(seed):
     out = {**base, **seed}
     out["settings"] = {**_SEED.get("settings", {}), **seed.get("settings", {})}
     return out
+
+# WebKit (npm run test:webkit): Playwright'ın Windows'taki WebKit'inde her IndexedDB işlemi ~15 ms (Chromium ~1 ms), açılış
+# ~450 ms sürer; testlerin sabit 200–400 ms beklemeleri yetmez. Her goto/reload sonrası uygulamanın açılması (window.aykBooted)
+# en fazla 3 sn beklenir. Açılmazsa (kasıtlı bozuk kayıt, salt okunur açılış, uygulama dışı sayfa) sessizce devam: eski davranış.
+from playwright.sync_api import Page as _Page, Error as _PwError
+def _wrap_nav(_orig):
+    def nav(self, *a, **kw):
+        r = _orig(self, *a, **kw)
+        try: self.wait_for_function("window.aykBooted === true", timeout=3000, polling=20)
+        except _PwError: pass
+        return r
+    return nav
+if not getattr(_Page, "_ayk_boot_wait", False):
+    _Page.goto = _wrap_nav(_Page.goto); _Page.reload = _wrap_nav(_Page.reload); _Page._ayk_boot_wait = True

@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "python3 tests/run_all.py",
+    "test:webkit": "python3 tests/run_all.py --webkit",
     "kontrol": "python3 scripts/kontrol/kontrol.py"
   },
   "devDependencies": {

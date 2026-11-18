@@ -23,6 +23,12 @@ V40 = {"activeTab": "nutrition", "today": "2026-11-13", "settings": {"splash": F
 def stored(pg): return pg.evaluate("aykStoredState()")
 def ls(pg): return pg.evaluate(f"localStorage.getItem('{KEY}')")
 def snaps(pg): return pg.evaluate("aykSnapList()")
+def until(cond, timeout=10.0):   # koşul doğru olana dek bekle (zaman aşımında sessizce devam; ardından gelen kontrol yakalar)
+    end = time.time() + timeout
+    while time.time() < end:
+        if cond(): return True
+        time.sleep(0.02)
+    return False
 
 try:
   with sync_playwright() as p:
@@ -103,6 +109,9 @@ try:
         pg.evaluate("w => { state.weight = w; renderAll(); }", 60 + d)
         pg.clock.set_system_time(T("2026-09-01T09:00:00") + datetime.timedelta(days=d))
         pg.evaluate("document.dispatchEvent(new Event('visibilitychange'))"); pg.wait_for_timeout(25)
+        # o günün yedeği yazılıp budanmadan (en fazla 7 gece + 4 hafta = 11) sonraki güne geçme. WebKit'te IndexedDB işlemi
+        # ~15 ms: kuyrukta bekleyen yedek sonraki günlerin verisini yakalardı (gerçek kullanımda günler arası saatler var).
+        until(lambda: pg.evaluate("async () => !!(await idbGet('snaps', 'day-' + logicalToday())) && (await aykSnapList()).length <= 11"))
     pg.wait_for_timeout(150)
     sn = snaps(pg)
     kinds = {k: len([x for x in sn if x["kind"] == k]) for k in ("day", "week", "pre", "import")}
@@ -112,10 +121,13 @@ try:
     pg.evaluate("openProfile()"); pg.wait_for_timeout(200)
     pg.evaluate("document.getElementById('pfSnaps').closest('details').open = true"); pg.wait_for_timeout(100)
     rows = pg.locator("#pfSnaps [data-snap]")
+    try: rows.nth(10).wait_for(state="attached", timeout=5000)   # liste bölüm açılınca IndexedDB'den okunur (WebKit'te yavaş)
+    except Exception: pass
     check(rows.count() == 11, f"Profil'de 11 iç yedek listeleniyor ({rows.count()})")
     oldest = sorted([x for x in sn if x["kind"] == "week"], key=lambda x: x["date"])[0]
     pg.locator(f'#pfSnaps [data-snap="{oldest["key"]}"] [data-snap-restore]').click(); pg.wait_for_timeout(150)
     pg.click("#uiDlgOk"); pg.wait_for_timeout(250)
+    pg.locator("#toastWrap button", has_text="Geri al").wait_for(timeout=5000)   # dönüş bitti (önce iç yedek yazılır; WebKit'te yavaş)
     w_old = json.loads(pg.evaluate("aykSnapJson(%s)" % json.dumps(oldest["key"])))["weight"]
     check(stored(pg)["weight"] == w_old and w_old < 120, f"iç yedeğe dönüldü (kilo {w_old})")
     pg.locator("#toastWrap button", has_text="Geri al").click(); pg.wait_for_timeout(150)
@@ -210,7 +222,10 @@ try:
         pg.evaluate("w => { state.weight = w; renderAll(); document.dispatchEvent(new Event('visibilitychange')); writeMirror(); }", 81 + i)
         reload(pg)
         check(pg.evaluate("state.weight") == 81 + i, f"R2-I1: açılış {i + 1}: veri doğru")
-    check(len([x for x in snaps(pg) if x["kind"] == "import"]) == 0, "R2-I1: hızlı dokunuş + arka plan içe almaya yol açmıyor")
+    # WebKit sayfa kapanırken bitmemiş IndexedDB yazmasını iptal eder (Chromium bitirir): o zaman tasarım gereği aynadan içe
+    # alınır ve veri yine doğrudur (yukarıdaki kontroller). Yazma bitince WebKit'te de içe alma olmadığı 18 Kasım 2026'da doğrulandı.
+    if pg.context.browser.browser_type.name == "chromium":
+        check(len([x for x in snaps(pg) if x["kind"] == "import"]) == 0, "R2-I1: hızlı dokunuş + arka plan içe almaya yol açmıyor")
     # I3: içe alma iki kez tutmadıysa eski modda kalır
     pg.evaluate("localStorage.setItem('ayk_plus_v5_idb_hata', '2:' + Date.now())"); reload(pg)
     check(pg.evaluate("storeMode") == "ls" and pg.evaluate("state.weight") == 83, "I3: doğrulama tutmayan cihazda eski modda kalıyor, veri yerinde")

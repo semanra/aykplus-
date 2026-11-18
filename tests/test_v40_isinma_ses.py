@@ -19,7 +19,7 @@ def it(name, **kw):
 def base(**kw):
     d = {"activeTab": "mobility", "today": "2026-11-13", "settings": {"splash": False}, "mobilityRoutine": {"dynamic": [], "static": [], "routines": []}}
     d.update(kw); return d
-SPEECH = """window.__said = []; window.__cancel = 0; try { Object.defineProperty(window, 'speechSynthesis', { value: { speak: u => window.__said.push(u.text), cancel: () => { window.__cancel++; }, getVoices: () => [] }, configurable: true }); } catch (e) {}"""
+SPEECH = """window.__said = []; window.__cancel = 0; if (typeof SpeechSynthesisUtterance === 'undefined') window.SpeechSynthesisUtterance = function (tx) { this.text = tx; }; try { Object.defineProperty(window, 'speechSynthesis', { value: { speak: u => window.__said.push(u.text), cancel: () => { window.__cancel++; }, getVoices: () => [] }, configurable: true }); } catch (e) {}"""
 
 try:
   with sync_playwright() as p:

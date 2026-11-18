@@ -85,7 +85,11 @@ try:
     MODE["m"] = "ok"; ctx.set_offline(True)
     reload_ok(pg, "çevrimdışı")
     # Önbellekte olmayan bir dosya çevrimdışıyken HTML döndürmemeli (eskiden index.html dönüyordu)
+    n_err = len(errs)
     miss = pg.evaluate("fetch('olmayan-dosya.js').then(r => r.status + ':' + r.headers.get('content-type'), e => 'ağ hatası')")
+    pg.wait_for_timeout(100)
+    # WebKit bu bilinçli ağ hatasını ayrıca sayfa hatası olarak da bildirir; yalnızca bu adımdaki bu mesaj yok sayılır
+    errs[n_err:] = [e for e in errs[n_err:] if "Response served by service worker is an error" not in e]
     check(miss == "ağ hatası", f"önbellekte olmayan dosyaya index.html dönmüyor ({miss})")
     ctx.set_offline(False)
     # 6) Sunucu normale döndükten sonra uygulama çalışır

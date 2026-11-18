@@ -18,8 +18,15 @@ ANIM_INIT = TEST_INIT.replace(NO_ANIM_FLAG, "")
 assert ANIM_INIT != TEST_INIT
 TOUCH = """
 window.__tch = (type, el, x, y) => {
-  const tc = new Touch({ identifier: 1, target: el, clientX: x, clientY: y });
-  const ev = new TouchEvent(type, { bubbles: true, cancelable: true, touches: type === 'touchend' ? [] : [tc], targetTouches: type === 'touchend' ? [] : [tc], changedTouches: [tc] });
+  let tc, ev;
+  try { tc = new Touch({ identifier: 1, target: el, clientX: x, clientY: y }); } catch (e) { tc = null; }
+  if (tc) ev = new TouchEvent(type, { bubbles: true, cancelable: true, touches: type === 'touchend' ? [] : [tc], targetTouches: type === 'touchend' ? [] : [tc], changedTouches: [tc] });
+  else {   // Playwright WebKit (Windows): Touch kurucusu yok; aynı alanlarla düz olay (iPhone gerçek dokunuş üretir)
+    tc = { identifier: 1, target: el, clientX: x, clientY: y, pageX: x, pageY: y, screenX: x, screenY: y };
+    ev = new Event(type, { bubbles: true, cancelable: true });
+    const L = type === 'touchend' ? [] : [tc];
+    Object.defineProperties(ev, { touches: { value: L }, targetTouches: { value: L }, changedTouches: { value: [tc] } });
+  }
   el.dispatchEvent(ev);
 };
 """

@@ -14,7 +14,10 @@ EN_WORDS = re.compile(r"\b(start|left|right|done|switch|side|reps|seconds|sets|f
 def boot(pg): pg.wait_for_function("window.aykBooted === true"); pg.wait_for_timeout(80)
 STUB = """window.__said = [];
 (function(){ const ss = window.speechSynthesis; if (!ss) return;
-  ss.speak = u => { window.__said.push(u.text); }; ss.cancel = () => {}; ss.getVoices = () => []; })();"""
+  ss.speak = u => { window.__said.push(u.text); }; ss.cancel = () => {}; ss.getVoices = () => []; })();
+// Playwright WebKit (Windows) sesli okuma içermez (iPhone'da var): sahte nesne
+if (!window.speechSynthesis) { Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: u => { window.__said.push(u.text); }, cancel() {}, getVoices: () => [] } }); }
+if (typeof SpeechSynthesisUtterance === 'undefined') window.SpeechSynthesisUtterance = function (tx) { this.text = tx; };"""
 try:
   with sync_playwright() as p:
     b = p.chromium.launch()

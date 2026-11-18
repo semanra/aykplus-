@@ -1,4 +1,5 @@
 import os as _o, sys as _s; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from ortak_tohum import TEST_INIT
+# service_workers="block": ağ taklidi (route) WebKit'te service worker'ın gönderdiği istekleri görmez; bu testte SW denenmiyor (bkz. test_v25_sw.py)
 # v13: Beslenme yeni temada ve tasarım dosyasındaki yapıda:
 # Bugün / Menülerim / Besinler / Geçmiş sekmeleri, ikame (⇄), hazır porsiyonlar, kiloya göre gramaj,
 # gündüz (açık) teması, barkod okuma (Open Food Facts; testte internet yanıtı taklit edilir).
@@ -38,7 +39,7 @@ OFF_NOVAL = {"status": 1, "product": {"product_name": "Değersiz Ürün", "nutri
 
 try:
   with sync_playwright() as p:
-    b = p.chromium.launch(); ctx = b.new_context(locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    b = p.chromium.launch(); ctx = b.new_context(service_workers="block", locale="tr-TR", color_scheme="dark", viewport={"width": 375, "height": 812}, device_scale_factor=2, is_mobile=True, has_touch=True)
     ctx.add_init_script(TEST_INIT)
     pg = ctx.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("dialog", lambda d: d.accept())
     off_calls = []
@@ -197,7 +198,10 @@ try:
     pg.locator('#nvFoods button[aria-label="Barkod okut"]').click(); pg.wait_for_timeout(1200)
     check(pg.evaluate("$('barcodeModal').classList.contains('flex')"), "barkod penceresi açıldı")
     check(len(pg.inner_text("#bcStatus")) > 0 and pg.is_visible("#bcManual"), f"kamera durumu yazıyor, elle giriş var: {pg.inner_text('#bcStatus')!r}")
-    check(pg.evaluate("typeof window.ZXing") == "object", "barkod okuyucu (ZXing) uygulamanın içinden yüklendi")
+    if pg.evaluate("!!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)"):
+        check(pg.evaluate("typeof window.ZXing") == "object", "barkod okuyucu (ZXing) uygulamanın içinden yüklendi")
+    else:   # Playwright WebKit (Windows) kamera arayüzü içermez (iPhone'da var): uygulama elle girişe yönlendirmeli
+        check("kamera açılamadı" in pg.inner_text("#bcStatus"), "kamera yokken elle giriş uyarısı")
     pg.fill("#bcManual", "123"); pg.click("#bcSearchBtn"); pg.wait_for_timeout(100)
     check("Geçerli bir barkod" in pg.inner_text("#bcStatus"), "kısa numarada uyarı")
     pg.fill("#bcManual", "8690000000017"); pg.click("#bcSearchBtn"); pg.wait_for_timeout(500)
