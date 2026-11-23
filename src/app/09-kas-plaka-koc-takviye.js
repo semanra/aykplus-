@@ -750,20 +750,74 @@ function removeSupp(i) {
 const MEASURES = [["bel", "Bel", true], ["kalca", "Kalça", true], ["gogus", "Göğüs", false], ["kol", "Kol (pazı)", false], ["bacak", "Bacak (üst)", false], ["boyun", "Boyun", true]];
 let measureSel = "bel";
 
-function openMeasureModal() {
+function openMeasureModal(restore) {
   const last = state.measurements[state.measurements.length - 1] || {};
+  const draft = restore ? measureDraft : null;   // v64: rehberden "Ölçülere dön" → yazılanlar korunur
+  measureDraft = null;
   $("chartTitle").textContent = lenTxt(t("Ölçü ekle (cm)"));   // v53: imperial'de in
   $("chartBody").innerHTML = `
     <div class="grid grid-cols-2 gap-2 text-xs">
       ${MEASURES.map(([k, n]) => `<div><label class="block text-[var(--w-muted)] mb-1">${t(n)}</label>
-        <input id="ms_${k}" type="text" inputmode="decimal" placeholder="—" value="${last[k] ? esc(fmtLen(last[k])) : ""}" class="w-full p-2 rounded-lg text-base text-center" /></div>`).join("")}
+        <input id="ms_${k}" type="text" inputmode="decimal" placeholder="—" value="${draft ? esc(draft[k] || "") : last[k] ? esc(fmtLen(last[k])) : ""}" class="w-full p-2 rounded-lg text-base text-center" /></div>`).join("")}
     </div>
+    <button type="button" data-measure-guide onclick="openMeasureGuide(true)" class="mt-2 min-h-[44px] w-full flex items-center justify-center gap-2 rounded-lg bg-[var(--w-elev)] text-[var(--w-acc)] text-[13px] font-semibold">${t("Nasıl ölçerim?")}</button>
     <p class="text-[12px] text-[var(--w-dim)] mt-2">${t("İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.")}</p>
     <div class="flex justify-end gap-2 mt-3">
       <button onclick="closeModal('chartModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">${t("İptal")}</button>
       <button onclick="saveMeasurement()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">${t("Kaydet")}</button>
     </div>`;
   openModal("chartModal");
+}
+// v64: ÖLÇÜ REHBERİ. Genel kurallar + her ölçü için görsel (img/olcu/<anahtar>.webp), 3 adım ve sık hata.
+// Ölçü penceresinden açılınca (fromModal) yazılan değerler measureDraft'ta tutulur, "Ölçülere dön" geri getirir.
+// Kararlar: Kol GEVŞEK ölçülür (kasılı değil); Bel GÖBEK DELİĞİ hizasında (sahibin eski kayıtlarıyla tutarlı).
+let measureDraft = null;
+const MEASURE_GUIDE = {
+  bel: { steps: ["Dik dur, ayakların kalça genişliğinde açık olsun.", "Mezurayı göbek deliği hizasından, yere paralel sar.", "Normal nefes ver; nefesi verdikten sonra oku."], mistake: "Karnını içine çekmek ya da mezurayı kalça kemiklerine kaydırmak." },
+  kalca: { steps: ["Ayaklarını birleştir, dik dur.", "Mezurayı kalçanın en çıkık yerinden sar; aynada yandan bakarak bul.", "Mezura önde ve arkada aynı yükseklikte, yere paralel kalsın."], mistake: "Mezuranın arkada aşağı kayması." },
+  gogus: { steps: ["Kollarını yanlara sal, omuzlarını gevşet.", "Mezurayı koltuk altlarından ve kürek kemiklerinin üstünden geçir.", "Önde meme uçları hizasında, normal nefes verdikten sonra oku."], mistake: "Göğsü şişirerek ya da nefesi tutarak ölçmek." },
+  kol: { steps: ["Kolunu yana sal, tamamen gevşek bırak.", "Omuz ile dirsek arasının ortasında, en kalın yerinden sar.", "Hep aynı kolu ölç."], mistake: "Kolu bükerek ya da pazıyı kasarak ölçmek." },
+  bacak: { steps: ["Dik dur, ağırlığını iki bacağına eşit ver.", "Mezurayı kasık kıvrımının birkaç parmak altından, uyluğun en kalın yerinden sar.", "Hep aynı bacağı ölç."], mistake: "Bacağı kasmak ya da mezurayı eğik tutmak." },
+  boyun: { steps: ["Başını dik tut, karşıya bak; omuzlarını indir.", "Mezurayı âdemelmasının hemen altından sar.", "Önde çok hafif aşağı eğimli olabilir; boynu sıkma."], mistake: "Çeneyi kaldırmak ya da mezurayı boyna bastırmak." },
+};
+const MEASURE_RULES = [
+  "Sabah, tuvaletten sonra, bir şey yiyip içmeden ve antrenmandan önce ölç.",
+  "Mezura tenine değsin ama sıkmasın; deriyi içeri bastırmasın.",
+  "Mezura yere paralel dursun; aynada yandan kontrol et.",
+  "Rahat dur, normal nefes ver; karnını içine çekme, kaslarını sıkma.",
+  "Kol ve bacakta hep aynı tarafı ölç.",
+  "Her ölçüyü iki kez al; fark varsa ortalamasını yaz.",
+  "Haftada ya da iki haftada bir, aynı gün ve saatte ölç. Tek ölçüme değil, haftalar içindeki gidişe bak.",
+];
+function openMeasureGuide(fromModal) {
+  if (fromModal) { measureDraft = {}; MEASURES.forEach(([k]) => { const el = $("ms_" + k); if (el) measureDraft[k] = el.value; }); }
+  $("chartTitle").textContent = t("Nasıl ölçerim?");
+  const chips = MEASURES.map(([k, n]) => `<button type="button" data-mg-chip="${k}" onclick="document.getElementById('mg_${k}').scrollIntoView({behavior: 'smooth', block: 'start'})" class="min-h-[44px] px-3.5 rounded-full bg-[var(--w-elev)] text-[var(--w-text)] text-[13px] font-semibold">${t(n)}</button>`).join("");
+  const cards = MEASURES.map(([k, n]) => {
+    const g = MEASURE_GUIDE[k];
+    return `<section id="mg_${k}" data-mg="${k}" class="scroll-mt-2 rounded-2xl bg-[var(--w-elev)] p-3.5 space-y-2.5">
+      <h4 class="font-bold text-[15px] text-[var(--w-text)]">${t(n)}</h4>
+      <div data-olcu-img class="h-[230px] flex items-center justify-center"><img src="img/olcu/${k}.webp" alt="${esc(t("{ad}: mezuranın yeri", { ad: t(n) }))}" width="720" height="720" loading="lazy" decoding="async" draggable="false" class="h-full w-auto max-w-full object-contain" onerror="this.closest('[data-olcu-img]').remove()"></div>
+      <ol class="list-decimal pl-5 space-y-1 text-[13px] text-[var(--w-text1)]">${g.steps.map(x => `<li>${t(x)}</li>`).join("")}</ol>
+      <p class="text-[13px] text-[var(--w-muted)]"><span class="font-semibold text-[var(--w-warn-text)]">${t("Sık hata:")}</span> ${t(g.mistake)}</p>
+    </section>`;
+  }).join("");
+  $("chartBody").innerHTML = `
+    <div data-measure-guide-body class="space-y-3">
+      <div class="rounded-2xl bg-[var(--w-elev)] p-3.5">
+        <h4 class="font-bold text-[15px] text-[var(--w-text)] mb-1.5">${t("Genel kurallar")}</h4>
+        <ul class="list-disc pl-5 space-y-1 text-[13px] text-[var(--w-text1)]">${MEASURE_RULES.map(x => `<li>${t(x)}</li>`).join("")}</ul>
+      </div>
+      <div class="flex flex-wrap gap-2">${chips}</div>
+      ${cards}
+      <div class="flex justify-end gap-2 pt-1">
+        ${fromModal
+          ? `<button data-mg-back onclick="openMeasureModal(true)" class="w-btn text-[13px] px-4 min-h-[44px] rounded-lg font-semibold">${t("Ölçülere dön")}</button>`
+          : `<button data-mg-close onclick="closeModal('chartModal')" class="w-btn text-[13px] px-4 min-h-[44px] rounded-lg font-semibold">${t("Kapat")}</button>`}
+      </div>
+    </div>`;
+  openModal("chartModal");
+  const box = $("chartBody").parentElement; if (box) box.scrollTop = 0;
 }
 function saveMeasurement() {
   const now = Date.now();

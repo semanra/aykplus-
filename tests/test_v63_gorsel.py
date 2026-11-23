@@ -138,7 +138,8 @@ try:
     pg.wait_for_function("!!navigator.serviceWorker.controller", timeout=5000)
     pg.evaluate("fetch('img/hareket/1.webp').then(r => r.blob())"); pg.wait_for_timeout(300)
     check(pg.evaluate("caches.open('aykplus-gorsel-1').then(c => c.match('img/hareket/1.webp')).then(r => !!r)"), "görülen görsel ayrı önbelleğe girdi (aykplus-gorsel-1)")
-    check(not pg.evaluate("caches.open('aykplus-v63').then(c => c.match('img/hareket/1.webp')).then(r => !!r)"), "görsel sürüm önbelleğine girmedi")
+    ver = re.search(r"const CACHE = '([^']+)'", swsrc).group(1)   # v64: sürüm adı sw.js'ten
+    check(not pg.evaluate(f"caches.open('{ver}').then(c => c.match('img/hareket/1.webp')).then(r => !!r)"), "görsel sürüm önbelleğine girmedi")
     c.close()
     check(errs == [], "sayfa hatası yok: " + str(errs[:3]))
     b.close()

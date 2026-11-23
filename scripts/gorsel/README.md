@@ -22,3 +22,8 @@ Bilinen, kabul edilen: makine çerçevesinin içinde kalan küçük beyaz alanla
 silme figürdeki parlak yerleri de siliyordu); bazı yer gölgelerinde küçük beyaz parçalar; 292'de beyaz masa yüzeyi saydam.
 
 Önizleme: `python onizle.py <dosya.webp>` → koyu ve açık zeminde `_on.png`.
+
+## Ölçü rehberi görselleri (v64, `olcu.py`)
+Kaynak: masaüstü `AYK+ Ölçü Görselleri/olcu-<anahtar>.png` (ChatGPT, 1254×1254, beyaz zemin). `python scripts/gorsel/olcu.py`
+→ `img/olcu/<anahtar>.webp` (720×720, şeffaf). bel/kalça/göğüs: sıkı ayar (`GRAD` 2, gölge birleştirme kapalı; yoksa açık renkli
+uyluklar da silinir) ve yer gölgesi alttan kırpılır; kol: gövdenin düz kesildiği sağ kenar kırpılır.

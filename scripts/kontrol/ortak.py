@@ -105,6 +105,8 @@ SCREENS = [
   ("p-guc", "setProgressView('guc')"),
   ("p-beslenme", "setProgressView('beslenme')"),
   ("p-olcu-modal", "setProgressView('kilo'); openMeasureModal()"),
+  # v64: ölçü rehberi (ölçü penceresinden)
+  ("p-olcu-rehber", "openMeasureGuide(true); document.querySelectorAll('[data-olcu-img] img').forEach(i => { i.loading = 'eager'; })"),
   ("profil", "closeModal('chartModal'); openProfile()"),
   ("profil-orta", PF_SCROLL % 0.45),
   ("profil-alt", PF_SCROLL % 1),
@@ -166,6 +168,7 @@ EN_SCREENS = [
   ("en-p-guc", "setProgressView('guc')"),
   ("en-p-beslenme", "setProgressView('beslenme')"),
   ("en-p-grafik", "setProgressView('guc'); openExerciseChart(0)"),
+  ("en-p-olcu-rehber", "closeModal('chartModal'); openMeasureGuide(); document.querySelectorAll('[data-olcu-img] img').forEach(i => { i.loading = 'eager'; })"),
   # v51: Besin adları (yalnız ölçüm; foods-en.js yüklenmiş olmalı, kontrol.py bekler)
   ("en-n-besin-ara", "closeModal('chartModal'); switchTab('nutrition'); setNutriView('foods'); $('foodSearch').value = 'chicken breast'; foodSearchInput(); renderFoods()"),
   ("en-n-besin-kart", "selectFood('u171474'); renderAll()"),
