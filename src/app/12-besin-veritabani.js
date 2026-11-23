@@ -167,3 +167,40 @@ function foodSourceText(f) {
   return "";
 }
 
+
+// ---------------------------------------------------------------------------
+// v65: BESİN GRUPLARI (yalnız gösterim; kayıttaki kimlik ve cat alanları DEĞİŞMEZ). Plan: docs/PLAN-v65-besin-kategorileri.md
+// ---------------------------------------------------------------------------
+const FOOD_GROUPS = [
+  ["et", "Et, tavuk ve balık"], ["sut", "Süt ürünleri ve yumurta"], ["tahil", "Tahıllar ve ekmek"], ["bakla", "Baklagiller"],
+  ["sebze", "Sebzeler"], ["meyve", "Meyveler"], ["kuru", "Kuruyemiş ve yağlar"], ["kahvalti", "Kahvaltılıklar"],
+  ["atistirma", "Atıştırmalık ve tatlılar"], ["icecek", "İçecekler"], ["fast", "Fast food ve hazır yemek"], ["turk", "Türk mutfağı"],
+  ["sos", "Sos, çorba ve baharat"], ["takviye", "Takviyeler"], ["diger", "Diğer"],
+];
+// kategori adı (emojisiz) → grup: FOOD_CAT_GROUP (src/data.js; kategori adları veri katmanı, Türkçe)
+// uygulamanın kendi listesinde kategorisi karışık olanlar (ör. "Karbonhidratlar" içindeki muz)
+const FOOD_ID_GROUP = { hindi_fume: "et", whey_shake: "takviye", greens_scoop: "takviye", patates: "sebze", tatli_patates: "sebze",
+  muz: "meyve", yesil_elma: "meyve", avokado: "meyve", zeytin: "kahvalti" };
+// Grup anahtarı; kullanıcının kendi besin/tarifi için "" (onlar kendi çiplerinde)
+function foodGroupOf(id, f) {
+  if (!f || String(id).startsWith("custom_")) return "";
+  return FOOD_ID_GROUP[id] || FOOD_CAT_GROUP[stripEmoji(f.cat || "")] || "diger";
+}
+function foodGroupName(g) {
+  if (g === "") return "";
+  const x = FOOD_GROUPS.find(([k]) => k === g);
+  return x ? t(x[1]) : t("Diğer");
+}
+// Süzgeçler: yüksek protein (kalorinin ≥ %30'u proteinden), düşük kalori (g/ml: 100 g'da ≤ 100 kcal; diğer birimler: 1 birimde ≤ 100 kcal)
+function foodHighProtein(f) { const k = kcalPerUnit(f); return k > 0 && (num(f.p) * 4) / k >= 0.3; }
+function foodLowCal(f) { const k = kcalPerUnit(f); return (f.unit === "g" || f.unit === "ml") ? k * 100 <= 100 : k <= 100; }
+function isFavFood(id) { return (state.favFoods || []).includes(id); }
+function toggleFavFood(id) {
+  if (!Array.isArray(state.favFoods)) state.favFoods = [];
+  const on = !state.favFoods.includes(id);
+  state.favFoods = on ? [id, ...state.favFoods].slice(0, FAV_FOODS_MAX) : state.favFoods.filter(x => x !== id);
+  toast(on ? t("Favorilere eklendi") : t("Favorilerden çıkarıldı"));
+  renderAll();
+}
+const FAV_FOODS_MAX = 300;
+const FOOD_TOP_HITS = 5;   // v65: gruplu aramada başlıksız/üstte kalan en iyi sonuç sayısı

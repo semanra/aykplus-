@@ -879,6 +879,7 @@ async function deleteCustomFood(id) {
   state.combos.forEach(c => { c.items = c.items.filter(i => i.foodId !== id); });
   state.combos = state.combos.filter(c => c.items.length);
   state.recentFoods = state.recentFoods.filter(x => x !== id);
+  state.favFoods = (state.favFoods || []).filter(x => x !== id);   // v65
   closeModal("pickerModal");
   renderAll();
   offerUndo(t("{ad} silindi", { ad: f.name }));

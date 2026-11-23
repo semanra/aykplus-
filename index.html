@@ -1024,6 +1024,7 @@
         <button onclick="openBarcode()" class="w-11 h-11 shrink-0 rounded-full flex items-center justify-center n-accent" aria-label="Barkod okut" data-t-aria="Barkod okut"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13.5 8v8M17 8v8"></path></svg></button>
       </div>
       <div id="foodCats" class="flex gap-2 overflow-x-auto no-scrollbar -mx-0.5 px-0.5"></div>
+      <div id="foodFilters" class="flex gap-2 -mt-1" role="group" aria-label="Süzgeçler" data-t-aria="Süzgeçler"></div>
       <div id="foodList"></div>
       <div class="grid grid-cols-2 gap-2">
         <button onclick="openCustomFoodModal()" class="h-12 rounded-full n-btn-outline text-[14px]" data-t="Özel besin tanımla">Özel besin tanımla</button>
@@ -1726,7 +1727,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v64</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v65</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -2364,6 +2365,18 @@ const DEFAULT_STATE = {
   workoutLogs: [],
   workoutDays: [{ id: "day_1", name: "1. Gün", exercises: [] }],
   mobilityRoutine: { dynamic: [], static: [], routines: [] }
+};
+
+// v65: besin kategorisi (emojisiz cat değeri) → gösterim grubu (FOOD_GROUPS, src/app/12-besin-veritabani.js). Kayıt değişmez.
+const FOOD_CAT_GROUP = {
+  "Kırmızı et": "et", "Tavuk ve hindi": "et", "Balık ve deniz ürünleri": "et", "Sakatat": "et", "Şarküteri": "et", "Et / Tavuk / Balık": "et",
+  "Süt ürünleri": "sut", "Peynirler": "sut", "Yumurta": "sut", "Protein & Kahvaltı": "sut",
+  "Tahıllar ve makarna": "tahil", "Ekmek ve hamur işleri": "tahil", "Kahvaltılık gevrekler": "tahil", "Karbonhidratlar": "tahil",
+  "Baklagiller": "bakla", "Sebzeler": "sebze", "Yeşillik & Sebzeler": "sebze", "Meyveler": "meyve",
+  "Kuruyemiş ve tohumlar": "kuru", "Yağlar": "kuru", "Kuruyemiş & Sağlıklı Yağlar": "kuru", "Kahvaltılıklar": "kahvalti",
+  "Atıştırmalıklar": "atistirma", "Tatlılar": "atistirma", "İçecekler": "icecek",
+  "Hazır yemekler": "fast", "Esnek Diyet / Dışarıdan": "fast", "Türk yemekleri (tarif)": "turk", "Türk Mutfağı": "turk",
+  "Soslar ve çorbalar": "sos", "Baharatlar": "sos", "Takviyeler": "takviye",
 };
 
 </script>
@@ -3084,6 +3097,9 @@ function normalizeStateInner(raw) {
   });
   if (!Array.isArray(s.recentFoods)) s.recentFoods = [];
   s.recentFoods = s.recentFoods.filter(x => typeof x === "string" && x);   // v35
+  // v65: favori besinler (kimlik listesi; tekrarsız, en fazla 300; bulunamayan kimlik silinmez, listede gösterilmez)
+  if (!Array.isArray(s.favFoods)) s.favFoods = [];
+  s.favFoods = [...new Set(s.favFoods.filter(x => typeof x === "string" && x))].slice(0, 300);
   if (!isObj(s.customFoods)) s.customFoods = {};
   // v25: özel besin kayıtları: boşlar atılır, değerler sayıya çevrilir, tarif malzemeleri temizlenir
   Object.keys(s.customFoods).forEach(id => {
@@ -4741,7 +4757,7 @@ function renderMenus() {
 // BESİNLER (arama, kategori, gramaj, hazır porsiyon, canlı kalan)
 // ---------------------------------------------------------------------------
 // dest: "day" → bugünkü plana (yalnızca bugün), "menu" → Menülerim'e
-const foodUI = { meal: null, cat: "all", sel: null, amt: 0, dest: "day" };
+const foodUI = { meal: null, cat: "all", sel: null, amt: 0, dest: "day", fHP: false, fLC: false };   // v65: fHP yüksek protein, fLC düşük kalori süzgeci (kaydedilmez)
 function foodMeals() { return foodUI.dest === "menu" ? curMeals() : dayMeals(); }
 function foodTargetIdx() {
   const meals = foodMeals();
@@ -4762,6 +4778,7 @@ function setFoodDest(d) { foodUI.dest = d === "menu" ? "menu" : "day"; renderAll
 function setFoodMeal(i) { foodUI.meal = i; renderAll(); }
 function setFoodCat(c) { foodUI.cat = c; foodUI.sel = null; foodUI.limit = 0; renderFoods(); }
 function foodCatKey(cat) { return "c:" + String(cat || "Diğer"); }
+function setFoodFilter(k) { if (k === "hp") foodUI.fHP = !foodUI.fHP; else foodUI.fLC = !foodUI.fLC; foodUI.limit = 0; renderFoods(); }
 
 function renderFoods() {
   const meals = foodMeals();
@@ -4769,14 +4786,18 @@ function renderFoods() {
   $("foodMealChips").innerHTML = meals.map((m, i) => `<button onclick="setFoodMeal(${i})" class="n-chip ${i === tIdx ? "solid" : ""} max-w-[220px]" aria-pressed="${i === tIdx}"><span class="truncate">${esc(m.time ? m.time + " · " + m.title : m.title)}</span></button>`).join("");
   const db = getFoodDB();
   const cats = [];
+  if ((state.favFoods || []).some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["fav", t("Favoriler")]);   // v65
   if (state.recentFoods.some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["recent", t("Son kullanılanlar")]);
   if (state.combos.length) cats.push(["combos", t("Komboların")]);
   if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", t("Tariflerim")]);
   if (Object.keys(state.customFoods).length) cats.push(["custom", t("Özel eklediklerim")]);
-  [...new Set(Object.values(BASE_FOOD_DB).map(f => f.cat || "Diğer"))].forEach(c => cats.push([foodCatKey(c), t(stripEmoji(c))]));
-  [...new Set(Object.values(USDA_DB).map(f => f.cat))].forEach(c => { if (!cats.some(x => x[0] === foodCatKey(c))) cats.push([foodCatKey(c), t(c)]); });
+  // v65: ~36 kategori yerine 14 grup (gösterim eşlemesi, 12-besin-veritabani.js); yalnız görünür besini olan grup çıkar
+  const used = new Set(Object.keys(db).filter(id => !isHiddenFood(db[id])).map(id => foodGroupOf(id, db[id])));
+  FOOD_GROUPS.forEach(([g, l]) => { if (used.has(g)) cats.push(["g:" + g, t(l)]); });
   if (!cats.some(c => c[0] === foodUI.cat)) foodUI.cat = "all";
-  $("foodCats").innerHTML = [["all", t("Tümü")], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
+  $("foodCats").innerHTML = [["all", t("Tümü")], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}" data-food-cat="${esc(k)}" aria-pressed="${foodUI.cat === k}">${esc(l)}</button>`).join("");
+  $("foodFilters").innerHTML = [["hp", t("Yüksek protein"), foodUI.fHP], ["lc", t("Düşük kalori"), foodUI.fLC]].map(([k, l, on]) =>
+    `<button onclick="setFoodFilter('${k}')" class="n-chip ${on ? "solid" : ""}" data-food-filter="${k}" aria-pressed="${on}">${on ? svgI("check", 14, 2.6) : ""}${esc(l)}</button>`).join("");
   renderFoodHead();
   renderFoodSuggest();
   renderFoodList();
@@ -4863,11 +4884,14 @@ function renderFoodList() {
     updateFoodSelUI();
     return;
   }
-  if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id] && !isHiddenFood(db[id]));
+  if (foodUI.cat === "fav") ids = (state.favFoods || []).filter(id => db[id] && !isHiddenFood(db[id]));   // v65
+  else if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id] && !isHiddenFood(db[id]));
   else if (foodUI.cat === "recipes") ids = Object.keys(state.customFoods).filter(id => id.startsWith("custom_recipe_") && db[id]);
   else if (foodUI.cat === "custom") ids = Object.keys(state.customFoods).filter(id => db[id]);
-  else if (foodUI.cat.startsWith("c:")) ids = Object.keys(db).filter(id => !isHiddenFood(db[id]) && foodCatKey(db[id].cat) === foodUI.cat);
+  else if (foodUI.cat.startsWith("g:")) { const g = foodUI.cat.slice(2); ids = Object.keys(db).filter(id => !isHiddenFood(db[id]) && foodGroupOf(id, db[id]) === g); }
   else ids = Object.keys(db).filter(id => !isHiddenFood(db[id]));
+  if (foodUI.fHP) ids = ids.filter(id => foodHighProtein(db[id]));   // v65 süzgeçler
+  if (foodUI.fLC) ids = ids.filter(id => foodLowCal(db[id]));
   // v18: akıllı arama (Türkçe karakter, kelime sırası, eş anlamlı, küçük yazım hatası) + sıralama
   if (words.length) ids = searchFoods(ids, q);
   else if (foodUI.cat === "all") ids = rankBrowse(ids);
@@ -4876,8 +4900,29 @@ function renderFoodList() {
   if (foodUI.sel && !shownIds.includes(foodUI.sel) && ids.includes(foodUI.sel)) shownIds.unshift(foodUI.sel);   // seçili besin her zaman görünür
   if (words.length) { if (!total && !comboHtml) noteMissSearch($("foodSearch").value); else cancelMissSearch(); }
   const tIdx = foodTargetIdx();
-  const html = shownIds.map(id => {
-    const f = db[id];
+  // v65: "Tümü"nde arama: ilk FOOD_TOP_HITS sonuç "En iyi eşleşmeler" altında arama sırasıyla (alaka sırası bozulmasın),
+  // kalanlar grup başlıklarıyla (grup sırası = gruptaki ilk sonucun sırası; grup içinde arama sırası aynen). Az sonuçta başlık yok.
+  const grouped = foodUI.cat === "all" && words.length > 0 && shownIds.length > FOOD_TOP_HITS;
+  const grpOf = id => { const g = foodGroupOf(id, db[id]); return g || (String(id).startsWith("custom_recipe_") ? "_recipes" : "_custom"); };
+  const grpName = g => g === "_top" ? t("En iyi eşleşmeler") : g === "_recipes" ? t("Tariflerim") : g === "_custom" ? t("Özel eklediklerim") : foodGroupName(g);
+  let order = shownIds.map(id => [id, "_top"]);
+  if (grouped) {
+    const top = shownIds.slice(0, FOOD_TOP_HITS), rest = shownIds.slice(FOOD_TOP_HITS), gs = [];
+    rest.forEach(id => { const g = grpOf(id); if (!gs.includes(g)) gs.push(g); });
+    order = [...top.map(id => [id, "_top"]), ...gs.flatMap(g => rest.filter(id => grpOf(id) === g).map(id => [id, g]))];
+  }
+  let lastGrp = null;
+  const html = order.map(([id, g]) => {
+    let head = "";
+    if (grouped && g !== lastGrp) { lastGrp = g; head = `<div class="text-[12px] font-bold n-muted uppercase tracking-wide pt-4 pb-1" data-food-group="${esc(g)}">${esc(grpName(g))}</div>`; }
+    return head + foodRowHtml(id, db[id], tIdx);
+  }).join("");
+  const more = total > shownIds.length
+    ? `<button onclick="foodUI.limit = (foodUI.limit || FOOD_PAGE) + 100; renderFoodList()" class="n-btn-ghost w-full h-12 rounded-full text-[14px] mt-2" id="foodMore">${t("{n} sonuç daha · göster", { n: fmtInt(total - shownIds.length) })}</button>` : "";
+  $("foodList").innerHTML = (comboHtml + html) ? comboHtml + html + more : noResultHtml($("foodSearch").value.trim());
+  updateFoodSelUI();
+}
+function foodRowHtml(id, f, tIdx) {   // v65: renderFoodList'ten ayrıldı (gruplu arama başlıkları için)
     const def = num(f.def, 1);
     if (id !== foodUI.sel) {
       return `<button onclick='selectFood(${esc(JSON.stringify(id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-food="${esc(id)}">
@@ -4895,7 +4940,10 @@ function renderFoodList() {
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
             ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(foodNoteL(f))}</div>` : ""}
             ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">${esc(t("Kalori USDA ölçümüdür ({x} nedeniyle makrolardan hesaplanandan farklı).", { x: kxL(f.kx) }))}</div>` : ""}</div>
-          <div class="text-right shrink-0 whitespace-nowrap"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
+          <div class="flex items-start gap-1 shrink-0">
+            <div class="text-right whitespace-nowrap pt-2"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
+            <button onclick='toggleFavFood(${esc(JSON.stringify(id))})' data-fav aria-pressed="${isFavFood(id)}" aria-label="${esc(isFavFood(id) ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 h-11 -mr-1 rounded-full flex items-center justify-center ${isFavFood(id) ? "n-k" : "n-muted"}"><svg width="22" height="22" viewBox="0 0 24 24" fill="${isFavFood(id) ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>
+          </div>
         </div>
         <div class="flex items-center justify-between px-1">
           <button onclick="foodStep(-1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Azalt"))}">${svgI("minus", 20, 2.4)}</button>
@@ -4928,11 +4976,6 @@ function renderFoodList() {
             <button onclick='deleteCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}${t("Sil")}</button>
           </div>` : ""}
       </div>`;
-  }).join("");
-  const more = total > shownIds.length
-    ? `<button onclick="foodUI.limit = (foodUI.limit || FOOD_PAGE) + 100; renderFoodList()" class="n-btn-ghost w-full h-12 rounded-full text-[14px] mt-2" id="foodMore">${t("{n} sonuç daha · göster", { n: fmtInt(total - shownIds.length) })}</button>` : "";
-  $("foodList").innerHTML = (comboHtml + html) ? comboHtml + html + more : noResultHtml($("foodSearch").value.trim());
-  updateFoodSelUI();
 }
 
 // Seçili besinin canlı değerleri (tam yeniden çizim yapmadan; iPhone'da klavye kapanmasın)
@@ -9849,6 +9892,7 @@ async function deleteCustomFood(id) {
   state.combos.forEach(c => { c.items = c.items.filter(i => i.foodId !== id); });
   state.combos = state.combos.filter(c => c.items.length);
   state.recentFoods = state.recentFoods.filter(x => x !== id);
+  state.favFoods = (state.favFoods || []).filter(x => x !== id);   // v65
   closeModal("pickerModal");
   renderAll();
   offerUndo(t("{ad} silindi", { ad: f.name }));
@@ -10634,6 +10678,43 @@ function foodSourceText(f) {
   return "";
 }
 
+
+// ---------------------------------------------------------------------------
+// v65: BESİN GRUPLARI (yalnız gösterim; kayıttaki kimlik ve cat alanları DEĞİŞMEZ). Plan: docs/PLAN-v65-besin-kategorileri.md
+// ---------------------------------------------------------------------------
+const FOOD_GROUPS = [
+  ["et", "Et, tavuk ve balık"], ["sut", "Süt ürünleri ve yumurta"], ["tahil", "Tahıllar ve ekmek"], ["bakla", "Baklagiller"],
+  ["sebze", "Sebzeler"], ["meyve", "Meyveler"], ["kuru", "Kuruyemiş ve yağlar"], ["kahvalti", "Kahvaltılıklar"],
+  ["atistirma", "Atıştırmalık ve tatlılar"], ["icecek", "İçecekler"], ["fast", "Fast food ve hazır yemek"], ["turk", "Türk mutfağı"],
+  ["sos", "Sos, çorba ve baharat"], ["takviye", "Takviyeler"], ["diger", "Diğer"],
+];
+// kategori adı (emojisiz) → grup: FOOD_CAT_GROUP (src/data.js; kategori adları veri katmanı, Türkçe)
+// uygulamanın kendi listesinde kategorisi karışık olanlar (ör. "Karbonhidratlar" içindeki muz)
+const FOOD_ID_GROUP = { hindi_fume: "et", whey_shake: "takviye", greens_scoop: "takviye", patates: "sebze", tatli_patates: "sebze",
+  muz: "meyve", yesil_elma: "meyve", avokado: "meyve", zeytin: "kahvalti" };
+// Grup anahtarı; kullanıcının kendi besin/tarifi için "" (onlar kendi çiplerinde)
+function foodGroupOf(id, f) {
+  if (!f || String(id).startsWith("custom_")) return "";
+  return FOOD_ID_GROUP[id] || FOOD_CAT_GROUP[stripEmoji(f.cat || "")] || "diger";
+}
+function foodGroupName(g) {
+  if (g === "") return "";
+  const x = FOOD_GROUPS.find(([k]) => k === g);
+  return x ? t(x[1]) : t("Diğer");
+}
+// Süzgeçler: yüksek protein (kalorinin ≥ %30'u proteinden), düşük kalori (g/ml: 100 g'da ≤ 100 kcal; diğer birimler: 1 birimde ≤ 100 kcal)
+function foodHighProtein(f) { const k = kcalPerUnit(f); return k > 0 && (num(f.p) * 4) / k >= 0.3; }
+function foodLowCal(f) { const k = kcalPerUnit(f); return (f.unit === "g" || f.unit === "ml") ? k * 100 <= 100 : k <= 100; }
+function isFavFood(id) { return (state.favFoods || []).includes(id); }
+function toggleFavFood(id) {
+  if (!Array.isArray(state.favFoods)) state.favFoods = [];
+  const on = !state.favFoods.includes(id);
+  state.favFoods = on ? [id, ...state.favFoods].slice(0, FAV_FOODS_MAX) : state.favFoods.filter(x => x !== id);
+  toast(on ? t("Favorilere eklendi") : t("Favorilerden çıkarıldı"));
+  renderAll();
+}
+const FAV_FOODS_MAX = 300;
+const FOOD_TOP_HITS = 5;   // v65: gruplu aramada başlıksız/üstte kalan en iyi sonuç sayısı
 // ---------------------------------------------------------------------------
 // GENEL RENDER
 // ---------------------------------------------------------------------------
@@ -12676,7 +12757,25 @@ Object.assign(EN, {
   "Süzme yoğurt için tam yağlı Yunan yoğurdu, beyaz peynir için feta kullanıldı.": "Full-fat Greek yogurt was used for strained yogurt, and feta for white cheese.",
   "Yaklaşık tarif.": "Approximate recipe.",
   "Kaymak/tahin dahil değil.": "Kaymak/tahini is not included.",
-  "Kaymak dahil değil.": "Kaymak is not included."
+  "Kaymak dahil değil.": "Kaymak is not included.",
+  // v65 besin grupları ve süzgeçler
+  "En iyi eşleşmeler": "Best matches",
+  "Favoriler": "Favourites",
+  "Yüksek protein": "High protein",
+  "Düşük kalori": "Low calorie",
+  "Süzgeçler": "Filters",
+  "Favorilere eklendi": "Added to favourites",
+  "Favorilerden çıkarıldı": "Removed from favourites",
+  "Favorilere ekle": "Add to favourites",
+  "Favorilerden çıkar": "Remove from favourites",
+  "Et, tavuk ve balık": "Meat, poultry and fish",
+  "Süt ürünleri ve yumurta": "Dairy and eggs",
+  "Tahıllar ve ekmek": "Grains and bread",
+  "Kuruyemiş ve yağlar": "Nuts and fats",
+  "Atıştırmalık ve tatlılar": "Snacks and sweets",
+  "Fast food ve hazır yemek": "Fast food and ready meals",
+  "Türk mutfağı": "Turkish cuisine",
+  "Sos, çorba ve baharat": "Sauces, soups and spices",
 });
 // Yerleşik tarif notu (f.src === "tarif"): cümle cümle sözlükten; Türkçede ve özel besinde olduğu gibi.
 function foodNoteL(f) {

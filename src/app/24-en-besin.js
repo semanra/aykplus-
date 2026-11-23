@@ -188,7 +188,25 @@ Object.assign(EN, {
   "Süzme yoğurt için tam yağlı Yunan yoğurdu, beyaz peynir için feta kullanıldı.": "Full-fat Greek yogurt was used for strained yogurt, and feta for white cheese.",
   "Yaklaşık tarif.": "Approximate recipe.",
   "Kaymak/tahin dahil değil.": "Kaymak/tahini is not included.",
-  "Kaymak dahil değil.": "Kaymak is not included."
+  "Kaymak dahil değil.": "Kaymak is not included.",
+  // v65 besin grupları ve süzgeçler
+  "En iyi eşleşmeler": "Best matches",
+  "Favoriler": "Favourites",
+  "Yüksek protein": "High protein",
+  "Düşük kalori": "Low calorie",
+  "Süzgeçler": "Filters",
+  "Favorilere eklendi": "Added to favourites",
+  "Favorilerden çıkarıldı": "Removed from favourites",
+  "Favorilere ekle": "Add to favourites",
+  "Favorilerden çıkar": "Remove from favourites",
+  "Et, tavuk ve balık": "Meat, poultry and fish",
+  "Süt ürünleri ve yumurta": "Dairy and eggs",
+  "Tahıllar ve ekmek": "Grains and bread",
+  "Kuruyemiş ve yağlar": "Nuts and fats",
+  "Atıştırmalık ve tatlılar": "Snacks and sweets",
+  "Fast food ve hazır yemek": "Fast food and ready meals",
+  "Türk mutfağı": "Turkish cuisine",
+  "Sos, çorba ve baharat": "Sauces, soups and spices",
 });
 // Yerleşik tarif notu (f.src === "tarif"): cümle cümle sözlükten; Türkçede ve özel besinde olduğu gibi.
 function foodNoteL(f) {

@@ -342,6 +342,9 @@ function normalizeStateInner(raw) {
   });
   if (!Array.isArray(s.recentFoods)) s.recentFoods = [];
   s.recentFoods = s.recentFoods.filter(x => typeof x === "string" && x);   // v35
+  // v65: favori besinler (kimlik listesi; tekrarsız, en fazla 300; bulunamayan kimlik silinmez, listede gösterilmez)
+  if (!Array.isArray(s.favFoods)) s.favFoods = [];
+  s.favFoods = [...new Set(s.favFoods.filter(x => typeof x === "string" && x))].slice(0, 300);
   if (!isObj(s.customFoods)) s.customFoods = {};
   // v25: özel besin kayıtları: boşlar atılır, değerler sayıya çevrilir, tarif malzemeleri temizlenir
   Object.keys(s.customFoods).forEach(id => {

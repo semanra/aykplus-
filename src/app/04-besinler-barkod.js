@@ -2,7 +2,7 @@
 // BESİNLER (arama, kategori, gramaj, hazır porsiyon, canlı kalan)
 // ---------------------------------------------------------------------------
 // dest: "day" → bugünkü plana (yalnızca bugün), "menu" → Menülerim'e
-const foodUI = { meal: null, cat: "all", sel: null, amt: 0, dest: "day" };
+const foodUI = { meal: null, cat: "all", sel: null, amt: 0, dest: "day", fHP: false, fLC: false };   // v65: fHP yüksek protein, fLC düşük kalori süzgeci (kaydedilmez)
 function foodMeals() { return foodUI.dest === "menu" ? curMeals() : dayMeals(); }
 function foodTargetIdx() {
   const meals = foodMeals();
@@ -23,6 +23,7 @@ function setFoodDest(d) { foodUI.dest = d === "menu" ? "menu" : "day"; renderAll
 function setFoodMeal(i) { foodUI.meal = i; renderAll(); }
 function setFoodCat(c) { foodUI.cat = c; foodUI.sel = null; foodUI.limit = 0; renderFoods(); }
 function foodCatKey(cat) { return "c:" + String(cat || "Diğer"); }
+function setFoodFilter(k) { if (k === "hp") foodUI.fHP = !foodUI.fHP; else foodUI.fLC = !foodUI.fLC; foodUI.limit = 0; renderFoods(); }
 
 function renderFoods() {
   const meals = foodMeals();
@@ -30,14 +31,18 @@ function renderFoods() {
   $("foodMealChips").innerHTML = meals.map((m, i) => `<button onclick="setFoodMeal(${i})" class="n-chip ${i === tIdx ? "solid" : ""} max-w-[220px]" aria-pressed="${i === tIdx}"><span class="truncate">${esc(m.time ? m.time + " · " + m.title : m.title)}</span></button>`).join("");
   const db = getFoodDB();
   const cats = [];
+  if ((state.favFoods || []).some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["fav", t("Favoriler")]);   // v65
   if (state.recentFoods.some(id => db[id] && !isHiddenFood(db[id]))) cats.push(["recent", t("Son kullanılanlar")]);
   if (state.combos.length) cats.push(["combos", t("Komboların")]);
   if (Object.keys(state.customFoods).some(id => id.startsWith("custom_recipe_"))) cats.push(["recipes", t("Tariflerim")]);
   if (Object.keys(state.customFoods).length) cats.push(["custom", t("Özel eklediklerim")]);
-  [...new Set(Object.values(BASE_FOOD_DB).map(f => f.cat || "Diğer"))].forEach(c => cats.push([foodCatKey(c), t(stripEmoji(c))]));
-  [...new Set(Object.values(USDA_DB).map(f => f.cat))].forEach(c => { if (!cats.some(x => x[0] === foodCatKey(c))) cats.push([foodCatKey(c), t(c)]); });
+  // v65: ~36 kategori yerine 14 grup (gösterim eşlemesi, 12-besin-veritabani.js); yalnız görünür besini olan grup çıkar
+  const used = new Set(Object.keys(db).filter(id => !isHiddenFood(db[id])).map(id => foodGroupOf(id, db[id])));
+  FOOD_GROUPS.forEach(([g, l]) => { if (used.has(g)) cats.push(["g:" + g, t(l)]); });
   if (!cats.some(c => c[0] === foodUI.cat)) foodUI.cat = "all";
-  $("foodCats").innerHTML = [["all", t("Tümü")], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}">${esc(l)}</button>`).join("");
+  $("foodCats").innerHTML = [["all", t("Tümü")], ...cats].map(([k, l]) => `<button onclick='setFoodCat(${esc(JSON.stringify(k))})' class="n-chip ${foodUI.cat === k ? "solid" : ""}" data-food-cat="${esc(k)}" aria-pressed="${foodUI.cat === k}">${esc(l)}</button>`).join("");
+  $("foodFilters").innerHTML = [["hp", t("Yüksek protein"), foodUI.fHP], ["lc", t("Düşük kalori"), foodUI.fLC]].map(([k, l, on]) =>
+    `<button onclick="setFoodFilter('${k}')" class="n-chip ${on ? "solid" : ""}" data-food-filter="${k}" aria-pressed="${on}">${on ? svgI("check", 14, 2.6) : ""}${esc(l)}</button>`).join("");
   renderFoodHead();
   renderFoodSuggest();
   renderFoodList();
@@ -124,11 +129,14 @@ function renderFoodList() {
     updateFoodSelUI();
     return;
   }
-  if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id] && !isHiddenFood(db[id]));
+  if (foodUI.cat === "fav") ids = (state.favFoods || []).filter(id => db[id] && !isHiddenFood(db[id]));   // v65
+  else if (foodUI.cat === "recent") ids = state.recentFoods.filter(id => db[id] && !isHiddenFood(db[id]));
   else if (foodUI.cat === "recipes") ids = Object.keys(state.customFoods).filter(id => id.startsWith("custom_recipe_") && db[id]);
   else if (foodUI.cat === "custom") ids = Object.keys(state.customFoods).filter(id => db[id]);
-  else if (foodUI.cat.startsWith("c:")) ids = Object.keys(db).filter(id => !isHiddenFood(db[id]) && foodCatKey(db[id].cat) === foodUI.cat);
+  else if (foodUI.cat.startsWith("g:")) { const g = foodUI.cat.slice(2); ids = Object.keys(db).filter(id => !isHiddenFood(db[id]) && foodGroupOf(id, db[id]) === g); }
   else ids = Object.keys(db).filter(id => !isHiddenFood(db[id]));
+  if (foodUI.fHP) ids = ids.filter(id => foodHighProtein(db[id]));   // v65 süzgeçler
+  if (foodUI.fLC) ids = ids.filter(id => foodLowCal(db[id]));
   // v18: akıllı arama (Türkçe karakter, kelime sırası, eş anlamlı, küçük yazım hatası) + sıralama
   if (words.length) ids = searchFoods(ids, q);
   else if (foodUI.cat === "all") ids = rankBrowse(ids);
@@ -137,8 +145,29 @@ function renderFoodList() {
   if (foodUI.sel && !shownIds.includes(foodUI.sel) && ids.includes(foodUI.sel)) shownIds.unshift(foodUI.sel);   // seçili besin her zaman görünür
   if (words.length) { if (!total && !comboHtml) noteMissSearch($("foodSearch").value); else cancelMissSearch(); }
   const tIdx = foodTargetIdx();
-  const html = shownIds.map(id => {
-    const f = db[id];
+  // v65: "Tümü"nde arama: ilk FOOD_TOP_HITS sonuç "En iyi eşleşmeler" altında arama sırasıyla (alaka sırası bozulmasın),
+  // kalanlar grup başlıklarıyla (grup sırası = gruptaki ilk sonucun sırası; grup içinde arama sırası aynen). Az sonuçta başlık yok.
+  const grouped = foodUI.cat === "all" && words.length > 0 && shownIds.length > FOOD_TOP_HITS;
+  const grpOf = id => { const g = foodGroupOf(id, db[id]); return g || (String(id).startsWith("custom_recipe_") ? "_recipes" : "_custom"); };
+  const grpName = g => g === "_top" ? t("En iyi eşleşmeler") : g === "_recipes" ? t("Tariflerim") : g === "_custom" ? t("Özel eklediklerim") : foodGroupName(g);
+  let order = shownIds.map(id => [id, "_top"]);
+  if (grouped) {
+    const top = shownIds.slice(0, FOOD_TOP_HITS), rest = shownIds.slice(FOOD_TOP_HITS), gs = [];
+    rest.forEach(id => { const g = grpOf(id); if (!gs.includes(g)) gs.push(g); });
+    order = [...top.map(id => [id, "_top"]), ...gs.flatMap(g => rest.filter(id => grpOf(id) === g).map(id => [id, g]))];
+  }
+  let lastGrp = null;
+  const html = order.map(([id, g]) => {
+    let head = "";
+    if (grouped && g !== lastGrp) { lastGrp = g; head = `<div class="text-[12px] font-bold n-muted uppercase tracking-wide pt-4 pb-1" data-food-group="${esc(g)}">${esc(grpName(g))}</div>`; }
+    return head + foodRowHtml(id, db[id], tIdx);
+  }).join("");
+  const more = total > shownIds.length
+    ? `<button onclick="foodUI.limit = (foodUI.limit || FOOD_PAGE) + 100; renderFoodList()" class="n-btn-ghost w-full h-12 rounded-full text-[14px] mt-2" id="foodMore">${t("{n} sonuç daha · göster", { n: fmtInt(total - shownIds.length) })}</button>` : "";
+  $("foodList").innerHTML = (comboHtml + html) ? comboHtml + html + more : noResultHtml($("foodSearch").value.trim());
+  updateFoodSelUI();
+}
+function foodRowHtml(id, f, tIdx) {   // v65: renderFoodList'ten ayrıldı (gruplu arama başlıkları için)
     const def = num(f.def, 1);
     if (id !== foodUI.sel) {
       return `<button onclick='selectFood(${esc(JSON.stringify(id))})' class="w-full min-h-[64px] flex items-center justify-between gap-3 py-2.5 text-left n-bb" data-food="${esc(id)}">
@@ -156,7 +185,10 @@ function renderFoodList() {
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
             ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(foodNoteL(f))}</div>` : ""}
             ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">${esc(t("Kalori USDA ölçümüdür ({x} nedeniyle makrolardan hesaplanandan farklı).", { x: kxL(f.kx) }))}</div>` : ""}</div>
-          <div class="text-right shrink-0 whitespace-nowrap"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
+          <div class="flex items-start gap-1 shrink-0">
+            <div class="text-right whitespace-nowrap pt-2"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
+            <button onclick='toggleFavFood(${esc(JSON.stringify(id))})' data-fav aria-pressed="${isFavFood(id)}" aria-label="${esc(isFavFood(id) ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 h-11 -mr-1 rounded-full flex items-center justify-center ${isFavFood(id) ? "n-k" : "n-muted"}"><svg width="22" height="22" viewBox="0 0 24 24" fill="${isFavFood(id) ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></button>
+          </div>
         </div>
         <div class="flex items-center justify-between px-1">
           <button onclick="foodStep(-1)" class="w-12 h-12 rounded-full n-card flex items-center justify-center" aria-label="${esc(t("Azalt"))}">${svgI("minus", 20, 2.4)}</button>
@@ -189,11 +221,6 @@ function renderFoodList() {
             <button onclick='deleteCustomFood(${esc(JSON.stringify(id))})' class="n-btn-ghost h-11 px-4 rounded-full text-[13px] flex items-center gap-1.5 n-over">${svgI("trash", 16)}${t("Sil")}</button>
           </div>` : ""}
       </div>`;
-  }).join("");
-  const more = total > shownIds.length
-    ? `<button onclick="foodUI.limit = (foodUI.limit || FOOD_PAGE) + 100; renderFoodList()" class="n-btn-ghost w-full h-12 rounded-full text-[14px] mt-2" id="foodMore">${t("{n} sonuç daha · göster", { n: fmtInt(total - shownIds.length) })}</button>` : "";
-  $("foodList").innerHTML = (comboHtml + html) ? comboHtml + html + more : noResultHtml($("foodSearch").value.trim());
-  updateFoodSelUI();
 }
 
 // Seçili besinin canlı değerleri (tam yeniden çizim yapmadan; iPhone'da klavye kapanmasın)

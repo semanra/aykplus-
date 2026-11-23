@@ -594,3 +594,15 @@ const DEFAULT_STATE = {
   workoutDays: [{ id: "day_1", name: "1. Gün", exercises: [] }],
   mobilityRoutine: { dynamic: [], static: [], routines: [] }
 };
+
+// v65: besin kategorisi (emojisiz cat değeri) → gösterim grubu (FOOD_GROUPS, src/app/12-besin-veritabani.js). Kayıt değişmez.
+const FOOD_CAT_GROUP = {
+  "Kırmızı et": "et", "Tavuk ve hindi": "et", "Balık ve deniz ürünleri": "et", "Sakatat": "et", "Şarküteri": "et", "Et / Tavuk / Balık": "et",
+  "Süt ürünleri": "sut", "Peynirler": "sut", "Yumurta": "sut", "Protein & Kahvaltı": "sut",
+  "Tahıllar ve makarna": "tahil", "Ekmek ve hamur işleri": "tahil", "Kahvaltılık gevrekler": "tahil", "Karbonhidratlar": "tahil",
+  "Baklagiller": "bakla", "Sebzeler": "sebze", "Yeşillik & Sebzeler": "sebze", "Meyveler": "meyve",
+  "Kuruyemiş ve tohumlar": "kuru", "Yağlar": "kuru", "Kuruyemiş & Sağlıklı Yağlar": "kuru", "Kahvaltılıklar": "kahvalti",
+  "Atıştırmalıklar": "atistirma", "Tatlılar": "atistirma", "İçecekler": "icecek",
+  "Hazır yemekler": "fast", "Esnek Diyet / Dışarıdan": "fast", "Türk yemekleri (tarif)": "turk", "Türk Mutfağı": "turk",
+  "Soslar ve çorbalar": "sos", "Baharatlar": "sos", "Takviyeler": "takviye",
+};

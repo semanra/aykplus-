@@ -244,7 +244,7 @@ try:
     check(len(cats) >= 30 and not [c for c in cats if TRL.search(c)], "en: bütün kategori başlıkları Türkçe harfsiz %s" % [c for c in cats if TRL.search(c)])
     pg.evaluate("setNutriView('foods'); renderAll()"); pg.wait_for_timeout(200)
     chips = pg.evaluate("[...document.querySelectorAll('#foodCats button')].map(b => b.textContent)")
-    check(chips and not [c for c in chips if TRL.search(c)] and "Red meat" in chips and "Turkish cuisine" in chips, "en: kategori çipleri İngilizce %s" % chips[:6])
+    check(chips and not [c for c in chips if TRL.search(c)] and "Meat, poultry and fish" in chips and "Turkish cuisine" in chips, "en: kategori çipleri İngilizce %s" % chips[:6])
     # kx besini: not İngilizce
     kx = pg.evaluate("Object.keys(getFoodDB()).find(i => getFoodDB()[i].kx && !isHiddenFood(getFoodDB()[i]))")
     pg.evaluate("selectFood(%s)" % json.dumps(kx)); pg.wait_for_timeout(200)
@@ -280,7 +280,8 @@ try:
     check(pg.evaluate("foodNameL(BASE_FOOD_DB.yulaf)") == "Yulaf Ezmesi" and pg.evaluate("exNameL(%s)" % json.dumps(NM)) == NM, "tr: BASE_FOOD_DB adı ve hareket adı aynen")
     pg.evaluate("setNutriView('foods'); renderAll()"); pg.wait_for_timeout(200)
     chips = pg.evaluate("[...document.querySelectorAll('#foodCats button')].map(b => b.textContent)")
-    check("Kırmızı et" in chips and "Türk Mutfağı" in chips, "tr: kategori çipleri Türkçe %s" % chips[:6])
+    check("Et, tavuk ve balık" in chips and "Türk mutfağı" in chips  # v65: gruplar
+         , "tr: kategori çipleri Türkçe %s" % chips[:6])
     kx = pg.evaluate("Object.keys(getFoodDB()).find(i => getFoodDB()[i].kx && !isHiddenFood(getFoodDB()[i]))")
     pg.evaluate("selectFood(%s)" % json.dumps(kx)); pg.wait_for_timeout(150)
     check("Kalori USDA ölçümüdür (" in pg.inner_text("#foodSelCard"), "tr: kx notu Türkçe")
