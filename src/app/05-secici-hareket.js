@@ -48,9 +48,12 @@ function renderPickerList() {
       if (shown >= 150) { hidden++; return; }
       shown++;
       const idx = picker.flat.push(it) - 1;
-      const main = `<button onclick="pickerChoose(${idx})" class="flex-1 min-w-0 text-left px-3 py-2.5">
+      const thumb = it.img ? exThumbHtml(it.img, "w-[64px] h-[36px]") : "";   // v63: hareket görseli (yoksa boş)
+      const main = `<button onclick="pickerChoose(${idx})" class="flex-1 min-w-0 text-left px-3 py-2.5 ${thumb ? "flex items-center gap-3" : ""}">
+        ${thumb}${thumb ? `<span class="flex-1 min-w-0">` : ""}
         <div class="text-sm font-medium text-[var(--w-text1)]">${esc(it.label)}</div>
         ${it.sub ? `<div class="text-[12px] text-[var(--w-muted)] mt-0.5">${esc(it.sub)}</div>` : ""}
+        ${thumb ? `</span>` : ""}
       </button>`;
       html += `<div class="bg-[var(--w-elev)] border border-[var(--w-line)] rounded-xl active:bg-[var(--w-elev2)] flex">${main}</div>`;
     });
@@ -77,7 +80,7 @@ function openExercisePicker() {
   const groups = Object.keys(EXERCISE_LIBRARY).map(g => ({
     label: libCatL(g),
     short: t(g.replace(/^\d+\.\s*/, "").replace(/\s*\(.*$/, "") + "|kategori"),   // v48: kısa çip adı (Türkçede bağlam atılır, metin aynı)
-    items: EXERCISE_LIBRARY[g].map(n => n.trim()).map(n => ({ id: n, label: exNameL(n), sub: detectKind(n) !== "weight" ? kindL(detectKind(n)) : "" }))
+    items: EXERCISE_LIBRARY[g].map(n => n.trim()).map(n => ({ id: n, label: exNameL(n), sub: detectKind(n) !== "weight" ? kindL(detectKind(n)) : "", img: n }))
   }));
   openPicker(t("Hareket Kütüphanesi"), groups, it => openExerciseModal({ name: it.id, kind: detectKind(it.id) }),
     { label: t("Listede yok mu? Özel hareket yaz"), onClick: () => openExerciseModal({ name: "", kind: "weight" }) });

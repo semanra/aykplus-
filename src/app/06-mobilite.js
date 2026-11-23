@@ -270,6 +270,7 @@ function mobDetailHtml() {
     </div>
     <button id="mobDtTitle" onclick="mobRename(${id})" class="t-display text-[32px] leading-[1.02] text-[var(--t-text)] text-left mt-3 min-h-[44px] w-full break-words" aria-label="${t("Adı değiştir")}">${esc(mobNameL(it.name))}</button>
     <div class="text-[13px] font-semibold ${it.type === "dynamic" ? "text-[var(--t-dim)]" : "text-[var(--t-acc-text)]"} mt-1">${mobTypeL(it.type)}</div>
+    ${exImgBigHtml(it.name, "mobDtImg", "mt-3", mobNameL(it.name))}
     ${it.rxOk ? "" : `<div id="mobDtRx" class="mt-3 text-[13.5px] text-[var(--t-warn-text)] bg-[var(--t-elev)] rounded-2xl px-3.5 py-2.5">${t("Eski yazım")}: ${esc(it.rx)}<br><span class="text-[var(--t-muted)]">${t("Okunamadı; değerleri kontrol et.")}</span></div>`}
     <div class="m-lbl">${t("Uygulama")}</div>
     ${seg("mode", "mode", [["reps", t("Tekrar")], ["time", t("Süre")]], it.mode)}
@@ -378,6 +379,7 @@ function mobRenderAddList() {
         const sum = mobSummary(normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription }, x.type)));
         const has = inRoutine.has(x.m.name);
         return `<div data-mob-lib="${x.key}" class="m-card">
+          ${exThumbHtml(x.m.name, "w-[76px] h-[43px] ml-1")}
           <div class="flex-1 min-w-0"><span class="m-kind ${x.type === "dynamic" ? "" : "s"}">${mobTypeL(x.type)}${has ? ` · <span class="text-[var(--t-text)]">${t("Rutinde")}</span>` : ""}</span>
             <span class="m-name block">${esc(mobNameL(x.m.name))}</span><span class="m-rx block">${esc(sum)}</span></div>
           <button data-mob-add onclick="mobAddLib('${x.key}')" class="m-add mr-1.5 ${has ? "in" : ""}" aria-label="${esc(t(has ? "{ad} zaten rutinde, yine de ekle" : "{ad} ekle", { ad: mobNameL(x.m.name) }))}">${svgI(has ? "check" : "plus", 20, 2.6)}</button>
@@ -452,7 +454,8 @@ function mobSesStartIds(title, ids, rid) {
   unlockAudio();
   undoSnap = null;   // v40: seanstan önce çıkmış "Geri al" seansın kaydettiği tikleri geri almasın
   if (mobT) clearInterval(mobT.iv);
-  mobT = { ses: { rid, title, ids: ids.slice(), pos: 0, skipped: [], doneIds: [], t0: Date.now(), guideOpen: true }, iv: 0, t0: Date.now() };
+  // v63: görsel hareketi gösterdiği için "Nasıl yapılır" seansta kapalı başlar (açınca adımlar; alttaki düğmeler ekranda kalsın)
+  mobT = { ses: { rid, title, ids: ids.slice(), pos: 0, skipped: [], doneIds: [], t0: Date.now(), guideOpen: false }, iv: 0, t0: Date.now() };
   mobSesLoad(0);
   mobTimerOpen();
 }
@@ -686,6 +689,7 @@ function mobTimerRender() {
       <h3 id="mobTTitle" class="t-display text-[30px] leading-[1.05] break-words">${esc(mobNameL(T.name))}</h3>
       <p id="mobTSub" class="text-[15px] ${work || reps ? "text-[var(--t-muted)]" : "text-[var(--t-acc-text)] font-semibold"} mt-1.5">${sub}</p>
     </div>
+    ${exImgBigHtml(T.name, "mobTImg", reps ? "mt-3" : "mt-3 tm-c", mobNameL(T.name))}
     ${center}
     ${guide}
     <div class="w-full max-w-lg mt-auto pt-5">

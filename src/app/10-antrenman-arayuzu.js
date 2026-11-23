@@ -353,6 +353,7 @@ function gymActiveHtml() {
               ${ex.kind !== "weight" ? `<span class="t-chip">${ex.kind === "cardio" ? t("Kardiyo") : t("Süreli")}</span>` : ""}
             </div>
           </div>
+          ${exImgSrc(ex.name) ? `<button data-ex-img data-ex-thumb="${exIdx}" onclick="openExSheet(+this.dataset.exThumb)" aria-label="${esc(t("{ad} görseli", { ad: exNameL(ex.name) }))}" class="ex-thumb shrink-0 w-[78px] h-11 -mr-1">${exImgTag(ex.name, "w-full h-full object-contain")}</button>` : ""}
           <button onclick="openExSheet(${exIdx})" aria-label="${t("Hareket seçenekleri")}" class="w-11 h-11 shrink-0 rounded-[14px] bg-[var(--t-elev)] flex items-center justify-center">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
           </button>
@@ -499,6 +500,7 @@ function libListHtml() {
     const last = h[h.length - 1];
     const meta = last ? t("Son: {s} · {d}", { s: sessionSummary(last), d: fmtDate(last.ts) }) : t("Henüz yapılmadı");
     return `<div class="t-card-flat rounded-2xl min-h-[72px] pl-3.5 pr-2 py-2 flex items-center gap-3">
+      ${exThumbHtml(n, "w-[76px] h-[43px] -ml-1.5")}
       <span class="flex-1 min-w-0 flex flex-col gap-1">
         <span class="text-[15px] font-bold">${esc(exNameL(n))}</span>
         <span class="text-xs t-muted truncate">${esc(meta)}</span>
@@ -694,6 +696,7 @@ function openExSheet(exIdx) {
   $("exSheetBody").innerHTML = `
     <div class="px-1 pb-2"><div class="text-xl font-bold">${esc(exNameL(ex.name))}</div>
       <div class="text-[13px] t-muted">${esc([muscleL(muscleOf(ex)), targetL(ex.targetInfo), ex.kind !== "cardio" ? t("Dinlenme {n} sn", { n: String(ex.rest ?? state.settings.restSec) }) : ""].filter(Boolean).join(" · "))}</div></div>
+    ${exImgBigHtml(ex.name, "exSheetImg", "mb-1")}
     ${item(`openExerciseChart(${exIdx})`, "chart", t("İlerleme grafiği"), t("Tahmini 1RM ve son kayıtlar"))}
     ${ex.kind === "weight" && eq !== "bodyweight" ? item(`openPlateTool(${exIdx})`, "calc", eq === "plates" ? t("Plaka ve ısınma") : t("Kademe ve ısınma"), plateSub) : ""}
     ${item(`openEditExercise(${exIdx})`, "edit", t("Hareketi düzenle"), ex.kind === "weight" ? t("Set, tekrar, ekipman, kademeler, kas grubu") : t("Set, süre, dinlenme"))}

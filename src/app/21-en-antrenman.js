@@ -43,7 +43,7 @@ Object.assign(EN, {
   "SET": "SET", "ÖNCEKİ": "PREVIOUS", "KG": "KG", "TEKRAR": "REPS", "SÜRE": "TIME",
   "HAREKET {n} / {total}": "EXERCISE {n} / {total}",
   "Kardiyo": "Cardio", "Süreli": "Timed",
-  "Hareket seçenekleri": "Exercise options",
+  "Hareket seçenekleri": "Exercise options", "{ad} görseli": "{ad} image",
   "Geçen sefer ({date}):": "Last time ({date}):",
   "Not ekle (koltuk ayarı, tutuş...)": "Add a note (seat setting, grip...)",
   "+ Bölüm ekle": "+ Add segment", "+ Set ekle": "+ Add set",

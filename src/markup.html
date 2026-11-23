@@ -97,6 +97,13 @@
     body.theme-train .sticky-bar { background-color: var(--t-bg); border-bottom-color: var(--t-elev); }
     body.theme-train .bottom-nav { background-color: var(--t-nav); border-top-color: var(--t-elev); }
     .t-card { background: var(--t-surface); border: 1px solid var(--t-line); }
+    /* v63: hareket görselleri (şeffaf zemin; img/hareket/<no>.webp) */
+    .ex-thumb { display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 10px; }
+    .ex-big { width: 100%; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .ex-big img { -webkit-user-select: none; user-select: none; }
+    /* mobilite seansı: görsel ekran yüksekliğine göre küçülür (iPhone SE'de alttaki düğmeler ekranda kalsın) */
+    #mobTImg { width: clamp(140px, calc((100vh - 575px) * 1.78), 300px); width: clamp(140px, calc((100dvh - 575px) * 1.78), 300px); }
+    #mobTImg.tm-c { width: clamp(100px, calc((100vh - 645px) * 1.78), 300px); width: clamp(100px, calc((100dvh - 645px) * 1.78), 300px); }   /* süreli: nefes dairesi daha uzun */
     .t-card-flat { background: var(--t-surface); }
     .t-panel { background: var(--t-panel); border: 1px solid var(--t-panel-line); }
     .t-label { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--t-muted); }
@@ -1718,7 +1725,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v62</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v63</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

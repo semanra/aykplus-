@@ -1,0 +1,1754 @@
+[
+{
+"no": 1,
+"bolum": "Antrenman",
+"ad": "Barbell Bench Press",
+"gorsel": 1
+},
+{
+"no": 2,
+"bolum": "Antrenman",
+"ad": "Incline Dumbbell Press",
+"gorsel": 2
+},
+{
+"no": 3,
+"bolum": "Antrenman",
+"ad": "Pec Deck Fly (Butterfly)",
+"gorsel": 3
+},
+{
+"no": 4,
+"bolum": "Antrenman",
+"ad": "Cable Crossover (High-to-Low)",
+"gorsel": 4
+},
+{
+"no": 5,
+"bolum": "Antrenman",
+"ad": "Machine Shoulder Press",
+"gorsel": 5
+},
+{
+"no": 6,
+"bolum": "Antrenman",
+"ad": "Dumbbell Lateral Raise",
+"gorsel": 6
+},
+{
+"no": 7,
+"bolum": "Antrenman",
+"ad": "Reverse Pec Deck (Arka Omuz Makinesi)",
+"gorsel": 7
+},
+{
+"no": 8,
+"bolum": "Antrenman",
+"ad": "Face Pull (Rope)",
+"gorsel": 8
+},
+{
+"no": 9,
+"bolum": "Antrenman",
+"ad": "Hack Squat",
+"gorsel": 9
+},
+{
+"no": 10,
+"bolum": "Antrenman",
+"ad": "Seated Leg Curl",
+"gorsel": 10
+},
+{
+"no": 11,
+"bolum": "Antrenman",
+"ad": "Lying Leg Curl",
+"gorsel": 11
+},
+{
+"no": 12,
+"bolum": "Antrenman",
+"ad": "Barbell Hip Thrust",
+"gorsel": 12
+},
+{
+"no": 13,
+"bolum": "Antrenman",
+"ad": "Seated Calf Raise",
+"gorsel": 13
+},
+{
+"no": 14,
+"bolum": "Antrenman",
+"ad": "Incline Dumbbell Curl",
+"gorsel": 14
+},
+{
+"no": 15,
+"bolum": "Antrenman",
+"ad": "Triceps Rope/Bar Pushdown",
+"gorsel": 15
+},
+{
+"no": 16,
+"bolum": "Antrenman",
+"ad": "Crunch Machine",
+"gorsel": 16
+},
+{
+"no": 17,
+"bolum": "Antrenman",
+"ad": "Hanging Leg Raise",
+"gorsel": 17
+},
+{
+"no": 18,
+"bolum": "Antrenman",
+"ad": "Chest-Supported Row",
+"gorsel": 18
+},
+{
+"no": 19,
+"bolum": "Antrenman",
+"ad": "Lat Pulldown",
+"gorsel": 19
+},
+{
+"no": 20,
+"bolum": "Antrenman",
+"ad": "Cable Lateral Raise",
+"gorsel": 20
+},
+{
+"no": 21,
+"bolum": "Antrenman",
+"ad": "Overhead Cable Triceps Extension",
+"gorsel": 21
+},
+{
+"no": 22,
+"bolum": "Antrenman",
+"ad": "Preacher Curl",
+"gorsel": 22
+},
+{
+"no": 23,
+"bolum": "Antrenman",
+"ad": "Romanian Deadlift",
+"gorsel": 23
+},
+{
+"no": 24,
+"bolum": "Antrenman",
+"ad": "Leg Extension",
+"gorsel": 24
+},
+{
+"no": 25,
+"bolum": "Antrenman",
+"ad": "Standing Calf Raise",
+"gorsel": 25
+},
+{
+"no": 26,
+"bolum": "Antrenman",
+"ad": "Pull-up",
+"gorsel": 26
+},
+{
+"no": 27,
+"bolum": "Antrenman",
+"ad": "Weighted Dips",
+"gorsel": 27
+},
+{
+"no": 28,
+"bolum": "Antrenman",
+"ad": "Seated Cable Row",
+"gorsel": 28
+},
+{
+"no": 29,
+"bolum": "Antrenman",
+"ad": "Skullcrusher",
+"gorsel": 29
+},
+{
+"no": 30,
+"bolum": "Antrenman",
+"ad": "Hammer Curl",
+"gorsel": 30
+},
+{
+"no": 31,
+"bolum": "Antrenman",
+"ad": "Leg Press",
+"gorsel": 31
+},
+{
+"no": 32,
+"bolum": "Antrenman",
+"ad": "Bulgarian Split Squat",
+"gorsel": 32
+},
+{
+"no": 33,
+"bolum": "Antrenman",
+"ad": "Hyperextension",
+"gorsel": 33
+},
+{
+"no": 34,
+"bolum": "Antrenman",
+"ad": "Flat Dumbbell Bench Press",
+"gorsel": 34
+},
+{
+"no": 35,
+"bolum": "Antrenman",
+"ad": "Machine Chest Press (Flat)",
+"gorsel": 35
+},
+{
+"no": 36,
+"bolum": "Antrenman",
+"ad": "Cable Fly (Mid-Pulley)",
+"gorsel": 36
+},
+{
+"no": 37,
+"bolum": "Antrenman",
+"ad": "Pull-up (Geniş Tutuş Barfiks)",
+"gorsel": 26
+},
+{
+"no": 38,
+"bolum": "Antrenman",
+"ad": "Lat Pulldown (Wide Grip / Geniş Tutuş)",
+"gorsel": 19
+},
+{
+"no": 39,
+"bolum": "Antrenman",
+"ad": "Machine High Row / Iso-Lateral Pulldown",
+"gorsel": 39
+},
+{
+"no": 40,
+"bolum": "Antrenman",
+"ad": "Seated Cable Row (V-Bar / Close Grip)",
+"gorsel": 28
+},
+{
+"no": 41,
+"bolum": "Antrenman",
+"ad": "Barbell Bent-Over Row (Overhand / Underhand)",
+"gorsel": 41
+},
+{
+"no": 42,
+"bolum": "Antrenman",
+"ad": "Conventional Deadlift",
+"gorsel": 42
+},
+{
+"no": 43,
+"bolum": "Antrenman",
+"ad": "Overhead Dumbbell Shoulder Press (Seated / Standing)",
+"gorsel": 43
+},
+{
+"no": 44,
+"bolum": "Antrenman",
+"ad": "Barbell Back Squat (High-Bar / Low-Bar)",
+"gorsel": 44
+},
+{
+"no": 45,
+"bolum": "Antrenman",
+"ad": "Leg Press (45 Derece)",
+"gorsel": 31
+},
+{
+"no": 46,
+"bolum": "Antrenman",
+"ad": "Horizontal / Seated Leg Press",
+"gorsel": 46
+},
+{
+"no": 47,
+"bolum": "Antrenman",
+"ad": "Goblet Squat",
+"gorsel": 47
+},
+{
+"no": 48,
+"bolum": "Antrenman",
+"ad": "Leg Extension (Çift Bacak)",
+"gorsel": 24
+},
+{
+"no": 49,
+"bolum": "Antrenman",
+"ad": "Romanian Deadlift (RDL - Barbell)",
+"gorsel": 23
+},
+{
+"no": 50,
+"bolum": "Antrenman",
+"ad": "Dumbbell Romanian Deadlift",
+"gorsel": 50
+},
+{
+"no": 51,
+"bolum": "Antrenman",
+"ad": "Machine Hip Thrust / Glute Drive",
+"gorsel": 51
+},
+{
+"no": 52,
+"bolum": "Antrenman",
+"ad": "Standing Calf Raise (Makine veya Smith)",
+"gorsel": 25
+},
+{
+"no": 53,
+"bolum": "Antrenman",
+"ad": "Hammer Curl (Dumbbell)",
+"gorsel": 30
+},
+{
+"no": 54,
+"bolum": "Antrenman",
+"ad": "Standing Barbell / EZ-Bar Curl",
+"gorsel": 54
+},
+{
+"no": 55,
+"bolum": "Antrenman",
+"ad": "Skullcrusher (EZ-Bar / Dumbbell Alna Triceps)",
+"gorsel": 29
+},
+{
+"no": 56,
+"bolum": "Antrenman",
+"ad": "Plank / RKC Plank",
+"gorsel": 56
+},
+{
+"no": 57,
+"bolum": "Antrenman",
+"ad": "Incline Barbell Bench Press",
+"gorsel": 57
+},
+{
+"no": 58,
+"bolum": "Antrenman",
+"ad": "Decline Barbell Bench Press",
+"gorsel": 58
+},
+{
+"no": 59,
+"bolum": "Antrenman",
+"ad": "Decline Dumbbell Press",
+"gorsel": 59
+},
+{
+"no": 60,
+"bolum": "Antrenman",
+"ad": "Incline Machine Chest Press",
+"gorsel": 60
+},
+{
+"no": 61,
+"bolum": "Antrenman",
+"ad": "Smith Machine Bench Press",
+"gorsel": 61
+},
+{
+"no": 62,
+"bolum": "Antrenman",
+"ad": "Smith Machine Incline Press",
+"gorsel": 62
+},
+{
+"no": 63,
+"bolum": "Antrenman",
+"ad": "Weighted Dips (Göğüs Odaklı)",
+"gorsel": 27
+},
+{
+"no": 64,
+"bolum": "Antrenman",
+"ad": "Assisted Chest Dips",
+"gorsel": 64
+},
+{
+"no": 65,
+"bolum": "Antrenman",
+"ad": "Low-to-High Cable Fly (Üst Göğüs)",
+"gorsel": 65
+},
+{
+"no": 66,
+"bolum": "Antrenman",
+"ad": "Seated Cable Chest Fly",
+"gorsel": 66
+},
+{
+"no": 67,
+"bolum": "Antrenman",
+"ad": "Flat / Incline Dumbbell Fly",
+"gorsel": 67
+},
+{
+"no": 68,
+"bolum": "Antrenman",
+"ad": "Dumbbell Pullover",
+"gorsel": 68
+},
+{
+"no": 69,
+"bolum": "Antrenman",
+"ad": "Push-Up (Şınav) / Weighted Push-Up",
+"gorsel": 69
+},
+{
+"no": 70,
+"bolum": "Antrenman",
+"ad": "Svend Press / Plate Press",
+"gorsel": 70
+},
+{
+"no": 71,
+"bolum": "Antrenman",
+"ad": "Weighted Pull-up (Ağırlıklı Barfiks)",
+"gorsel": 71
+},
+{
+"no": 72,
+"bolum": "Antrenman",
+"ad": "Chin-up (Avuç İçi Bakan Barfiks)",
+"gorsel": 72
+},
+{
+"no": 73,
+"bolum": "Antrenman",
+"ad": "Neutral Grip Pull-up",
+"gorsel": 73
+},
+{
+"no": 74,
+"bolum": "Antrenman",
+"ad": "Assisted Pull-up Machine",
+"gorsel": 74
+},
+{
+"no": 75,
+"bolum": "Antrenman",
+"ad": "Close-Grip / V-Bar Lat Pulldown",
+"gorsel": 75
+},
+{
+"no": 76,
+"bolum": "Antrenman",
+"ad": "Reverse-Grip (Underhand) Lat Pulldown",
+"gorsel": 76
+},
+{
+"no": 77,
+"bolum": "Antrenman",
+"ad": "Single-Arm Kneeling Cable Lat Pulldown",
+"gorsel": 77
+},
+{
+"no": 78,
+"bolum": "Antrenman",
+"ad": "Straight-Arm Cable / Rope Pulldown",
+"gorsel": 78
+},
+{
+"no": 79,
+"bolum": "Antrenman",
+"ad": "Dumbbell / Cable Lat Pullover",
+"gorsel": 79
+},
+{
+"no": 80,
+"bolum": "Antrenman",
+"ad": "Chest-Supported Row (Makine veya Sehpa)",
+"gorsel": 18
+},
+{
+"no": 81,
+"bolum": "Antrenman",
+"ad": "Wide-Grip Seated Cable Row (Üst Sırt)",
+"gorsel": 81
+},
+{
+"no": 82,
+"bolum": "Antrenman",
+"ad": "Pendlay Row",
+"gorsel": 82
+},
+{
+"no": 83,
+"bolum": "Antrenman",
+"ad": "One-Arm Dumbbell Row",
+"gorsel": 83
+},
+{
+"no": 84,
+"bolum": "Antrenman",
+"ad": "T-Bar Row (Landmine veya Makine)",
+"gorsel": 84
+},
+{
+"no": 85,
+"bolum": "Antrenman",
+"ad": "Iso-Lateral / Hammer Strength Machine Row",
+"gorsel": 85
+},
+{
+"no": 86,
+"bolum": "Antrenman",
+"ad": "Meadows Row",
+"gorsel": 86
+},
+{
+"no": 87,
+"bolum": "Antrenman",
+"ad": "Smith Machine Bent-Over Row",
+"gorsel": 87
+},
+{
+"no": 88,
+"bolum": "Antrenman",
+"ad": " Helms Row / Incline Bench Dumbbell Row",
+"gorsel": 88
+},
+{
+"no": 89,
+"bolum": "Antrenman",
+"ad": "Inverted Row (Vücut Ağırlığı Yatay Çekiş)",
+"gorsel": 89
+},
+{
+"no": 90,
+"bolum": "Antrenman",
+"ad": "Sumo Deadlift",
+"gorsel": 90
+},
+{
+"no": 91,
+"bolum": "Antrenman",
+"ad": "Rack Pull (Kısmi Deadlift)",
+"gorsel": 91
+},
+{
+"no": 92,
+"bolum": "Antrenman",
+"ad": "Hyperextension (45 Derece Back Extension)",
+"gorsel": 33
+},
+{
+"no": 93,
+"bolum": "Antrenman",
+"ad": "Reverse Hyperextension",
+"gorsel": 93
+},
+{
+"no": 94,
+"bolum": "Antrenman",
+"ad": "Good Morning (Barbell)",
+"gorsel": 94
+},
+{
+"no": 95,
+"bolum": "Antrenman",
+"ad": "Overhead Barbell Press (Military Press)",
+"gorsel": 95
+},
+{
+"no": 96,
+"bolum": "Antrenman",
+"ad": "Smith Machine Shoulder Press",
+"gorsel": 96
+},
+{
+"no": 97,
+"bolum": "Antrenman",
+"ad": "Arnold Press",
+"gorsel": 97
+},
+{
+"no": 98,
+"bolum": "Antrenman",
+"ad": "Landmine Shoulder Press",
+"gorsel": 98
+},
+{
+"no": 99,
+"bolum": "Antrenman",
+"ad": "Cable Lateral Raise (Single-Arm)",
+"gorsel": 20
+},
+{
+"no": 100,
+"bolum": "Antrenman",
+"ad": "Behind-the-Back Cable Lateral Raise",
+"gorsel": 100
+},
+{
+"no": 101,
+"bolum": "Antrenman",
+"ad": "Machine Lateral Raise",
+"gorsel": 101
+},
+{
+"no": 102,
+"bolum": "Antrenman",
+"ad": "Chest-Supported / Incline Lateral Raise",
+"gorsel": 102
+},
+{
+"no": 103,
+"bolum": "Antrenman",
+"ad": "Egyptian Cable Lateral Raise",
+"gorsel": 103
+},
+{
+"no": 104,
+"bolum": "Antrenman",
+"ad": "Bent-Over Dumbbell Reverse Fly (Rear Delt)",
+"gorsel": 104
+},
+{
+"no": 105,
+"bolum": "Antrenman",
+"ad": "Single-Arm Rear Delt Cable Fly",
+"gorsel": 105
+},
+{
+"no": 106,
+"bolum": "Antrenman",
+"ad": "Dumbbell / Barbell Front Raise",
+"gorsel": 106
+},
+{
+"no": 107,
+"bolum": "Antrenman",
+"ad": "Cable Rope Front Raise",
+"gorsel": 107
+},
+{
+"no": 108,
+"bolum": "Antrenman",
+"ad": "Barbell Upright Row / Cable Upright Row",
+"gorsel": 108
+},
+{
+"no": 109,
+"bolum": "Antrenman",
+"ad": "Dumbbell Shrug (Trapez)",
+"gorsel": 109
+},
+{
+"no": 110,
+"bolum": "Antrenman",
+"ad": "Barbell / Smith Machine Shrug",
+"gorsel": 110
+},
+{
+"no": 111,
+"bolum": "Antrenman",
+"ad": "Cable Shrug",
+"gorsel": 111
+},
+{
+"no": 112,
+"bolum": "Antrenman",
+"ad": "Barbell Front Squat",
+"gorsel": 112
+},
+{
+"no": 113,
+"bolum": "Antrenman",
+"ad": "Single-Leg Press",
+"gorsel": 113
+},
+{
+"no": 114,
+"bolum": "Antrenman",
+"ad": "Bulgarian Split Squat (Dumbbell / Barbell)",
+"gorsel": 32
+},
+{
+"no": 115,
+"bolum": "Antrenman",
+"ad": "Smith Machine Squat",
+"gorsel": 115
+},
+{
+"no": 116,
+"bolum": "Antrenman",
+"ad": "Pendulum Squat",
+"gorsel": 116
+},
+{
+"no": 117,
+"bolum": "Antrenman",
+"ad": "Belt Squat",
+"gorsel": 117
+},
+{
+"no": 118,
+"bolum": "Antrenman",
+"ad": "Sissy Squat",
+"gorsel": 118
+},
+{
+"no": 119,
+"bolum": "Antrenman",
+"ad": "Walking Lunges",
+"gorsel": 119
+},
+{
+"no": 120,
+"bolum": "Antrenman",
+"ad": "Reverse Lunges",
+"gorsel": 120
+},
+{
+"no": 121,
+"bolum": "Antrenman",
+"ad": "Single-Leg Extension (Tek Bacak)",
+"gorsel": 121
+},
+{
+"no": 122,
+"bolum": "Antrenman",
+"ad": "Step-Up (Dumbbell / Box)",
+"gorsel": 122
+},
+{
+"no": 123,
+"bolum": "Antrenman",
+"ad": "Single-Leg Romanian Deadlift",
+"gorsel": 123
+},
+{
+"no": 124,
+"bolum": "Antrenman",
+"ad": "Stiff-Legged Deadlift",
+"gorsel": 124
+},
+{
+"no": 125,
+"bolum": "Antrenman",
+"ad": "Standing Single-Leg Curl",
+"gorsel": 125
+},
+{
+"no": 126,
+"bolum": "Antrenman",
+"ad": "Nordic Hamstring Curl",
+"gorsel": 126
+},
+{
+"no": 127,
+"bolum": "Antrenman",
+"ad": "Glute-Ham Raise (GHR)",
+"gorsel": 127
+},
+{
+"no": 128,
+"bolum": "Antrenman",
+"ad": "Smith Machine Hip Thrust",
+"gorsel": 128
+},
+{
+"no": 129,
+"bolum": "Antrenman",
+"ad": "Kas Glute Bridge",
+"gorsel": 129
+},
+{
+"no": 130,
+"bolum": "Antrenman",
+"ad": "Cable Pull-Through",
+"gorsel": 130
+},
+{
+"no": 131,
+"bolum": "Antrenman",
+"ad": "Cable Glute Kickback",
+"gorsel": 131
+},
+{
+"no": 132,
+"bolum": "Antrenman",
+"ad": "Hip Abduction Machine (Dış Bacak / Yan Kalça)",
+"gorsel": 132
+},
+{
+"no": 133,
+"bolum": "Antrenman",
+"ad": "Hip Adduction Machine (İç Bacak)",
+"gorsel": 133
+},
+{
+"no": 134,
+"bolum": "Antrenman",
+"ad": "Leg Press Calf Raise",
+"gorsel": 134
+},
+{
+"no": 135,
+"bolum": "Antrenman",
+"ad": "Donkey Calf Raise",
+"gorsel": 135
+},
+{
+"no": 136,
+"bolum": "Antrenman",
+"ad": "Single-Leg Dumbbell Calf Raise",
+"gorsel": 136
+},
+{
+"no": 137,
+"bolum": "Antrenman",
+"ad": "Tibialis Raise",
+"gorsel": 137
+},
+{
+"no": 138,
+"bolum": "Antrenman",
+"ad": "Preacher Curl (EZ-Bar / Makine)",
+"gorsel": 22
+},
+{
+"no": 139,
+"bolum": "Antrenman",
+"ad": "Single-Arm Dumbbell Preacher Curl",
+"gorsel": 139
+},
+{
+"no": 140,
+"bolum": "Antrenman",
+"ad": "Cross-Body Hammer Curl",
+"gorsel": 140
+},
+{
+"no": 141,
+"bolum": "Antrenman",
+"ad": "Cable Rope Hammer Curl",
+"gorsel": 141
+},
+{
+"no": 142,
+"bolum": "Antrenman",
+"ad": "Standing Alternating Dumbbell Curl",
+"gorsel": 142
+},
+{
+"no": 143,
+"bolum": "Antrenman",
+"ad": "Bayesian Cable Curl (Arkadan Kablo Curl)",
+"gorsel": 143
+},
+{
+"no": 144,
+"bolum": "Antrenman",
+"ad": "Standing Cable Bar Curl",
+"gorsel": 144
+},
+{
+"no": 145,
+"bolum": "Antrenman",
+"ad": "High-Pulley Double Biceps Cable Curl",
+"gorsel": 145
+},
+{
+"no": 146,
+"bolum": "Antrenman",
+"ad": "Spider Curl",
+"gorsel": 146
+},
+{
+"no": 147,
+"bolum": "Antrenman",
+"ad": "Concentration Curl",
+"gorsel": 147
+},
+{
+"no": 148,
+"bolum": "Antrenman",
+"ad": "Reverse Barbell / Cable Curl (Ön Kol)",
+"gorsel": 148
+},
+{
+"no": 149,
+"bolum": "Antrenman",
+"ad": "Zottman Curl",
+"gorsel": 149
+},
+{
+"no": 150,
+"bolum": "Antrenman",
+"ad": "Wrist Curl (Bilek)",
+"gorsel": 150
+},
+{
+"no": 151,
+"bolum": "Antrenman",
+"ad": "Reverse Wrist Curl (Bilek)",
+"gorsel": 151
+},
+{
+"no": 152,
+"bolum": "Antrenman",
+"ad": "Overhead Cable Triceps Extension (Rope / Bar)",
+"gorsel": 21
+},
+{
+"no": 153,
+"bolum": "Antrenman",
+"ad": "Single-Arm Overhead Dumbbell Triceps Extension",
+"gorsel": 153
+},
+{
+"no": 154,
+"bolum": "Antrenman",
+"ad": "Seated Two-Arm Overhead Dumbbell Extension",
+"gorsel": 154
+},
+{
+"no": 155,
+"bolum": "Antrenman",
+"ad": "Cross-Body Dual Cable Triceps Extension",
+"gorsel": 155
+},
+{
+"no": 156,
+"bolum": "Antrenman",
+"ad": "Single-Arm Reverse/Underhand Cable Pushdown",
+"gorsel": 156
+},
+{
+"no": 157,
+"bolum": "Antrenman",
+"ad": "JM Press",
+"gorsel": 157
+},
+{
+"no": 158,
+"bolum": "Antrenman",
+"ad": "Close-Grip Barbell Bench Press",
+"gorsel": 158
+},
+{
+"no": 159,
+"bolum": "Antrenman",
+"ad": "Triceps Dip Machine",
+"gorsel": 159
+},
+{
+"no": 160,
+"bolum": "Antrenman",
+"ad": "Bench Dips",
+"gorsel": 160
+},
+{
+"no": 161,
+"bolum": "Antrenman",
+"ad": "Dumbbell / Cable Triceps Kickback",
+"gorsel": 161
+},
+{
+"no": 162,
+"bolum": "Antrenman",
+"ad": "Diamond Push-Up",
+"gorsel": 162
+},
+{
+"no": 163,
+"bolum": "Antrenman",
+"ad": "Captain's Chair Knee / Leg Raise",
+"gorsel": 163
+},
+{
+"no": 164,
+"bolum": "Antrenman",
+"ad": "Kneeling Cable Crunch (Halatla)",
+"gorsel": 164
+},
+{
+"no": 165,
+"bolum": "Antrenman",
+"ad": "Decline Bench Crunch",
+"gorsel": 165
+},
+{
+"no": 166,
+"bolum": "Antrenman",
+"ad": "Sit-Up",
+"gorsel": 166
+},
+{
+"no": 167,
+"bolum": "Antrenman",
+"ad": "Ab Wheel Rollout",
+"gorsel": 167
+},
+{
+"no": 168,
+"bolum": "Antrenman",
+"ad": "Side Plank",
+"gorsel": 168
+},
+{
+"no": 169,
+"bolum": "Antrenman",
+"ad": "Russian Twist (Medicine Ball / Plate)",
+"gorsel": 169
+},
+{
+"no": 170,
+"bolum": "Antrenman",
+"ad": "Pallof Press (Anti-Rotasyon)",
+"gorsel": 170
+},
+{
+"no": 171,
+"bolum": "Antrenman",
+"ad": "Woodchopper (Cable)",
+"gorsel": 171
+},
+{
+"no": 172,
+"bolum": "Antrenman",
+"ad": "Deadbug",
+"gorsel": 172
+},
+{
+"no": 173,
+"bolum": "Antrenman",
+"ad": "Bird-Dog",
+"gorsel": 173
+},
+{
+"no": 174,
+"bolum": "Antrenman",
+"ad": "Stomach Vacuum",
+"gorsel": 174
+},
+{
+"no": 175,
+"bolum": "Antrenman",
+"ad": "Incline Treadmill Walk (Eğimli Yürüyüş)",
+"gorsel": 175
+},
+{
+"no": 176,
+"bolum": "Antrenman",
+"ad": "Stairmaster (Merdiven Makinesi)",
+"gorsel": 176
+},
+{
+"no": 177,
+"bolum": "Antrenman",
+"ad": "Assault / Air Bike (HIIT)",
+"gorsel": 177
+},
+{
+"no": 178,
+"bolum": "Antrenman",
+"ad": "Stationary Bike (Sabit Bisiklet)",
+"gorsel": 178
+},
+{
+"no": 179,
+"bolum": "Antrenman",
+"ad": "Rowing Machine (Kürek)",
+"gorsel": 179
+},
+{
+"no": 180,
+"bolum": "Antrenman",
+"ad": "Elliptical Trainer",
+"gorsel": 180
+},
+{
+"no": 181,
+"bolum": "Antrenman",
+"ad": "Jump Rope (İp Atlama)",
+"gorsel": 181
+},
+{
+"no": 182,
+"bolum": "Antrenman",
+"ad": "Treadmill Run (Koşu Bandı)",
+"gorsel": 182
+},
+{
+"no": 183,
+"bolum": "Antrenman",
+"ad": "Outdoor Run (Açık Hava Koşu)",
+"gorsel": 183
+},
+{
+"no": 184,
+"bolum": "Antrenman",
+"ad": "Outdoor Walk (Tempolu Yürüyüş)",
+"gorsel": 184
+},
+{
+"no": 185,
+"bolum": "Antrenman",
+"ad": "Outdoor Cycling (Bisiklet)",
+"gorsel": 185
+},
+{
+"no": 186,
+"bolum": "Antrenman",
+"ad": "Swimming (Yüzme)",
+"gorsel": 186
+},
+{
+"no": 187,
+"bolum": "Antrenman",
+"ad": "Farmer's Walk (Çiftçi Yürüyüşü)",
+"gorsel": 187
+},
+{
+"no": 188,
+"bolum": "Antrenman",
+"ad": "Kettlebell Swing",
+"gorsel": 188
+},
+{
+"no": 189,
+"bolum": "Mobilite",
+"ad": "World’s Greatest Stretch",
+"gorsel": 189
+},
+{
+"no": 190,
+"bolum": "Mobilite",
+"ad": "90/90 Hip Switch",
+"gorsel": 190
+},
+{
+"no": 191,
+"bolum": "Mobilite",
+"ad": "Kneeling Ankle Dorsiflexion",
+"gorsel": 191
+},
+{
+"no": 192,
+"bolum": "Mobilite",
+"ad": "Quadruped Cat-Cow",
+"gorsel": 192
+},
+{
+"no": 193,
+"bolum": "Mobilite",
+"ad": "Towel/Band Shoulder Dislocates",
+"gorsel": 193
+},
+{
+"no": 194,
+"bolum": "Mobilite",
+"ad": "Doorway Pec & Biceps Stretch",
+"gorsel": 194
+},
+{
+"no": 195,
+"bolum": "Mobilite",
+"ad": "Child’s Pose with Lat Reach",
+"gorsel": 195
+},
+{
+"no": 196,
+"bolum": "Mobilite",
+"ad": "Couch Stretch",
+"gorsel": 196
+},
+{
+"no": 197,
+"bolum": "Mobilite",
+"ad": "Supine Figure-4 Glute Stretch",
+"gorsel": 197
+},
+{
+"no": 198,
+"bolum": "Mobilite",
+"ad": "Single-Leg Seated Hamstring Stretch",
+"gorsel": 198
+},
+{
+"no": 199,
+"bolum": "Mobilite",
+"ad": "Leg Swings (Öne-Arkaya & Yana)",
+"gorsel": 199
+},
+{
+"no": 200,
+"bolum": "Mobilite",
+"ad": "Quadruped Thoracic Rotation (T-Spine)",
+"gorsel": 200
+},
+{
+"no": 201,
+"bolum": "Mobilite",
+"ad": "Deep Squat Hold with Pry & Thoracic Reach",
+"gorsel": 201
+},
+{
+"no": 202,
+"bolum": "Mobilite",
+"ad": "Scapular Push-Up & Wall Slides",
+"gorsel": 202
+},
+{
+"no": 203,
+"bolum": "Mobilite",
+"ad": "Cossack Squat (Dinamik Yan Lunge)",
+"gorsel": 203
+},
+{
+"no": 204,
+"bolum": "Mobilite",
+"ad": "Inchworm to Cobra Flow",
+"gorsel": 204
+},
+{
+"no": 205,
+"bolum": "Mobilite",
+"ad": "Quadruped Hip CARs (Controlled Articular Rotations)",
+"gorsel": 205
+},
+{
+"no": 206,
+"bolum": "Mobilite",
+"ad": "Shoulder CARs (Ayakta Tam Daire)",
+"gorsel": 206
+},
+{
+"no": 207,
+"bolum": "Mobilite",
+"ad": "Thread the Needle (Dinamik)",
+"gorsel": 207
+},
+{
+"no": 208,
+"bolum": "Mobilite",
+"ad": "Banded Pull-Apart & External Rotation",
+"gorsel": 208
+},
+{
+"no": 209,
+"bolum": "Mobilite",
+"ad": "Glute Bridge March",
+"gorsel": 209
+},
+{
+"no": 210,
+"bolum": "Mobilite",
+"ad": "Arm Circles (Kol Çevirme)",
+"gorsel": 210
+},
+{
+"no": 211,
+"bolum": "Mobilite",
+"ad": "Hip Circles (Kalça Çevirme)",
+"gorsel": 211
+},
+{
+"no": 212,
+"bolum": "Mobilite",
+"ad": "Walking Knee Hugs (Yürüyerek Diz Çekme)",
+"gorsel": 212
+},
+{
+"no": 213,
+"bolum": "Mobilite",
+"ad": "Walking Quad Pull (Yürüyerek Ön Bacak Çekme)",
+"gorsel": 213
+},
+{
+"no": 214,
+"bolum": "Mobilite",
+"ad": "Spiderman Lunge with Rotation",
+"gorsel": 214
+},
+{
+"no": 215,
+"bolum": "Mobilite",
+"ad": "Hip Airplane (Kalça Uçağı)",
+"gorsel": 215
+},
+{
+"no": 216,
+"bolum": "Mobilite",
+"ad": "Ankle Circles (Ayak Bileği Çevirme)",
+"gorsel": 216
+},
+{
+"no": 217,
+"bolum": "Mobilite",
+"ad": "Calf Raises (Topuk Kaldırma)",
+"gorsel": 217
+},
+{
+"no": 218,
+"bolum": "Mobilite",
+"ad": "Bird Dog (Kuş-Köpek)",
+"gorsel": 218
+},
+{
+"no": 219,
+"bolum": "Mobilite",
+"ad": "Dead Bug (Ölü Böcek)",
+"gorsel": 219
+},
+{
+"no": 220,
+"bolum": "Mobilite",
+"ad": "Prone Y-T-W Raises",
+"gorsel": 220
+},
+{
+"no": 221,
+"bolum": "Mobilite",
+"ad": "Open Book (Yan Yatarak Göğüs Açma)",
+"gorsel": 221
+},
+{
+"no": 222,
+"bolum": "Mobilite",
+"ad": "Bodyweight Good Morning",
+"gorsel": 222
+},
+{
+"no": 223,
+"bolum": "Mobilite",
+"ad": "Jefferson Curl (Hafif)",
+"gorsel": 223
+},
+{
+"no": 224,
+"bolum": "Mobilite",
+"ad": "Walking Lunge with Overhead Reach",
+"gorsel": 224
+},
+{
+"no": 225,
+"bolum": "Mobilite",
+"ad": "Scorpion Stretch (Akrep)",
+"gorsel": 225
+},
+{
+"no": 226,
+"bolum": "Mobilite",
+"ad": "Sumo Squat to Stand",
+"gorsel": 226
+},
+{
+"no": 227,
+"bolum": "Mobilite",
+"ad": "Fire Hydrants",
+"gorsel": 227
+},
+{
+"no": 228,
+"bolum": "Mobilite",
+"ad": "Clamshells (İstiridye)",
+"gorsel": 228
+},
+{
+"no": 229,
+"bolum": "Mobilite",
+"ad": "Seated Thoracic Rotation",
+"gorsel": 229
+},
+{
+"no": 230,
+"bolum": "Mobilite",
+"ad": "Neck CARs (Boyun Çevirme)",
+"gorsel": 230
+},
+{
+"no": 231,
+"bolum": "Mobilite",
+"ad": "Wrist Circles & Rocks (Bilek Mobilitesi)",
+"gorsel": 231
+},
+{
+"no": 232,
+"bolum": "Mobilite",
+"ad": "Heel & Toe Walks (Topuk ve Parmak Ucu Yürüyüşü)",
+"gorsel": 232
+},
+{
+"no": 233,
+"bolum": "Mobilite",
+"ad": "Kneeling Adductor Rock-Back",
+"gorsel": 233
+},
+{
+"no": 234,
+"bolum": "Mobilite",
+"ad": "Gate Openers (Kalça Kapı Açma)",
+"gorsel": 234
+},
+{
+"no": 235,
+"bolum": "Mobilite",
+"ad": "Pelvic Tilts (Leğen Devirme)",
+"gorsel": 235
+},
+{
+"no": 236,
+"bolum": "Mobilite",
+"ad": "Prone Back Extension (Süpermen)",
+"gorsel": 236
+},
+{
+"no": 237,
+"bolum": "Mobilite",
+"ad": "Leg Cradle Walk",
+"gorsel": 237
+},
+{
+"no": 238,
+"bolum": "Mobilite",
+"ad": "Shoulder Taps & Scap Circles",
+"gorsel": 238
+},
+{
+"no": 239,
+"bolum": "Mobilite",
+"ad": "Pigeon Pose (Güvercin Pozu)",
+"gorsel": 239
+},
+{
+"no": 240,
+"bolum": "Mobilite",
+"ad": "Frog Stretch (Kurbağa Esnemesi)",
+"gorsel": 240
+},
+{
+"no": 241,
+"bolum": "Mobilite",
+"ad": "Half-Kneeling Hip Flexor Stretch",
+"gorsel": 241
+},
+{
+"no": 242,
+"bolum": "Mobilite",
+"ad": "Butterfly Groin Stretch",
+"gorsel": 242
+},
+{
+"no": 243,
+"bolum": "Mobilite",
+"ad": "Standing Wall Calf & Soleus Stretch",
+"gorsel": 243
+},
+{
+"no": 244,
+"bolum": "Mobilite",
+"ad": "Overhead Triceps & Lat Side Lean Stretch",
+"gorsel": 244
+},
+{
+"no": 245,
+"bolum": "Mobilite",
+"ad": "Cross-Body Posterior Shoulder Stretch",
+"gorsel": 245
+},
+{
+"no": 246,
+"bolum": "Mobilite",
+"ad": "Upper Trap & Levator Scapulae Neck Stretch",
+"gorsel": 246
+},
+{
+"no": 247,
+"bolum": "Mobilite",
+"ad": "Cobra / Sphinx Abdominal Stretch",
+"gorsel": 247
+},
+{
+"no": 248,
+"bolum": "Mobilite",
+"ad": "Supine Spinal Twist (Yatarak Omurga Rotasyonu)",
+"gorsel": 248
+},
+{
+"no": 249,
+"bolum": "Mobilite",
+"ad": "Dead Hang (Barfikste Pasif Asılma)",
+"gorsel": 249
+},
+{
+"no": 250,
+"bolum": "Mobilite",
+"ad": "Lizard Pose (Kertenkele)",
+"gorsel": 250
+},
+{
+"no": 251,
+"bolum": "Mobilite",
+"ad": "Standing Quad Stretch (Ayakta Ön Bacak)",
+"gorsel": 251
+},
+{
+"no": 252,
+"bolum": "Mobilite",
+"ad": "Seated Forward Fold (Oturarak Öne Eğilme)",
+"gorsel": 252
+},
+{
+"no": 253,
+"bolum": "Mobilite",
+"ad": "Standing Forward Fold (Ayakta Öne Eğilme)",
+"gorsel": 253
+},
+{
+"no": 254,
+"bolum": "Mobilite",
+"ad": "Supine Hamstring Strap Stretch",
+"gorsel": 254
+},
+{
+"no": 255,
+"bolum": "Mobilite",
+"ad": "Wide-Leg Seated Straddle (Pancake)",
+"gorsel": 255
+},
+{
+"no": 256,
+"bolum": "Mobilite",
+"ad": "Happy Baby (Mutlu Bebek)",
+"gorsel": 256
+},
+{
+"no": 257,
+"bolum": "Mobilite",
+"ad": "Knees to Chest (Dizleri Göğse Çekme)",
+"gorsel": 257
+},
+{
+"no": 258,
+"bolum": "Mobilite",
+"ad": "Seated Spinal Twist (Oturarak Omurga Rotasyonu)",
+"gorsel": 258
+},
+{
+"no": 259,
+"bolum": "Mobilite",
+"ad": "Puppy Pose (Yavru Köpek)",
+"gorsel": 259
+},
+{
+"no": 260,
+"bolum": "Mobilite",
+"ad": "Sleeper Stretch (Uyku Esnemesi)",
+"gorsel": 260
+},
+{
+"no": 261,
+"bolum": "Mobilite",
+"ad": "Towel Behind Back Shoulder Stretch",
+"gorsel": 261
+},
+{
+"no": 262,
+"bolum": "Mobilite",
+"ad": "Bench Prayer Stretch (Kanat Esnetme)",
+"gorsel": 262
+},
+{
+"no": 263,
+"bolum": "Mobilite",
+"ad": "Chin Tucks & Neck Flexion",
+"gorsel": 263
+},
+{
+"no": 264,
+"bolum": "Mobilite",
+"ad": "Wrist Flexor & Extensor Stretch",
+"gorsel": 264
+},
+{
+"no": 265,
+"bolum": "Mobilite",
+"ad": "Kneeling Shin Stretch (Kaval Önü)",
+"gorsel": 265
+},
+{
+"no": 266,
+"bolum": "Mobilite",
+"ad": "Toe Sit (Parmak Esnetme)",
+"gorsel": 266
+},
+{
+"no": 267,
+"bolum": "Mobilite",
+"ad": "Reclined Butterfly (Yatarak Kelebek)",
+"gorsel": 267
+},
+{
+"no": 268,
+"bolum": "Mobilite",
+"ad": "Standing Side Bend (Yana Eğilme)",
+"gorsel": 268
+},
+{
+"no": 269,
+"bolum": "Mobilite",
+"ad": "Low Lunge (Alçak Hamle)",
+"gorsel": 269
+},
+{
+"no": 270,
+"bolum": "Mobilite",
+"ad": "Seated Figure-4 (Sandalyede Kalça)",
+"gorsel": 270
+},
+{
+"no": 271,
+"bolum": "Mobilite",
+"ad": "Downward Dog (Aşağı Bakan Köpek)",
+"gorsel": 271
+},
+{
+"no": 272,
+"bolum": "Mobilite",
+"ad": "Camel Pose (Deve, Hafif)",
+"gorsel": 272
+},
+{
+"no": 273,
+"bolum": "Mobilite",
+"ad": "Bear Hug Upper Back Stretch",
+"gorsel": 273
+},
+{
+"no": 274,
+"bolum": "Mobilite",
+"ad": "Doorway Hamstring Stretch (Kapı Eşiğinde)",
+"gorsel": 274
+},
+{
+"no": 275,
+"bolum": "Mobilite",
+"ad": "Pec Stretch on Foam Roller (Göğüs Açma)",
+"gorsel": 275
+},
+{
+"no": 276,
+"bolum": "Mobilite",
+"ad": "Calf Stretch on Step (Basamakta Baldır)",
+"gorsel": 276
+},
+{
+"no": 277,
+"bolum": "Mobilite",
+"ad": "Thoracic Spine Foam Roll",
+"gorsel": 277
+},
+{
+"no": 278,
+"bolum": "Mobilite",
+"ad": "Latissimus Dorsi Foam Roll",
+"gorsel": 278
+},
+{
+"no": 279,
+"bolum": "Mobilite",
+"ad": "Quadriceps & Hip Flexor Foam Roll",
+"gorsel": 279
+},
+{
+"no": 280,
+"bolum": "Mobilite",
+"ad": "Glute / Piriformis Lacrosse Ball Release",
+"gorsel": 280
+},
+{
+"no": 281,
+"bolum": "Mobilite",
+"ad": "Plantar Fascia (Ayak Tabanı) Top Masajı",
+"gorsel": 281
+},
+{
+"no": 282,
+"bolum": "Mobilite",
+"ad": "Calf Foam Roll (Baldır)",
+"gorsel": 282
+},
+{
+"no": 283,
+"bolum": "Mobilite",
+"ad": "Hamstring Foam Roll (Arka Bacak)",
+"gorsel": 283
+},
+{
+"no": 284,
+"bolum": "Mobilite",
+"ad": "Adductor Foam Roll (İç Bacak)",
+"gorsel": 284
+},
+{
+"no": 285,
+"bolum": "Mobilite",
+"ad": "TFL & Outer Thigh Foam Roll (Dış Bacak)",
+"gorsel": 285
+},
+{
+"no": 286,
+"bolum": "Mobilite",
+"ad": "Glute Foam Roll (Kalça)",
+"gorsel": 286
+},
+{
+"no": 287,
+"bolum": "Mobilite",
+"ad": "Pec Ball Release (Göğüs Topla)",
+"gorsel": 287
+},
+{
+"no": 288,
+"bolum": "Mobilite",
+"ad": "Upper Trap Ball Release (Trapez Topla)",
+"gorsel": 288
+},
+{
+"no": 289,
+"bolum": "Mobilite",
+"ad": "Thoracic Two-Ball Release (Sırt İki Top)",
+"gorsel": 289
+},
+{
+"no": 290,
+"bolum": "Mobilite",
+"ad": "Infraspinatus Ball Release (Kürek Kemiği)",
+"gorsel": 290
+},
+{
+"no": 291,
+"bolum": "Mobilite",
+"ad": "Tibialis Foam Roll (Kaval Önü)",
+"gorsel": 291
+},
+{
+"no": 292,
+"bolum": "Mobilite",
+"ad": "Forearm Ball Release (Ön Kol)",
+"gorsel": 292
+}
+]

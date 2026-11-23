@@ -1,8 +1,12 @@
 // AYK+ çevrimdışı önbellek. Uygulamayı güncellediğinde aşağıdaki sürümü artır (v4, v5...).
-const CACHE = 'aykplus-v62';
+const CACHE = 'aykplus-v63';
 const FILES = ['./', './index.html', './manifest.json', './icon.png', './icon-192.png', './icon-512.png', './anatomy.jpg', './anatomy-light.webp', './vendor/zxing.min.js', './foods.js'];
 // İnternet bu süre içinde yanıt vermezse (spor salonunda zayıf sinyal) önbellekteki kopya açılır.
 const NET_TIMEOUT_MS = 3000;
+// v63: hareket görselleri (img/hareket/*.webp, ~16 MB) baştan indirilmez; görüldükçe AYRI önbelleğe girer. Bu önbellek
+// sürüm değişince silinmez (görsel dosyası değişirse adı / IMG_CACHE numarası değişir). Önce önbellek, yoksa internet.
+const IMG_CACHE = 'aykplus-gorsel-1';
+const IMG_PATH = '/img/hareket/';
 // Bir istek zaman aşımına uğrar ya da internet yoksa, sonraki 30 sn boyunca dosyalar beklemeden önbellekten verilir
 // (sayfa + foods.js için ayrı ayrı 3'er sn beklenmesin). İnternet yanıtı yine arka planda önbelleği günceller.
 const SLOW_WINDOW_MS = 30000;
@@ -17,7 +21,7 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== IMG_CACHE).map(k => caches.delete(k)))));
   self.clients.claim();
 });
 
@@ -29,6 +33,13 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || !req.url.startsWith(self.location.origin)) return;
+  if (new URL(req.url).pathname.includes(IMG_PATH)) {
+    e.respondWith(caches.open(IMG_CACHE).then(c => c.match(req, { ignoreSearch: true }).then(hit => hit || fetch(req).then(res => {
+      if (res && res.ok) { const copy = res.clone(); e.waitUntil(c.put(req, copy).catch(() => {})); }
+      return res;
+    }))));
+    return;
+  }
   const isPage = req.mode === 'navigate';
   const fromCache = () => caches.match(req, { ignoreSearch: true })
     .then(r => r || (isPage ? caches.match('./index.html') : undefined));
