@@ -1,4 +1,6 @@
-# v66 — İçecekler ve fast food (yol haritası 1. bölüm, 3. madde) — PLAN, onay bekliyor
+# v66 — İçecekler (yol haritası 1. bölüm, 3. madde) — PLAN
+
+**Karar (23 Kasım 2026, kullanıcı):** Fast food EKLENMEZ ("kesin olmayan bir şeyi koymayalım"); kullanıcı kendi ekler (barkod / özel besin). Yalnızca resmi değeri bulunabilen içecekler. Aşağıdaki C bölümü bu yüzden iptal.
 
 23 Kasım 2026. v65'teki "İçecekler" ve "Fast food ve hazır yemek" gruplarına yeni ürünler eklenecek.
 

@@ -163,6 +163,7 @@ function renderMissList() {
 // Besin kartındaki kaynak satırı
 function foodSourceText(f) {
   if (f.src === "tarif") return t("Tarif hesaplaması (yaklaşık), USDA malzemeleriyle");
+  if (f.brand && f.srcSite) { const [y, m] = String(f.srcDate || "").split("-"); return t("Kaynak: {b} ({s}), {d} kontrolü. Tarif değişebilir; paketteki etiketi esas al.", { b: f.brand, s: f.srcSite, d: m && y ? m + "." + y : "" }); }   // v66
   if (typeof f.src === "number") return `USDA FoodData Central · ${f.src}`;
   return "";
 }
@@ -193,7 +194,9 @@ function foodGroupName(g) {
 }
 // Süzgeçler: yüksek protein (kalorinin ≥ %30'u proteinden), düşük kalori (g/ml: 100 g'da ≤ 100 kcal; diğer birimler: 1 birimde ≤ 100 kcal)
 function foodHighProtein(f) { const k = kcalPerUnit(f); return k > 0 && (num(f.p) * 4) / k >= 0.3; }
-function foodLowCal(f) { const k = kcalPerUnit(f); return (f.unit === "g" || f.unit === "ml") ? k * 100 <= 100 : k <= 100; }
+function foodLowCal(f) { const k = kcalPerUnit(f); if (f.drink || f.cat === "İçecekler") return f.unit === "ml" || f.unit === "g" ? k * 100 <= 20 : k <= 20; return (f.unit === "g" || f.unit === "ml") ? k * 100 <= 100 : k <= 100; }
+// v66: içecek mi? (markalı içecek, USDA İçecekler grubu, kullanıcının "İçecek" olarak eklediği)
+function isDrinkFood(id, f) { return !!f && (f.drink === true || foodGroupOf(id, f) === "icecek"); }
 function isFavFood(id) { return (state.favFoods || []).includes(id); }
 function toggleFavFood(id) {
   if (!Array.isArray(state.favFoods)) state.favFoods = [];

@@ -602,7 +602,8 @@ try:
       "restPillLabel": "JS yazar (timerLabelText)", "cfTitle": "JS yazar (openCustomFood/editCustomFood)", "pickerTitle": "JS yazar (openPicker)", "pickerExtraBtn": "JS yazar (openPicker)",
       "mealModalTitle": "JS yazar (openMealModal)", "pfPhotoBtnText": "JS yazar (refreshProfilePhoto)", "lastBackupText": "JS yazar (renderProfile)", "uiDlgCancel": "JS yazar (uiDialog)",
       "pfLang": "dil adı kendi dilinde kalır ('Türkçe' / 'English')", "pfAvatar": "alt metni: görsel yalnızca süs", "obDots": "aria-label her adımda JS yazar (obRender, t(\"Adım {n} / {m}\"))",
-      "exMuscle": "kas seçenekleri: değer = kayıtlı Türkçe kas adı; metni JS her açılışta muscleL ile yazar (openExerciseModal)"}
+      "exMuscle": "kas seçenekleri: değer = kayıtlı Türkçe kas adı; metni JS her açılışta muscleL ile yazar (openExerciseModal)",
+      "cfOpenBtn": "JS yazar (renderFoods: Özel besin / Özel içecek tanımla, v66)", "cfNameLabel": "JS yazar (cfSetKind: Besin Adı / İçecek adı, v66)"}
     mk = open(os.path.join(REPO, "src", "markup.html"), encoding="utf-8").read(); mk = mk[mk.index("<body"):]
     mhit = markup_tarama(mk)
     mbad = [(k, x[:40], ids[-1] if ids else None) for (k, x, ids, ln) in mhit if not any(i in MK_IZIN for i in ids)]

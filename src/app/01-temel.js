@@ -354,6 +354,7 @@ function normalizeStateInner(raw) {
     ["p", "c", "f"].forEach(k => { f[k] = num(f[k], 0); });
     if (f.kcal != null) { const k = num(f.kcal, NaN); if (isFinite(k)) f.kcal = k; else delete f.kcal; }
     if (f.def != null) f.def = num(f.def, 100) || 100;
+    if (f.drink !== true) delete f.drink;   // v66: kullanıcının içeceği (İçecekler bölümünde görünür)
     if (f.recipe != null) {
       if (!isObj(f.recipe)) delete f.recipe;
       else { f.recipe.items = normItems(f.recipe.items); if (f.recipe.cooked != null) f.recipe.cooked = num(f.recipe.cooked, 0); }
@@ -528,7 +529,7 @@ let foodDbVer = 0, _rdb = null, _rdbRef = null, _rdbVer = -1, _fdb = null, _fdbR
 function realFoodDB() {
   const c = state.customFoods || {};
   if (_rdb && _rdbRef === c && _rdbVer === foodDbVer) return _rdb;
-  _rdb = Object.assign({}, USDA_DB, BASE_FOOD_DB, c);
+  _rdb = Object.assign({}, USDA_DB, BASE_FOOD_DB, DRINK_DB, c);   // v66: DRINK_DB markalı içecekler
   _rdbRef = c; _rdbVer = foodDbVer;
   return _rdb;
 }

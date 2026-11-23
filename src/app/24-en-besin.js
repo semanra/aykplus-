@@ -117,6 +117,8 @@ function foodNameL(f) {
   if (e && e[0]) return e[0];
   const b = baseIdOf(f);
   if (b && Object.prototype.hasOwnProperty.call(BASE_EN, b)) return BASE_EN[b];
+  const d = drinkIdOf(f);   // v66
+  if (d && Object.prototype.hasOwnProperty.call(DRINK_EN, d)) return DRINK_EN[d];
   return f.name;
 }
 // Hazır porsiyon adı (gösterim): USDA besininde i. porsiyonun kendi İngilizce etiketi; yoksa verilen etiket.
@@ -207,6 +209,26 @@ Object.assign(EN, {
   "Fast food ve hazır yemek": "Fast food and ready meals",
   "Türk mutfağı": "Turkish cuisine",
   "Sos, çorba ve baharat": "Sauces, soups and spices",
+  // v66 içecek bölümü
+  "Besinler|tür": "Foods",
+  "İçecekler|tür": "Drinks",
+  "Markalı": "Branded",
+  "Besin|tür": "Food",
+  "İçecek|tür": "Drink",
+  "İçecek adı:": "Drink name:",
+  "Örn: Ev limonatası / Soğuk kahve": "e.g. Homemade lemonade / Iced coffee",
+  "Varsayılan miktar (ml):": "Default amount (ml):",
+  "1 porsiyon kaç ml?": "How many ml is 1 serving?",
+  "İçecek ara (ayran, kola, meyve suyu...)": "Search drinks (ayran, cola, juice...)",
+  "Kendi içeceğini tanımla": "Add your own drink",
+  "Özel içecek tanımla": "Add custom drink",
+  "{f} içecek listene eklendi": "{f} added to your drinks",
+  "Kaynak: {b} ({s}), {d} kontrolü. Tarif değişebilir; paketteki etiketi esas al.": "Source: {b} ({s}), checked {d}. Recipes may change; the label on the package takes precedence.",
+  "Besin mi, içecek mi?": "Food or drink?",
+  "100 ml": "100 ml",
+  "1 porsiyon (kutu / şişe)": "1 serving (can / bottle)",
+  "İçeceklerde {n} sonuç var": {"one": "{n} result in Drinks", "other": "{n} results in Drinks"},
+  "Besinlerde {n} sonuç var": {"one": "{n} result in Foods", "other": "{n} results in Foods"}
 });
 // Yerleşik tarif notu (f.src === "tarif"): cümle cümle sözlükten; Türkçede ve özel besinde olduğu gibi.
 function foodNoteL(f) {
@@ -269,4 +291,43 @@ function exNameL(name) {
   if (curLang() !== "en") return name;
   const k = String(name == null ? "" : name).trim();
   return Object.prototype.hasOwnProperty.call(EX_EN, k) ? EX_EN[k] : name;
+}
+
+// v66: markalı içeceklerin İngilizce adları (kimlik → ad); kayıtta ad Türkçe kalır
+const DRINK_EN = {
+  "d_cocacola": "Coca-Cola",
+  "d_cocacola_zero": "Coca-Cola Zero Sugar",
+  "d_cocacola_light": "Coca-Cola Light",
+  "d_fanta_portakal": "Fanta Orange",
+  "d_fanta_nar": "Fanta Pomegranate",
+  "d_sprite": "Sprite",
+  "d_sprite_sekersiz": "Sprite Sugar Free",
+  "d_sprite_coolmint": "Sprite Cool Mint",
+  "d_fusetea_seftali": "Fuse Tea Peach",
+  "d_fusetea_limon": "Fuse Tea Lemon",
+  "d_cappy_portakal100": "Cappy 100% Orange Juice",
+  "d_cappy_pulpy": "Cappy Pulpy Orange",
+  "d_cappy_seftali": "Cappy Peach Nectar",
+  "d_cappy_karisik100": "Cappy 100% Mixed Fruit Juice",
+  "d_uludag_gazoz": "Uludağ Gazoz (lemon-lime soda)",
+  "d_uludag_gazoz_sekersiz": "Uludağ Gazoz Sugar Free",
+  "d_frutti_limon": "Uludağ Frutti Lemon",
+  "d_frutti_elma": "Uludağ Frutti Apple",
+  "d_frutti_karpuz_cilek": "Uludağ Frutti Watermelon-Strawberry",
+  "d_frutti_cilek": "Uludağ Frutti Strawberry",
+  "d_frutti_nar": "Uludağ Frutti Pomegranate",
+  "d_frutti_seftali": "Uludağ Frutti Peach",
+  "d_beypazari_limon": "Beypazarı Lemon Mineral Water",
+  "d_kizilay_limon": "Kızılay Lemon Mineral Water",
+  "d_sutas_ayran": "Sütaş Ayran (yogurt drink)",
+  "d_doganay_salgam": "Doğanay Şalgam (fermented turnip juice)",
+  "d_dimes_portakal100": "Dimes 100% Orange Juice",
+  "d_dimes_karisik": "Dimes Mixed Fruit Nectar",
+  "d_dimes_seftali": "Dimes Peach Nectar",
+  "d_dimes_portakal_icecek": "Dimes Orange Drink"
+};
+let _drinkIdMap = null;
+function drinkIdOf(f) {
+  if (!_drinkIdMap) { _drinkIdMap = new Map(); Object.keys(DRINK_DB).forEach(id => _drinkIdMap.set(DRINK_DB[id], id)); }
+  return _drinkIdMap.get(f) || "";
 }

@@ -858,7 +858,7 @@ function editCustomFood(id) {
   $("cfC").value = fmtNum(f.c * base);
   $("cfF").value = fmtNum(f.f * base);
   $("cfK").value = f.kcal != null ? fmtNum(f.kcal * base) : "";
-  cfUnitChanged();
+  cfSetKind(f.drink ? "drink" : "food");   // v66
   openModal("customFoodModal");
 }
 function customFoodUses(id) {
