@@ -15459,6 +15459,69 @@ function shareData(log) {
   };
 }
 
+// ============================================================================
+// v67 — KAS HARİTASI (img/kas-harita.png: her kas grubu ayrı anahtar renk; scripts/gorsel/kas_harita.py)
+// ============================================================================
+// Sıra ve renkler kas_harita.py KEYS ile aynı. Ad = MUSCLES kayıt adı (gösterimde muscleL).
+const MAP_KEYS = [
+  { name: "bosluk", rgb: [0, 0, 0] }, { name: "govde", rgb: [128, 128, 128] },
+  { name: MUSCLES[0], rgb: [255, 0, 0] }, { name: MUSCLES[2], rgb: [255, 255, 0] }, { name: MUSCLES[6], rgb: [0, 0, 255] },
+  { name: MUSCLES[7], rgb: [255, 0, 255] }, { name: MUSCLES[8], rgb: [255, 128, 0] }, { name: MUSCLES[3], rgb: [0, 255, 0] },
+  { name: MUSCLES[1], rgb: [0, 255, 255] }, { name: MUSCLES[4], rgb: [128, 0, 255] }, { name: MUSCLES[5], rgb: [128, 64, 0] }
+];
+// Boya takımları: gövde, boş kas, çalışan kas (az set → çok set); [r, g, b, a]
+const MAP_PALS = {
+  dark: { body: [40, 40, 45, 255], idle: [64, 64, 72, 255], lo: [24, 140, 130, 255], hi: [31, 209, 193, 255] },
+  light: { body: [212, 212, 216, 255], idle: [186, 186, 194, 255], lo: [70, 160, 150, 255], hi: [14, 124, 114, 255] },
+  clear: { body: [255, 255, 255, 70], idle: [255, 255, 255, 120], lo: [31, 209, 193, 200], hi: [31, 209, 193, 255] }
+};
+let muscleLabelsP = null;
+function loadMuscleLabels() {
+  if (!muscleLabelsP) {
+    muscleLabelsP = new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        const cv = document.createElement("canvas"); cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+        const ctx = cv.getContext("2d"); ctx.drawImage(img, 0, 0);
+        const px = ctx.getImageData(0, 0, cv.width, cv.height).data;
+        const lab = new Uint8Array(cv.width * cv.height);
+        for (let i = 0; i < lab.length; i++) {
+          const r = px[i * 4], g = px[i * 4 + 1], b = px[i * 4 + 2];
+          let best = 0, bd = Infinity;
+          MAP_KEYS.forEach((k, j) => { const d = (r - k.rgb[0]) ** 2 + (g - k.rgb[1]) ** 2 + (b - k.rgb[2]) ** 2; if (d < bd) { bd = d; best = j; } });
+          lab[i] = best;
+        }
+        res({ w: cv.width, h: cv.height, lab });
+      };
+      img.onerror = () => rej(new Error("kas-harita"));
+      img.src = "img/kas-harita.png";
+    }).catch(e => { muscleLabelsP = null; throw e; });   // yüklenemediyse bir sonraki paylaşımda yeniden dene
+  }
+  return muscleLabelsP;
+}
+// muscles: { kas adı: set sayısı }; pal: dark | light | clear → tam boy canvas (yüklenemezse null)
+async function paintMuscleMap(muscles, pal) {
+  let L;
+  try { L = await loadMuscleLabels(); } catch (e) { return null; }
+  const P = MAP_PALS[pal] || MAP_PALS.dark;
+  const mx = Math.max(1, ...Object.values(muscles || {}).map(v => num(v)));
+  const cols = MAP_KEYS.map((k, i) => {
+    if (i === 0) return [0, 0, 0, 0];
+    if (i === 1) return P.body;
+    const n = num((muscles || {})[k.name]);
+    if (!(n > 0)) return P.idle;
+    const f = 0.55 + 0.45 * n / mx;   // 0,55 … 1: koyu turkuazdan parlak turkuaza
+    const tt = (f - 0.55) / 0.45;
+    return P.lo.map((v, c) => Math.round(v + (P.hi[c] - v) * tt));
+  });
+  const cv = document.createElement("canvas"); cv.width = L.w; cv.height = L.h;
+  const ctx = cv.getContext("2d");
+  const im = ctx.createImageData(L.w, L.h);
+  for (let i = 0; i < L.lab.length; i++) { const c = cols[L.lab[i]]; im.data[i * 4] = c[0]; im.data[i * 4 + 1] = c[1]; im.data[i * 4 + 2] = c[2]; im.data[i * 4 + 3] = c[3]; }
+  ctx.putImageData(im, 0, 0);
+  return cv;
+}
+
 </script>
 </body>
 </html>

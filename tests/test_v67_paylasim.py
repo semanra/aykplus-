@@ -90,7 +90,29 @@ try:
     en = pg.evaluate("[shareData(%s).monthTxt, monthOrdinalEn(1), monthOrdinalEn(2), monthOrdinalEn(3), monthOrdinalEn(11), monthOrdinalEn(12), monthOrdinalEn(13), monthOrdinalEn(21), monthOrdinalEn(22)]" % LAST)
     check(en == ["2nd workout of November", "1st", "2nd", "3rd", "11th", "12th", "13th", "21st", "22nd"], "2: İngilizce ay sırası %s" % en)
     pg.evaluate("setLang('tr')")
+
+    # --- 3) paintMuscleMap
+    PX = """async ([mus, pal]) => { const L = await loadMuscleLabels(); const cv = await paintMuscleMap(mus, pal);
+      const px = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+      const at = name => { const i = MAP_KEYS.findIndex(k => k.name === name); const j = L.lab.indexOf(i); return Array.from(px.slice(j * 4, j * 4 + 4)); };
+      return { w: cv.width, h: cv.height, lw: L.w, chest: at('Göğüs'), sh: at('Omuz'), back: at('Sırt'), body: at('govde'), gap: at('bosluk') }; }"""
+    r = pg.evaluate(PX, [{"Göğüs": 7, "Omuz": 9}, "dark"])
+    check(r["w"] == r["lw"] == 900, "3: boyanan harita etiket boyutunda (%s)" % r["w"])
+    check(r["chest"][1] > 120 and r["chest"][0] < 60 and r["chest"][3] == 255, "3: çalışan kas turkuaz %s" % r["chest"])
+    check(r["sh"][1] > r["chest"][1], "3: çok set = daha parlak (omuz %s > göğüs %s)" % (r["sh"][1], r["chest"][1]))
+    check(r["back"] == [64, 64, 72, 255] and r["body"] == [40, 40, 45, 255], "3: boş kas / gövde koyu gri %s %s" % (r["back"], r["body"]))
+    check(r["gap"][3] == 0, "3: boşluk şeffaf")
+    r = pg.evaluate(PX, [{"Göğüs": 3}, "clear"])
+    check(r["body"][3] == 70 and r["back"][3] == 120 and r["chest"][:3] == [31, 209, 193], "3: şeffaf takım %s %s %s" % (r["body"], r["back"], r["chest"]))
+    r = pg.evaluate(PX, [{"Göğüs": 3}, "light"])
+    check(r["body"][:3] == [212, 212, 216] and r["chest"][:3] == [14, 124, 114], "3: aydınlık takım %s %s" % (r["body"], r["chest"]))
     c.close()
+    # görsel yüklenemezse: null, sayfa hatası yok
+    c2 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
+    c2.add_init_script(TEST_INIT); c2.route("**/img/kas-harita.png", lambda rt: rt.fulfill(status=404, body="yok"))
+    pg2 = c2.new_page(); pg2.on("pageerror", lambda e: errs.append(str(e))); pg2.goto(URL); boot(pg2)
+    check(pg2.evaluate("paintMuscleMap({ 'Göğüs': 2 }, 'dark').then(x => x === null)"), "3: görsel yoksa null")
+    c2.close()
     b.close()
 finally:
     srv.terminate()
