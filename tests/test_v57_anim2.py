@@ -294,9 +294,9 @@ try:
     check(not q.is_visible("#finishModal"), "1) Kapat pencereyi kapattı")
     q.evaluate("openFinishSummary(state.workoutLogs.length - 1, [])"); q.wait_for_timeout(60)
     check(q.locator("#finPrList").count() == 0, "1) rekor yoksa liste yok")
-    q.click("#finShare"); q.wait_for_timeout(1200)
-    check(not q.is_visible("#finishModal") and q.is_visible("#chartModal") and q.inner_text("#chartTitle") == "Antrenman Özeti" and q.locator("#chartBody img").count() == 1, "1) Paylaş paylaşım kartını açtı")
-    q.evaluate("closeModal('chartModal')")
+    q.click("#finShare"); q.wait_for_selector("#shareTrack img[src]", timeout=8000)   # v67: yeni paylaşım penceresi
+    check(not q.is_visible("#finishModal") and q.is_visible("#shareModal") and q.inner_text("#shareTitle") == "Paylaş", "1) Paylaş paylaşım penceresini açtı")
+    q.evaluate("closeShare()")
     q.evaluate("""() => { const d = activeDay(); d.exercises.splice(0); d.exercises.push({ name: 'Zz Tek', kind: 'weight', targetInfo: '1x5', sets: makeWeightSets(1, '5', 50, 5) });
       d.exercises[0].sets[0].done = true; state.workoutStartedAt = 0; renderAll(); void finishAndLogWorkout(); }""")
     q.wait_for_selector("#uiDialog:not(.hidden)"); q.click("#uiDlgOk"); q.wait_for_timeout(100)

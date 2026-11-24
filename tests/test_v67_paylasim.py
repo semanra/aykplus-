@@ -194,6 +194,94 @@ try:
     check(not any("Çalışan kaslar" in x for x in r["tx"]) and "Kardiyo" in r["tx"], "4: kardiyo kartında çalışan kaslar satırı yok, Kardiyo var")
     check(pg.evaluate("shareTplsFor(shareData({ dayName: 'Eski', ts: Date.now(), volume: 500, sets: 5 }))") == ["map", "photo", "sticker"], "4: eski kayıt → liste yok")
     c.close()
+
+    # --- 5) Paylaşım penceresi
+    c, pg = ctx(); pg.evaluate(SEED)
+    pg.evaluate("void openFinishSummary(state.workoutLogs.length - 1, [])"); pg.wait_for_selector("#finShare")
+    pg.click("#finShare")
+    pg.wait_for_selector("#shareModal:not(.hidden)"); pg.wait_for_function("document.querySelector('#shareTrack [data-share-tpl] img[src]')")
+    r = pg.evaluate("""() => ({ dots: [...document.querySelectorAll('#shareDots [data-share-dot]')].map(e => e.dataset.shareDot),
+      tpl: $('shareModal').dataset.tpl, theme: !$('shareTheme').classList.contains('hidden'), photo: !$('sharePhotoBtn').classList.contains('hidden'),
+      copy: !$('shareCopy').classList.contains('hidden') })""")
+    check(r["dots"] == ["map", "pr", "photo", "sticker", "list"] and r["tpl"] == "map", "5: bitiş özetinden açılır, 5 şablon, kas haritasıyla %s" % r)
+    check(r["theme"] and not r["photo"] and not r["copy"], "5: kas haritasında tema seçici var, fotoğraf/kopyala yok")
+    small = pg.evaluate("""() => [...document.querySelectorAll('#shareModal button')].filter(e => e.offsetParent).map(e => { const b = e.getBoundingClientRect(); return [e.textContent.trim().slice(0, 16) || e.getAttribute('aria-label'), Math.round(b.width), Math.round(b.height)]; }).filter(x => x[1] < 44 || x[2] < 44)""")
+    check(small == [], "5: penceredeki bütün düğmeler ≥ 44 px: %s" % small)
+    check(pg.evaluate("$('shareGo').getBoundingClientRect().bottom") <= 844, "5: Paylaş düğmesi iPhone ekranında kaydırmadan görünür (%s)" % pg.evaluate("$('shareGo').getBoundingClientRect().bottom"))
+    pg.screenshot(path=os.path.join(SHOTS, "v67_pencere.png"))
+    # parmakla kaydırma: kaydırma durunca o şablon seçilir
+    pg.evaluate("() => { const tr = $('shareTrack'); tr.scrollLeft = 4 * tr.clientWidth; }")
+    pg.wait_for_function("$('shareModal').dataset.tpl === 'list'", timeout=3000)
+    check(pg.evaluate("$('shareModal').dataset.tpl") == "list", "5: kaydırınca şablon değişir (liste)")
+    pg.evaluate("() => { const tr = $('shareTrack'); tr.scrollLeft = 0; }")
+    pg.wait_for_function("$('shareModal').dataset.tpl === 'map'", timeout=3000)
+    # seçimler hatırlanır
+    pg.click('[data-share-size="post"]'); pg.click('[data-share-theme="light"]'); pg.click('[data-share-stat="vol"]')
+    pg.click('[data-share-dot="list"]'); pg.wait_for_timeout(150)
+    pg.click("#shareClose"); pg.wait_for_selector("#shareModal.hidden", state="attached")
+    stored = pg.evaluate("aykStoredState().then(s => s.settings.share)")
+    check(stored and stored["tpl"] == "list" and stored["size"] == "post" and stored["theme"] == "light" and stored["stats"]["vol"] is False and stored["stats"]["dur"] is True, "5: seçimler kayda yazıldı %s" % stored)
+    pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#shareModal:not(.hidden)")
+    r = pg.evaluate("""() => ({ tpl: $('shareModal').dataset.tpl, size: document.querySelector('[data-share-size="post"]').getAttribute('aria-pressed'),
+      theme: document.querySelector('[data-share-theme="light"]').getAttribute('aria-pressed'), vol: document.querySelector('[data-share-stat="vol"]').getAttribute('aria-pressed') })""")
+    check(r == {"tpl": "list", "size": "true", "theme": "true", "vol": "false"}, "5: yeniden açılınca aynı seçimler %s" % r)
+    # son açık istatistik kapatılamaz
+    left = pg.evaluate("""() => { const on = () => [...document.querySelectorAll('[data-share-stat]')].filter(b => !b.disabled && b.getAttribute('aria-pressed') === 'true');
+      for (let i = 0; i < 8 && on().length; i++) on()[0].click();   // hepsini kapatmayı dene
+      return on().map(b => b.dataset.shareStat); }""")
+    check(len(left) == 1, "5: son açık istatistik kapatılamaz (açık kalan: %s)" % left)
+    pg.click("#shareClose")
+    # bozuk ayar → varsayılan; fotoğraf hatırlanmaz
+    nb = pg.evaluate("""() => { const a = clone(state); a.settings.share = 'x'; const b = clone(state); b.settings.share = { tpl: 'photo', size: 5, theme: 'mor', stats: { vol: 'evet' } };
+      const c = clone(state); delete c.settings.share; return [normalizeState(a).settings.share, normalizeState(b).settings.share, normalizeState(c).settings.share]; }""")
+    dflt = {"tpl": "map", "size": "story", "theme": "dark", "stats": {"dur": True, "vol": True, "sets": True, "prs": True, "cardio": True, "month": True}}
+    check(nb[0] == dflt and nb[2] == dflt and nb[1]["tpl"] == "map" and nb[1]["size"] == "story" and nb[1]["theme"] == "dark" and nb[1]["stats"]["vol"] is True, "5: bozuk / eksik ayar → varsayılan %s" % nb)
+    # fotoğraf: önizlemede kullanılır, hiçbir yere kaydedilmez
+    pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#shareModal:not(.hidden)")
+    pg.click('[data-share-dot="photo"]'); pg.wait_for_selector("#sharePhotoBtn:not(.hidden)")
+    check(pg.evaluate("$('shareGo').disabled"), "5: fotoğraf seçilmeden Paylaş pasif")
+    import struct, zlib
+    def png1(rgb):
+        raw = b"\x00" + bytes(rgb) * 4
+        def ch(t, d): return struct.pack(">I", len(d)) + t + d + struct.pack(">I", zlib.crc32(t + d))
+        return b"\x89PNG\r\n\x1a\n" + ch(b"IHDR", struct.pack(">IIBBBBB", 4, 1, 8, 2, 0, 0, 0)) + ch(b"IDAT", zlib.compress(raw)) + ch(b"IEND", b"")
+    pg.set_input_files("#sharePhotoInput", files=[{"name": "f.png", "mimeType": "image/png", "buffer": png1((220, 40, 40))}])
+    pg.wait_for_function("!$('shareGo').disabled")
+    check(pg.evaluate("sharePhoto !== null"), "5: seçilen fotoğraf önizlemede kullanılıyor")
+    pg.click("#shareClose")
+    leak = pg.evaluate("""async () => { const s = JSON.stringify(await aykStoredState()); const ls = Object.keys(localStorage).map(k => localStorage.getItem(k) || '').join('');
+      return { photo: sharePhoto, s: /data:image|blob:/.test(s.replace(state.customIconDataUrl || '@@', '')), ls: /blob:/.test(ls) }; }""")
+    check(leak["photo"] is None and not leak["s"] and not leak["ls"], "5: pencere kapanınca fotoğraf bırakılır, kayıtta görsel yok %s" % leak)
+    pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#shareModal:not(.hidden)")
+    check(pg.evaluate("$('shareModal').dataset.tpl") != "photo" and pg.evaluate("sharePhoto") is None, "5: fotoğraf şablonu ve fotoğraf hatırlanmaz")
+    pg.click("#shareClose")
+    # paylaş yedeği (indirme) ve kopyala
+    pg.evaluate("() => { delete Navigator.prototype.share; delete Navigator.prototype.canShare; }")
+    pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#shareModal:not(.hidden)")
+    pg.click('[data-share-dot="map"]')
+    with pg.expect_download(timeout=8000) as dl: pg.click("#shareGo")
+    check(dl.value.suggested_filename.endswith(".png"), "5: paylaşım yoksa PNG indirilir (%s)" % dl.value.suggested_filename)
+    pg.click("#shareClose")
+    pg.evaluate("() => { window.__cp = 0; window.ClipboardItem = function (o) { this.o = o; }; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { write: async () => { window.__cp++; } } }); }")
+    pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#shareModal:not(.hidden)")
+    pg.click('[data-share-dot="sticker"]'); pg.wait_for_selector("#shareCopy:not(.hidden)")
+    check(pg.evaluate("$('shareTheme').classList.contains('hidden')"), "5: çıkartmada tema seçici gizli")
+    pg.click("#shareCopy"); pg.wait_for_function("window.__cp === 1")
+    check(pg.evaluate("window.__cp") == 1, "5: Kopyala panoya yazar")
+    pg.click("#shareClose")
+    pg.evaluate("() => { delete window.ClipboardItem; }")
+    pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#shareModal:not(.hidden)")
+    pg.click('[data-share-dot="sticker"]'); pg.wait_for_timeout(100)
+    check(pg.evaluate("$('shareCopy').classList.contains('hidden')"), "5: pano desteklenmiyorsa Kopyala gizli")
+    pg.click("#shareClose")
+    # Geçmiş'ten eski antrenman: liste yok, Süre pasif
+    pg.evaluate("() => { state.workoutLogs.unshift({ dayName: 'Eski', ts: Date.now() - 400 * 86400000, volume: 500, sets: 5 }); renderAll(); }")
+    pg.evaluate("void openShareCard(0)"); pg.wait_for_selector("#shareModal:not(.hidden)")
+    r = pg.evaluate("""() => ({ dots: [...document.querySelectorAll('#shareDots [data-share-dot]')].map(e => e.dataset.shareDot),
+      dur: document.querySelector('[data-share-stat="dur"]').disabled })""")
+    check(r["dots"] == ["map", "photo", "sticker"] and r["dur"], "5: eski antrenman: liste/rekor yok, Süre çipi pasif %s" % r)
+    pg.click("#shareClose")
+    c.close()
     # görsel yüklenemezse: null, sayfa hatası yok
     c2 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
     c2.add_init_script(TEST_INIT); c2.route("**/img/kas-harita.png", lambda rt: rt.fulfill(status=404, body="yok"))

@@ -2,7 +2,6 @@
 // ---------------------------------------------------------------------------
 // PAYLAŞILABİLİR ANTRENMAN ÖZET KARTI (1080×1350 PNG)
 // ---------------------------------------------------------------------------
-let shareFile = null;
 
 function logExerciseLines(log) {
   if (!log.id) return [];
@@ -318,44 +317,6 @@ async function buildShareCanvas(log, opts) {
   return cv;
 }
 
-async function openShareCard(logIdx) {
-  const log = state.workoutLogs[logIdx];
-  if (!log) return;
-  $("chartTitle").textContent = t("Antrenman Özeti");
-  $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-muted)] text-center py-10">${t("Kart hazırlanıyor...")}</div>`;
-  openModal("chartModal");
-  try {
-    const cv = await buildShareCanvas(log);
-    const blob = await new Promise(res => cv.toBlob(res, "image/png"));
-    if (!blob) throw new Error("blob");
-    const name = `AYK-antrenman-${log.ts ? todayStr(new Date(log.ts)) : "ozet"}.png`;
-    try { shareFile = new File([blob], name, { type: "image/png" }); } catch (e) { shareFile = blob; shareFile.name = name; }
-    const url = URL.createObjectURL(blob);
-    $("chartBody").innerHTML = `
-      <img src="${url}" alt="${t("Antrenman özeti")}" class="w-full rounded-xl border border-[var(--w-line)]" />
-      <button onclick="shareWorkoutCard()" class="w-full mt-3 w-btn text-sm font-semibold py-2.5 rounded-lg">${t("Paylaş / Fotoğraflara Kaydet")}</button>
-      <p class="text-[12px] text-[var(--w-dim)] mt-2 text-center">${t("Paylaş menüsünden Instagram, WhatsApp veya \"Görüntüyü Kaydet\"i seçebilirsin.")}</p>`;
-  } catch (e) {
-    $("chartBody").innerHTML = `<div class="text-xs text-[var(--w-over)] text-center py-8">${t("Kart oluşturulamadı.")}</div>`;
-  }
-}
-
-async function shareWorkoutCard() {
-  if (!shareFile) return;
-  const file = shareFile;
-  if (navigator.canShare && file instanceof File && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: t("AYK+ Antrenman") }); return; }
-    catch (e) { if (e && e.name === "AbortError") return; }
-  }
-  try {
-    const url = URL.createObjectURL(file);
-    const a = document.createElement("a");
-    a.href = url; a.download = file.name || "AYK-antrenman.png";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-    toast(t("Görsel indirildi"));
-  } catch (e) { toast(t("Paylaşılamadı. Görsele basılı tutup kaydedebilirsin."), "error"); }
-}
 
 
 // ============================================================================
@@ -482,3 +443,216 @@ async function paintMuscleMap(muscles, pal) {
   ctx.putImageData(im, 0, 0);
   return cv;
 }
+
+// ============================================================================
+// v67 — PAYLAŞIM PENCERESİ (#shareModal): şablon kaydırma, boyut, tema, istatistik, fotoğraf, paylaş / kopyala
+// Fotoğraf YALNIZ bellekte (sharePhoto); kayda, önbelleğe, yedeğe girmez; pencere kapanınca bırakılır.
+// ============================================================================
+let sharePhoto = null, sharePhotoId = 0;
+let shareCtx = null;   // { li, log, data, tpls, tpl, urls: {tpl: objectURL}, full: {key, blob}, gen }
+const SHARE_TPL_NAMES = { map: () => t("Kas haritası"), pr: () => t("Rekor|şablon"), photo: () => t("Fotoğraf|şablon"), sticker: () => t("Çıkartma"), list: () => t("Hareket listesi") };
+const SHARE_CHIP_KEYS = ["dur", "vol", "sets", "prs", "cardio", "month"];
+function shareSettings() { return state.settings.share; }
+function shareOpts(tpl) {
+  const s = shareSettings();
+  return { tpl, size: s.size, theme: s.theme, stats: s.stats, photo: tpl === "photo" ? sharePhoto : null };
+}
+function shareKey(tpl) { const s = shareSettings(); return [tpl, s.size, s.theme, JSON.stringify(s.stats), tpl === "photo" ? sharePhotoId : 0].join("|"); }
+function shareCanBlob(cv) { return new Promise(res => cv.toBlob(res, "image/png")); }
+
+async function openShareCard(logIdx) {
+  const log = state.workoutLogs[logIdx];
+  if (!log) return;
+  shareClearPhoto();
+  const data = shareData(log), tpls = shareTplsFor(data), saved = shareSettings().tpl;
+  let tpl = tpls.includes(saved) && saved !== "photo" ? saved : "map";
+  if (tpl === "map" && !Object.keys(data.muscles).length && tpls.includes("list")) tpl = "list";
+  shareCtx = { li: logIdx, log, data, tpls, tpl, urls: {}, full: null, gen: 0 };
+  const sizeBtn = (k, l) => `<button data-share-size="${k}" onclick="setShareOpt('size','${k}')" class="h-11 rounded-[11px] text-[13px] font-bold">${l}</button>`;
+  const themeBtn = (k, l) => `<button data-share-theme="${k}" onclick="setShareOpt('theme','${k}')" class="h-11 rounded-[11px] text-[13px] font-bold">${l}</button>`;
+  const chips = SHARE_CHIP_KEYS.map(k => {
+    const st = data.stats.find(s => s.key === k), has = k === "month" ? true : !!(st && st.has);
+    const label = k === "month" ? t("Ay sırası") : st.label;
+    return `<button data-share-stat="${k}" onclick="toggleShareStat('${k}')" ${has ? "" : "disabled"} class="min-h-[44px] px-3.5 rounded-full border text-[13px] font-semibold disabled:opacity-35">${esc(label)}</button>`;
+  }).join("");
+  $("shareBody").innerHTML = `
+    <div class="w-10 h-1.5 rounded-full bg-[var(--w-line)] mx-auto mb-3"></div>
+    <div class="flex items-center gap-3">
+      <h3 id="shareTitle" class="flex-1 text-[21px] font-extrabold leading-tight text-[var(--w-text)]">${t("Paylaş")}</h3>
+      <button id="shareClose" onclick="closeShare()" aria-label="${t("Kapat")}" class="w-11 h-11 shrink-0 rounded-full bg-[var(--w-elev)] text-[var(--w-muted)] flex items-center justify-center">${svgI("x", 20, 2.2)}</button>
+    </div>
+    <div id="shareTrack" onscroll="shareOnScroll()" class="share-track mt-3 flex overflow-x-auto snap-x snap-mandatory">
+      ${tpls.map(k => `<div data-share-tpl="${k}" class="snap-center shrink-0 w-full flex justify-center"><div class="share-prev ${k === "sticker" ? "share-checker" : ""} rounded-2xl overflow-hidden border border-[var(--w-line)]"><img alt="${esc(SHARE_TPL_NAMES[k]())}" class="block h-full w-auto" /></div></div>`).join("")}
+    </div>
+    <div id="shareDots" class="flex justify-center mt-1">${tpls.map(k => `<button data-share-dot="${k}" onclick="setShareTpl('${k}', true)" aria-label="${esc(SHARE_TPL_NAMES[k]())}" class="w-11 h-11 flex items-center justify-center"><span class="block w-2 h-2 rounded-full"></span></button>`).join("")}</div>
+    <div id="shareTplName" class="text-center text-[14px] font-bold text-[var(--w-text)] -mt-1"></div>
+    <div class="grid grid-cols-2 gap-2 mt-3">
+      <div id="shareSize" class="grid grid-cols-2 gap-0.5 bg-[var(--w-elev)] rounded-[14px] p-0.5">${sizeBtn("story", t("Hikâye"))}${sizeBtn("post", t("Gönderi"))}</div>
+      <div id="shareTheme" class="grid grid-cols-2 gap-0.5 bg-[var(--w-elev)] rounded-[14px] p-0.5">${themeBtn("dark", t("Koyu"))}${themeBtn("light", t("Aydınlık"))}</div>
+    </div>
+    <div id="shareStats" class="flex flex-wrap gap-2 mt-3">${chips}</div>
+    <button id="sharePhotoBtn" onclick="$('sharePhotoInput').click()" class="hidden w-full mt-3 h-12 rounded-2xl bg-[var(--w-elev)] text-[var(--w-text)] text-[15px] font-bold">${t("Fotoğraf seç")}</button>
+    <input id="sharePhotoInput" type="file" accept="image/*" class="hidden" onchange="sharePickPhoto(this)" />
+    <div class="flex gap-2.5 mt-4">
+      <button id="shareGo" onclick="shareGo()" class="w-btn flex-1 h-[52px] rounded-2xl text-[15px] disabled:opacity-40">${t("Paylaş")}</button>
+      <button id="shareCopy" onclick="shareCopy()" class="hidden h-[52px] px-5 rounded-2xl bg-[var(--w-elev)] text-[var(--w-text)] text-[15px] font-bold">${t("Kopyala")}</button>
+    </div>`;
+  openModal("shareModal");
+  shareSyncUi();
+  requestAnimationFrame(() => { shareScrollTo(tpl, false); shareRenderAll(); });
+}
+function shareCopyOk() { return !!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem); }
+function shareSyncUi() {
+  if (!shareCtx) return;
+  const s = shareSettings(), tpl = shareCtx.tpl, m = $("shareModal");
+  m.dataset.tpl = tpl;
+  document.querySelectorAll("[data-share-dot]").forEach(b => { const on = b.dataset.shareDot === tpl; b.setAttribute("aria-pressed", on); b.firstElementChild.className = "block w-2 h-2 rounded-full " + (on ? "bg-[var(--w-acc)]" : "bg-[var(--w-line)]"); });
+  document.querySelectorAll("[data-share-size]").forEach(b => { const on = b.dataset.shareSize === s.size; b.setAttribute("aria-pressed", on); b.className = "h-11 rounded-[11px] text-[13px] font-bold " + (on ? "bg-[var(--w-text)] text-[var(--w-sheet)]" : "text-[var(--w-muted)]"); });
+  document.querySelectorAll("[data-share-theme]").forEach(b => { const on = b.dataset.shareTheme === s.theme; b.setAttribute("aria-pressed", on); b.className = "h-11 rounded-[11px] text-[13px] font-bold " + (on ? "bg-[var(--w-text)] text-[var(--w-sheet)]" : "text-[var(--w-muted)]"); });
+  document.querySelectorAll("[data-share-stat]").forEach(b => { const on = s.stats[b.dataset.shareStat] !== false; b.setAttribute("aria-pressed", on); b.className = "min-h-[44px] px-3.5 rounded-full border text-[13px] font-semibold disabled:opacity-35 " + (on && !b.disabled ? "border-[var(--w-acc)] text-[var(--w-acc)] bg-[rgba(var(--t-acc-rgb),0.12)]" : "border-[var(--w-line)] text-[var(--w-muted)]"); });
+  $("shareTplName").textContent = SHARE_TPL_NAMES[tpl]();
+  $("shareTheme").classList.toggle("hidden", tpl === "photo" || tpl === "sticker");
+  $("sharePhotoBtn").classList.toggle("hidden", tpl !== "photo");
+  if (tpl === "photo") $("sharePhotoBtn").textContent = sharePhoto ? t("Başka fotoğraf seç") : t("Fotoğraf seç");
+  $("shareCopy").classList.toggle("hidden", tpl !== "sticker" || !shareCopyOk());
+  $("shareGo").disabled = tpl === "photo" && !sharePhoto;
+}
+// Kaydırma: şablon, kaydırma DURUNCA seçilir (ara konumdan yanlış şablon seçilmesin); düğmeyle kaydırırken hedef belli
+function shareScrollTo(tpl, smooth) {
+  const tr = $("shareTrack"), i = shareCtx.tpls.indexOf(tpl);
+  if (!tr || i < 0) return;
+  const left = i * tr.clientWidth;
+  shareCtx.target = smooth && Math.abs(tr.scrollLeft - left) > 2 ? tpl : null;   // anında atlamada olay gelmeyebilir: hedef bekleme
+  tr.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
+}
+function shareOnScroll() {
+  if (!shareCtx) return;
+  clearTimeout(shareCtx.scrollT);
+  shareCtx.scrollT = setTimeout(() => {
+    if (!shareCtx) return;
+    const tr = $("shareTrack"), i = Math.round(tr.scrollLeft / Math.max(1, tr.clientWidth));
+    const k = shareCtx.tpls[Math.max(0, Math.min(shareCtx.tpls.length - 1, i))];
+    if (shareCtx.target) { if (k === shareCtx.target) shareCtx.target = null; return; }
+    if (k && k !== shareCtx.tpl) setShareTpl(k, false);
+  }, 140);
+}
+function setShareTpl(k, scroll) {
+  if (!shareCtx || !shareCtx.tpls.includes(k)) return;
+  shareCtx.tpl = k;
+  if (k !== "photo") { state.settings.share.tpl = k; saveState(); }   // fotoğraf şablonu hatırlanmaz
+  if (scroll) shareScrollTo(k, true);
+  shareSyncUi();
+  shareRender(k);
+}
+function setShareOpt(key, v) {
+  if (!shareCtx) return;
+  state.settings.share[key] = v; saveState();
+  shareSyncUi(); shareRenderAll();
+}
+function toggleShareStat(k) {
+  if (!shareCtx) return;
+  const s = state.settings.share.stats;
+  if (s[k] !== false) {
+    const onCount = SHARE_CHIP_KEYS.filter(x => s[x] !== false && !(document.querySelector('[data-share-stat="' + x + '"]') || {}).disabled).length;
+    if (onCount <= 1) { toast(t("En az bir bilgi açık kalmalı")); return; }
+    s[k] = false;
+  } else s[k] = true;
+  saveState(); shareSyncUi(); shareRenderAll();
+}
+// Önizleme: tam boy çiz → küçült → <img>; o anki şablonun tam boy dosyası paylaşım için saklanır (iOS dokunuş süresi)
+async function shareRender(tpl) {
+  if (!shareCtx) return;
+  const ctxRef = shareCtx, key = shareKey(tpl);
+  if (ctxRef.keys && ctxRef.keys[tpl] === key) return;
+  const cv = await buildShareCanvas(ctxRef.log, shareOpts(tpl));
+  if (shareCtx !== ctxRef || shareKey(tpl) !== key) return;
+  const sm = document.createElement("canvas"), sw = 360;
+  sm.width = sw; sm.height = Math.round(cv.height * sw / cv.width);
+  const sx = sm.getContext("2d"); sx.imageSmoothingQuality = "high"; sx.drawImage(cv, 0, 0, sm.width, sm.height);
+  const blob = await shareCanBlob(sm);
+  if (!blob || shareCtx !== ctxRef) return;
+  if (ctxRef.urls[tpl]) URL.revokeObjectURL(ctxRef.urls[tpl]);
+  ctxRef.urls[tpl] = URL.createObjectURL(blob);
+  (ctxRef.keys = ctxRef.keys || {})[tpl] = key;
+  const img = document.querySelector('[data-share-tpl="' + tpl + '"] img');
+  if (img) img.src = ctxRef.urls[tpl];
+  if (tpl === ctxRef.tpl) shareCanBlob(cv).then(b => { if (shareCtx === ctxRef && b && shareKey(tpl) === key) ctxRef.full = { key, blob: b }; });
+}
+async function shareRenderAll() {
+  if (!shareCtx) return;
+  const ctxRef = shareCtx;
+  await shareRender(ctxRef.tpl);
+  for (const k of ctxRef.tpls) { if (shareCtx !== ctxRef) return; if (k !== ctxRef.tpl) await shareRender(k); }
+}
+async function shareBlob() {
+  const ctxRef = shareCtx, key = shareKey(ctxRef.tpl);
+  if (ctxRef.full && ctxRef.full.key === key) return ctxRef.full.blob;
+  return shareCanBlob(await buildShareCanvas(ctxRef.log, shareOpts(ctxRef.tpl)));
+}
+function shareFileName() {
+  const log = shareCtx.log;
+  return "AYK-" + shareCtx.tpl + "-" + (log.ts ? todayStr(new Date(log.ts)) : "antrenman") + ".png";
+}
+async function shareGo() {
+  if (!shareCtx || $("shareGo").disabled) return;
+  try {
+    const blob = await shareBlob();
+    if (!blob) throw new Error("blob");
+    let file;
+    try { file = new File([blob], shareFileName(), { type: "image/png" }); } catch (e) { file = blob; file.name = shareFileName(); }
+    await shareFileOut(file);
+  } catch (e) { toast(t("Kart oluşturulamadı."), "error"); }
+}
+async function shareFileOut(file) {
+  if (navigator.canShare && file instanceof File && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], title: t("AYK+ Antrenman") }); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  try {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url; a.download = file.name || "AYK-antrenman.png";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    toast(t("Görsel indirildi"));
+  } catch (e) { toast(t("Paylaşılamadı. Görsele basılı tutup kaydedebilirsin."), "error"); }
+}
+async function shareCopy() {
+  if (!shareCtx || !shareCopyOk()) return;
+  try {
+    await navigator.clipboard.write([new ClipboardItem({ "image/png": shareBlob() })]);   // iOS: Promise ile, dokunuş anında
+    toast(t("Kopyalandı. Instagram hikâyesinde yapıştır."));
+  } catch (e) { toast(t("Kopyalanamadı. Paylaş'ı kullan."), "error"); }
+}
+async function sharePickPhoto(input) {
+  const f = input.files && input.files[0];
+  input.value = "";
+  if (!f || !shareCtx) return;
+  let img = null;
+  try { img = await createImageBitmap(f, { imageOrientation: "from-image" }); }
+  catch (e) {
+    try {
+      const url = URL.createObjectURL(f);
+      img = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = url; });
+      img._url = url;
+    } catch (e2) { toast(t("Fotoğraf açılamadı."), "error"); return; }
+  }
+  shareClearPhoto();
+  sharePhoto = img; sharePhotoId++;
+  shareSyncUi(); shareRender("photo");
+}
+function shareClearPhoto() {
+  if (sharePhoto) {
+    try { if (sharePhoto.close) sharePhoto.close(); } catch (e) { /* zaten bırakıldı */ }
+    if (sharePhoto._url) URL.revokeObjectURL(sharePhoto._url);
+  }
+  sharePhoto = null;
+}
+function closeShare() {
+  closeModal("shareModal");
+  shareClearPhoto();
+  if (shareCtx) Object.values(shareCtx.urls).forEach(u => URL.revokeObjectURL(u));
+  shareCtx = null;
+  const b = $("shareBody"); if (b) b.innerHTML = "";
+}
+document.addEventListener("click", e => { if (e.target && e.target.id === "shareModal") closeShare(); });

@@ -153,16 +153,16 @@ try:
       state.exerciseHistory['bench52'] = [{ logId: 'l52', name: 'Bench Press', kind: 'weight', sets: [{ kg: 60, reps: 8 }] }]; }""")
     def card(lang):
         pg.evaluate("setLang('%s')" % lang); pg.wait_for_timeout(100)
-        pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#chartBody img", timeout=8000)
-        r = {"title": pg.inner_text("#chartTitle"), "alt": pg.get_attribute("#chartBody img", "alt"), "body": pg.inner_text("#chartBody"),
+        pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#shareTrack img[src]", timeout=8000)   # v67: yeni pencere
+        r = {"title": pg.inner_text("#shareTitle"), "alt": pg.get_attribute("#shareTrack img", "alt"), "body": pg.inner_text("#shareBody"),
              "ex": pg.evaluate("logExerciseLines(state.workoutLogs[state.workoutLogs.length - 1])[0].txt")}
-        pg.evaluate("closeModal('chartModal')") if pg.evaluate("typeof closeModal === 'function'") else None
+        pg.evaluate("closeShare()")
         return r
     r = card("en")
-    check(r["title"] == "Workout summary" and r["alt"] == "Workout summary" and not TR_CH.search(r["body"]) and "Share / Save to Photos" in r["body"], "en: paylaşım kartı penceresi İngilizce: %r %r" % (r["title"], r["body"][:60]))
+    check(r["title"] == "Share" and r["alt"] == "Muscle map" and not TR_CH.search(r["body"]) and "Story" in r["body"] and "Volume" in r["body"], "en: paylaşım penceresi İngilizce: %r %r" % (r["title"], r["body"][:80]))
     check(r["ex"] == "1 set • best 60×8", "en: kart hareket satırı: %r" % r["ex"])
     r = card("tr")
-    check(r["title"] == "Antrenman Özeti" and r["alt"] == "Antrenman özeti" and "Paylaş / Fotoğraflara Kaydet" in r["body"] and r["ex"] == "1 set • en iyi 60×8", "tr: paylaşım kartı penceresi eski metinle: %r" % r)
+    check(r["title"] == "Paylaş" and r["alt"] == "Kas haritası" and "Hikâye" in r["body"] and r["ex"] == "1 set • en iyi 60×8", "tr: paylaşım penceresi Türkçe: %r" % r)
     # tuval metinleri: fillText çağrılarını yakala
     def canvas_texts(lang):
         pg.evaluate("setLang('%s')" % lang); pg.wait_for_timeout(100)

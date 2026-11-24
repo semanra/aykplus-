@@ -435,6 +435,11 @@ function normalizeStateInner(raw) {
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
   s.settings.anim = s.settings.anim !== false;   // v55: uygulama içi animasyonlar (varsayılan açık)
   if (!["system", "normal", "large", "xlarge"].includes(s.settings.textSize)) s.settings.textSize = "system";   // v61
+  {   // v67: paylaşım seçimleri (fotoğraf şablonu ve fotoğraf asla kaydedilmez)
+    const sh = isObj(s.settings.share) ? s.settings.share : {}, ss = isObj(sh.stats) ? sh.stats : {};
+    s.settings.share = { tpl: ["map", "pr", "sticker", "list"].includes(sh.tpl) ? sh.tpl : "map", size: sh.size === "post" ? "post" : "story",
+      theme: sh.theme === "light" ? "light" : "dark", stats: Object.fromEntries(["dur", "vol", "sets", "prs", "cardio", "month"].map(k => [k, ss[k] !== false])) };
+  }
   s.settings.scaleOn = !!s.settings.scaleOn;
   s.settings.scaleBase = num(s.settings.scaleBase, 0);
   if (s.settings.scaleOn && !(s.settings.scaleBase > 0)) s.settings.scaleOn = false;

@@ -40,11 +40,11 @@ with sync_playwright() as p:
     print("toast has share:", pg.locator("#toastWrap button", has_text="Paylaş").count())
     pg.evaluate("setGymView('history')"); pg.wait_for_timeout(100); print("history:", pg.inner_text("#workoutHistoryList").replace("\n"," | ")[:160])
     # ---------- 3) paylaşım kartı
-    pg.locator('[onclick="openShareCard(0)"]').tap(); pg.wait_for_timeout(1500)
-    src=pg.get_attribute("#chartBody img","src"); print("share img:", bool(src))
-    data=pg.evaluate("""async()=>{const r=await fetch(document.querySelector('#chartBody img').src); const b=await r.blob(); const fr=new FileReader(); return await new Promise(res=>{fr.onload=()=>res(fr.result); fr.readAsDataURL(b);});}""")
+    pg.locator('[onclick="openShareCard(0)"]').tap(); pg.wait_for_selector("#shareTrack img[src]", timeout=8000)   # v67: yeni paylaşım penceresi
+    src=pg.get_attribute("#shareTrack img[src]","src"); print("share img:", bool(src))
+    data=pg.evaluate("""async()=>{const r=await fetch(document.querySelector('#shareTrack img[src]').src); const b=await r.blob(); const fr=new FileReader(); return await new Promise(res=>{fr.onload=()=>res(fr.result); fr.readAsDataURL(b);});}""")
     import base64; open(SHOTS+'/v8_share.png','wb').write(base64.b64decode(data.split(',')[1]))
-    pg.click("#chartModal button[onclick=\"closeModal('chartModal')\"]")
+    pg.click("#shareClose")
     # ---------- 4) geri al: hareket sil
     n0=len(st(pg)["workoutDays"][st(pg)["activeWorkoutDayIdx"]]["exercises"])
     pg.evaluate("removeExercise(0)"); pg.wait_for_timeout(150)

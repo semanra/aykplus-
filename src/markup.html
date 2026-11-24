@@ -788,6 +788,11 @@
     .ayk-done { position: relative; display: inline-block; }
     .ayk-done::after { content: ""; position: absolute; inset: -3px -6px; border-radius: 8px; background: rgba(var(--t-acc-rgb), .3); box-shadow: 0 0 14px rgba(var(--t-acc-rgb), .55); pointer-events: none; animation: aykDoneGlow .9s ease-out forwards; }
     @keyframes aykDoneGlow { 0% { opacity: 0; transform: scale(.8); } 30% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.15); } }
+      /* v67 paylaşım penceresi */
+    .share-track { scrollbar-width: none; overscroll-behavior-x: contain; }
+    .share-track::-webkit-scrollbar { display: none; }
+    .share-prev { height: min(44vh, 400px); }
+    .share-checker { background: repeating-conic-gradient(#3a3a3f 0 25%, #2a2a2e 0 50%) 0 0 / 20px 20px; }
   </style>
 </head>
 <body class="pb-36">
@@ -1401,6 +1406,13 @@
   <div id="finishModal" class="fixed inset-0 bg-black/70 hidden items-end md:items-center justify-center z-50">
     <div role="dialog" aria-modal="true" aria-labelledby="finTitle" class="sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] px-5 pt-2.5 pb-6 overflow-y-auto" style="max-height: 90vh;">
       <div id="finBody"></div>
+    </div>
+  </div>
+
+  <!-- v67 PAYLAŞIM PENCERESİ (içerik openShareCard ile çizilir) -->
+  <div id="shareModal" class="fixed inset-0 bg-black/70 hidden items-end md:items-center justify-center z-50">
+    <div role="dialog" aria-modal="true" aria-labelledby="shareTitle" class="sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] px-5 pt-2.5 pb-6 overflow-y-auto" style="max-height: 94vh;">
+      <div id="shareBody"></div>
     </div>
   </div>
 
