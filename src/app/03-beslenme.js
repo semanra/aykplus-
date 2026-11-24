@@ -111,7 +111,8 @@ function setThemeOpt(mode, el) {
 }
 const toggleNutriLight = toggleTheme;   // eski ad (başlıktaki düğme)
 // Sistem teması değişince: olay + yedek olarak uygulamaya dönüşte yeniden bak (iOS arka plandayken olayı kaçırabilir)
-function onSystemTheme() { try { if (state.settings.theme === "system" && themeIsLight() !== document.documentElement.classList.contains("light")) applyTabVisibility(); } catch (e) {} }
+// v68: renderAll de çağrılır — 3D kas haritası canvas'ta çizildiği için CSS tek başına temayı değiştiremez
+function onSystemTheme() { try { if (state.settings.theme === "system" && themeIsLight() !== document.documentElement.classList.contains("light")) { applyTabVisibility(); renderAll(); } } catch (e) {} }
 if (THEME_MQ) { if (THEME_MQ.addEventListener) THEME_MQ.addEventListener("change", onSystemTheme); else if (THEME_MQ.addListener) THEME_MQ.addListener(onSystemTheme); }
 document.addEventListener("visibilitychange", () => { if (!document.hidden) onSystemTheme(); });
 window.addEventListener("focus", onSystemTheme);

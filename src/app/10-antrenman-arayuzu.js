@@ -695,17 +695,19 @@ function openFinishSummary(li, prList) {
   if (typeof animFinishIn === "function") animFinishIn(stats);   // v57 ANİM: antrenman özeti
   if (hasMap) drawFinishMap(fMus);
 }
-// v68: kaslar son hâliyle çizilir; animasyon açıksa (animFinishMap) çok setliden aza sırayla yanar
+// v68: harita EKRAN çözünürlüğünde (200 CSS px yükseklik × piksel oranı) çizilir — tam boy (900 px) kare kare
+// boyamak iPhone tuval belleğini doldurur. Animasyon açıksa (animFinishMap) kaslar çoktan aza sırayla yanar.
 async function drawFinishMap(mus) {
   const theme = themeIsLight() ? "light" : "dark";
-  const fin = await paintMuscleMap3d(mus, { theme, scale: "session" });
+  let fin = null;
+  try { fin = await paintMuscleMap3d(mus, { theme, scale: "session" }); } catch (e) { fin = null; }
   const cv = document.getElementById("finMap");
   if (!cv) return;
   if (!fin) { const box = document.getElementById("finMapBox"); if (box) box.remove(); return; }
-  cv.width = fin.width; cv.height = fin.height;
-  const put = m => { if (cv.isConnected && m) { const x = cv.getContext("2d"); x.clearRect(0, 0, cv.width, cv.height); x.drawImage(m, 0, 0); } };
-  if (typeof animFinishMap === "function" && animFinishMap(mus, theme, put)) return;
-  put(fin);
+  const H = Math.round(200 * Math.min(3, window.devicePixelRatio || 1)), W = Math.round(H * fin.width / fin.height);
+  cv.width = W; cv.height = H;
+  try { if (typeof animFinishMap === "function" && await animFinishMap(mus, theme, cv, fin)) return; } catch (e) { /* son hâl aşağıda */ }
+  try { const x = cv.getContext("2d"); x.clearRect(0, 0, W, H); x.drawImage(fin, 0, 0, W, H); } catch (e) { /* tuval belleği: harita boş kalır */ }
 }
 
 // --- Hareket menüsü (alttan açılan) ---

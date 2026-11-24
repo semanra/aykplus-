@@ -485,22 +485,49 @@ function animFinishIn(stats) {
 }
 
 /* v68 ANİM: bitiş özeti kas haritası */
-// Çalışan kaslar set çoktan aza 160 ms arayla yanar: her kas 350 ms'de koyu turkuazdan kendi parlaklığına çıkar
-// (ışımayla). Kare başına tam boyama pahalı → ~70 ms'de bir boyanır; toplam ≤ 1,5 sn, sonunda son hâl. true = oynatıyor.
-function animFinishMap(mus, theme, put) {
-  if (!animOK()) return false;
-  const order = Object.keys(mus).sort((a, b) => mus[b] - mus[a]);
-  const target = {}; order.forEach(m => { target[m] = muscleLevel(mus[m], "session"); });
-  const total = Math.min(1500, (order.length - 1) * 160 + 350), t0 = performance.now();
-  const step = async () => {
-    const el = performance.now() - t0, lv = {};
-    order.forEach((m, i) => { const p = Math.max(0, Math.min(1, (el - i * 160) / 350)); if (p > 0) lv[m] = target[m] * p; });
-    const done = el >= total;
-    const cv = await paintMuscleMap3d(done ? mus : {}, done ? { theme, scale: "session" } : { theme, scale: "session", levels: lv });
-    put(cv);
-    if (!done && document.getElementById("finMap")) setTimeout(step, 70);
+// Çalışan kaslar set çoktan aza sırayla boştaki griden kendi rengine geçer (her biri 350 ms, en çok 160 ms arayla,
+// toplam ≤ 1,5 sn). Boyama BİR KEZ: boş figür (önbellekte) + son hâlden ekran çözünürlüğünde kas başına katman;
+// kareler yalnız saydamlıkla üst üste çizilir (kare başına piksel döngüsü / büyük tuval yok). Son karede son hâl
+// (ışımalı). Hata olursa (tuval belleği) son hâl çizilir. true = oynatıyor.
+async function animFinishMap(mus, theme, cv, fin) {
+  if (!animOK() || !muscleMapData) return false;
+  const base = await paintMuscleMap3d({}, { theme, scale: "session" });
+  if (!base || !cv.isConnected) return false;
+  const M = muscleMapData, W = cv.width, H = cv.height, x = cv.getContext("2d");
+  const order = Object.keys(mus).filter(m => num(mus[m]) > 0 && MUSCLES.includes(m)).sort((a, b) => mus[b] - mus[a]);
+  if (!order.length) return false;
+  const slot = {}; order.forEach((m, i) => { slot[MUSCLES.indexOf(m) + 2] = i; });
+  const small = document.createElement("canvas"); small.width = W; small.height = H;
+  const sctx = small.getContext("2d"); sctx.drawImage(fin, 0, 0, W, H);
+  const fd = sctx.getImageData(0, 0, W, H).data;
+  small.width = small.height = 0;
+  const layers = order.map(() => { const c = document.createElement("canvas"); c.width = W; c.height = H; return c; });
+  const imgs = layers.map(c => c.getContext("2d").createImageData(W, H));
+  for (let y = 0; y < H; y++) {
+    const row = Math.min(M.h - 1, Math.floor(y * M.h / H)) * M.w;
+    for (let xx = 0; xx < W; xx++) {
+      const k = slot[M.lab[row + Math.min(M.w - 1, Math.floor(xx * M.w / W))]];
+      if (k === undefined) continue;
+      const j = (y * W + xx) * 4, o = imgs[k].data;
+      o[j] = fd[j]; o[j + 1] = fd[j + 1]; o[j + 2] = fd[j + 2]; o[j + 3] = fd[j + 3];
+    }
+  }
+  layers.forEach((c, i) => c.getContext("2d").putImageData(imgs[i], 0, 0));
+  const stag = order.length > 1 ? Math.min(160, (1500 - 350) / (order.length - 1)) : 0, total = (order.length - 1) * stag + 350, t0 = performance.now();
+  const free = () => layers.forEach(c => { c.width = c.height = 0; });
+  const last = () => { try { x.globalAlpha = 1; x.clearRect(0, 0, W, H); x.drawImage(fin, 0, 0, W, H); } catch (e) { /* boş kalır */ } };
+  const frame = () => {
+    try {
+      if (!cv.isConnected) { free(); return; }
+      const el = performance.now() - t0;
+      if (el >= total) { last(); free(); return; }
+      x.clearRect(0, 0, W, H); x.drawImage(base, 0, 0, W, H);
+      layers.forEach((c, i) => { const p = Math.max(0, Math.min(1, (el - i * stag) / 350)); if (p > 0) { x.globalAlpha = p; x.drawImage(c, 0, 0); } });
+      x.globalAlpha = 1;
+      requestAnimationFrame(frame);
+    } catch (e) { free(); last(); }
   };
-  step();
+  requestAnimationFrame(frame);
   return true;
 }
 

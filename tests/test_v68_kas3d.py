@@ -245,7 +245,7 @@ try:
     c, pg = ctx(); pg.evaluate(FSEED)
     pg.evaluate("openFinishSummary(0, [])"); pg.wait_for_timeout(500)
     f6 = pg.evaluate(FPIX)
-    check(f6 != -1 and f6[0] > 500, "6a: bitiş özetinde kas haritası, çalışan kaslar turkuaz (%s)" % (f6,))
+    check(f6 != -1 and f6[0] > 100, "6a: bitiş özetinde kas haritası, çalışan kaslar turkuaz (%s)" % (f6,))
     check(pg.locator("#finMap").bounding_box()["height"] >= 150, "6a: harita yeterince büyük")
     pg.screenshot(path=os.path.join(SHOTS, "v68_bitis_ozeti.png"))
     pg.evaluate("closeModal('finishModal'); openFinishSummary(1, [])"); pg.wait_for_timeout(300)
@@ -258,14 +258,46 @@ try:
     c.close()
     c, pg = ctx(anim=True); pg.evaluate(FSEED)
     check(pg.evaluate("animOK()"), "6d: (ön koşul) animasyon açık")
-    pg.evaluate("""() => { window.__lv = []; const o = window.paintMuscleMap3d; window.paintMuscleMap3d = (m, op) => { if (op && op.levels) window.__lv.push(Object.assign({}, op.levels)); return o(m, op); }; }""")
+    pg.evaluate("""() => { window.__smp = []; const t0 = performance.now(); const tick = () => { const cv = document.getElementById('finMap'), M = muscleMapData;
+        if (cv && cv.width && M) { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, r = { 'Göğüs': 0, 'Triceps': 0 };
+          for (let y = 0; y < cv.height; y += 2) for (let x = 0; x < cv.width; x += 2) { const id = M.lab[Math.floor(y * M.h / cv.height) * M.w + Math.floor(x * M.w / cv.width)];
+            const j = (y * cv.width + x) * 4; if (d[j + 1] > d[j] + 60 && d[j + 3] > 200) { if (id === 2) r['Göğüs']++; if (id === 9) r['Triceps']++; } }
+          window.__smp.push(r); }
+        if (performance.now() - t0 < 2000) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }""")
     pg.evaluate("openFinishSummary(0, [])"); pg.wait_for_timeout(2200)
-    lv = pg.evaluate("window.__lv")
-    early = [x for x in lv if "Göğüs" in x and "Triceps" not in x]
-    check(len(lv) >= 4 and early, "6d: kaslar sırayla yanar (önce en çok setli göğüs; %d kare)" % len(lv))
-    check(all(x.get("Göğüs", 0) <= 1 for x in lv) and len(set(round(x.get("Göğüs", 0), 2) for x in lv)) > 2, "6d: göğüs parlaklığı kademeli artar")
+    smp = pg.evaluate("window.__smp")
+    early = [x for x in smp if x["Göğüs"] > 20 and x["Triceps"] == 0]
+    check(len(smp) >= 4 and early, "6d: kaslar sırayla yanar (önce en çok setli göğüs; %d örnek)" % len(smp))
+    check(len(set(x["Göğüs"] for x in smp)) > 2, "6d: göğüs kademeli belirir")
     fa = pg.evaluate(FPIX)
     check(f6 != -1 and fa != -1 and abs(fa[1] - f6[1]) <= 5 and abs(fa[0] - f6[0]) <= max(20, f6[0] * 0.03), "6d: animasyon sonunda son hâl (%s / %s)" % (fa, f6))
+    c.close()
+
+    # --- 8) İnceleme düzeltmeleri
+    # 8a: telefon teması kendiliğinden değişince (ayar "system") harita yeni temayla yeniden çizilir
+    c, pg = ctx(); pg.evaluate(WSEED); pg.evaluate("state.settings.theme = 'system'; renderAll()"); pg.wait_for_timeout(300)
+    d0 = pg.evaluate(TQPIX)
+    pg.emulate_media(color_scheme="light"); pg.wait_for_timeout(600)
+    d1 = pg.evaluate(TQPIX)
+    check(d1[1] > 10 * max(d0[1], 50), "8a: sistem teması aydınlığa geçince harita açık figürle çizilir (%s → %s)" % (d0, d1))
+    c.close()
+    # 8b: bitiş animasyonu ekran çözünürlüğünde boyar, kare başına 900 px tuval üretmez; hata olsa da son hâl çizilir
+    c, pg = ctx(anim=True); pg.evaluate(FSEED)
+    pg.evaluate("""() => { window.__big = 0; const o = document.createElement.bind(document);
+      document.createElement = (t) => { const e = o(t); if (String(t).toLowerCase() === 'canvas') { let w = 0; Object.defineProperty(e, 'width', { get: () => w, set: v => { w = v; if (v >= 900) window.__big++; } }); } return e; }; }""")
+    pg.evaluate("openFinishSummary(0, [])"); pg.wait_for_timeout(2200)
+    big = pg.evaluate("window.__big")
+    cvw = pg.evaluate("document.getElementById('finMap').width")
+    check(big <= 10, "8b: animasyon boyunca kare başına tam boy tuval yok (%d; eskiden 26)" % big)
+    check(0 < cvw < 900, "8b: bitiş haritası ekran çözünürlüğünde (%d px)" % cvw)
+    fz = pg.evaluate(FPIX)
+    check(fz != -1 and fz[0] > 50, "8b: animasyon sonunda çalışan kaslar turkuaz (%s)" % (fz,))
+    c.close()
+    c, pg = ctx(anim=True); pg.evaluate(FSEED)
+    pg.evaluate("""() => { const o = CanvasRenderingContext2D.prototype.drawImage; let n = 0; window.__restore = () => { CanvasRenderingContext2D.prototype.drawImage = o; };
+      CanvasRenderingContext2D.prototype.drawImage = function () { if (this.canvas.id !== 'finMap' && ++n === 6) throw new Error('tuval belleği'); return o.apply(this, arguments); }; }""")
+    pg.evaluate("openFinishSummary(0, [])"); pg.wait_for_timeout(2200); pg.evaluate("window.__restore()")
+    check(pg.locator("#finTitle").is_visible(), "8c: animasyon sırasında çizim hatası pencereyi bozmaz")
     c.close()
 
     # --- 7) Paylaşım penceresi animasyonu
