@@ -33,7 +33,9 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || !req.url.startsWith(self.location.origin)) return;
-  if (new URL(req.url).pathname.includes(IMG_PATH)) {
+  const path = new URL(req.url).pathname;
+  // v67: paylaşım kas haritası kurulumda önbelleğe alınır ve sürümle yenilenir (etiket renkleri koda bağlı) → kalıcı görsel önbelleğine girmez
+  if (path.includes(IMG_PATH) && !path.endsWith('/kas-harita.png')) {
     e.respondWith(caches.open(IMG_CACHE).then(c => c.match(req, { ignoreSearch: true }).then(hit => hit || fetch(req).then(res => {
       if (res && res.ok) { const copy = res.clone(); e.waitUntil(c.put(req, copy).catch(() => {})); }
       return res;

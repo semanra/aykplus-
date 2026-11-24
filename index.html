@@ -13977,7 +13977,7 @@ Object.assign(EN, {
   // --- antrenman paylaşım kartı (tuval + pencere)
   "Antrenman tamamlandı": "Workout complete", "Antrenman|kart": "Workout",
   "Süre|kart": "Time", "Tonaj|kart": "Volume", "Rekor|kart": "PRs", "Kardiyo|kart": "Cardio", "Set|kart": "Sets", "Hareket|kart": "Exercises", "Hareketler|kart": "Exercises",
-  "AYK+ ile kaydedildi": "Logged with AYK+", "YENİ REKOR": "NEW PR", "Kas haritası": "Muscle map", "Rekor|şablon": "PR", "Fotoğraf|şablon": "Photo", "Çıkartma": "Sticker", "Hareket listesi": "Exercise list", "Hikâye": "Story", "Gönderi": "Post", "Ay sırası": "Month count", "Başka fotoğraf seç": "Choose another photo", "En az bir bilgi açık kalmalı": "Keep at least one stat on", "Kopyalandı. Instagram hikâyesinde yapıştır.": "Copied. Paste it into your Instagram story.", "Kopyalanamadı. Paylaş'ı kullan.": "Couldn't copy. Use Share.", "Fotoğraf açılamadı.": "Couldn't open the photo.", "Çalışan kaslar:": "Muscles worked:", "Fotoğraf seç": "Choose photo", "HAREKETLER": "EXERCISES", "Tahmini 1RM ~{v} · önceki en iyiden +{d}": "Est. 1RM ~{v} · +{d} over previous best", "+{n} rekor daha": { one: "+{n} more PR", other: "+{n} more PRs" }, "+{n} hareket daha": { one: "+{n} more exercise", other: "+{n} more exercises" }, "{ay} ayının {n}. antrenmanı": "{n} workout of {ay}",
+  "AYK+ ile kaydedildi": "Logged with AYK+", "YENİ REKOR": "NEW PR", "Hazır. Paylaş'a bir kez daha dokun.": "Ready. Tap Share once more.", "Kas haritası": "Muscle map", "Rekor|şablon": "PR", "Fotoğraf|şablon": "Photo", "Çıkartma": "Sticker", "Hareket listesi": "Exercise list", "Hikâye": "Story", "Gönderi": "Post", "Ay sırası": "Month count", "Başka fotoğraf seç": "Choose another photo", "En az bir bilgi açık kalmalı": "Keep at least one stat on", "Kopyalandı. Instagram hikâyesinde yapıştır.": "Copied. Paste it into your Instagram story.", "Kopyalanamadı. Paylaş'ı kullan.": "Couldn't copy. Use Share.", "Fotoğraf açılamadı.": "Couldn't open the photo.", "Çalışan kaslar:": "Muscles worked:", "Fotoğraf seç": "Choose photo", "HAREKETLER": "EXERCISES", "Tahmini 1RM ~{v} · önceki en iyiden +{d}": "Est. 1RM ~{v} · +{d} over previous best", "+{n} rekor daha": { one: "+{n} more PR", other: "+{n} more PRs" }, "+{n} hareket daha": { one: "+{n} more exercise", other: "+{n} more exercises" }, "{ay} ayının {n}. antrenmanı": "{n} workout of {ay}",
   "{c} × {s} sn|kart": "{c} × {s} sec",
   "{n} set • en iyi {kg}×{r}": { one: "{n} set • best {kg}×{r}", other: "{n} sets • best {kg}×{r}" },
   "{n} set • {r} tekrar": { one: "{n} set • {r} reps", other: "{n} sets • {r} reps" },
@@ -15645,7 +15645,7 @@ function shareData(log) {
   const cMin = num(log.cardioMin), cKm = num(log.cardioKm);
   const stats = [
     { key: "dur", label: t("Süre|kart"), value: fmtMinutes(num(log.durationMin)), has: num(log.durationMin) > 0 },
-    { key: "vol", label: t("Tonaj|kart"), value: Math.round(wRaw(num(log.volume))).toLocaleString(locale()) + " " + wUnit(), has: true },
+    { key: "vol", label: t("Tonaj|kart"), value: Math.round(wRaw(num(log.volume))).toLocaleString(locale()) + " " + wUnit(), has: num(log.volume) > 0 },   // yalnız kardiyoda "0 kg" yazmasın
     { key: "sets", label: t("Set|kart"), value: String(num(log.sets)), has: true },
     { key: "prs", label: t("Rekor|kart"), value: String(num(log.prs)), has: prOk },
     { key: "cardio", label: t("Kardiyo|kart"), value: t("{m} dk", { m: cMin }) + (cKm > 0 ? " · " + fmtNum(cKm) + " km" : ""), has: cMin > 0 }
@@ -15761,7 +15761,7 @@ async function openShareCard(logIdx) {
       <h3 id="shareTitle" class="flex-1 text-[21px] font-extrabold leading-tight text-[var(--w-text)]">${t("Paylaş")}</h3>
       <button id="shareClose" onclick="closeShare()" aria-label="${t("Kapat")}" class="w-11 h-11 shrink-0 rounded-full bg-[var(--w-elev)] text-[var(--w-muted)] flex items-center justify-center">${svgI("x", 20, 2.2)}</button>
     </div>
-    <div id="shareTrack" onscroll="shareOnScroll()" class="share-track mt-3 flex overflow-x-auto snap-x snap-mandatory">
+    <div id="shareTrack" onscroll="shareOnScroll()" onpointerdown="shareUserScroll()" ontouchstart="shareUserScroll()" class="share-track mt-3 flex overflow-x-auto snap-x snap-mandatory">
       ${tpls.map(k => `<div data-share-tpl="${k}" class="snap-center shrink-0 w-full flex justify-center"><div class="share-prev ${k === "sticker" ? "share-checker" : ""} rounded-2xl overflow-hidden border border-[var(--w-line)]"><img alt="${esc(SHARE_TPL_NAMES[k]())}" class="block h-full w-auto" /></div></div>`).join("")}
     </div>
     <div id="shareDots" class="flex justify-center mt-1">${tpls.map(k => `<button data-share-dot="${k}" onclick="setShareTpl('${k}', true)" aria-label="${esc(SHARE_TPL_NAMES[k]())}" class="w-11 h-11 flex items-center justify-center"><span class="block w-2 h-2 rounded-full"></span></button>`).join("")}</div>
@@ -15803,8 +15803,11 @@ function shareScrollTo(tpl, smooth) {
   if (!tr || i < 0) return;
   const left = i * tr.clientWidth;
   shareCtx.target = smooth && Math.abs(tr.scrollLeft - left) > 2 ? tpl : null;   // anında atlamada olay gelmeyebilir: hedef bekleme
+  clearTimeout(shareCtx.targetT);
+  if (shareCtx.target) shareCtx.targetT = setTimeout(() => { if (shareCtx) shareCtx.target = null; }, 900);   // kaydırma yarıda kesilirse takılı kalmasın
   tr.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
 }
+function shareUserScroll() { if (shareCtx) shareCtx.target = null; }   // parmak değdi: hedef beklemesi biter
 function shareOnScroll() {
   if (!shareCtx) return;
   clearTimeout(shareCtx.scrollT);
@@ -15823,6 +15826,21 @@ function setShareTpl(k, scroll) {
   if (scroll) shareScrollTo(k, true);
   shareSyncUi();
   shareRender(k);
+}
+// Görünen şablonun tam boy dosyası arka planda hazırlanır: iOS'ta Paylaş dokunuşu içinde uzun çizim olmasın
+async function shareEnsureFull() {
+  const ctxRef = shareCtx;
+  if (!ctxRef) return;
+  const tpl = ctxRef.tpl, key = shareKey(tpl);
+  if ((ctxRef.full && ctxRef.full.key === key) || ctxRef.fullBusy === key || (tpl === "photo" && !sharePhoto)) return;
+  ctxRef.fullBusy = key;
+  try {
+    const cv = await buildShareCanvas(ctxRef.log, shareOpts(tpl));
+    const b = await shareCanBlob(cv);
+    cv.width = cv.height = 0;   // iPhone tuval belleği: hemen bırak
+    if (shareCtx === ctxRef && b && shareKey(ctxRef.tpl) === key) ctxRef.full = { key, blob: b };
+  } catch (e) { /* önizleme yine görünür; Paylaş gerekirse yeniden çizer */ }
+  finally { if (ctxRef.fullBusy === key) ctxRef.fullBusy = null; }
 }
 function setShareOpt(key, v) {
   if (!shareCtx) return;
@@ -15843,20 +15861,27 @@ function toggleShareStat(k) {
 async function shareRender(tpl) {
   if (!shareCtx) return;
   const ctxRef = shareCtx, key = shareKey(tpl);
-  if (ctxRef.keys && ctxRef.keys[tpl] === key) return;
-  const cv = await buildShareCanvas(ctxRef.log, shareOpts(tpl));
-  if (shareCtx !== ctxRef || shareKey(tpl) !== key) return;
-  const sm = document.createElement("canvas"), sw = 360;
-  sm.width = sw; sm.height = Math.round(cv.height * sw / cv.width);
-  const sx = sm.getContext("2d"); sx.imageSmoothingQuality = "high"; sx.drawImage(cv, 0, 0, sm.width, sm.height);
-  const blob = await shareCanBlob(sm);
-  if (!blob || shareCtx !== ctxRef) return;
-  if (ctxRef.urls[tpl]) URL.revokeObjectURL(ctxRef.urls[tpl]);
-  ctxRef.urls[tpl] = URL.createObjectURL(blob);
-  (ctxRef.keys = ctxRef.keys || {})[tpl] = key;
-  const img = document.querySelector('[data-share-tpl="' + tpl + '"] img');
-  if (img) img.src = ctxRef.urls[tpl];
-  if (tpl === ctxRef.tpl) shareCanBlob(cv).then(b => { if (shareCtx === ctxRef && b && shareKey(tpl) === key) ctxRef.full = { key, blob: b }; });
+  if (ctxRef.keys && ctxRef.keys[tpl] === key) { if (tpl === ctxRef.tpl) shareEnsureFull(); return; }
+  let cv = null, sm = null;
+  try {
+    cv = await buildShareCanvas(ctxRef.log, shareOpts(tpl));
+    if (shareCtx !== ctxRef || shareKey(tpl) !== key) return;
+    sm = document.createElement("canvas"); const sw = 360;
+    sm.width = sw; sm.height = Math.round(cv.height * sw / cv.width);
+    const sx = sm.getContext("2d"); sx.imageSmoothingQuality = "high"; sx.drawImage(cv, 0, 0, sm.width, sm.height);
+    const blob = await shareCanBlob(sm);
+    if (!blob || shareCtx !== ctxRef) return;
+    if (ctxRef.urls[tpl]) URL.revokeObjectURL(ctxRef.urls[tpl]);
+    ctxRef.urls[tpl] = URL.createObjectURL(blob);
+    (ctxRef.keys = ctxRef.keys || {})[tpl] = key;
+    const img = document.querySelector('[data-share-tpl="' + tpl + '"] img');
+    if (img) img.src = ctxRef.urls[tpl];
+    if (tpl === ctxRef.tpl && !(ctxRef.full && ctxRef.full.key === key)) {
+      const b = await shareCanBlob(cv);
+      if (shareCtx === ctxRef && b && shareKey(tpl) === key) ctxRef.full = { key, blob: b };
+    }
+  } catch (e) { /* çizilemedi (ör. iPhone tuval belleği): önceki önizleme kalır, Paylaş yeniden dener */ }
+  finally { if (cv) cv.width = cv.height = 0; if (sm) sm.width = sm.height = 0; }   // iPhone tuval belleği
 }
 async function shareRenderAll() {
   if (!shareCtx) return;
@@ -15874,7 +15899,8 @@ function shareFileName() {
   return "AYK-" + shareCtx.tpl + "-" + (log.ts ? todayStr(new Date(log.ts)) : "antrenman") + ".png";
 }
 async function shareGo() {
-  if (!shareCtx || $("shareGo").disabled) return;
+  if (!shareCtx || $("shareGo").disabled || shareCtx.busy) return;   // çift dokunuş: tek paylaşım
+  const ctxRef = shareCtx; ctxRef.busy = true;
   try {
     const blob = await shareBlob();
     if (!blob) throw new Error("blob");
@@ -15882,11 +15908,15 @@ async function shareGo() {
     try { file = new File([blob], shareFileName(), { type: "image/png" }); } catch (e) { file = blob; file.name = shareFileName(); }
     await shareFileOut(file);
   } catch (e) { toast(t("Kart oluşturulamadı."), "error"); }
+  finally { ctxRef.busy = false; }
 }
 async function shareFileOut(file) {
   if (navigator.canShare && file instanceof File && navigator.canShare({ files: [file] })) {
     try { await navigator.share({ files: [file], title: t("AYK+ Antrenman") }); return; }
-    catch (e) { if (e && e.name === "AbortError") return; }
+    catch (e) {
+      if (e && e.name === "AbortError") return;
+      if (e && e.name === "NotAllowedError") { toast(t("Hazır. Paylaş'a bir kez daha dokun.")); return; }   // iOS: dokunuş süresi geçti; dosya artık hazır
+    }
   }
   try {
     const url = URL.createObjectURL(file);
@@ -15917,6 +15947,15 @@ async function sharePickPhoto(input) {
       img._url = url;
     } catch (e2) { toast(t("Fotoğraf açılamadı."), "error"); return; }
   }
+  // iPhone belleği: en uzun kenar 2160 px (hikâye 1920 px için yeterli)
+  const iw = img.width || img.naturalWidth, ih = img.height || img.naturalHeight, sc = Math.min(1, 2160 / Math.max(iw, ih, 1));
+  if (sc < 1) {
+    const cv = document.createElement("canvas"); cv.width = Math.round(iw * sc); cv.height = Math.round(ih * sc);
+    cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+    try { if (img.close) img.close(); } catch (e) { /* bırakıldı */ }
+    if (img._url) URL.revokeObjectURL(img._url);
+    img = cv;
+  }
   shareClearPhoto();
   sharePhoto = img; sharePhotoId++;
   shareSyncUi(); shareRender("photo");
@@ -15924,6 +15963,7 @@ async function sharePickPhoto(input) {
 function shareClearPhoto() {
   if (sharePhoto) {
     try { if (sharePhoto.close) sharePhoto.close(); } catch (e) { /* zaten bırakıldı */ }
+    if (sharePhoto instanceof HTMLCanvasElement) sharePhoto.width = sharePhoto.height = 0;
     if (sharePhoto._url) URL.revokeObjectURL(sharePhoto._url);
   }
   sharePhoto = null;

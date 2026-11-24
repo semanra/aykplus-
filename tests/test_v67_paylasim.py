@@ -85,6 +85,7 @@ try:
     d = pg.evaluate("""() => { const T = Date.now(); state.exerciseHistory['kosu67'] = [{ ts: T, logId: 'LC', kind: 'cardio', name: 'Koşu Bandı', sets: [{ min: 30, km: 5 }] }];
       return shareData({ id: 'LC', ts: T, dayName: 'Kardiyo', durationMin: 30, volume: 0, sets: 1, prs: 0, cardioMin: 30, cardioKm: 5 }); }""")
     check(d["muscles"] == {} and d["stats"][4]["has"] and d["prs"] == [] and len(d["rows"]) == 1, "2: yalnız kardiyo")
+    check(not d["stats"][1]["has"], "2: yalnız kardiyoda tonaj 0 → gösterilmez (kartta '0 kg' olmasın)")
     # İngilizce sıra eki
     pg.evaluate("setLang('en')")
     en = pg.evaluate("[shareData(%s).monthTxt, monthOrdinalEn(1), monthOrdinalEn(2), monthOrdinalEn(3), monthOrdinalEn(11), monthOrdinalEn(12), monthOrdinalEn(13), monthOrdinalEn(21), monthOrdinalEn(22)]" % LAST)
@@ -295,6 +296,76 @@ try:
     del errs[n0:]
     c.close()
     # görsel yüklenemezse: null, sayfa hatası yok
+    # --- 7) Son inceleme bulguları (iPhone davranışları)
+    c, pg = ctx(); pg.evaluate(SEED)
+    pg.evaluate("() => { window.__unh = 0; window.addEventListener('unhandledrejection', () => { window.__unh++; }); }")
+    pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_function("document.querySelectorAll('#shareTrack img[src]').length === 5", timeout=15000)
+    # 7a: kaydırınca yeni şablonun tam boy dosyası da arka planda hazırlanır (iOS: Paylaş dokunuşunda çizim yok)
+    pg.evaluate("() => { const tr = $('shareTrack'); tr.scrollLeft = 4 * tr.clientWidth; }")
+    pg.wait_for_function("$('shareModal').dataset.tpl === 'list'", timeout=3000)
+    ok = True
+    try: pg.wait_for_function("shareCtx.full && shareCtx.full.key === shareKey('list')", timeout=4000)
+    except Exception: ok = False
+    check(ok, "7a: kaydırılan şablonun tam boy görseli önceden hazır")
+    # 7b: noktaya dokunup kaydırma bitmeden parmakla başka karta geçince takılı kalmaz
+    pg.evaluate("() => { document.querySelector('[data-share-dot=\"map\"]').click(); const tr = $('shareTrack'); tr.scrollLeft = 3 * tr.clientWidth; }")
+    pg.wait_for_timeout(1300)
+    pg.evaluate("() => { const tr = $('shareTrack'); tr.scrollLeft = 1 * tr.clientWidth; }")
+    ok = True
+    try: pg.wait_for_function("$('shareModal').dataset.tpl === 'pr'", timeout=3000)
+    except Exception: ok = False
+    check(ok, "7b: yarıda kesilen nokta kaydırmasından sonra parmakla kaydırma çalışır (%s)" % pg.evaluate("$('shareModal').dataset.tpl"))
+    # 7c: hızlı çip dokunuşları birikmiş çizim döngüleri bırakmaz
+    pg.wait_for_timeout(1500)
+    pg.evaluate("() => { window.__bc = 0; const o = buildShareCanvas; window.buildShareCanvas = async function () { window.__bc++; return o.apply(this, arguments); }; }")
+    for _ in range(6): pg.evaluate("toggleShareStat('sets')")
+    pg.wait_for_timeout(4000)
+    n = pg.evaluate("window.__bc")
+    check(n <= 14, "7c: 6 hızlı dokunuşta en çok 14 çizim (%d)" % n)
+    # 7d: çizim hatası sessiz sözsüz reddedilmiş söz bırakmaz
+    pg.evaluate("() => { window.buildShareCanvas = async () => { throw new Error('test'); }; }")
+    pg.evaluate("toggleShareStat('sets')"); pg.wait_for_timeout(800)
+    check(pg.evaluate("window.__unh") == 0, "7d: çizim hatasında yakalanmamış hata yok (%d)" % pg.evaluate("window.__unh"))
+    pg.evaluate("closeShare()")
+    c.close()
+    # 7e: büyük fotoğraf küçültülür (iPhone bellek sınırı)
+    c, pg = ctx(); pg.evaluate(SEED)
+    pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#shareModal:not(.hidden)")
+    pg.click('[data-share-dot="photo"]'); pg.wait_for_selector("#sharePhotoBtn:not(.hidden)")
+    big = pg.evaluate("() => { const c = document.createElement('canvas'); c.width = 4000; c.height = 3000; const x = c.getContext('2d'); x.fillStyle = '#c33'; x.fillRect(0, 0, 4000, 3000); return c.toDataURL('image/jpeg', 0.5); }")
+    import base64 as _b
+    pg.set_input_files("#sharePhotoInput", files=[{"name": "b.jpg", "mimeType": "image/jpeg", "buffer": _b.b64decode(big.split(",", 1)[1])}])
+    pg.wait_for_function("!$('shareGo').disabled", timeout=8000)
+    wh = pg.evaluate("[sharePhoto.width, sharePhoto.height]")
+    check(max(wh) <= 2160 and wh[0] * 3 == wh[1] * 4, "7e: fotoğraf en uzun kenar 2160 px'e küçültüldü, oran korundu %s" % wh)
+    # 7f: Paylaş'a iki kez hızlı dokunma tek paylaşım açar, indirme yapmaz
+    pg.click('[data-share-dot="map"]'); pg.wait_for_timeout(300)
+    pg.evaluate("""() => { window.__sh = 0; window.__dl = 0; Navigator.prototype.canShare = () => true;
+      Navigator.prototype.share = function () { window.__sh++; if (window.__sh > 1) return Promise.reject(Object.assign(new Error('x'), { name: 'InvalidStateError' })); return new Promise(r => setTimeout(r, 600)); };
+      const oc = HTMLAnchorElement.prototype.click; HTMLAnchorElement.prototype.click = function () { if (this.download) { window.__dl++; return; } return oc.call(this); }; }""")
+    pg.evaluate("() => { shareGo(); shareGo(); }"); pg.wait_for_timeout(1200)
+    r = pg.evaluate("[window.__sh, window.__dl]")
+    check(r == [1, 0], "7f: çift dokunuşta tek paylaşım, indirme yok (paylaş, indir) %s" % r)
+    # 7g: iOS dokunuş süresi geçmişse (NotAllowedError) indirmeye düşmez, tekrar dokun der
+    pg.evaluate("() => { window.__dl = 0; Navigator.prototype.share = () => Promise.reject(Object.assign(new Error('x'), { name: 'NotAllowedError' })); }")
+    pg.evaluate("shareGo()"); pg.wait_for_timeout(600)
+    check(pg.evaluate("window.__dl") == 0, "7g: NotAllowedError → indirme yok")
+    pg.evaluate("closeShare()")
+    c.close()
+    # 7h: kas haritası çevrimdışı da gelir (kurulumda önbelleğe alınan kopya)
+    cs = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="tr-TR")
+    cs.add_init_script(TEST_INIT)
+    ps = cs.new_page(); ps.goto(URL); boot(ps)
+    ps.wait_for_function("navigator.serviceWorker && navigator.serviceWorker.ready.then(() => true)")
+    ps.wait_for_function("caches.open('aykplus-v67').then(c => c.match('./img/kas-harita.png')).then(r => !!r)", timeout=15000)
+    ps.reload(); boot(ps); ps.wait_for_function("!!navigator.serviceWorker.controller", timeout=10000)
+    # sunucuda dosya yokken (404; Playwright çevrimdışı ayarı service worker isteklerini kesmiyor) önbellekteki kopya gelmeli
+    hid = MAP + ".gizli"; os.rename(MAP, hid)
+    try: got = ps.evaluate("fetch('img/kas-harita.png?t=' + Date.now()).then(r => r.ok ? r.blob().then(b => b.size) : 0).catch(() => -1)")
+    finally: os.rename(hid, MAP)
+    check(got > 10000, "7h: sunucuya ulaşılamazken kas haritası kurulum önbelleğinden gelir (%s)" % got)
+    cs.close()
+
     c2 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
     c2.add_init_script(TEST_INIT); c2.route("**/img/kas-harita.png", lambda rt: rt.fulfill(status=404, body="yok"))
     pg2 = c2.new_page(); pg2.on("pageerror", lambda e: errs.append(str(e))); pg2.goto(URL); boot(pg2)
