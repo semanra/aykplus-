@@ -366,6 +366,25 @@ try:
     check(got > 10000, "7h: sunucuya ulaşılamazken kas haritası kurulum önbelleğinden gelir (%s)" % got)
     cs.close()
 
+    # --- 8) Küçük konular (inceleme)
+    c, pg = ctx(); pg.evaluate(SEED)
+    d = pg.evaluate("shareData({ dayName: 'Eski', date: '01.03.2025 10:00', volume: 500, sets: 5 })")
+    check(d["monthTxt"] == "", "8a: tarihi (ts) olmayan eski kayıtta ay sırası satırı yok: %r" % d["monthTxt"])
+    tx = pg.evaluate("""async () => { const out = []; const o = CanvasRenderingContext2D.prototype.fillText; CanvasRenderingContext2D.prototype.fillText = function (x) { out.push(String(x)); return o.apply(this, arguments); };
+      try { await buildShareCanvas({ dayName: 'Eski', volume: 500, sets: 5 }, { tpl: 'map' }); } finally { CanvasRenderingContext2D.prototype.fillText = o; } return out; }""")
+    check(not [x for x in tx if "antrenmanı" in x], "8a: kartta da ay satırı çizilmez")
+    r = pg.evaluate("""() => { const T = Date.now(); state.exerciseHistory['bos67'] = [{ ts: T, logId: 'LE', kind: 'weight', name: 'Boş Hareket', sets: [] }];
+      state.exerciseHistory['sure67'] = [{ ts: T, logId: 'LE', kind: 'time', name: 'Plank', sets: [] }];
+      try { const d = shareData({ id: 'LE', ts: T, dayName: 'Boş', volume: 0, sets: 0 }); return { rows: d.rows.map(x => x.txt), ok: true }; } catch (e) { return { ok: false, e: String(e) }; } }""")
+    check(r["ok"] and not any("Infinity" in x for x in r.get("rows", [])) and r.get("rows") == [], "8b: seti olmayan hareket oturumu satır üretmez, çökmez %s" % r)
+    # 8c: fotoğraf çözülürken pencere kapatılıp açılırsa fotoğraf yeni pencereye geçmez
+    pg.evaluate("void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_selector("#shareModal:not(.hidden)")
+    pg.evaluate("""() => { window.__cib = window.createImageBitmap; window.createImageBitmap = (f, o) => new Promise(r => setTimeout(() => r(window.__cib(f, o)), 500)); }""")
+    pg.set_input_files("#sharePhotoInput", files=[{"name": "f.png", "mimeType": "image/png", "buffer": png1((10, 200, 10))}])
+    pg.evaluate("closeShare(); void openShareCard(state.workoutLogs.length - 1)"); pg.wait_for_timeout(900)
+    check(pg.evaluate("sharePhoto === null"), "8c: kapatılan pencerenin fotoğrafı yeni pencereye geçmez")
+    pg.evaluate("() => { window.createImageBitmap = window.__cib; closeShare(); }")
+    c.close()
     c2 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
     c2.add_init_script(TEST_INIT); c2.route("**/img/kas-harita.png", lambda rt: rt.fulfill(status=404, body="yok"))
     pg2 = c2.new_page(); pg2.on("pageerror", lambda e: errs.append(str(e))); pg2.goto(URL); boot(pg2)

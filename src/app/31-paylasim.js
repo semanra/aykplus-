@@ -8,6 +8,7 @@ function logExerciseLines(log) {
   const out = [];
   Object.keys(state.exerciseHistory).forEach(k => state.exerciseHistory[k].forEach(sess => {
     if (sess.logId !== log.id) return;
+    if (!Array.isArray(sess.sets) || !sess.sets.length) return;   // v67: seti olmayan oturum satır üretmez
     let txt;
     if (sess.kind === "cardio") { const ct = cardioTotals(sess.sets, false); txt = t("{m} dk", { m: ct.min }) + (ct.km > 0 ? ` • ${fmtNum(ct.km)} km` : ""); }
     else if (sess.kind === "time") txt = t("{c} × {s} sn|kart", { c: String(sess.sets.length), s: String(Math.max(...sess.sets.map(s => num(s.sec)))) });
@@ -387,7 +388,7 @@ function shareData(log) {
     day: String(log.dayName || t("Antrenman|kart")),
     dateTxt: log.ts ? fmtDay(d, { day: "numeric", month: "long", year: "numeric" }) : String(log.date || ""),
     stats, muscles, rows, prs, monthNo,
-    monthTxt: t("{ay} ayının {n}. antrenmanı", { ay, n: curLang() === "en" ? monthOrdinalEn(monthNo) : monthNo })
+    monthTxt: log.ts ? t("{ay} ayının {n}. antrenmanı", { ay, n: curLang() === "en" ? monthOrdinalEn(monthNo) : monthNo }) : ""   // tarihi olmayan eski kayıtta ay bilinmez
   };
 }
 
@@ -668,6 +669,7 @@ async function sharePickPhoto(input) {
   const f = input.files && input.files[0];
   input.value = "";
   if (!f || !shareCtx) return;
+  const ctxRef = shareCtx;
   let img = null;
   try { img = await createImageBitmap(f, { imageOrientation: "from-image" }); }
   catch (e) {
@@ -685,6 +687,12 @@ async function sharePickPhoto(input) {
     try { if (img.close) img.close(); } catch (e) { /* bırakıldı */ }
     if (img._url) URL.revokeObjectURL(img._url);
     img = cv;
+  }
+  if (shareCtx !== ctxRef) {   // çözülürken pencere kapandı / yeniden açıldı: fotoğraf yeni pencereye geçmez
+    try { if (img.close) img.close(); } catch (e) { /* bırakıldı */ }
+    if (img._url) URL.revokeObjectURL(img._url);
+    if (img instanceof HTMLCanvasElement) img.width = img.height = 0;
+    return;
   }
   shareClearPhoto();
   sharePhoto = img; sharePhotoId++;
