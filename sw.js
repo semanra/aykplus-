@@ -1,6 +1,6 @@
 // AYK+ çevrimdışı önbellek. Uygulamayı güncellediğinde aşağıdaki sürümü artır (v4, v5...).
 const CACHE = 'aykplus-v67';
-const FILES = ['./', './index.html', './manifest.json', './icon.png', './icon-192.png', './icon-512.png', './anatomy.jpg', './anatomy-light.webp', './img/kas-harita.png', './vendor/zxing.min.js', './foods.js'];
+const FILES = ['./', './index.html', './manifest.json', './icon.png', './icon-192.png', './icon-512.png', './anatomy.jpg', './anatomy-light.webp', './img/kas-3d-etiket.png', './img/kas-3d-isik.webp', './vendor/zxing.min.js', './foods.js'];
 // İnternet bu süre içinde yanıt vermezse (spor salonunda zayıf sinyal) önbellekteki kopya açılır.
 const NET_TIMEOUT_MS = 3000;
 // v63: hareket görselleri (img/hareket/*.webp, ~16 MB) baştan indirilmez; görüldükçe AYRI önbelleğe girer. Bu önbellek
@@ -35,7 +35,7 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET' || !req.url.startsWith(self.location.origin)) return;
   const path = new URL(req.url).pathname;
   // v67: paylaşım kas haritası kurulumda önbelleğe alınır ve sürümle yenilenir (etiket renkleri koda bağlı) → kalıcı görsel önbelleğine girmez
-  if (path.includes(IMG_PATH) && !path.endsWith('/kas-harita.png')) {
+  if (path.includes(IMG_PATH) && !path.includes('/kas-3d-')) {
     e.respondWith(caches.open(IMG_CACHE).then(c => c.match(req, { ignoreSearch: true }).then(hit => hit || fetch(req).then(res => {
       if (res && res.ok) { const copy = res.clone(); e.waitUntil(c.put(req, copy).catch(() => {})); }
       return res;

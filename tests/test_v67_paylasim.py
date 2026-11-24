@@ -1,7 +1,7 @@
 # v67: Antrenman paylaşım görselleri (Strava benzeri)
-# 1) img/kas-harita.png: yalnız 11 anahtar renk, her kas grubu var, 900 px, < 150 KB, sw.js önbelleğinde
+# 1) v68'den beri 3D harita (img/kas-3d-*), sw.js önbelleğinde
 # 2) shareData: kas setleri, istatistikler, rekorlar, ay sırası, eski kayıt, kardiyo
-# 3) paintMuscleMap: çalışan kas turkuaz, boş kas gri, boşluk şeffaf; görsel yoksa null
+# 3) paintMuscleMap3d (v68) etiket boyutunda; görsel yoksa null
 # 4) buildShareCanvas: 5 şablon × 2 boyut, şeffaf çıkartma, kişisel bilgi yok, istatistik kapatma, rekor kartı, uzun ad, İngilizce
 # 5) Paylaşım penceresi: açılış, seçimlerin hatırlanması, bozuk ayar, fotoğraf saklanmaz, paylaş/kopyala yedekleri, 44 px
 import os, sys, subprocess, time, re
@@ -15,24 +15,12 @@ def check(cond, label):
     print(("ok   " if cond else "FAIL ") + label)
     if not cond: fails.append(label)
 
-# --- 1) Kas haritası etiket görseli (sayfa açmadan)
-KEYS = {(0, 0, 0): "boşluk", (128, 128, 128): "gövde", (255, 0, 0): "Göğüs", (255, 255, 0): "Omuz", (0, 0, 255): "Biceps",
-        (255, 0, 255): "Triceps", (255, 128, 0): "Karın", (0, 255, 0): "Ön Bacak", (0, 255, 255): "Sırt",
-        (128, 0, 255): "Arka Bacak & Kalça", (128, 64, 0): "Kalf"}
-MAP = os.path.join(REPO, "img", "kas-harita.png")
-if not os.path.exists(MAP):
-    check(False, "1: img/kas-harita.png var")
-else:
-    from PIL import Image
-    im = Image.open(MAP).convert("RGB")
-    cols = dict((c, n) for n, c in im.getcolors(maxcolors=1 << 20) or [])
-    check(set(cols) <= set(KEYS), "1: yalnız 11 anahtar renk: fazlası %s" % [c for c in cols if c not in KEYS][:5])
-    small = [KEYS[c] for c in KEYS if c not in [(0, 0, 0), (128, 128, 128)] and cols.get(c, 0) < 5000]
-    check(small == [], "1: her kas grubu ≥ 5000 piksel: eksik %s" % small)
-    check(im.width == 900, "1: genişlik 900 (%d)" % im.width)
-    check(os.path.getsize(MAP) < 150_000, "1: dosya < 150 KB (%d)" % os.path.getsize(MAP))
+# --- 1) Kas haritası (v68: 3D harita img/kas-3d-*; ayrıntılı denetim test_v68_kas3d.py)
+MAP = os.path.join(REPO, "img", "kas-3d-etiket.png")
+check(os.path.exists(MAP) and os.path.exists(os.path.join(REPO, "img", "kas-3d-isik.webp")), "1: img/kas-3d-etiket.png ve kas-3d-isik.webp var")
 sw = open(os.path.join(REPO, "sw.js"), encoding="utf-8").read()
-check("'./img/kas-harita.png'" in sw, "1: sw.js FILES içinde kas-harita.png")
+check("'./img/kas-3d-etiket.png'" in sw and "'./img/kas-3d-isik.webp'" in sw, "1: sw.js FILES içinde 3D harita dosyaları")
+SW_CACHE = re.search(r"const CACHE = '([^']+)'", sw).group(1)
 
 srv = subprocess.Popen([sys.executable, '-m', 'http.server', str(PORT)], cwd=REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); time.sleep(1)
 from playwright.sync_api import sync_playwright
@@ -92,21 +80,10 @@ try:
     check(en == ["2nd workout of November", "1st", "2nd", "3rd", "11th", "12th", "13th", "21st", "22nd"], "2: İngilizce ay sırası %s" % en)
     pg.evaluate("setLang('tr')")
 
-    # --- 3) paintMuscleMap
-    PX = """async ([mus, pal]) => { const L = await loadMuscleLabels(); const cv = await paintMuscleMap(mus, pal);
-      const px = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
-      const at = name => { const i = MAP_KEYS.findIndex(k => k.name === name); const j = L.lab.indexOf(i); return Array.from(px.slice(j * 4, j * 4 + 4)); };
-      return { w: cv.width, h: cv.height, lw: L.w, chest: at('Göğüs'), sh: at('Omuz'), back: at('Sırt'), body: at('govde'), gap: at('bosluk') }; }"""
-    r = pg.evaluate(PX, [{"Göğüs": 7, "Omuz": 9}, "dark"])
-    check(r["w"] == r["lw"] == 900, "3: boyanan harita etiket boyutunda (%s)" % r["w"])
-    check(r["chest"][1] > 120 and r["chest"][0] < 60 and r["chest"][3] == 255, "3: çalışan kas turkuaz %s" % r["chest"])
-    check(r["sh"][1] > r["chest"][1], "3: çok set = daha parlak (omuz %s > göğüs %s)" % (r["sh"][1], r["chest"][1]))
-    check(r["back"] == [64, 64, 72, 255] and r["body"] == [40, 40, 45, 255], "3: boş kas / gövde koyu gri %s %s" % (r["back"], r["body"]))
-    check(r["gap"][3] == 0, "3: boşluk şeffaf")
-    r = pg.evaluate(PX, [{"Göğüs": 3}, "clear"])
-    check(r["body"][3] == 70 and r["back"][3] == 120 and r["chest"][:3] == [31, 209, 193], "3: şeffaf takım %s %s %s" % (r["body"], r["back"], r["chest"]))
-    r = pg.evaluate(PX, [{"Göğüs": 3}, "light"])
-    check(r["body"][:3] == [212, 212, 216] and r["chest"][:3] == [14, 124, 114], "3: aydınlık takım %s %s" % (r["body"], r["chest"]))
+    # --- 3) Kas haritası (v68: paintMuscleMap3d; renk denetimi test_v68_kas3d.py bölüm 3)
+    r = pg.evaluate("""async () => { const M = await loadMuscleMap(); const cv = await paintMuscleMap3d({ 'Göğüs': 7 }, { theme: 'dark', scale: 'session' });
+      return [cv.width, M.w, typeof paintMuscleMap, typeof MAP_KEYS]; }""")
+    check(r[0] == r[1] == 900 and r[2] == "undefined" and r[3] == "undefined", "3: 3D harita etiket boyutunda; eski düz harita kodu yok %s" % r)
     # --- 4) Şablonlar
     TX = """async (opts) => { const out = []; const o = CanvasRenderingContext2D.prototype.fillText;
       CanvasRenderingContext2D.prototype.fillText = function (tx) { out.push([String(tx), this.measureText(String(tx)).width]); return o.apply(this, arguments); };
@@ -185,7 +162,12 @@ try:
       return { id: 'LF', ts: T, dayName: 'Tam Vücut', durationMin: 60, volume: 1800, sets: 9, prs: 0, cardioMin: 0 }; }"""
     r = pg.evaluate("async () => { const L = (%s)(); const out = []; const o = CanvasRenderingContext2D.prototype.fillText; CanvasRenderingContext2D.prototype.fillText = function (tx) { out.push([String(tx), this.measureText(String(tx)).width]); return o.apply(this, arguments); }; try { await buildShareCanvas(L, { tpl: 'map' }); } finally { CanvasRenderingContext2D.prototype.fillText = o; } return out; }" % FB)
     cutw = [x for x, w in r if x.endswith("…")]
-    check(cutw == [] and all(w <= 968 for x, w in r) and sum(1 for x, w in r if "Arka Bacak & Kalça" in x or x == "Arka Bacak & Kalça") == 1, "4: tam vücutta çalışan kaslar kırpılmadan (gerekirse 2 satır): %s" % [x for x, w in r if "Çalışan" in x or "Karın" in x or "…" in x])
+    lab = [i for i, (x, w) in enumerate(r) if x.startswith("Çalışan kaslar")]
+    check(lab and r[lab[0] + 1][0] != " • ", "4: 'Çalışan kaslar:' sonrası ayraç yok, doğrudan kas adı (%s)" % (r[lab[0] + 1][0] if lab else None))
+    # v68: 13 kas grubu iki satıra sığmazsa kalanlar "+N" (kırpılmış ad yok)
+    more = [x for x, w in r if x.startswith("+") and x[1:].isdigit()]
+    shown = sum(1 for x, w in r if x in pg.evaluate("MUSCLES.map(muscleL)"))
+    check(cutw == [] and all(w <= 968 for x, w in r) and len(more) == 1 and shown + int(more[0][1:]) == 13, "4: tam vücutta çalışan kaslar kırpılmadan, sığmayan +N: %s" % [x for x, w in r if "Çalışan" in x or "+" in x or "…" in x])
     # İngilizce
     pg.evaluate("setLang('en')")
     TR_CH = re.compile(r"[çğıöşüÇĞİÖŞÜ]")
@@ -357,11 +339,11 @@ try:
     cs.add_init_script(TEST_INIT)
     ps = cs.new_page(); ps.goto(URL); boot(ps)
     ps.wait_for_function("navigator.serviceWorker && navigator.serviceWorker.ready.then(() => true)")
-    ps.wait_for_function("caches.open('aykplus-v67').then(c => c.match('./img/kas-harita.png')).then(r => !!r)", timeout=15000)
+    ps.wait_for_function("caches.open('%s').then(c => c.match('./img/kas-3d-etiket.png'))" % SW_CACHE + ".then(r => !!r)", timeout=15000)
     ps.reload(); boot(ps); ps.wait_for_function("!!navigator.serviceWorker.controller", timeout=10000)
     # sunucuda dosya yokken (404; Playwright çevrimdışı ayarı service worker isteklerini kesmiyor) önbellekteki kopya gelmeli
     hid = MAP + ".gizli"; os.rename(MAP, hid)
-    try: got = ps.evaluate("fetch('img/kas-harita.png?t=' + Date.now()).then(r => r.ok ? r.blob().then(b => b.size) : 0).catch(() => -1)")
+    try: got = ps.evaluate("fetch('img/kas-3d-etiket.png?t=' + Date.now()).then(r => r.ok ? r.blob().then(b => b.size) : 0).catch(() => -1)")
     finally: os.rename(hid, MAP)
     check(got > 10000, "7h: sunucuya ulaşılamazken kas haritası kurulum önbelleğinden gelir (%s)" % got)
     cs.close()
@@ -386,9 +368,9 @@ try:
     pg.evaluate("() => { window.createImageBitmap = window.__cib; closeShare(); }")
     c.close()
     c2 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
-    c2.add_init_script(TEST_INIT); c2.route("**/img/kas-harita.png", lambda rt: rt.fulfill(status=404, body="yok"))
+    c2.add_init_script(TEST_INIT); c2.route("**/img/kas-3d-*", lambda rt: rt.fulfill(status=404, body="yok"))
     pg2 = c2.new_page(); pg2.on("pageerror", lambda e: errs.append(str(e))); pg2.goto(URL); boot(pg2)
-    check(pg2.evaluate("paintMuscleMap({ 'Göğüs': 2 }, 'dark').then(x => x === null)"), "3: görsel yoksa null")
+    check(pg2.evaluate("paintMuscleMap3d({ 'Göğüs': 2 }, { theme: 'dark' }).then(x => x === null)"), "3: görsel yoksa null")
     c2.close()
     b.close()
 finally:

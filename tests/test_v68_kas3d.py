@@ -140,6 +140,29 @@ try:
         open(os.path.join(SHOTS, "v68_harita_%s.png" % th), "wb").write(base64.b64decode(pg.evaluate("window.__shot").split(",")[1]))
     c.close()
 
+    # --- 4) Paylaşım kartı
+    SEED = """() => { const T = Date.now(); state.workoutLogs = []; state.exerciseHistory = {};
+      const add = (name, muscle, sets) => { const k = exKey(name); (state.exerciseHistory[k] = state.exerciseHistory[k] || []).push({ ts: T, logId: 'L1', kind: 'weight', name, muscle, sets }); };
+      const rep = (n, kg, reps) => Array.from({ length: n }, () => ({ kg, reps }));
+      state.workoutLogs.push({ id: 'L1', ts: T, dayName: 'İtiş Günü', durationMin: 60, volume: 9000, sets: 11, prs: 0, cardioMin: 0 });
+      add('Bench Press', 'Göğüs', rep(8, 80, 8)); add('Lateral Raise', 'Omuz', rep(3, 10, 15)); renderAll(); }"""
+    CARD = """async ([tpl, theme, size]) => { const cv = await buildShareCanvas(state.workoutLogs[0], { tpl, theme, size, stats: {} });
+      const px = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let tq = 0;
+      for (let i = 0; i < px.length; i += 16) { const r = px[i], g = px[i + 1], b = px[i + 2]; if (px[i + 3] > 200 && g > 150 && b > 130 && r < 110) tq++; }
+      return tq; }"""
+    c, pg = ctx(); pg.evaluate(SEED)
+    for tpl, th in [("map", "dark"), ("map", "light"), ("sticker", "dark"), ("list", "dark")]:
+        check(pg.evaluate(CARD, [tpl, th, "story"]) > 500, "4a: %s/%s kartında turkuaz kas haritası" % (tpl, th))
+    check(pg.evaluate("[typeof paintMuscleMap, typeof MAP_KEYS, typeof loadMuscleLabels]") == ["undefined"] * 3, "4a: eski düz harita kodu kaldırıldı")
+    c.close()
+    sw = open(os.path.join(REPO, "sw.js"), encoding="utf-8").read()
+    check("'./img/kas-3d-etiket.png'" in sw and "'./img/kas-3d-isik.webp'" in sw and "kas-harita.png" not in sw, "4b: sw.js FILES 3D harita dosyaları, eski harita yok")
+    check("/kas-3d-" in sw, "4b: sw.js kalıcı görsel önbelleği 3D haritayı hariç tutar")
+    c, pg = ctx(route=("**/img/kas-3d-*", lambda rt: rt.fulfill(status=404, body="yok"))); pg.evaluate(SEED)
+    n = pg.evaluate("buildShareCanvas(state.workoutLogs[0], { tpl: 'map', theme: 'dark', size: 'story', stats: {} }).then(cv => cv.width)")
+    check(n == 1080, "4c: harita görseli 404 → kart yine üretilir")
+    c.close()
+
     b.close()
 finally:
     srv.terminate()

@@ -15431,20 +15431,28 @@ function drawStar(ctx, x, y, r, col) {
 }
 // "Çalışan kaslar: Göğüs • Omuz • Triceps" ortalı; sığmazsa iki satır (y = iki satırın ortası)
 function drawWorked(ctx, y, data, c) {
-  const names = MUSCLES.filter(m => data.muscles[m] > 0).map(m => muscleL(m));
+  // v68: 13 kas grubu → en çok set yapılanlar önde; iki satıra sığmayanlar "+N" (kırpılmış ad yok)
+  const ms = MUSCLES.filter(m => data.muscles[m] > 0).sort((a, b) => data.muscles[b] - data.muscles[a]);
+  const names = ms.map(m => muscleL(m));
   if (!names.length) return;
   const FL = shSans(32, 500, true), FB = shSans(32, 700, true), MAXW = 936;
   ctx.save(); ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
   const wOf = (txt, f) => { ctx.font = f; return ctx.measureText(txt).width; };
   const lines = [[[t("Çalışan kaslar:") + " ", FL, c.mu]]], lw = [wOf(t("Çalışan kaslar:") + " ", FL)];
-  names.forEach((n, i) => {
-    const sep = i ? " • " : "", add = wOf(sep, FB) + wOf(n, FB);
+  const sepW = wOf(" • ", FB), moreW = k => sepW + wOf("+" + k, FB);
+  for (let i = 0; i < names.length; i++) {
+    const n = names[i], sep = i && lines[lines.length - 1].length ? " • " : "", add = (sep ? sepW : 0) + wOf(n, FB);
     let L = lines.length - 1;
-    if (i && lw[L] + add > MAXW && lines.length < 2) { lines.push([]); lw.push(0); L++; }
-    const segs = lines[L];
-    if (segs.length && sep) { segs.push([sep, FB, c.acc]); lw[L] += wOf(sep, FB); }
-    segs.push([n, FB, c.tx]); lw[L] += wOf(n, FB);
-  });
+    const left = names.length - i - 1, need = add + (left && L === 1 ? moreW(left) : 0);
+    if (lw[L] + need > MAXW) {
+      if (L === 0) { lines.push([]); lw.push(0); L = 1; i--; continue; }
+      const k = names.length - i;   // sığmayanlar
+      lines[L].push([" • ", FB, c.acc], ["+" + k, FB, c.mu]); lw[L] += moreW(k);
+      break;
+    }
+    if (sep) { lines[L].push([sep, FB, c.acc]); lw[L] += sepW; }
+    lines[L].push([n, FB, c.tx]); lw[L] += wOf(n, FB);
+  }
   const y0 = lines.length > 1 ? y - 22 : y;
   lines.forEach((segs, li) => {
     let x = 540 - Math.min(lw[li], MAXW) / 2;
@@ -15479,7 +15487,7 @@ async function buildShareCanvas(log, opts) {
   const vis = shareVisStats(data, st);
   const month = st.month === false ? null : data.monthTxt;
   const day = upperL(data.day);
-  const map = await paintMuscleMap(data.muscles, onDark ? "clear" : c.map);
+  const map = await paintMuscleMap3d(data.muscles, { theme: onDark ? "clear" : c.map, scale: "session" });   // v68: 3D harita (32-kas-harita.js)
 
   if (tpl === "sticker") {   // tamamen şeffaf zemin; yazılara gölge
     ctx.save(); ctx.shadowColor = "rgba(0,0,0,0.5)"; ctx.shadowBlur = 18; ctx.shadowOffsetY = 4;
@@ -15488,7 +15496,7 @@ async function buildShareCanvas(log, opts) {
     drawWordmark(ctx, 540, top + 48, 54, c, "center");
     drawTitle(ctx, 540, top + 160, day, c, 96, 936, 0, "center");
     const ph = drawStatPanel(ctx, 90, top + 200, 900, vis.slice(0, 3), 3, c, { vsize: 60, px: 34, py: 26 });
-    drawMapImg(ctx, map, 400, top + 200 + ph + 36, 280);
+    drawMapImg(ctx, map, 400, top + 200 + ph + 60, 280);   // v68: eğik panelin ışıması başa değmesin
     ctx.restore();
     return cv;
   }
@@ -15673,69 +15681,6 @@ function shareData(log) {
     stats, muscles, rows, prs, monthNo,
     monthTxt: log.ts ? t("{ay} ayının {n}. antrenmanı", { ay, n: curLang() === "en" ? monthOrdinalEn(monthNo) : monthNo }) : ""   // tarihi olmayan eski kayıtta ay bilinmez
   };
-}
-
-// ============================================================================
-// v67 — KAS HARİTASI (img/kas-harita.png: her kas grubu ayrı anahtar renk; scripts/gorsel/kas_harita.py)
-// ============================================================================
-// Sıra ve renkler kas_harita.py KEYS ile aynı. Ad = MUSCLES kayıt adı (gösterimde muscleL).
-const MAP_KEYS = [
-  { name: "bosluk", rgb: [0, 0, 0] }, { name: "govde", rgb: [128, 128, 128] },
-  { name: MUSCLES[0], rgb: [255, 0, 0] }, { name: MUSCLES[2], rgb: [255, 255, 0] }, { name: MUSCLES[6], rgb: [0, 0, 255] },
-  { name: MUSCLES[7], rgb: [255, 0, 255] }, { name: MUSCLES[8], rgb: [255, 128, 0] }, { name: MUSCLES[3], rgb: [0, 255, 0] },
-  { name: MUSCLES[1], rgb: [0, 255, 255] }, { name: MUSCLES[4], rgb: [128, 0, 255] }, { name: MUSCLES[5], rgb: [128, 64, 0] }
-];
-// Boya takımları: gövde, boş kas, çalışan kas (az set → çok set); [r, g, b, a]
-const MAP_PALS = {
-  dark: { body: [40, 40, 45, 255], idle: [64, 64, 72, 255], lo: [24, 140, 130, 255], hi: [31, 209, 193, 255] },
-  light: { body: [212, 212, 216, 255], idle: [186, 186, 194, 255], lo: [70, 160, 150, 255], hi: [14, 124, 114, 255] },
-  clear: { body: [255, 255, 255, 70], idle: [255, 255, 255, 120], lo: [31, 209, 193, 200], hi: [31, 209, 193, 255] }
-};
-let muscleLabelsP = null;
-function loadMuscleLabels() {
-  if (!muscleLabelsP) {
-    muscleLabelsP = new Promise((res, rej) => {
-      const img = new Image();
-      img.onload = () => {
-        const cv = document.createElement("canvas"); cv.width = img.naturalWidth; cv.height = img.naturalHeight;
-        const ctx = cv.getContext("2d"); ctx.drawImage(img, 0, 0);
-        const px = ctx.getImageData(0, 0, cv.width, cv.height).data;
-        const lab = new Uint8Array(cv.width * cv.height);
-        for (let i = 0; i < lab.length; i++) {
-          const r = px[i * 4], g = px[i * 4 + 1], b = px[i * 4 + 2];
-          let best = 0, bd = Infinity;
-          MAP_KEYS.forEach((k, j) => { const d = (r - k.rgb[0]) ** 2 + (g - k.rgb[1]) ** 2 + (b - k.rgb[2]) ** 2; if (d < bd) { bd = d; best = j; } });
-          lab[i] = best;
-        }
-        res({ w: cv.width, h: cv.height, lab });
-      };
-      img.onerror = () => rej(new Error("kas-harita"));
-      img.src = "img/kas-harita.png";
-    }).catch(e => { muscleLabelsP = null; throw e; });   // yüklenemediyse bir sonraki paylaşımda yeniden dene
-  }
-  return muscleLabelsP;
-}
-// muscles: { kas adı: set sayısı }; pal: dark | light | clear → tam boy canvas (yüklenemezse null)
-async function paintMuscleMap(muscles, pal) {
-  let L;
-  try { L = await loadMuscleLabels(); } catch (e) { return null; }
-  const P = MAP_PALS[pal] || MAP_PALS.dark;
-  const mx = Math.max(1, ...Object.values(muscles || {}).map(v => num(v)));
-  const cols = MAP_KEYS.map((k, i) => {
-    if (i === 0) return [0, 0, 0, 0];
-    if (i === 1) return P.body;
-    const n = num((muscles || {})[k.name]);
-    if (!(n > 0)) return P.idle;
-    const f = 0.55 + 0.45 * n / mx;   // 0,55 … 1: koyu turkuazdan parlak turkuaza
-    const tt = (f - 0.55) / 0.45;
-    return P.lo.map((v, c) => Math.round(v + (P.hi[c] - v) * tt));
-  });
-  const cv = document.createElement("canvas"); cv.width = L.w; cv.height = L.h;
-  const ctx = cv.getContext("2d");
-  const im = ctx.createImageData(L.w, L.h);
-  for (let i = 0; i < L.lab.length; i++) { const c = cols[L.lab[i]]; im.data[i * 4] = c[0]; im.data[i * 4 + 1] = c[1]; im.data[i * 4 + 2] = c[2]; im.data[i * 4 + 3] = c[3]; }
-  ctx.putImageData(im, 0, 0);
-  return cv;
 }
 
 // ============================================================================

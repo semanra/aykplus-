@@ -28,8 +28,10 @@ Kaynak: masaüstü `AYK+ Ölçü Görselleri/olcu-<anahtar>.png` (ChatGPT, 1254�
 → `img/olcu/<anahtar>.webp` (720×720, şeffaf). bel/kalça/göğüs: sıkı ayar (`GRAD` 2, gölge birleştirme kapalı; yoksa açık renkli
 uyluklar da silinir) ve yer gölgesi alttan kırpılır; kol: gövdenin düz kesildiği sağ kenar kırpılır.
 
-## Paylaşım kartı kas haritası (v67, `kas_harita.py`)
-Kaynak: `tasarimlar/_paylasim/kaynak-gemini.jpg` (Gemini Pro, 24 Kasım 2026; her kas grubu ayrı düz renk, siyah zemin).
-`python scripts/gorsel/kas_harita.py` → `img/kas-harita.png` (palet PNG, yalnız 11 anahtar renk, 900 px, ~21 KB):
-her piksel en yakın anahtar renge atanır, JPEG kenar gürültüsü `ModeFilter(5)` ile temizlenir, %3 boşlukla kırpılır.
-Renk → kas eşlemesi `src/app/31-paylasim.js` `MAP_KEYS` ile aynı sırada. Önden görünümde baldır yok (anatomik olarak arkada).
+## 3D kas haritası (v68, `kas_3d.py`)
+Kaynak: `tasarimlar/_paylasim/3d/kaynak-3d-gemini-tam.jpg` (Gemini Pro, 24 Kasım 2026; 3D görünümlü, gölgeli, her kas grubu ayrı renk, siyah zemin; 13 grup).
+`python scripts/gorsel/kas_3d.py` → `img/kas-3d-etiket.png` (palet PNG, renk = gri indeks×17; 0 zemin, 1 gövde, 2.. = `MUSCLES` sırası)
++ `img/kas-3d-isik.webp` (gri ışık). Kas tondan tanınır, yakın renkler konuma göre ayrılır (karın alt → kalf, biceps bacakta → iç bacak,
+triceps/göğüs alt bacakta → kaval, ön kol boyunda → boyun); kırıntı temizliği yalnız renkli piksellerde, 150 px altı kopuk parça
+çevresine katılır. Kontrol görseli `tasarimlar/_paylasim/3d/etiket-kontrol-uretim.png`. Boyama `src/app/32-kas-harita.js`.
+(v67'nin düz `kas_harita.py` / `img/kas-harita.png` dosyaları v68'de kaldırıldı.)
