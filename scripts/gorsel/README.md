@@ -27,3 +27,9 @@ silme figürdeki parlak yerleri de siliyordu); bazı yer gölgelerinde küçük 
 Kaynak: masaüstü `AYK+ Ölçü Görselleri/olcu-<anahtar>.png` (ChatGPT, 1254×1254, beyaz zemin). `python scripts/gorsel/olcu.py`
 → `img/olcu/<anahtar>.webp` (720×720, şeffaf). bel/kalça/göğüs: sıkı ayar (`GRAD` 2, gölge birleştirme kapalı; yoksa açık renkli
 uyluklar da silinir) ve yer gölgesi alttan kırpılır; kol: gövdenin düz kesildiği sağ kenar kırpılır.
+
+## Paylaşım kartı kas haritası (v67, `kas_harita.py`)
+Kaynak: `tasarimlar/_paylasim/kaynak-gemini.jpg` (Gemini Pro, 24 Kasım 2026; her kas grubu ayrı düz renk, siyah zemin).
+`python scripts/gorsel/kas_harita.py` → `img/kas-harita.png` (palet PNG, yalnız 11 anahtar renk, 900 px, ~21 KB):
+her piksel en yakın anahtar renge atanır, JPEG kenar gürültüsü `ModeFilter(5)` ile temizlenir, %3 boşlukla kırpılır.
+Renk → kas eşlemesi `src/app/31-paylasim.js` `MAP_KEYS` ile aynı sırada. Önden görünümde baldır yok (anatomik olarak arkada).
