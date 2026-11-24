@@ -504,6 +504,22 @@ function animFinishMap(mus, theme, put) {
   return true;
 }
 
+/* v68 ANİM: paylaşım penceresi */
+// Önizleme kaydırıcısı açılırken 0,96 → 1 ölçek + saydamlık (220 ms); rekor şablonu ilk gösterildiğinde önizlemenin
+// üstünden bir kez ışık şeridi geçer (~700 ms). Yalnız ekrandaki önizleme; paylaşılan görsel (canvas) değişmez.
+function animShareIn() {
+  const tr = document.getElementById("shareTrack");
+  if (!animOK() || !tr) return;
+  tr.classList.add("ayk-share-in");
+  setTimeout(() => tr.classList.remove("ayk-share-in"), 300);
+}
+function animSharePr(el) {
+  if (!animOK() || !el) return false;
+  el.classList.add("ayk-pr-shine");
+  setTimeout(() => el.classList.remove("ayk-pr-shine"), 760);
+  return true;
+}
+
 /* v57 ANİM: hareket tamam */
 // Hareketin son seti tiklenince kart başlığındaki "· tamamlandı" kısa turkuaz parlamayla belirir (CSS ::after + ölçek).
 function animExDone(exIdx) {

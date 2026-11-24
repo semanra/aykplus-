@@ -455,6 +455,7 @@ async function openShareCard(logIdx) {
     </div>`;
   openModal("shareModal");
   shareSyncUi();
+  if (typeof animShareIn === "function") animShareIn();   // v68 ANİM: önizleme girişi
   requestAnimationFrame(() => { shareScrollTo(tpl, false); shareRenderAll(); });
 }
 function shareCopyOk() { return !!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem); }
@@ -501,7 +502,14 @@ function setShareTpl(k, scroll) {
   if (k !== "photo") { state.settings.share.tpl = k; saveState(); }   // fotoğraf şablonu hatırlanmaz
   if (scroll) shareScrollTo(k, true);
   shareSyncUi();
+  if (k === "pr" && shareCtx.urls.pr) sharePrShine();   // önizlemesi hazırsa hemen
   shareRender(k);
+}
+// v68: rekor kartı parıltısı pencere başına bir kez (animasyon 27-animasyon.js animSharePr)
+function sharePrShine() {
+  if (!shareCtx || shareCtx.prShone || typeof animSharePr !== "function") return;
+  const el = document.querySelector('[data-share-tpl="pr"] .share-prev');
+  if (el && animSharePr(el)) shareCtx.prShone = true;
 }
 // Görünen şablonun tam boy dosyası arka planda hazırlanır: iOS'ta Paylaş dokunuşu içinde uzun çizim olmasın
 async function shareEnsureFull() {
@@ -552,6 +560,7 @@ async function shareRender(tpl) {
     (ctxRef.keys = ctxRef.keys || {})[tpl] = key;
     const img = document.querySelector('[data-share-tpl="' + tpl + '"] img');
     if (img) img.src = ctxRef.urls[tpl];
+    if (tpl === "pr" && ctxRef.tpl === "pr") sharePrShine();   // v68 ANİM: rekor kartı ilk gösterimde parlar
     if (tpl === ctxRef.tpl && !(ctxRef.full && ctxRef.full.key === key)) {
       const b = await shareCanBlob(cv);
       if (shareCtx === ctxRef && b && shareKey(tpl) === key) ctxRef.full = { key, blob: b };

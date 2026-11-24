@@ -268,6 +268,36 @@ try:
     check(f6 != -1 and fa != -1 and abs(fa[1] - f6[1]) <= 5 and abs(fa[0] - f6[0]) <= max(20, f6[0] * 0.03), "6d: animasyon sonunda son hâl (%s / %s)" % (fa, f6))
     c.close()
 
+    # --- 7) Paylaşım penceresi animasyonu
+    PSEED = """() => { const T = Date.now(); state.workoutLogs = []; state.exerciseHistory = {};
+      const add = (name, muscle, ts, logId, kg) => { const k = exKey(name); (state.exerciseHistory[k] = state.exerciseHistory[k] || []).push({ ts, logId, kind: 'weight', name, muscle, sets: [{ kg, reps: 8 }, { kg, reps: 8 }] }); };
+      state.workoutLogs.push({ id: 'P0', ts: T - 7 * 864e5, dayName: 'İtiş', durationMin: 50, volume: 1280, sets: 2, prs: 0, cardioMin: 0 }); add('Bench Press', 'Göğüs', T - 7 * 864e5, 'P0', 80);
+      state.workoutLogs.push({ id: 'P1', ts: T, dayName: 'İtiş', durationMin: 50, volume: 1360, sets: 2, prs: 1, cardioMin: 0 }); add('Bench Press', 'Göğüs', T, 'P1', 85);
+      state.settings.share.tpl = 'map'; state.activeTab = 'gym'; renderAll(); }"""
+    c, pg = ctx(anim=True); pg.evaluate(PSEED)
+    pg.evaluate("void openShareCard(1)")
+    check(pg.evaluate("document.getElementById('shareTrack').classList.contains('ayk-share-in')"), "7a: açılışta önizleme giriş animasyonu")
+    pg.wait_for_timeout(450)
+    check(not pg.evaluate("document.getElementById('shareTrack').classList.contains('ayk-share-in')"), "7a: giriş sınıfı 400 ms içinde kalkar")
+    pg.wait_for_timeout(1500)
+    pg.evaluate("setShareTpl('pr', true)")
+    pg.wait_for_function("document.querySelector('[data-share-tpl=\"pr\"] .share-prev').classList.contains('ayk-pr-shine')", timeout=3000)
+    check(True, "7b: rekor şablonu ilk gösterimde parıltı")
+    pg.wait_for_timeout(900)
+    check(not pg.evaluate("document.querySelector('[data-share-tpl=\"pr\"] .share-prev').classList.contains('ayk-pr-shine')"), "7b: parıltı sınıfı biter")
+    pg.evaluate("setShareTpl('map', true)"); pg.wait_for_timeout(300); pg.evaluate("setShareTpl('pr', true)"); pg.wait_for_timeout(300)
+    check(not pg.evaluate("document.querySelector('[data-share-tpl=\"pr\"] .share-prev').classList.contains('ayk-pr-shine')"), "7b: ikinci gösterimde parıltı yok")
+    da = pg.evaluate("buildShareCanvas(state.workoutLogs[1], { tpl: 'pr', theme: 'dark', size: 'post', stats: {} }).then(cv => cv.toDataURL())")
+    pg.evaluate("closeShare()")
+    c.close()
+    c, pg = ctx(); pg.evaluate(PSEED)
+    pg.evaluate("state.settings.share.tpl = 'pr'; void openShareCard(1)"); pg.wait_for_timeout(1200)
+    check(not pg.evaluate("document.getElementById('shareTrack').classList.contains('ayk-share-in')") and pg.locator(".ayk-pr-shine").count() == 0, "7c: animasyon kapalıyken sınıf eklenmez")
+    dn = pg.evaluate("buildShareCanvas(state.workoutLogs[1], { tpl: 'pr', theme: 'dark', size: 'post', stats: {} }).then(cv => cv.toDataURL())")
+    check(da == dn, "7d: paylaşılan görsel animasyondan etkilenmez")
+    pg.evaluate("closeShare()")
+    c.close()
+
     b.close()
 finally:
     srv.terminate()

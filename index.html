@@ -790,6 +790,12 @@
     .share-track { scrollbar-width: none; overscroll-behavior-x: contain; }
     .share-track::-webkit-scrollbar { display: none; }
     .share-prev { height: min(44vh, 400px); }
+    /* v68 ANİM: paylaşım önizlemesi girişi ve rekor kartı parıltısı (27-animasyon.js animShareIn / animSharePr) */
+    .ayk-share-in { animation: aykShareIn .22s ease-out both; }
+    @keyframes aykShareIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+    .ayk-pr-shine { position: relative; }
+    .ayk-pr-shine::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .5) 50%, transparent 65%); transform: translateX(-120%); animation: aykPrShine .7s ease-out forwards; }
+    @keyframes aykPrShine { to { transform: translateX(120%); } }
     .share-checker { background: repeating-conic-gradient(#3a3a3f 0 25%, #2a2a2e 0 50%) 0 0 / 20px 20px; }
   </style>
 </head>
@@ -14701,6 +14707,22 @@ function animFinishMap(mus, theme, put) {
   return true;
 }
 
+/* v68 ANİM: paylaşım penceresi */
+// Önizleme kaydırıcısı açılırken 0,96 → 1 ölçek + saydamlık (220 ms); rekor şablonu ilk gösterildiğinde önizlemenin
+// üstünden bir kez ışık şeridi geçer (~700 ms). Yalnız ekrandaki önizleme; paylaşılan görsel (canvas) değişmez.
+function animShareIn() {
+  const tr = document.getElementById("shareTrack");
+  if (!animOK() || !tr) return;
+  tr.classList.add("ayk-share-in");
+  setTimeout(() => tr.classList.remove("ayk-share-in"), 300);
+}
+function animSharePr(el) {
+  if (!animOK() || !el) return false;
+  el.classList.add("ayk-pr-shine");
+  setTimeout(() => el.classList.remove("ayk-pr-shine"), 760);
+  return true;
+}
+
 /* v57 ANİM: hareket tamam */
 // Hareketin son seti tiklenince kart başlığındaki "· tamamlandı" kısa turkuaz parlamayla belirir (CSS ::after + ölçek).
 function animExDone(exIdx) {
@@ -15789,6 +15811,7 @@ async function openShareCard(logIdx) {
     </div>`;
   openModal("shareModal");
   shareSyncUi();
+  if (typeof animShareIn === "function") animShareIn();   // v68 ANİM: önizleme girişi
   requestAnimationFrame(() => { shareScrollTo(tpl, false); shareRenderAll(); });
 }
 function shareCopyOk() { return !!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem); }
@@ -15835,7 +15858,14 @@ function setShareTpl(k, scroll) {
   if (k !== "photo") { state.settings.share.tpl = k; saveState(); }   // fotoğraf şablonu hatırlanmaz
   if (scroll) shareScrollTo(k, true);
   shareSyncUi();
+  if (k === "pr" && shareCtx.urls.pr) sharePrShine();   // önizlemesi hazırsa hemen
   shareRender(k);
+}
+// v68: rekor kartı parıltısı pencere başına bir kez (animasyon 27-animasyon.js animSharePr)
+function sharePrShine() {
+  if (!shareCtx || shareCtx.prShone || typeof animSharePr !== "function") return;
+  const el = document.querySelector('[data-share-tpl="pr"] .share-prev');
+  if (el && animSharePr(el)) shareCtx.prShone = true;
 }
 // Görünen şablonun tam boy dosyası arka planda hazırlanır: iOS'ta Paylaş dokunuşu içinde uzun çizim olmasın
 async function shareEnsureFull() {
@@ -15886,6 +15916,7 @@ async function shareRender(tpl) {
     (ctxRef.keys = ctxRef.keys || {})[tpl] = key;
     const img = document.querySelector('[data-share-tpl="' + tpl + '"] img');
     if (img) img.src = ctxRef.urls[tpl];
+    if (tpl === "pr" && ctxRef.tpl === "pr") sharePrShine();   // v68 ANİM: rekor kartı ilk gösterimde parlar
     if (tpl === ctxRef.tpl && !(ctxRef.full && ctxRef.full.key === key)) {
       const b = await shareCanBlob(cv);
       if (shareCtx === ctxRef && b && shareKey(tpl) === key) ctxRef.full = { key, blob: b };
