@@ -1,6 +1,6 @@
 # v68 3D kas haritası: Gemini Pro'nun 3D görünümlü renk anahtarlı vücut görselinden iki dosya üretir.
 # Kaynak: tasarimlar/_paylasim/3d/kaynak-3d-gemini-tam.jpg (her kas grubu ayrı renk, gölgeli, siyah zemin)
-# Çıktı:  img/kas-3d-etiket.png  paletli; 0 zemin, 1 gövde, 2.. = MUSCLES sırası (indeks = MUSCLES.indexOf(ad) + 2)
+# Çıktı:  img/kas-3d-etiket.png  paletli (renk = gri indeks×17); 0 zemin, 1 gövde, 2.. = MUSCLES sırası (indeks = MUSCLES.indexOf(ad) + 2)
 #         img/kas-3d-isik.webp   gri ton ışık (grup başına normalize, 0…1,15 → 0…255)
 # Uygulama (src/app/32-kas-harita.js) ikisini okuyup tema / set yoğunluğuna göre boyar. Çalıştır: python scripts/gorsel/kas_3d.py
 import os
@@ -101,12 +101,13 @@ def main():
     lab = drop_crumbs(lab)
     sh = Image.fromarray((np.clip(shade / 1.15, 0, 1) * 255).astype(np.uint8)).resize((WIDTH, h), Image.LANCZOS)
     out = Image.fromarray(lab, "P")
-    pal = [0, 0, 0, 90, 90, 90] + [c for i in range(13) for c in ((i * 97) % 256, (i * 57 + 80) % 256, (i * 151 + 40) % 256)]
-    out.putpalette(pal + [0] * (768 - len(pal)))
+    # palet: indeks i → gri (i×17); tarayıcı RGB okur, uygulama round(R / 17) ile indeksi geri bulur
+    out.putpalette([i * 17 for i in range(15) for _ in range(3)] + [0] * (768 - 45))
     out.save(OUT_LAB, optimize=True)
     sh.save(OUT_SHD, "WEBP", quality=82, method=6)
     # kontrol görseli: her kas ayrı renk, ışıkla çarpılmış
-    chk = np.asarray(out.convert("RGB")).astype(np.float32) * (np.asarray(sh).astype(np.float32)[..., None] / 255 * 0.7 + 0.3)
+    cpal = np.array([(0, 0, 0), (90, 90, 90)] + [((i * 97) % 256, (i * 57 + 80) % 256, (i * 151 + 40) % 256) for i in range(13)], np.float32)
+    chk = cpal[lab] * (np.asarray(sh).astype(np.float32)[..., None] / 255 * 0.7 + 0.3)
     Image.fromarray(chk.clip(0, 255).astype(np.uint8)).save(OUT_CHK)
     print("✓", OUT_LAB, out.size, os.path.getsize(OUT_LAB), "bayt")
     print("✓", OUT_SHD, sh.size, os.path.getsize(OUT_SHD), "bayt")
