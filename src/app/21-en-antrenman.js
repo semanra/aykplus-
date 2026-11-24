@@ -4,6 +4,7 @@ Object.assign(EN, {
   // --- kas grupları (MUSCLES: kayıtta Türkçe, gösterimde muscleL)
   "Göğüs": "Chest", "Sırt": "Back", "Omuz": "Shoulders", "Ön Bacak": "Quads", "Arka Bacak & Kalça": "Hamstrings and glutes",
   "Kalf": "Calves", "Biceps": "Biceps", "Triceps": "Triceps", "Karın": "Abs",
+  "Ön Kol": "Forearms", "Boyun": "Neck", "İç Bacak": "Adductors", "Kaval": "Tibialis",   // v68
   // --- hareket türü, zorluk, ekipman
   "🏋️ Ağırlık": "🏋️ Weights", "🏃 Kardiyo": "🏃 Cardio", "⏱️ Süreli": "⏱️ Timed",
   "Kolay": "Easy", "Orta": "Moderate", "Zor": "Hard", "Tükeniş": "Failure",

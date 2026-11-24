@@ -46,5 +46,51 @@ else:
     vals, cnt = np.unique(box, return_counts=True)
     check(int(vals[cnt.argmax()]) == MUSCLES.index("Göğüs") + 2, "1e: ön göğüs bölgesinde çoğunluk Göğüs (%s)" % dict(zip(vals.tolist(), cnt.tolist())))
 
+srv = subprocess.Popen([sys.executable, '-m', 'http.server', str(PORT)], cwd=REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); time.sleep(1)
+from playwright.sync_api import sync_playwright
+URL = f"http://localhost:{PORT}/index.html"
+def boot(pg): pg.wait_for_function("window.aykBooted === true"); pg.wait_for_timeout(80)
+try:
+  with sync_playwright() as p:
+    b = p.chromium.launch()
+    def ctx(locale="tr-TR", scheme="dark", anim=False, route=None):
+        c = b.new_context(color_scheme=scheme, viewport={"width": 390, "height": 844}, locale=locale, service_workers="block")
+        c.add_init_script(TEST_INIT)
+        if anim: c.add_init_script("delete window.AYK_NO_ANIM; Object.defineProperty(window, 'AYK_NO_ANIM', { get: () => undefined, set: () => {} });")
+        if route: c.route(route[0], route[1])
+        pg = c.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.goto(URL); boot(pg)
+        return c, pg
+    c, pg = ctx()
+
+    # --- 2) Kas grupları
+    check(pg.evaluate("MUSCLES") == MUSCLES, "2a: MUSCLES 13 grup, sıra")
+    check(pg.evaluate("MINOR_MUSCLES") == ["Ön Kol", "Boyun", "İç Bacak", "Kaval"], "2a: MINOR_MUSCLES")
+    AUTO = {"Wrist Curl (Bilek)": "Ön Kol", "Reverse Wrist Curl (Bilek)": "Ön Kol", "Reverse Barbell / Cable Curl (Ön Kol)": "Ön Kol",
+            "Hip Adduction Machine (İç Bacak)": "İç Bacak", "Tibialis Raise": "Kaval", "Neck Curl": "Boyun", "Seated Calf Raise": "Kalf",
+            "Hammer Curl (Dumbbell)": "Biceps", "Hip Abduction Machine (Dış Bacak / Yan Kalça)": "Arka Bacak & Kalça",
+            "Copenhagen Plank": "İç Bacak", "Farmer Walk": "Ön Kol", "Bench Press": "Göğüs", "Barbell Curl": "Biceps"}
+    got = pg.evaluate("names => Object.fromEntries(names.map(n => [n, autoMuscle(n)]))", list(AUTO))
+    check(got == AUTO, "2b: autoMuscle %s" % {k: v for k, v in got.items() if AUTO[k] != v})
+    w = pg.evaluate("""() => { const T = Date.now(); state.exerciseHistory = {};
+      state.exerciseHistory[exKey('Tibialis Raise')] = [{ ts: T, logId: 'X', kind: 'weight', name: 'Tibialis Raise', muscle: 'Kalf', sets: [{ kg: 10, reps: 15 }, { kg: 10, reps: 15 }] }];
+      state.exerciseHistory[exKey('Wrist Curl (Bilek)')] = [{ ts: T, logId: 'X', kind: 'weight', name: 'Wrist Curl (Bilek)', sets: [{ kg: 10, reps: 15 }] }];
+      renderAll(); return weeklyMuscleSets(weekStart()); }""")
+    check(w["Kalf"] == 2 and w["Kaval"] == 0 and w["Ön Kol"] == 1, "2c: elle seçilmiş Kalf korunur, Wrist Curl Ön Kol'a sayılır %s" % w)
+    pg.wait_for_timeout(2300)
+    st = pg.evaluate("aykStoredState()")
+    check(st["exerciseHistory"][pg.evaluate("exKey('Tibialis Raise')")][0]["muscle"] == "Kalf", "2c: kayıttaki muscle değişmedi")
+    opts = pg.evaluate("Array.from(document.querySelectorAll('#exMuscle option')).map(o => o.value)")
+    check(opts == ["auto"] + MUSCLES, "2d: #exMuscle seçenekleri %s" % opts)
+    pg.evaluate("setLang('en')")
+    pg.evaluate("openExerciseModal({ name: 'Tibialis Raise', kind: 'weight' })")
+    txt = pg.evaluate("Array.from(document.querySelectorAll('#exMuscle option')).slice(-4).map(o => o.textContent)")
+    check(txt == ["Forearms", "Neck", "Adductors", "Tibialis"], "2d: İngilizce adlar %s" % txt)
+    pg.evaluate("closeModal('exerciseModal'); setLang('tr')")
+    c.close()
+
+    b.close()
+finally:
+    srv.terminate()
+check(errs == [], "sayfa hatası yok: %s" % errs[:3])
 if fails: print("\n%d HATA" % len(fails)); sys.exit(1)
 print("\nTÜMÜ GEÇTİ")

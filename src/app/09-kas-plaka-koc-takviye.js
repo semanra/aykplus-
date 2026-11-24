@@ -2,7 +2,9 @@
 // v7 — KAS GRUBU, PROGRESİF YÜKLENME, PLAKA/ISINMA, KALORİ KOÇU
 // ============================================================================
 
-const MUSCLES = ["Göğüs", "Sırt", "Omuz", "Ön Bacak", "Arka Bacak & Kalça", "Kalf", "Biceps", "Triceps", "Karın"];
+const MUSCLES = ["Göğüs", "Sırt", "Omuz", "Ön Bacak", "Arka Bacak & Kalça", "Kalf", "Biceps", "Triceps", "Karın", "Ön Kol", "Boyun", "İç Bacak", "Kaval"];
+// v68: küçük kaslar (3D haritada ayrı bölge). Listelerde yalnız set > 0 ise görünür, 10–20 set yorumu yapılmaz.
+const MINOR_MUSCLES = ["Ön Kol", "Boyun", "İç Bacak", "Kaval"];
 // v48: kayıtlı kas adının (MUSCLES, ex.muscle, state.libMuscle) görünen adı; kayıt hep Türkçe kalır
 function muscleL(m) { return MUSCLES.includes(m) ? t(m) : m; }
 // v48: EXERCISE_LIBRARY kategori başlığının görünen adı (anahtar ve sıra değişmez)
@@ -23,16 +25,26 @@ const LIB_MUSCLE_MAP = (() => {
   });
   return m;
 })();
+// v68: kategorisinden farklı kasa sayılan kütüphane hareketleri (yeni küçük kas grupları)
+const LIB_MUSCLE_OVERRIDE = {
+  "Wrist Curl (Bilek)": "Ön Kol", "Reverse Wrist Curl (Bilek)": "Ön Kol", "Reverse Barbell / Cable Curl (Ön Kol)": "Ön Kol",
+  "Hip Adduction Machine (İç Bacak)": "İç Bacak", "Tibialis Raise": "Kaval"
+};
+Object.keys(LIB_MUSCLE_OVERRIDE).forEach(n => { LIB_MUSCLE_MAP[exKey(n)] = LIB_MUSCLE_OVERRIDE[n]; });
 
 // Sıralama önemli: önce özel durumlar (leg curl → arka bacak, reverse pec → omuz gibi)
 const MUSCLE_RULES = [
+  ["Kaval", /tibialis|kaval/],
+  ["İç Bacak", /adduct|iç bacak|copenhagen/],
+  ["Ön Kol", /wrist|bilek|forearm|farmer|ön kol|reverse (barbell |cable |ez-bar )?curl/],
+  ["Boyun", /neck|boyun/],
   ["Karın", /crunch|leg raise|knee raise|plank|ab wheel|rollout|sit-?up|russian twist|pallof|woodchop|deadbug|dead bug|bird-?dog|vacuum|karın|mekik/],
-  ["Kalf", /calf|kalf|tibialis|baldır/],
-  ["Arka Bacak & Kalça", /leg curl|hamstring|nordic|\brdl\b|romanian|stiff|hip thrust|glute|abduct|adduct|pull-?through|kalça|good morning/],
+  ["Kalf", /calf|kalf|baldır/],
+  ["Arka Bacak & Kalça", /leg curl|hamstring|nordic|\brdl\b|romanian|stiff|hip thrust|glute|abduct|pull-?through|kalça|good morning/],
   ["Ön Bacak", /squat|leg press|lunge|leg extension|step-?up|hack|sissy|ön bacak/],
   ["Omuz", /shoulder|military|overhead press|arnold|lateral raise|front raise|rear delt|reverse pec|reverse fly|face pull|upright row|shrug|landmine (shoulder )?press|omuz/],
   ["Triceps", /tricep|overhead.*extension|pushdown|skull|jm press|close-?grip (barbell )?bench|bench dips|dip machine|kickback|diamond|arka kol/],
-  ["Biceps", /curl|bicep|ön kol/],
+  ["Biceps", /curl|bicep/],
   ["Sırt", /pull-?up|chin-?up|pulldown|row|deadlift|rack pull|pullover|hyperextension|back extension|\blat\b|barfiks|sırt/],
   ["Göğüs", /bench|chest|pec|fly|crossover|push-?up|dip|svend|şınav|göğüs|\bpress\b/]
 ];
