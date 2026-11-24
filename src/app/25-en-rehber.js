@@ -1109,7 +1109,7 @@ Object.assign(EN, {
   // --- antrenman paylaşım kartı (tuval + pencere)
   "Antrenman tamamlandı": "Workout complete", "Antrenman|kart": "Workout",
   "Süre|kart": "Time", "Tonaj|kart": "Volume", "Rekor|kart": "PRs", "Kardiyo|kart": "Cardio", "Set|kart": "Sets", "Hareket|kart": "Exercises", "Hareketler|kart": "Exercises",
-  "AYK+ ile kaydedildi": "Logged with AYK+",
+  "AYK+ ile kaydedildi": "Logged with AYK+", "{ay} ayının {n}. antrenmanı": "{n} workout of {ay}",
   "{c} × {s} sn|kart": "{c} × {s} sec",
   "{n} set • en iyi {kg}×{r}": { one: "{n} set • best {kg}×{r}", other: "{n} sets • best {kg}×{r}" },
   "{n} set • {r} tekrar": { one: "{n} set • {r} reps", other: "{n} sets • {r} reps" },

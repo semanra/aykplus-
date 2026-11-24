@@ -34,5 +34,66 @@ else:
 sw = open(os.path.join(REPO, "sw.js"), encoding="utf-8").read()
 check("'./img/kas-harita.png'" in sw, "1: sw.js FILES içinde kas-harita.png")
 
+srv = subprocess.Popen([sys.executable, '-m', 'http.server', str(PORT)], cwd=REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); time.sleep(1)
+from playwright.sync_api import sync_playwright
+URL = f"http://localhost:{PORT}/index.html"
+def boot(pg): pg.wait_for_function("window.aykBooted === true"); pg.wait_for_timeout(80)
+# Örnek antrenman: 24 Kasım 2026, İtiş Günü; Bench önceki 80×8 → bu sefer 85×8 (rekor)
+SEED = """() => { const T = new Date(2026, 10, 24, 18, 0).getTime(), D = 86400000;
+  state.workoutLogs = []; state.exerciseHistory = {};
+  const add = (name, muscle, ts, logId, sets, kind) => { const k = exKey(name); (state.exerciseHistory[k] = state.exerciseHistory[k] || []).push(Object.assign({ ts, logId, kind: kind || 'weight', name, sets }, muscle ? { muscle } : {})); };
+  const rep = (n, kg, reps) => Array.from({ length: n }, () => ({ kg, reps }));
+  state.workoutLogs.push({ id: 'L0', ts: T - 7 * D, dayName: 'İtiş Günü', durationMin: 60, volume: 2560, sets: 4, prs: 0, cardioMin: 0 });
+  add('Bench Press', 'Göğüs', T - 7 * D, 'L0', rep(4, 80, 8));
+  state.workoutLogs.push({ id: 'L1', ts: T, dayName: 'İtiş Günü', durationMin: 72, volume: 12450, sets: 11, prs: 1, cardioMin: 0 });
+  add('Bench Press', 'Göğüs', T, 'L1', rep(4, 85, 8));
+  add('Lateral Raise', 'Omuz', T, 'L1', rep(4, 10, 15));
+  add('Triceps Pushdown', 'Triceps', T, 'L1', rep(3, 35, 12));
+  renderAll(); }"""
+LAST = "state.workoutLogs[state.workoutLogs.length - 1]"
+try:
+  with sync_playwright() as p:
+    b = p.chromium.launch()
+    def ctx(locale="tr-TR"):
+        c = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale=locale, service_workers="block")
+        c.add_init_script(TEST_INIT)
+        pg = c.new_page(); pg.on("pageerror", lambda e: errs.append(str(e))); pg.goto(URL); boot(pg)
+        return c, pg
+    c, pg = ctx()
+    pg.evaluate(SEED)
+
+    # --- 2) shareData
+    d = pg.evaluate("shareData(%s)" % LAST)
+    check(d["muscles"] == {"Göğüs": 4, "Omuz": 4, "Triceps": 3}, "2: kas setleri %s" % d["muscles"])
+    check([s["key"] for s in d["stats"]] == ["dur", "vol", "sets", "prs", "cardio"], "2: istatistik sırası")
+    st = {s["key"]: s for s in d["stats"]}
+    check(st["vol"]["value"] == "12.450 kg" and st["vol"]["label"] == "Tonaj" and st["dur"]["value"] == "1 sa 12 dk", "2: tonaj/süre metni %s %s" % (st["vol"], st["dur"]))
+    check(st["dur"]["has"] and st["prs"]["has"] and not st["cardio"]["has"], "2: has bayrakları")
+    check(len(d["rows"]) == 3 and [r["pr"] for r in d["rows"]].count(True) == 1 and [r for r in d["rows"] if r["pr"]][0]["name"] == "Bench Press", "2: satırlar ve rekor yıldızı %s" % d["rows"])
+    check(len(d["prs"]) == 1 and d["prs"][0]["name"] == "Bench Press" and d["prs"][0]["kg"] == 85 and d["prs"][0]["reps"] == 8 and d["prs"][0]["pct"] > 0, "2: rekor listesi %s" % d["prs"])
+    check(d["monthNo"] == 2 and d["monthTxt"] == "Kasım ayının 2. antrenmanı", "2: ay sırası %s %s" % (d["monthNo"], d["monthTxt"]))
+    d0 = pg.evaluate("shareData(state.workoutLogs[0])")
+    check(d0["prs"] == [] and not any(r["pr"] for r in d0["rows"]) and d0["monthNo"] == 1, "2: önceki oturum yoksa rekor yok; ilk antrenman 1.")
+    pg.evaluate("%s.prs = 0" % LAST)
+    d = pg.evaluate("shareData(%s)" % LAST)
+    check(d["prs"] == [] and not any(r["pr"] for r in d["rows"]), "2: log.prs 0 → yıldız yok")
+    pg.evaluate("%s.prs = 1" % LAST)
+    # eski kayıt: id yok, süre yok
+    d = pg.evaluate("shareData({ dayName: 'Eski', ts: Date.now(), volume: 500, sets: 5 })")
+    check(d["muscles"] == {} and d["rows"] == [] and not d["stats"][0]["has"] and d["stats"][1]["has"], "2: eski kayıt güvenli %s" % d["stats"][:2])
+    # kardiyo
+    d = pg.evaluate("""() => { const T = Date.now(); state.exerciseHistory['kosu67'] = [{ ts: T, logId: 'LC', kind: 'cardio', name: 'Koşu Bandı', sets: [{ min: 30, km: 5 }] }];
+      return shareData({ id: 'LC', ts: T, dayName: 'Kardiyo', durationMin: 30, volume: 0, sets: 1, prs: 0, cardioMin: 30, cardioKm: 5 }); }""")
+    check(d["muscles"] == {} and d["stats"][4]["has"] and d["prs"] == [] and len(d["rows"]) == 1, "2: yalnız kardiyo")
+    # İngilizce sıra eki
+    pg.evaluate("setLang('en')")
+    en = pg.evaluate("[shareData(%s).monthTxt, monthOrdinalEn(1), monthOrdinalEn(2), monthOrdinalEn(3), monthOrdinalEn(11), monthOrdinalEn(12), monthOrdinalEn(13), monthOrdinalEn(21), monthOrdinalEn(22)]" % LAST)
+    check(en == ["2nd workout of November", "1st", "2nd", "3rd", "11th", "12th", "13th", "21st", "22nd"], "2: İngilizce ay sırası %s" % en)
+    pg.evaluate("setLang('tr')")
+    c.close()
+    b.close()
+finally:
+    srv.terminate()
+
 print("\n%d hata" % len(fails) + (" · sayfa hataları: %s" % errs if errs else ""))
 sys.exit(1 if fails or errs else 0)
