@@ -145,21 +145,31 @@ function drawStar(ctx, x, y, r, col) {
   for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; ctx[i ? "lineTo" : "moveTo"](x + rr * Math.cos(a), y + rr * Math.sin(a)); }
   ctx.closePath(); ctx.fill(); ctx.restore();
 }
-// "Çalışan kaslar: Göğüs • Omuz • Triceps" ortalı
+// "Çalışan kaslar: Göğüs • Omuz • Triceps" ortalı; sığmazsa iki satır (y = iki satırın ortası)
 function drawWorked(ctx, y, data, c) {
   const names = MUSCLES.filter(m => data.muscles[m] > 0).map(m => muscleL(m));
   if (!names.length) return;
-  const parts = [[t("Çalışan kaslar:") + " ", shSans(32, 500, true), c.mu]];
-  names.forEach((n, i) => { if (i) parts.push([" • ", shSans(32, 700, true), c.acc]); parts.push([n, shSans(32, 700, true), c.tx]); });
+  const FL = shSans(32, 500, true), FB = shSans(32, 700, true), MAXW = 936;
   ctx.save(); ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
-  const ws = parts.map(p => { ctx.font = p[1]; return ctx.measureText(p[0]).width; });
-  const total = ws.reduce((a, b) => a + b, 0);
-  if (total > 936) {
-    ctx.font = shSans(32, 700, true); ctx.fillStyle = c.tx; ctx.textAlign = "center";
-    ctx.fillText(fitText(ctx, parts.map(p => p[0]).join(""), 936), 540, y); ctx.restore(); return;
-  }
-  let x = 540 - total / 2;
-  parts.forEach((p, i) => { ctx.font = p[1]; ctx.fillStyle = p[2]; ctx.fillText(p[0], x, y); x += ws[i]; });
+  const wOf = (txt, f) => { ctx.font = f; return ctx.measureText(txt).width; };
+  const lines = [[[t("Çalışan kaslar:") + " ", FL, c.mu]]], lw = [wOf(t("Çalışan kaslar:") + " ", FL)];
+  names.forEach((n, i) => {
+    const sep = i ? " • " : "", add = wOf(sep, FB) + wOf(n, FB);
+    let L = lines.length - 1;
+    if (i && lw[L] + add > MAXW && lines.length < 2) { lines.push([]); lw.push(0); L++; }
+    const segs = lines[L];
+    if (segs.length && sep) { segs.push([sep, FB, c.acc]); lw[L] += wOf(sep, FB); }
+    segs.push([n, FB, c.tx]); lw[L] += wOf(n, FB);
+  });
+  const y0 = lines.length > 1 ? y - 22 : y;
+  lines.forEach((segs, li) => {
+    let x = 540 - Math.min(lw[li], MAXW) / 2;
+    segs.forEach(([txt, f, col]) => {
+      ctx.font = f; ctx.fillStyle = col;
+      const room = 540 + MAXW / 2 - x, out = ctx.measureText(txt).width > room ? fitText(ctx, txt, room) : txt;   // 2. satır da taşarsa son parça kısalır
+      ctx.fillText(out, x, y0 + li * 44); x += ctx.measureText(out).width;
+    });
+  });
   ctx.restore();
 }
 function coverImage(ctx, img, W, H) {

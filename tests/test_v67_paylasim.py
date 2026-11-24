@@ -179,6 +179,12 @@ try:
             r = draw(tpl=tp, size=sz)
             check(all(w <= 1080 - 2 * 56 for w in r["wid"]), "4: uzun adlar %s %s taşmıyor (en geniş %d)" % (tp, sz, max(r["wid"] or [0])))
     pg.evaluate("""() => { state.workoutLogs[state.workoutLogs.length - 1].dayName = 'İtiş Günü'; state.exerciseHistory[exKey('Bench Press')][1].name = 'Bench Press'; }""")
+    # tam vücut: çalışan kaslar satırı kırpılmaz, gerekirse iki satır
+    FB = """() => { const T = Date.now(); MUSCLES.forEach((m, i) => { const k = 'fb67_' + i; state.exerciseHistory[k] = [{ ts: T, logId: 'LF', kind: 'weight', name: 'Hareket ' + i, muscle: m, sets: [{ kg: 20, reps: 10 }] }]; });
+      return { id: 'LF', ts: T, dayName: 'Tam Vücut', durationMin: 60, volume: 1800, sets: 9, prs: 0, cardioMin: 0 }; }"""
+    r = pg.evaluate("async () => { const L = (%s)(); const out = []; const o = CanvasRenderingContext2D.prototype.fillText; CanvasRenderingContext2D.prototype.fillText = function (tx) { out.push([String(tx), this.measureText(String(tx)).width]); return o.apply(this, arguments); }; try { await buildShareCanvas(L, { tpl: 'map' }); } finally { CanvasRenderingContext2D.prototype.fillText = o; } return out; }" % FB)
+    cutw = [x for x, w in r if x.endswith("…")]
+    check(cutw == [] and all(w <= 968 for x, w in r) and sum(1 for x, w in r if "Arka Bacak & Kalça" in x or x == "Arka Bacak & Kalça") == 1, "4: tam vücutta çalışan kaslar kırpılmadan (gerekirse 2 satır): %s" % [x for x, w in r if "Çalışan" in x or "Karın" in x or "…" in x])
     # İngilizce
     pg.evaluate("setLang('en')")
     TR_CH = re.compile(r"[çğıöşüÇĞİÖŞÜ]")

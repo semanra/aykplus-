@@ -122,11 +122,15 @@ SCREENS = [
   ("profil-beslenme", "pfOpen('nutri')"),
   ("profil-veri", "pfOpen('data')"),
   ("profil-hakkinda2", "pfOpen('about')"),
+  # v67: paylaşım penceresi (Antrenman'dan, son antrenman). Listenin sonunda; görünür alan çekilir (sabit katman).
+  ("paylas-harita", "closeProfile(); switchTab('gym'); window.scrollTo(0, 0); void openShareCard(state.workoutLogs.length - 1); return new Promise(r => { const w = () => document.querySelector('#shareTrack [data-share-tpl] img[src]') ? setTimeout(r, 350) : setTimeout(w, 50); w(); })"),
+  ("paylas-foto", "setShareTpl('photo', true); return new Promise(r => { const w = () => document.querySelector('#shareTrack [data-share-tpl] img[src]') ? setTimeout(r, 350) : setTimeout(w, 50); w(); })"),
+  ("paylas-liste", "setShareTpl('list', true); return new Promise(r => { const w = () => document.querySelector('#shareTrack [data-share-tpl] img[src]') ? setTimeout(r, 350) : setTimeout(w, 50); w(); })"),
 ]
 # v59: gerçek Profil düzeni ekranları yalnız görünür alan çekilir (sabit katman; arkadaki sayfa tam sayfa çekimine karışır)
-PF_VIEW_ONLY = ("profil-ana", "profil-ara", "profil-kisisel", "profil-hedef", "profil-gorunum", "profil-antrenman", "profil-beslenme", "profil-veri", "profil-hakkinda2", "en-pf-")
+PF_VIEW_ONLY = ("paylas-", "en-paylas-", "en-u-paylas", "profil-ana", "profil-ara", "profil-kisisel", "profil-hedef", "profil-gorunum", "profil-antrenman", "profil-beslenme", "profil-veri", "profil-hakkinda2", "en-pf-")
 SCREEN_ROOT = {**{k: "#profilePage" for k in ("profil-ana", "profil-ara", "profil-kisisel", "profil-hedef", "profil-gorunum", "profil-antrenman", "profil-beslenme", "profil-veri", "profil-hakkinda2")}, "profil": "#profilePage", "profil-orta": "#profilePage", "profil-alt": "#profilePage", "m-sayac": "#mobTimer",
-               "m-seans-tekrar": "#mobTimer", "m-seans-sure": "#mobTimer", "m-bitis": "#mobTimer"}
+               "m-seans-tekrar": "#mobTimer", "m-seans-sure": "#mobTimer", "m-bitis": "#mobTimer", "paylas-harita": "#shareModal", "paylas-foto": "#shareModal", "paylas-liste": "#shareModal"}
 
 # v47: İngilizce ölçüm ekranları (piksel karşılaştırması YOK, yalnız taşma / 44 px / okunurluk). setLang('en') ile açılır.
 # v52: İngilizce herkese açık (EN_PUBLIC) → test bayrağı AYK_TEST_EN gerekmez; ayrıca TR_WORD_SCAN_JS ile Türkçe metin taranır.
@@ -187,9 +191,12 @@ EN_SCREENS = [
   ("en-pf-hedef", "pfOpen('body')"),
   ("en-pf-antrenman", "pfOpen('train')"),
   ("en-pf-veri", "pfOpen('data')"),
+  # v67: paylaşım penceresi İngilizce (metrik, sonra imperial)
+  ("en-paylas-harita", "closeProfile(); switchTab('gym'); window.scrollTo(0, 0); void openShareCard(state.workoutLogs.length - 1); return new Promise(r => { const w = () => document.querySelector('#shareTrack [data-share-tpl] img[src]') ? setTimeout(r, 350) : setTimeout(w, 50); w(); })"),
+  ("en-u-paylas", "closeShare(); setUnits('imperial'); void openShareCard(state.workoutLogs.length - 1); return new Promise(r => { const w = () => document.querySelector('#shareTrack [data-share-tpl] img[src]') ? setTimeout(r, 350) : setTimeout(w, 50); w(); })"),
 ]
 EN_ROOT = {"en-pf-ana": "#profilePage", "en-pf-hedef": "#profilePage", "en-pf-antrenman": "#profilePage", "en-pf-veri": "#profilePage", "en-profil": "#profilePage", "en-profil-orta": "#profilePage", "en-profil-alt": "#profilePage", "en-m-seans": "#mobTimer", "en-m-bitis": "#mobTimer",
-           "en-u-profil": "#profilePage", "en-u-profil-orta": "#profilePage"}
+           "en-u-profil": "#profilePage", "en-u-profil-orta": "#profilePage", "en-paylas-harita": "#shareModal", "en-u-paylas": "#shareModal"}
 # v44: kurulum ekranları. TEST_INIT OLMADAN, temiz depoda açılır (gerçek yeni kurulum yolu). Sırayla; her adım öncekinin üstüne.
 ONBOARD_SCREENS = [
   ("ob-1", ""),
