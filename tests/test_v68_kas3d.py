@@ -232,6 +232,42 @@ try:
     check(pg.locator("#libList").count() == 1 and not pg.locator(".t-bodymap").is_visible(), "5h: harita 404 → harita kutusu gizli, liste çalışır")
     c.close()
 
+    # --- 6) Bitiş özeti
+    FSEED = """() => { const T = Date.now(); state.workoutLogs = []; state.exerciseHistory = {};
+      const add = (name, muscle, n) => { const k = exKey(name); (state.exerciseHistory[k] = state.exerciseHistory[k] || []).push({ ts: T, logId: 'F1', kind: 'weight', name, muscle, sets: Array.from({ length: n }, () => ({ kg: 20, reps: 10 })) }); };
+      state.workoutLogs.push({ id: 'F1', ts: T, dayName: 'İtiş', durationMin: 50, volume: 4000, sets: 14, prs: 0, cardioMin: 0 });
+      add('Bench Press', 'Göğüs', 8); add('Lateral Raise', 'Omuz', 4); add('Pushdown', 'Triceps', 2);
+      state.exerciseHistory['kosu68'] = [{ ts: T, logId: 'F2', kind: 'cardio', name: 'Koşu', sets: [{ min: 30 }] }];
+      state.workoutLogs.push({ id: 'F2', ts: T, dayName: 'Kardiyo', durationMin: 30, volume: 0, sets: 1, prs: 0, cardioMin: 30 });
+      state.activeTab = 'gym'; renderAll(); }"""
+    FPIX = """() => { const cv = document.getElementById('finMap'); if (!cv || !cv.width) return -1; const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let n = 0, s = 0;
+      for (let i = 0; i < d.length; i += 16) if (d[i + 3] > 200 && d[i + 1] > d[i] + 60) { n++; s += d[i + 1]; } return [n, n ? s / n : 0]; }"""
+    c, pg = ctx(); pg.evaluate(FSEED)
+    pg.evaluate("openFinishSummary(0, [])"); pg.wait_for_timeout(500)
+    f6 = pg.evaluate(FPIX)
+    check(f6 != -1 and f6[0] > 500, "6a: bitiş özetinde kas haritası, çalışan kaslar turkuaz (%s)" % (f6,))
+    check(pg.locator("#finMap").bounding_box()["height"] >= 150, "6a: harita yeterince büyük")
+    pg.screenshot(path=os.path.join(SHOTS, "v68_bitis_ozeti.png"))
+    pg.evaluate("closeModal('finishModal'); openFinishSummary(1, [])"); pg.wait_for_timeout(300)
+    check(pg.locator("#finMap").count() == 0, "6b: yalnız kardiyoda harita yok")
+    pg.evaluate("closeModal('finishModal')")
+    c.close()
+    c, pg = ctx(route=("**/img/kas-3d-*", lambda rt: rt.fulfill(status=404, body="yok"))); pg.evaluate(FSEED)
+    pg.evaluate("openFinishSummary(0, [])"); pg.wait_for_timeout(500)
+    check(pg.locator("#finTitle").is_visible() and pg.locator("#finMap").count() == 0, "6c: harita 404 → özet açılır, harita yok")
+    c.close()
+    c, pg = ctx(anim=True); pg.evaluate(FSEED)
+    check(pg.evaluate("animOK()"), "6d: (ön koşul) animasyon açık")
+    pg.evaluate("""() => { window.__lv = []; const o = window.paintMuscleMap3d; window.paintMuscleMap3d = (m, op) => { if (op && op.levels) window.__lv.push(Object.assign({}, op.levels)); return o(m, op); }; }""")
+    pg.evaluate("openFinishSummary(0, [])"); pg.wait_for_timeout(2200)
+    lv = pg.evaluate("window.__lv")
+    early = [x for x in lv if "Göğüs" in x and "Triceps" not in x]
+    check(len(lv) >= 4 and early, "6d: kaslar sırayla yanar (önce en çok setli göğüs; %d kare)" % len(lv))
+    check(all(x.get("Göğüs", 0) <= 1 for x in lv) and len(set(round(x.get("Göğüs", 0), 2) for x in lv)) > 2, "6d: göğüs parlaklığı kademeli artar")
+    fa = pg.evaluate(FPIX)
+    check(f6 != -1 and fa != -1 and abs(fa[1] - f6[1]) <= 5 and abs(fa[0] - f6[0]) <= max(20, f6[0] * 0.03), "6d: animasyon sonunda son hâl (%s / %s)" % (fa, f6))
+    c.close()
+
     b.close()
 finally:
     srv.terminate()

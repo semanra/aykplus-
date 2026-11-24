@@ -484,6 +484,26 @@ function animFinishIn(stats) {
   setTimeout(() => box.classList.remove("ayk-fin-in"), base + 900);
 }
 
+/* v68 ANİM: bitiş özeti kas haritası */
+// Çalışan kaslar set çoktan aza 160 ms arayla yanar: her kas 350 ms'de koyu turkuazdan kendi parlaklığına çıkar
+// (ışımayla). Kare başına tam boyama pahalı → ~70 ms'de bir boyanır; toplam ≤ 1,5 sn, sonunda son hâl. true = oynatıyor.
+function animFinishMap(mus, theme, put) {
+  if (!animOK()) return false;
+  const order = Object.keys(mus).sort((a, b) => mus[b] - mus[a]);
+  const target = {}; order.forEach(m => { target[m] = muscleLevel(mus[m], "session"); });
+  const total = Math.min(1500, (order.length - 1) * 160 + 350), t0 = performance.now();
+  const step = async () => {
+    const el = performance.now() - t0, lv = {};
+    order.forEach((m, i) => { const p = Math.max(0, Math.min(1, (el - i * 160) / 350)); if (p > 0) lv[m] = target[m] * p; });
+    const done = el >= total;
+    const cv = await paintMuscleMap3d(done ? mus : {}, done ? { theme, scale: "session" } : { theme, scale: "session", levels: lv });
+    put(cv);
+    if (!done && document.getElementById("finMap")) setTimeout(step, 70);
+  };
+  step();
+  return true;
+}
+
 /* v57 ANİM: hareket tamam */
 // Hareketin son seti tiklenince kart başlığındaki "· tamamlandı" kısa turkuaz parlamayla belirir (CSS ::after + ölçek).
 function animExDone(exIdx) {

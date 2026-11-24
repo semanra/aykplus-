@@ -668,6 +668,7 @@ function openFinishSummary(li, prList) {
       <div class="text-[12px] font-semibold text-[var(--w-muted)] truncate">${x.label}</div>
       <div class="flex items-baseline gap-1 mt-1 min-w-0"><b id="${x.id}" class="t-display text-[28px] leading-none text-[var(--w-text)] tabular-nums truncate">${esc(x.txt)}</b>${x.unit ? `<span class="text-[13px] text-[var(--w-muted)]">${esc(x.unit)}</span>` : ""}</div>
     </div>`).join("");
+  const fMus = shareData(log).muscles, hasMap = Object.keys(fMus).length > 0;   // v68: bitiş özetinde 3D kas haritası
   const prs = (prList || []).map(p => `<div data-fin-pr class="flex items-center gap-2.5 min-h-[44px] border-b border-[var(--w-line)] last:border-0">
       <span data-fin-star class="text-[var(--t-warn-icon)] text-[16px] leading-none" aria-hidden="true">★</span>
       <span class="flex-1 min-w-0 truncate text-[15px] font-semibold text-[var(--w-text)]">${esc(exNameL(p.name))}</span>
@@ -684,6 +685,7 @@ function openFinishSummary(li, prList) {
       <button onclick="closeModal('finishModal')" aria-label="${t("Kapat")}" class="w-11 h-11 shrink-0 rounded-full bg-[var(--w-elev)] text-[var(--w-muted)] flex items-center justify-center">${svgI("x", 20, 2.2)}</button>
     </div>
     <div id="finStats" class="grid grid-cols-2 gap-2 mt-4">${tiles}</div>
+    ${hasMap ? `<div id="finMapBox" class="mt-3 rounded-2xl bg-[var(--w-elev)] py-3 flex justify-center"><canvas id="finMap" role="img" aria-label="${esc(t("Çalışan kaslar: {m}", { m: Object.keys(fMus).map(muscleL).join(", ") }))}" style="height:200px;aspect-ratio:${(1 / muscleMapRatio).toFixed(4)}"></canvas></div>` : ""}
     ${prs ? `<div id="finPrList" class="mt-3 rounded-2xl bg-[var(--w-elev)] px-3.5 py-1"><div class="text-[12px] font-semibold text-[var(--w-muted)] pt-2.5">${t("Yeni rekorlar")}</div>${prs}</div>` : ""}
     <div class="grid grid-cols-2 gap-2.5 mt-5">
       <button id="finClose" onclick="closeModal('finishModal')" class="h-[52px] rounded-2xl bg-[var(--w-elev)] text-[var(--w-text)] text-[15px] font-bold">${t("Kapat")}</button>
@@ -691,6 +693,19 @@ function openFinishSummary(li, prList) {
     </div>`;
   openModal("finishModal");
   if (typeof animFinishIn === "function") animFinishIn(stats);   // v57 ANİM: antrenman özeti
+  if (hasMap) drawFinishMap(fMus);
+}
+// v68: kaslar son hâliyle çizilir; animasyon açıksa (animFinishMap) çok setliden aza sırayla yanar
+async function drawFinishMap(mus) {
+  const theme = themeIsLight() ? "light" : "dark";
+  const fin = await paintMuscleMap3d(mus, { theme, scale: "session" });
+  const cv = document.getElementById("finMap");
+  if (!cv) return;
+  if (!fin) { const box = document.getElementById("finMapBox"); if (box) box.remove(); return; }
+  cv.width = fin.width; cv.height = fin.height;
+  const put = m => { if (cv.isConnected && m) { const x = cv.getContext("2d"); x.clearRect(0, 0, cv.width, cv.height); x.drawImage(m, 0, 0); } };
+  if (typeof animFinishMap === "function" && animFinishMap(mus, theme, put)) return;
+  put(fin);
 }
 
 // --- Hareket menüsü (alttan açılan) ---

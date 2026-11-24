@@ -86,7 +86,7 @@ Object.assign(EN, {
   "yok|yük": "none", "ideal|yük": "ideal", "yüksek|yük": "high",
   "KAS YÜKÜ": "MUSCLE LOAD", "Bu hafta": "This week",
   "Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç": "Muscle groups are coloured by number of sets; tap a coloured muscle to select it",
-  "ÖN": "FRONT", "ARKA": "BACK", "20+ set": "20+ sets", "8+ set": "8+ sets", "BUGÜN · KAS BAŞINA SET": "TODAY · SETS PER MUSCLE",
+  "ÖN": "FRONT", "ARKA": "BACK", "20+ set": "20+ sets", "8+ set": "8+ sets", "Çalışan kaslar: {m}": "Muscles worked: {m}", "BUGÜN · KAS BAŞINA SET": "TODAY · SETS PER MUSCLE",
   "PROGRAMIN HAFTALIK ETKİSİ": "YOUR PROGRAM'S WEEKLY IMPACT",
   "{n} gün": { one: "{n} day", other: "{n} days" }, "{n} set": { one: "{n} set", other: "{n} sets" },
   "Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.": "Assuming each day is done once a week. A common guideline for muscle growth is 10–20 sets per week. Each set counts towards the exercise's main muscle.",
