@@ -170,7 +170,7 @@ function mobRegionLast() {
   const out = {}, nr = mobNameRegions();
   MOB_REGIONS.forEach(([k]) => { out[k] = null; });
   const mark = (name, ago) => (nr[mobNorm(name)] || []).forEach(r => { if (r in out && (out[r] == null || ago < out[r])) out[r] = ago; });
-  Object.keys(state.mobilityLog || {}).forEach(k => { const ago = mobDaysAgo(k); if (ago >= 0) (state.mobilityLog[k] || []).forEach(n => mark(n, ago)); });
+  Object.keys(state.mobilityLog || {}).forEach(k => { const ago = mobDaysAgo(k); if (ago >= 0 && Array.isArray(state.mobilityLog[k])) state.mobilityLog[k].forEach(n => mark(n, ago)); });   // v67: bozuk (liste olmayan) kayıt atlanır, silinmez
   mobAllItems().filter(i => i.done).forEach(i => mark(i.name, 0));
   return out;
 }
@@ -183,7 +183,7 @@ function mobLastDone(r) {
   new Set([...Object.keys(ml), ...Object.keys(rl)]).forEach(k => {
     const ago = mobDaysAgo(k);
     if (ago < 0 || (best != null && ago >= best)) return;
-    const hit = rl[k] ? rl[k].includes(r.id) : (ml[k] || []).some(n => names.has(mobNorm(n)));
+    const hit = rl[k] ? rl[k].includes(r.id) : Array.isArray(ml[k]) && ml[k].some(n => names.has(mobNorm(n)));   // v67: bozuk kayıt atlanır
     if (hit) best = ago;
   });
   return best;

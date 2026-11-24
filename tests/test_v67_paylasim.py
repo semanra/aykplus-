@@ -287,6 +287,12 @@ try:
       dur: document.querySelector('[data-share-stat="dur"]').disabled })""")
     check(r["dots"] == ["map", "photo", "sticker"] and r["dur"], "5: eski antrenman: liste/rekor yok, Süre çipi pasif %s" % r)
     pg.click("#shareClose")
+    # 6) Eski açık (bozuk_veri.py v67'de buldu): mobilityLog'da liste olmayan kayıt Mobilite'yi çökertmesin; kayıt silinmez
+    n0 = len(errs)
+    pg.evaluate("() => { state.mobilityLog = Object.assign({}, state.mobilityLog, { x: 1, '2026-11-20': { a: 1 } }); state.gymActive = false; switchTab('mobility'); }")
+    pg.wait_for_timeout(150)
+    check(len(errs) == n0 and pg.evaluate("state.mobilityLog.x === 1"), "6: bozuk mobilityLog kaydında Mobilite açılır, kayıt aynen durur %s" % errs[n0:])
+    del errs[n0:]
     c.close()
     # görsel yüklenemezse: null, sayfa hatası yok
     c2 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
