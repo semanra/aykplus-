@@ -96,7 +96,7 @@ try:
     check(st(pg)["customIconDataUrl"] == PNG and st(pg)["weight"] == 90, "eski kayıt bozulmadı")
     check(pg.inner_text("#tabTitle").upper() == "İLERLEME", "eski kayıtta son sekmenin adı yazıyor")
     # Paylaşım kartı profil fotoğrafını değil uygulama logosunu kullanır
-    check(pg.evaluate("buildShareCanvas.toString().includes('img.src = \"icon.png\"')"), "paylaşım kartında AYK+ logosu kullanılıyor")
+    check(pg.evaluate("buildShareCanvas.toString().includes('drawWordmark(') && !buildShareCanvas.toString().includes('icon.png')"), "paylaşım kartında AYK+ yazısı (v67: simge resmi yok, logo tekrarı kalktı)")
 
     # ---------- 320 px ekranda başlık sığıyor
     pg.set_viewport_size({"width": 320, "height": 700})

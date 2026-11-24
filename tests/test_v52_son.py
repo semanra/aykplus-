@@ -171,8 +171,8 @@ try:
           try { await buildShareCanvas(state.workoutLogs[state.workoutLogs.length - 1]); } finally { CanvasRenderingContext2D.prototype.fillText = o; }
           return out; }""")
     ce = canvas_texts("en"); ct = canvas_texts("tr")
-    check("Workout complete" in ce and "Logged with AYK+" in ce and "Time" in ce and "Volume" in ce and "Exercises" in ce and not [x for x in ce if TR_CH.search(x)], "en: tuval metinleri İngilizce: %s" % ce)
-    check("Antrenman tamamlandı" in ct and "AYK+ ile kaydedildi" in ct and "Süre" in ct and "Tonaj" in ct and "Hareketler" in ct and "Set" in ct, "tr: tuval metinleri eski: %s" % ct)
+    check("Workout complete" in ce and "Logged with AYK+" in ce and "Time" in ce and "Volume" in ce and not [x for x in ce if TR_CH.search(x)], "en: tuval metinleri İngilizce: %s" % ce)
+    check("Antrenman tamamlandı" in ct and "AYK+ ile kaydedildi" in ct and "Süre" in ct and "Tonaj" in ct and "Set" in ct, "tr: tuval metinleri eski: %s" % ct)
     # --- sesli yönlendirme
     STUB = """() => { window.__sp = []; Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { cancel() {}, getVoices() { return [{ lang: 'tr-TR' }, { lang: 'en-GB' }]; },
         speak(u) { window.__sp.push([u.text, u.lang, u.voice ? u.voice.lang : null]); } } }); window.SpeechSynthesisUtterance = function (tx) { this.text = tx; };

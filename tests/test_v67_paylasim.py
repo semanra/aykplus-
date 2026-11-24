@@ -106,6 +106,93 @@ try:
     check(r["body"][3] == 70 and r["back"][3] == 120 and r["chest"][:3] == [31, 209, 193], "3: şeffaf takım %s %s %s" % (r["body"], r["back"], r["chest"]))
     r = pg.evaluate(PX, [{"Göğüs": 3}, "light"])
     check(r["body"][:3] == [212, 212, 216] and r["chest"][:3] == [14, 124, 114], "3: aydınlık takım %s %s" % (r["body"], r["chest"]))
+    # --- 4) Şablonlar
+    TX = """async (opts) => { const out = []; const o = CanvasRenderingContext2D.prototype.fillText;
+      CanvasRenderingContext2D.prototype.fillText = function (tx) { out.push([String(tx), this.measureText(String(tx)).width]); return o.apply(this, arguments); };
+      let cv; try { cv = await buildShareCanvas(opts.log ? opts.log : state.workoutLogs[state.workoutLogs.length - 1], opts); } finally { CanvasRenderingContext2D.prototype.fillText = o; }
+      const ctx = cv.getContext('2d');
+      return { w: cv.width, h: cv.height, tx: out.map(x => x[0]), wid: out.map(x => x[1]), a: ctx.getImageData(5, 5, 1, 1).data[3],
+               png: opts.png ? cv.toDataURL('image/png') : null }; }"""
+    import base64
+    def draw(**o): return pg.evaluate(TX, o)
+    def save(r, name):
+        open(os.path.join(SHOTS, name), "wb").write(base64.b64decode(r["png"].split(",", 1)[1]))
+    tpls = pg.evaluate("shareTplsFor(shareData(%s))" % LAST)
+    check(tpls == ["map", "pr", "photo", "sticker", "list"], "4: rekorlu antrenmanda 5 şablon %s" % tpls)
+    for tp in tpls:
+        for sz, dims in (("story", [1080, 1920]), ("post", [1080, 1350])):
+            for th in (("dark", "light") if tp in ("map", "pr", "list") else ("dark",)):
+                r = draw(tpl=tp, size=sz, theme=th, png=True)
+                check([r["w"], r["h"]] == dims, "4: %s %s %s boyut %s" % (tp, sz, th, [r["w"], r["h"]]))
+                check(all(w <= 1080 - 2 * 56 for w in r["wid"]), "4: %s %s %s hiçbir yazı taşmıyor (en geniş %d)" % (tp, sz, th, max(r["wid"] or [0])))
+                save(r, "v67_%s_%s_%s.png" % (tp, sz, th))
+    cut = [(tp, sz, x) for tp in tpls for sz in ("story", "post") for x in draw(tpl=tp, size=sz)["tx"] if x.endswith("…")]
+    check(cut == [], "4: normal verili kartlarda hiçbir yazı kırpılmıyor: %s" % cut[:4])
+    BOX = """async (opts) => { const boxes = []; const o = CanvasRenderingContext2D.prototype.drawImage;
+      CanvasRenderingContext2D.prototype.drawImage = function (im, x, y, w, h) { if (this.canvas.width === 1080 && im.width === 900) boxes.push([x, y, x + w, y + h]); return o.apply(this, arguments); };
+      const f = CanvasRenderingContext2D.prototype.fill; const pan = [];
+      let cv; try { cv = await buildShareCanvas(state.workoutLogs[state.workoutLogs.length - 1], opts); } finally { CanvasRenderingContext2D.prototype.drawImage = o; }
+      return boxes; }"""
+    over = []
+    for tp in ("map", "pr", "list", "photo"):
+        for sz in ("story", "post"):
+            bx = pg.evaluate(BOX, {"tpl": tp, "size": sz})
+            if len(bx) != 1: over.append((tp, sz, "harita sayısı %d" % len(bx)))
+    check(over == [], "4: her kartta tek harita %s" % over)
+    lst = pg.evaluate(BOX, {"tpl": "list", "size": "story"})
+    check(lst and lst[0][1] > 900 and (lst[0][2] - lst[0][0]) >= 360, "4: az hareketli listede harita alttaki boşlukta büyük: %s" % lst)
+    lp = pg.evaluate(BOX, {"tpl": "list", "size": "post"})
+    check(lp and lp[0][3] <= 400, "4: gönderi listesinde harita panelin (400) üstünde biter: %s" % lp)
+    ph = pg.evaluate(BOX, {"tpl": "photo", "size": "story"})
+    check(ph and ph[0][1] > 600, "4: fotoğraf kartında harita yer tutucunun (270–570) altında başlar: %s" % ph)
+    check(draw(tpl="sticker")["a"] == 0 and draw(tpl="map")["a"] == 255, "4: çıkartma köşesi şeffaf, kart köşesi dolu")
+    r = draw(tpl="map")
+    check("AYK" in r["tx"] and "+" in r["tx"] and "Antrenman tamamlandı" in r["tx"] and "AYK+ ile kaydedildi" in r["tx"], "4: kart metinleri (AYK+ yazısı, etiket, alt satır)")
+    check("Kasım ayının 2. antrenmanı" in r["tx"] and "İTİŞ GÜNÜ" in r["tx"], "4: ay sırası ve gün adı")
+    check(any("Göğüs" in x for x in r["tx"]) and any("Çalışan kaslar" in x for x in r["tx"]), "4: çalışan kaslar satırı")
+    # kişisel bilgi yok
+    pg.evaluate("""() => { state.weight = 93.7; state.settings.targetWeight = 77.3; state.settings.height = 181; state.settings.age = 34;
+      state.measurements = [{ date: '2026-11-20', waist: 88.5, chest: 104.5 }]; }""")
+    alltx = []
+    for tp in tpls:
+        for sz in ("story", "post"): alltx += draw(tpl=tp, size=sz)["tx"]
+    bad = [x for x in alltx if re.search(r"93[,.]7|77[,.]3|\b181\b|\b34\b|88[,.]5|104[,.]5", x)]
+    check(bad == [], "4: kişisel bilgi (kilo, hedef, boy, yaş, ölçü) hiçbir şablonda yok: %s" % bad)
+    # istatistik kapatma
+    r = draw(tpl="map", stats={"vol": False})
+    check("Tonaj" not in r["tx"] and "Süre" in r["tx"], "4: Tonaj kapalı → çizilmez")
+    r = draw(tpl="map", stats={"dur": False, "vol": False, "sets": False, "prs": False, "cardio": False, "month": False})
+    check(not any(x in r["tx"] for x in ("Süre", "Tonaj", "Set", "Rekor")) and "Kasım ayının 2. antrenmanı" not in r["tx"], "4: hepsi kapalı → panel ve ay satırı yok")
+    # rekor kartı
+    r = draw(tpl="pr")
+    check("YENİ REKOR" in r["tx"] and "BENCH PRESS" in r["tx"] and "85 kg × 8" in r["tx"], "4: rekor kartı %s" % r["tx"][:8])
+    pg.evaluate("setUnits('imperial')")
+    want = pg.evaluate("fmtW(85) + ' × 8'")
+    r = draw(tpl="pr"); r2 = draw(tpl="list")
+    check(want in r["tx"] and not [x for x in r["tx"] + r2["tx"] if x.endswith(" kg") or " kg " in x], "4: imperial rekor/liste lb (%s)" % want)
+    pg.evaluate("setUnits('metric')")
+    # uzun adlar
+    pg.evaluate("""() => { const L = state.workoutLogs[state.workoutLogs.length - 1]; L.dayName = 'Çok Uzun Bir Antrenman Günü Adı Gerçekten Çok Uzun 🔥🔥 Süper';
+      state.exerciseHistory[exKey('Bench Press')][1].name = 'Bench Press 🏋️ geniş tutuş, duraklamalı, çok uzun bir ad'; }""")
+    for tp in tpls:
+        for sz in ("story", "post"):
+            r = draw(tpl=tp, size=sz)
+            check(all(w <= 1080 - 2 * 56 for w in r["wid"]), "4: uzun adlar %s %s taşmıyor (en geniş %d)" % (tp, sz, max(r["wid"] or [0])))
+    pg.evaluate("""() => { state.workoutLogs[state.workoutLogs.length - 1].dayName = 'İtiş Günü'; state.exerciseHistory[exKey('Bench Press')][1].name = 'Bench Press'; }""")
+    # İngilizce
+    pg.evaluate("setLang('en')")
+    TR_CH = re.compile(r"[çğıöşüÇĞİÖŞÜ]")
+    r = draw(tpl="map"); rp = draw(tpl="pr"); rl = draw(tpl="list")
+    user = {"İTİŞ GÜNÜ", "İtiş Günü", pg.evaluate("upperL('İtiş Günü')")}   # kullanıcının Türkçe gün adı, dilin büyük harf kuralıyla
+    check("Workout complete" in r["tx"] and "Logged with AYK+" in r["tx"] and any("Muscles worked" in x for x in r["tx"]) and "2nd workout of November" in r["tx"] and "NEW PR" in rp["tx"], "4: İngilizce metinler")
+    check(not [x for x in r["tx"] + rp["tx"] + rl["tx"] if TR_CH.search(x) and x not in user], "4: İngilizcede Türkçe harf yok (kullanıcı adları hariç): %s" % [x for x in r["tx"] + rp["tx"] + rl["tx"] if TR_CH.search(x) and x not in user][:5])
+    pg.evaluate("setLang('tr')")
+    # yalnız kardiyo
+    CL = "{ id: 'LC', ts: Date.now(), dayName: 'Kardiyo', durationMin: 30, volume: 0, sets: 1, prs: 0, cardioMin: 30, cardioKm: 5 }"
+    check(pg.evaluate("shareTplsFor(shareData(%s))" % CL) == ["map", "photo", "sticker", "list"], "4: kardiyo → rekor şablonu yok")
+    r = pg.evaluate(TX.replace("opts.log ? opts.log :", "(%s) ||" % CL), {"tpl": "map"})
+    check(not any("Çalışan kaslar" in x for x in r["tx"]) and "Kardiyo" in r["tx"], "4: kardiyo kartında çalışan kaslar satırı yok, Kardiyo var")
+    check(pg.evaluate("shareTplsFor(shareData({ dayName: 'Eski', ts: Date.now(), volume: 500, sets: 5 }))") == ["map", "photo", "sticker"], "4: eski kayıt → liste yok")
     c.close()
     # görsel yüklenemezse: null, sayfa hatası yok
     c2 = b.new_context(color_scheme="dark", viewport={"width": 390, "height": 844}, locale="tr-TR", service_workers="block")
