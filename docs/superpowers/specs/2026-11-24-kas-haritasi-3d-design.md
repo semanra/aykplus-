@@ -96,7 +96,7 @@ A seçildi: v67'deki etiket yaklaşımının ışıklı hâli; kullanıcının o
 - Dokunma: `pointerup` → `muscleAt` → `selectMuscle(ad)`; boş yere dokunma bir şey yapmaz.
 - "Bugün" görünümünde de haritanın altında 44 px'lik kas satırları gösterilir (yalnız o gün set yapılan kaslar), küçük kas haritada ıskalanırsa satırdan seçilir (kurucu kararı).
 - VoiceOver: haritanın altında görsel olarak gizli (sr-only) her kas için bir düğme (`aria-pressed`), harita `role="img"` + açıklama.
-- Lejant: 0 / 1–9 / 10–20 / 20+ kutuları yeni renklerden (boşta, düşük, orta, yüksek) — "Bugün" görünümünde 1 / 2–4 / 5–7 / 8+.
+- Lejant: 0 / 1–9 / 10–20 / 20+ kutuları yeni renklerden (boşta, düşük, orta, yüksek) — "Bugün" görünümünde 0 / 1–3 / 4–7 / 8+.
 - Aydınlıkta `anatomy-light.webp` CSS kuralı kalkar; kart arka planı `--t-surface`, harita `light` temasıyla.
 - `BODY_POLYS`, `heatColor`, `anatomy.jpg`, `anatomy-light.webp`, `scripts/anatomy_light.py` kullanılmaz hâle gelir: kod silinir,
   görseller `sw.js`'ten çıkar. **`anatomy.jpg` repoda kalır** (kullanıcının kendi eseri), yalnız yüklenmez.
