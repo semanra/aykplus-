@@ -434,18 +434,36 @@ function gymProgramHtml() {
 }
 
 // --- Vücut haritası ---
-const BODY_POLYS = {
-  "Göğüs": ["112,182 150,174 195,180 197,252 160,264 125,252 112,225", "200,180 245,174 284,182 284,225 270,252 236,264 200,252"],
-  "Omuz": ["68,178 108,166 118,190 108,238 74,242 60,210", "288,166 328,178 336,210 322,242 288,238 278,190", "450,180 502,166 520,198 502,240 462,242 446,210", "644,166 696,180 700,210 684,242 644,240 626,198"],
-  "Biceps": ["58,244 100,244 100,296 84,330 58,322 48,282", "296,244 338,244 348,282 338,322 312,330 296,296"],
-  "Karın": ["156,262 240,262 242,360 236,438 198,482 160,438 154,360", "116,262 152,266 156,396 122,398 116,330", "244,266 280,262 280,330 276,398 242,396"],
-  "Ön Bacak": ["116,406 160,420 194,482 186,560 178,640 152,662 122,632 108,520", "280,406 236,420 202,482 210,560 218,640 244,662 274,632 288,520"],
-  "Kalf": ["106,702 150,692 148,800 140,872 118,872 104,790", "246,692 290,702 292,790 278,872 256,872 248,800", "500,668 560,668 566,740 556,802 516,802 500,740", "586,668 646,668 646,740 630,802 590,802 580,740"],
-  "Sırt": ["505,150 642,150 624,198 600,246 573,318 546,246 522,198", "522,200 558,250 566,330 560,386 518,388 500,330 496,270 506,232", "624,200 588,250 580,330 586,386 628,388 646,330 650,270 640,232"],
-  "Triceps": ["442,244 482,244 480,300 466,332 442,322 432,282", "664,244 704,244 714,282 704,322 680,332 666,300"],
-  "Arka Bacak & Kalça": ["500,392 570,410 576,460 562,496 522,500 500,472 494,430", "576,410 646,392 652,430 646,472 624,500 584,496 570,460", "498,502 568,506 568,600 556,662 516,666 500,600", "578,506 648,502 646,600 630,666 590,662 578,600"]
-};
-function heatColor(n) { return n === 0 ? "transparent" : n < 10 ? "#3E8F88" : n <= 20 ? "#14D9C6" : "#00FFE5"; }
+// v68: 3D harita (32-kas-harita.js) canvas'ı. Eski BODY_POLYS / anatomy.jpg kaldırıldı.
+function libMapOpts() {
+  const range = state.libRange === "today" || state.libRange === "program" ? state.libRange : "week";
+  return { theme: themeIsLight() ? "light" : "dark", scale: range === "today" ? "session" : "week", selected: MUSCLES.includes(state.libMuscle) ? state.libMuscle : null };
+}
+let bodyMapGen = 0;
+async function drawBodyMap(counts) {
+  const gen = ++bodyMapGen;
+  const map = await paintMuscleMap3d(counts, libMapOpts());
+  const cv = document.getElementById("bodyMapCv");
+  if (gen !== bodyMapGen || !cv) return;   // bu arada yeniden çizildi / ekran değişti
+  const box = cv.closest(".t-bodymap");
+  if (!map) {   // görsel yüklenemedi (çevrimdışı ilk açılış): harita ve lejant gizli, listeler çalışır
+    if (box) box.parentElement.classList.add("hidden");
+    const lg = document.querySelector("[data-map-legend]"); if (lg) lg.classList.add("hidden");
+    return;
+  }
+  if (box) box.style.aspectRatio = map.width + " / " + map.height;
+  cv.width = map.width; cv.height = map.height;
+  cv.getContext("2d").drawImage(map, 0, 0);
+}
+function bodyMapTap(ev) {
+  const cv = ev.currentTarget, M = muscleMapData;
+  if (!M || !cv) return;
+  const r = cv.getBoundingClientRect();
+  if (!r.width) return;
+  const k = M.w / r.width;
+  const m = muscleAt(M, (ev.clientX - r.left) * k, (ev.clientY - r.top) * k, 22 * k);   // 22 CSS px: küçük kaslar da parmakla seçilsin
+  if (m) selectMuscle(m);
+}
 function todayMuscleSets() {
   const counts = {};
   MUSCLES.forEach(m => { counts[m] = 0; });
@@ -515,62 +533,58 @@ function onLibSearch(v) { libSearchQ = v; $("libList").innerHTML = libListHtml()
 function gymLibraryHtml() {
   const range = state.libRange === "today" || state.libRange === "program" ? state.libRange : "week";
   const counts = range === "today" ? todayMuscleSets() : range === "program" ? programMuscleSets() : weeklyMuscleSets(weekStart());
-  const sel = state.libMuscle;
-  let polys = "", sels = "";
-  Object.keys(BODY_POLYS).forEach(m => {
-    const c = heatColor(counts[m] || 0);
-    BODY_POLYS[m].forEach((p, pi) => {
-      // v61: VoiceOver her kası bir kez okur (ilk parça düğme, diğerleri gizli)
-      const a11y = pi === 0 ? `role="button" aria-label="${esc(muscleL(m))}"${m === sel ? ' aria-pressed="true"' : ""}` : 'aria-hidden="true"';
-      polys += `<polygon points="${p}" fill="${c}" onclick="selectMuscle('${m}')" ${a11y} style="cursor:pointer"></polygon>`;
-      if (m === sel) sels += `<polygon points="${p}" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-dasharray="7 5" stroke-linejoin="round"></polygon>`;
-    });
-  });
+  const sel = MUSCLES.includes(state.libMuscle) ? state.libMuscle : null;
+  const minor = m => MINOR_MUSCLES.includes(m);
+  // v61/v68: VoiceOver her kası bir kez okur (görsel olarak gizli düğmeler; harita canvas'ı role=img)
+  const a11yBtns = MUSCLES.map(m => `<button data-muscle-btn onclick="selectMuscle(${esc(JSON.stringify(m))})" aria-label="${esc(muscleL(m))}" aria-pressed="${m === sel}"></button>`).join("");
   const n = sel ? counts[sel] || 0 : 0;
-  const tag = n === 0 ? t("henüz çalışılmadı") : n < 10 ? t("az|yük") : n <= 20 ? t("ideal aralıkta") : t("yüksek hacim");
+  // v68: küçük kaslarda ve Bugün görünümünde 10–20 set yorumu yok (yalnız sayı)
+  const tag = n === 0 ? t("henüz çalışılmadı") : minor(sel) || range === "today" ? "" : n < 10 ? t("az|yük") : n <= 20 ? t("ideal aralıkta") : t("yüksek hacim");
   const selTag = range === "program" && n === 0 ? t("programında yok") : tag;
-  const selLine = range === "today" ? tn(n, "Bugün <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", { tag: selTag })
+  const selLine = (range === "today" ? tn(n, "Bugün <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", { tag: selTag })
     : range === "program" ? tn(n, "Programında haftada <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", { tag: selTag })
-    : tn(n, "Bu hafta <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", { tag: selTag });
+    : tn(n, "Bu hafta <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", { tag: selTag })).replace(/ · $/, "");
   const rangeBtn = (k, l) => `<button onclick="setLibRange('${k}')" aria-pressed="${range === k}" class="h-11 rounded-[11px] text-[13px] ${range === k ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "t-muted font-semibold"}">${l}</button>`;
   const rangeTxt = range === "today" ? t("Bugünkü set sayısına göre") : range === "program" ? t("Programının bir haftada verdiği set sayısı") : t("Bu haftaki set sayısına göre");
   const pTotal = range !== "today" ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
-  const pRows = range !== "today" ? MUSCLES.map(m => {
+  // v68: küçük kaslar yalnız set > 0 ise, yorumsuz; Bugün görünümünde yalnız çalışılan kaslar (yorumsuz)
+  const rowMuscles = MUSCLES.filter(m => range === "today" ? (counts[m] || 0) > 0 : !minor(m) || (counts[m] || 0) > 0);
+  const pRows = rowMuscles.map(m => {
     const c = counts[m] || 0;
-    const tg = c === 0 ? t("yok|yük") : c < 10 ? t("az|yük") : c <= 20 ? t("ideal|yük") : t("yüksek|yük");
-    const col = c === 0 ? "#3A3A40" : c < 10 ? "#3E8F88" : c <= 20 ? "#14D9C6" : "#00FFE5";
+    const tg = minor(m) || range === "today" ? "" : c === 0 ? t("yok|yük") : c < 10 ? t("az|yük") : c <= 20 ? t("ideal|yük") : t("yüksek|yük");
+    const col = c === 0 ? "#3A3A40" : range === "today" ? "#14D9C6" : c < 10 ? "#3E8F88" : c <= 20 ? "#14D9C6" : "#00FFE5";
     return `<button onclick="selectMuscle(${esc(JSON.stringify(m))})" class="w-full min-h-[44px] flex items-center gap-2.5 text-left">
       <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} ${curLang() === "en" ? "line-clamp-2 leading-tight" : "truncate"}">${esc(muscleL(m))}</span>
-      <span class="relative flex-1 h-2.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / 24 * 100)}%;background:${col}"></span></span>
-      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b> <span class="t-dim text-[12px]">${tg}</span></span>
+      <span class="relative flex-1 h-2.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / (range === "today" ? 8 : 24) * 100)}%;background:${col}"></span></span>
+      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b>${tg ? ` <span class="t-dim text-[12px]">${tg}</span>` : ""}</span>
     </button>`;
-  }).join("") : "";
+  }).join("");
+  // v68: lejant haritanın renklerinden (boşta, az, orta, çok)
+  const MT = MAP_THEMES[themeIsLight() ? "light" : "dark"], mix = v => "rgb(" + MT.lo.map((x, i) => Math.round(x + (MT.hi[i] - x) * v)).join(",") + ")";
+  const legTxt = range === "today" ? ["0", "1–3", "4–7", t("8+ set")] : ["0", "1–9", "10–20", t("20+ set")];
+  const legCol = ["rgb(" + MT.idle.join(",") + ")", mix(0), mix(0.5), mix(1)];
+  const legend = legTxt.map((x, i) => `<span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm" style="background:${legCol[i]}"></span>${x}</span>`).join("");
   return `
     <div class="flex items-center justify-between">
       <div class="flex flex-col"><span class="t-label">${t("KAS YÜKÜ")}</span><span class="text-[13px] text-[var(--t-text2)]">${rangeTxt}</span></div>
     </div>
     <div class="grid grid-cols-3 gap-0.5 bg-[var(--t-surface)] border border-[var(--t-line)] rounded-[14px] p-0.5">${rangeBtn("week", t("Bu hafta"))}${rangeBtn("today", t("Bugün"))}${rangeBtn("program", t("Programım"))}</div>
     <div class="flex justify-center">
-      <div class="relative t-bodymap" style="width: min(100%, 340px); aspect-ratio: 765 / 1024;">
-        <img src="anatomy.jpg" alt="${t("Önden ve arkadan kas anatomisi")}" class="absolute inset-0 w-full h-full select-none" draggable="false" />
-        <svg viewBox="0 0 765 1024" class="absolute inset-0 w-full h-full" role="img" aria-label="${t("Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç")}">
-          <g style="mix-blend-mode: color">${polys}</g>
-          <g style="pointer-events:none">${sels}</g>
-        </svg>
-        <span class="absolute left-1.5 bottom-1 text-[12px] font-bold tracking-widest t-muted">${t("ÖN")}</span>
-        <span class="absolute right-1.5 bottom-1 text-[12px] font-bold tracking-widest t-muted">${t("ARKA")}</span>
+      <div class="relative t-bodymap" style="width: min(100%, 340px); aspect-ratio: ${(1 / muscleMapRatio).toFixed(4)};">
+        <canvas id="bodyMapCv" onclick="bodyMapTap(event)" class="absolute inset-0 w-full h-full select-none" style="cursor:pointer" role="img" aria-label="${t("Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç")}"></canvas>
+        <span class="absolute left-2 top-1.5 text-[12px] font-bold tracking-widest t-muted">${t("ÖN")}</span>
+        <span class="absolute right-2 top-1.5 text-[12px] font-bold tracking-widest t-muted">${t("ARKA")}</span>
       </div>
     </div>
-    <div class="flex items-center justify-center gap-3.5 text-[12px] t-muted">
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#9A9AA0]"></span>0</span>
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#6FA39E]"></span>1–9</span>
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#2FC4B6]"></span>10–20</span>
-      <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-[#4DF2E1]"></span>${t("20+ set")}</span>
-    </div>
+    <div class="sr-only">${a11yBtns}</div>
+    <div data-map-legend class="flex items-center justify-center gap-3.5 text-[12px] t-muted">${legend}</div>
     ${range === "program" ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5">
       <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("PROGRAMIN HAFTALIK ETKİSİ")}</span><span class="text-xs t-dim">${tn(state.workoutDays.length, "{n} gün")} · ${tn(pTotal, "{n} set")}</span></div>
       ${pRows}
       <p class="text-[12px] t-dim pt-1.5">${t("Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.")}</p>
+    </div>` : range === "today" && pRows ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5" data-today-muscles>
+      <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("BUGÜN · KAS BAŞINA SET")}</span></div>
+      ${pRows}
     </div>` : range === "week" && pTotal ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5" data-week-muscles>
       <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("BU HAFTA · KAS BAŞINA SET")}</span><span class="text-xs t-dim">${tn(pTotal, "{n} set")}</span></div>
       ${pRows}
@@ -618,6 +632,10 @@ function renderGym() {
   let html = active ? gymActiveHtml()
     : gymSubNav() + (state.gymView === "program" ? gymProgramHtml() : state.gymView === "library" ? gymLibraryHtml() : state.gymView === "history" ? gymHistoryHtml() : gymTodayHtml());
   $("gymRoot").innerHTML = html;
+  if (!active && state.gymView === "library") {   // v68: 3D kas haritası (çizim asenkron; önbellekte ise aynı karede)
+    const r = state.libRange;
+    drawBodyMap(r === "today" ? todayMuscleSets() : r === "program" ? programMuscleSets() : weeklyMuscleSets(weekStart()));
+  }
   updateActiveProgress();
   if (active && typeof animSuggIn === "function") animSuggIn();   // v57 ANİM: kilo önerisi (ilk göründüğünde)
 }

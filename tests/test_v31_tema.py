@@ -143,12 +143,11 @@ try:
             check(ov <= 0, f"[{scheme}] {name}: yatay taşma yok")
         if scheme == "light":
             pg.evaluate("hideProfile(); switchTab('gym'); setGymView('library')"); pg.wait_for_timeout(150)
-            # v38: koyu sahne kartı yerine zeminsiz çizim (anatomy-light.webp) açık kartta; siyah zeminli resim gizli
+            # v68: 3D harita canvas'ı açık kartta (anatomy-light.webp kalktı; renk denetimi test_v68_kas3d.py)
+            pg.wait_for_function("document.getElementById('bodyMapCv') && document.getElementById('bodyMapCv').width > 0")
             bm = pg.evaluate("""(() => { const e = document.querySelector('.t-bodymap'), cs = getComputedStyle(e);
-              return { bg: cs.backgroundColor, img: cs.backgroundImage, vis: getComputedStyle(e.querySelector('img')).visibility }; })()""")
-            check(bm["bg"] != "rgb(11, 11, 13)" and "anatomy-light.webp" in bm["img"] and bm["vis"] == "hidden", f"aydınlıkta vücut haritası açık kartta, zeminsiz çizimle ({bm})")
-            ok_img = pg.evaluate("new Promise(r => { const i = new Image(); i.onload = () => r(i.naturalWidth); i.onerror = () => r(0); i.src = 'anatomy-light.webp'; })")
-            check(ok_img == 765, f"zeminsiz çizim yükleniyor ({ok_img} px)")
+              return { bg: cs.backgroundColor, img: cs.backgroundImage, cv: !!e.querySelector('canvas') }; })()""")
+            check(bm["bg"] != "rgb(11, 11, 13)" and bm["img"] == "none" and bm["cv"], f"aydınlıkta vücut haritası açık kartta, 3D harita canvas'ı ({bm})")
             pg.screenshot(path=SHOTS + "/v31_aydinlik_hareketler.png")
             pg.evaluate("setGymView('today')"); pg.wait_for_timeout(100); pg.screenshot(path=SHOTS + "/v31_aydinlik_antrenman.png")
             pg.evaluate("switchTab('mobility')"); pg.wait_for_timeout(100); pg.screenshot(path=SHOTS + "/v31_aydinlik_mobilite.png")

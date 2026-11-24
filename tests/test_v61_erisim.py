@@ -88,7 +88,7 @@ try:
         for x in pg.evaluate(NAME_JS): noname.setdefault(x, js[:30])
     check(not noname, "adı olmayan düğme / giriş yok: %s" % list(noname.items())[:5])
     pg.evaluate("closeProfile(); state.gymActive = false; stopTimer(); switchTab('gym'); setGymView('library')"); pg.wait_for_timeout(80)
-    check(pg.evaluate("document.querySelectorAll('#gymRoot polygon[role=button]').length") == pg.evaluate("Object.keys(BODY_POLYS).length"), "vücut haritası: her kas bir kez okunur")
+    check(pg.evaluate("document.querySelectorAll('#gymRoot [data-muscle-btn]').length") == pg.evaluate("MUSCLES.length"), "vücut haritası: her kas bir kez okunur (v68: gizli kas düğmeleri)")
 
     # --- 3) CSV
     pg.evaluate("""() => { const now = Date.now(), D = DAY_MS;

@@ -1,6 +1,6 @@
 // AYK+ çevrimdışı önbellek. Uygulamayı güncellediğinde aşağıdaki sürümü artır (v4, v5...).
 const CACHE = 'aykplus-v67';
-const FILES = ['./', './index.html', './manifest.json', './icon.png', './icon-192.png', './icon-512.png', './anatomy.jpg', './anatomy-light.webp', './img/kas-3d-etiket.png', './img/kas-3d-isik.webp', './vendor/zxing.min.js', './foods.js'];
+const FILES = ['./', './index.html', './manifest.json', './icon.png', './icon-192.png', './icon-512.png', './img/kas-3d-etiket.png', './img/kas-3d-isik.webp', './vendor/zxing.min.js', './foods.js'];
 // İnternet bu süre içinde yanıt vermezse (spor salonunda zayıf sinyal) önbellekteki kopya açılır.
 const NET_TIMEOUT_MS = 3000;
 // v63: hareket görselleri (img/hareket/*.webp, ~16 MB) baştan indirilmez; görüldükçe AYRI önbelleğe girer. Bu önbellek

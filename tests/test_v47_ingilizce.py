@@ -556,8 +556,7 @@ try:
       "10-antrenman-arayuzu.js": {
         "Plakalı": "EQUIP_LABEL / EQUIP_SHORT: kayıt değil ama gösterimde equipL t(..) ile çevrilir (sabit tablo)",
         "Ağırlık yığını": "EQUIP_LABEL: equipL t(..)", "Dambıl": "EQUIP_LABEL / EQUIP_SHORT: equipL t(..)", "Vücut ağırlığı": "EQUIP_LABEL: equipL t(..)", "Vücut ağ.": "EQUIP_SHORT: equipL t(..)",
-        "Bugün": "GYM_VIEWS etiketleri, gösterimde t(l)", "Programım": "GYM_VIEWS", "Geçmiş": "GYM_VIEWS",
-        "Göğüs": "BODY_POLYS anahtarı = MUSCLES kas adı (kayıt anahtarı; gösterimde muscleL)", "Karın": "BODY_POLYS anahtarı", "Ön Bacak": "BODY_POLYS anahtarı", "Sırt": "BODY_POLYS anahtarı", "Arka Bacak & Kalça": "BODY_POLYS anahtarı"},
+        "Bugün": "GYM_VIEWS etiketleri, gösterimde t(l)", "Programım": "GYM_VIEWS", "Geçmiş": "GYM_VIEWS"},
       "11-mutfak-akilli.js": {},
       "06-mobilite.js": {
         "Sağ": "tur tarafı kayıt değeri ('Sağ'/'Sol', mobT.rounds; gösterimde mobSideL)",

@@ -8,6 +8,7 @@
 
 let muscleMapRatio = 1210 / 900;   // yüklenince gerçek oran
 let muscleMapP = null;
+let muscleMapData = null;   // yüklendiyse eşzamanlı erişim (dokunma)
 function loadMapImg(src) {
   return new Promise((res, rej) => {
     const img = new Image();
@@ -34,7 +35,8 @@ function loadMuscleMap() {
         shade[i] = S.d[i * 4] / 255 * 1.15;
       }
       muscleMapRatio = L.h / L.w;
-      return { w: L.w, h: L.h, lab, shade };
+      muscleMapData = { w: L.w, h: L.h, lab, shade };
+      return muscleMapData;
     }).catch(() => { muscleMapP = null; return null; });
   }
   return muscleMapP;

@@ -163,6 +163,75 @@ try:
     check(n == 1080, "4c: harita görseli 404 → kart yine üretilir")
     c.close()
 
+    # --- 5) Antrenman "KAS YÜKÜ"
+    WSEED = """() => { const T = Date.now(); state.exerciseHistory = {}; state.libMuscle = null; state.libRange = 'week';
+      const add = (name, muscle, n) => { const k = exKey(name); (state.exerciseHistory[k] = state.exerciseHistory[k] || []).push(Object.assign({ ts: T, logId: 'W', kind: 'weight', name, sets: Array.from({ length: n }, () => ({ kg: 20, reps: 10 })) }, muscle ? { muscle } : {})); };
+      add('Neck Curl', null, 3); add('Lateral Raise', 'Omuz', 12); state.gymView = 'library'; state.activeTab = 'gym'; renderAll(); }"""
+    CENTER = """async name => { const M = await loadMuscleMap(); const id = MUSCLES.indexOf(name) + 2, R = 8; let sx = 0, sy = 0, n = 0;
+      for (let i = 0; i < M.lab.length; i++) if (M.lab[i] === id && (i % M.w) < M.w / 2) { sx += i % M.w; sy += (i / M.w) | 0; n++; }
+      const mx = sx / n, my = sy / n; let best = null, bd = Infinity;
+      for (let y = R; y < M.h - R; y++) for (let x = R; x < M.w / 2; x++) { if (M.lab[y * M.w + x] !== id) continue;
+        if (M.lab[y * M.w + x - R] !== id || M.lab[y * M.w + x + R] !== id || M.lab[(y - R) * M.w + x] !== id || M.lab[(y + R) * M.w + x] !== id) continue;
+        const d = (x - mx) ** 2 + (y - my) ** 2; if (d < bd) { bd = d; best = [x, y]; } }
+      const r = document.getElementById('bodyMapCv').getBoundingClientRect(); return [r.left + best[0] * r.width / M.w, r.top + best[1] * r.height / M.h]; }"""
+    TQPIX = """() => { const cv = document.getElementById('bodyMapCv'); if (!cv || !cv.width) return -1; const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let n = 0, lt = 0;
+      for (let i = 0; i < d.length; i += 32) { if (d[i + 3] > 200 && d[i + 1] > d[i] + 60) n++; if (d[i + 3] > 200 && d[i] > 180 && Math.abs(d[i] - d[i + 1]) < 10) lt++; } return [n, lt]; }"""
+    reqs = []
+    c, pg = ctx(); pg.on("request", lambda r: reqs.append(r.url)); pg.evaluate(WSEED); pg.wait_for_timeout(300)
+    check(pg.locator("#bodyMapCv").count() == 1 and pg.locator("#gymRoot img[src='anatomy.jpg']").count() == 0, "5a: canvas harita var, anatomy.jpg yok")
+    pg.screenshot(path=os.path.join(SHOTS, "v68_kutuphane_koyu.png"), full_page=True)
+    xy = pg.evaluate(CENTER, "Göğüs"); pg.mouse.click(*xy); pg.wait_for_timeout(150)
+    check(pg.evaluate("state.libMuscle") == "Göğüs", "5b: göğse dokununca Göğüs seçilir (%s)" % pg.evaluate("state.libMuscle"))
+    for m in ["Boyun", "Kaval"]:
+        xy = pg.evaluate(CENTER, m); pg.mouse.click(*xy); pg.wait_for_timeout(150)
+        check(pg.evaluate("state.libMuscle") == m, "5b: küçük kas %s dokunuşla seçilir (%s)" % (m, pg.evaluate("state.libMuscle")))
+    r = pg.evaluate("document.getElementById('bodyMapCv').getBoundingClientRect().toJSON()")
+    pg.mouse.click(r["left"] + 3, r["top"] + 3); pg.wait_for_timeout(150)
+    check(pg.evaluate("state.libMuscle") == "Kaval", "5b: boş zemine dokunmak seçimi değiştirmez")
+    btn = pg.evaluate("Array.from(document.querySelectorAll('[data-muscle-btn]')).map(b => [b.getAttribute('aria-label'), b.getAttribute('aria-pressed')])")
+    check(len(btn) == 13 and [x[0] for x in btn] == MUSCLES and [x[0] for x in btn if x[1] == "true"] == ["Kaval"], "5c: 13 erişilebilir kas düğmesi, seçili aria-pressed %s" % btn[:3])
+    rows = pg.evaluate("Array.from(document.querySelectorAll('[data-week-muscles] button')).map(b => b.innerText.replace(/\\s+/g, ' ').trim())")
+    names = [x.split(" ")[0] for x in rows]
+    neck = [x for x in rows if x.startswith("Boyun")]
+    check(any(x.startswith("Göğüs") and "yok" in x for x in rows) and not any(x.startswith("Kaval") or x.startswith("Ön Kol") or x.startswith("İç Bacak") for x in rows), "5d: büyük kas 0 sette 'yok', küçük kas 0 sette satır yok %s" % rows)
+    check(len(neck) == 1 and "3" in neck[0] and not any(w in neck[0] for w in ["az", "ideal", "yok", "yüksek"]), "5d: Boyun 3 set: yalnız sayı, yorum yok %s" % neck)
+    sel = pg.evaluate("document.getElementById('gymRoot').innerText")
+    check("henüz çalışılmadı" in sel, "5g: 0 setteki küçük kas seçilince 'henüz çalışılmadı'")
+    pg.evaluate("state.libMuscle = 'xyz'; renderAll()")
+    check(pg.locator("#bodyMapCv").count() == 1, "5g: bozuk libMuscle hata vermez")
+    pg.evaluate("switchTab('progress'); setProgressView('guc')"); pg.wait_for_timeout(200)
+    prog = pg.evaluate("document.getElementById('pMuscles') ? document.getElementById('pMuscles').innerText : ''")
+    check("Boyun" in prog and "Kaval" not in prog and "Göğüs" in prog, "5d: İlerleme kas listesinde aynı kural")
+    pg.evaluate("switchTab('gym'); setGymView('library')"); pg.wait_for_timeout(200)
+    leg = pg.evaluate("document.querySelector('[data-map-legend]').innerText.replace(/\\s+/g, ' ')")
+    check(leg.strip() == "0 1–9 10–20 20+ set", "5j: haftalık lejant (%s)" % leg)
+    pg.evaluate("setLibRange('today')"); pg.wait_for_timeout(200)
+    leg = pg.evaluate("document.querySelector('[data-map-legend]').innerText.replace(/\\s+/g, ' ')")
+    check(leg.strip() == "0 1–3 4–7 8+ set", "5j: bugün lejantı (%s)" % leg)
+    trow = pg.locator("[data-today-muscles] button", has_text="Omuz")
+    check(trow.count() == 1 and trow.bounding_box()["height"] >= 44, "5i: Bugün görünümünde çalışılan kas satırı (≥ 44 px)")
+    if trow.count(): trow.click(); pg.wait_for_timeout(150)
+    check(pg.evaluate("state.libMuscle") == "Omuz", "5i: satıra dokununca kas seçilir")
+    pg.evaluate("setLibRange('week')"); pg.wait_for_timeout(200)
+    tq = pg.evaluate(TQPIX)
+    pg.evaluate("setTheme('light')"); pg.wait_for_timeout(500)
+    tl = pg.evaluate(TQPIX)
+    check(tl[1] > 10 * max(tq[1], 50), "5f: tema değişince harita açık figürle yeniden çizilir (koyu %s, aydınlık %s)" % (tq, tl))
+    pg.screenshot(path=os.path.join(SHOTS, "v68_kutuphane_acik.png"), full_page=True)
+    check(not any("anatomy" in u for u in reqs), "5a: anatomy görselleri yüklenmez (aydınlık dahil)")
+    c.close()
+    def slow(rt):
+        time.sleep(0.6); rt.continue_()
+    c, pg = ctx(route=("**/img/kas-3d-*", slow))
+    pg.evaluate("() => { state.gymView = 'library'; state.activeTab = 'gym'; renderAll(); }")
+    pg.mouse.click(195, 400); pg.wait_for_timeout(1800)
+    check(pg.evaluate(TQPIX) not in (-1, None) and pg.evaluate(TQPIX)[1] >= 0 and pg.evaluate("document.getElementById('bodyMapCv').width") > 0, "5e: geç yüklenen harita kendiliğinden çizilir, önce dokunmak hata vermez")
+    c.close()
+    c, pg = ctx(route=("**/img/kas-3d-*", lambda rt: rt.fulfill(status=404, body="yok")))
+    pg.evaluate("() => { state.gymView = 'library'; state.activeTab = 'gym'; renderAll(); }"); pg.wait_for_timeout(400)
+    check(pg.locator("#libList").count() == 1 and not pg.locator(".t-bodymap").is_visible(), "5h: harita 404 → harita kutusu gizli, liste çalışır")
+    c.close()
+
     b.close()
 finally:
     srv.terminate()

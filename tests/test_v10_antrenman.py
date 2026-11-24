@@ -76,9 +76,9 @@ with sync_playwright() as p:
     pg.locator("#exSheet button", has_text="Kapat").click()
     # --- vücut haritası
     pg.evaluate("exitActiveWorkout(); setGymView('library')"); pg.wait_for_timeout(200)
-    fills=pg.evaluate("[...document.querySelectorAll('#gymRoot svg polygon')].filter(p=>p.getAttribute('fill')!=='transparent' && p.getAttribute('fill')!=='none').length")
-    print("colored polys (week):", fills)
-    pg.locator('#gymRoot svg polygon').nth(0).click(force=True); pg.wait_for_timeout(150)
+    pg.wait_for_function("document.getElementById('bodyMapCv') && document.getElementById('bodyMapCv').width > 0")   # v68: 3D harita canvas'ı
+    print("map canvas:", pg.evaluate("document.getElementById('bodyMapCv').width"))
+    pg.evaluate("selectMuscle(MUSCLES[0])"); pg.wait_for_timeout(150)
     print("selected:", st(pg).get("libMuscle"), "| list:", pg.inner_text("#libList").replace("\n"," | ")[:160])
     pg.fill('#gymRoot input.t-search', "leg press"); pg.wait_for_timeout(100)
     print("search:", pg.inner_text("#libList").replace("\n"," | ")[:120])
