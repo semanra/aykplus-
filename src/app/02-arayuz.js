@@ -55,7 +55,7 @@ function openModal(id) {
 function closeModal(id) { const m = $(id); m.classList.add("hidden"); m.classList.remove("flex"); }
 document.addEventListener("click", e => {
   const el = e.target;
-  if (el && el.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "exSheet", "mealModal", "shopModal", "finishModal"].includes(el.id)) closeModal(el.id);
+  if (el && el.id && ["customFoodModal", "pickerModal", "exerciseModal", "chartModal", "calModal", "recapModal", "exSheet", "mealModal", "shopModal", "finishModal"].includes(el.id)) closeModal(el.id);
 });
 
 // Temalı onay / metin penceresi. Sonuç: onay → true (veya yazılan metin), vazgeç → null.

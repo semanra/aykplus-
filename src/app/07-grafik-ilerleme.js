@@ -314,7 +314,8 @@ function progGenelHtml() {
     })}
     ${row(t("Mobilite"), PC.lv, (d, i) => { const k = todayStr(d); const fut = k > tKey; const on = !!mob[k]; return cell(on, fut ? "fut" : on ? "lv" : "", pI("check", 14, 3), `${DN[i]}: ${on ? t("mobilite yapıldı") : fut ? t("henüz gelmedi") : t("mobilite yok")}`); })}
     ${pLegend([[`<i class="p-sdx gr">${pI("check", 10, 3.2)}</i>`, t("yapıldı / hedefte")], [`<i class="p-sdx near">${pI("tilde", 10, 3)}</i>`, t("yakın (±%15)")], [`<i class="p-sdx far">!</i>`, t("uzak")]])}</div>`;
-  return `<div class="p-tiles">${tiles}</div>${progWeighBtn("mb")}${progCoachHtml()}${strip}`;
+  return `<div class="p-tiles">${tiles}</div>${progWeighBtn("mb")}${progCoachHtml()}${strip}
+    <button onclick="openRecap()" data-open-recap class="p-chip w-full min-h-[44px]">${t("Aylık / yıllık özet")}</button>`;
 }
 
 // --- KİLO
@@ -471,7 +472,8 @@ function progGucHtml() {
   }
   const n28 = Object.keys(wd).filter(k => new Date(k + "T12:00:00").getTime() >= Date.now() - 28 * DAY_MS).length;
   const calCard = `<div class="p-card" id="pCalendar">${pSec(t("Antrenman takvimi"), PC.tq, `<span class="p-dim p-sm">${tn(n28, "son 4 hafta: {n} gün")}</span>`)}<div class="p-cal">${cal}</div>
-    ${pLegend([[`<i class="p-lg-w">${pI("check", 9, 3.2)}</i>`, t("Antrenman|sayı")], [`<i class="p-lg-m"></i>`, t("Mobilite")], [`<i class="p-lg-today"></i>`, t("Bugün")]])}</div>`;
+    ${pLegend([[`<i class="p-lg-w">${pI("check", 9, 3.2)}</i>`, t("Antrenman|sayı")], [`<i class="p-lg-m"></i>`, t("Mobilite")], [`<i class="p-lg-today"></i>`, t("Bugün")]])}
+    <button onclick="openWorkoutCalendar()" data-open-cal class="p-chip w-full min-h-[44px] mt-2">${t("Tüm takvim")}</button></div>`;
   return exCard + prCard + musCard + tonCard + calCard;
 }
 

@@ -168,7 +168,7 @@ try:
     tr_free2("Programım (boş gün)", must=("No exercises on this day yet.",))
     gym("() => { activeDay().exercises.push(...window.__keepEx); renderAll(); }")
     gym("setGymView('library')"); gym("selectMuscle(null)")
-    tr_free2("Hareketler (kas seçisiz)", must=("MUSCLE LOAD", "This week", "Program", "Tap a muscle on the map", "FRONT", "BACK", "Search 135+ exercises"))
+    tr_free2("Hareketler (kas seçisiz)", must=("MUSCLE LOAD", "This week", "Program", "FRONT", "BACK", "All equipment", "Search "))   # v73: kütüphane bölümleri
     gym("selectMuscle('Göğüs')")
     x = tr_free2("Hareketler (hafta, Chest)", must=("WEEKLY SETS PER MUSCLE", "Chest", "Hamstrings and glutes", "IN PROGRAM", "Not done yet"))
     check("Based on this week's sets" in x and re.search(r"This week \d+ sets? · ", x) is not None, "en: Hareketler hafta satırı")
@@ -232,9 +232,9 @@ try:
     pg.evaluate("closeModal('exerciseModal')")
     # hareket kütüphanesi seçicisi
     pg.evaluate("openExercisePicker()")
-    x = tr_free2("hareket kütüphanesi seçici", ids=("pickerModal",), must=("Exercise library", "Core and abs", "Back: vertical pulls", "Not in the list? Add a custom exercise"))
+    x = tr_free2("hareket kütüphanesi seçici", ids=("pickerModal",), must=("Exercise library", "Chest", "Abs", "All equipment", "Not in the list? Add a custom exercise"))   # v73: kas bölümleri
     chips = pg.evaluate("[...document.querySelectorAll('#pickerChips button')].map(b => b.textContent)")
-    check(len(chips) == 12 and chips[0] == "All" and chips[1] == "Chest", "en: seçici çipleri: %s" % chips)
+    check(chips[0] == "All" and "Chest" in chips and "Cardio" in chips and "Neck" in chips, "en: seçici çipleri (v73 kas bölümleri): %s" % chips)
     pg.evaluate("closeModal('pickerModal')")
     # plaka aracı
     SETUP3 = """() => { const d = activeDay();
@@ -318,7 +318,7 @@ try:
     pg.evaluate("closeModal('chartModal')")
     pg.evaluate("openExercisePicker()")
     chips = pg.evaluate("[...document.querySelectorAll('#pickerChips button')].map(b => b.textContent)")
-    check(chips[0] == "Tümü" and chips[2] == "Sırt - Dikey Çekiş" and chips[5] == "Bacak - Ön Bacak" and chips[9] == "Kol - Triceps", "tr: seçici çipleri aynı: %s" % chips)
+    check(chips[0] == "Tümü" and "Göğüs" in chips and "Kardiyo" in chips and "Boyun" in chips, "tr: seçici çipleri (v73 kas bölümleri): %s" % chips)
     pg.evaluate("closeModal('pickerModal')")
     # program işlemleri: onay pencereleri ve geri al bildirimleri
     setlang('en')

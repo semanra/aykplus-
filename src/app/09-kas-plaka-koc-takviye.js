@@ -586,6 +586,7 @@ function autoSelectNextDay() {
 function nextSetPtr(day) {
   for (let e = 0; e < day.exercises.length; e++) {
     const s = day.exercises[e].sets.findIndex(x => !x.done);
+    if (s >= 0 && day.exercises[e].ss) { const k = ssPick(day, e); if (k) return k; }   // v75: süperset sırası A1 B1 A2 B2
     if (s >= 0) return { e, s };
   }
   return null;

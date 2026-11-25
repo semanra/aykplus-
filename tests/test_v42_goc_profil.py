@@ -61,7 +61,7 @@ try:
     PRE27 = {"settings": {"splash": False, "macroView": "plan"}, "mobilityRoutine": {"dynamic": [{"name": "D1", "prescription": "1 Set x 8 Tekrar"}], "static": [{"name": "S1", "prescription": "2 Set x 30 sn"}]}}
     seed(pg, PRE27); s = st(pg)
     r = s["mobilityRoutine"]
-    check(s.get("dataVer") == 7 and len(r["routines"]) == 1 and [x["name"] for x in r["routines"][0]["items"]] == ["D1", "S1"], f"v27 öncesi kayıt: sürüm 6, rutine taşındı ({s.get('dataVer')})")
+    check(s.get("dataVer") == 8 and len(r["routines"]) == 1 and [x["name"] for x in r["routines"][0]["items"]] == ["D1", "S1"], f"v27 öncesi kayıt: sürüm 6, rutine taşındı ({s.get('dataVer')})")
     check(s["settings"]["macroView"] == "eaten" and "macroViewV26" not in s["settings"], "v26 öncesi: kalori halkası bir kereliğine Yenen, eski işaret kalktı")
     pg.evaluate("state.settings.macroView = 'plan'; renderAll()"); pg.reload(); pg.wait_for_function("window.aykBooted === true")
     check(st(pg)["settings"]["macroView"] == "plan", "sürüm 3'te kullanıcının seçimi korunuyor (tekrar çevrilmiyor)")
@@ -70,13 +70,13 @@ try:
     check(r["routines"] == [] and r["dynamic"][0]["name"] == "Eski", "sürüm 3'te bozuk rutin listesi boşalır; eski diziler yeniden çevrilmez, silinmez")
     V38 = {"settings": {"splash": False}, "mobilityRoutine": {"dynamic": [], "static": [], "items": [{"id": "x", "name": "Couch Stretch", "type": "static", "region": "hip", "sets": 2, "mode": "time", "sec": 30, "sides": 2}]}}
     seed(pg, V38); s = st(pg)
-    check(s["dataVer"] == 7 and s["mobilityRoutine"]["routines"][0]["items"][0]["name"] == "Couch Stretch", "v38 kaydı (items) sürüm 6'ya taşındı")
+    check(s["dataVer"] == 8 and s["mobilityRoutine"]["routines"][0]["items"][0]["name"] == "Couch Stretch", "v38 kaydı (items) sürüm 6'ya taşındı")
     pg.evaluate("t => void restoreFromText(t)", json.dumps(dict(PRE27, meals=[]))); pg.wait_for_timeout(150); pg.click("#uiDlgOk"); pg.wait_for_timeout(250)
     s = st(pg)
-    check(s["dataVer"] == 7 and s["mobilityRoutine"]["routines"][0]["items"][0]["name"] == "D1", "eski yedek dosyası geri yüklenince aynı zincirden geçiyor")
+    check(s["dataVer"] == 8 and s["mobilityRoutine"]["routines"][0]["items"][0]["name"] == "D1", "eski yedek dosyası geri yüklenince aynı zincirden geçiyor")
     pg.evaluate("localStorage.clear(); void indexedDB.deleteDatabase('aykplus')"); pg.reload(); pg.wait_for_function("window.aykBooted === true")
     s = st(pg)
-    check(s["dataVer"] == 7 and len(s["mobilityRoutine"]["routines"][0]["items"]) == 10, "yeni kurulum: varsayılanlar da sürüm 6'da")
+    check(s["dataVer"] == 8 and len(s["mobilityRoutine"]["routines"][0]["items"]) == 10, "yeni kurulum: varsayılanlar da sürüm 6'da")
     ctx.close()
 
     check(not errs, f"sayfa hatası yok ({errs[:3]})")

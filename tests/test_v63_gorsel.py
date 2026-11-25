@@ -77,7 +77,7 @@ try:
     # --- 3) Kütüphane, seçici, mobilite
     pg.evaluate("setGymView('library'); selectMuscle('Göğüs')"); pg.wait_for_timeout(200)
     lib = pg.evaluate(LOADED, "#libList [data-ex-img] img")
-    nlib = pg.evaluate("libExerciseItems('Göğüs', '').length")
+    nlib = pg.evaluate("document.querySelectorAll('#libList [data-lib-row]').length")
     check(len(lib) == nlib and nlib > 5 and all(x["ok"] for x in lib) and all(x["alt"] == "" for x in lib), f"kütüphane listesi: {nlib} harekette küçük görsel (süs, alt boş)")
     pg.screenshot(path=os.path.join(SHOTS, "v63_kutuphane.png"))
     pg.evaluate("openExercisePicker()"); pg.wait_for_timeout(250)

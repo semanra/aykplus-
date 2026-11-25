@@ -60,7 +60,7 @@ try:
     seed(LEG)
     s = st(pg)
     names = all_names(s)
-    check(s["dataVer"] == 7, "b: dataVer 7")
+    check(s["dataVer"] == 8, "b: dataVer 8 (v78 göç adımı 8 de geçer)")
     check(PEC_OLD not in names and RPD_OLD not in names, "b: programda birleşik ad kalmadı")
     check(names.count(PEC_NEW) == all_names(LEG).count(PEC_OLD) and names.count(FP_NEW) >= all_names(LEG).count(RPD_OLD) >= 1,
           "b: program hareketleri yeni ada geçti (Pec Deck %d, Face Pull %d)" % (names.count(PEC_NEW), names.count(FP_NEW)))

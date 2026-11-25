@@ -54,7 +54,7 @@
       --t-acc: #1FD1C1; --t-acc-rgb: 31, 209, 193; --t-on-acc: #00201D; --t-acc-text: #1FD1C1; --t-knob-on: #FFFFFF;
       --t-panel: #0B2624; --t-panel-line: #1B5E58; --t-panel-text: #CCF5F0; --t-well: #0E0E10;
       --t-danger: #FF5A5F; --t-danger-text: #FF8A8A; --t-danger-bg: #2A1517; --t-warn-bg: #2A1F0B; --t-warn-line: #6B4E16; --t-warn-text: #E5B85B; --t-warn-icon: #FBBF24; --t-warn-mid: #FCD34D; --t-warn-hi: #FEF3C7; --t-info: #38BDF8;
-      --d-tq: #1FD1C1; --d-on-tq: #00201D; --d-gr: #22C55E; --d-on-gr: #04130A; --d-gr-soft: #16241B; --d-lv: #B3A6FF; --d-lv-btn: #B3A6FF; --d-on-lv: #1B1446;
+      --d-tq: #1FD1C1; --d-tq-rgb: 31, 209, 193; --d-on-tq: #00201D; --d-gr: #22C55E; --d-on-gr: #04130A; --d-gr-soft: #16241B; --d-lv: #B3A6FF; --d-lv-btn: #B3A6FF; --d-on-lv: #1B1446;
       --d-wa: #4EA8DE; --d-kg: #F4F4F5; --d-over: #FB7185; --d-dot: #6B6B73;
     }
     /* v31 AYDINLIK TEMA (html.light). Aynı aile: nötr açık yüzeyler, tek vurgu; vurgu yazı/çizgi olarak koyulaşır (beyazda ≥ 4,5:1).
@@ -67,7 +67,7 @@
       --t-acc: #1FD1C1; --t-acc-rgb: 31, 209, 193; --t-on-acc: #00201D; --t-acc-text: #0E7C72; --t-knob-on: #FFFFFF;
       --t-panel: #E3F7F5; --t-panel-line: #9ADDD6; --t-panel-text: #0B4F49; --t-well: #F6F6F8;
       --t-danger: #DC2626; --t-danger-text: #C81E1E; --t-danger-bg: #FDECEC; --t-warn-bg: #FFF4DB; --t-warn-line: #F0CF85; --t-warn-text: #8A5A00; --t-warn-icon: #B7791F; --t-warn-mid: #8A5A00; --t-warn-hi: #713F12; --t-info: #0369A1;
-      --d-tq: #0F766E; --d-on-tq: #FFFFFF; --d-gr: #15803D; --d-on-gr: #FFFFFF; --d-gr-soft: #E7F6EC; --d-lv: #7C6BE0; --d-lv-btn: #5B47C9; --d-on-lv: #FFFFFF;
+      --d-tq: #0F766E; --d-tq-rgb: 15, 118, 110; --d-on-tq: #FFFFFF; --d-gr: #15803D; --d-on-gr: #FFFFFF; --d-gr-soft: #E7F6EC; --d-lv: #7C6BE0; --d-lv-btn: #5B47C9; --d-on-lv: #FFFFFF;
       --d-wa: #0284C7; --d-kg: #18181B; --d-over: #BE123C; --d-dot: #A1A1AA;
       color-scheme: light;
     }
@@ -485,6 +485,13 @@
     .p-cal-d.w u { background: var(--d-on-lv); }
     .p-cal-d.fut { background: var(--t-sunk); color: var(--t-dim); }
     .p-cal-d.today { box-shadow: inset 0 0 0 2px var(--t-text); }
+    /* v76: ayrıntılı takvim (set yoğunluğu 3 kademe; sabit rgba — v26 kuralı) */
+    .cal-grid .p-cal-d { min-height: 44px; font-weight: 600; }
+    .cal-l1 { background: rgba(var(--d-tq-rgb), .3); color: var(--t-text); }
+    .cal-l2 { background: rgba(var(--d-tq-rgb), .62); color: var(--t-text); }
+    .p-cal-d.cal-l3, .cal-l3 { background: var(--d-tq); color: var(--d-on-tq); font-weight: 800; }
+    .p-cal-d.cal-sel { box-shadow: inset 0 0 0 2px var(--t-acc-text), 0 0 0 2px var(--t-acc-text); }
+    .cal-lg { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
     @media (max-width: 359px) { .p-cal { gap: 4px; } .p-cal-d { font-size: 12px; border-radius: 8px; } }
     .p-mt-g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
     .p-mt { background: var(--t-elev); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -1172,6 +1179,7 @@
         </div>
         <input id="pickerSearch" type="text" placeholder="Ara..." data-t-ph="Ara..." oninput="renderPickerList()" autocomplete="off" class="w-full px-3 py-2.5 rounded-xl text-base" />
         <div id="pickerChips" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
+        <div id="pickerEquip" class="hidden flex gap-1.5 overflow-x-auto no-scrollbar pb-1" role="group" aria-label="Ekipman" data-t-aria="Ekipman"></div>
       </div>
       <div id="pickerList" class="flex-1 overflow-y-auto px-4 pb-3 space-y-1.5"></div>
       <div id="pickerExtraWrap" class="hidden p-3 border-t border-[var(--w-line)]">
@@ -1428,6 +1436,28 @@
         <button onclick="closeModal('chartModal')" class="modal-x text-[var(--w-muted)] text-2xl leading-none px-1" aria-label="Kapat" data-t-aria="Kapat">&times;</button>
       </div>
       <div id="chartBody"></div>
+    </div>
+  </div>
+
+  <!-- v76: ANTRENMAN TAKVİMİ -->
+  <div id="calModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
+    <div role="dialog" aria-labelledby="calTitle" class="sheet w-full md:max-w-lg bg-[var(--t-surface)] border-t border-[var(--t-line)] md:border rounded-t-[28px] md:rounded-[28px] text-[var(--t-text)] flex flex-col" style="max-height: 92vh;">
+      <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
+        <h3 id="calTitle" class="text-[20px] font-extrabold" data-t="Antrenman takvimi">Antrenman takvimi</h3>
+        <button onclick="closeModal('calModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 rounded-[14px] bg-[var(--t-elev)] flex items-center justify-center text-[var(--t-muted)]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <div id="calBody" class="flex-1 overflow-y-auto px-5 pb-5 space-y-3"></div>
+    </div>
+  </div>
+
+  <!-- v77: AYLIK / YILLIK ÖZET -->
+  <div id="recapModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-50">
+    <div role="dialog" aria-labelledby="recapTitle" class="sheet w-full md:max-w-lg bg-[var(--t-surface)] border-t border-[var(--t-line)] md:border rounded-t-[28px] md:rounded-[28px] text-[var(--t-text)] flex flex-col" style="max-height: 92vh;">
+      <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
+        <h3 id="recapTitle" class="text-[20px] font-extrabold" data-t="Özet">Özet</h3>
+        <button onclick="closeModal('recapModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 rounded-[14px] bg-[var(--t-elev)] flex items-center justify-center text-[var(--t-muted)]"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <div id="recapBody" class="flex-1 overflow-y-auto px-5 pb-5 space-y-3"></div>
     </div>
   </div>
 
@@ -1753,7 +1783,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v72</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v78</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

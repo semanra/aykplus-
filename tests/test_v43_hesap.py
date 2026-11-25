@@ -30,7 +30,7 @@ try:
     OWNER = {"weight": 105, "deficit": 700, "dayType": "train",
              "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}}
     seed(pg, OWNER); t = pg.evaluate("getTargets()"); s = st(pg)
-    check(s["dataVer"] == 7 and s["settings"]["goal"] == "lose" and s["settings"]["activity"] == "mid", "eski kayıt: lose + mid, dataVer 6")
+    check(s["dataVer"] == 8 and s["settings"]["goal"] == "lose" and s["settings"]["activity"] == "mid", "eski kayıt: lose + mid, dataVer 6")
     check(t["calTarget"] == 2478, "sahibin kalorisi değişmedi (2478)")
     check(t["proTarget"] == 180 and t["fatTarget"] == 69 and t["carbTarget"] == 284, "protein 180, yağ 69, karb 284")
     check(s["deficit"] == 700, "açık korunuyor")
@@ -64,10 +64,10 @@ try:
     check(s["goal"] == "lose" and s["activity"] == "mid" and s["gainPace"] == "mid" and s["proteinHigh"] is False, "bozuk ayarlar geçerli değere döndü")
     for df, want in [(0, "keep"), (700, "lose")]:
         seed(pg, {"weight": 105, "deficit": df, "dayType": "train", "dataVer": 2, "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}})
-        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 7, f"v42 kaydı (açık {df}) → {want}, dataVer 6")
+        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 8, f"v42 kaydı (açık {df}) → {want}, dataVer 6")
         bk = {"weight": 105, "deficit": df, "dayType": "train", "dataVer": 2, "meals": [], "settings": {"sex": "male", "age": 26, "height": 180, "targetWeight": 82}}
         pg.evaluate("t => void restoreFromText(t)", json.dumps(bk)); pg.wait_for_timeout(150); pg.click("#uiDlgOk"); pg.wait_for_timeout(250)
-        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 7, f"v42 yedeği geri yüklendi (açık {df}) → {want}, dataVer 6")
+        s = st(pg); check(s["settings"]["goal"] == want and s["dataVer"] == 8, f"v42 yedeği geri yüklendi (açık {df}) → {want}, dataVer 6")
     seed(pg, {**OWNER, "dataVer": 3, "deficit": 0, "settings": {**OWNER["settings"], "goal": "lose"}})
     check(st(pg)["settings"]["goal"] == "lose", "dataVer 3 kayıtta göç tekrar çalışmıyor (kullanıcının seçimi korunur)")
     ctx.close()

@@ -3,8 +3,9 @@
 // ---------------------------------------------------------------------------
 let picker = null;
 
-function openPicker(title, groups, onPick, extra) {
-  picker = { groups, onPick, extra: extra || null, cat: "all", flat: [] };
+function openPicker(title, groups, onPick, extra, opts) {
+  // v73: opts (isteğe bağlı) = { equips: [[anahtar, ad]], allEquipLabel, equipTest(it, e), fav: { has(ad), toggle(ad) } }; grupların isteğe bağlı key / pseudo alanı
+  picker = { groups, onPick, extra: extra || null, cat: "all", flat: [], opts: opts || {}, eq: "all" };
   $("pickerTitle").textContent = title;
   $("pickerSearch").value = "";
   $("pickerSearch").placeholder = t("Ara...");
@@ -19,12 +20,28 @@ function openPicker(title, groups, onPick, extra) {
 function renderPickerChips() {
   const chip = (key, label) => {
     const on = picker.cat === key;
-    return `<button onclick="setPickerCat('${key}')" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${on ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
+    return `<button onclick="setPickerCat(${esc(JSON.stringify(key))})" aria-pressed="${on}" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${on ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
   };
-  $("pickerChips").innerHTML = chip("all", t("Tümü")) + picker.groups.map((g, i) => chip(String(i), g.short || g.label)).join("");
+  $("pickerChips").innerHTML = chip("all", t("Tümü")) + picker.groups.map((g, i) => chip(pickerKey(g, i), g.short || g.label)).join("");
+  const eqs = picker.opts.equips;   // v73: ekipman süzgeci
+  $("pickerEquip").classList.toggle("hidden", !eqs);
+  if (eqs) {
+    const ec = (key, label) => `<button onclick="setPickerEq('${key}')" aria-pressed="${picker.eq === key}" data-pick-eq="${key}" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${picker.eq === key ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
+    $("pickerEquip").innerHTML = ec("all", picker.opts.allEquipLabel || t("Tümü")) + eqs.map(([k, l]) => ec(k, l)).join("");
+  }
 }
-
+function pickerKey(g, i) { return g.key != null ? "k:" + g.key : String(i); }
 function setPickerCat(key) { picker.cat = key; renderPickerChips(); renderPickerList(); }
+function setPickerEq(key) { picker.eq = key; renderPickerChips(); renderPickerList(); }
+function pickerFav(idx) {
+  const it = picker && picker.flat[idx], f = picker && picker.opts.fav;
+  if (!it || !f) return;
+  const top = $("pickerList").scrollTop;
+  f.toggle(it.fav);
+  if (!picker.groups.some((g, i) => pickerKey(g, i) === picker.cat)) picker.cat = "all";
+  renderPickerChips(); renderPickerList();
+  $("pickerList").scrollTop = top;
+}
 
 function renderPickerList() {
   if (!picker) return;
@@ -33,9 +50,13 @@ function renderPickerList() {
   picker.flat = [];
   let html = "";
   let shown = 0, hidden = 0;
+  const eq = picker.eq !== "all" && picker.opts.equipTest ? picker.eq : null;
+  const fav = picker.opts.fav;
   picker.groups.forEach((g, gi) => {
-    if (picker.cat !== "all" && picker.cat !== String(gi)) return;
+    if (picker.cat !== "all" && picker.cat !== pickerKey(g, gi)) return;
+    if (g.pseudo && words.length && picker.cat === "all") return;   // v73: aramada favori/son grupları tekrar etmez
     const items = g.items.filter(it => {
+      if (eq && !picker.opts.equipTest(it, eq)) return false;
       if (!words.length) return true;
       const hay = normSearch(it.label + " " + (it.sub || "") + " " + g.label);
       return words.every(w => hay.includes(w));
@@ -55,7 +76,8 @@ function renderPickerList() {
         ${it.sub ? `<div class="text-[12px] text-[var(--w-muted)] mt-0.5">${esc(it.sub)}</div>` : ""}
         ${thumb ? `</span>` : ""}
       </button>`;
-      html += `<div class="bg-[var(--w-elev)] border border-[var(--w-line)] rounded-xl active:bg-[var(--w-elev2)] flex">${main}</div>`;
+      const star = fav && it.fav ? (on => `<button onclick="pickerFav(${idx})" data-fav aria-pressed="${on}" aria-label="${esc(on ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 shrink-0 flex items-center justify-center ${on ? "text-[var(--w-warn-text)]" : "text-[var(--w-dim)]"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${ICON.star}"/></svg></button>`)(fav.has(it.fav)) : "";
+      html += `<div class="bg-[var(--w-elev)] border border-[var(--w-line)] rounded-xl active:bg-[var(--w-elev2)] flex">${main}${star}</div>`;
     });
   });
   if (hidden) html += `<div class="text-[12px] text-[var(--w-dim)] text-center py-3">${tn(hidden, "{n} sonuç daha var; aramayı daralt.")}</div>`;
@@ -76,15 +98,7 @@ function pickerExtra() {
 }
 
 
-function openExercisePicker() {
-  const groups = Object.keys(EXERCISE_LIBRARY).map(g => ({
-    label: libCatL(g),
-    short: t(g.replace(/^\d+\.\s*/, "").replace(/\s*\(.*$/, "") + "|kategori"),   // v48: kısa çip adı (Türkçede bağlam atılır, metin aynı)
-    items: EXERCISE_LIBRARY[g].map(n => n.trim()).map(n => ({ id: n, label: exNameL(n), sub: detectKind(n) !== "weight" ? kindL(detectKind(n)) : "", img: n }))
-  }));
-  openPicker(t("Hareket Kütüphanesi"), groups, it => openExerciseModal({ name: it.id, kind: detectKind(it.id) }),
-    { label: t("Listede yok mu? Özel hareket yaz"), onClick: () => openExerciseModal({ name: "", kind: "weight" }) });
-}
+// v73: openExercisePicker → 33-kutuphane.js
 
 // ---------------------------------------------------------------------------
 // HAREKET EKLE / DÜZENLE MODALI
@@ -371,6 +385,10 @@ function toggleSetDone(exIdx, sIdx) {
   s.pr = false;
   if (!s.done) delete s.e;
   if (s.done && !state.workoutStartedAt) state.workoutStartedAt = Date.now();
+  // v75: süperset — set bitince sıradaki set aynı grupta ve daha aşağıdaysa tur sürüyor (dinlenme yok)
+  const ssG = ex.kind !== "cardio" ? ssInfo(activeDay())[exIdx] : null;
+  let ssGo = -1;
+  if (s.done && ssG) { const p = nextSetPtr(activeDay()); if (p && p.e > exIdx && p.e <= ssG.last) ssGo = p.e; }
   if (!s.done && !workoutInProgress()) state.workoutStartedAt = 0;
   if (s.done) {
     if (ex.kind === "weight") {
@@ -386,21 +404,33 @@ function toggleSetDone(exIdx, sIdx) {
       }
     }
     if (ex.kind !== "cardio") {
-      const hasNext = ex.sets.some(o => !o.done) || activeDay().exercises.some((o, i) => i > exIdx && o.sets.some(x => !x.done));
-      if (hasNext) startTimer(ex.rest ?? state.settings.restSec, "Dinlenme • " + ex.name);
+      if (ssGo < 0) {   // v75: süperset/devre içinde tur bitmediyse dinlenme yok; tur sonunda grubun son hareketinin dinlenmesi
+        const hasNext = ex.sets.some(o => !o.done) || activeDay().exercises.some((o, i) => (i > exIdx || (ssG && i >= ssG.first && i !== exIdx)) && o.sets.some(x => !x.done));
+        const rEx = ssG ? activeDay().exercises[ssG.last] : ex;
+        if (hasNext) startTimer(rEx.rest ?? state.settings.restSec, "Dinlenme • " + ex.name);
+      }
     }
   }
   renderAll();
   if (s.done && typeof animSetTick === "function") animSetTick(exIdx, sIdx, !!s.pr);   // v55 ANİM: set tiki (+ rekor parıltısı)
   if (s.done && ex.sets.every(x => x.done) && typeof animExDone === "function") animExDone(exIdx);   // v57 ANİM: hareket tamam
-  if (s.done && ex.sets.every(x => x.done)) {
+  if (s.done && ssG) {   // v75: grupta sıradaki harekete kaydır
+    const p = nextSetPtr(activeDay());
+    if (p && p.e !== exIdx && p.e >= ssG.first && p.e <= ssG.last) scrollToExercise(p.e);
+    else if (ex.sets.every(x => x.done) && p && p.e !== exIdx) scrollToExercise(p.e);
+  } else if (s.done && ex.sets.every(x => x.done)) {
     const day = activeDay();
     const j = day.exercises.findIndex((o, i) => i > exIdx && o.sets.some(x => !x.done));
     if (j >= 0) scrollToExercise(j);
   }
 }
 
-function updateExerciseNote(exIdx, val) { activeDay().exercises[exIdx].note = val; saveState(); }
+function updateExerciseNote(exIdx, val) {   // v78: not harekete bağlı (bütün günlerde aynı)
+  const ex = activeDay().exercises[exIdx];
+  if (!ex) return;
+  setExNote(ex.name, val);
+  saveState();
+}
 
 function addSetToExercise(exIdx) {
   const ex = activeDay().exercises[exIdx];

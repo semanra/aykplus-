@@ -161,6 +161,9 @@ function fillExLevels(v) {
 function equipL(eq, short) { return t((short ? EQUIP_SHORT : EQUIP_LABEL)[eq] || ""); }
 const GYM_VIEWS = [["today", "Bugün"], ["program", "Programım"], ["library", "Hareketler"], ["history", "Geçmiş"]];
 const ICON = {
+  cal: "M4 6h16v14H4zM4 10h16M8 3v4M16 3v4",
+  link: "M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1",
+  unlink: "M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1M4 4l16 16",
   talk: "M4 5h16v11H9l-5 4V5zM8 9.5h8M8 12.5h5",
   undo: "M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5", vol: "M11 5L6 9H3v6h3l5 4V5zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13",
   volOff: "M11 5L6 9H3v6h3l5 4V5zM16 9.5l5 5M21 9.5l-5 5",
@@ -328,7 +331,9 @@ function gymActiveHtml() {
   const day = activeDay();
   const ptr = nextSetPtr(day);
   const total = day.exercises.length;
+  const ssI = ssInfo(day);   // v75
   const cards = day.exercises.map((ex, exIdx) => {
+    const ssg = ssI[exIdx];
     const hist = historyFor(ex.name);
     const last = hist[hist.length - 1];
     const eq = equipOf(ex);
@@ -341,9 +346,10 @@ function gymActiveHtml() {
       ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 36px minmax(0,1fr) 78px 60px 44px"><span class="text-center">${t("SET")}</span><span class="truncate">${t("ÖNCEKİ")}</span><span class="text-center">${isImperial() ? "LB" : t("KG")}</span><span class="text-center">${t("TEKRAR")}</span><span></span></div>`
       : ex.kind === "time" ? `<div class="grid gap-2 px-1 text-[12px] font-bold tracking-wider t-dim" style="grid-template-columns: 40px minmax(0,1fr) 84px 44px"><span class="text-center">${t("SET")}</span><span>${t("SÜRE")}</span><span></span><span></span></div>` : "";
     return `
-      <div id="exCard_${exIdx}" class="t-card rounded-[22px] p-4 space-y-3" style="scroll-margin-top: 9rem;">
+      <div id="exCard_${exIdx}" class="t-card rounded-[22px] p-4 space-y-3" style="scroll-margin-top: 9rem;${ssg ? " box-shadow: inset 4px 0 0 var(--t-acc);" : ""}"${ssg ? ` data-ss="${ssg.letter}"` : ""}>
         <div class="flex items-start justify-between gap-2">
           <div class="min-w-0 space-y-1.5">
+            ${ssg ? `<div data-ss-label class="text-[12px] font-bold tracking-wider" style="color:var(--t-acc-text)">${ssLabel(ssg)} · ${ssg.pos + 1}/${ssg.size}</div><div data-ss-next class="text-[12px] t-muted line-clamp-2">${ssg.pos + 1 < ssg.size ? t("Sonra dinlenmeden: {ad}", { ad: esc(exNameL(day.exercises[exIdx + 1].name)) }) : t("Sonra dinlen")}</div>` : ""}
             <div class="t-label">${t("HAREKET {n} / {total}", { n: exIdx + 1, total })}${allDone ? ` <span class="t-accent" data-ex-done>· ${t("TAMAMLANDI")}</span>` : ""}</div>
             <div class="text-[21px] font-bold leading-tight">${esc(exNameL(ex.name))}</div>
             <div class="flex flex-wrap gap-1.5">
@@ -362,7 +368,7 @@ function gymActiveHtml() {
         <div id="exRight_${exIdx}" class="text-[12px] t-dim">${exRightText(ex)}</div>
         ${(ptr && ptr.e === exIdx) || ex.sets.some(s => s.done) ? levelsAskHtml(ex, exIdx) : ""}
         ${suggestionHtml(ex, exIdx)}
-        <input type="text" value="${esc(ex.note || "")}" placeholder="${t("Not ekle (koltuk ayarı, tutuş...)")}" onchange="updateExerciseNote(${exIdx}, this.value)" class="t-note w-full text-[13px]" />
+        <input type="text" value="${esc(exNote(ex.name))}" maxlength="300" aria-label="${t("Hareket notu")}" placeholder="${t("Not ekle (koltuk ayarı, tutuş...)")}" onchange="updateExerciseNote(${exIdx}, this.value)" class="t-note w-full text-[13px]" />
         ${head}
         <div class="space-y-1.5">${ex.sets.map((s, i) => setRowHtml(ex, exIdx, s, i, ptr, prevOf(i))).join("")}</div>
         <button onclick="addSetToExercise(${exIdx})" class="w-full h-11 rounded-[14px] border-[1.5px] border-dashed border-[var(--t-line)] t-muted text-sm font-semibold">${ex.kind === "cardio" ? t("+ Bölüm ekle") : t("+ Set ekle")}</button>
@@ -401,14 +407,16 @@ function gymProgramHtml() {
   const day = activeDay();
   const nIdx = nextDayIdx();
   const chips = state.workoutDays.map((d, i) => `<button onclick="selectWorkoutDay(${i})" class="shrink-0 h-11 px-4 rounded-full text-[13px] ${i === state.activeWorkoutDayIdx ? "bg-[var(--t-text)] text-[var(--t-bg)] font-bold" : "bg-[var(--t-surface)] border border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${esc(d.name)}${i === nIdx ? ` <span class="text-[11px] font-bold" style="color:#1FD1C1">${t("SIRADA")}</span>` : ""}</button>`).join("");
+  const ssI = ssInfo(day);   // v75
   const rows = day.exercises.map((ex, i) => {
     const eq = equipOf(ex);
+    const ssg = ssI[i];
     const meta = [targetL(ex.targetInfo), muscleL(muscleOf(ex)), eq ? equipL(eq, true) : (ex.kind === "cardio" ? t("Kardiyo") : t("Süreli"))].filter(Boolean).join(" · ");
     const lvWarn = usesLevels(ex) && !ex.levels ? `<span class="text-[12px] text-[var(--t-warn-mid)]">${t("Kademe tanımlı değil")}</span>` : usesLevels(ex) ? `<span class="text-[12px] t-dim">${t("Kademe: {lv}", { lv: esc(levelsSummary(ex)) })}</span>` : "";
-    return `<div data-ex-row="${i}" class="t-card-flat rounded-2xl min-h-[64px] pl-1 pr-1.5 py-2 flex items-center gap-2">
+    return `<div data-ex-row="${i}" class="t-card-flat rounded-2xl min-h-[64px] pl-1 pr-1.5 py-2 flex items-center gap-2"${ssg ? ` data-ss="${ssg.letter}" style="box-shadow: inset 4px 0 0 var(--t-acc)"` : ""}>
       ${day.exercises.length > 1 ? `<button class="drag-handle w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-dim" data-exidx="${i}" aria-label="${t("{name} hareketini sürükleyerek taşı", { name: esc(exNameL(ex.name)) })}" style="touch-action: none; cursor: grab;">${svgI("grip", 22, 2.4)}</button>` : `<span class="w-3"></span>`}
       <span class="t-display text-xl t-dim w-6 text-center">${i + 1}</span>
-      <span class="flex-1 min-w-0 flex flex-col gap-0.5"><span class="text-[15px] font-semibold line-clamp-2 leading-snug">${esc(exNameL(ex.name))}</span><span class="text-xs t-muted truncate">${esc(meta)}</span>${lvWarn}</span>
+      <span class="flex-1 min-w-0 flex flex-col gap-0.5">${ssg ? `<span data-ss-label class="text-[11px] font-bold tracking-wider" style="color:var(--t-acc-text)">${ssLabel(ssg)} · ${ssg.pos + 1}/${ssg.size}</span>` : ""}<span class="text-[15px] font-semibold line-clamp-2 leading-snug">${esc(exNameL(ex.name))}</span><span class="text-xs t-muted truncate">${esc(meta)}</span>${exNoteLine(ex.name)}${lvWarn}</span>
       <button onclick="openExSheet(${i})" aria-label="${t("{name} seçenekleri", { name: esc(exNameL(ex.name)) })}" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center t-muted">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="19" cy="12" r="1.9"></circle></svg>
       </button>
@@ -488,43 +496,7 @@ function selectMuscle(m) { state.libMuscle = MUSCLES.includes(m) ? m : null; lib
 function setLibRange(r) { state.libRange = r === "today" || r === "program" ? r : "week"; renderAll(); }
 let libSearchQ = "";
 
-function libExerciseItems(muscle, q) {
-  const seen = new Set();
-  const out = [];
-  const add = name => {
-    const k = exKey(name);
-    if (seen.has(k)) return;
-    seen.add(k);
-    out.push(name.trim());
-  };
-  const words = normSearch(q).split(/\s+/).filter(Boolean);
-  const match = name => words.length ? words.every(w => normSearch(name).includes(w)) : autoMuscle(name) === muscle;
-  activeDay().exercises.forEach(ex => { if (ex.kind === "weight" && match(ex.name) && (words.length || muscleOf(ex) === muscle)) add(ex.name); });
-  Object.keys(EXERCISE_LIBRARY).forEach(c => EXERCISE_LIBRARY[c].forEach(n => { if (match(n)) add(n); }));
-  return out.slice(0, 40);
-}
-function libListHtml() {
-  const q = libSearchQ.trim();
-  const m = state.libMuscle;
-  if (!q && !m) return `<div class="text-sm t-muted text-center py-4">${t("Hareketleri görmek için haritada bir kasa dokun ya da yukarıdan ara.")}</div>`;
-  const items = libExerciseItems(m, q);
-  const inDay = new Set(activeDay().exercises.map(e => exKey(e.name)));
-  if (!items.length) return `<div class="text-sm t-muted text-center py-4">${t("Sonuç bulunamadı.")}</div>`;
-  return items.map(n => {
-    const h = historyFor(n);
-    const last = h[h.length - 1];
-    const meta = last ? t("Son: {s} · {d}", { s: sessionSummary(last), d: fmtDate(last.ts) }) : t("Henüz yapılmadı");
-    return `<div class="t-card-flat rounded-2xl min-h-[72px] pl-3.5 pr-2 py-2 flex items-center gap-3">
-      ${exThumbHtml(n, "w-[76px] h-[43px] -ml-1.5")}
-      <span class="flex-1 min-w-0 flex flex-col gap-1">
-        <span class="text-[15px] font-bold">${esc(exNameL(n))}</span>
-        <span class="text-xs t-muted truncate">${esc(meta)}</span>
-        ${inDay.has(exKey(n)) ? `<span class="self-start text-[11px] font-bold px-2 py-0.5 rounded-full border border-[var(--t-panel-line)] bg-[var(--t-panel)]" style="color:#1FD1C1">${t("PROGRAMDA")}</span>` : ""}
-      </span>
-      <button onclick="openExerciseModal({ name: ${esc(JSON.stringify(n))}, kind: detectKind(${esc(JSON.stringify(n))}) })" aria-label="${t("{name} hareketini {day} gününe ekle", { name: esc(exNameL(n)), day: esc(activeDay().name) })}" class="t-btn-outline w-11 h-11 rounded-xl flex items-center justify-center">${svgI("plus", 20, 2.4)}</button>
-    </div>`;
-  }).join("");
-}
+// v73: kütüphane listesi (bölümler, ekipman, favoriler) → 33-kutuphane.js
 function onLibSearch(v) { libSearchQ = v; $("libList").innerHTML = libListHtml(); }
 
 function gymLibraryHtml() {
@@ -597,9 +569,9 @@ function gymLibraryHtml() {
     <label class="flex items-center gap-2.5 h-12 rounded-[14px] bg-[var(--t-surface)] border border-[var(--t-line)] px-3.5 t-muted">
       ${svgI("search", 18)}
       <span class="sr-only">${t("Hareket ara")}</span>
-      <input type="text" value="${esc(libSearchQ)}" oninput="onLibSearch(this.value)" placeholder="${t("135+ hareket içinde ara")}" class="t-search flex-1 min-w-0" />
+      <input type="text" value="${esc(libSearchQ)}" oninput="onLibSearch(this.value)" placeholder="${t("{n} hareket içinde ara", { n: libAllNames().length })}" class="t-search flex-1 min-w-0" />
     </label>
-    <div id="libList" class="space-y-2">${libListHtml()}</div>`;
+    <div id="libBrowse" class="space-y-2.5">${libBrowseHtml()}</div>`;
 }
 
 function gymHistoryHtml() {
@@ -622,11 +594,13 @@ function gymHistoryHtml() {
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Tonaj")}</div><div class="t-display text-[26px]">${fmtNum(wRaw(weekLogs.reduce((a, l) => a + num(l.volume), 0)) / 1000)}<span class="t-dim text-lg"> ${isImperial() ? t("bin lb") : t("t|ton")}</span></div></div>
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Toplam")}</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> ${tn(state.workoutLogs.length, "antr.")}</span></div></div>
     </div>
+    <button onclick="openWorkoutCalendar()" data-open-cal class="t-btn-ghost w-full h-11 rounded-xl text-sm flex items-center justify-center gap-2">${svgI("cal", 18)}${t("Takvim")}</button>
     <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">${t("Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.")}</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">${t("Bugünün antrenmanına git")}</button></div>`}</div>
     <button onclick="switchTab('progress')" class="t-btn-ghost w-full min-h-11 px-4 py-2 rounded-xl text-sm">${t("Grafikler ve rekorlar: İlerleme sekmesi")}</button>`;
 }
 
 function renderGym() {
+  ssCleanAll();   // v75: sıra değişince / silinince süperset grupları düzelir
   if (!GYM_VIEWS.some(x => x[0] === state.gymView)) state.gymView = "today";
   const active = state.gymView === "today" && state.gymActive;
   let html = active ? gymActiveHtml()
@@ -733,9 +707,12 @@ function openExSheet(exIdx) {
     <div class="px-1 pb-2"><div class="text-xl font-bold">${esc(exNameL(ex.name))}</div>
       <div class="text-[13px] t-muted">${esc([muscleL(muscleOf(ex)), targetL(ex.targetInfo), ex.kind !== "cardio" ? t("Dinlenme {n} sn", { n: String(ex.rest ?? state.settings.restSec) }) : ""].filter(Boolean).join(" · "))}</div></div>
     ${exImgBigHtml(ex.name, "exSheetImg", "mb-1")}
+    ${item(`openExNote(${exIdx})`, "talk", exNote(ex.name) ? t("Notu düzenle") : t("Not ekle"), exNote(ex.name) || t("Koltuk ayarı, tutuş, kademe…"))}
     ${item(`openExerciseChart(${exIdx})`, "chart", t("İlerleme grafiği"), t("Tahmini 1RM ve son kayıtlar"))}
     ${ex.kind === "weight" && eq !== "bodyweight" ? item(`openPlateTool(${exIdx})`, "calc", eq === "plates" ? t("Plaka ve ısınma") : t("Kademe ve ısınma"), plateSub) : ""}
     ${item(`openEditExercise(${exIdx})`, "edit", t("Hareketi düzenle"), ex.kind === "weight" ? t("Set, tekrar, ekipman, kademeler, kas grubu") : t("Set, süre, dinlenme"))}
+    ${item(`openSwapExercise(${exIdx})`, "repeat", t("Hareketi değiştir"), t("Aynı kası çalıştıran benzer hareketler"))}
+    ${ssSheetItems(exIdx, item)}
     <div class="grid grid-cols-2 gap-1.5">
       <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, -1)" ${exIdx === 0 ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[var(--t-elev0)] flex items-center justify-center gap-2 text-[14px] font-semibold ${exIdx === 0 ? "opacity-30" : ""}">${svgI("up", 18)} ${t("Yukarı taşı")}</button>
       <button onclick="closeModal('exSheet'); moveExercise(${exIdx}, 1)" ${last ? "disabled" : ""} class="min-h-[52px] rounded-2xl bg-[var(--t-elev0)] flex items-center justify-center gap-2 text-[14px] font-semibold ${last ? "opacity-30" : ""}">${svgI("down", 18)} ${t("Aşağı taşı")}</button>

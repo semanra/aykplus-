@@ -97,7 +97,7 @@ Object.assign(EN, {
   "Programında haftada <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "<b class=\"text-[var(--t-text)]\">{n} set</b> a week in your program · {tag}", other: "<b class=\"text-[var(--t-text)]\">{n} sets</b> a week in your program · {tag}" },
   "Bu hafta <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "This week <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", other: "This week <b class=\"text-[var(--t-text)]\">{n} sets</b> · {tag}" },
   "programında yok": "not in your program", "Temizle": "Clear",
-  "Hareket ara": "Search exercises", "135+ hareket içinde ara": "Search 135+ exercises",
+  "Hareket ara": "Search exercises", "{n} hareket içinde ara": "Search {n} exercises",
   // --- Geçmiş
   "{n} dk kardiyo": "{n} min cardio", "{n} rekor": { one: "{n} PR", other: "{n} PRs" },
   "Kaydı sil": "Delete entry", "antr.": { one: "workout", other: "workouts" }, "Toplam": "Total",
@@ -238,4 +238,24 @@ Object.assign(EN, {
   "Hareket taşındı": "Exercise moved",
   // v57: antrenman özeti penceresi
   "Tamamlanan set": "Sets done", "Yeni rekorlar": "New PRs",
+  // v73: hareket kütüphanesi
+  "Bar / Plaka": "Barbell / Plates", "Dambıl / KB": "Dumbbell / KB", "Kablo": "Cable", "Tüm ekipman": "All equipment",
+  "Son yapılanlar": "Recently done", "Bölümler": "Sections", "Favorilere eklendi": "Added to favourites", "Favorilerden çıkarıldı": "Removed from favourites",
+  "{n} hareket": { one: "{n} exercise", other: "{n} exercises" },
+  "Bu ekipmanla favori hareket yok.": "No favourite exercises with this equipment.",
+  "Henüz favori hareket yok. Bir hareketin yıldızına dokununca burada görünür.": "No favourite exercises yet. Tap an exercise's star and it will show up here.",
+  "Bu ekipmanla son yapılan hareket yok.": "No recent exercises with this equipment.",
+  "Henüz kaydedilmiş hareket yok.": "No exercises logged yet.",
+  // v74: hareket değiştir
+  "Hareketi değiştir": "Swap exercise", "Aynı kası çalıştıran benzer hareketler": "Similar exercises for the same muscle",
+  "En yakın alternatifler": "Closest alternatives", "En yakın": "Closest", "Diğer {kas} hareketleri": "Other {kas} exercises", "{a} yerine {b}": "{b} instead of {a}",
+  // v75: süperset / devre
+  "DEVRE {l}": "CIRCUIT {l}", "SÜPERSET {l}": "SUPERSET {l}", "Bağlandı: dinlenmeden art arda yapılır": "Linked: done back to back without rest",
+  "Süpersetten çıkarıldı": "Removed from superset", "Sonrakiyle bağla (süperset)": "Link with next (superset)", "{ad} ile dinlenmeden art arda": "Back to back with {ad}, no rest",
+  "Süpersetten çıkar": "Remove from superset", "Bu hareket kendi başına yapılır": "This exercise is done on its own",
+  "Sonra dinlenmeden: {ad}": "Next, no rest: {ad}", "Sonra dinlen": "Then rest",
+  // v78: hareket notu
+  "Hareket notu": "Exercise note", "Koltuk ayarı, tutuş, kademe… Bu hareket hangi günde olursa olsun not görünür.": "Seat setting, grip, stack level… The note shows wherever this exercise appears.",
+  "Örn: koltuk 4, dirsekler içeride": "E.g. seat 4, elbows tucked", "Not kaydedildi": "Note saved", "Not silindi": "Note deleted", "Not:": "Note:",
+  "Notu düzenle": "Edit note", "Not ekle": "Add note", "Koltuk ayarı, tutuş, kademe…": "Seat setting, grip, stack level…",
 });

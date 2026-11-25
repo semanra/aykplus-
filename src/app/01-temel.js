@@ -233,7 +233,8 @@ function normMobItem(x) {
 // çalışmaz. normalizeState yalnızca doğrulama/temizlik yapar. Yeni bir biçim değişikliği = yeni adım + DATA_VER + 1.
 // (v4 kaydının içe alınması başka anahtardan geldiği için loadState'te.)
 // ---------------------------------------------------------------------------
-const DATA_VER = 7;
+const DATA_VER = 8;
+const EX_NOTE_MAX = 300;   // v78
 // v62: yapay zekânın önerdiği birleşik "X VEYA Y" kütüphane adları iki ayrı hareketti; ayrı hâlleri listede zaten var.
 // Sahibin seçimi (18 Kasım 2026): salonda Pec Deck ve Face Pull yapıldı → program ve geçmiş o harekete taşınır.
 const EX_RENAME_V62 = [
@@ -247,6 +248,8 @@ function renameExerciseData(s, from, to) {
   if (Array.isArray(s.workoutDays)) s.workoutDays.forEach(d => {
     if (isObj(d) && Array.isArray(d.exercises)) d.exercises.forEach(ex => { if (isObj(ex) && exKey(ex.name) === fk) ex.name = to; });
   });
+  if (Array.isArray(s.favExercises)) s.favExercises = s.favExercises.map(x => typeof x === "string" && exKey(x) === fk ? to : x);   // v73
+  if (isObj(s.exNotes) && s.exNotes[fk]) { if (!s.exNotes[tk]) s.exNotes[tk] = s.exNotes[fk]; delete s.exNotes[fk]; }   // v78
   const h = s.exerciseHistory;
   if (!isObj(h) || !Array.isArray(h[fk])) return;
   const moved = h[fk].map(x => { if (isObj(x) && exKey(x.name) === fk) x.name = to; return x; });
@@ -272,6 +275,14 @@ function migrateState(s, rawHadGoal) {
   if (v < 5) s.settings.lang = "tr";   // v46: var olan kayıt Türkçe kalır
   if (v < 6) s.settings.units = "metric";   // v53: var olan kayıt (ve eski yedek) kg / cm kalır
   if (v < 7) EX_RENAME_V62.forEach(([from, to]) => renameExerciseData(s, from, to));   // v62: birleşik hareket adları → gerçek hareket
+  if (v < 8) {   // v78: hareket notu güne değil harekete bağlı (state.exNotes[exKey]); günlerdeki ex.note silinmez, otomatik "Hedef:" notları alınmaz
+    if (!isObj(s.exNotes)) s.exNotes = {};
+    s.workoutDays.forEach(d => d.exercises.forEach(ex => {
+      const n = typeof ex.note === "string" ? ex.note.trim() : "";
+      const k = exKey(ex.name);
+      if (n && k && !/^(Hedef|Target):/.test(n) && !s.exNotes[k]) s.exNotes[k] = n.slice(0, EX_NOTE_MAX);
+    }));
+  }
   s.dataVer = Math.max(v, DATA_VER);
 }
 
@@ -290,6 +301,7 @@ function normalizeStateInner(raw) {
     day.exercises = day.exercises.filter(isObj);   // v35: boş/bozuk hareket kaydı bütün veriyi okunamaz yapmasın
     if (typeof day.name !== "string" || !day.name.trim()) day.name = (day.name != null && typeof day.name !== "object" ? String(day.name) : "").trim() || repairName("Antrenman günü|onarım");
     day.exercises.forEach(normalizeExercise);
+    ssCleanDay(day);   // v75: süperset grupları
   });
   if (!isObj(s.mobilityRoutine)) s.mobilityRoutine = clone(DEFAULT_STATE.mobilityRoutine);
   if (!Array.isArray(s.mobilityRoutine.dynamic)) s.mobilityRoutine.dynamic = [];
@@ -345,6 +357,16 @@ function normalizeStateInner(raw) {
   // v65: favori besinler (kimlik listesi; tekrarsız, en fazla 300; bulunamayan kimlik silinmez, listede gösterilmez)
   if (!Array.isArray(s.favFoods)) s.favFoods = [];
   s.favFoods = [...new Set(s.favFoods.filter(x => typeof x === "string" && x))].slice(0, 300);
+  // v78: hareket notları { exKey: metin } (boş atılır, en fazla EX_NOTE_MAX karakter)
+  if (!isObj(s.exNotes)) s.exNotes = {};
+  Object.keys(s.exNotes).forEach(k => {
+    const v = s.exNotes[k];
+    if (typeof v !== "string" || !v.trim() || !k) delete s.exNotes[k];
+    else if (v.length > EX_NOTE_MAX || v !== v.trim()) s.exNotes[k] = v.trim().slice(0, EX_NOTE_MAX);
+  });
+  // v73: favori hareketler (hareket adları; exKey ile tekrarsız, en fazla 200)
+  if (!Array.isArray(s.favExercises)) s.favExercises = [];
+  { const seen = new Set(); s.favExercises = s.favExercises.filter(x => typeof x === "string" && x.trim()).map(x => x.trim()).filter(x => { const k = exKey(x); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 200); }
   if (!isObj(s.customFoods)) s.customFoods = {};
   // v25: özel besin kayıtları: boşlar atılır, değerler sayıya çevrilir, tarif malzemeleri temizlenir
   Object.keys(s.customFoods).forEach(id => {
@@ -445,7 +467,7 @@ function normalizeStateInner(raw) {
   s.settings.scaleBase = num(s.settings.scaleBase, 0);
   if (s.settings.scaleOn && !(s.settings.scaleBase > 0)) s.settings.scaleOn = false;
   if (!["week", "today", "program"].includes(s.libRange)) s.libRange = "week";
-  if (s.libMuscle && !["Göğüs", "Sırt", "Omuz", "Ön Bacak", "Arka Bacak & Kalça", "Kalf", "Biceps", "Triceps", "Karın"].includes(s.libMuscle)) s.libMuscle = null;
+  if (s.libMuscle && !MUSCLES.includes(s.libMuscle)) s.libMuscle = null;   // v73: küçük kaslar da seçili kalır
   s.workoutDays.forEach((d, i) => { if (!d.id) d.id = "day_" + i + "_" + Date.now(); });
   if (!TABS.includes(s.activeTab)) s.activeTab = "nutrition";
   s.activeWorkoutDayIdx = Math.max(0, Math.min(s.workoutDays.length - 1, parseInt(s.activeWorkoutDayIdx) || 0));

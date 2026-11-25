@@ -542,7 +542,8 @@ try:
         "🏋️ Ağırlık": "KIND_LABEL: kayıt değeri, gösterimde kindL (v48)", "⏱️ Süreli": "KIND_LABEL: gösterimde kindL", "Tükeniş": "EFFORT_LABELS: gösterimde effortL",
         "Adsız hareket": "normalizeState onarım yedeği (bozuk kayıt; kayıtlı-metinler a1)", "Tahmini öğün": "normalizeState onarım yedeği (a1)",
         "{n}. Öğün|onarım": "normalizeState onarım yedeği; v53 repairName ile kaydın dilinde (EN girişi 26-birim.js)", "Antrenman günü": "normalizeState onarım yedeği (a1)", "Adsız besin": "normalizeState onarım yedeği (a1)", "Özel": "normalizeState onarım yedeği (a1)",
-        "Göğüs": "MUSCLES kas adı: kayıt/anahtar, gösterimde muscleL (v48)", "Sırt": "MUSCLES: gösterimde muscleL", "Ön Bacak": "MUSCLES: gösterimde muscleL", "Arka Bacak & Kalça": "MUSCLES: gösterimde muscleL", "Karın": "MUSCLES: gösterimde muscleL"},
+        # v73: kas adları 01-temel.js'de artık yazılı değil (normalizeState MUSCLES kullanır)
+        },
       "02-arayuz.js": {"İlerleme": "TAB_TITLES değeri, gösterimde t(TAB_TITLES[..])", "boş görsel": HATA, "okunamadı": HATA},
       "03-beslenme.js": {"Bugün": "NUTRI_VIEWS etiketleri, gösterimde t(l)", "Menülerim": "NUTRI_VIEWS", "Geçmiş": "NUTRI_VIEWS"},
       "04-besinler-barkod.js": {"Diğer": "besin kategori anahtarı (veri; gösterimde t(stripEmoji(c)), v51)", "ZXing yüklenemedi": HATA,

@@ -201,4 +201,19 @@ Object.assign(EN, {
   "Gün içindeki hareketliliğine en yakın olanı seç.": "Choose the option closest to how active you are during the day.",
   "Birini seç; örnek program buna göre hazırlanır.": "Choose one; the sample program is built to match.",
   "Örnek menü şu an hazırlanamadı; menünü kendin ekleyebilirsin.": "The sample meal plan couldn't be prepared right now; you can add your own meals.",
+  // v76: antrenman takvimi
+  "Takvim": "Calendar", "Tüm takvim": "Full calendar", "Önceki ay": "Previous month", "Sonraki ay": "Next month",
+  "antrenman|takvim": { one: "workout", other: "workouts" }, "set|takvim": { one: "set", other: "sets" }, "mobilite günü": "mobility days",
+  "1–9 set": "1–9 sets", "10–19 set": "10–19 sets", "20+ set": "20+ sets", "{y} yılında {n} antrenman": { one: "{n} workout in {y}", other: "{n} workouts in {y}" },
+  "Ayrıntı için bir güne dokun.": "Tap a day for details.", "Bu gün antrenman kaydı yok.": "No workout logged on this day.",
+  "Mobilite: {n} hareket": { one: "Mobility: {n} move", other: "Mobility: {n} moves" }, "{n} antrenman": { one: "{n} workout", other: "{n} workouts" },
+  // v77: aylık / yıllık özet
+  "Aylık / yıllık özet": "Monthly / yearly recap", "Özet": "Recap", "Geçen ay": "Last month", "Bu yıl": "This year", "Geçen yıl": "Last year", "Bu ay": "This month",
+  "Bu dönemde kayıt yok. Antrenman, mobilite ve beslenme kaydettikçe özetin burada birikir.": "Nothing logged in this period. Your recap builds up here as you log workouts, mobility and nutrition.",
+  "{n} kez": { one: "{n} time", other: "{n} times" }, "saat": "hours", "rekor|özet": { one: "PR", other: "PRs" }, "hafta seri": { one: "week streak", other: "week streak" },
+  "Kardiyo: {m} dk": "Cardio: {m} min", "EN ÇOK YAPTIĞIN HAREKETLER": "YOUR TOP EXERCISES", "EN ÇOK ÇALIŞAN KASLAR": "MOST TRAINED MUSCLES",
+  "Set sayısı; yardımcı kaslara yarım set sayılır.": "Set count; helper muscles count as half a set.", "MOBİLİTE": "MOBILITY", "KİLO": "WEIGHT",
+  "{n} gün esneme / mobilite": { one: "{n} day of stretching / mobility", other: "{n} days of stretching / mobility" },
+  "Ortalama {k} kcal · {p} g protein": "Average {k} kcal · {p} g protein",
+  "Kayıtlı {d} günün {h} gününde kalori hedefine (±%5), {pr} gününde protein hedefine ulaştın.": "On {h} of {d} logged days you hit your calorie target (±5%), and your protein target on {pr}.",
 });
