@@ -20,19 +20,19 @@ function openPicker(title, groups, onPick, extra, opts) {
 function renderPickerChips() {
   const chip = (key, label) => {
     const on = picker.cat === key;
-    return `<button onclick="setPickerCat(${esc(JSON.stringify(key))})" aria-pressed="${on}" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${on ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
+    return `<button onclick="setPickerCat(${esc(JSON.stringify(key))})" aria-pressed="${on}" class="shrink-0 min-h-[44px] min-w-[44px] text-[13px] px-3.5 rounded-full border ${on ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
   };
   $("pickerChips").innerHTML = chip("all", t("Tümü")) + picker.groups.map((g, i) => chip(pickerKey(g, i), g.short || g.label)).join("");
   const eqs = picker.opts.equips;   // v73: ekipman süzgeci
   $("pickerEquip").classList.toggle("hidden", !eqs);
   if (eqs) {
-    const ec = (key, label) => `<button onclick="setPickerEq('${key}')" aria-pressed="${picker.eq === key}" data-pick-eq="${key}" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${picker.eq === key ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
+    const ec = (key, label) => `<button onclick="setPickerEq('${key}')" aria-pressed="${picker.eq === key}" data-pick-eq="${key}" class="shrink-0 min-h-[44px] min-w-[44px] text-[13px] px-3.5 rounded-full border ${picker.eq === key ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
     $("pickerEquip").innerHTML = ec("all", picker.opts.allEquipLabel || t("Tümü")) + eqs.map(([k, l]) => ec(k, l)).join("");
   }
 }
 function pickerKey(g, i) { return g.key != null ? "k:" + g.key : String(i); }
-function setPickerCat(key) { picker.cat = key; renderPickerChips(); renderPickerList(); }
-function setPickerEq(key) { picker.eq = key; renderPickerChips(); renderPickerList(); }
+function setPickerCat(key) { picker.cat = key; renderPickerChips(); renderPickerList(); if (typeof animListIn === "function") animListIn("pickerList"); }   /* v80 ANİM: liste geçişi */
+function setPickerEq(key) { picker.eq = key; renderPickerChips(); renderPickerList(); if (typeof animListIn === "function") animListIn("pickerList"); }   /* v80 ANİM: liste geçişi */
 function pickerFav(idx) {
   const it = picker && picker.flat[idx], f = picker && picker.opts.fav;
   if (!it || !f) return;
@@ -41,6 +41,7 @@ function pickerFav(idx) {
   if (!picker.groups.some((g, i) => pickerKey(g, i) === picker.cat)) picker.cat = "all";
   renderPickerChips(); renderPickerList();
   $("pickerList").scrollTop = top;
+  if (typeof animStarPop === "function") animStarPop(exKey(it.fav));   /* v80 ANİM: yıldız */
 }
 
 function renderPickerList() {
@@ -76,7 +77,7 @@ function renderPickerList() {
         ${it.sub ? `<div class="text-[12px] text-[var(--w-muted)] mt-0.5">${esc(it.sub)}</div>` : ""}
         ${thumb ? `</span>` : ""}
       </button>`;
-      const star = fav && it.fav ? (on => `<button onclick="pickerFav(${idx})" data-fav aria-pressed="${on}" aria-label="${esc(on ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 shrink-0 flex items-center justify-center ${on ? "text-[var(--w-warn-text)]" : "text-[var(--w-dim)]"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${ICON.star}"/></svg></button>`)(fav.has(it.fav)) : "";
+      const star = fav && it.fav ? (on => `<button onclick="pickerFav(${idx})" data-fav data-fav-key="${esc(exKey(it.fav))}" aria-pressed="${on}" aria-label="${esc(on ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 shrink-0 flex items-center justify-center ${on ? "text-[var(--w-warn-text)]" : "text-[var(--w-dim)]"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${ICON.star}"/></svg></button>`)(fav.has(it.fav)) : "";
       html += `<div class="bg-[var(--w-elev)] border border-[var(--w-line)] rounded-xl active:bg-[var(--w-elev2)] flex">${main}${star}</div>`;
     });
   });
@@ -280,6 +281,7 @@ function saveExerciseModal() {
     closeModal("exerciseModal");
     toast(t("{name} eklendi", { name: v.name }));
     renderAll();
+    if (typeof animFlashEx === "function") animFlashEx(activeDay().exercises.length - 1);   /* v80 ANİM: vurgu */
     if (state.gymActive) setTimeout(() => { const el = $("exCard_" + (activeDay().exercises.length - 1)); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
     return;
   }
@@ -416,12 +418,12 @@ function toggleSetDone(exIdx, sIdx) {
   if (s.done && ex.sets.every(x => x.done) && typeof animExDone === "function") animExDone(exIdx);   // v57 ANİM: hareket tamam
   if (s.done && ssG) {   // v75: grupta sıradaki harekete kaydır
     const p = nextSetPtr(activeDay());
-    if (p && p.e !== exIdx && p.e >= ssG.first && p.e <= ssG.last) scrollToExercise(p.e);
-    else if (ex.sets.every(x => x.done) && p && p.e !== exIdx) scrollToExercise(p.e);
+    if (p && p.e !== exIdx && p.e >= ssG.first && p.e <= ssG.last) { scrollToExercise(p.e); if (typeof animNextCard === "function") animNextCard(p.e); }   /* v80 ANİM: hareket kartı geçişi */
+    else if (ex.sets.every(x => x.done) && p && p.e !== exIdx) { scrollToExercise(p.e); if (typeof animNextCard === "function") animNextCard(p.e); }
   } else if (s.done && ex.sets.every(x => x.done)) {
     const day = activeDay();
     const j = day.exercises.findIndex((o, i) => i > exIdx && o.sets.some(x => !x.done));
-    if (j >= 0) scrollToExercise(j);
+    if (j >= 0) { scrollToExercise(j); if (typeof animNextCard === "function") animNextCard(j); }   /* v80 ANİM: hareket kartı geçişi */
   }
 }
 
@@ -440,6 +442,7 @@ function addSetToExercise(exIdx) {
   else ex.sets.push({ kg: last ? last.kg : 0, reps: last ? last.reps : 10, target: last ? last.target : "8–12", done: false });
   if (ex.kind !== "cardio") ex.targetInfo = ex.targetInfo.replace(/^\d+x/, ex.sets.length + "x");
   renderAll();
+  if (typeof animNewSet === "function") animNewSet(exIdx);   /* v80 ANİM: vurgu (yeni set) */
 }
 
 function removeLastSetFromExercise(exIdx) {

@@ -352,6 +352,7 @@ function updateMacroCard(prefix, consumed, target, unit) {
   const pct = target > 0 ? Math.min(100, Math.round((cRound / target) * 100)) : 0;
   $(`${prefix}Consumed`).textContent = fmtInt(cRound);
   if (typeof animNum === "function") animNum(`${prefix}Consumed`, cRound, fmtInt);   // v55 ANİM: sayı
+  if (prefix !== "cal" && typeof animMacroBar === "function") animMacroBar(prefix, cRound, target);   /* v80 ANİM: makro çubukları */
   $(`${prefix}Target`).textContent = fmtInt(target);
   const st = $(`${prefix}Status`);
   if (prefix === "cal") {

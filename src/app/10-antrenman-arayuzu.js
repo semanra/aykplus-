@@ -191,6 +191,7 @@ function svgI(name, size = 20, sw = 2) {
 function setGymView(v) {
   const prev = state.gymView;
   state.gymView = GYM_VIEWS.some(x => x[0] === v) ? v : "today";
+  if (prev !== state.gymView && state.gymView === "library" && typeof animBodyMapArmNext === "function") animBodyMapArmNext();   /* v80 ANİM: kas haritası */
   window.scrollTo(0, 0);
   renderAll();
   if (prev !== state.gymView && typeof animGymViewIn === "function") animGymViewIn();   // v57 ANİM: sekme geçişi
@@ -462,6 +463,10 @@ async function drawBodyMap(counts) {
   }
   if (box) box.style.aspectRatio = map.width + " / " + map.height;
   cv.width = map.width; cv.height = map.height;
+  /* v80 ANİM: kas haritası — görünüme girince / aralık değişince kaslar sırayla yanar (seçili kas yokken) */
+  const arm = typeof animBodyMapArm !== "undefined" && animBodyMapArm && !state.libMuscle;
+  if (typeof animBodyMapArm !== "undefined") animBodyMapArm = false;
+  try { if (arm && typeof animFinishMap === "function" && await animFinishMap(counts, libMapOpts().theme, cv, map)) return; } catch (e) { /* son hâl aşağıda */ }
   try { cv.getContext("2d").drawImage(map, 0, 0); } catch (e) { /* tuval belleği: harita boş kalır, listeler çalışır */ }
 }
 function bodyMapTap(ev) {
@@ -493,7 +498,7 @@ function programMuscleSets() {
   return counts;
 }
 function selectMuscle(m) { state.libMuscle = MUSCLES.includes(m) ? m : null; libSearchQ = ""; renderAll(); }
-function setLibRange(r) { state.libRange = r === "today" || r === "program" ? r : "week"; renderAll(); }
+function setLibRange(r) { state.libRange = r === "today" || r === "program" ? r : "week"; if (typeof animBodyMapArmNext === "function") animBodyMapArmNext(); renderAll(); }   /* v80 ANİM: kas haritası */
 let libSearchQ = "";
 
 // v73: kütüphane listesi (bölümler, ekipman, favoriler) → 33-kutuphane.js

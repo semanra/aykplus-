@@ -60,8 +60,9 @@ function openRecap(p) {
   recapPeriod = RECAP_PERIODS.includes(p) ? p : "month";
   renderRecap();
   openModal("recapModal");
+  if (typeof animRecapIn === "function") animRecapIn();   /* v80 ANİM: özet */
 }
-function setRecapPeriod(p) { recapPeriod = RECAP_PERIODS.includes(p) ? p : "month"; renderRecap(); }
+function setRecapPeriod(p) { recapPeriod = RECAP_PERIODS.includes(p) ? p : "month"; renderRecap(); if (typeof animRecapIn === "function") animRecapIn(); }   /* v80 ANİM: özet */
 let recapMapGen = 0;
 function renderRecap() {
   const body = $("recapBody");
@@ -112,5 +113,7 @@ async function drawRecapMap(mus, maxM) {
   if (!map) { cv.remove(); return; }
   const H = Math.round(150 * Math.min(3, window.devicePixelRatio || 1)), W = Math.round(H * map.width / map.height);
   cv.width = W; cv.height = H;
+  /* v80 ANİM: kas haritası — özet açılınca kaslar sırayla yanar */
+  try { if (typeof animFinishMap === "function" && await animFinishMap(mus, themeIsLight() ? "light" : "dark", cv, map)) return; } catch (e) { /* son hâl aşağıda */ }
   try { cv.getContext("2d").drawImage(map, 0, 0, W, H); } catch (e) { /* tuval belleği: boş kalır */ }
 }

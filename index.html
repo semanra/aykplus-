@@ -1783,7 +1783,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v79</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v80</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -4355,6 +4355,7 @@ function updateMacroCard(prefix, consumed, target, unit) {
   const pct = target > 0 ? Math.min(100, Math.round((cRound / target) * 100)) : 0;
   $(`${prefix}Consumed`).textContent = fmtInt(cRound);
   if (typeof animNum === "function") animNum(`${prefix}Consumed`, cRound, fmtInt);   // v55 ANİM: sayı
+  if (prefix !== "cal" && typeof animMacroBar === "function") animMacroBar(prefix, cRound, target);   /* v80 ANİM: makro çubukları */
   $(`${prefix}Target`).textContent = fmtInt(target);
   const st = $(`${prefix}Status`);
   if (prefix === "cal") {
@@ -5753,19 +5754,19 @@ function openPicker(title, groups, onPick, extra, opts) {
 function renderPickerChips() {
   const chip = (key, label) => {
     const on = picker.cat === key;
-    return `<button onclick="setPickerCat(${esc(JSON.stringify(key))})" aria-pressed="${on}" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${on ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
+    return `<button onclick="setPickerCat(${esc(JSON.stringify(key))})" aria-pressed="${on}" class="shrink-0 min-h-[44px] min-w-[44px] text-[13px] px-3.5 rounded-full border ${on ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
   };
   $("pickerChips").innerHTML = chip("all", t("Tümü")) + picker.groups.map((g, i) => chip(pickerKey(g, i), g.short || g.label)).join("");
   const eqs = picker.opts.equips;   // v73: ekipman süzgeci
   $("pickerEquip").classList.toggle("hidden", !eqs);
   if (eqs) {
-    const ec = (key, label) => `<button onclick="setPickerEq('${key}')" aria-pressed="${picker.eq === key}" data-pick-eq="${key}" class="shrink-0 text-[12px] px-2.5 py-1 rounded-full border ${picker.eq === key ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
+    const ec = (key, label) => `<button onclick="setPickerEq('${key}')" aria-pressed="${picker.eq === key}" data-pick-eq="${key}" class="shrink-0 min-h-[44px] min-w-[44px] text-[13px] px-3.5 rounded-full border ${picker.eq === key ? "w-btn font-semibold" : "bg-[var(--w-elev)] border-[var(--w-line)] text-[var(--w-muted)]"}">${esc(label)}</button>`;
     $("pickerEquip").innerHTML = ec("all", picker.opts.allEquipLabel || t("Tümü")) + eqs.map(([k, l]) => ec(k, l)).join("");
   }
 }
 function pickerKey(g, i) { return g.key != null ? "k:" + g.key : String(i); }
-function setPickerCat(key) { picker.cat = key; renderPickerChips(); renderPickerList(); }
-function setPickerEq(key) { picker.eq = key; renderPickerChips(); renderPickerList(); }
+function setPickerCat(key) { picker.cat = key; renderPickerChips(); renderPickerList(); if (typeof animListIn === "function") animListIn("pickerList"); }   /* v80 ANİM: liste geçişi */
+function setPickerEq(key) { picker.eq = key; renderPickerChips(); renderPickerList(); if (typeof animListIn === "function") animListIn("pickerList"); }   /* v80 ANİM: liste geçişi */
 function pickerFav(idx) {
   const it = picker && picker.flat[idx], f = picker && picker.opts.fav;
   if (!it || !f) return;
@@ -5774,6 +5775,7 @@ function pickerFav(idx) {
   if (!picker.groups.some((g, i) => pickerKey(g, i) === picker.cat)) picker.cat = "all";
   renderPickerChips(); renderPickerList();
   $("pickerList").scrollTop = top;
+  if (typeof animStarPop === "function") animStarPop(exKey(it.fav));   /* v80 ANİM: yıldız */
 }
 
 function renderPickerList() {
@@ -5809,7 +5811,7 @@ function renderPickerList() {
         ${it.sub ? `<div class="text-[12px] text-[var(--w-muted)] mt-0.5">${esc(it.sub)}</div>` : ""}
         ${thumb ? `</span>` : ""}
       </button>`;
-      const star = fav && it.fav ? (on => `<button onclick="pickerFav(${idx})" data-fav aria-pressed="${on}" aria-label="${esc(on ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 shrink-0 flex items-center justify-center ${on ? "text-[var(--w-warn-text)]" : "text-[var(--w-dim)]"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${ICON.star}"/></svg></button>`)(fav.has(it.fav)) : "";
+      const star = fav && it.fav ? (on => `<button onclick="pickerFav(${idx})" data-fav data-fav-key="${esc(exKey(it.fav))}" aria-pressed="${on}" aria-label="${esc(on ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 shrink-0 flex items-center justify-center ${on ? "text-[var(--w-warn-text)]" : "text-[var(--w-dim)]"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="${on ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${ICON.star}"/></svg></button>`)(fav.has(it.fav)) : "";
       html += `<div class="bg-[var(--w-elev)] border border-[var(--w-line)] rounded-xl active:bg-[var(--w-elev2)] flex">${main}${star}</div>`;
     });
   });
@@ -6013,6 +6015,7 @@ function saveExerciseModal() {
     closeModal("exerciseModal");
     toast(t("{name} eklendi", { name: v.name }));
     renderAll();
+    if (typeof animFlashEx === "function") animFlashEx(activeDay().exercises.length - 1);   /* v80 ANİM: vurgu */
     if (state.gymActive) setTimeout(() => { const el = $("exCard_" + (activeDay().exercises.length - 1)); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
     return;
   }
@@ -6149,12 +6152,12 @@ function toggleSetDone(exIdx, sIdx) {
   if (s.done && ex.sets.every(x => x.done) && typeof animExDone === "function") animExDone(exIdx);   // v57 ANİM: hareket tamam
   if (s.done && ssG) {   // v75: grupta sıradaki harekete kaydır
     const p = nextSetPtr(activeDay());
-    if (p && p.e !== exIdx && p.e >= ssG.first && p.e <= ssG.last) scrollToExercise(p.e);
-    else if (ex.sets.every(x => x.done) && p && p.e !== exIdx) scrollToExercise(p.e);
+    if (p && p.e !== exIdx && p.e >= ssG.first && p.e <= ssG.last) { scrollToExercise(p.e); if (typeof animNextCard === "function") animNextCard(p.e); }   /* v80 ANİM: hareket kartı geçişi */
+    else if (ex.sets.every(x => x.done) && p && p.e !== exIdx) { scrollToExercise(p.e); if (typeof animNextCard === "function") animNextCard(p.e); }
   } else if (s.done && ex.sets.every(x => x.done)) {
     const day = activeDay();
     const j = day.exercises.findIndex((o, i) => i > exIdx && o.sets.some(x => !x.done));
-    if (j >= 0) scrollToExercise(j);
+    if (j >= 0) { scrollToExercise(j); if (typeof animNextCard === "function") animNextCard(j); }   /* v80 ANİM: hareket kartı geçişi */
   }
 }
 
@@ -6173,6 +6176,7 @@ function addSetToExercise(exIdx) {
   else ex.sets.push({ kg: last ? last.kg : 0, reps: last ? last.reps : 10, target: last ? last.target : "8–12", done: false });
   if (ex.kind !== "cardio") ex.targetInfo = ex.targetInfo.replace(/^\d+x/, ex.sets.length + "x");
   renderAll();
+  if (typeof animNewSet === "function") animNewSet(exIdx);   /* v80 ANİM: vurgu (yeni set) */
 }
 
 function removeLastSetFromExercise(exIdx) {
@@ -6529,11 +6533,12 @@ function mobHomeHtml() {
     return `<div data-mob-reg="${k}" class="m-rg ${a === 0 ? "ok" : ""} ${warn ? "warn" : ""}"><b class="t-display">${mobUpper(mobRegionL(k))}</b><span>${txt}</span></div>`;
   }).join("");
   if (sug) setTimeout(() => drawMobSuggestMap(sug.counts), 0);   // v71: kart çizildikten sonra harita
+  if (typeof animSeriGrow === "function") setTimeout(animSeriGrow, 0);   /* v80 ANİM: seri */
   return `<div id="mobHome">
     ${mobSuggestHtml(sug)}
     <div class="grid grid-cols-2 gap-2 ${sug ? "mt-3" : ""}">
-      <div class="m-wk"><b class="t-display">${w.count}</b><span>${tn(w.count, "gün bu hafta")}</span></div>
-      <div class="m-wk"><b class="t-display">${w.streak}</b><span>${tn(w.streak, "gün üst üste")}</span></div>
+      <div class="m-wk"><b class="t-display" data-seri="mob-hafta">${w.count}</b><span>${tn(w.count, "gün bu hafta")}</span></div>
+      <div class="m-wk"><b class="t-display" data-seri="mob-seri">${w.streak}</b><span>${tn(w.streak, "gün üst üste")}</span></div>
     </div>
     <div class="m-days" aria-label="${t("Bu hafta mobilite yapılan günler")}">${dayShort().map((l, i) =>
       `<i class="${w.days[i] ? "d" : ""} ${i === w.dow ? "t" : ""}" aria-label="${w.days[i] ? t("{gun} yapıldı", { gun: l }) : l}">${l}</i>`).join("")}</div>
@@ -9468,6 +9473,7 @@ function svgI(name, size = 20, sw = 2) {
 function setGymView(v) {
   const prev = state.gymView;
   state.gymView = GYM_VIEWS.some(x => x[0] === v) ? v : "today";
+  if (prev !== state.gymView && state.gymView === "library" && typeof animBodyMapArmNext === "function") animBodyMapArmNext();   /* v80 ANİM: kas haritası */
   window.scrollTo(0, 0);
   renderAll();
   if (prev !== state.gymView && typeof animGymViewIn === "function") animGymViewIn();   // v57 ANİM: sekme geçişi
@@ -9739,6 +9745,10 @@ async function drawBodyMap(counts) {
   }
   if (box) box.style.aspectRatio = map.width + " / " + map.height;
   cv.width = map.width; cv.height = map.height;
+  /* v80 ANİM: kas haritası — görünüme girince / aralık değişince kaslar sırayla yanar (seçili kas yokken) */
+  const arm = typeof animBodyMapArm !== "undefined" && animBodyMapArm && !state.libMuscle;
+  if (typeof animBodyMapArm !== "undefined") animBodyMapArm = false;
+  try { if (arm && typeof animFinishMap === "function" && await animFinishMap(counts, libMapOpts().theme, cv, map)) return; } catch (e) { /* son hâl aşağıda */ }
   try { cv.getContext("2d").drawImage(map, 0, 0); } catch (e) { /* tuval belleği: harita boş kalır, listeler çalışır */ }
 }
 function bodyMapTap(ev) {
@@ -9770,7 +9780,7 @@ function programMuscleSets() {
   return counts;
 }
 function selectMuscle(m) { state.libMuscle = MUSCLES.includes(m) ? m : null; libSearchQ = ""; renderAll(); }
-function setLibRange(r) { state.libRange = r === "today" || r === "program" ? r : "week"; renderAll(); }
+function setLibRange(r) { state.libRange = r === "today" || r === "program" ? r : "week"; if (typeof animBodyMapArmNext === "function") animBodyMapArmNext(); renderAll(); }   /* v80 ANİM: kas haritası */
 let libSearchQ = "";
 
 // v73: kütüphane listesi (bölümler, ekipman, favoriler) → 33-kutuphane.js
@@ -11032,6 +11042,7 @@ function renderAll() {
   if (profileIsOpen()) renderProfile();
   renderBanner();
   syncOnboarding();   // v44: kurulum ekranı kayda göre açılır/kapanır
+  if (typeof animEmptyIn === "function") animEmptyIn();   /* v80 ANİM: boş ekran */
   saveState();
   restorePendingFocus();
 }
@@ -14898,13 +14909,17 @@ function sheetTouchMove(e) {
   sheetDrag.pts.push([performance.now(), d]);
   if (sheetDrag.pts.length > 6) sheetDrag.pts.shift();
   sheetDrag.sheet.style.transform = d ? `translateY(${d}px)` : "";
+  /* v80 ANİM: çekerken arka plan açılır */
+  if (animOK() && sheetDrag.ov) sheetDrag.ov.style.backgroundColor = `rgba(0,0,0,${(0.8 * Math.max(0.15, 1 - d / Math.max(300, sheetDrag.sheet.offsetHeight))).toFixed(3)})`;
 }
-function sheetReset(sheet) { sheet.style.transition = ""; sheet.style.transform = ""; }
+function sheetReset(sheet) { sheet.style.transition = ""; sheet.style.transform = ""; if (sheet.parentElement) { sheet.parentElement.style.transition = ""; sheet.parentElement.style.backgroundColor = ""; } }
 function sheetSnapBack(sheet, anim) {
   if (!anim) { sheetReset(sheet); return; }
   sheet.style.transition = "transform .28s " + SHEET_EASE;
   sheet.style.transform = "";
-  setTimeout(() => { if (!sheetDrag.on) sheet.style.transition = ""; }, 300);
+  const ov = sheet.parentElement;   /* v80 ANİM: arka plan geri koyulaşır */
+  if (ov) { ov.style.transition = "background-color .28s ease"; ov.style.backgroundColor = ""; }
+  setTimeout(() => { if (!sheetDrag.on) { sheet.style.transition = ""; if (ov) ov.style.transition = ""; } }, 300);
 }
 function sheetTouchEnd() {
   sheetDrag.pend = false;
@@ -16751,14 +16766,15 @@ function setLibCat(c) {
   libCat = c;
   if (state.libMuscle) { selectMuscle(null); return; }   // harita seçimi de kalkar (yeniden çizer)
   libRefresh();
+  if (typeof animListIn === "function") animListIn("libList");   /* v80 ANİM: liste geçişi */
 }
-function setLibEq(e) { libEq = LIB_EQUIPS.includes(e) ? e : "all"; libRefresh(); }
+function setLibEq(e) { libEq = LIB_EQUIPS.includes(e) ? e : "all"; libRefresh(); if (typeof animListIn === "function") animListIn("libList"); }   /* v80 ANİM: liste geçişi */
 function libRefresh() { const el = $("libBrowse"); if (el) el.innerHTML = libBrowseHtml(); }
-function libToggleFav(name) { toggleFavExercise(name); libRefresh(); }
+function libToggleFav(name) { toggleFavExercise(name); libRefresh(); if (typeof animStarPop === "function") animStarPop(exKey(name)); }   /* v80 ANİM: yıldız */
 
 function libChipsHtml() {
   const cur = libCurCat();
-  const chip = (on, onclick, label, extra = "") => `<button onclick="${onclick}" aria-pressed="${on}" ${extra} class="shrink-0 min-h-[44px] px-3.5 rounded-full text-[13px] border ${on ? "bg-[var(--t-text)] text-[var(--t-bg)] border-transparent font-bold" : "bg-[var(--t-surface)] border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${label}</button>`;
+  const chip = (on, onclick, label, extra = "") => `<button onclick="${onclick}" aria-pressed="${on}" ${extra} class="shrink-0 min-h-[44px] min-w-[44px] px-3.5 rounded-full text-[13px] border ${on ? "bg-[var(--t-text)] text-[var(--t-bg)] border-transparent font-bold" : "bg-[var(--t-surface)] border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${label}</button>`;
   const favN = (state.favExercises || []).length;
   let row1 = chip(cur === "fav", "setLibCat('fav')", `<span class="inline-flex items-center gap-1">${svgI("star", 14, 2.2)}${t("Favoriler")}${favN ? ` <span class="opacity-70">${favN}</span>` : ""}</span>`, "data-lib-cat=\"fav\"")
     + chip(cur === "recent", "setLibCat('recent')", t("Son yapılanlar"), "data-lib-cat=\"recent\"")
@@ -16783,7 +16799,7 @@ function libRowHtml(n, inDay) {
         ${exNoteLine(n)}
         ${inDay.has(exKey(n)) ? `<span class="self-start text-[11px] font-bold px-2 py-0.5 rounded-full border border-[var(--t-panel-line)] bg-[var(--t-panel)]" style="color:var(--t-acc-text)">${t("PROGRAMDA")}</span>` : ""}
       </span>
-      <button onclick="libToggleFav(${js})" data-fav aria-pressed="${fav}" aria-label="${esc(fav ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${fav ? "text-[var(--t-warn-mid)]" : "t-dim"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="${fav ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${ICON.star}"/></svg></button>
+      <button onclick="libToggleFav(${js})" data-fav data-fav-key="${esc(exKey(n))}" aria-pressed="${fav}" aria-label="${esc(fav ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${fav ? "text-[var(--t-warn-mid)]" : "t-dim"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="${fav ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${ICON.star}"/></svg></button>
       <button onclick="openExerciseModal({ name: ${js}, kind: detectKind(${js}) })" aria-label="${t("{name} hareketini {day} gününe ekle", { name: esc(exNameL(n)), day: esc(activeDay().name) })}" class="t-btn-outline w-11 h-11 shrink-0 rounded-xl flex items-center justify-center">${svgI("plus", 20, 2.4)}</button>
     </div>`;
 }
@@ -16913,6 +16929,7 @@ function swapExercise(exIdx, newName) {
   if (keepOld) { ex.sets = done; day.exercises.splice(exIdx + 1, 0, nx); }
   else day.exercises.splice(exIdx, 1, nx);
   renderAll();
+  if (typeof animFlashEx === "function") animFlashEx(keepOld ? exIdx + 1 : exIdx);   /* v80 ANİM: vurgu */
   offerUndo(t("{a} yerine {b}", { a: exNameL(ex.name), b: exNameL(newName) }));
 }
 // ============================================================================
@@ -16988,6 +17005,7 @@ function ssLinkNext(i) {
   a.ss = id; b.ss = id;
   ssCleanDay(activeDay());
   renderAll();
+  if (typeof animFlashEx === "function") animFlashEx([i, i + 1]);   /* v80 ANİM: vurgu */
   offerUndo(t("Bağlandı: dinlenmeden art arda yapılır"));
 }
 function ssUnlink(i) {
@@ -17044,6 +17062,7 @@ function calMove(dir) {
   if (y > now.getFullYear() || (y === now.getFullYear() && m > now.getMonth())) return;
   calView = { y, m, sel: null };
   renderCalendar();
+  if (typeof animCalSlide === "function") animCalSlide(dir);   /* v80 ANİM: takvim ay geçişi */
 }
 function calSelect(k) { calView.sel = calView.sel === k ? null : k; renderCalendar(); }
 
@@ -17168,8 +17187,9 @@ function openRecap(p) {
   recapPeriod = RECAP_PERIODS.includes(p) ? p : "month";
   renderRecap();
   openModal("recapModal");
+  if (typeof animRecapIn === "function") animRecapIn();   /* v80 ANİM: özet */
 }
-function setRecapPeriod(p) { recapPeriod = RECAP_PERIODS.includes(p) ? p : "month"; renderRecap(); }
+function setRecapPeriod(p) { recapPeriod = RECAP_PERIODS.includes(p) ? p : "month"; renderRecap(); if (typeof animRecapIn === "function") animRecapIn(); }   /* v80 ANİM: özet */
 let recapMapGen = 0;
 function renderRecap() {
   const body = $("recapBody");
@@ -17220,6 +17240,8 @@ async function drawRecapMap(mus, maxM) {
   if (!map) { cv.remove(); return; }
   const H = Math.round(150 * Math.min(3, window.devicePixelRatio || 1)), W = Math.round(H * map.width / map.height);
   cv.width = W; cv.height = H;
+  /* v80 ANİM: kas haritası — özet açılınca kaslar sırayla yanar */
+  try { if (typeof animFinishMap === "function" && await animFinishMap(mus, themeIsLight() ? "light" : "dark", cv, map)) return; } catch (e) { /* son hâl aşağıda */ }
   try { cv.getContext("2d").drawImage(map, 0, 0, W, H); } catch (e) { /* tuval belleği: boş kalır */ }
 }
 // ============================================================================
@@ -17249,6 +17271,174 @@ async function openExNote(exIdx) {
 function exNoteLine(name, cls = "text-xs") {
   const n = exNote(name);
   return n ? `<span data-ex-note class="${cls} t-muted flex items-center gap-1 min-w-0"><span class="shrink-0" aria-hidden="true">${svgI("edit", 12, 2)}</span><span class="truncate italic"><span class="sr-only">${t("Not:")} </span>${esc(n)}</span></span>` : "";
+}
+// ============================================================================
+// v80 — CİLA ANİMASYONLARI (v73–v79'da eklenen özellikler için)
+// 27-animasyon.js ile aynı kurallar: animOK() false ise hiçbir şey oynamaz (son hâl anında); yalnız transform / opacity;
+// Web Animations API (bitince öğede stil kalmaz). Her blok "v80 ANİM: <ad>" etiketli; çağrı yerleri typeof denetimli.
+// ============================================================================
+
+/* v80 ANİM: yıldız */
+// Favori yıldızına dokununca yeniden çizilen yıldız kısa bir "pıt" ile büyüyüp oturur.
+function animStarPop(key) {
+  if (!animOK() || !key) return;
+  requestAnimationFrame(() => {
+    document.querySelectorAll(`[data-fav-key="${CSS && CSS.escape ? CSS.escape(key) : key}"]`).forEach(el => {
+      animPlay(el, [{ transform: "scale(.6)" }, { transform: "scale(1.25)", offset: 0.55 }, { transform: "none" }], { duration: 320, easing: "ease-out" });
+    });
+  });
+}
+
+/* v80 ANİM: vurgu */
+// Değiştirilen / eklenen / süpersete bağlanan hareket ve yeni eklenen set satırı: kısa "belirme" (ölçek + saydamlık),
+// gözün değişen yeri bulması için. sel: CSS seçicileri (bulunamayan atlanır).
+function animFlash(sels) {
+  if (!animOK()) return;
+  requestAnimationFrame(() => {
+    (Array.isArray(sels) ? sels : [sels]).forEach(sel => {
+      const el = typeof sel === "string" ? document.querySelector(sel) : sel;
+      if (el) animPlay(el, [{ opacity: 0.35, transform: "scale(.96)" }, { opacity: 1, transform: "scale(1.015)", offset: 0.6 }, { opacity: 1, transform: "none" }], { duration: 360, easing: ANIM_EASE });
+    });
+  });
+}
+// Antrenman sürerken kart, değilse Programım satırı
+function animFlashEx(idxs) {
+  const list = (Array.isArray(idxs) ? idxs : [idxs]).map(i => state.gymView === "today" && state.gymActive ? `#exCard_${i}` : `[data-ex-row="${i}"]`);
+  animFlash(list);
+}
+// Yeni eklenen set satırı (son set)
+function animNewSet(exIdx) {
+  if (!animOK()) return;
+  const ex = activeDay().exercises[exIdx];
+  if (!ex) return;
+  requestAnimationFrame(() => {
+    const btn = document.querySelector(`#gymRoot button[onclick="toggleSetDone(${exIdx}, ${ex.sets.length - 1})"]`);
+    const row = btn && btn.closest(".rounded-2xl");
+    if (row) animPlay(row, [{ opacity: 0, transform: "translateY(-6px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "ease-out" });
+  });
+}
+
+/* v80 ANİM: liste geçişi */
+// Kütüphanede bölüm / ekipman değişince ve seçicide çip değişince liste yumuşakça belirir (aramada oynamaz).
+function animListIn(id) {
+  if (!animOK()) return;
+  const el = document.getElementById(id);
+  if (el) animPlay(el, [{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 170, easing: "ease-out" });
+}
+
+/* v80 ANİM: takvim ay geçişi */
+// Önceki / sonraki aya geçerken ızgara geldiği yönden kayarak belirir.
+function animCalSlide(dir) {
+  if (!animOK()) return;
+  const el = document.querySelector("#calBody .cal-grid");
+  if (el) animPlay(el, [{ opacity: 0, transform: `translateX(${dir > 0 ? 18 : -18}px)` }, { opacity: 1, transform: "none" }], { duration: 220, easing: ANIM_EASE });
+}
+
+/* v80 ANİM: özet */
+// Özet açılınca ve dönem değişince kutular sırayla belirir; tam sayılar 0'dan sayarak gelir.
+function animRecapIn() {
+  if (!animOK()) return;
+  const tiles = [...document.querySelectorAll("#recapBody .grid > div")];
+  tiles.forEach((el, i) => animPlay(el, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 240, delay: i * 40, easing: "ease-out", fill: "backwards" }));
+  document.querySelectorAll("#recapBody section").forEach((el, i) => animPlay(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 260, delay: 200 + i * 60, easing: "ease-out", fill: "backwards" }));
+  tiles.forEach(tile => {
+    const el = tile.querySelector(".t-display");
+    if (!el || !/^\d+$/.test(el.textContent.trim())) return;   // yalnız tam sayılar (ondalıklı ve binlik ayraçlı metin olduğu gibi)
+    const to = +el.textContent.trim();
+    if (to < 2) return;
+    const t0 = performance.now(), dur = 520;
+    const step = now => {
+      if (!el.isConnected) return;
+      const p = Math.min(1, (now - t0) / dur), v = Math.round(to * (1 - Math.pow(1 - p, 3)));
+      el.textContent = String(v);
+      if (p < 1) requestAnimationFrame(step); else el.textContent = String(to);
+    };
+    el.textContent = "0";
+    requestAnimationFrame(step);
+  });
+}
+
+/* v80 ANİM: hareket kartı geçişi */
+// Antrenmanda sıradaki harekete (hareket bitince / süperset sırası) kaydırılınca kart kaydırma bitince hafifçe öne çıkar
+// ve kenarında kısa bir turkuaz parıltı (ayk-glow) oynar.
+function animNextCard(idx) {
+  if (!animOK()) return;
+  setTimeout(() => {
+    const el = document.getElementById("exCard_" + idx);
+    if (!el) return;
+    animPlay(el, [{ transform: "scale(.985)", opacity: 0.75 }, { transform: "scale(1.012)", opacity: 1, offset: 0.55 }, { transform: "none", opacity: 1 }], { duration: 420, easing: ANIM_EASE });
+    el.classList.remove("ayk-glow"); void el.offsetWidth; el.classList.add("ayk-glow");
+    setTimeout(() => el.classList.remove("ayk-glow"), 560);
+  }, 380);
+}
+
+/* v80 ANİM: kas haritası */
+// Antrenman → Hareketler KAS YÜKÜ haritası (görünüme girince / aralık değişince) ve aylık özet haritası: çalışan kaslar
+// set çoktan aza sırayla boştaki griden kendi rengine geçer (bitiş özetindeki v68 animasyonu animFinishMap ile aynı).
+let animBodyMapArm = false;
+function animBodyMapArmNext() { animBodyMapArm = true; }
+
+/* v80 ANİM: makro çubukları */
+// Protein / karb / yağ değeri ARTINCA (besin eklendi, öğün yendi) çubuk kayarak dolarken ucu kısa bir "nabız" atar;
+// hedefe ilk ulaşıldığında çubuk bir kez parlar. İlk çizimde ve azalırken oynamaz.
+const animMacroPrev = {};
+function animMacroBar(prefix, val, target) {
+  const prev = animMacroPrev[prefix];
+  animMacroPrev[prefix] = val;
+  if (prev == null || val <= prev || !animOK()) return;
+  const bar = document.getElementById(prefix + "Bar");
+  if (!bar) return;
+  const reached = target > 0 && prev < target && val >= target;
+  animPlay(bar, reached
+    ? [{ opacity: 1 }, { opacity: 0.45, offset: 0.3 }, { opacity: 1, offset: 0.6 }, { opacity: 0.6, offset: 0.8 }, { opacity: 1 }]
+    : [{ transform: "scaleY(1)" }, { transform: "scaleY(1.9)", offset: 0.4 }, { transform: "scaleY(1)" }], { duration: reached ? 900 : 480, delay: 120, easing: "ease-out" });
+}
+
+/* v80 ANİM: seri */
+// Mobilite ana ekranındaki "gün üst üste" ve "gün bu hafta" sayısı ARTINCA (ör. bugün seans bitti) sayı önceki değerden
+// sayarak gelir ve "pıt" yapar. Son görülen değer bu cihazda hatırlanır (yalnız görsel kolaylık; kayıt değil).
+const ANIM_SERI_KEY = "ayk_anim_seri";
+function animSeriGrow() {
+  let seen = {};
+  try { seen = JSON.parse(localStorage.getItem(ANIM_SERI_KEY) || "{}") || {}; } catch (e) { seen = {}; }
+  const now = {};
+  document.querySelectorAll("[data-seri]").forEach(el => {
+    const k = el.getAttribute("data-seri"), v = +el.textContent.trim();
+    if (!Number.isFinite(v)) return;
+    now[k] = v;
+    const from = seen[k];
+    if (from == null || v <= from || !animOK()) return;
+    let t0 = 0;
+    const dur = 520;
+    const step = ts => {
+      if (!el.isConnected) return;
+      if (!t0) t0 = ts;
+      const p = Math.min(1, (ts - t0) / dur);
+      el.textContent = String(Math.round(from + (v - from) * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(step); else el.textContent = String(v);
+    };
+    el.textContent = String(from);
+    requestAnimationFrame(step);
+    animPlay(el, [{ transform: "scale(.7)" }, { transform: "scale(1.25)", offset: 0.6 }, { transform: "none" }], { duration: 480, delay: 380, easing: "ease-out" });
+  });
+  if (Object.keys(now).length) { try { localStorage.setItem(ANIM_SERI_KEY, JSON.stringify(Object.assign(seen, now))); } catch (e) { /* özel pencere */ } }
+}
+
+/* v80 ANİM: boş ekran */
+// "Menün henüz boş", "Bu günde henüz hareket yok" gibi boş kartlar EKRANA YENİ GELDİĞİNDE bir kez yukarı kayarak belirir,
+// ana düğmesi iki kez hafifçe "buraya dokun" der. Her çizimde değil: önceki çizimde de görünen kart oynamaz.
+let animEmptyPrev = new Set();
+function animEmptyIn() {
+  const els = [...document.querySelectorAll("[data-empty-menu], [data-empty-day]")].filter(el => el.offsetParent !== null);
+  const keys = new Set(els.map(el => (el.hasAttribute("data-empty-menu") ? "menu" : "day") + ":" + state.activeTab));
+  const fresh = els.filter(el => !animEmptyPrev.has((el.hasAttribute("data-empty-menu") ? "menu" : "day") + ":" + state.activeTab));
+  animEmptyPrev = keys;
+  if (!animOK()) return;
+  fresh.forEach(el => {
+    animPlay(el, [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 320, easing: ANIM_EASE, fill: "backwards" });
+    const btn = el.querySelector("button");
+    if (btn) animPlay(btn, [{ transform: "none" }, { transform: "scale(1.05)", offset: 0.25 }, { transform: "none", offset: 0.5 }, { transform: "scale(1.05)", offset: 0.75 }, { transform: "none" }], { duration: 1100, delay: 450, easing: "ease-in-out" });
+  });
 }
 
 </script>

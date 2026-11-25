@@ -33,6 +33,7 @@ function calMove(dir) {
   if (y > now.getFullYear() || (y === now.getFullYear() && m > now.getMonth())) return;
   calView = { y, m, sel: null };
   renderCalendar();
+  if (typeof animCalSlide === "function") animCalSlide(dir);   /* v80 ANİM: takvim ay geçişi */
 }
 function calSelect(k) { calView.sel = calView.sel === k ? null : k; renderCalendar(); }
 

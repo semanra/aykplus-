@@ -35,6 +35,7 @@ function renderAll() {
   if (profileIsOpen()) renderProfile();
   renderBanner();
   syncOnboarding();   // v44: kurulum ekranı kayda göre açılır/kapanır
+  if (typeof animEmptyIn === "function") animEmptyIn();   /* v80 ANİM: boş ekran */
   saveState();
   restorePendingFocus();
 }

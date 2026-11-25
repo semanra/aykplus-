@@ -71,6 +71,7 @@ function ssLinkNext(i) {
   a.ss = id; b.ss = id;
   ssCleanDay(activeDay());
   renderAll();
+  if (typeof animFlashEx === "function") animFlashEx([i, i + 1]);   /* v80 ANİM: vurgu */
   offerUndo(t("Bağlandı: dinlenmeden art arda yapılır"));
 }
 function ssUnlink(i) {

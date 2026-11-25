@@ -358,13 +358,17 @@ function sheetTouchMove(e) {
   sheetDrag.pts.push([performance.now(), d]);
   if (sheetDrag.pts.length > 6) sheetDrag.pts.shift();
   sheetDrag.sheet.style.transform = d ? `translateY(${d}px)` : "";
+  /* v80 ANİM: çekerken arka plan açılır */
+  if (animOK() && sheetDrag.ov) sheetDrag.ov.style.backgroundColor = `rgba(0,0,0,${(0.8 * Math.max(0.15, 1 - d / Math.max(300, sheetDrag.sheet.offsetHeight))).toFixed(3)})`;
 }
-function sheetReset(sheet) { sheet.style.transition = ""; sheet.style.transform = ""; }
+function sheetReset(sheet) { sheet.style.transition = ""; sheet.style.transform = ""; if (sheet.parentElement) { sheet.parentElement.style.transition = ""; sheet.parentElement.style.backgroundColor = ""; } }
 function sheetSnapBack(sheet, anim) {
   if (!anim) { sheetReset(sheet); return; }
   sheet.style.transition = "transform .28s " + SHEET_EASE;
   sheet.style.transform = "";
-  setTimeout(() => { if (!sheetDrag.on) sheet.style.transition = ""; }, 300);
+  const ov = sheet.parentElement;   /* v80 ANİM: arka plan geri koyulaşır */
+  if (ov) { ov.style.transition = "background-color .28s ease"; ov.style.backgroundColor = ""; }
+  setTimeout(() => { if (!sheetDrag.on) { sheet.style.transition = ""; if (ov) ov.style.transition = ""; } }, 300);
 }
 function sheetTouchEnd() {
   sheetDrag.pend = false;

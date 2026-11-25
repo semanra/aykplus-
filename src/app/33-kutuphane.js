@@ -123,14 +123,15 @@ function setLibCat(c) {
   libCat = c;
   if (state.libMuscle) { selectMuscle(null); return; }   // harita seçimi de kalkar (yeniden çizer)
   libRefresh();
+  if (typeof animListIn === "function") animListIn("libList");   /* v80 ANİM: liste geçişi */
 }
-function setLibEq(e) { libEq = LIB_EQUIPS.includes(e) ? e : "all"; libRefresh(); }
+function setLibEq(e) { libEq = LIB_EQUIPS.includes(e) ? e : "all"; libRefresh(); if (typeof animListIn === "function") animListIn("libList"); }   /* v80 ANİM: liste geçişi */
 function libRefresh() { const el = $("libBrowse"); if (el) el.innerHTML = libBrowseHtml(); }
-function libToggleFav(name) { toggleFavExercise(name); libRefresh(); }
+function libToggleFav(name) { toggleFavExercise(name); libRefresh(); if (typeof animStarPop === "function") animStarPop(exKey(name)); }   /* v80 ANİM: yıldız */
 
 function libChipsHtml() {
   const cur = libCurCat();
-  const chip = (on, onclick, label, extra = "") => `<button onclick="${onclick}" aria-pressed="${on}" ${extra} class="shrink-0 min-h-[44px] px-3.5 rounded-full text-[13px] border ${on ? "bg-[var(--t-text)] text-[var(--t-bg)] border-transparent font-bold" : "bg-[var(--t-surface)] border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${label}</button>`;
+  const chip = (on, onclick, label, extra = "") => `<button onclick="${onclick}" aria-pressed="${on}" ${extra} class="shrink-0 min-h-[44px] min-w-[44px] px-3.5 rounded-full text-[13px] border ${on ? "bg-[var(--t-text)] text-[var(--t-bg)] border-transparent font-bold" : "bg-[var(--t-surface)] border-[var(--t-line)] text-[var(--t-text2)] font-semibold"}">${label}</button>`;
   const favN = (state.favExercises || []).length;
   let row1 = chip(cur === "fav", "setLibCat('fav')", `<span class="inline-flex items-center gap-1">${svgI("star", 14, 2.2)}${t("Favoriler")}${favN ? ` <span class="opacity-70">${favN}</span>` : ""}</span>`, "data-lib-cat=\"fav\"")
     + chip(cur === "recent", "setLibCat('recent')", t("Son yapılanlar"), "data-lib-cat=\"recent\"")
@@ -155,7 +156,7 @@ function libRowHtml(n, inDay) {
         ${exNoteLine(n)}
         ${inDay.has(exKey(n)) ? `<span class="self-start text-[11px] font-bold px-2 py-0.5 rounded-full border border-[var(--t-panel-line)] bg-[var(--t-panel)]" style="color:var(--t-acc-text)">${t("PROGRAMDA")}</span>` : ""}
       </span>
-      <button onclick="libToggleFav(${js})" data-fav aria-pressed="${fav}" aria-label="${esc(fav ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${fav ? "text-[var(--t-warn-mid)]" : "t-dim"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="${fav ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${ICON.star}"/></svg></button>
+      <button onclick="libToggleFav(${js})" data-fav data-fav-key="${esc(exKey(n))}" aria-pressed="${fav}" aria-label="${esc(fav ? t("Favorilerden çıkar") : t("Favorilere ekle"))}" class="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center ${fav ? "text-[var(--t-warn-mid)]" : "t-dim"}"><svg width="20" height="20" viewBox="0 0 24 24" fill="${fav ? "currentColor" : "none"}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${ICON.star}"/></svg></button>
       <button onclick="openExerciseModal({ name: ${js}, kind: detectKind(${js}) })" aria-label="${t("{name} hareketini {day} gününe ekle", { name: esc(exNameL(n)), day: esc(activeDay().name) })}" class="t-btn-outline w-11 h-11 shrink-0 rounded-xl flex items-center justify-center">${svgI("plus", 20, 2.4)}</button>
     </div>`;
 }
@@ -285,5 +286,6 @@ function swapExercise(exIdx, newName) {
   if (keepOld) { ex.sets = done; day.exercises.splice(exIdx + 1, 0, nx); }
   else day.exercises.splice(exIdx, 1, nx);
   renderAll();
+  if (typeof animFlashEx === "function") animFlashEx(keepOld ? exIdx + 1 : exIdx);   /* v80 ANİM: vurgu */
   offerUndo(t("{a} yerine {b}", { a: exNameL(ex.name), b: exNameL(newName) }));
 }

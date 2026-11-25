@@ -213,11 +213,12 @@ function mobHomeHtml() {
     return `<div data-mob-reg="${k}" class="m-rg ${a === 0 ? "ok" : ""} ${warn ? "warn" : ""}"><b class="t-display">${mobUpper(mobRegionL(k))}</b><span>${txt}</span></div>`;
   }).join("");
   if (sug) setTimeout(() => drawMobSuggestMap(sug.counts), 0);   // v71: kart çizildikten sonra harita
+  if (typeof animSeriGrow === "function") setTimeout(animSeriGrow, 0);   /* v80 ANİM: seri */
   return `<div id="mobHome">
     ${mobSuggestHtml(sug)}
     <div class="grid grid-cols-2 gap-2 ${sug ? "mt-3" : ""}">
-      <div class="m-wk"><b class="t-display">${w.count}</b><span>${tn(w.count, "gün bu hafta")}</span></div>
-      <div class="m-wk"><b class="t-display">${w.streak}</b><span>${tn(w.streak, "gün üst üste")}</span></div>
+      <div class="m-wk"><b class="t-display" data-seri="mob-hafta">${w.count}</b><span>${tn(w.count, "gün bu hafta")}</span></div>
+      <div class="m-wk"><b class="t-display" data-seri="mob-seri">${w.streak}</b><span>${tn(w.streak, "gün üst üste")}</span></div>
     </div>
     <div class="m-days" aria-label="${t("Bu hafta mobilite yapılan günler")}">${dayShort().map((l, i) =>
       `<i class="${w.days[i] ? "d" : ""} ${i === w.dow ? "t" : ""}" aria-label="${w.days[i] ? t("{gun} yapıldı", { gun: l }) : l}">${l}</i>`).join("")}</div>
