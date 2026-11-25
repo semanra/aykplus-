@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS = {
   units: "metric",   // v53: "metric" | "imperial" (yalnız gösterim/giriş; kayıt hep kg / cm; 26-birim.js)
   onboarded: true,   // v44: yeni kurulumda freshState() false yapar; var olan kayıt hep true
   sex: "male", height: 170, age: 30, targetWeight: 70,
-  waterTarget: 2.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
+  waterTarget: 2.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, mobSuggest: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
   macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true, anim: true,
   nutriLight: false, scaleOn: false, scaleBase: 0,
@@ -433,6 +433,7 @@ function normalizeStateInner(raw) {
   s.settings.proteinHigh = s.settings.proteinHigh === true;
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
+  s.settings.mobSuggest = s.settings.mobSuggest !== false;   // v71: kaslara göre esneme önerisi (varsayılan açık)
   s.settings.anim = s.settings.anim !== false;   // v55: uygulama içi animasyonlar (varsayılan açık)
   if (!["system", "normal", "large", "xlarge"].includes(s.settings.textSize)) s.settings.textSize = "system";   // v61
   {   // v67: paylaşım seçimleri (fotoğraf şablonu ve fotoğraf asla kaydedilmez)

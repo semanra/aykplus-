@@ -651,3 +651,21 @@ const DRINK_DB = {
   d_dimes_seftali: {"name": "Dimes Şeftali Nektarı", "cat": "İçecekler", "unit": "ml", "step": 50, "def": 200, "p": 0.0, "c": 0.11, "f": 0.0, "kcal": 0.43, "drink": true, "brand": "Dimes", "srcSite": "dimes.com.tr", "srcDate": "2026-11", "aliases": ["dimes", "meyve suyu", "şeftali", "nektar"]},
   d_dimes_portakal_icecek: {"name": "Dimes Portakal İçeceği", "cat": "İçecekler", "unit": "ml", "step": 50, "def": 200, "p": 0.0, "c": 0.11, "f": 0.0, "kcal": 0.47, "drink": true, "brand": "Dimes", "srcSite": "dimes.com.tr", "srcDate": "2026-11", "aliases": ["dimes", "meyve suyu", "portakal"]},
 };
+
+// v71: çalışan kasa göre esneme önerisi (06-mobilite.js mobSuggestData). Anahtar = MUSCLES adı, değer = mobilite kütüphanesindeki
+// hareket adları, öncelik sırasıyla (önce ekipmansız esnemeler, sonra rulo / top). Adlar kütüphanedekiyle birebir (test_v71).
+const MUSCLE_STRETCH = {   // öncelik sırasıyla: önce ekipmansız esnemeler, sonra rulo / top
+  "Göğüs": ["Doorway Pec & Biceps Stretch", "Puppy Pose (Yavru Köpek)", "Pec Stretch on Foam Roller (Göğüs Açma)", "Pec Ball Release (Göğüs Topla)"],
+  "Sırt": ["Child’s Pose with Lat Reach", "Bear Hug Upper Back Stretch", "Bench Prayer Stretch (Kanat Esnetme)", "Latissimus Dorsi Foam Roll"],
+  "Omuz": ["Cross-Body Posterior Shoulder Stretch", "Sleeper Stretch (Uyku Esnemesi)", "Towel Behind Back Shoulder Stretch", "Infraspinatus Ball Release (Kürek Kemiği)"],
+  "Ön Bacak": ["Standing Quad Stretch (Ayakta Ön Bacak)", "Half-Kneeling Hip Flexor Stretch", "Couch Stretch", "Quadriceps & Hip Flexor Foam Roll"],
+  "Arka Bacak & Kalça": ["Supine Hamstring Strap Stretch", "Supine Figure-4 Glute Stretch", "Pigeon Pose (Güvercin Pozu)", "Single-Leg Seated Hamstring Stretch", "Hamstring Foam Roll (Arka Bacak)", "Glute Foam Roll (Kalça)"],
+  "Kalf": ["Standing Wall Calf & Soleus Stretch", "Calf Stretch on Step (Basamakta Baldır)", "Downward Dog (Aşağı Bakan Köpek)", "Calf Foam Roll (Baldır)"],
+  "Biceps": ["Doorway Pec & Biceps Stretch", "Towel Behind Back Shoulder Stretch", "Wrist Flexor & Extensor Stretch"],
+  "Triceps": ["Overhead Triceps & Lat Side Lean Stretch", "Bench Prayer Stretch (Kanat Esnetme)"],
+  "Karın": ["Cobra / Sphinx Abdominal Stretch", "Standing Side Bend (Yana Eğilme)", "Supine Spinal Twist (Yatarak Omurga Rotasyonu)"],
+  "Ön Kol": ["Wrist Flexor & Extensor Stretch", "Forearm Ball Release (Ön Kol)"],
+  "Boyun": ["Upper Trap & Levator Scapulae Neck Stretch", "Chin Tucks & Neck Flexion", "Upper Trap Ball Release (Trapez Topla)"],
+  "İç Bacak": ["Butterfly Groin Stretch", "Frog Stretch (Kurbağa Esnemesi)", "Adductor Foam Roll (İç Bacak)"],
+  "Kaval": ["Kneeling Shin Stretch (Kaval Önü)", "Tibialis Foam Roll (Kaval Önü)"]
+};

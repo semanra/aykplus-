@@ -86,4 +86,12 @@ Object.assign(EN, {
   "Sesli yönlendirmeyi kapat": "Turn voice guidance off", "Sesli yönlendirmeyi aç": "Turn voice guidance on",
   "Bip sesini kapat": "Turn the beep off", "Bip sesini aç": "Turn the beep on",
   "Sıradaki: {ad}": "Next: {ad}",
+  // v71: kaslara göre esneme önerisi
+  "Kaslarına göre esneme": "Stretches for your worked muscles",
+  "Son 2 günde çalışan kaslar: {m}": "Worked in the last 2 days: {m}",
+  "Rutin olarak kaydet": "Save as routine",
+  "Esneme önerisi": "Stretch suggestion",
+  "{ad} rutini eklendi": "Routine added: {ad}",
+  "Kaslara göre esneme önerisi": "Stretch suggestions for worked muscles",
+  "Son 2 günde çalışan kaslara uygun esneme hareketlerini Mobilite'de ve antrenman özetinde önerir.": "Suggests stretches for the muscles you worked in the last 2 days, in Mobility and in the workout summary.",
 });

@@ -1647,6 +1647,10 @@
               <input id="setWarmup" type="checkbox" role="switch" class="t-sw" />
             </label>
             <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Kaslara göre esneme önerisi">Kaslara göre esneme önerisi</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Son 2 günde çalışan kaslara uygun esneme hareketlerini Mobilite'de ve antrenman özetinde önerir.">Son 2 günde çalışan kaslara uygun esneme hareketlerini Mobilite'de ve antrenman özetinde önerir.</span></span>
+              <input id="setMobSuggest" type="checkbox" role="switch" class="t-sw" />
+            </label>
+            <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
               <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Mobilitede sesli yönlendirme">Mobilitede sesli yönlendirme</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Seansta hareketin adını, tarafı ve süreyi söyler. iPhone'da yalnızca uygulama açıkken ve telefon sessizde değilken konuşur.">Seansta hareketin adını, tarafı ve süreyi söyler. iPhone'da yalnızca uygulama açıkken ve telefon sessizde değilken konuşur.</span></span>
               <input id="setMobVoice" type="checkbox" role="switch" class="t-sw" />
             </label>
@@ -1749,7 +1753,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v70</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v71</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -2446,6 +2450,24 @@ const DRINK_DB = {
   d_dimes_portakal_icecek: {"name": "Dimes Portakal İçeceği", "cat": "İçecekler", "unit": "ml", "step": 50, "def": 200, "p": 0.0, "c": 0.11, "f": 0.0, "kcal": 0.47, "drink": true, "brand": "Dimes", "srcSite": "dimes.com.tr", "srcDate": "2026-11", "aliases": ["dimes", "meyve suyu", "portakal"]},
 };
 
+// v71: çalışan kasa göre esneme önerisi (06-mobilite.js mobSuggestData). Anahtar = MUSCLES adı, değer = mobilite kütüphanesindeki
+// hareket adları, öncelik sırasıyla (önce ekipmansız esnemeler, sonra rulo / top). Adlar kütüphanedekiyle birebir (test_v71).
+const MUSCLE_STRETCH = {   // öncelik sırasıyla: önce ekipmansız esnemeler, sonra rulo / top
+  "Göğüs": ["Doorway Pec & Biceps Stretch", "Puppy Pose (Yavru Köpek)", "Pec Stretch on Foam Roller (Göğüs Açma)", "Pec Ball Release (Göğüs Topla)"],
+  "Sırt": ["Child’s Pose with Lat Reach", "Bear Hug Upper Back Stretch", "Bench Prayer Stretch (Kanat Esnetme)", "Latissimus Dorsi Foam Roll"],
+  "Omuz": ["Cross-Body Posterior Shoulder Stretch", "Sleeper Stretch (Uyku Esnemesi)", "Towel Behind Back Shoulder Stretch", "Infraspinatus Ball Release (Kürek Kemiği)"],
+  "Ön Bacak": ["Standing Quad Stretch (Ayakta Ön Bacak)", "Half-Kneeling Hip Flexor Stretch", "Couch Stretch", "Quadriceps & Hip Flexor Foam Roll"],
+  "Arka Bacak & Kalça": ["Supine Hamstring Strap Stretch", "Supine Figure-4 Glute Stretch", "Pigeon Pose (Güvercin Pozu)", "Single-Leg Seated Hamstring Stretch", "Hamstring Foam Roll (Arka Bacak)", "Glute Foam Roll (Kalça)"],
+  "Kalf": ["Standing Wall Calf & Soleus Stretch", "Calf Stretch on Step (Basamakta Baldır)", "Downward Dog (Aşağı Bakan Köpek)", "Calf Foam Roll (Baldır)"],
+  "Biceps": ["Doorway Pec & Biceps Stretch", "Towel Behind Back Shoulder Stretch", "Wrist Flexor & Extensor Stretch"],
+  "Triceps": ["Overhead Triceps & Lat Side Lean Stretch", "Bench Prayer Stretch (Kanat Esnetme)"],
+  "Karın": ["Cobra / Sphinx Abdominal Stretch", "Standing Side Bend (Yana Eğilme)", "Supine Spinal Twist (Yatarak Omurga Rotasyonu)"],
+  "Ön Kol": ["Wrist Flexor & Extensor Stretch", "Forearm Ball Release (Ön Kol)"],
+  "Boyun": ["Upper Trap & Levator Scapulae Neck Stretch", "Chin Tucks & Neck Flexion", "Upper Trap Ball Release (Trapez Topla)"],
+  "İç Bacak": ["Butterfly Groin Stretch", "Frog Stretch (Kurbağa Esnemesi)", "Adductor Foam Roll (İç Bacak)"],
+  "Kaval": ["Kneeling Shin Stretch (Kaval Önü)", "Tibialis Foam Roll (Kaval Önü)"]
+};
+
 </script>
 <script>
 // ---------------------------------------------------------------------------
@@ -2835,7 +2857,7 @@ const DEFAULT_SETTINGS = {
   units: "metric",   // v53: "metric" | "imperial" (yalnız gösterim/giriş; kayıt hep kg / cm; 26-birim.js)
   onboarded: true,   // v44: yeni kurulumda freshState() false yapar; var olan kayıt hep true
   sex: "male", height: 170, age: 30, targetWeight: 70,
-  waterTarget: 2.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, keepAwake: true,
+  waterTarget: 2.5, restSec: 90, sound: true, mobSound: true, mobVoice: false, warmupCard: true, mobSuggest: true, keepAwake: true,
   bodyFat: "", targetBodyFat: "",
   macroView: "eaten", calAdjust: 0, coachAppliedAt: 0, barKg: 20, separatePlans: false, splash: true, anim: true,
   nutriLight: false, scaleOn: false, scaleBase: 0,
@@ -3255,6 +3277,7 @@ function normalizeStateInner(raw) {
   s.settings.proteinHigh = s.settings.proteinHigh === true;
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
+  s.settings.mobSuggest = s.settings.mobSuggest !== false;   // v71: kaslara göre esneme önerisi (varsayılan açık)
   s.settings.anim = s.settings.anim !== false;   // v55: uygulama içi animasyonlar (varsayılan açık)
   if (!["system", "normal", "large", "xlarge"].includes(s.settings.textSize)) s.settings.textSize = "system";   // v61
   {   // v67: paylaşım seçimleri (fotoğraf şablonu ve fotoğraf asla kaydedilmez)
@@ -6398,14 +6421,16 @@ function mobRoutineCardHtml(r) {
   </div>`;
 }
 function mobHomeHtml() {
-  const w = mobWeekStats(), last = mobRegionLast();
+  const w = mobWeekStats(), last = mobRegionLast(), sug = mobSuggestData();
   const regs = MOB_REGIONS.map(([k]) => {
     const a = last[k], warn = a != null && a >= 7;
     const txt = a == null ? t("Henüz yok") : warn ? tn(a, "{n} gündür yok") : mobAgoText(a);
     return `<div data-mob-reg="${k}" class="m-rg ${a === 0 ? "ok" : ""} ${warn ? "warn" : ""}"><b class="t-display">${mobUpper(mobRegionL(k))}</b><span>${txt}</span></div>`;
   }).join("");
+  if (sug) setTimeout(() => drawMobSuggestMap(sug.counts), 0);   // v71: kart çizildikten sonra harita
   return `<div id="mobHome">
-    <div class="grid grid-cols-2 gap-2">
+    ${mobSuggestHtml(sug)}
+    <div class="grid grid-cols-2 gap-2 ${sug ? "mt-3" : ""}">
       <div class="m-wk"><b class="t-display">${w.count}</b><span>${tn(w.count, "gün bu hafta")}</span></div>
       <div class="m-wk"><b class="t-display">${w.streak}</b><span>${tn(w.streak, "gün üst üste")}</span></div>
     </div>
@@ -6616,7 +6641,10 @@ function mobRoundsOf(it) {
   for (let s = 1; s <= it.sets; s++) (it.sides === 2 ? ["Sağ", "Sol"] : [null]).forEach(side => rounds.push({ side, set: s }));
   return rounds;
 }
-function mobFindAny(id) { for (const r of mobRoutines()) { const it = r.items.find(i => i.id === id); if (it) return it; } return null; }
+function mobFindAny(id) {
+  for (const r of mobRoutines()) { const it = r.items.find(i => i.id === id); if (it) return it; }
+  return String(id).startsWith("sg_") ? mobSuggestItems.find(i => i.id === id) || null : null;   // v71: öneri seansının geçici öğeleri
+}
 function mobTimerOpen() {
   const m = $("mobTimer"); m.classList.remove("hidden"); m.classList.add("flex");
   document.body.classList.add("pf-open");
@@ -6666,7 +6694,7 @@ function mobSesLoad(pos) {
 }
 function mobSesItemDone() {
   const S = mobT.ses, it = mobFindAny(mobT.id);
-  if (it) { it.done = true; saveState(); }
+  if (it) { it.done = true; if (String(it.id).startsWith("sg_")) mobSuggestLogDone(it); saveState(); }
   if (!S.doneIds.includes(mobT.id)) S.doneIds.push(mobT.id);
   S.skipped = S.skipped.filter(x => x !== mobT.id);
   mobSesAdvance();
@@ -6935,6 +6963,86 @@ function mobWarmupHide() {
   renderAll();
   offerUndo(t("Isınma kartı gizlendi. Profil'den geri açabilirsin"));
 }
+
+// --- v71: ÇALIŞAN KASLARA GÖRE ESNEME ÖNERİSİ (settings.mobSuggest, varsayılan açık). Son 48 saatte biten antrenmanlarda
+// çalışan kaslar → elle seçilmiş esneme / gevşetme hareketleri (kütüphaneden; kullanıcının rutininde olmaları gerekmez).
+// Öneri kaydedilmez; seans geçici öğelerle (mobSuggestItems, kimlik "sg_…") çalışır, biten hareket bugünün mobilityLog'una yazılır.
+// Tasarım: docs/superpowers/specs/2026-11-25-kas-mobilite-onerisi-design.md
+// Kas → esneme listesi: MUSCLE_STRETCH (src/data.js; veri, kütüphanedeki hareket adları)
+const MOB_SUGGEST_MAX = 6, MOB_SUGGEST_HOURS = 48;
+let mobSuggestItems = [];
+// → null (kapalı / son 48 saatte antrenman yok) | { muscles: [[kas, set]], counts: {kas: set}, libs: [mobLibAll öğesi] }
+function mobSuggestData() {
+  if (!state.settings.mobSuggest) return null;
+  const counts = weeklyMuscleSets(Date.now() - MOB_SUGGEST_HOURS * 3600 * 1000);
+  const muscles = MUSCLES.map(m => [m, counts[m] || 0]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1] || MUSCLES.indexOf(a[0]) - MUSCLES.indexOf(b[0]));
+  if (!muscles.length) return null;
+  const lib = {}; mobLibAll().forEach(x => { lib[mobNorm(x.m.name).trim()] = x; });
+  const lists = muscles.map(([m]) => (MUSCLE_STRETCH[m] || []).map(n => lib[mobNorm(n).trim()]).filter(Boolean));
+  const libs = [], seen = new Set(), pos = lists.map(() => 0);
+  for (let more = true; more && libs.length < MOB_SUGGEST_MAX;) {   // sırayla her kastan bir sonraki kullanılmamış hareket
+    more = false;
+    for (let i = 0; i < lists.length && libs.length < MOB_SUGGEST_MAX; i++) {
+      while (pos[i] < lists[i].length && seen.has(lists[i][pos[i]].m.name)) pos[i]++;
+      if (pos[i] < lists[i].length) { const x = lists[i][pos[i]++]; seen.add(x.m.name); libs.push(x); more = true; }
+    }
+  }
+  if (!libs.length) return null;
+  return { muscles, counts, libs };
+}
+function mobSuggestNewItem(x) {   // kütüphaneden eklemeyle aynı dönüşüm (mobAddLib)
+  return normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription, note: mobNoteL(x.m.note) }, x.type));
+}
+function mobSuggestMin(d) { return Math.max(1, Math.round(d.libs.reduce((a, x) => a + mobItemSec(mobSuggestNewItem(x)), 0) / 60)); }
+function mobSuggestHtml(d) {
+  if (!d) return "";
+  const mus = d.muscles.map(([m]) => muscleL(m));
+  return `<div id="mobSuggest" class="m-warm mb-1">
+    <div class="flex gap-3">
+      <canvas id="mobSugMap" role="img" aria-label="${esc(t("Çalışan kaslar: {m}", { m: mus.join(", ") }))}" class="shrink-0 self-start" style="height:120px;aspect-ratio:${(1 / muscleMapRatio).toFixed(4)}"></canvas>
+      <div class="min-w-0 flex-1">
+        <b class="block text-[15.5px] leading-snug">${t("Kaslarına göre esneme")}</b>
+        <span class="block text-[13px] text-[var(--t-muted)] mt-0.5">${t("Son 2 günde çalışan kaslar: {m}", { m: esc(mus.join(" · ")) })}</span>
+        <span class="block text-[13px] text-[var(--t-muted)] mt-1">${tn(d.libs.length, "{n} hareket · ~{min} dk|mobilite", { min: mobSuggestMin(d) })}</span>
+      </div>
+    </div>
+    <div data-mob-sug-list class="text-[12.5px] text-[var(--t-dim)] mt-2">${d.libs.map(x => esc(mobNameL(x.m.name))).join(" · ")}</div>
+    <div class="grid grid-cols-[1fr_auto] gap-2.5 mt-3">
+      <button id="mobSuggestStart" onclick="mobSuggestStart()" class="m-warm-go justify-center">${svgI("play", 16, 2.4)}${t("Başlat")}</button>
+      <button id="mobSuggestSave" onclick="mobSuggestSave()" class="m-btn ghost">${t("Rutin olarak kaydet")}</button>
+    </div>
+  </div>`;
+}
+let mobSugMapGen = 0;
+async function drawMobSuggestMap(counts) {
+  const gen = ++mobSugMapGen;
+  let map = null;
+  try { map = await paintMuscleMap3d(counts, { theme: themeIsLight() ? "lavLight" : "lav", scale: "session" }); } catch (e) { map = null; }
+  const cv = $("mobSugMap");
+  if (gen !== mobSugMapGen || !cv) return;
+  if (!map) { cv.remove(); return; }   // görsel yüklenemedi (çevrimdışı ilk açılış): yalnız metin
+  const H = Math.round(120 * Math.min(3, window.devicePixelRatio || 1)), W = Math.round(H * map.width / map.height);
+  cv.width = W; cv.height = H;
+  try { cv.getContext("2d").drawImage(map, 0, 0, W, H); } catch (e) { /* tuval belleği: boş kalır */ }
+}
+function mobSuggestStart() {
+  const d = mobSuggestData(); if (!d) return;
+  mobSuggestItems = d.libs.map((x, i) => Object.assign(mobSuggestNewItem(x), { id: "sg_" + i }));
+  mobSesStartIds(t("Esneme önerisi"), mobSuggestItems.map(i => i.id), null);
+}
+function mobSuggestLogDone(it) {   // biten öneri hareketi bugünün mobilite günlüğüne (gece arşivi birleştirir; biçim aynı)
+  const k = mobTodayKey(), cur = Array.isArray(state.mobilityLog[k]) ? state.mobilityLog[k] : [];
+  if (!cur.includes(it.name)) state.mobilityLog[k] = [...cur, it.name];
+}
+function mobSuggestSave() {
+  const d = mobSuggestData(); if (!d) return;
+  snapshot();
+  const r = { id: mobNewRoutineId(), name: t("Esneme önerisi"), items: d.libs.map(mobSuggestNewItem) };
+  mobRoutines().push(r);
+  renderAll();
+  offerUndo(t("{ad} rutini eklendi", { ad: r.name }));
+}
+function finStretchGo() { closeModal("finishModal"); switchTab("mobility"); window.scrollTo(0, 0); }
 // ---------------------------------------------------------------------------
 // GRAFİK (SVG)
 // ---------------------------------------------------------------------------
@@ -7459,7 +7567,7 @@ function renderProgress() {
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setAnim", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobSuggest", "setMobVoice", "setSplash", "setAnim", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 // v58: yazı kutularının kayıttan gösterilen değerleri (fillProfileFields ve yazarken kayıt denetimi ortak kullanır)
 function pfTextVals() {
@@ -7487,6 +7595,7 @@ function fillProfileFields(skipId) {
   $("setSound").checked = !!st.sound;
   $("setAwake").checked = !!st.keepAwake;
   $("setWarmup").checked = st.warmupCard !== false;
+  $("setMobSuggest").checked = st.mobSuggest !== false;   // v71
   $("setMobVoice").checked = st.mobVoice === true;
   $("setSplash").checked = st.splash !== false;
   $("setAnim").checked = st.anim !== false;   // v55
@@ -7859,6 +7968,7 @@ function applyProfileFields(changedId, opts = {}) {
   st.sound = $("setSound").checked;
   st.keepAwake = $("setAwake").checked;
   st.warmupCard = $("setWarmup").checked;
+  st.mobSuggest = $("setMobSuggest").checked;   // v71
   st.mobVoice = $("setMobVoice").checked;
   st.splash = $("setSplash").checked;
   st.anim = $("setAnim").checked;   // v55
@@ -9696,6 +9806,7 @@ function openFinishSummary(li, prList) {
     <div id="finStats" class="grid grid-cols-2 gap-2 mt-4">${tiles}</div>
     ${hasMap ? `<div id="finMapBox" class="mt-3 rounded-2xl bg-[var(--w-elev)] py-3 flex justify-center"><canvas id="finMap" role="img" aria-label="${esc(t("Çalışan kaslar: {m}", { m: Object.keys(fMus).map(muscleL).join(", ") }))}" style="height:200px;aspect-ratio:${(1 / muscleMapRatio).toFixed(4)}"></canvas></div>` : ""}
     ${prs ? `<div id="finPrList" class="mt-3 rounded-2xl bg-[var(--w-elev)] px-3.5 py-1"><div class="text-[12px] font-semibold text-[var(--w-muted)] pt-2.5">${t("Yeni rekorlar")}</div>${prs}</div>` : ""}
+    ${typeof mobSuggestData === "function" && mobSuggestData() ? `<button id="finStretch" onclick="finStretchGo()" class="w-full min-h-[52px] mt-3 rounded-2xl bg-[var(--w-elev)] text-[var(--w-text)] text-[15px] font-semibold flex items-center justify-center gap-2"><span style="color:var(--d-lv)">${svgI("play", 16, 2.4)}</span>${t("Esneme önerisi")}</button>` : ""}
     <div class="grid grid-cols-2 gap-2.5 mt-5">
       <button id="finClose" onclick="closeModal('finishModal')" class="h-[52px] rounded-2xl bg-[var(--w-elev)] text-[var(--w-text)] text-[15px] font-bold">${t("Kapat")}</button>
       <button id="finShare" onclick="closeModal('finishModal'); openShareCard(${li})" class="w-btn h-[52px] rounded-2xl text-[15px]">${t("Paylaş")}</button>
@@ -12396,6 +12507,14 @@ Object.assign(EN, {
   "Sesli yönlendirmeyi kapat": "Turn voice guidance off", "Sesli yönlendirmeyi aç": "Turn voice guidance on",
   "Bip sesini kapat": "Turn the beep off", "Bip sesini aç": "Turn the beep on",
   "Sıradaki: {ad}": "Next: {ad}",
+  // v71: kaslara göre esneme önerisi
+  "Kaslarına göre esneme": "Stretches for your worked muscles",
+  "Son 2 günde çalışan kaslar: {m}": "Worked in the last 2 days: {m}",
+  "Rutin olarak kaydet": "Save as routine",
+  "Esneme önerisi": "Stretch suggestion",
+  "{ad} rutini eklendi": "Routine added: {ad}",
+  "Kaslara göre esneme önerisi": "Stretch suggestions for worked muscles",
+  "Son 2 günde çalışan kaslara uygun esneme hareketlerini Mobilite'de ve antrenman özetinde önerir.": "Suggests stretches for the muscles you worked in the last 2 days, in Mobility and in the workout summary.",
 });
 // v50: İngilizce sözlük, İlerleme + kurulum + örnek içerik (terimler: docs/i18n-terimler.md bölüm 8, 10, 11).
 // Örnek içerik kayda o anki dilde yazılır (docs/i18n-kayitli-metinler.md a3); targetInfo/set.target her dilde Türkçe biçim kalır.
@@ -16146,6 +16265,11 @@ const MAP_THEMES = {
   light: { body: [230, 230, 235], idle: [184, 184, 196], a: 1, lo: [0, 110, 100], hi: [0, 196, 178], hl: [120, 245, 232], glow: [0, 196, 178], glowK: 0.6, selDim: 0.38, selLift: 0.08, selGlow: "rgba(0,150,136,0.55)", outline: [140, 140, 153], shadow: 0.22 },
   clear: { body: [255, 255, 255], idle: [255, 255, 255], a: 0.27, aIdle: 0.47, lo: [6, 112, 104], hi: [24, 236, 214], hl: [185, 255, 248], glow: [24, 236, 214], glowK: 1, selDim: 0.42, selLift: 0.12, selGlow: "rgba(24,236,214,0.75)" }
 };
+// v71: mobilite önerisi için lavanta (mobilite vurgusu #B3A6FF; aydınlıkta koyu lavanta, "Aydınlık 3" figürüyle)
+Object.assign(MAP_THEMES, {
+  lav: Object.assign({}, MAP_THEMES.dark, { lo: [74, 58, 160], hi: [179, 166, 255], hl: [232, 228, 255], glow: [179, 166, 255] }),
+  lavLight: Object.assign({}, MAP_THEMES.light, { lo: [70, 52, 170], hi: [120, 98, 235], hl: [220, 212, 255], glow: [120, 98, 235], selGlow: "rgba(91,71,201,0.55)" })
+});
 // v69: seçili kas "spot ışığı" — selDim: geri kalan haritanın görünürlüğü, selLift: seçili kasın beyaza açılması, selGlow: çevresindeki ışıma
 
 // v69: seçili kasın pikselleri + kasın içinde kalan dar yarıklar (kapatma, r px) → global indeks listesi.

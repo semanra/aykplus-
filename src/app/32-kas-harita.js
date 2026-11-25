@@ -55,6 +55,11 @@ const MAP_THEMES = {
   light: { body: [230, 230, 235], idle: [184, 184, 196], a: 1, lo: [0, 110, 100], hi: [0, 196, 178], hl: [120, 245, 232], glow: [0, 196, 178], glowK: 0.6, selDim: 0.38, selLift: 0.08, selGlow: "rgba(0,150,136,0.55)", outline: [140, 140, 153], shadow: 0.22 },
   clear: { body: [255, 255, 255], idle: [255, 255, 255], a: 0.27, aIdle: 0.47, lo: [6, 112, 104], hi: [24, 236, 214], hl: [185, 255, 248], glow: [24, 236, 214], glowK: 1, selDim: 0.42, selLift: 0.12, selGlow: "rgba(24,236,214,0.75)" }
 };
+// v71: mobilite önerisi için lavanta (mobilite vurgusu #B3A6FF; aydınlıkta koyu lavanta, "Aydınlık 3" figürüyle)
+Object.assign(MAP_THEMES, {
+  lav: Object.assign({}, MAP_THEMES.dark, { lo: [74, 58, 160], hi: [179, 166, 255], hl: [232, 228, 255], glow: [179, 166, 255] }),
+  lavLight: Object.assign({}, MAP_THEMES.light, { lo: [70, 52, 170], hi: [120, 98, 235], hl: [220, 212, 255], glow: [120, 98, 235], selGlow: "rgba(91,71,201,0.55)" })
+});
 // v69: seçili kas "spot ışığı" — selDim: geri kalan haritanın görünürlüğü, selLift: seçili kasın beyaza açılması, selGlow: çevresindeki ışıma
 
 // v69: seçili kasın pikselleri + kasın içinde kalan dar yarıklar (kapatma, r px) → global indeks listesi.

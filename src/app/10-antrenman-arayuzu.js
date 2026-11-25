@@ -687,6 +687,7 @@ function openFinishSummary(li, prList) {
     <div id="finStats" class="grid grid-cols-2 gap-2 mt-4">${tiles}</div>
     ${hasMap ? `<div id="finMapBox" class="mt-3 rounded-2xl bg-[var(--w-elev)] py-3 flex justify-center"><canvas id="finMap" role="img" aria-label="${esc(t("Çalışan kaslar: {m}", { m: Object.keys(fMus).map(muscleL).join(", ") }))}" style="height:200px;aspect-ratio:${(1 / muscleMapRatio).toFixed(4)}"></canvas></div>` : ""}
     ${prs ? `<div id="finPrList" class="mt-3 rounded-2xl bg-[var(--w-elev)] px-3.5 py-1"><div class="text-[12px] font-semibold text-[var(--w-muted)] pt-2.5">${t("Yeni rekorlar")}</div>${prs}</div>` : ""}
+    ${typeof mobSuggestData === "function" && mobSuggestData() ? `<button id="finStretch" onclick="finStretchGo()" class="w-full min-h-[52px] mt-3 rounded-2xl bg-[var(--w-elev)] text-[var(--w-text)] text-[15px] font-semibold flex items-center justify-center gap-2"><span style="color:var(--d-lv)">${svgI("play", 16, 2.4)}</span>${t("Esneme önerisi")}</button>` : ""}
     <div class="grid grid-cols-2 gap-2.5 mt-5">
       <button id="finClose" onclick="closeModal('finishModal')" class="h-[52px] rounded-2xl bg-[var(--w-elev)] text-[var(--w-text)] text-[15px] font-bold">${t("Kapat")}</button>
       <button id="finShare" onclick="closeModal('finishModal'); openShareCard(${li})" class="w-btn h-[52px] rounded-2xl text-[15px]">${t("Paylaş")}</button>

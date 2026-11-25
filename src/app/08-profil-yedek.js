@@ -2,7 +2,7 @@
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobVoice", "setSplash", "setAnim", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobSuggest", "setMobVoice", "setSplash", "setAnim", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 // v58: yazı kutularının kayıttan gösterilen değerleri (fillProfileFields ve yazarken kayıt denetimi ortak kullanır)
 function pfTextVals() {
@@ -30,6 +30,7 @@ function fillProfileFields(skipId) {
   $("setSound").checked = !!st.sound;
   $("setAwake").checked = !!st.keepAwake;
   $("setWarmup").checked = st.warmupCard !== false;
+  $("setMobSuggest").checked = st.mobSuggest !== false;   // v71
   $("setMobVoice").checked = st.mobVoice === true;
   $("setSplash").checked = st.splash !== false;
   $("setAnim").checked = st.anim !== false;   // v55
@@ -402,6 +403,7 @@ function applyProfileFields(changedId, opts = {}) {
   st.sound = $("setSound").checked;
   st.keepAwake = $("setAwake").checked;
   st.warmupCard = $("setWarmup").checked;
+  st.mobSuggest = $("setMobSuggest").checked;   // v71
   st.mobVoice = $("setMobVoice").checked;
   st.splash = $("setSplash").checked;
   st.anim = $("setAnim").checked;   // v55

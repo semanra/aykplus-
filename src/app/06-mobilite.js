@@ -206,14 +206,16 @@ function mobRoutineCardHtml(r) {
   </div>`;
 }
 function mobHomeHtml() {
-  const w = mobWeekStats(), last = mobRegionLast();
+  const w = mobWeekStats(), last = mobRegionLast(), sug = mobSuggestData();
   const regs = MOB_REGIONS.map(([k]) => {
     const a = last[k], warn = a != null && a >= 7;
     const txt = a == null ? t("Henüz yok") : warn ? tn(a, "{n} gündür yok") : mobAgoText(a);
     return `<div data-mob-reg="${k}" class="m-rg ${a === 0 ? "ok" : ""} ${warn ? "warn" : ""}"><b class="t-display">${mobUpper(mobRegionL(k))}</b><span>${txt}</span></div>`;
   }).join("");
+  if (sug) setTimeout(() => drawMobSuggestMap(sug.counts), 0);   // v71: kart çizildikten sonra harita
   return `<div id="mobHome">
-    <div class="grid grid-cols-2 gap-2">
+    ${mobSuggestHtml(sug)}
+    <div class="grid grid-cols-2 gap-2 ${sug ? "mt-3" : ""}">
       <div class="m-wk"><b class="t-display">${w.count}</b><span>${tn(w.count, "gün bu hafta")}</span></div>
       <div class="m-wk"><b class="t-display">${w.streak}</b><span>${tn(w.streak, "gün üst üste")}</span></div>
     </div>
@@ -424,7 +426,10 @@ function mobRoundsOf(it) {
   for (let s = 1; s <= it.sets; s++) (it.sides === 2 ? ["Sağ", "Sol"] : [null]).forEach(side => rounds.push({ side, set: s }));
   return rounds;
 }
-function mobFindAny(id) { for (const r of mobRoutines()) { const it = r.items.find(i => i.id === id); if (it) return it; } return null; }
+function mobFindAny(id) {
+  for (const r of mobRoutines()) { const it = r.items.find(i => i.id === id); if (it) return it; }
+  return String(id).startsWith("sg_") ? mobSuggestItems.find(i => i.id === id) || null : null;   // v71: öneri seansının geçici öğeleri
+}
 function mobTimerOpen() {
   const m = $("mobTimer"); m.classList.remove("hidden"); m.classList.add("flex");
   document.body.classList.add("pf-open");
@@ -474,7 +479,7 @@ function mobSesLoad(pos) {
 }
 function mobSesItemDone() {
   const S = mobT.ses, it = mobFindAny(mobT.id);
-  if (it) { it.done = true; saveState(); }
+  if (it) { it.done = true; if (String(it.id).startsWith("sg_")) mobSuggestLogDone(it); saveState(); }
   if (!S.doneIds.includes(mobT.id)) S.doneIds.push(mobT.id);
   S.skipped = S.skipped.filter(x => x !== mobT.id);
   mobSesAdvance();
@@ -743,3 +748,83 @@ function mobWarmupHide() {
   renderAll();
   offerUndo(t("Isınma kartı gizlendi. Profil'den geri açabilirsin"));
 }
+
+// --- v71: ÇALIŞAN KASLARA GÖRE ESNEME ÖNERİSİ (settings.mobSuggest, varsayılan açık). Son 48 saatte biten antrenmanlarda
+// çalışan kaslar → elle seçilmiş esneme / gevşetme hareketleri (kütüphaneden; kullanıcının rutininde olmaları gerekmez).
+// Öneri kaydedilmez; seans geçici öğelerle (mobSuggestItems, kimlik "sg_…") çalışır, biten hareket bugünün mobilityLog'una yazılır.
+// Tasarım: docs/superpowers/specs/2026-11-25-kas-mobilite-onerisi-design.md
+// Kas → esneme listesi: MUSCLE_STRETCH (src/data.js; veri, kütüphanedeki hareket adları)
+const MOB_SUGGEST_MAX = 6, MOB_SUGGEST_HOURS = 48;
+let mobSuggestItems = [];
+// → null (kapalı / son 48 saatte antrenman yok) | { muscles: [[kas, set]], counts: {kas: set}, libs: [mobLibAll öğesi] }
+function mobSuggestData() {
+  if (!state.settings.mobSuggest) return null;
+  const counts = weeklyMuscleSets(Date.now() - MOB_SUGGEST_HOURS * 3600 * 1000);
+  const muscles = MUSCLES.map(m => [m, counts[m] || 0]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1] || MUSCLES.indexOf(a[0]) - MUSCLES.indexOf(b[0]));
+  if (!muscles.length) return null;
+  const lib = {}; mobLibAll().forEach(x => { lib[mobNorm(x.m.name).trim()] = x; });
+  const lists = muscles.map(([m]) => (MUSCLE_STRETCH[m] || []).map(n => lib[mobNorm(n).trim()]).filter(Boolean));
+  const libs = [], seen = new Set(), pos = lists.map(() => 0);
+  for (let more = true; more && libs.length < MOB_SUGGEST_MAX;) {   // sırayla her kastan bir sonraki kullanılmamış hareket
+    more = false;
+    for (let i = 0; i < lists.length && libs.length < MOB_SUGGEST_MAX; i++) {
+      while (pos[i] < lists[i].length && seen.has(lists[i][pos[i]].m.name)) pos[i]++;
+      if (pos[i] < lists[i].length) { const x = lists[i][pos[i]++]; seen.add(x.m.name); libs.push(x); more = true; }
+    }
+  }
+  if (!libs.length) return null;
+  return { muscles, counts, libs };
+}
+function mobSuggestNewItem(x) {   // kütüphaneden eklemeyle aynı dönüşüm (mobAddLib)
+  return normMobItem(mobFromLegacy({ name: x.m.name, prescription: x.m.prescription, note: mobNoteL(x.m.note) }, x.type));
+}
+function mobSuggestMin(d) { return Math.max(1, Math.round(d.libs.reduce((a, x) => a + mobItemSec(mobSuggestNewItem(x)), 0) / 60)); }
+function mobSuggestHtml(d) {
+  if (!d) return "";
+  const mus = d.muscles.map(([m]) => muscleL(m));
+  return `<div id="mobSuggest" class="m-warm mb-1">
+    <div class="flex gap-3">
+      <canvas id="mobSugMap" role="img" aria-label="${esc(t("Çalışan kaslar: {m}", { m: mus.join(", ") }))}" class="shrink-0 self-start" style="height:120px;aspect-ratio:${(1 / muscleMapRatio).toFixed(4)}"></canvas>
+      <div class="min-w-0 flex-1">
+        <b class="block text-[15.5px] leading-snug">${t("Kaslarına göre esneme")}</b>
+        <span class="block text-[13px] text-[var(--t-muted)] mt-0.5">${t("Son 2 günde çalışan kaslar: {m}", { m: esc(mus.join(" · ")) })}</span>
+        <span class="block text-[13px] text-[var(--t-muted)] mt-1">${tn(d.libs.length, "{n} hareket · ~{min} dk|mobilite", { min: mobSuggestMin(d) })}</span>
+      </div>
+    </div>
+    <div data-mob-sug-list class="text-[12.5px] text-[var(--t-dim)] mt-2">${d.libs.map(x => esc(mobNameL(x.m.name))).join(" · ")}</div>
+    <div class="grid grid-cols-[1fr_auto] gap-2.5 mt-3">
+      <button id="mobSuggestStart" onclick="mobSuggestStart()" class="m-warm-go justify-center">${svgI("play", 16, 2.4)}${t("Başlat")}</button>
+      <button id="mobSuggestSave" onclick="mobSuggestSave()" class="m-btn ghost">${t("Rutin olarak kaydet")}</button>
+    </div>
+  </div>`;
+}
+let mobSugMapGen = 0;
+async function drawMobSuggestMap(counts) {
+  const gen = ++mobSugMapGen;
+  let map = null;
+  try { map = await paintMuscleMap3d(counts, { theme: themeIsLight() ? "lavLight" : "lav", scale: "session" }); } catch (e) { map = null; }
+  const cv = $("mobSugMap");
+  if (gen !== mobSugMapGen || !cv) return;
+  if (!map) { cv.remove(); return; }   // görsel yüklenemedi (çevrimdışı ilk açılış): yalnız metin
+  const H = Math.round(120 * Math.min(3, window.devicePixelRatio || 1)), W = Math.round(H * map.width / map.height);
+  cv.width = W; cv.height = H;
+  try { cv.getContext("2d").drawImage(map, 0, 0, W, H); } catch (e) { /* tuval belleği: boş kalır */ }
+}
+function mobSuggestStart() {
+  const d = mobSuggestData(); if (!d) return;
+  mobSuggestItems = d.libs.map((x, i) => Object.assign(mobSuggestNewItem(x), { id: "sg_" + i }));
+  mobSesStartIds(t("Esneme önerisi"), mobSuggestItems.map(i => i.id), null);
+}
+function mobSuggestLogDone(it) {   // biten öneri hareketi bugünün mobilite günlüğüne (gece arşivi birleştirir; biçim aynı)
+  const k = mobTodayKey(), cur = Array.isArray(state.mobilityLog[k]) ? state.mobilityLog[k] : [];
+  if (!cur.includes(it.name)) state.mobilityLog[k] = [...cur, it.name];
+}
+function mobSuggestSave() {
+  const d = mobSuggestData(); if (!d) return;
+  snapshot();
+  const r = { id: mobNewRoutineId(), name: t("Esneme önerisi"), items: d.libs.map(mobSuggestNewItem) };
+  mobRoutines().push(r);
+  renderAll();
+  offerUndo(t("{ad} rutini eklendi", { ad: r.name }));
+}
+function finStretchGo() { closeModal("finishModal"); switchTab("mobility"); window.scrollTo(0, 0); }
