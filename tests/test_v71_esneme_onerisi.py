@@ -40,9 +40,9 @@ try:
     check(allm == [], f"1a: her kas grubunun en az bir esnemesi var {allm}")
     pg.evaluate(SEED, [5, LIST])
     d = pg.evaluate("() => { const d = mobSuggestData(); return d && { mus: d.muscles.map(x => x[0]), names: d.libs.map(x => x.m.name) }; }")
-    check(d and d["mus"] == ["Göğüs", "Omuz", "Triceps", "Ön Kol"], f"1b: kaslar set çoktan aza {d and d['mus']}")
+    check(d and d["mus"] == ["Omuz", "Göğüs", "Triceps", "Ön Kol"], f"1b: kaslar set çoktan aza (v72: Omuz 6 + bench 4,5 = 10,5) {d and d['mus']}")
     check(d and len(d["names"]) == 6 and len(set(d["names"])) == 6, f"1c: en fazla 6, tekil {d and d['names']}")
-    check(d and d["names"][:4] == ["Doorway Pec & Biceps Stretch", "Cross-Body Posterior Shoulder Stretch", "Overhead Triceps & Lat Side Lean Stretch", "Wrist Flexor & Extensor Stretch"],
+    check(d and d["names"][:4] == ["Cross-Body Posterior Shoulder Stretch", "Doorway Pec & Biceps Stretch", "Overhead Triceps & Lat Side Lean Stretch", "Wrist Flexor & Extensor Stretch"],
           f"1d: her kastan sırayla ilk hareket {d and d['names'][:4]}")
     pg.evaluate(SEED, [50, LIST])
     check(pg.evaluate("mobSuggestData()") is None, "1e: 48 saatten eski antrenman → öneri yok")

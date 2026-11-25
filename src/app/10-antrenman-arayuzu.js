@@ -442,7 +442,8 @@ function libMapOpts() {
 let bodyMapGen = 0;
 async function drawBodyMap(counts) {
   const gen = ++bodyMapGen;
-  const map = await paintMuscleMap3d(counts, libMapOpts());
+  let map = null;
+  try { map = await paintMuscleMap3d(counts, libMapOpts()); } catch (e) { map = null; }   // v72: çizim hatası ekranı bozmasın
   const cv = document.getElementById("bodyMapCv");
   if (gen !== bodyMapGen || !cv) return;   // bu arada yeniden çizildi / ekran değişti
   const box = cv.closest(".t-bodymap");
@@ -453,7 +454,7 @@ async function drawBodyMap(counts) {
   }
   if (box) box.style.aspectRatio = map.width + " / " + map.height;
   cv.width = map.width; cv.height = map.height;
-  cv.getContext("2d").drawImage(map, 0, 0);
+  try { cv.getContext("2d").drawImage(map, 0, 0); } catch (e) { /* tuval belleği: harita boş kalır, listeler çalışır */ }
 }
 function bodyMapTap(ev) {
   const cv = ev.currentTarget, M = muscleMapData;
@@ -470,10 +471,7 @@ function todayMuscleSets() {
   const t0 = new Date(); t0.setHours(0, 0, 0, 0);
   const fromHist = weeklyMuscleSets(t0.getTime());
   MUSCLES.forEach(m => { counts[m] += fromHist[m] || 0; });
-  activeDay().exercises.forEach(ex => {
-    const g = muscleOf(ex);
-    if (g) counts[g] += ex.sets.filter(s => s.done).length;
-  });
+  activeDay().exercises.forEach(ex => addMuscleSets(counts, muscleOf(ex), ex.name, ex.sets.filter(s => s.done).length));   // v72: yardımcı kaslar yarım
   return counts;
 }
 // Programın haftalık etkisi: tüm antrenman günlerindeki planlanan setler (her gün haftada bir kez yapılır varsayımıyla).
@@ -482,8 +480,7 @@ function programMuscleSets() {
   MUSCLES.forEach(m => { counts[m] = 0; });
   state.workoutDays.forEach(d => d.exercises.forEach(ex => {
     if (ex.kind === "cardio") return;
-    const g = muscleOf(ex);
-    if (g && counts[g] != null) counts[g] += ex.sets.length;
+    addMuscleSets(counts, muscleOf(ex), ex.name, ex.sets.length);   // v72: yardımcı kaslar yarım
   }));
   return counts;
 }
@@ -556,9 +553,12 @@ function gymLibraryHtml() {
     return `<button onclick="selectMuscle(${esc(JSON.stringify(m))})" class="w-full min-h-[44px] flex items-center gap-2.5 text-left">
       <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} ${curLang() === "en" ? "line-clamp-2 leading-tight" : "truncate"}">${esc(muscleL(m))}</span>
       <span class="relative flex-1 h-2.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / (range === "today" ? 8 : 24) * 100)}%;background:${col}"></span></span>
-      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b>${tg ? ` <span class="t-dim text-[12px]">${tg}</span>` : ""}</span>
+      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${fmtNum(c)}</b>${tg ? ` <span class="t-dim text-[12px]">${tg}</span>` : ""}</span>
     </button>`;
   }).join("");
+  // v72: VoiceOver haritayı resim olarak okur: hangi kasların çalıştığını söyler (seçim aşağıdaki gizli kas düğmeleriyle)
+  const worked = MUSCLES.filter(m => (counts[m] || 0) > 0).sort((a, b) => counts[b] - counts[a]).map(muscleL);
+  const mapAria = worked.length ? t("Kas haritası. Çalışan kaslar: {m}", { m: worked.join(", ") }) : t("Kas haritası. Henüz çalışılan kas yok");
   // v68: lejant haritanın renklerinden (boşta, az, orta, çok)
   const MT = MAP_THEMES[themeIsLight() ? "light" : "dark"], mix = v => "rgb(" + MT.lo.map((x, i) => Math.round(x + (MT.hi[i] - x) * v)).join(",") + ")";
   const legTxt = range === "today" ? ["0", "1–3", "4–7", t("8+ set")] : ["0", "1–9", "10–20", t("20+ set")];
@@ -571,7 +571,7 @@ function gymLibraryHtml() {
     <div class="grid grid-cols-3 gap-0.5 bg-[var(--t-surface)] border border-[var(--t-line)] rounded-[14px] p-0.5">${rangeBtn("week", t("Bu hafta"))}${rangeBtn("today", t("Bugün"))}${rangeBtn("program", t("Programım"))}</div>
     <div class="flex justify-center">
       <div class="relative t-bodymap" style="width: min(100%, 340px); aspect-ratio: ${(1 / muscleMapRatio).toFixed(4)};">
-        <canvas id="bodyMapCv" onclick="bodyMapTap(event)" class="absolute inset-0 w-full h-full select-none" style="cursor:pointer" role="img" aria-label="${t("Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç")}"></canvas>
+        <canvas id="bodyMapCv" onclick="bodyMapTap(event)" class="absolute inset-0 w-full h-full select-none" style="cursor:pointer" role="img" aria-label="${esc(mapAria)}"></canvas>
         <span class="absolute left-2 top-1.5 text-[12px] font-bold tracking-widest t-muted">${t("ÖN")}</span>
         <span class="absolute right-2 top-1.5 text-[12px] font-bold tracking-widest t-muted">${t("ARKA")}</span>
       </div>
@@ -581,14 +581,14 @@ function gymLibraryHtml() {
     ${range === "program" ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5">
       <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("PROGRAMIN HAFTALIK ETKİSİ")}</span><span class="text-xs t-dim">${tn(state.workoutDays.length, "{n} gün")} · ${tn(pTotal, "{n} set")}</span></div>
       ${pRows}
-      <p class="text-[12px] t-dim pt-1.5">${t("Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.")}</p>
+      <p class="text-[12px] t-dim pt-1.5">${t("Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına 1, yardımcı kaslarına yarım sayılır.")}</p>
     </div>` : range === "today" && pRows ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5" data-today-muscles>
       <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("BUGÜN · KAS BAŞINA SET")}</span></div>
       ${pRows}
     </div>` : range === "week" && pTotal ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5" data-week-muscles>
       <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("BU HAFTA · KAS BAŞINA SET")}</span><span class="text-xs t-dim">${tn(pTotal, "{n} set")}</span></div>
       ${pRows}
-      <p class="text-[12px] t-dim pt-1.5">${t("Pazartesiden bu yana kaydedilen setler. Kas gelişimi için genel öneri haftada 10–20 set.")}</p>
+      <p class="text-[12px] t-dim pt-1.5">${t("Pazartesiden bu yana kaydedilen setler; yardımcı kaslara yarım set sayılır. Kas gelişimi için genel öneri haftada 10–20 set.")}</p>
     </div>` : ""}
     ${sel ? `<div class="t-card rounded-[18px] min-h-[64px] px-4 flex items-center justify-between gap-2">
       <span class="flex flex-col gap-0.5"><span class="text-base font-bold">${esc(muscleL(sel))}</span><span class="text-[13px] t-muted">${selLine}</span></span>

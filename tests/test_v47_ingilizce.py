@@ -561,7 +561,7 @@ try:
       "06-mobilite.js": {
         "Sağ": "tur tarafı kayıt değeri ('Sağ'/'Sol', mobT.rounds; gösterimde mobSideL)",
         "Göğüs": "MOB_WARM_REGIONS anahtarı = MUSCLES kas adı (kayıt anahtarı, çeviri yok)", "Sırt": "MOB_WARM_REGIONS anahtarı (kas adı)",
-        "Ön Bacak": "MOB_WARM_REGIONS anahtarı (kas adı)", "Arka Bacak & Kalça": "MOB_WARM_REGIONS anahtarı (kas adı)", "Karın": "MOB_WARM_REGIONS anahtarı (kas adı)"},
+        "Ön Bacak": "MOB_WARM_REGIONS anahtarı (kas adı)", "Arka Bacak & Kalça": "MOB_WARM_REGIONS anahtarı (kas adı)", "Karın": "MOB_WARM_REGIONS anahtarı (kas adı)", "İç Bacak": "MOB_WARM_REGIONS anahtarı (kas adı, v72)"},
       "12-besin-veritabani.js": {"Et, tavuk ve balık": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "Süt ürünleri ve yumurta": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "Tahıllar ve ekmek": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "Kuruyemiş ve yağlar": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "Kahvaltılıklar": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "Atıştırmalık ve tatlılar": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "İçecekler": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "Fast food ve hazır yemek": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "Türk mutfağı": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "Sos, çorba ve baharat": "FOOD_GROUPS etiketi (v65), gösterimde t(l)", "Diğer": "FOOD_GROUPS etiketi (v65), gösterimde t(l)"}, "13-cizim-baslat.js": {},
       "07-grafik-ilerleme.js": {"Toplam süre": "seri metriği anahtarı (kod karşılaştırır; gösterim t(ser.metric), v50)", "Güç": "PROG_VIEWS etiketi, gösterimde t(l)"},
       "14-ornek-icerik.js": {

@@ -442,10 +442,10 @@ function progGucHtml() {
   // v68: küçük kaslar (MINOR_MUSCLES) yalnız set > 0 ise, 10–20 bandı ve yorumu olmadan
   const mus = MUSCLES.filter(m => !MINOR_MUSCLES.includes(m) || (counts[m] || 0) > 0).map(m => [m, counts[m] || 0]).sort((a, b) => b[1] - a[1]).map(([m, c]) => {
     const mn = MINOR_MUSCLES.includes(m), st = c === 0 ? "yok" : c < 10 ? "az" : c <= 20 ? "uygun" : "fazla";
-    return `<div class="p-bl"><span class="p-bl-n">${esc(muscleL(m))}</span><span class="p-bl-t">${mn ? "" : `<i class="p-bl-band" style="left:${(10 / scale * 100).toFixed(1)}%;width:${(10 / scale * 100).toFixed(1)}%"></i>`}<i class="p-bl-v" style="width:${Math.min(100, c / scale * 100).toFixed(1)}%"></i></span><span class="p-bl-c"><b>${c}</b>${mn ? "" : ` <small class="${st === "uygun" ? "ok" : ""}">${t(st)}</small>`}</span></div>`;
+    return `<div class="p-bl"><span class="p-bl-n">${esc(muscleL(m))}</span><span class="p-bl-t">${mn ? "" : `<i class="p-bl-band" style="left:${(10 / scale * 100).toFixed(1)}%;width:${(10 / scale * 100).toFixed(1)}%"></i>`}<i class="p-bl-v" style="width:${Math.min(100, c / scale * 100).toFixed(1)}%"></i></span><span class="p-bl-c"><b>${fmtNum(c)}</b>${mn ? "" : ` <small class="${st === "uygun" ? "ok" : ""}">${t(st)}</small>`}</span></div>`;
   }).join("");
-  const musCard = `<div class="p-card" id="pMuscles">${pSec(t("Bu hafta kas başına set"), PC.tq, `<span class="p-dim p-sm">${t("toplam {n}", { n: String(total) })}</span>`)}
-    ${total ? `<div class="p-bls">${mus}</div>${pLegend([[`<i class="p-lg-band"></i>`, t("10–20 set: kas gelişimi için genel öneri")]])}<p class="p-fine">${t("Her set hareketin ana kas grubuna sayılır; kas grubunu hareketi düzenlerken değiştirebilirsin.")}</p>`
+  const musCard = `<div class="p-card" id="pMuscles">${pSec(t("Bu hafta kas başına set"), PC.tq, `<span class="p-dim p-sm">${t("toplam {n}", { n: fmtNum(total) })}</span>`)}
+    ${total ? `<div class="p-bls">${mus}</div>${pLegend([[`<i class="p-lg-band"></i>`, t("10–20 set: kas gelişimi için genel öneri")]])}<p class="p-fine">${t("Her set hareketin ana kas grubuna 1, yardımcı kaslarına yarım sayılır; ana kas grubunu hareketi düzenlerken değiştirebilirsin.")}</p>`
       : `<p class="p-fine">${t("Bu hafta kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettikçe her kas grubunun set sayısı burada birikir.")}</p>`}</div>`;
   // Haftalık tonaj (8 hafta) + bu haftanın kardiyo / rekor sayısı
   const ws = weekStart(), w = progWeekly();

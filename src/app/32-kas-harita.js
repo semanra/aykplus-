@@ -24,7 +24,11 @@ function loadMapImg(src) {
   });
 }
 // → {w, h, lab: Uint8Array, shade: Float32Array} veya null (yüklenemedi; sonraki çağrı yeniden dener)
+// v72: yüklenemezse 20 sn boyunca yeniden istenmez (çevrimdışıyken her çizimde ağ isteği olmasın); internet gelince hemen dener.
+let muscleMapFailAt = 0;
+window.addEventListener("online", () => { muscleMapFailAt = 0; });
 function loadMuscleMap() {
+  if (!muscleMapP && muscleMapFailAt && Date.now() - muscleMapFailAt < 20000) return Promise.resolve(null);
   if (!muscleMapP) {
     muscleMapP = Promise.all([loadMapImg("img/kas-3d-etiket.png"), loadMapImg("img/kas-3d-isik.webp")]).then(([L, S]) => {
       if (L.w !== S.w || L.h !== S.h) throw new Error("kas-3d boyut");
@@ -37,7 +41,7 @@ function loadMuscleMap() {
       muscleMapRatio = L.h / L.w;
       muscleMapData = { w: L.w, h: L.h, lab, shade };
       return muscleMapData;
-    }).catch(() => { muscleMapP = null; return null; });
+    }).catch(() => { muscleMapP = null; muscleMapFailAt = Date.now(); return null; });
   }
   return muscleMapP;
 }

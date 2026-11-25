@@ -111,7 +111,7 @@ Object.assign(EN, {
   "yok": "none", "az": "low", "uygun": "good", "fazla": "high",
   "Bu hafta kas başına set": "Sets per muscle this week", "toplam {n}": "total {n}",
   "10–20 set: kas gelişimi için genel öneri": "10–20 sets: general guideline for muscle growth",
-  "Her set hareketin ana kas grubuna sayılır; kas grubunu hareketi düzenlerken değiştirebilirsin.": "Each set counts towards the exercise's main muscle group; you can change the muscle group when you edit the exercise.",
+  "Her set hareketin ana kas grubuna 1, yardımcı kaslarına yarım sayılır; ana kas grubunu hareketi düzenlerken değiştirebilirsin.": "Each set counts as 1 for the exercise's main muscle group and ½ for helper muscles; you can change the main group when editing the exercise.",
   "Bu hafta kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettikçe her kas grubunun set sayısı burada birikir.": "No workouts saved this week. As you finish and save workouts, the set count for each muscle group builds up here.",
   "Bu h.": "This wk", "Haftalık tonaj": "Weekly volume", "ton": "tonnes", "Son 8 haftanın tonajı (ton)": "Volume for the last 8 weeks (tonnes)",
   "Bu hafta sürüyor (yarı saydam); bitmemiş haftayı tam haftalarla karşılaştırma.": "This week is still in progress (semi-transparent); don't compare it with full weeks.",

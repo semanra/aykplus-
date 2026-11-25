@@ -708,7 +708,8 @@ function mobTimerRender() {
 // --- v40: ANTRENMANDA ISINMA KARTI (isteğe bağlı: settings.warmupCard). Günün kaslarına uygun bölgelerdeki dinamik
 // hareketler, yalnızca kullanıcının kendi rutinlerinden (hazır şablon yok), en fazla 4, ada göre tekil.
 const MOB_WARM_REGIONS = { "Göğüs": ["chest", "shoulder"], "Sırt": ["spine", "shoulder"], "Omuz": ["shoulder"], "Biceps": ["shoulder"], "Triceps": ["shoulder"],
-  "Ön Bacak": ["hip", "ankle"], "Arka Bacak & Kalça": ["hip", "hamstring"], "Kalf": ["ankle"], "Karın": ["spine"] };
+  "Ön Bacak": ["hip", "ankle"], "Arka Bacak & Kalça": ["hip", "hamstring"], "Kalf": ["ankle"], "Karın": ["spine"],
+  "Boyun": ["spine", "shoulder"], "İç Bacak": ["hip"], "Kaval": ["ankle"] };   // v72: v68'in küçük kasları (Ön Kol: bölge yok, bilek hareketleri "Diğer")
 function mobWarmupItems(day) {
   const regs = new Set();
   ((day && day.exercises) || []).forEach(ex => (MOB_WARM_REGIONS[muscleOf(ex)] || []).forEach(r => regs.add(r)));

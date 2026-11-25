@@ -52,7 +52,7 @@ try:
 
     # --- 2) shareData
     d = pg.evaluate("shareData(%s)" % LAST)
-    check(d["muscles"] == {"Göğüs": 4, "Omuz": 4, "Triceps": 3}, "2: kas setleri %s" % d["muscles"])
+    check(d["muscles"] == {"Göğüs": 4, "Omuz": 6, "Triceps": 5}, "2: kas setleri (v72: bench press Omuz ve Triceps'e yarım) %s" % d["muscles"])
     check([s["key"] for s in d["stats"]] == ["dur", "vol", "sets", "prs", "cardio"], "2: istatistik sırası")
     st = {s["key"]: s for s in d["stats"]}
     check(st["vol"]["value"] == "12.450 kg" and st["vol"]["label"] == "Tonaj" and st["dur"]["value"] == "1 sa 12 dk", "2: tonaj/süre metni %s %s" % (st["vol"], st["dur"]))

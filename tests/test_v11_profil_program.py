@@ -153,7 +153,8 @@ try:
     check(pg.locator("button", has_text="Programım").count() >= 1, "harita üstünde Programım düğmesi var")
     pg.locator("#gymRoot button[onclick=\"setLibRange('program')\"]").click(); pg.wait_for_timeout(150)
     exp = pg.evaluate("""(() => { const c = {}; MUSCLES.forEach(m => c[m] = 0);
-      state.workoutDays.forEach(d => d.exercises.forEach(ex => { if (ex.kind === 'cardio') return; const g = muscleOf(ex); if (g) c[g] += ex.sets.length; })); return c; })()""")
+      state.workoutDays.forEach(d => d.exercises.forEach(ex => { if (ex.kind === 'cardio') return; const g = muscleOf(ex); if (!g || !ex.sets.length) return; c[g] += ex.sets.length;
+        secondaryMuscles(ex.name, g).forEach(m => { c[m] += ex.sets.length * 0.5; }); })); return c; })()""")   # v72: yardımcı kaslar yarım
     got = pg.evaluate("programMuscleSets()")
     check(got == exp and sum(got.values()) > 0, "Programım sayımı tüm günlerdeki planlı setlere eşit")
     txt = pg.inner_text("#gymRoot")

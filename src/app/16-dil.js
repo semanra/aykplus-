@@ -32,7 +32,7 @@ function tn(n, key, vars) {
     const one = Number(n) === 1, pick = one ? e.one : e.other, alt = one ? e.other : e.one;
     if (typeof pick === "string") s = pick; else if (typeof alt === "string") s = alt;
   }
-  return trFill(s, { ...(vars || {}), n });
+  return trFill(s, { ...(vars || {}), n: typeof n === "number" && !Number.isInteger(n) ? fmtNum(n) : n });   // v72: 4,5 set
 }
 // v46: dile göre gösterim yardımcıları (veri anahtarları exKey/normSearch/mobNorm hep Türkçe kalır)
 function fmtDay(d, opts) { return new Date(d).toLocaleDateString(locale(), opts); }

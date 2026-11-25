@@ -233,6 +233,39 @@ function dismissSuggestion(exIdx) {
 // ---------------------------------------------------------------------------
 // HAFTALIK KAS GRUBU SET SAYISI
 // ---------------------------------------------------------------------------
+// v72: yardımcı (dolaylı) kaslar. Her set hareketin ana kasına 1, yardımcı kaslarına 0,5 sayılır (kullanıcı kararı,
+// 25 Kasım 2026: "yarım set sayılabilir"; haftalık 10–20 set yorumuna da dahil). Kayıt değişmez; adla türetilir.
+// İlk eşleşen kural kazanır (boş liste = yardımcı kas yok, sonraki kurallara bakılmaz). Ana kas listeden çıkarılır.
+const MUSCLE_SECONDARY = [
+  [/copenhagen/, ["Karın"]],
+  [/face pull|rear delt|reverse pec|reverse fly/, ["Sırt"]],
+  [/neck|boyun|leg curl|hamstring curl|nordic|glute-ham|wrist|bilek|sissy|leg extension|hip thrust|glute|bridge|abduct|adduct|calf|kalf|crunch|plank|pullover|straight-?arm|farmer/, []],
+  [/pec deck|fly|crossover|svend/, ["Omuz"]],
+  [/\bdip/, ["Triceps", "Göğüs", "Omuz"]],
+  [/close-?grip (barbell )?bench|jm press/, ["Göğüs", "Omuz"]],
+  [/bench|chest press|push-?up|şinav|floor press|incline.*press|decline.*press|dumbbell press/, ["Triceps", "Omuz"]],
+  [/overhead press|military|shoulder press|arnold|landmine (shoulder )?press|push press/, ["Triceps"]],
+  [/upright row/, ["Biceps"]],
+  [/deadlift|rack pull|\brdl\b|romanian|stiff/, ["Sırt", "Arka Bacak & Kalça", "Ön Kol"]],
+  [/good morning|hyperextension|back extension/, ["Arka Bacak & Kalça", "Sırt"]],
+  [/pull-?up|chin-?up|pulldown|\brow\b|barfiks/, ["Biceps", "Ön Kol"]],
+  [/hammer|reverse [^()]*curl|zottman/, ["Ön Kol", "Biceps"]],
+  [/curl/, ["Ön Kol"]],
+  [/squat|leg press|lunge|step-?up|hack/, ["Arka Bacak & Kalça"]],
+  [/kettlebell swing/, ["Ön Kol"]]
+];
+const _secCache = {};
+function secondaryMuscles(name, primary) {
+  const k = exKey(name);
+  if (!_secCache[k]) { const r = MUSCLE_SECONDARY.find(([re]) => re.test(k)); _secCache[k] = r ? r[1] : []; }
+  return _secCache[k].filter(m => m !== primary);
+}
+// counts'a bir hareketin n setini ekler: ana kas n, yardımcı kaslar n × 0,5
+function addMuscleSets(counts, primary, name, n) {
+  if (!primary || !(n > 0)) return;
+  counts[primary] = (counts[primary] || 0) + n;
+  secondaryMuscles(name, primary).forEach(m => { counts[m] = (counts[m] || 0) + n * 0.5; });
+}
 function weeklyMuscleSets(fromTs) {
   const counts = {};
   MUSCLES.forEach(m => { counts[m] = 0; });
@@ -240,7 +273,7 @@ function weeklyMuscleSets(fromTs) {
     state.exerciseHistory[k].forEach(sess => {
       if (sess.ts < fromTs || sess.kind === "cardio") return;
       const g = sess.muscle && MUSCLES.includes(sess.muscle) ? sess.muscle : autoMuscle(sess.name || k);
-      if (g) counts[g] += (sess.sets || []).length;
+      addMuscleSets(counts, g, sess.name || k, (sess.sets || []).length);
     });
   });
   return counts;

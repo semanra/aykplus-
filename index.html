@@ -1753,7 +1753,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v71</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v72</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -6923,7 +6923,8 @@ function mobTimerRender() {
 // --- v40: ANTRENMANDA ISINMA KARTI (isteğe bağlı: settings.warmupCard). Günün kaslarına uygun bölgelerdeki dinamik
 // hareketler, yalnızca kullanıcının kendi rutinlerinden (hazır şablon yok), en fazla 4, ada göre tekil.
 const MOB_WARM_REGIONS = { "Göğüs": ["chest", "shoulder"], "Sırt": ["spine", "shoulder"], "Omuz": ["shoulder"], "Biceps": ["shoulder"], "Triceps": ["shoulder"],
-  "Ön Bacak": ["hip", "ankle"], "Arka Bacak & Kalça": ["hip", "hamstring"], "Kalf": ["ankle"], "Karın": ["spine"] };
+  "Ön Bacak": ["hip", "ankle"], "Arka Bacak & Kalça": ["hip", "hamstring"], "Kalf": ["ankle"], "Karın": ["spine"],
+  "Boyun": ["spine", "shoulder"], "İç Bacak": ["hip"], "Kaval": ["ankle"] };   // v72: v68'in küçük kasları (Ön Kol: bölge yok, bilek hareketleri "Diğer")
 function mobWarmupItems(day) {
   const regs = new Set();
   ((day && day.exercises) || []).forEach(ex => (MOB_WARM_REGIONS[muscleOf(ex)] || []).forEach(r => regs.add(r)));
@@ -7487,10 +7488,10 @@ function progGucHtml() {
   // v68: küçük kaslar (MINOR_MUSCLES) yalnız set > 0 ise, 10–20 bandı ve yorumu olmadan
   const mus = MUSCLES.filter(m => !MINOR_MUSCLES.includes(m) || (counts[m] || 0) > 0).map(m => [m, counts[m] || 0]).sort((a, b) => b[1] - a[1]).map(([m, c]) => {
     const mn = MINOR_MUSCLES.includes(m), st = c === 0 ? "yok" : c < 10 ? "az" : c <= 20 ? "uygun" : "fazla";
-    return `<div class="p-bl"><span class="p-bl-n">${esc(muscleL(m))}</span><span class="p-bl-t">${mn ? "" : `<i class="p-bl-band" style="left:${(10 / scale * 100).toFixed(1)}%;width:${(10 / scale * 100).toFixed(1)}%"></i>`}<i class="p-bl-v" style="width:${Math.min(100, c / scale * 100).toFixed(1)}%"></i></span><span class="p-bl-c"><b>${c}</b>${mn ? "" : ` <small class="${st === "uygun" ? "ok" : ""}">${t(st)}</small>`}</span></div>`;
+    return `<div class="p-bl"><span class="p-bl-n">${esc(muscleL(m))}</span><span class="p-bl-t">${mn ? "" : `<i class="p-bl-band" style="left:${(10 / scale * 100).toFixed(1)}%;width:${(10 / scale * 100).toFixed(1)}%"></i>`}<i class="p-bl-v" style="width:${Math.min(100, c / scale * 100).toFixed(1)}%"></i></span><span class="p-bl-c"><b>${fmtNum(c)}</b>${mn ? "" : ` <small class="${st === "uygun" ? "ok" : ""}">${t(st)}</small>`}</span></div>`;
   }).join("");
-  const musCard = `<div class="p-card" id="pMuscles">${pSec(t("Bu hafta kas başına set"), PC.tq, `<span class="p-dim p-sm">${t("toplam {n}", { n: String(total) })}</span>`)}
-    ${total ? `<div class="p-bls">${mus}</div>${pLegend([[`<i class="p-lg-band"></i>`, t("10–20 set: kas gelişimi için genel öneri")]])}<p class="p-fine">${t("Her set hareketin ana kas grubuna sayılır; kas grubunu hareketi düzenlerken değiştirebilirsin.")}</p>`
+  const musCard = `<div class="p-card" id="pMuscles">${pSec(t("Bu hafta kas başına set"), PC.tq, `<span class="p-dim p-sm">${t("toplam {n}", { n: fmtNum(total) })}</span>`)}
+    ${total ? `<div class="p-bls">${mus}</div>${pLegend([[`<i class="p-lg-band"></i>`, t("10–20 set: kas gelişimi için genel öneri")]])}<p class="p-fine">${t("Her set hareketin ana kas grubuna 1, yardımcı kaslarına yarım sayılır; ana kas grubunu hareketi düzenlerken değiştirebilirsin.")}</p>`
       : `<p class="p-fine">${t("Bu hafta kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettikçe her kas grubunun set sayısı burada birikir.")}</p>`}</div>`;
   // Haftalık tonaj (8 hafta) + bu haftanın kardiyo / rekor sayısı
   const ws = weekStart(), w = progWeekly();
@@ -8444,6 +8445,39 @@ function dismissSuggestion(exIdx) {
 // ---------------------------------------------------------------------------
 // HAFTALIK KAS GRUBU SET SAYISI
 // ---------------------------------------------------------------------------
+// v72: yardımcı (dolaylı) kaslar. Her set hareketin ana kasına 1, yardımcı kaslarına 0,5 sayılır (kullanıcı kararı,
+// 25 Kasım 2026: "yarım set sayılabilir"; haftalık 10–20 set yorumuna da dahil). Kayıt değişmez; adla türetilir.
+// İlk eşleşen kural kazanır (boş liste = yardımcı kas yok, sonraki kurallara bakılmaz). Ana kas listeden çıkarılır.
+const MUSCLE_SECONDARY = [
+  [/copenhagen/, ["Karın"]],
+  [/face pull|rear delt|reverse pec|reverse fly/, ["Sırt"]],
+  [/neck|boyun|leg curl|hamstring curl|nordic|glute-ham|wrist|bilek|sissy|leg extension|hip thrust|glute|bridge|abduct|adduct|calf|kalf|crunch|plank|pullover|straight-?arm|farmer/, []],
+  [/pec deck|fly|crossover|svend/, ["Omuz"]],
+  [/\bdip/, ["Triceps", "Göğüs", "Omuz"]],
+  [/close-?grip (barbell )?bench|jm press/, ["Göğüs", "Omuz"]],
+  [/bench|chest press|push-?up|şinav|floor press|incline.*press|decline.*press|dumbbell press/, ["Triceps", "Omuz"]],
+  [/overhead press|military|shoulder press|arnold|landmine (shoulder )?press|push press/, ["Triceps"]],
+  [/upright row/, ["Biceps"]],
+  [/deadlift|rack pull|\brdl\b|romanian|stiff/, ["Sırt", "Arka Bacak & Kalça", "Ön Kol"]],
+  [/good morning|hyperextension|back extension/, ["Arka Bacak & Kalça", "Sırt"]],
+  [/pull-?up|chin-?up|pulldown|\brow\b|barfiks/, ["Biceps", "Ön Kol"]],
+  [/hammer|reverse [^()]*curl|zottman/, ["Ön Kol", "Biceps"]],
+  [/curl/, ["Ön Kol"]],
+  [/squat|leg press|lunge|step-?up|hack/, ["Arka Bacak & Kalça"]],
+  [/kettlebell swing/, ["Ön Kol"]]
+];
+const _secCache = {};
+function secondaryMuscles(name, primary) {
+  const k = exKey(name);
+  if (!_secCache[k]) { const r = MUSCLE_SECONDARY.find(([re]) => re.test(k)); _secCache[k] = r ? r[1] : []; }
+  return _secCache[k].filter(m => m !== primary);
+}
+// counts'a bir hareketin n setini ekler: ana kas n, yardımcı kaslar n × 0,5
+function addMuscleSets(counts, primary, name, n) {
+  if (!primary || !(n > 0)) return;
+  counts[primary] = (counts[primary] || 0) + n;
+  secondaryMuscles(name, primary).forEach(m => { counts[m] = (counts[m] || 0) + n * 0.5; });
+}
 function weeklyMuscleSets(fromTs) {
   const counts = {};
   MUSCLES.forEach(m => { counts[m] = 0; });
@@ -8451,7 +8485,7 @@ function weeklyMuscleSets(fromTs) {
     state.exerciseHistory[k].forEach(sess => {
       if (sess.ts < fromTs || sess.kind === "cardio") return;
       const g = sess.muscle && MUSCLES.includes(sess.muscle) ? sess.muscle : autoMuscle(sess.name || k);
-      if (g) counts[g] += (sess.sets || []).length;
+      addMuscleSets(counts, g, sess.name || k, (sess.sets || []).length);
     });
   });
   return counts;
@@ -9561,7 +9595,8 @@ function libMapOpts() {
 let bodyMapGen = 0;
 async function drawBodyMap(counts) {
   const gen = ++bodyMapGen;
-  const map = await paintMuscleMap3d(counts, libMapOpts());
+  let map = null;
+  try { map = await paintMuscleMap3d(counts, libMapOpts()); } catch (e) { map = null; }   // v72: çizim hatası ekranı bozmasın
   const cv = document.getElementById("bodyMapCv");
   if (gen !== bodyMapGen || !cv) return;   // bu arada yeniden çizildi / ekran değişti
   const box = cv.closest(".t-bodymap");
@@ -9572,7 +9607,7 @@ async function drawBodyMap(counts) {
   }
   if (box) box.style.aspectRatio = map.width + " / " + map.height;
   cv.width = map.width; cv.height = map.height;
-  cv.getContext("2d").drawImage(map, 0, 0);
+  try { cv.getContext("2d").drawImage(map, 0, 0); } catch (e) { /* tuval belleği: harita boş kalır, listeler çalışır */ }
 }
 function bodyMapTap(ev) {
   const cv = ev.currentTarget, M = muscleMapData;
@@ -9589,10 +9624,7 @@ function todayMuscleSets() {
   const t0 = new Date(); t0.setHours(0, 0, 0, 0);
   const fromHist = weeklyMuscleSets(t0.getTime());
   MUSCLES.forEach(m => { counts[m] += fromHist[m] || 0; });
-  activeDay().exercises.forEach(ex => {
-    const g = muscleOf(ex);
-    if (g) counts[g] += ex.sets.filter(s => s.done).length;
-  });
+  activeDay().exercises.forEach(ex => addMuscleSets(counts, muscleOf(ex), ex.name, ex.sets.filter(s => s.done).length));   // v72: yardımcı kaslar yarım
   return counts;
 }
 // Programın haftalık etkisi: tüm antrenman günlerindeki planlanan setler (her gün haftada bir kez yapılır varsayımıyla).
@@ -9601,8 +9633,7 @@ function programMuscleSets() {
   MUSCLES.forEach(m => { counts[m] = 0; });
   state.workoutDays.forEach(d => d.exercises.forEach(ex => {
     if (ex.kind === "cardio") return;
-    const g = muscleOf(ex);
-    if (g && counts[g] != null) counts[g] += ex.sets.length;
+    addMuscleSets(counts, muscleOf(ex), ex.name, ex.sets.length);   // v72: yardımcı kaslar yarım
   }));
   return counts;
 }
@@ -9675,9 +9706,12 @@ function gymLibraryHtml() {
     return `<button onclick="selectMuscle(${esc(JSON.stringify(m))})" class="w-full min-h-[44px] flex items-center gap-2.5 text-left">
       <span class="w-[132px] shrink-0 text-[13px] ${m === sel ? "text-[var(--t-text)] font-bold" : "text-[var(--t-text2)]"} ${curLang() === "en" ? "line-clamp-2 leading-tight" : "truncate"}">${esc(muscleL(m))}</span>
       <span class="relative flex-1 h-2.5 rounded-full bg-[var(--t-elev)] overflow-hidden"><span class="absolute inset-y-0 left-0 rounded-full" style="width:${Math.min(100, c / (range === "today" ? 8 : 24) * 100)}%;background:${col}"></span></span>
-      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${c}</b>${tg ? ` <span class="t-dim text-[12px]">${tg}</span>` : ""}</span>
+      <span class="w-[68px] shrink-0 text-right text-[13px]"><b class="text-[var(--t-text)]">${fmtNum(c)}</b>${tg ? ` <span class="t-dim text-[12px]">${tg}</span>` : ""}</span>
     </button>`;
   }).join("");
+  // v72: VoiceOver haritayı resim olarak okur: hangi kasların çalıştığını söyler (seçim aşağıdaki gizli kas düğmeleriyle)
+  const worked = MUSCLES.filter(m => (counts[m] || 0) > 0).sort((a, b) => counts[b] - counts[a]).map(muscleL);
+  const mapAria = worked.length ? t("Kas haritası. Çalışan kaslar: {m}", { m: worked.join(", ") }) : t("Kas haritası. Henüz çalışılan kas yok");
   // v68: lejant haritanın renklerinden (boşta, az, orta, çok)
   const MT = MAP_THEMES[themeIsLight() ? "light" : "dark"], mix = v => "rgb(" + MT.lo.map((x, i) => Math.round(x + (MT.hi[i] - x) * v)).join(",") + ")";
   const legTxt = range === "today" ? ["0", "1–3", "4–7", t("8+ set")] : ["0", "1–9", "10–20", t("20+ set")];
@@ -9690,7 +9724,7 @@ function gymLibraryHtml() {
     <div class="grid grid-cols-3 gap-0.5 bg-[var(--t-surface)] border border-[var(--t-line)] rounded-[14px] p-0.5">${rangeBtn("week", t("Bu hafta"))}${rangeBtn("today", t("Bugün"))}${rangeBtn("program", t("Programım"))}</div>
     <div class="flex justify-center">
       <div class="relative t-bodymap" style="width: min(100%, 340px); aspect-ratio: ${(1 / muscleMapRatio).toFixed(4)};">
-        <canvas id="bodyMapCv" onclick="bodyMapTap(event)" class="absolute inset-0 w-full h-full select-none" style="cursor:pointer" role="img" aria-label="${t("Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç")}"></canvas>
+        <canvas id="bodyMapCv" onclick="bodyMapTap(event)" class="absolute inset-0 w-full h-full select-none" style="cursor:pointer" role="img" aria-label="${esc(mapAria)}"></canvas>
         <span class="absolute left-2 top-1.5 text-[12px] font-bold tracking-widest t-muted">${t("ÖN")}</span>
         <span class="absolute right-2 top-1.5 text-[12px] font-bold tracking-widest t-muted">${t("ARKA")}</span>
       </div>
@@ -9700,14 +9734,14 @@ function gymLibraryHtml() {
     ${range === "program" ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5">
       <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("PROGRAMIN HAFTALIK ETKİSİ")}</span><span class="text-xs t-dim">${tn(state.workoutDays.length, "{n} gün")} · ${tn(pTotal, "{n} set")}</span></div>
       ${pRows}
-      <p class="text-[12px] t-dim pt-1.5">${t("Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.")}</p>
+      <p class="text-[12px] t-dim pt-1.5">${t("Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına 1, yardımcı kaslarına yarım sayılır.")}</p>
     </div>` : range === "today" && pRows ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5" data-today-muscles>
       <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("BUGÜN · KAS BAŞINA SET")}</span></div>
       ${pRows}
     </div>` : range === "week" && pTotal ? `<div class="t-card rounded-[18px] px-4 py-3 space-y-0.5" data-week-muscles>
       <div class="flex items-baseline justify-between pb-1"><span class="t-label">${t("BU HAFTA · KAS BAŞINA SET")}</span><span class="text-xs t-dim">${tn(pTotal, "{n} set")}</span></div>
       ${pRows}
-      <p class="text-[12px] t-dim pt-1.5">${t("Pazartesiden bu yana kaydedilen setler. Kas gelişimi için genel öneri haftada 10–20 set.")}</p>
+      <p class="text-[12px] t-dim pt-1.5">${t("Pazartesiden bu yana kaydedilen setler; yardımcı kaslara yarım set sayılır. Kas gelişimi için genel öneri haftada 10–20 set.")}</p>
     </div>` : ""}
     ${sel ? `<div class="t-card rounded-[18px] min-h-[64px] px-4 flex items-center justify-between gap-2">
       <span class="flex flex-col gap-0.5"><span class="text-base font-bold">${esc(muscleL(sel))}</span><span class="text-[13px] t-muted">${selLine}</span></span>
@@ -11461,7 +11495,7 @@ function tn(n, key, vars) {
     const one = Number(n) === 1, pick = one ? e.one : e.other, alt = one ? e.other : e.one;
     if (typeof pick === "string") s = pick; else if (typeof alt === "string") s = alt;
   }
-  return trFill(s, { ...(vars || {}), n });
+  return trFill(s, { ...(vars || {}), n: typeof n === "number" && !Number.isInteger(n) ? fmtNum(n) : n });   // v72: 4,5 set
 }
 // v46: dile göre gösterim yardımcıları (veri anahtarları exKey/normSearch/mobNorm hep Türkçe kalır)
 function fmtDay(d, opts) { return new Date(d).toLocaleDateString(locale(), opts); }
@@ -12266,13 +12300,14 @@ Object.assign(EN, {
   "Bu haftaki set sayısına göre": "Based on this week's sets",
   "yok|yük": "none", "ideal|yük": "ideal", "yüksek|yük": "high",
   "KAS YÜKÜ": "MUSCLE LOAD", "Bu hafta": "This week",
-  "Kas grupları set sayısına göre renklendi; renklenmiş bir kasa dokunarak seç": "Muscle groups are coloured by number of sets; tap a coloured muscle to select it",
+  "Kas haritası. Çalışan kaslar: {m}": "Muscle map. Worked muscles: {m}",
+  "Kas haritası. Henüz çalışılan kas yok": "Muscle map. No muscles worked yet",
   "ÖN": "FRONT", "ARKA": "BACK", "20+ set": "20+ sets", "8+ set": "8+ sets", "Çalışan kaslar: {m}": "Muscles worked: {m}", "BUGÜN · KAS BAŞINA SET": "TODAY · SETS PER MUSCLE",
   "PROGRAMIN HAFTALIK ETKİSİ": "YOUR PROGRAM'S WEEKLY IMPACT",
   "{n} gün": { one: "{n} day", other: "{n} days" }, "{n} set": { one: "{n} set", other: "{n} sets" },
-  "Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına sayılır.": "Assuming each day is done once a week. A common guideline for muscle growth is 10–20 sets per week. Each set counts towards the exercise's main muscle.",
+  "Her gün haftada bir kez yapılırsa. Kas gelişimi için genel öneri haftada 10–20 set. Her set hareketin ana kasına 1, yardımcı kaslarına yarım sayılır.": "Assuming each day is done once a week. A common guideline for muscle growth is 10–20 sets per week. Each set counts as 1 for the main muscle and ½ for helper muscles.",
   "BU HAFTA · KAS BAŞINA SET": "WEEKLY SETS PER MUSCLE",
-  "Pazartesiden bu yana kaydedilen setler. Kas gelişimi için genel öneri haftada 10–20 set.": "Sets logged since Monday. A common guideline for muscle growth is 10–20 sets per week.",
+  "Pazartesiden bu yana kaydedilen setler; yardımcı kaslara yarım set sayılır. Kas gelişimi için genel öneri haftada 10–20 set.": "Sets logged since Monday; helper muscles count as half a set. A common guideline for muscle growth is 10–20 sets per week.",
   "Bugün <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "Today <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", other: "Today <b class=\"text-[var(--t-text)]\">{n} sets</b> · {tag}" },
   "Programında haftada <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "<b class=\"text-[var(--t-text)]\">{n} set</b> a week in your program · {tag}", other: "<b class=\"text-[var(--t-text)]\">{n} sets</b> a week in your program · {tag}" },
   "Bu hafta <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}": { one: "This week <b class=\"text-[var(--t-text)]\">{n} set</b> · {tag}", other: "This week <b class=\"text-[var(--t-text)]\">{n} sets</b> · {tag}" },
@@ -12629,7 +12664,7 @@ Object.assign(EN, {
   "yok": "none", "az": "low", "uygun": "good", "fazla": "high",
   "Bu hafta kas başına set": "Sets per muscle this week", "toplam {n}": "total {n}",
   "10–20 set: kas gelişimi için genel öneri": "10–20 sets: general guideline for muscle growth",
-  "Her set hareketin ana kas grubuna sayılır; kas grubunu hareketi düzenlerken değiştirebilirsin.": "Each set counts towards the exercise's main muscle group; you can change the muscle group when you edit the exercise.",
+  "Her set hareketin ana kas grubuna 1, yardımcı kaslarına yarım sayılır; ana kas grubunu hareketi düzenlerken değiştirebilirsin.": "Each set counts as 1 for the exercise's main muscle group and ½ for helper muscles; you can change the main group when editing the exercise.",
   "Bu hafta kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettikçe her kas grubunun set sayısı burada birikir.": "No workouts saved this week. As you finish and save workouts, the set count for each muscle group builds up here.",
   "Bu h.": "This wk", "Haftalık tonaj": "Weekly volume", "ton": "tonnes", "Son 8 haftanın tonajı (ton)": "Volume for the last 8 weeks (tonnes)",
   "Bu hafta sürüyor (yarı saydam); bitmemiş haftayı tam haftalarla karşılaştırma.": "This week is still in progress (semi-transparent); don't compare it with full weeks.",
@@ -15911,7 +15946,7 @@ function shareData(log) {
   lines.forEach(l => {
     if (l.sess.kind === "cardio") return;
     const g = l.sess.muscle && MUSCLES.includes(l.sess.muscle) ? l.sess.muscle : autoMuscle(l.sess.name || l.key);
-    if (g) muscles[g] = (muscles[g] || 0) + (l.sess.sets || []).length;
+    addMuscleSets(muscles, g, l.sess.name || l.key, (l.sess.sets || []).length);   // v72: yardımcı kaslar yarım
   });
   const prOk = num(log.prs) > 0;
   const prs = [];
@@ -16234,7 +16269,11 @@ function loadMapImg(src) {
   });
 }
 // → {w, h, lab: Uint8Array, shade: Float32Array} veya null (yüklenemedi; sonraki çağrı yeniden dener)
+// v72: yüklenemezse 20 sn boyunca yeniden istenmez (çevrimdışıyken her çizimde ağ isteği olmasın); internet gelince hemen dener.
+let muscleMapFailAt = 0;
+window.addEventListener("online", () => { muscleMapFailAt = 0; });
 function loadMuscleMap() {
+  if (!muscleMapP && muscleMapFailAt && Date.now() - muscleMapFailAt < 20000) return Promise.resolve(null);
   if (!muscleMapP) {
     muscleMapP = Promise.all([loadMapImg("img/kas-3d-etiket.png"), loadMapImg("img/kas-3d-isik.webp")]).then(([L, S]) => {
       if (L.w !== S.w || L.h !== S.h) throw new Error("kas-3d boyut");
@@ -16247,7 +16286,7 @@ function loadMuscleMap() {
       muscleMapRatio = L.h / L.w;
       muscleMapData = { w: L.w, h: L.h, lab, shade };
       return muscleMapData;
-    }).catch(() => { muscleMapP = null; return null; });
+    }).catch(() => { muscleMapP = null; muscleMapFailAt = Date.now(); return null; });
   }
   return muscleMapP;
 }

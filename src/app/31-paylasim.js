@@ -371,7 +371,7 @@ function shareData(log) {
   lines.forEach(l => {
     if (l.sess.kind === "cardio") return;
     const g = l.sess.muscle && MUSCLES.includes(l.sess.muscle) ? l.sess.muscle : autoMuscle(l.sess.name || l.key);
-    if (g) muscles[g] = (muscles[g] || 0) + (l.sess.sets || []).length;
+    addMuscleSets(muscles, g, l.sess.name || l.key, (l.sess.sets || []).length);   // v72: yardımcı kaslar yarım
   });
   const prOk = num(log.prs) > 0;
   const prs = [];

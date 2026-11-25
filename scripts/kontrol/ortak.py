@@ -91,7 +91,7 @@ SCREENS = [
   ("g-dialog", "closeModal('pickerModal'); void uiAsk({title:'Deneme', message:'Antrenman penceresi', input:{value:'12'}, ok:'Kaydet'})"),
   ("g-toast", "uiDialogDone(false); toast('Deneme bildirimi', 'ok', { label: 'Geri al', fn: () => {} })"),
   ("g-paylas", "document.getElementById('toastWrap').innerHTML=''; state.gymActive = false; stopTimer(); setGymView('history'); openShareCard(0)"),
-  ("m-liste", "closeModal('chartModal'); switchTab('mobility')"),   # v39: mobilite ana ekranı
+  ("m-liste", "closeShare(); closeModal('chartModal'); switchTab('mobility')"),   # v39: mobilite ana ekranı (v72: önceki ekranın Paylaş penceresi kapanır)
   ("m-rutin", "mobOpenRoutine(mobRoutines()[0].id)"),
   ("m-duzenle", "mobEdit(true)"),
   ("m-detay", "mobEdit(false); mobOpen(state.mobilityRoutine.routines[0].items[0].id)"),
