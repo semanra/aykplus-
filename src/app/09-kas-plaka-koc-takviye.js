@@ -28,7 +28,13 @@ const LIB_MUSCLE_MAP = (() => {
 // v68: kategorisinden farklı kasa sayılan kütüphane hareketleri (yeni küçük kas grupları)
 const LIB_MUSCLE_OVERRIDE = {
   "Wrist Curl (Bilek)": "Ön Kol", "Reverse Wrist Curl (Bilek)": "Ön Kol", "Reverse Barbell / Cable Curl (Ön Kol)": "Ön Kol",
-  "Hip Adduction Machine (İç Bacak)": "İç Bacak", "Tibialis Raise": "Kaval"
+  "Hip Adduction Machine (İç Bacak)": "İç Bacak", "Tibialis Raise": "Kaval",
+  // v70: yeni küçük kas hareketleri (boyun hareketleri Omuz & Trapez kategorisinde durur)
+  "Plate Neck Flexion (Boyun Öne)": "Boyun", "Plate Neck Extension (Boyun Arkaya)": "Boyun", "Lateral Neck Flexion (Boyun Yana)": "Boyun",
+  "Wrist Roller (Bilek Sarma)": "Ön Kol", "Plate Pinch Hold (Plaka Sıkıştırma)": "Ön Kol", "Dead Hang (Kavrama / Asılma)": "Ön Kol",
+  "Copenhagen Plank (İç Bacak)": "İç Bacak", "Cable Hip Adduction (İç Bacak)": "İç Bacak", "Banded Dorsiflexion (Kaval)": "Kaval",
+  // v70: Farmer's Walk kardiyodan ağırlık bölümüne (Kol – Biceps & Ön Kol) taşındı; kavrama → Ön Kol (geçmiş setler de sayılır)
+  "Farmer's Walk (Çiftçi Yürüyüşü)": "Ön Kol"
 };
 Object.keys(LIB_MUSCLE_OVERRIDE).forEach(n => { LIB_MUSCLE_MAP[exKey(n)] = LIB_MUSCLE_OVERRIDE[n]; });
 

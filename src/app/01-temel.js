@@ -88,7 +88,7 @@ function weekStart(d = new Date()) {
 function detectKind(name) {
   const n = String(name || "").toLocaleLowerCase("tr");
   if (/farmer|çiftçi|kettlebell/.test(n)) return "weight";
-  if (/plank|vacuum|dead hang|wall sit|l-sit|hollow hold|asılma/.test(n)) return "time";
+  if (/plank|vacuum|dead hang|wall sit|l-sit|hollow hold|asılma|pinch hold/.test(n)) return "time";
   if (/treadmill|koşu|\brun\b|running|jogging|yürüyüş|stairmaster|merdiven|bike|bisiklet|cycling|rowing machine|kürek|elliptical|eliptik|jump rope|ip atlama|swim|yüzme|kardiyo|cardio|hiit|spinning/.test(n)) return "cardio";
   return "weight";
 }

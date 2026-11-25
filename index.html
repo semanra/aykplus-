@@ -1749,7 +1749,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v69</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v70</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -1975,7 +1975,10 @@ const EXERCISE_LIBRARY = {
     "Barbell Upright Row / Cable Upright Row",
     "Dumbbell Shrug (Trapez)",
     "Barbell / Smith Machine Shrug",
-    "Cable Shrug"
+    "Cable Shrug",
+    "Plate Neck Flexion (Boyun Öne)",
+    "Plate Neck Extension (Boyun Arkaya)",
+    "Lateral Neck Flexion (Boyun Yana)"
   ],
   "5. Bacak - Ön Bacak (Quadriceps)": [
     "Hack Squat",
@@ -2011,9 +2014,12 @@ const EXERCISE_LIBRARY = {
     "Smith Machine Hip Thrust",
     "Kas Glute Bridge",
     "Cable Pull-Through",
+    "Kettlebell Swing",
     "Cable Glute Kickback",
     "Hip Abduction Machine (Dış Bacak / Yan Kalça)",
-    "Hip Adduction Machine (İç Bacak)"
+    "Hip Adduction Machine (İç Bacak)",
+    "Copenhagen Plank (İç Bacak)",
+    "Cable Hip Adduction (İç Bacak)"
   ],
   "7. Bacak - Kalf (Calves & Tibialis)": [
     "Standing Calf Raise (Makine veya Smith)",
@@ -2021,7 +2027,8 @@ const EXERCISE_LIBRARY = {
     "Leg Press Calf Raise",
     "Donkey Calf Raise",
     "Single-Leg Dumbbell Calf Raise",
-    "Tibialis Raise"
+    "Tibialis Raise",
+    "Banded Dorsiflexion (Kaval)"
   ],
   "8. Kol - Biceps & Ön Kol (Biceps & Forearms)": [
     "Preacher Curl (EZ-Bar / Makine)",
@@ -2040,7 +2047,11 @@ const EXERCISE_LIBRARY = {
     "Reverse Barbell / Cable Curl (Ön Kol)",
     "Zottman Curl",
     "Wrist Curl (Bilek)",
-    "Reverse Wrist Curl (Bilek)"
+    "Reverse Wrist Curl (Bilek)",
+    "Wrist Roller (Bilek Sarma)",
+    "Plate Pinch Hold (Plaka Sıkıştırma)",
+    "Dead Hang (Kavrama / Asılma)",
+    "Farmer's Walk (Çiftçi Yürüyüşü)"
   ],
   "9. Kol - Triceps (Arka Kol)": [
     "Overhead Cable Triceps Extension (Rope / Bar)",
@@ -2086,9 +2097,7 @@ const EXERCISE_LIBRARY = {
     "Outdoor Run (Açık Hava Koşu)",
     "Outdoor Walk (Tempolu Yürüyüş)",
     "Outdoor Cycling (Bisiklet)",
-    "Swimming (Yüzme)",
-    "Farmer's Walk (Çiftçi Yürüyüşü)",
-    "Kettlebell Swing"
+    "Swimming (Yüzme)"
   ]
 };
 
@@ -2901,7 +2910,7 @@ function weekStart(d = new Date()) {
 function detectKind(name) {
   const n = String(name || "").toLocaleLowerCase("tr");
   if (/farmer|çiftçi|kettlebell/.test(n)) return "weight";
-  if (/plank|vacuum|dead hang|wall sit|l-sit|hollow hold|asılma/.test(n)) return "time";
+  if (/plank|vacuum|dead hang|wall sit|l-sit|hollow hold|asılma|pinch hold/.test(n)) return "time";
   if (/treadmill|koşu|\brun\b|running|jogging|yürüyüş|stairmaster|merdiven|bike|bisiklet|cycling|rowing machine|kürek|elliptical|eliptik|jump rope|ip atlama|swim|yüzme|kardiyo|cardio|hiit|spinning/.test(n)) return "cardio";
   return "weight";
 }
@@ -8120,7 +8129,13 @@ const LIB_MUSCLE_MAP = (() => {
 // v68: kategorisinden farklı kasa sayılan kütüphane hareketleri (yeni küçük kas grupları)
 const LIB_MUSCLE_OVERRIDE = {
   "Wrist Curl (Bilek)": "Ön Kol", "Reverse Wrist Curl (Bilek)": "Ön Kol", "Reverse Barbell / Cable Curl (Ön Kol)": "Ön Kol",
-  "Hip Adduction Machine (İç Bacak)": "İç Bacak", "Tibialis Raise": "Kaval"
+  "Hip Adduction Machine (İç Bacak)": "İç Bacak", "Tibialis Raise": "Kaval",
+  // v70: yeni küçük kas hareketleri (boyun hareketleri Omuz & Trapez kategorisinde durur)
+  "Plate Neck Flexion (Boyun Öne)": "Boyun", "Plate Neck Extension (Boyun Arkaya)": "Boyun", "Lateral Neck Flexion (Boyun Yana)": "Boyun",
+  "Wrist Roller (Bilek Sarma)": "Ön Kol", "Plate Pinch Hold (Plaka Sıkıştırma)": "Ön Kol", "Dead Hang (Kavrama / Asılma)": "Ön Kol",
+  "Copenhagen Plank (İç Bacak)": "İç Bacak", "Cable Hip Adduction (İç Bacak)": "İç Bacak", "Banded Dorsiflexion (Kaval)": "Kaval",
+  // v70: Farmer's Walk kardiyodan ağırlık bölümüne (Kol – Biceps & Ön Kol) taşındı; kavrama → Ön Kol (geçmiş setler de sayılır)
+  "Farmer's Walk (Çiftçi Yürüyüşü)": "Ön Kol"
 };
 Object.keys(LIB_MUSCLE_OVERRIDE).forEach(n => { LIB_MUSCLE_MAP[exKey(n)] = LIB_MUSCLE_OVERRIDE[n]; });
 
@@ -12873,7 +12888,17 @@ const EX_EN = {
   "Outdoor Walk (Tempolu Yürüyüş)": "Outdoor Walk (Brisk)",
   "Outdoor Cycling (Bisiklet)": "Outdoor Cycling",
   "Swimming (Yüzme)": "Swimming",
-  "Farmer's Walk (Çiftçi Yürüyüşü)": "Farmer's Walk"
+  "Farmer's Walk (Çiftçi Yürüyüşü)": "Farmer's Walk",
+  // v70
+  "Plate Neck Flexion (Boyun Öne)": "Plate Neck Flexion",
+  "Plate Neck Extension (Boyun Arkaya)": "Plate Neck Extension",
+  "Lateral Neck Flexion (Boyun Yana)": "Lateral Neck Flexion",
+  "Wrist Roller (Bilek Sarma)": "Wrist Roller",
+  "Plate Pinch Hold (Plaka Sıkıştırma)": "Plate Pinch Hold",
+  "Dead Hang (Kavrama / Asılma)": "Dead Hang (Grip)",
+  "Copenhagen Plank (İç Bacak)": "Copenhagen Plank (Adductors)",
+  "Cable Hip Adduction (İç Bacak)": "Cable Hip Adduction (Inner Thigh)",
+  "Banded Dorsiflexion (Kaval)": "Banded Dorsiflexion (Tibialis)"
 };
 function exNameL(name) {
   if (curLang() !== "en") return name;
@@ -15362,7 +15387,17 @@ const EX_IMG = {
   "Thoracic Two-Ball Release (Sırt İki Top)": 289,
   "Infraspinatus Ball Release (Kürek Kemiği)": 290,
   "Tibialis Foam Roll (Kaval Önü)": 291,
-  "Forearm Ball Release (Ön Kol)": 292
+  "Forearm Ball Release (Ön Kol)": 292,
+  // v70: küçük kas hareketleri (Boyun, Ön Kol, İç Bacak, Kaval)
+  "Plate Neck Flexion (Boyun Öne)": 293,
+  "Plate Neck Extension (Boyun Arkaya)": 294,
+  "Lateral Neck Flexion (Boyun Yana)": 295,
+  "Wrist Roller (Bilek Sarma)": 296,
+  "Plate Pinch Hold (Plaka Sıkıştırma)": 297,
+  "Dead Hang (Kavrama / Asılma)": 298,
+  "Copenhagen Plank (İç Bacak)": 299,
+  "Cable Hip Adduction (İç Bacak)": 300,
+  "Banded Dorsiflexion (Kaval)": 301
 };
 let _exImgIdx = null;
 function exImgKey(name) { return exKey(name).replace(/[’']/g, ""); }

@@ -3,6 +3,8 @@
 Uygulamadaki görseller: `img/hareket/<no>.webp` (1024×576, şeffaf zemin, iki panel: başlangıç → bitiş).
 Eşleme (hareket adı → görsel numarası): `harita.json` → `src/app/30-gorsel.js` içindeki `EX_IMG`.
 16 hareket başka bir hareketin görselini kullanır (aynı hareket, farklı ad); bu yüzden 292 ad, 276 görsel.
+v70: küçük kas grupları için 9 yeni görsel (293–301): kaynak adaylar `tasarimlar/hareket-yeni/aday/`, seçilenler
+`python scripts/gorsel/yeni_v70.py 293=293-gem-3.jpg ...` ile masaüstü kaynağa kopyalanır ve aynı işlemle webp'ye çevrilir (301 ad, 285 görsel).
 
 ## Kaynak
 Ham görseller (Gemini / ChatGPT, beyaz zemin, büyük boy) depoda DEĞİL: kullanıcının masaüstü

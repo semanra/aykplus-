@@ -47,7 +47,7 @@ try:
     nums = set(info["nums"])
     check(nums <= files, "eşlemedeki her görsel dosyası diskte var: " + str(sorted(nums - files)[:5]))
     check(files <= nums, "kullanılmayan (artık) görsel dosyası yok: " + str(sorted(files - nums)[:5]))
-    check(len(files) == 276 and info["names"] == 292, f"276 görsel, 292 ad ({len(files)}, {info['names']})")
+    check(len(files) == 285 and info["names"] == 301, f"285 görsel, 301 ad (v70: +9 küçük kas hareketi) ({len(files)}, {info['names']})")
     big = [f for f in os.listdir(IMG_DIR) if os.path.getsize(os.path.join(IMG_DIR, f)) > 200_000]
     check(not big, "her görsel 200 KB'tan küçük: " + str(big[:3]))
     check(all(n for _, n in info["ownKeys"]), "sahibin programındaki bütün hareketlerin görseli var: " + str([x for x in info["ownKeys"] if not x[1]]))

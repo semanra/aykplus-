@@ -294,7 +294,17 @@ const EX_IMG = {
   "Thoracic Two-Ball Release (Sırt İki Top)": 289,
   "Infraspinatus Ball Release (Kürek Kemiği)": 290,
   "Tibialis Foam Roll (Kaval Önü)": 291,
-  "Forearm Ball Release (Ön Kol)": 292
+  "Forearm Ball Release (Ön Kol)": 292,
+  // v70: küçük kas hareketleri (Boyun, Ön Kol, İç Bacak, Kaval)
+  "Plate Neck Flexion (Boyun Öne)": 293,
+  "Plate Neck Extension (Boyun Arkaya)": 294,
+  "Lateral Neck Flexion (Boyun Yana)": 295,
+  "Wrist Roller (Bilek Sarma)": 296,
+  "Plate Pinch Hold (Plaka Sıkıştırma)": 297,
+  "Dead Hang (Kavrama / Asılma)": 298,
+  "Copenhagen Plank (İç Bacak)": 299,
+  "Cable Hip Adduction (İç Bacak)": 300,
+  "Banded Dorsiflexion (Kaval)": 301
 };
 let _exImgIdx = null;
 function exImgKey(name) { return exKey(name).replace(/[’']/g, ""); }

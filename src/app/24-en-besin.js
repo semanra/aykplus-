@@ -285,7 +285,17 @@ const EX_EN = {
   "Outdoor Walk (Tempolu Yürüyüş)": "Outdoor Walk (Brisk)",
   "Outdoor Cycling (Bisiklet)": "Outdoor Cycling",
   "Swimming (Yüzme)": "Swimming",
-  "Farmer's Walk (Çiftçi Yürüyüşü)": "Farmer's Walk"
+  "Farmer's Walk (Çiftçi Yürüyüşü)": "Farmer's Walk",
+  // v70
+  "Plate Neck Flexion (Boyun Öne)": "Plate Neck Flexion",
+  "Plate Neck Extension (Boyun Arkaya)": "Plate Neck Extension",
+  "Lateral Neck Flexion (Boyun Yana)": "Lateral Neck Flexion",
+  "Wrist Roller (Bilek Sarma)": "Wrist Roller",
+  "Plate Pinch Hold (Plaka Sıkıştırma)": "Plate Pinch Hold",
+  "Dead Hang (Kavrama / Asılma)": "Dead Hang (Grip)",
+  "Copenhagen Plank (İç Bacak)": "Copenhagen Plank (Adductors)",
+  "Cable Hip Adduction (İç Bacak)": "Cable Hip Adduction (Inner Thigh)",
+  "Banded Dorsiflexion (Kaval)": "Banded Dorsiflexion (Tibialis)"
 };
 function exNameL(name) {
   if (curLang() !== "en") return name;

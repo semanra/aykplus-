@@ -181,7 +181,10 @@ const EXERCISE_LIBRARY = {
     "Barbell Upright Row / Cable Upright Row",
     "Dumbbell Shrug (Trapez)",
     "Barbell / Smith Machine Shrug",
-    "Cable Shrug"
+    "Cable Shrug",
+    "Plate Neck Flexion (Boyun Öne)",
+    "Plate Neck Extension (Boyun Arkaya)",
+    "Lateral Neck Flexion (Boyun Yana)"
   ],
   "5. Bacak - Ön Bacak (Quadriceps)": [
     "Hack Squat",
@@ -217,9 +220,12 @@ const EXERCISE_LIBRARY = {
     "Smith Machine Hip Thrust",
     "Kas Glute Bridge",
     "Cable Pull-Through",
+    "Kettlebell Swing",
     "Cable Glute Kickback",
     "Hip Abduction Machine (Dış Bacak / Yan Kalça)",
-    "Hip Adduction Machine (İç Bacak)"
+    "Hip Adduction Machine (İç Bacak)",
+    "Copenhagen Plank (İç Bacak)",
+    "Cable Hip Adduction (İç Bacak)"
   ],
   "7. Bacak - Kalf (Calves & Tibialis)": [
     "Standing Calf Raise (Makine veya Smith)",
@@ -227,7 +233,8 @@ const EXERCISE_LIBRARY = {
     "Leg Press Calf Raise",
     "Donkey Calf Raise",
     "Single-Leg Dumbbell Calf Raise",
-    "Tibialis Raise"
+    "Tibialis Raise",
+    "Banded Dorsiflexion (Kaval)"
   ],
   "8. Kol - Biceps & Ön Kol (Biceps & Forearms)": [
     "Preacher Curl (EZ-Bar / Makine)",
@@ -246,7 +253,11 @@ const EXERCISE_LIBRARY = {
     "Reverse Barbell / Cable Curl (Ön Kol)",
     "Zottman Curl",
     "Wrist Curl (Bilek)",
-    "Reverse Wrist Curl (Bilek)"
+    "Reverse Wrist Curl (Bilek)",
+    "Wrist Roller (Bilek Sarma)",
+    "Plate Pinch Hold (Plaka Sıkıştırma)",
+    "Dead Hang (Kavrama / Asılma)",
+    "Farmer's Walk (Çiftçi Yürüyüşü)"
   ],
   "9. Kol - Triceps (Arka Kol)": [
     "Overhead Cable Triceps Extension (Rope / Bar)",
@@ -292,9 +303,7 @@ const EXERCISE_LIBRARY = {
     "Outdoor Run (Açık Hava Koşu)",
     "Outdoor Walk (Tempolu Yürüyüş)",
     "Outdoor Cycling (Bisiklet)",
-    "Swimming (Yüzme)",
-    "Farmer's Walk (Çiftçi Yürüyüşü)",
-    "Kettlebell Swing"
+    "Swimming (Yüzme)"
   ]
 };
 
