@@ -87,8 +87,9 @@ function weekStart(d = new Date()) {
 // Hareket tipini isimden otomatik algıla
 function detectKind(name) {
   const n = String(name || "").toLocaleLowerCase("tr");
+  if (/bottoms-up/.test(n)) return "time";   // v79: ters kettlebell tutuşu (adında "kettlebell" geçse de süreli)
   if (/farmer|çiftçi|kettlebell/.test(n)) return "weight";
-  if (/plank|vacuum|dead hang|wall sit|l-sit|hollow hold|asılma|pinch hold/.test(n)) return "time";
+  if (/plank|vacuum|dead hang|wall sit|l-sit|hollow hold|asılma|pinch hold|[iı]sometric|bottoms-up|towel hang|heel walk/.test(n)) return "time";
   if (/treadmill|koşu|\brun\b|running|jogging|yürüyüş|stairmaster|merdiven|bike|bisiklet|cycling|rowing machine|kürek|elliptical|eliptik|jump rope|ip atlama|swim|yüzme|kardiyo|cardio|hiit|spinning/.test(n)) return "cardio";
   return "weight";
 }

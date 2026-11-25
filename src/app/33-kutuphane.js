@@ -19,8 +19,8 @@ function libEquipsOf(name) {
   if (detectKind(name) !== "cardio") {
     if (/cable|kablo|pushdown|crossover|face pull|pull-through|woodchopper|pallof/.test(k) || (/pulldown/.test(k) && !/iso-lateral/.test(k))) out.add("cable");
     if (/machine|makine|smith|pec deck|leg press|hack squat|pendulum|belt squat|leg extension|leg curl|hammer strength|iso-lateral|chest-supported row|t-bar|calf raise|glute drive|assisted|preacher/.test(k) && !/dumbbell calf|dumbbell preacher/.test(k)) out.add("machine");
-    if ((/goblet|arnold|concentration|spider|zottman|step-up|lunge|bulgarian|farmer|lateral raise|hammer curl|kickback|skullcrusher/.test(k) && !/cable|machine/.test(k)) || /dumbbell|dambıl|\bdb\b|kettlebell/.test(k)) out.add("dumbbell");
-    if (/pull-?up|chin-?up|barfiks|push-?up|şinav|\bdips?\b|hanging|inverted row|nordic|sissy|hyperextension|back extension|plank|sit-up|ab wheel|deadbug|bird-dog|vacuum|dead hang|captain|glute-ham|band|tibialis raise|decline bench crunch|lunge/.test(k) && !/dip machine/.test(k)) out.add("body");
+    if ((/goblet|cossack|arnold|concentration|spider|zottman|step-up|lunge|bulgarian|farmer|lateral raise|hammer curl|kickback|skullcrusher/.test(k) && !/cable|machine/.test(k)) || /dumbbell|dambıl|\bdb\b|kettlebell/.test(k)) out.add("dumbbell");
+    if (/pull-?up|chin-?up|barfiks|push-?up|şinav|\bdips?\b|hanging|inverted row|nordic|sissy|hyperextension|back extension|plank|sit-up|ab wheel|deadbug|bird-dog|vacuum|dead hang|captain|glute-ham|band|tibialis raise|decline bench crunch|lunge|chin tuck|ball squeeze|side-lying|heel walk|gripper|towel hang/.test(k) && !/dip machine/.test(k)) out.add("body");
     if (/barbell|ez-bar|landmine|plate|plaka|wrist|t-bar|preacher curl \(ez/.test(k)) out.add("bar");
     if (!out.size && /deadlift|good morning|rack pull|pendlay|meadows|squat|hip thrust|glute bridge|jm press|russian twist|neck|bench press|military|upright row|shrug/.test(k)) out.add("bar");
     if (!out.size) { const e = autoEquip(name); out.add(e === "dumbbell" ? "dumbbell" : e === "bodyweight" ? "body" : e === "stack" ? "machine" : "bar"); }

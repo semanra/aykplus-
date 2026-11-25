@@ -5,6 +5,7 @@ Eşleme (hareket adı → görsel numarası): `harita.json` → `src/app/30-gors
 16 hareket başka bir hareketin görselini kullanır (aynı hareket, farklı ad); bu yüzden 292 ad, 276 görsel.
 v70: küçük kas grupları için 9 yeni görsel (293–301): kaynak adaylar `tasarimlar/hareket-yeni/aday/`, seçilenler
 `python scripts/gorsel/yeni_v70.py 293=293-gem-3.jpg ...` ile masaüstü kaynağa kopyalanır ve aynı işlemle webp'ye çevrilir (301 ad, 285 görsel).
+v79: 18 görsel daha (302–319, hepsi ChatGPT; seçimler `302=302-gpt-1.png 304=304-gpt-2.png 305=305-gpt-3.png 314=314-gpt-2.png`, diğerleri `-gpt-1`) aynı betikle (319 ad, 303 görsel).
 
 ## Kaynak
 Ham görseller (Gemini / ChatGPT, beyaz zemin, büyük boy) depoda DEĞİL: kullanıcının masaüstü

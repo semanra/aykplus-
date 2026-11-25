@@ -184,7 +184,12 @@ const EXERCISE_LIBRARY = {
     "Cable Shrug",
     "Plate Neck Flexion (Boyun Öne)",
     "Plate Neck Extension (Boyun Arkaya)",
-    "Lateral Neck Flexion (Boyun Yana)"
+    "Lateral Neck Flexion (Boyun Yana)",
+    "Neck Harness Extension (Boyun Kemeri)",
+    "4-Way Neck Machine (Boyun Makinesi)",
+    "Banded Neck Isometric (Bantla Boyun Sabit Tutuş)",
+    "Banded Neck Rotation (Bantla Boyun Döndürme)",
+    "Chin Tuck (Çene İçeri Çekme)"
   ],
   "5. Bacak - Ön Bacak (Quadriceps)": [
     "Hack Squat",
@@ -225,7 +230,12 @@ const EXERCISE_LIBRARY = {
     "Hip Abduction Machine (Dış Bacak / Yan Kalça)",
     "Hip Adduction Machine (İç Bacak)",
     "Copenhagen Plank (İç Bacak)",
-    "Cable Hip Adduction (İç Bacak)"
+    "Cable Hip Adduction (İç Bacak)",
+    "Sumo Goblet Squat (İç Bacak)",
+    "Side-Lying Hip Adduction (Yan Yatarak İç Bacak)",
+    "Adductor Ball Squeeze (Top Sıkıştırma)",
+    "Lateral Lunge (Yan Lunge)",
+    "Weighted Cossack Squat (Ağırlıklı Kazak Squat)"
   ],
   "7. Bacak - Kalf (Calves & Tibialis)": [
     "Standing Calf Raise (Makine veya Smith)",
@@ -234,7 +244,9 @@ const EXERCISE_LIBRARY = {
     "Donkey Calf Raise",
     "Single-Leg Dumbbell Calf Raise",
     "Tibialis Raise",
-    "Banded Dorsiflexion (Kaval)"
+    "Banded Dorsiflexion (Kaval)",
+    "Heel Walk (Topuk Yürüyüşü)",
+    "Seated Dumbbell Tibialis Raise (Oturarak Ayak Ucu Kaldırma)"
   ],
   "8. Kol - Biceps & Ön Kol (Biceps & Forearms)": [
     "Preacher Curl (EZ-Bar / Makine)",
@@ -257,7 +269,13 @@ const EXERCISE_LIBRARY = {
     "Wrist Roller (Bilek Sarma)",
     "Plate Pinch Hold (Plaka Sıkıştırma)",
     "Dead Hang (Kavrama / Asılma)",
-    "Farmer's Walk (Çiftçi Yürüyüşü)"
+    "Farmer's Walk (Çiftçi Yürüyüşü)",
+    "Behind-the-Back Barbell Wrist Curl (Arkadan Bilek Bükme)",
+    "Dumbbell Pronation / Supination (Bilek Çevirme)",
+    "Dumbbell Radial Deviation (Bileği Yukarı Kaldırma)",
+    "Hand Gripper (El Yayı)",
+    "Towel Hang (Havluyla Asılma)",
+    "Kettlebell Bottoms-Up Hold (Ters Kettlebell Tutuşu)"
   ],
   "9. Kol - Triceps (Arka Kol)": [
     "Overhead Cable Triceps Extension (Rope / Bar)",

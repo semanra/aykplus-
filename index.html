@@ -1783,7 +1783,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v78</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v79</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -2012,7 +2012,12 @@ const EXERCISE_LIBRARY = {
     "Cable Shrug",
     "Plate Neck Flexion (Boyun Öne)",
     "Plate Neck Extension (Boyun Arkaya)",
-    "Lateral Neck Flexion (Boyun Yana)"
+    "Lateral Neck Flexion (Boyun Yana)",
+    "Neck Harness Extension (Boyun Kemeri)",
+    "4-Way Neck Machine (Boyun Makinesi)",
+    "Banded Neck Isometric (Bantla Boyun Sabit Tutuş)",
+    "Banded Neck Rotation (Bantla Boyun Döndürme)",
+    "Chin Tuck (Çene İçeri Çekme)"
   ],
   "5. Bacak - Ön Bacak (Quadriceps)": [
     "Hack Squat",
@@ -2053,7 +2058,12 @@ const EXERCISE_LIBRARY = {
     "Hip Abduction Machine (Dış Bacak / Yan Kalça)",
     "Hip Adduction Machine (İç Bacak)",
     "Copenhagen Plank (İç Bacak)",
-    "Cable Hip Adduction (İç Bacak)"
+    "Cable Hip Adduction (İç Bacak)",
+    "Sumo Goblet Squat (İç Bacak)",
+    "Side-Lying Hip Adduction (Yan Yatarak İç Bacak)",
+    "Adductor Ball Squeeze (Top Sıkıştırma)",
+    "Lateral Lunge (Yan Lunge)",
+    "Weighted Cossack Squat (Ağırlıklı Kazak Squat)"
   ],
   "7. Bacak - Kalf (Calves & Tibialis)": [
     "Standing Calf Raise (Makine veya Smith)",
@@ -2062,7 +2072,9 @@ const EXERCISE_LIBRARY = {
     "Donkey Calf Raise",
     "Single-Leg Dumbbell Calf Raise",
     "Tibialis Raise",
-    "Banded Dorsiflexion (Kaval)"
+    "Banded Dorsiflexion (Kaval)",
+    "Heel Walk (Topuk Yürüyüşü)",
+    "Seated Dumbbell Tibialis Raise (Oturarak Ayak Ucu Kaldırma)"
   ],
   "8. Kol - Biceps & Ön Kol (Biceps & Forearms)": [
     "Preacher Curl (EZ-Bar / Makine)",
@@ -2085,7 +2097,13 @@ const EXERCISE_LIBRARY = {
     "Wrist Roller (Bilek Sarma)",
     "Plate Pinch Hold (Plaka Sıkıştırma)",
     "Dead Hang (Kavrama / Asılma)",
-    "Farmer's Walk (Çiftçi Yürüyüşü)"
+    "Farmer's Walk (Çiftçi Yürüyüşü)",
+    "Behind-the-Back Barbell Wrist Curl (Arkadan Bilek Bükme)",
+    "Dumbbell Pronation / Supination (Bilek Çevirme)",
+    "Dumbbell Radial Deviation (Bileği Yukarı Kaldırma)",
+    "Hand Gripper (El Yayı)",
+    "Towel Hang (Havluyla Asılma)",
+    "Kettlebell Bottoms-Up Hold (Ters Kettlebell Tutuşu)"
   ],
   "9. Kol - Triceps (Arka Kol)": [
     "Overhead Cable Triceps Extension (Rope / Bar)",
@@ -2961,8 +2979,9 @@ function weekStart(d = new Date()) {
 // Hareket tipini isimden otomatik algıla
 function detectKind(name) {
   const n = String(name || "").toLocaleLowerCase("tr");
+  if (/bottoms-up/.test(n)) return "time";   // v79: ters kettlebell tutuşu (adında "kettlebell" geçse de süreli)
   if (/farmer|çiftçi|kettlebell/.test(n)) return "weight";
-  if (/plank|vacuum|dead hang|wall sit|l-sit|hollow hold|asılma|pinch hold/.test(n)) return "time";
+  if (/plank|vacuum|dead hang|wall sit|l-sit|hollow hold|asılma|pinch hold|[iı]sometric|bottoms-up|towel hang|heel walk/.test(n)) return "time";
   if (/treadmill|koşu|\brun\b|running|jogging|yürüyüş|stairmaster|merdiven|bike|bisiklet|cycling|rowing machine|kürek|elliptical|eliptik|jump rope|ip atlama|swim|yüzme|kardiyo|cardio|hiit|spinning/.test(n)) return "cardio";
   return "weight";
 }
@@ -8330,7 +8349,26 @@ const LIB_MUSCLE_OVERRIDE = {
   "Wrist Roller (Bilek Sarma)": "Ön Kol", "Plate Pinch Hold (Plaka Sıkıştırma)": "Ön Kol", "Dead Hang (Kavrama / Asılma)": "Ön Kol",
   "Copenhagen Plank (İç Bacak)": "İç Bacak", "Cable Hip Adduction (İç Bacak)": "İç Bacak", "Banded Dorsiflexion (Kaval)": "Kaval",
   // v70: Farmer's Walk kardiyodan ağırlık bölümüne (Kol – Biceps & Ön Kol) taşındı; kavrama → Ön Kol (geçmiş setler de sayılır)
-  "Farmer's Walk (Çiftçi Yürüyüşü)": "Ön Kol"
+  "Farmer's Walk (Çiftçi Yürüyüşü)": "Ön Kol",
+  // v79: küçük kas gruplarına 18 hareket daha (boyun Omuz kategorisinde, iç bacak Arka Bacak, kaval Kalf, ön kol Kol kategorisinde durur)
+  "Neck Harness Extension (Boyun Kemeri)": "Boyun",
+  "4-Way Neck Machine (Boyun Makinesi)": "Boyun",
+  "Banded Neck Isometric (Bantla Boyun Sabit Tutuş)": "Boyun",
+  "Banded Neck Rotation (Bantla Boyun Döndürme)": "Boyun",
+  "Chin Tuck (Çene İçeri Çekme)": "Boyun",
+  "Behind-the-Back Barbell Wrist Curl (Arkadan Bilek Bükme)": "Ön Kol",
+  "Dumbbell Pronation / Supination (Bilek Çevirme)": "Ön Kol",
+  "Dumbbell Radial Deviation (Bileği Yukarı Kaldırma)": "Ön Kol",
+  "Hand Gripper (El Yayı)": "Ön Kol",
+  "Towel Hang (Havluyla Asılma)": "Ön Kol",
+  "Kettlebell Bottoms-Up Hold (Ters Kettlebell Tutuşu)": "Ön Kol",
+  "Sumo Goblet Squat (İç Bacak)": "İç Bacak",
+  "Side-Lying Hip Adduction (Yan Yatarak İç Bacak)": "İç Bacak",
+  "Adductor Ball Squeeze (Top Sıkıştırma)": "İç Bacak",
+  "Lateral Lunge (Yan Lunge)": "İç Bacak",
+  "Weighted Cossack Squat (Ağırlıklı Kazak Squat)": "İç Bacak",
+  "Heel Walk (Topuk Yürüyüşü)": "Kaval",
+  "Seated Dumbbell Tibialis Raise (Oturarak Ayak Ucu Kaldırma)": "Kaval"
 };
 Object.keys(LIB_MUSCLE_OVERRIDE).forEach(n => { LIB_MUSCLE_MAP[exKey(n)] = LIB_MUSCLE_OVERRIDE[n]; });
 
@@ -8534,8 +8572,9 @@ function dismissSuggestion(exIdx) {
 // İlk eşleşen kural kazanır (boş liste = yardımcı kas yok, sonraki kurallara bakılmaz). Ana kas listeden çıkarılır.
 const MUSCLE_SECONDARY = [
   [/copenhagen/, ["Karın"]],
+  [/sumo goblet|lateral lunge|cossack/, ["Ön Bacak", "Arka Bacak & Kalça"]],   // v79: iç bacak ağırlıklı squat / lunge
   [/face pull|rear delt|reverse pec|reverse fly/, ["Sırt"]],
-  [/neck|boyun|leg curl|hamstring curl|nordic|glute-ham|wrist|bilek|sissy|leg extension|hip thrust|glute|bridge|abduct|adduct|calf|kalf|crunch|plank|pullover|straight-?arm|farmer/, []],
+  [/neck|boyun|leg curl|hamstring curl|nordic|glute-ham|wrist|bilek|sissy|leg extension|hip thrust|glute|bridge|abduct|adduct|calf|kalf|crunch|plank|pullover|straight-?arm|farmer|chin tuck|gripper|towel hang|bottoms-up|radial|pronation|heel walk|tibialis|ball squeeze/, []],
   [/pec deck|fly|crossover|svend/, ["Omuz"]],
   [/\bdip/, ["Triceps", "Göğüs", "Omuz"]],
   [/close-?grip (barbell )?bench|jm press/, ["Göğüs", "Omuz"]],
@@ -13149,7 +13188,26 @@ const EX_EN = {
   "Dead Hang (Kavrama / Asılma)": "Dead Hang (Grip)",
   "Copenhagen Plank (İç Bacak)": "Copenhagen Plank (Adductors)",
   "Cable Hip Adduction (İç Bacak)": "Cable Hip Adduction (Inner Thigh)",
-  "Banded Dorsiflexion (Kaval)": "Banded Dorsiflexion (Tibialis)"
+  "Banded Dorsiflexion (Kaval)": "Banded Dorsiflexion (Tibialis)",
+  // v79
+  "Neck Harness Extension (Boyun Kemeri)": "Neck Harness Extension",
+  "4-Way Neck Machine (Boyun Makinesi)": "4-Way Neck Machine",
+  "Banded Neck Isometric (Bantla Boyun Sabit Tutuş)": "Banded Neck Isometric",
+  "Banded Neck Rotation (Bantla Boyun Döndürme)": "Banded Neck Rotation",
+  "Chin Tuck (Çene İçeri Çekme)": "Chin Tuck",
+  "Behind-the-Back Barbell Wrist Curl (Arkadan Bilek Bükme)": "Behind-the-Back Barbell Wrist Curl",
+  "Dumbbell Pronation / Supination (Bilek Çevirme)": "Dumbbell Pronation / Supination",
+  "Dumbbell Radial Deviation (Bileği Yukarı Kaldırma)": "Dumbbell Radial Deviation",
+  "Hand Gripper (El Yayı)": "Hand Gripper",
+  "Towel Hang (Havluyla Asılma)": "Towel Hang",
+  "Kettlebell Bottoms-Up Hold (Ters Kettlebell Tutuşu)": "Kettlebell Bottoms-Up Hold",
+  "Sumo Goblet Squat (İç Bacak)": "Sumo Goblet Squat (Adductors)",
+  "Side-Lying Hip Adduction (Yan Yatarak İç Bacak)": "Side-Lying Hip Adduction",
+  "Adductor Ball Squeeze (Top Sıkıştırma)": "Adductor Ball Squeeze",
+  "Lateral Lunge (Yan Lunge)": "Lateral Lunge",
+  "Weighted Cossack Squat (Ağırlıklı Kazak Squat)": "Weighted Cossack Squat",
+  "Heel Walk (Topuk Yürüyüşü)": "Heel Walk",
+  "Seated Dumbbell Tibialis Raise (Oturarak Ayak Ucu Kaldırma)": "Seated Dumbbell Tibialis Raise"
 };
 function exNameL(name) {
   if (curLang() !== "en") return name;
@@ -15648,7 +15706,26 @@ const EX_IMG = {
   "Dead Hang (Kavrama / Asılma)": 298,
   "Copenhagen Plank (İç Bacak)": 299,
   "Cable Hip Adduction (İç Bacak)": 300,
-  "Banded Dorsiflexion (Kaval)": 301
+  "Banded Dorsiflexion (Kaval)": 301,
+  // v79: küçük kas hareketleri 2. tur
+  "Neck Harness Extension (Boyun Kemeri)": 302,
+  "4-Way Neck Machine (Boyun Makinesi)": 303,
+  "Banded Neck Isometric (Bantla Boyun Sabit Tutuş)": 304,
+  "Banded Neck Rotation (Bantla Boyun Döndürme)": 305,
+  "Chin Tuck (Çene İçeri Çekme)": 306,
+  "Behind-the-Back Barbell Wrist Curl (Arkadan Bilek Bükme)": 307,
+  "Dumbbell Pronation / Supination (Bilek Çevirme)": 308,
+  "Dumbbell Radial Deviation (Bileği Yukarı Kaldırma)": 309,
+  "Hand Gripper (El Yayı)": 310,
+  "Towel Hang (Havluyla Asılma)": 311,
+  "Kettlebell Bottoms-Up Hold (Ters Kettlebell Tutuşu)": 312,
+  "Sumo Goblet Squat (İç Bacak)": 313,
+  "Side-Lying Hip Adduction (Yan Yatarak İç Bacak)": 314,
+  "Adductor Ball Squeeze (Top Sıkıştırma)": 315,
+  "Lateral Lunge (Yan Lunge)": 316,
+  "Weighted Cossack Squat (Ağırlıklı Kazak Squat)": 317,
+  "Heel Walk (Topuk Yürüyüşü)": 318,
+  "Seated Dumbbell Tibialis Raise (Oturarak Ayak Ucu Kaldırma)": 319
 };
 let _exImgIdx = null;
 function exImgKey(name) { return exKey(name).replace(/[’']/g, ""); }
@@ -16570,8 +16647,8 @@ function libEquipsOf(name) {
   if (detectKind(name) !== "cardio") {
     if (/cable|kablo|pushdown|crossover|face pull|pull-through|woodchopper|pallof/.test(k) || (/pulldown/.test(k) && !/iso-lateral/.test(k))) out.add("cable");
     if (/machine|makine|smith|pec deck|leg press|hack squat|pendulum|belt squat|leg extension|leg curl|hammer strength|iso-lateral|chest-supported row|t-bar|calf raise|glute drive|assisted|preacher/.test(k) && !/dumbbell calf|dumbbell preacher/.test(k)) out.add("machine");
-    if ((/goblet|arnold|concentration|spider|zottman|step-up|lunge|bulgarian|farmer|lateral raise|hammer curl|kickback|skullcrusher/.test(k) && !/cable|machine/.test(k)) || /dumbbell|dambıl|\bdb\b|kettlebell/.test(k)) out.add("dumbbell");
-    if (/pull-?up|chin-?up|barfiks|push-?up|şinav|\bdips?\b|hanging|inverted row|nordic|sissy|hyperextension|back extension|plank|sit-up|ab wheel|deadbug|bird-dog|vacuum|dead hang|captain|glute-ham|band|tibialis raise|decline bench crunch|lunge/.test(k) && !/dip machine/.test(k)) out.add("body");
+    if ((/goblet|cossack|arnold|concentration|spider|zottman|step-up|lunge|bulgarian|farmer|lateral raise|hammer curl|kickback|skullcrusher/.test(k) && !/cable|machine/.test(k)) || /dumbbell|dambıl|\bdb\b|kettlebell/.test(k)) out.add("dumbbell");
+    if (/pull-?up|chin-?up|barfiks|push-?up|şinav|\bdips?\b|hanging|inverted row|nordic|sissy|hyperextension|back extension|plank|sit-up|ab wheel|deadbug|bird-dog|vacuum|dead hang|captain|glute-ham|band|tibialis raise|decline bench crunch|lunge|chin tuck|ball squeeze|side-lying|heel walk|gripper|towel hang/.test(k) && !/dip machine/.test(k)) out.add("body");
     if (/barbell|ez-bar|landmine|plate|plaka|wrist|t-bar|preacher curl \(ez/.test(k)) out.add("bar");
     if (!out.size && /deadlift|good morning|rack pull|pendlay|meadows|squat|hip thrust|glute bridge|jm press|russian twist|neck|bench press|military|upright row|shrug/.test(k)) out.add("bar");
     if (!out.size) { const e = autoEquip(name); out.add(e === "dumbbell" ? "dumbbell" : e === "bodyweight" ? "body" : e === "stack" ? "machine" : "bar"); }

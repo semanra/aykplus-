@@ -52,7 +52,7 @@ try:
     check(pg.get_attribute("#gymRoot input.t-search", "placeholder") == f"{n_all} hareket içinde ara", f"2c: arama kutusu gerçek sayıyı yazar ({n_all})")
     pg.evaluate("selectMuscle('Boyun')"); pg.wait_for_timeout(200)
     rows = pg.evaluate(ROWS)
-    check(len(rows) == 3 and all("Neck" in r for r in rows), f"2d: Boyun bölümü 3 hareket {rows}")
+    check(len(rows) == 8 and all("Neck" in r or "Chin" in r for r in rows), f"2d: Boyun bölümü 8 hareket (v79) {rows}")
     check(pg.locator("[data-lib-muscle='Boyun'][aria-pressed='true']").count() == 1, "2e: kas çipi seçili")
     pg.evaluate("setLibCat('cardio')"); pg.wait_for_timeout(200)
     rows = pg.evaluate(ROWS)
@@ -66,7 +66,7 @@ try:
     heads = pg.evaluate(HEADS)
     check("Biceps" in heads and "Ön Kol" in heads and "Arka Bacak & Kalça" in heads, f"2h: aramada sonuçlar kas başlıklarıyla {heads}")
     pg.evaluate("onLibSearch('boyun')"); pg.wait_for_timeout(150)
-    check(len(pg.evaluate(ROWS)) == 3, "2i: kas adıyla arama (boyun)")
+    check(len(pg.evaluate(ROWS)) == 8, "2i: kas adıyla arama (boyun, v79: 8)")
     pg.evaluate("onLibSearch('')")
     # yıldız
     pg.evaluate("() => { libSearchQ = ''; selectMuscle('Göğüs'); }"); pg.wait_for_timeout(200)

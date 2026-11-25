@@ -34,7 +34,26 @@ const LIB_MUSCLE_OVERRIDE = {
   "Wrist Roller (Bilek Sarma)": "Ön Kol", "Plate Pinch Hold (Plaka Sıkıştırma)": "Ön Kol", "Dead Hang (Kavrama / Asılma)": "Ön Kol",
   "Copenhagen Plank (İç Bacak)": "İç Bacak", "Cable Hip Adduction (İç Bacak)": "İç Bacak", "Banded Dorsiflexion (Kaval)": "Kaval",
   // v70: Farmer's Walk kardiyodan ağırlık bölümüne (Kol – Biceps & Ön Kol) taşındı; kavrama → Ön Kol (geçmiş setler de sayılır)
-  "Farmer's Walk (Çiftçi Yürüyüşü)": "Ön Kol"
+  "Farmer's Walk (Çiftçi Yürüyüşü)": "Ön Kol",
+  // v79: küçük kas gruplarına 18 hareket daha (boyun Omuz kategorisinde, iç bacak Arka Bacak, kaval Kalf, ön kol Kol kategorisinde durur)
+  "Neck Harness Extension (Boyun Kemeri)": "Boyun",
+  "4-Way Neck Machine (Boyun Makinesi)": "Boyun",
+  "Banded Neck Isometric (Bantla Boyun Sabit Tutuş)": "Boyun",
+  "Banded Neck Rotation (Bantla Boyun Döndürme)": "Boyun",
+  "Chin Tuck (Çene İçeri Çekme)": "Boyun",
+  "Behind-the-Back Barbell Wrist Curl (Arkadan Bilek Bükme)": "Ön Kol",
+  "Dumbbell Pronation / Supination (Bilek Çevirme)": "Ön Kol",
+  "Dumbbell Radial Deviation (Bileği Yukarı Kaldırma)": "Ön Kol",
+  "Hand Gripper (El Yayı)": "Ön Kol",
+  "Towel Hang (Havluyla Asılma)": "Ön Kol",
+  "Kettlebell Bottoms-Up Hold (Ters Kettlebell Tutuşu)": "Ön Kol",
+  "Sumo Goblet Squat (İç Bacak)": "İç Bacak",
+  "Side-Lying Hip Adduction (Yan Yatarak İç Bacak)": "İç Bacak",
+  "Adductor Ball Squeeze (Top Sıkıştırma)": "İç Bacak",
+  "Lateral Lunge (Yan Lunge)": "İç Bacak",
+  "Weighted Cossack Squat (Ağırlıklı Kazak Squat)": "İç Bacak",
+  "Heel Walk (Topuk Yürüyüşü)": "Kaval",
+  "Seated Dumbbell Tibialis Raise (Oturarak Ayak Ucu Kaldırma)": "Kaval"
 };
 Object.keys(LIB_MUSCLE_OVERRIDE).forEach(n => { LIB_MUSCLE_MAP[exKey(n)] = LIB_MUSCLE_OVERRIDE[n]; });
 
@@ -238,8 +257,9 @@ function dismissSuggestion(exIdx) {
 // İlk eşleşen kural kazanır (boş liste = yardımcı kas yok, sonraki kurallara bakılmaz). Ana kas listeden çıkarılır.
 const MUSCLE_SECONDARY = [
   [/copenhagen/, ["Karın"]],
+  [/sumo goblet|lateral lunge|cossack/, ["Ön Bacak", "Arka Bacak & Kalça"]],   // v79: iç bacak ağırlıklı squat / lunge
   [/face pull|rear delt|reverse pec|reverse fly/, ["Sırt"]],
-  [/neck|boyun|leg curl|hamstring curl|nordic|glute-ham|wrist|bilek|sissy|leg extension|hip thrust|glute|bridge|abduct|adduct|calf|kalf|crunch|plank|pullover|straight-?arm|farmer/, []],
+  [/neck|boyun|leg curl|hamstring curl|nordic|glute-ham|wrist|bilek|sissy|leg extension|hip thrust|glute|bridge|abduct|adduct|calf|kalf|crunch|plank|pullover|straight-?arm|farmer|chin tuck|gripper|towel hang|bottoms-up|radial|pronation|heel walk|tibialis|ball squeeze/, []],
   [/pec deck|fly|crossover|svend/, ["Omuz"]],
   [/\bdip/, ["Triceps", "Göğüs", "Omuz"]],
   [/close-?grip (barbell )?bench|jm press/, ["Göğüs", "Omuz"]],

@@ -295,7 +295,26 @@ const EX_EN = {
   "Dead Hang (Kavrama / Asılma)": "Dead Hang (Grip)",
   "Copenhagen Plank (İç Bacak)": "Copenhagen Plank (Adductors)",
   "Cable Hip Adduction (İç Bacak)": "Cable Hip Adduction (Inner Thigh)",
-  "Banded Dorsiflexion (Kaval)": "Banded Dorsiflexion (Tibialis)"
+  "Banded Dorsiflexion (Kaval)": "Banded Dorsiflexion (Tibialis)",
+  // v79
+  "Neck Harness Extension (Boyun Kemeri)": "Neck Harness Extension",
+  "4-Way Neck Machine (Boyun Makinesi)": "4-Way Neck Machine",
+  "Banded Neck Isometric (Bantla Boyun Sabit Tutuş)": "Banded Neck Isometric",
+  "Banded Neck Rotation (Bantla Boyun Döndürme)": "Banded Neck Rotation",
+  "Chin Tuck (Çene İçeri Çekme)": "Chin Tuck",
+  "Behind-the-Back Barbell Wrist Curl (Arkadan Bilek Bükme)": "Behind-the-Back Barbell Wrist Curl",
+  "Dumbbell Pronation / Supination (Bilek Çevirme)": "Dumbbell Pronation / Supination",
+  "Dumbbell Radial Deviation (Bileği Yukarı Kaldırma)": "Dumbbell Radial Deviation",
+  "Hand Gripper (El Yayı)": "Hand Gripper",
+  "Towel Hang (Havluyla Asılma)": "Towel Hang",
+  "Kettlebell Bottoms-Up Hold (Ters Kettlebell Tutuşu)": "Kettlebell Bottoms-Up Hold",
+  "Sumo Goblet Squat (İç Bacak)": "Sumo Goblet Squat (Adductors)",
+  "Side-Lying Hip Adduction (Yan Yatarak İç Bacak)": "Side-Lying Hip Adduction",
+  "Adductor Ball Squeeze (Top Sıkıştırma)": "Adductor Ball Squeeze",
+  "Lateral Lunge (Yan Lunge)": "Lateral Lunge",
+  "Weighted Cossack Squat (Ağırlıklı Kazak Squat)": "Weighted Cossack Squat",
+  "Heel Walk (Topuk Yürüyüşü)": "Heel Walk",
+  "Seated Dumbbell Tibialis Raise (Oturarak Ayak Ucu Kaldırma)": "Seated Dumbbell Tibialis Raise"
 };
 function exNameL(name) {
   if (curLang() !== "en") return name;

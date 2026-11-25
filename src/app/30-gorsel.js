@@ -304,7 +304,26 @@ const EX_IMG = {
   "Dead Hang (Kavrama / Asılma)": 298,
   "Copenhagen Plank (İç Bacak)": 299,
   "Cable Hip Adduction (İç Bacak)": 300,
-  "Banded Dorsiflexion (Kaval)": 301
+  "Banded Dorsiflexion (Kaval)": 301,
+  // v79: küçük kas hareketleri 2. tur
+  "Neck Harness Extension (Boyun Kemeri)": 302,
+  "4-Way Neck Machine (Boyun Makinesi)": 303,
+  "Banded Neck Isometric (Bantla Boyun Sabit Tutuş)": 304,
+  "Banded Neck Rotation (Bantla Boyun Döndürme)": 305,
+  "Chin Tuck (Çene İçeri Çekme)": 306,
+  "Behind-the-Back Barbell Wrist Curl (Arkadan Bilek Bükme)": 307,
+  "Dumbbell Pronation / Supination (Bilek Çevirme)": 308,
+  "Dumbbell Radial Deviation (Bileği Yukarı Kaldırma)": 309,
+  "Hand Gripper (El Yayı)": 310,
+  "Towel Hang (Havluyla Asılma)": 311,
+  "Kettlebell Bottoms-Up Hold (Ters Kettlebell Tutuşu)": 312,
+  "Sumo Goblet Squat (İç Bacak)": 313,
+  "Side-Lying Hip Adduction (Yan Yatarak İç Bacak)": 314,
+  "Adductor Ball Squeeze (Top Sıkıştırma)": 315,
+  "Lateral Lunge (Yan Lunge)": 316,
+  "Weighted Cossack Squat (Ağırlıklı Kazak Squat)": 317,
+  "Heel Walk (Topuk Yürüyüşü)": 318,
+  "Seated Dumbbell Tibialis Raise (Oturarak Ayak Ucu Kaldırma)": 319
 };
 let _exImgIdx = null;
 function exImgKey(name) { return exKey(name).replace(/[’']/g, ""); }
