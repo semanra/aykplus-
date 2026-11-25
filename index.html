@@ -1749,7 +1749,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v68</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v69</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -16107,10 +16107,41 @@ function muscleLevel(sets, scale) {
 
 // Renkler 0–255 (onaylanan önizleme tasarimlar/paylasim-3d-tur3.png). a = gövde/boşta saydamlığı
 const MAP_THEMES = {
-  dark: { body: [56, 56, 64], idle: [87, 87, 97], a: 1, lo: [6, 112, 104], hi: [24, 236, 214], hl: [185, 255, 248], glow: [24, 236, 214], glowK: 1, sel: [255, 255, 255] },
-  light: { body: [230, 230, 235], idle: [184, 184, 196], a: 1, lo: [0, 110, 100], hi: [0, 196, 178], hl: [120, 245, 232], glow: [0, 196, 178], glowK: 0.6, sel: [24, 24, 27], outline: [140, 140, 153], shadow: 0.22 },
-  clear: { body: [255, 255, 255], idle: [255, 255, 255], a: 0.27, aIdle: 0.47, lo: [6, 112, 104], hi: [24, 236, 214], hl: [185, 255, 248], glow: [24, 236, 214], glowK: 1, sel: [255, 255, 255] }
+  dark: { body: [56, 56, 64], idle: [87, 87, 97], a: 1, lo: [6, 112, 104], hi: [24, 236, 214], hl: [185, 255, 248], glow: [24, 236, 214], glowK: 1, selDim: 0.42, selLift: 0.12, selGlow: "rgba(24,236,214,0.75)" },
+  light: { body: [230, 230, 235], idle: [184, 184, 196], a: 1, lo: [0, 110, 100], hi: [0, 196, 178], hl: [120, 245, 232], glow: [0, 196, 178], glowK: 0.6, selDim: 0.38, selLift: 0.08, selGlow: "rgba(0,150,136,0.55)", outline: [140, 140, 153], shadow: 0.22 },
+  clear: { body: [255, 255, 255], idle: [255, 255, 255], a: 0.27, aIdle: 0.47, lo: [6, 112, 104], hi: [24, 236, 214], hl: [185, 255, 248], glow: [24, 236, 214], glowK: 1, selDim: 0.42, selLift: 0.12, selGlow: "rgba(24,236,214,0.75)" }
 };
+// v69: seçili kas "spot ışığı" — selDim: geri kalan haritanın görünürlüğü, selLift: seçili kasın beyaza açılması, selGlow: çevresindeki ışıma
+
+// v69: seçili kasın pikselleri + kasın içinde kalan dar yarıklar (kapatma, r px) → global indeks listesi.
+// Yarıklar da seçili katmana alınır; yoksa ışıma kas çizgilerinin arasından sızar.
+function selMaskIdx(lab, w, h, id, r) {
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (lab[y * w + x] === id) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  if (x1 < 0) return [];
+  const p = 2 * r; x0 = Math.max(0, x0 - p); y0 = Math.max(0, y0 - p); x1 = Math.min(w - 1, x1 + p); y1 = Math.min(h - 1, y1 + p);
+  const bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+  let m = new Uint8Array(bw * bh);
+  for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) m[y * bw + x] = lab[(y + y0) * w + x + x0] === id ? 1 : 0;
+  const pass = (src, max) => {   // ayrılabilir kare süzgeç: max = genişletme, min = aşındırma
+    const a = new Uint8Array(bw * bh), b = new Uint8Array(bw * bh);
+    for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) {
+      let v = max ? 0 : 1;
+      for (let k = -r; k <= r; k++) { const xx = x + k, q = xx < 0 || xx >= bw ? 0 : src[y * bw + xx]; v = max ? (v | q) : (v & q); }
+      a[y * bw + x] = v;
+    }
+    for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) {
+      let v = max ? 0 : 1;
+      for (let k = -r; k <= r; k++) { const yy = y + k, q = yy < 0 || yy >= bh ? 0 : a[yy * bw + x]; v = max ? (v | q) : (v & q); }
+      b[y * bw + x] = v;
+    }
+    return b;
+  };
+  m = pass(pass(m, true), false);
+  const out = [];
+  for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) { const i = (y + y0) * w + x + x0; if (m[y * bw + x] && lab[i]) out.push(i); }   // zemin (lab 0) asla
+  return out;
+}
 
 // Görsel koordinatında kas adı; gövde/zemindeyse r yarıçapında en yakın kas; yoksa null
 function muscleAt(M, x, y, r) {
@@ -16160,9 +16191,6 @@ async function paintMuscleMap3d(muscles, opts) {
     if (!id) continue;
     const L = shade[i], j = i * 4;
     const lv = id >= 2 ? lev[id] : -1;
-    if (id === selId && (lab[i - 1] !== id || lab[i + 1] !== id || lab[i - w] !== id || lab[i + w] !== id || lab[i - 2] !== id || lab[i + 2] !== id || lab[i - 2 * w] !== id || lab[i + 2 * w] !== id)) {
-      o[j] = T.sel[0]; o[j + 1] = T.sel[1]; o[j + 2] = T.sel[2]; o[j + 3] = 255; continue;   // seçili kas konturu (~3 px)
-    }
     if (lv < 0) {
       const c = id === 1 ? T.body : T.idle, k = Math.min(L, 1.15);
       o[j] = c[0] * k; o[j + 1] = c[1] * k; o[j + 2] = c[2] * k;
@@ -16206,8 +16234,25 @@ async function paintMuscleMap3d(muscles, opts) {
   ctx.drawImage(fig, 0, 0);
   fig.width = fig.height = glowCv.width = glowCv.height = 0;
   if (sil) sil.width = sil.height = 0;
-  if (key) { muscleMapCache.push({ key, cv: out }); if (muscleMapCache.length > 4) muscleMapCache.shift(); }
-  return out;
+  let res = out;
+  if (selId >= 0) {   // v69 spot ışığı: bütün harita solar (kartın zeminine doğru), seçili kas tam parlak + ışıma
+    const sc = document.createElement("canvas"); sc.width = w; sc.height = h;
+    const sctx = sc.getContext("2d"), sim = sctx.createImageData(w, h), so = sim.data, L = T.selLift;
+    selMaskIdx(lab, w, h, selId, Math.max(2, Math.round(w / 180))).forEach(i => {
+      const j = i * 4, k = lab[i] === selId ? L : 0;
+      so[j] = o[j] + (255 - o[j]) * k; so[j + 1] = o[j + 1] + (255 - o[j + 1]) * k; so[j + 2] = o[j + 2] + (255 - o[j + 2]) * k; so[j + 3] = o[j + 3];
+    });
+    sctx.putImageData(sim, 0, 0);
+    res = document.createElement("canvas"); res.width = w; res.height = h;
+    const rctx = res.getContext("2d");
+    rctx.globalAlpha = T.selDim; rctx.drawImage(out, 0, 0); rctx.globalAlpha = 1;
+    rctx.save(); rctx.shadowColor = T.selGlow; rctx.shadowBlur = h / 70; rctx.shadowOffsetX = OFF;
+    rctx.drawImage(sc, -OFF, 0); rctx.drawImage(sc, -OFF, 0); rctx.restore();
+    rctx.drawImage(sc, 0, 0);
+    out.width = out.height = sc.width = sc.height = 0;
+  }
+  if (key) { muscleMapCache.push({ key, cv: res }); if (muscleMapCache.length > 4) muscleMapCache.shift(); }
+  return res;
 }
 
 </script>

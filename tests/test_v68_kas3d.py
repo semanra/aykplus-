@@ -120,17 +120,26 @@ try:
       const b = await paintMuscleMap3d({ 'Göğüs': 3 }, { theme: 'dark', scale: 'week' }); const c = await paintMuscleMap3d({ 'Göğüs': 3 }, { theme: 'light', scale: 'week' });
       return [a === b, a !== c]; }""")
     check(same == [True, True], "3e: aynı anahtar aynı canvas, tema farklı → farklı %s" % same)
-    SEL = """async theme => { const M = await loadMuscleMap(); const cv = await paintMuscleMap3d({}, { theme, scale: 'week', selected: 'Göğüs' });
-      const px = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data, sx = cv.width / M.w, id = MUSCLES.indexOf('Göğüs') + 2;
-      let hi = 0, lo = 255;
-      for (let y = 1; y < M.h - 1; y++) for (let x = 1; x < M.w - 1; x++) { const i = y * M.w + x; if (M.lab[i] !== id) continue;
-        if (M.lab[i - 1] === id && M.lab[i + 1] === id && M.lab[i - M.w] === id && M.lab[i + M.w] === id) continue;
-        const j = (Math.round(y * sx) * cv.width + Math.round(x * sx)) * 4, v = Math.min(px[j], px[j + 1], px[j + 2]), V = Math.max(px[j], px[j + 1], px[j + 2]);
-        hi = Math.max(hi, v); lo = Math.min(lo, V); }
-      return [hi, lo]; }"""
-    sd = pg.evaluate(SEL, "dark"); sl = pg.evaluate(SEL, "light")
-    check(sd[0] >= 230, "3f: koyuda seçili kas kenarı beyaz %s" % sd)
-    check(sl[1] <= 40, "3f: aydınlıkta seçili kas kenarı koyu %s" % sl)
+    # v69: seçim "spot ışığı" (beyaz kontur kalktı): seçili kas tam görünür ve açılır, geri kalan solar, kas içi yarıklar opak
+    SEL = """async ([theme, name]) => { const M = await loadMuscleMap(); const mus = { 'Göğüs': 9, 'Omuz': 5 };
+      const a = await paintMuscleMap3d(mus, { theme, scale: 'week' }), s = await paintMuscleMap3d(mus, { theme, scale: 'week', selected: name });
+      const A = a.getContext('2d').getImageData(0, 0, a.width, a.height).data, S = s.getContext('2d').getImageData(0, 0, s.width, s.height).data;
+      const id = MUSCLES.indexOf(name) + 2, om = MUSCLES.indexOf('Omuz') + 2;
+      let selA = 255, lift = 0, n = 0, dimN = 0, dimLo = 0, white = 0;
+      for (let i = 0; i < M.lab.length; i++) { const j = i * 4;
+        if (M.lab[i] === id) { selA = Math.min(selA, S[j + 3]); lift += (S[j] + S[j + 1] + S[j + 2]) - (A[j] + A[j + 1] + A[j + 2]); n++;
+          if (S[j] > 235 && S[j + 1] > 235 && S[j + 2] > 235) white++; }
+        else if (M.lab[i] === om) { dimN++; if (S[j + 3] < 130) dimLo++; } }
+      const idx = selMaskIdx(M.lab, M.w, M.h, id, Math.max(2, Math.round(M.w / 180)));
+      let gaps = 0, gapA = 255; idx.forEach(i => { if (M.lab[i] !== id) { gaps++; gapA = Math.min(gapA, S[i * 4 + 3]); } });
+      return { selA, lift: lift / Math.max(1, n), dim: dimLo / Math.max(1, dimN), white: white / Math.max(1, n), gaps, gapA, sameSize: a.width === s.width && a.height === s.height }; }"""
+    for th in ["dark", "light"]:
+        r = pg.evaluate(SEL, [th, "Göğüs"])
+        check(r["selA"] == 255 and r["lift"] > 5, "3f %s: seçili kas tam görünür ve açılır %s" % (th, r))
+        check(r["dim"] > 0.6, "3f %s: seçili olmayan kas solar (Omuz piksellerinin %%%d'i yarı saydam; kenarı seçili kasın ışımasında)" % (th, r["dim"] * 100))
+        check(r["white"] < 0.02 and r["sameSize"], "3f %s: beyaz kontur yok, boyut aynı %s" % (th, r))
+        k = pg.evaluate(SEL, [th, "Kalf"])
+        check(k["selA"] == 255 and k["gaps"] > 0 and k["gapA"] == 255, "3f %s: çalışılmamış kas (Kalf) seçili, iç yarıklar opak (ışıma sızmaz) %s" % (th, k))
     for th in ["dark", "light", "clear"]:
         pg.evaluate("""async th => { const cv = await paintMuscleMap3d({ 'Göğüs': 9, 'Omuz': 5, 'Triceps': 3, 'Karın': 1 }, { theme: th, scale: 'session' });
           const o = document.createElement('canvas'); o.width = cv.width; o.height = cv.height; const x = o.getContext('2d');
@@ -212,7 +221,7 @@ try:
     check(trow.count() == 1 and trow.bounding_box()["height"] >= 44, "5i: Bugün görünümünde çalışılan kas satırı (≥ 44 px)")
     if trow.count(): trow.click(); pg.wait_for_timeout(150)
     check(pg.evaluate("state.libMuscle") == "Omuz", "5i: satıra dokununca kas seçilir")
-    pg.evaluate("setLibRange('week')"); pg.wait_for_timeout(200)
+    pg.evaluate("setLibRange('week'); selectMuscle(null)"); pg.wait_for_timeout(200)   # v69: seçim haritayı soldurur; tema ölçümü seçimsiz
     tq = pg.evaluate(TQPIX)
     pg.evaluate("setTheme('light')"); pg.wait_for_timeout(500)
     tl = pg.evaluate(TQPIX)
