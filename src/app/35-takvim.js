@@ -46,8 +46,9 @@ function renderCalendar() {
   const lead = (first.getDay() + 6) % 7;   // Pazartesi başlangıç
   const tKey = todayStr(logicalNow());
   const now = logicalNow(), isNow = y === now.getFullYear() && m === now.getMonth();
-  const firstYear = state.workoutLogs.reduce((a, l) => l && l.ts ? Math.min(a, new Date(l.ts).getFullYear()) : a, now.getFullYear());
-  const canBack = y > firstYear || (y === firstYear && m > 0 && Object.keys(st).some(k => k < todayStr(first)));
+  // v82: geri gitme antrenman VE mobilite kayıtlarına bakar (yalnız mobilite yapılan aya da gidilebilsin)
+  const firstKey = todayStr(first);
+  const canBack = Object.keys(st).some(k => k < firstKey) || Object.keys(mob).some(k => k < firstKey);
   let grid = dayShort().map(d => `<div class="p-cal-h">${d}</div>`).join("");
   for (let i = 0; i < lead; i++) grid += `<div></div>`;
   let mN = 0, mSets = 0, mVol = 0, mMob = 0;

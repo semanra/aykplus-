@@ -998,7 +998,7 @@
             <button id="goalGain" aria-pressed="false" onclick="setGoal('gain')" data-t="Al">Al</button>
           </div>
           <div id="loseBox">
-            <input id="deficitSlider" type="range" min="50" max="1000" step="50" value="700" oninput="updateProfile()" class="w-full h-11" aria-label="Kalori açığı" data-t-aria="Kalori açığı" />
+            <input id="deficitSlider" type="range" min="50" max="1000" step="50" value="700" oninput="updateProfile(event)" class="w-full h-11" aria-label="Kalori açığı" data-t-aria="Kalori açığı" />
           </div>
           <div id="gainBox" class="hidden my-1">
             <div class="n-seg grid-cols-3" role="group" aria-label="Kilo alma hızı" data-t-aria="Kilo alma hızı">
@@ -1783,7 +1783,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v81</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v82</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

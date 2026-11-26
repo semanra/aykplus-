@@ -258,4 +258,6 @@ Object.assign(EN, {
   "Hareket notu": "Exercise note", "Koltuk ayarı, tutuş, kademe… Bu hareket hangi günde olursa olsun not görünür.": "Seat setting, grip, stack level… The note shows wherever this exercise appears.",
   "Örn: koltuk 4, dirsekler içeride": "E.g. seat 4, elbows tucked", "Not kaydedildi": "Note saved", "Not silindi": "Note deleted", "Not:": "Note:",
   "Notu düzenle": "Edit note", "Not ekle": "Add note", "Koltuk ayarı, tutuş, kademe…": "Seat setting, grip, stack level…",
+  // v82
+  "Plaka hesabı en fazla {n} kg için yapılır.": "Plates are calculated up to {n} kg.",
 });

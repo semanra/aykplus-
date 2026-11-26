@@ -14,10 +14,12 @@ function loadMapImg(src) {
     const img = new Image();
     img.onload = () => {
       const cv = document.createElement("canvas"); cv.width = img.naturalWidth; cv.height = img.naturalHeight;
-      const ctx = cv.getContext("2d"); ctx.drawImage(img, 0, 0);
-      const d = ctx.getImageData(0, 0, cv.width, cv.height).data;
-      cv.width = cv.height = 0;
-      res({ w: img.naturalWidth, h: img.naturalHeight, d });
+      try {   // v82: tuval açılamazsa (getContext null / bellek) söz hata ile biter, asılı kalmaz
+        const ctx = cv.getContext("2d"); ctx.drawImage(img, 0, 0);
+        const d = ctx.getImageData(0, 0, cv.width, cv.height).data;
+        res({ w: img.naturalWidth, h: img.naturalHeight, d });
+      } catch (e) { rej(e); }
+      finally { cv.width = cv.height = 0; }
     };
     img.onerror = () => rej(new Error(src));
     img.src = src;
@@ -204,6 +206,10 @@ async function paintMuscleMap3d(muscles, opts) {
     rctx.drawImage(sc, 0, 0);
     out.width = out.height = sc.width = sc.height = 0;
   }
-  if (key) { muscleMapCache.push({ key, cv: res }); if (muscleMapCache.length > 4) muscleMapCache.shift(); }
+  if (key) {
+    muscleMapCache.push({ key, cv: res });
+    // v82: önbellekten düşen tuval boşaltılır (iOS tuval belleği); süren bir animasyon bitebilsin diye 5 sn sonra
+    if (muscleMapCache.length > 4) { const old = muscleMapCache.shift(); setTimeout(() => { if (!muscleMapCache.some(e => e.cv === old.cv)) old.cv.width = old.cv.height = 0; }, 5000); }
+  }
   return res;
 }

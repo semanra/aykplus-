@@ -14,7 +14,11 @@ function getTargets() {
   const tdee = Math.round(bmr * mult);
   const goal = ["lose", "keep", "gain"].includes(st.goal) ? st.goal : "lose";
   const goalDelta = goal === "lose" ? -state.deficit : goal === "gain" ? Math.round(tdee * (GAIN_PACE[st.gainPace] || GAIN_PACE.mid)) : 0;
-  const calTarget = Math.max(female ? 1400 : 1750, tdee + Math.round(num(st.calAdjust, 0)) + goalDelta);
+  const floor = female ? 1400 : 1750, adj = Math.round(num(st.calAdjust, 0));
+  const calTarget = Math.max(floor, tdee + adj + goalDelta);
+  // v82: güvenli alt sınır hedefi yukarı çektiyse gerçekte uygulanan fark (ekrandaki açık / hafta hesabı bununla)
+  const floored = tdee + adj + goalDelta < floor;
+  const effDelta = floored ? calTarget - tdee - adj : goalDelta;
   // v43: kanıta dayalı protein. ref = hedef kilo (≥ 30 ise, kilodan büyük olamaz), yoksa kilo
   const tw = num(st.targetWeight, 0);
   const ref = tw >= 30 ? Math.min(state.weight, tw) : state.weight;
@@ -23,9 +27,14 @@ function getTargets() {
   let pro = Math.min(base, state.weight * 2.2);
   if (st.proteinHigh) pro = Math.max(pro, state.weight * 2.0);
   const proTarget = Math.round(pro);
-  const fatTarget = Math.round(calTarget * 0.25 / 9);
-  const carbTarget = Math.max(60, Math.round((calTarget - (proTarget * 4) - (fatTarget * 9)) / 4));
-  return { calTarget, proTarget, carbTarget, fatTarget, tdee, goal, goalDelta };
+  // Yağ kalorinin %25'i; protein yüksek ve kalori düşükken karbonhidrat 60 g altına düşecekse (v82) yağ %20'ye iner.
+  // Yine de sığmıyorsa karbonhidrat 60 g'da kalır ve aşım macroOver ile bildirilir.
+  let fatTarget = Math.round(calTarget * 0.25 / 9);
+  let carbRaw = Math.round((calTarget - (proTarget * 4) - (fatTarget * 9)) / 4);
+  if (carbRaw < 60) { fatTarget = Math.round(calTarget * 0.20 / 9); carbRaw = Math.round((calTarget - (proTarget * 4) - (fatTarget * 9)) / 4); }
+  const carbTarget = Math.max(60, carbRaw);
+  const macroOver = Math.max(0, proTarget * 4 + carbTarget * 4 + fatTarget * 9 - calTarget);
+  return { calTarget, proTarget, carbTarget, fatTarget, tdee, goal, goalDelta, floor, floored, effDelta, macroOver };
 }
 
 function validBf(v) {
@@ -305,7 +314,7 @@ function renderWeightBlock(st) {
   [["paceSlow", "slow"], ["paceMid", "mid"], ["paceFast", "fast"]].forEach(([id, p]) => { $(id).className = st.gainPace === p ? "on" : ""; $(id).setAttribute("aria-pressed", st.gainPace === p ? "true" : "false"); });
   $("loseBox").classList.toggle("hidden", goal !== "lose");
   $("gainBox").classList.toggle("hidden", goal !== "gain");
-  $("goalVal").textContent = (tg.goalDelta < 0 ? "−" : tg.goalDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.goalDelta));
+  $("goalVal").textContent = (tg.effDelta < 0 ? "−" : tg.effDelta > 0 ? "+" : "") + fmtInt(Math.abs(tg.effDelta));   // v82: alt sınırda gerçek fark
   $("weightHistoryText").textContent = state.weightLogs.length > 0
     ? state.weightLogs.slice(-3).map(l => `${fmtW(num(l.weight), { body: true })} (${l.ts ? fmtDate(l.ts) : logDateLabel(l.date)})`).join(" → ")
     : wTxt(t("Hedef: {w} kg", { w: fmtWNum(num(st.targetWeight, 82), { body: true }) }));
@@ -314,8 +323,8 @@ function renderWeightBlock(st) {
   $("weightAvgText").classList.toggle("hidden", !wa7);
   const target = num(st.targetWeight, 82);
   const diffKg = state.weight - target;
-  const weeklyLoss = (state.deficit * 7) / 7700;
-  const weeklyGain = (tg.goalDelta * 7) / 7700;
+  const weeklyLoss = goal === "lose" ? (Math.max(0, -tg.effDelta) * 7) / 7700 : (state.deficit * 7) / 7700;
+  const weeklyGain = (tg.effDelta * 7) / 7700;
   let info;
   const tw = fmtWNum(target, { body: true });   // v53: hedef ve haftalık hız gösterim biriminde (hesap kg)
   if (goal === "keep") info = t("Kilo koruma: hedef kalorin harcamana eşit");
@@ -324,6 +333,9 @@ function renderWeightBlock(st) {
   else info = diffKg <= 0 ? t("{w} kg hedefine ulaştın!", { w: tw })
     : weeklyLoss > 0 ? tn(Math.ceil(diffKg / weeklyLoss), "Haftalık ~{r} kg kayıp → {w} kg hedefine ~{n} hafta", { r: fmtWNum(weeklyLoss, { fine: true }), w: tw })
     : t("Kalori açığı yok: kilo koruma modu");
+  // v82: güvenli alt sınır notu ve makro aşımı notu
+  if (tg.floored && goal !== "keep") info = t("Güvenli alt sınır ({n} kcal) nedeniyle hedefin bundan aşağı inmiyor.", { n: fmtInt(tg.floor) }) + " " + info;
+  if (tg.macroOver >= 20) info += " " + t("Protein hedefin yüksek olduğu için makroların toplamı kalori hedefini ~{n} kcal aşıyor.", { n: fmtInt(tg.macroOver) });
   $("timelineInfo").textContent = wTxt(info);
   const hint = coachHintText();
   $("coachHint").classList.toggle("hidden", !hint);

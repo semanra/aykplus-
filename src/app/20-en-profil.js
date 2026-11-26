@@ -201,4 +201,10 @@ Object.assign(EN, {
   "Mezurayı âdemelmasının hemen altından sar.": "Wrap the tape just below the Adam's apple.",
   "Önde çok hafif aşağı eğimli olabilir; boynu sıkma.": "It may slope down very slightly at the front; don't squeeze your neck.",
   "Çeneyi kaldırmak ya da mezurayı boyna bastırmak.": "Lifting your chin or pressing the tape into your neck.",
+  // v82
+  "Önceki hâl yedeklenemedi": "Couldn't back up the current state",
+  "Şu anki verilerin iç yedeğe kaydedilemedi. Geri yüklersen önceki hâle dönemezsin. Önce Yedekle ile dosya alman önerilir. Yine de devam edilsin mi?": "Your current data couldn't be saved to the internal backup. If you restore, you won't be able to go back. It's best to save a backup file first. Continue anyway?",
+  "Yine de geri yükle": "Restore anyway",
+  "Şu anki verilerin iç yedeğe kaydedilemedi. Sıfırlarsan önceki hâle dönemezsin. Önce Yedekle ile dosya alman önerilir. Yine de devam edilsin mi?": "Your current data couldn't be saved to the internal backup. If you reset, you won't be able to go back. It's best to save a backup file first. Continue anyway?",
+  "Yine de sıfırla": "Reset anyway",
 });

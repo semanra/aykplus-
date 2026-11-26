@@ -74,6 +74,15 @@ function fmtClock(sec) {
   sec = Math.max(0, Math.round(sec));
   return String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
 }
+// v82: hareket geçmişine güvenli erişim ("constructor", "__proto__" gibi adlar Object.prototype'tan değer almasın)
+function exHist(k, create) {
+  const h = state.exerciseHistory;
+  if (Object.prototype.hasOwnProperty.call(h, k) && Array.isArray(h[k])) return h[k];
+  if (!create) return null;
+  const a = [];
+  Object.defineProperty(h, k, { value: a, writable: true, enumerable: true, configurable: true });
+  return a;
+}
 function exKey(name) { return String(name || "").toLocaleLowerCase("tr").replace(/ı/g, "i").replace(/\s+/g, " ").trim(); }
 function normSearch(s) {
   return String(s || "").toLocaleLowerCase("tr").replace(/ı/g, "i").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -141,6 +150,8 @@ function normalizeExercise(ex) {
   }
   ex.sets.forEach(s => { s.done = !!s.done; if (s.e != null && !(EFFORT_LABELS[s.e] && s.done)) delete s.e; });   // v23: set zorluğu (1–4)
   if (ex.note == null) ex.note = "";
+  // v82: dinlenme süresi her zaman 0–3600 tam sayı (içe aktarılan yedekte metin olarak gelip ekrana yazılmasın)
+  if (ex.rest != null) { const r = Math.round(num(ex.rest, NaN)); if (isFinite(r)) ex.rest = Math.max(0, Math.min(3600, r)); else delete ex.rest; }
   return ex;
 }
 
@@ -252,9 +263,12 @@ function renameExerciseData(s, from, to) {
   if (Array.isArray(s.favExercises)) s.favExercises = s.favExercises.map(x => typeof x === "string" && exKey(x) === fk ? to : x);   // v73
   if (isObj(s.exNotes) && s.exNotes[fk]) { if (!s.exNotes[tk]) s.exNotes[tk] = s.exNotes[fk]; delete s.exNotes[fk]; }   // v78
   const h = s.exerciseHistory;
-  if (!isObj(h) || !Array.isArray(h[fk])) return;
+  if (!isObj(h)) return;
+  const own = k => Object.prototype.hasOwnProperty.call(h, k) && Array.isArray(h[k]);   // v82: "__proto__" gibi adlar
+  if (!own(fk)) return;
   const moved = h[fk].map(x => { if (isObj(x) && exKey(x.name) === fk) x.name = to; return x; });
-  const into = Array.isArray(h[tk]) ? h[tk] : [];
+  const into = own(tk) ? h[tk] : [];
+  if (!own(tk)) Object.defineProperty(h, tk, { value: into, writable: true, enumerable: true, configurable: true });
   h[tk] = into.length ? into.concat(moved).sort((a, b) => num(isObj(a) ? a.ts : 0, 0) - num(isObj(b) ? b.ts : 0, 0)) : moved;
   delete h[fk];
 }
@@ -398,7 +412,9 @@ function normalizeStateInner(raw) {
   s.measurements = s.measurements.filter(isObj);   // v35
   if (!num(s.workoutStartedAt, 0)) s.workoutStartedAt = 0;
   // v10: antrenman ve dinlenme menüleri her zaman ayrı
-  if (!s.restMeals.length) s.restMeals = clone(s.meals).map(mm => ({ ...mm, id: (mm.id || "meal") + "_rest", done: false }));
+  // v82: kullanıcı dinlenme menüsünü bilerek boşalttıysa (restMealsEmptyOk) yeniden doldurulmaz
+  if (s.restMeals.length) delete s.restMealsEmptyOk;
+  else if (s.restMealsEmptyOk !== true) { delete s.restMealsEmptyOk; s.restMeals = clone(s.meals).map(mm => ({ ...mm, id: (mm.id || "meal") + "_rest", done: false })); }
   s.settings.separatePlans = true;
   // v13: her öğünün kalıcı bir kimliği olsun (açık/kapalı görünüm "Geri al" sonrası da korunur)
   [s.meals, s.restMeals].forEach((ms, li) => {

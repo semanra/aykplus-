@@ -228,7 +228,7 @@ function suggestionHtml(ex, exIdx) {
       </div>
       <div class="flex items-center justify-between gap-2">
         ${noLv ? `<button onclick="openEditExercise(${exIdx})" class="text-[12px] text-[var(--t-warn-hi)] underline text-left">${t("Makine kademelerini tanımla, doğru kiloyu önereyim")}</button>` : "<span></span>"}
-        <button onclick="dismissSuggestion(${exIdx})" class="text-[12px] t-muted h-9 px-2">${t("Şimdi değil")}</button>
+        <button onclick="dismissSuggestion(${exIdx})" class="text-[12px] t-muted min-h-[44px] px-2">${t("Şimdi değil")}</button>
       </div>
     </div>`;
 }
@@ -322,9 +322,11 @@ function setPlateBar(v) {
   saveState(); renderPlateTool();
 }
 
+const PLATE_MAX = { kg: 1000, lb: 2200 };   // v82: üstünde plaka hesabı yapılmaz (çok büyük sayı yazılınca donma)
 function platesFor(total, bar) {
   const perSide = (total - bar) / 2;
   if (perSide < -1e-9) return { ok: false, reason: "light" };
+  if (!(total <= (isImperial() ? PLATE_MAX.lb : PLATE_MAX.kg))) return { ok: false, reason: "heavy", list: [], rem: perSide, perSide, achieved: bar };
   let rem = Math.round(perSide * 100) / 100;
   const list = [];
   plateSet().forEach(p => { while (rem + 1e-9 >= p) { list.push(p); rem = Math.round((rem - p) * 100) / 100; } });
@@ -428,7 +430,9 @@ function renderPlateTool() {
   let html = "";
   if (bar > 0) {
     const r = platesFor(W, bar);
-    if (!r.ok && r.reason === "light") {
+    if (!r.ok && r.reason === "heavy") {
+      html += `<div class="text-xs text-[var(--w-warn-text)] bg-[var(--w-warn-bg)] border border-[var(--w-warn-line)] rounded-lg px-3 py-2">${wTxt(t("Plaka hesabı en fazla {n} kg için yapılır.", { n: fmtKg(isImperial() ? PLATE_MAX.lb : PLATE_MAX.kg) }))}</div>`;
+    } else if (!r.ok && r.reason === "light") {
       html += `<div class="text-xs text-[var(--w-warn-text)] bg-[var(--w-warn-bg)] border border-[var(--w-warn-line)] rounded-lg px-3 py-2">${wTxt(t("Bu kilo {bar} kg'lık bardan hafif.", { bar: fmtKg(bar) }))}</div>`;
     } else {
       html += `<div class="bg-[var(--w-elev0)] border border-[var(--w-line)] rounded-xl p-3">
@@ -499,8 +503,9 @@ function coachAnalysis() {
   const weekly = slope * 7;
 
   // Bu aralıktaki günlük kalori ortalaması (öğün tiki varsa yenen, yoksa plan)
-  const fromKey = todayStr(new Date(pts[0].t));
-  const intakes = Object.keys(state.dailyLogs).filter(k => k >= fromKey).map(k => {
+  // v82: yalnız ilk tartıdan son tartıya kadar olan günler (son tartıdan sonra yenenler kilo değişimine yansımadı)
+  const fromKey = todayStr(new Date(pts[0].t)), toKey = todayStr(new Date(pts[pts.length - 1].t));
+  const intakes = Object.keys(state.dailyLogs).filter(k => k >= fromKey && k < toKey).map(k => {
     const d = state.dailyLogs[k];
     return num(d.mealsDone) > 0 && num(d.eatenKcal) > 0 ? num(d.eatenKcal) : num(d.kcal);
   }).filter(v => v > 0);
@@ -520,11 +525,11 @@ function coachAnalysis() {
   if (goal === "gain" && weekly < 0.05 && fullDelta < 0) fullDelta = 0;
   if (goal === "lose" && weekly >= 0 && fullDelta > 0) fullDelta = 0;
   let delta = Math.max(-COACH_MAX_STEP, Math.min(COACH_MAX_STEP, fullDelta));
-  const adj = num(state.settings.calAdjust, 0);
+  const adj = targets.calTarget - (targets.tdee + targets.goalDelta);   // v82: alt sınırda birikmiş düzeltme değil, uygulanan fark
   if (adj + delta > 1000) delta = 1000 - adj;
   if (adj + delta < -1000) delta = -1000 - adj;
 
-  const expectedWeekly = targets.goalDelta === 0 ? 0 : (targets.goalDelta * 7) / 7700;
+  const expectedWeekly = targets.effDelta === 0 ? 0 : (targets.effDelta * 7) / 7700;   // v82: alt sınırdaki gerçek fark
   const pctPerWeek = (weekly / state.weight) * 100;
   return {
     ready: true, goal, n: pts.length, spanDays: res.spanDays, weekly, expectedWeekly, pctPerWeek,
@@ -540,9 +545,12 @@ function coachAnalysis() {
 function applyCoach() {
   const a = coachAnalysis();
   if (!a.ready || a.delta === 0) return;
-  state.settings.calAdjust = num(state.settings.calAdjust, 0) + a.delta;
+  // v82: düzeltme doğrudan yeni hedefe göre yazılır (alt sınırdayken birikmiş düzeltme yüzünden hedef değişmeyebiliyordu)
+  const tg = getTargets();
+  state.settings.calAdjust = Math.max(-1000, Math.min(1000, Math.round(a.newTarget - (tg.tdee + tg.goalDelta))));
   state.settings.coachAppliedAt = Date.now();
-  toast(t("Hedef kalori {v} kcal ayarlandı", { v: (a.delta > 0 ? "+" : "") + a.delta }));
+  const d = getTargets().calTarget - tg.calTarget;
+  toast(t("Hedef kalori {v} kcal ayarlandı", { v: (d > 0 ? "+" : "") + d }));
   renderAll();
 }
 async function resetCoachAdjust() {
@@ -646,6 +654,7 @@ function deleteMeal(mIdx) {
   snapshot();
   const ttl = meals[mIdx].title;
   meals.splice(mIdx, 1);
+  if (meals === state.restMeals && !meals.length) state.restMealsEmptyOk = true;   // v82: boş dinlenme menüsü bilinçli
   renderAll();
   offerUndo(t("\"{ad}\" silindi", { ad: ttl }));
 }
@@ -835,8 +844,8 @@ function openMeasureModal(restore) {
     <button type="button" data-measure-guide onclick="openMeasureGuide(true)" class="mt-2 min-h-[44px] w-full flex items-center justify-center gap-2 rounded-lg bg-[var(--w-elev)] text-[var(--w-acc)] text-[13px] font-semibold">${t("Nasıl ölçerim?")}</button>
     <p class="text-[12px] text-[var(--w-dim)] mt-2">${t("İpucu: Haftada veya iki haftada bir, sabah aç karnına ve mezurayı sıkmadan ölç. Bel: göbek deliği hizası. Kol ve bacak: hep aynı tarafı, en kalın yerinden. Ölçmediğin alanı boş bırakabilirsin.")}</p>
     <div class="flex justify-end gap-2 mt-3">
-      <button onclick="closeModal('chartModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 py-2 rounded-lg">${t("İptal")}</button>
-      <button onclick="saveMeasurement()" class="w-btn text-xs px-4 py-2 rounded-lg font-semibold">${t("Kaydet")}</button>
+      <button onclick="closeModal('chartModal')" class="bg-[var(--w-elev)] text-[var(--w-muted)] text-xs px-3 min-h-[44px] rounded-lg">${t("İptal")}</button>
+      <button onclick="saveMeasurement()" class="w-btn text-xs px-4 min-h-[44px] rounded-lg font-semibold">${t("Kaydet")}</button>
     </div>`;
   openModal("chartModal");
 }

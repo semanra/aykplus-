@@ -404,7 +404,7 @@ try:
     pg.evaluate("void restoreFromText('not json')"); d = dlg()
     check(d[0] == "Invalid backup" and d[1] == "This backup isn't valid. The file or code looks corrupted." and d[2] == "OK", "en: geçersiz yedek uyarısı: %s" % d)
     pg.click("#uiDlgOk")
-    pg.evaluate("void restoreFromText('{\"meals\": []}')"); d = dlg()
+    pg.evaluate("void restoreFromText('{\"meals\": [], \"settings\": {}}')"); d = dlg()   # v82: yalnız 'meals' adı yetmez (looksLikeBackup)
     check(d == ["Restore this backup?", "All your current data will be replaced with this backup. Continue?", "Restore", "Cancel"], "en: yedek geri yükleme onayı: %s" % d)
     pg.click("#uiDlgCancel")
     pg.evaluate("void resetToDefaults()"); d = dlg()

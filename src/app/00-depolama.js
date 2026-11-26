@@ -153,7 +153,11 @@ async function storageInit() {
     if (lsGet(MIRROR_OFF_KEY) === "1") { mirrorDirty = true; writeMirror(true); }   // yer açıldıysa ayna yeniden çalışsın
   } catch (e) {
     console.error(e);
-    return storageUseLegacy();
+    // v82: IndexedDB açıldı ama okunamadı → ayna ile açılır; bu oturumun değişiklikleri sonra kazansın (satır yukarıdaki gibi).
+    // Ayna kapalıysa (localStorage eski olabilir) salt okunur.
+    const mirrorOff = lsGet(MIRROR_OFF_KEY) === "1";
+    storageUseLegacy();
+    if (mirrorOff) storeReadOnly = true; else storeGen += 1e6;
   }
 }
 function storageUseLegacy() {
@@ -306,14 +310,16 @@ function writeMirror(force) {
   }
 }
 // İçeriği tamamen değiştiren işlemlerden önce (iç yedeğe dönme, yedek dosyası, fabrika ayarları) o anki hâl iç yedeğe
+// v82: true = önceki hâl iç yedekte (ya da bu modda iç yedek yok); false = yazılamadı (çağıran karar verir)
 async function storageSnapshotNow() {
-  if (storeMode !== "idb" || !aykDB) return;
+  if (storeMode !== "idb" || !aykDB) return true;
   try {
     const puts = [];
     await storageAddSnap("safe", JSON.stringify(state), puts);
     if (puts.length) await idbWrite(puts);
-    await storagePruneSnapKind("safe", 3);
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); return false; }
+  try { await storagePruneSnapKind("safe", 3); } catch (e) { console.error(e); }
+  return true;
 }
 // Aynı içerik o türde zaten yedekliyse tekrar eklenmez
 async function storageAddSnap(kind, json, puts) {

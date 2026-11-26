@@ -419,4 +419,7 @@ Object.assign(EN, {
   "Öğün taşındı": "Meal moved", "Özel besini düzenle": "Edit custom food", "{ad} silinsin mi?": "Delete {ad}?",
   "{n} öğün/komboda kullanılıyor. Silersen oralardan da çıkarılacak.": { one: "Used in {n} meal or combo. If you delete it, it will be removed from there too.", other: "Used in {n} meals or combos. If you delete it, it will be removed from them too." },
   "{ad} silindi": "{ad} deleted",
+  // v82
+  "Güvenli alt sınır ({n} kcal) nedeniyle hedefin bundan aşağı inmiyor.": "Because of the safe minimum ({n} kcal), your target won't go lower than this.",
+  "Protein hedefin yüksek olduğu için makroların toplamı kalori hedefini ~{n} kcal aşıyor.": "Because your protein target is high, your macros add up to ~{n} kcal more than your calorie target.",
 });

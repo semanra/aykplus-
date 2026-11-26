@@ -551,15 +551,25 @@ async function deleteRescue() {
 }
 
 // v44: opts.onboarding = kurulum ekranından (kaybedilecek veri yok → onay sorulmaz). Başarılı geri yükleme kurulumu kapatır.
+// v82: AYK+ yedeği mi? (yalnız "meals" / "workoutDays" adının geçmesi yetmez: dizi olmalı ve gerçek bir alan dolu olmalı)
+function looksLikeBackup(p) {
+  if (!isObj(p)) return false;
+  const arrM = p.meals == null || Array.isArray(p.meals), arrW = p.workoutDays == null || Array.isArray(p.workoutDays);
+  if (!arrM || !arrW || !(Array.isArray(p.meals) || Array.isArray(p.workoutDays))) return false;
+  if (p.settings != null && !isObj(p.settings)) return false;
+  return isObj(p.settings) || (Array.isArray(p.meals) && p.meals.some(isObj)) || (Array.isArray(p.workoutDays) && p.workoutDays.some(isObj));
+}
 async function restoreFromText(text, opts = {}) {
   let parsed;
   try { parsed = JSON.parse(String(text || "").trim()); } catch (e) { sayAlert(t("Geçersiz yedek"), t("Geçersiz yedek! Dosya veya kod bozuk görünüyor.")); return false; }
   if (parsed && parsed.state && (parsed.state.meals || parsed.state.workoutDays)) parsed = parsed.state;
-  if (!parsed || typeof parsed !== "object" || !(parsed.meals || parsed.workoutDays)) { sayAlert(t("Yedek tanınmadı"), t("Bu bir AYK+ yedeği değil.")); return false; }
+  if (!looksLikeBackup(parsed)) { sayAlert(t("Yedek tanınmadı"), t("Bu bir AYK+ yedeği değil.")); return false; }
   if (!opts.onboarding && !(await askConfirm(t("Yedek geri yüklensin mi?"), t("Mevcut tüm verilerin bu yedekle DEĞİŞTİRİLECEK. Devam edilsin mi?"), t("Geri yükle"), true))) return false;
   let next;
   try { next = normalizeState(parsed); } catch (e) { console.error(e); sayAlert(t("Yedek okunamadı"), t("Yedek dosyası bozuk görünüyor; mevcut verilerin değiştirilmedi.")); return false; }
-  await storageSnapshotNow();   // v41: geri yüklemeden önceki hâl iç yedekte
+  // v41: geri yüklemeden önceki hâl iç yedekte. v82: yazılamazsa sessizce sürmez; kullanıcı açıkça onaylarsa devam
+  if (!(await storageSnapshotNow()) && !opts.onboarding
+    && !(await askConfirm(t("Önceki hâl yedeklenemedi"), t("Şu anki verilerin iç yedeğe kaydedilemedi. Geri yüklersen önceki hâle dönemezsin. Önce Yedekle ile dosya alman önerilir. Yine de devam edilsin mi?"), t("Yine de geri yükle"), true))) return false;
   next.settings.onboarded = true;   // v44: yedekten dönen kullanıcı kurulumu görmez (renderAll → syncOnboarding kapatır)
   state = next;
   state.lastBackupAt = state.lastBackupAt || Date.now();
@@ -598,7 +608,9 @@ function restoreBackupFromText() { restoreFromText($("backupText").value); }
 async function resetToDefaults() {
   if (!(await askConfirm(t("Fabrika ayarlarına sıfırla"), t("TÜM veriler silinip başlangıç ayarlarına dönülecek. Emin misin?"), t("Devam et"), true))) return;
   if (!(await askConfirm(t("Son onay"), t("Bu işlem geri alınamaz. Önce yedek almanı öneririm. Sıfırlansın mı?"), t("Sıfırla|tüm veri"), true))) return;
-  await storageSnapshotNow();   // v41: sıfırlamadan önceki hâl iç yedekte (Profil → Otomatik iç yedekler)
+  // v41: sıfırlamadan önceki hâl iç yedekte (Profil → Otomatik iç yedekler). v82: yazılamazsa açık onay
+  if (!(await storageSnapshotNow())
+    && !(await askConfirm(t("Önceki hâl yedeklenemedi"), t("Şu anki verilerin iç yedeğe kaydedilemedi. Sıfırlarsan önceki hâle dönemezsin. Önce Yedekle ile dosya alman önerilir. Yine de devam edilsin mi?"), t("Yine de sıfırla"), true))) return;
   state = freshState();   // v44: kurulum ekranı yeniden açılır
   state.today = logicalToday();
   closeSettings();

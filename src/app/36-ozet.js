@@ -44,11 +44,11 @@ function recapData(p) {
   }));
   r.ex = Object.values(exCount).sort((x, y) => y.n - x.n || y.sets - x.sets).slice(0, 3);
   r.mob = Object.keys(state.mobilityLog || {}).filter(k => keyIn(k) && (state.mobilityLog[k] || []).length).length;
-  // beslenme: kaydı olan günlerin ortalaması ve hedefi tutturduğu gün (±%5 kalori — İlerleme ile aynı, protein ≥ %90)
+  // beslenme: kaydı olan günlerin ortalaması ve hedefi tutturduğu gün (v82: İlerleme ile aynı kural — kalori hitClass, protein ≥ %95)
   const nd = Object.keys(state.dailyLogs || {}).filter(keyIn).map(k => state.dailyLogs[k]).filter(d => isObj(d) && num(d.eatenKcal) > 0);
   if (nd.length) {
-    const hit = nd.filter(d => num(d.calTarget) > 0 && Math.abs(num(d.eatenKcal) - num(d.calTarget)) <= num(d.calTarget) * 0.05).length;
-    const pro = nd.filter(d => num(d.proTarget) > 0 && num(d.eatenP) >= num(d.proTarget) * 0.9).length;
+    const hit = nd.filter(d => hitClass(num(d.eatenKcal), num(d.calTarget)) === "ok").length;
+    const pro = nd.filter(d => num(d.proTarget) > 0 && num(d.eatenP) >= num(d.proTarget) * 0.95).length;
     r.nut = { days: nd.length, kcal: Math.round(nd.reduce((s, d) => s + num(d.eatenKcal), 0) / nd.length), p: Math.round(nd.reduce((s, d) => s + num(d.eatenP), 0) / nd.length), hit, pro };
   }
   const wl = (state.weightLogs || []).filter(x => x && x.ts && inR(x.ts) && num(x.weight) > 0).sort((x, y) => x.ts - y.ts);

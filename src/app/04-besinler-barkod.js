@@ -443,20 +443,21 @@ function renderNutriHistory() {
 // ---------------------------------------------------------------------------
 // BARKOD (kamera → ZXing; ürün bilgisi Open Food Facts'ten, internet gerekir)
 // ---------------------------------------------------------------------------
-const bc = { reader: null, token: 0, found: null };
+const bc = { reader: null, token: 0, found: null, session: 0 };   // v82: session = pencere her açılış/kapanışta artar
 let cfPendingBarcode = null;
 function bcStatus(msg) { $("bcStatus").textContent = msg || ""; }
 function openBarcode() {
   $("bcResult").innerHTML = "";
   $("bcManual").value = "";
   bc.found = null;
+  bc.session++;
   const m = $("barcodeModal");
   const wasHidden = m.classList.contains("hidden");
   m.classList.remove("hidden"); m.classList.add("flex");
   if (wasHidden && typeof animSheetIn === "function") animSheetIn(m);   // v57 ANİM: pencereler
   startScan();
 }
-function closeBarcode() { stopScan(); closeModal("barcodeModal"); }
+function closeBarcode() { bc.session++; stopScan(); closeModal("barcodeModal"); }
 function loadZXing() {
   return new Promise((res, rej) => {
     if (window.ZXing) { res(window.ZXing); return; }
@@ -492,7 +493,17 @@ async function startScan() {
       wrap.classList.add("hidden");
       onBarcode(code);
     });
-    if (token === bc.token) bcStatus(t("Barkodu çerçevenin içine getir."));
+    if (token !== bc.token) {   // v82: kamera izni beklenirken pencere kapandı / yeniden açıldı → geç açılan kamera kapatılır
+      if (bc.reader && bc.reader !== reader) {   // yeni tarama başladı: yalnız eski akışın izleri durur, yeni görüntüye dokunulmaz
+        try { if (reader.stream) reader.stream.getTracks().forEach(tr => tr.stop()); } catch (e) { /* yoksay */ }
+      } else {
+        try { reader.reset(); } catch (e) { /* yoksay */ }
+        const v = $("bcVideo");
+        if (v && v.srcObject) { try { v.srcObject.getTracks().forEach(tr => tr.stop()); } catch (e) { /* yoksay */ } v.srcObject = null; }
+      }
+      return;
+    }
+    bcStatus(t("Barkodu çerçevenin içine getir."));
   } catch (e) {
     if (token !== bc.token) return;
     stopScan();
@@ -532,13 +543,16 @@ async function onBarcode(raw) {
     return;
   }
   bcStatus(t("{code} aranıyor…", { code }));
+  const sess = bc.session;
   let p;
   try { p = await fetchOFF(code); }
   catch (e) {
+    if (sess !== bc.session) return;   // v82: pencere bu arada kapandı
     bcStatus(t("Ürün bilgisine ulaşılamadı. İnternet bağlantını kontrol edip tekrar dene ya da besini elle ekle."));
     bcManualButton(code, "");
     return;
   }
+  if (sess !== bc.session) return;   // v82: arama sürerken pencere kapandı / yeniden açıldı → etiket formu kendiliğinden açılmaz
   if ($("bcManual").value !== code) return;   // bu arada başka barkod arandı
   if (!p) {
     // v14: bulunamayınca doğrudan etiket formu açılır
@@ -659,9 +673,13 @@ function updateProfile(ev) {
     clearTimeout(updateProfile.tm);
     if (weightSliding) updateProfile.tm = setTimeout(() => { weightSliding = false; if (state.nutriView === "menus") renderAll(); }, 2000);
   }
-  if (!isImperial()) state.weight = round1(num(sl.value, state.weight));
-  else if (sl.value !== sl.dataset.shown) state.weight = keepBodyKg(num(sl.value, num(bodyKgToDisp(state.weight))), state.weight);   // v53: lb; kaydırılmadıysa kg aynen
-  state.deficit = Math.round(num($("deficitSlider").value, state.deficit));
+  // v82: her kaydırıcı yalnız kendi değerini yazar (açık kaydırılınca kilo 0,5 adıma yuvarlanmasın)
+  const ds = $("deficitSlider"), all = !ev || (ev.target !== sl && ev.target !== ds);
+  if (all || ev.target === sl) {
+    if (!isImperial()) { if (sl.value !== sl.dataset.shown) state.weight = round1(num(sl.value, state.weight)); }
+    else if (sl.value !== sl.dataset.shown) state.weight = keepBodyKg(num(sl.value, num(bodyKgToDisp(state.weight))), state.weight);   // v53: lb; kaydırılmadıysa kg aynen
+  }
+  if (all || ev.target === ds) state.deficit = Math.round(num(ds.value, state.deficit));
   renderAll();
 }
 function setGoal(g) {

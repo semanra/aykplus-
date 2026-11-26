@@ -357,7 +357,7 @@ function sessionPr(key, sess, beforeTs) {
   if (!best || !(num(best.kg) > 0)) return null;
   const cur = e1rm(best.kg, best.reps);
   let prev = 0;
-  (state.exerciseHistory[key] || []).forEach(o => {
+  (exHist(key) || []).forEach(o => {
     if (o === sess || o.kind !== "weight" || !(num(o.ts) < beforeTs)) return;
     (o.sets || []).forEach(s => { prev = Math.max(prev, e1rm(s.kg, s.reps)); });
   });
@@ -577,7 +577,8 @@ async function shareRenderAll() {
 async function shareBlob() {
   const ctxRef = shareCtx, key = shareKey(ctxRef.tpl);
   if (ctxRef.full && ctxRef.full.key === key) return ctxRef.full.blob;
-  return shareCanBlob(await buildShareCanvas(ctxRef.log, shareOpts(ctxRef.tpl)));
+  const cv = await buildShareCanvas(ctxRef.log, shareOpts(ctxRef.tpl));
+  try { return await shareCanBlob(cv); } finally { if (cv) cv.width = cv.height = 0; }   // v82: iPhone tuval belleği
 }
 function shareFileName() {
   const log = shareCtx.log;
@@ -627,11 +628,12 @@ async function sharePickPhoto(input) {
   let img = null;
   try { img = await createImageBitmap(f, { imageOrientation: "from-image" }); }
   catch (e) {
+    let url = null;
     try {
-      const url = URL.createObjectURL(f);
+      url = URL.createObjectURL(f);
       img = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = url; });
       img._url = url;
-    } catch (e2) { toast(t("Fotoğraf açılamadı."), "error"); return; }
+    } catch (e2) { if (url) URL.revokeObjectURL(url); toast(t("Fotoğraf açılamadı."), "error"); return; }   // v82: hata yolunda URL bırakılır
   }
   // iPhone belleği: en uzun kenar 2160 px (hikâye 1920 px için yeterli)
   const iw = img.width || img.naturalWidth, ih = img.height || img.naturalHeight, sc = Math.min(1, 2160 / Math.max(iw, ih, 1));

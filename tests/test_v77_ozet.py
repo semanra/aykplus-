@@ -28,7 +28,7 @@ SEED = """() => {
   log(new Date(y - 1, 5, 5, 18).getTime(), 'Z', 5, 999, 40, 0);
   const dk = d => todayStr(new Date(y, m, d, 12));
   state.mobilityLog[dk(2)] = ['x']; state.mobilityLog[dk(3)] = ['y', 'z'];
-  state.dailyLogs[dk(1)] = { eatenKcal: 2000, calTarget: 2050, eatenP: 150, proTarget: 160 };
+  state.dailyLogs[dk(1)] = { eatenKcal: 2000, calTarget: 2050, eatenP: 154, proTarget: 160 };   // v82: protein eşiği %95 (İlerleme ile aynı)
   state.dailyLogs[dk(2)] = { eatenKcal: 2500, calTarget: 2050, eatenP: 120, proTarget: 160 };
   state.weightLogs = [{ ts: at(1), weight: 80, date: '' }, { ts: at(9), weight: 79.2, date: '' }];
   const wk = ts => { const d = new Date(ts); const dow = (d.getDay() + 6) % 7; return Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate() - dow, 12)).getTime() / (7 * 864e5)); };
@@ -59,7 +59,7 @@ try:
     check(pg.evaluate("() => { const c = document.getElementById('recapMap'); return !c || c.width > 0; }"), "3d: kas haritası çizilir (ya da sessizce kalkar)")
     check("2 gün esneme / mobilite" in pg.inner_text("[data-recap-mob]"), "3e: mobilite 2 gün")
     nut = pg.inner_text("[data-recap-nut]")
-    check("Ortalama 2.250 kcal · 135 g protein" in nut and "Kayıtlı 2 günün 1 gününde kalori hedefine (±%5), 1 gününde protein" in nut, f"3f: beslenme ({nut!r})")
+    check("Ortalama 2.250 kcal · 137 g protein" in nut and "Kayıtlı 2 günün 1 gününde kalori hedefine (±%5), 1 gününde protein" in nut, f"3f: beslenme ({nut!r})")
     check("80 kg → 79,2 kg" in pg.inner_text("[data-recap-w]") and "-0,8" in pg.inner_text("[data-recap-w]"), f"3g: kilo değişimi {pg.inner_text('[data-recap-w]')!r}")
     # 4) dönemler
     chips = pg.evaluate("() => [...document.querySelectorAll('[data-recap-p]')].map(b => b.dataset.recapP)")

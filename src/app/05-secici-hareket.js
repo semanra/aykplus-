@@ -320,7 +320,7 @@ function e1rm(kg, reps) {
   if (kg <= 0 || reps <= 0) return 0;
   return reps === 1 ? kg : kg * (1 + reps / 30);
 }
-function historyFor(name) { return state.exerciseHistory[exKey(name)] || []; }
+function historyFor(name) { return exHist(exKey(name)) || []; }
 // v60: geçmişte bu hareketle kaldırılan son çalışma kilosu (en son ağırlık seansının en büyük kilosu; yoksa 0)
 function lastWorkKg(name) {
   const h = historyFor(name);
@@ -346,8 +346,8 @@ function paceText(min, km) {
   if (!(min > 0 && km > 0)) return "";
   const speed = km / (min / 60);
   const pace = min / km;
-  const pm = Math.floor(pace), ps = Math.round((pace - pm) * 60);
-  return t("{speed} km/s • {pm}:{ps} /km", { speed, pm: String(pm), ps: String(ps === 60 ? 59 : ps).padStart(2, "0") });
+  const tot = Math.round(pace * 60), pm = Math.floor(tot / 60), ps = tot % 60;   // v82: 5:59,8 → 6:00 (eskiden 5:59)
+  return t("{speed} km/s • {pm}:{ps} /km", { speed, pm: String(pm), ps: String(ps).padStart(2, "0") });
 }
 function sessionSummary(sess) {
   const sets = sess.sets || [];
@@ -518,7 +518,7 @@ async function finishAndLogWorkout() {
     const done = ex.sets.filter(s => s.done);
     if (!done.length) return;
     const key = exKey(ex.name);
-    const arr = state.exerciseHistory[key] || (state.exerciseHistory[key] = []);
+    const arr = exHist(key, true);
     const sets = done.map(s => ex.kind === "cardio" ? { min: num(s.min), km: num(s.km), lvl: s.lvl || "" }
       : ex.kind === "time" ? { sec: num(s.sec) } : (EFFORT_LABELS[s.e] ? { kg: num(s.kg), reps: num(s.reps), e: s.e } : { kg: num(s.kg), reps: num(s.reps) }));
     const sess = { ts, logId, kind: ex.kind, name: ex.name, sets };
