@@ -195,6 +195,17 @@ function foodGroupName(g) {
 // Süzgeçler: yüksek protein (kalorinin ≥ %30'u proteinden), düşük kalori (g/ml: 100 g'da ≤ 100 kcal; diğer birimler: 1 birimde ≤ 100 kcal)
 function foodHighProtein(f) { const k = kcalPerUnit(f); return k > 0 && (num(f.p) * 4) / k >= 0.3; }
 function foodLowCal(f) { const k = kcalPerUnit(f); if (f.drink || f.cat === "İçecekler") return f.unit === "ml" || f.unit === "g" ? k * 100 <= 20 : k <= 20; return (f.unit === "g" || f.unit === "ml") ? k * 100 <= 100 : k <= 100; }
+// v81: düşük karbonhidrat — 100 g/ml'de ≤ 5 g karbonhidrat (adet/porsiyon biriminde enerjinin ≤ %10'u);
+//      düşük yağ — 100 g'da ≤ 3 g, 100 ml'de ≤ 1,5 g yağ (AB "düşük yağlı" beyanı; adet biriminde enerjinin ≤ %20'si)
+function foodLowCarb(f) {
+  if (f.unit === "g" || f.unit === "ml") return num(f.c) * 100 <= 5;
+  const k = kcalPerUnit(f); return k > 0 ? (num(f.c) * 4) / k <= 0.1 : num(f.c) <= 0;
+}
+function foodLowFat(f) {
+  if (f.unit === "g") return num(f.f) * 100 <= 3;
+  if (f.unit === "ml") return num(f.f) * 100 <= 1.5;
+  const k = kcalPerUnit(f); return k > 0 ? (num(f.f) * 9) / k <= 0.2 : num(f.f) <= 0;
+}
 // v66: içecek mi? (markalı içecek, USDA İçecekler grubu, kullanıcının "İçecek" olarak eklediği)
 function isDrinkFood(id, f) { return !!f && (f.drink === true || foodGroupOf(id, f) === "icecek"); }
 function isFavFood(id) { return (state.favFoods || []).includes(id); }

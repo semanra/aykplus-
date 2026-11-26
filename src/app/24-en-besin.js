@@ -196,6 +196,8 @@ Object.assign(EN, {
   "Favoriler": "Favourites",
   "Yüksek protein": "High protein",
   "Düşük kalori": "Low calorie",
+  "Düşük karbonhidrat": "Low carb",   // v81
+  "Düşük yağ": "Low fat",
   "Süzgeçler": "Filters",
   "Favorilere eklendi": "Added to favourites",
   "Favorilerden çıkarıldı": "Removed from favourites",

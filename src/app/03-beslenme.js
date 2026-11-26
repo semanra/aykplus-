@@ -277,17 +277,22 @@ function renderNutrition() {
   if (typeof animApplyItemMarks === "function") animApplyItemMarks(view);   // v57 ANİM: besin ekleme
 }
 // Menülerim: güncel kilo, kalori açığı, koç ipucu
+let weightSliding = false;   // v81: kilo çubuğu sürükleniyor (oninput → true, change → false)
 function renderWeightBlock(st) {
   const logged = state.weightLogs.map(l => num(l.weight, 0)).filter(w => w > 0);
   const minW = Math.floor(Math.min(num(st.targetWeight, 82) - 5, ...logged.map(w => w - 5), state.weight));
   const maxW = Math.ceil(Math.max(...logged.map(w => w + 10), state.weight + 10, num(st.targetWeight, 82) + 10));
   const slider = $("weightSlider");
-  if (isImperial()) {   // v53: kaydırıcı lb'de; kaydırılmadıysa kayıttaki kg değişmez (updateProfile)
+  // v81: sınırlar kaydırma sürerken DEĞİŞMEZ (eskiden her adımda "kilo + 10" yeniden hesaplanıyordu → uca gelince
+  // üst sınır kaçıyor, 600 kg'a kadar gidiyordu). Bırakınca (change) yeni kiloya göre yeniden kurulur. Aralık 30–300 kg.
+  if (weightSliding) { /* yalnız değer ve yazılar güncellenir */ }
+  else if (isImperial()) {   // v53: kaydırıcı lb'de; kaydırılmadıysa kayıttaki kg değişmez (updateProfile)
     const D = x => num(bodyKgToDisp(x));
     slider.min = Math.floor(Math.min(D(num(st.targetWeight, 82)) - 10, ...logged.map(w => D(w) - 10), D(state.weight)));
     slider.max = Math.ceil(Math.max(...logged.map(w => D(w) + 20), D(state.weight) + 20, D(num(st.targetWeight, 82)) + 20));
+    slider.min = Math.max(66, num(slider.min)); slider.max = Math.min(661, num(slider.max));
     slider.value = D(state.weight);
-  } else { slider.min = minW; slider.max = maxW; slider.value = state.weight; }
+  } else { slider.min = Math.max(30, minW); slider.max = Math.min(300, maxW); slider.value = state.weight; }
   slider.dataset.shown = slider.value;
   $("weightVal").textContent = fmtWNum(state.weight, { body: true });
   if ($("weightUnit").textContent !== wUnit()) $("weightUnit").textContent = wUnit();

@@ -152,7 +152,7 @@ try:
     nat = pg.evaluate("""() => { const db = getFoodDB(); const id = Object.keys(db).find(i => typeof db[i].src === 'number' && naturalUnit(db[i])); return id ? [id, naturalUnit(db[id]).label] : null; }""")
     check(nat is not None and not re.search(r"adet|dilim|parça|göğüs", nat[1]), "en naturalUnit: etiket İngilizce %s" % (nat,))
     # Kombo seçimi kartı: malzeme adları İngilizce
-    pg.evaluate("state.combos = [{ id: 'kx', name: 'Kombom', items: [{ foodId: 'u168652', amount: 50 }, { foodId: 'u175139', amount: 30 }] }]; foodUI.sel = null; foodUI.cat = 'combos'; $('foodSearch').value = ''; renderAll();")
+    pg.evaluate("state.combos = [{ id: 'kx', name: 'Kombom', items: [{ foodId: 'u168652', amount: 50 }, { foodId: 'u175139', amount: 30 }] }]; foodUI.sel = null; foodUI.cat = 'combos'; foodUI.auto = false; $('foodSearch').value = ''; renderAll();")
     pg.evaluate("selectCombo('kx')"); pg.wait_for_timeout(150)
     ch = pg.inner_text("#foodList")
     check(EN_BEEF in ch and EN_SARD in ch and "Kombom" in ch, "en kombo kartı: malzemeler İngilizce, kombo adı olduğu gibi")

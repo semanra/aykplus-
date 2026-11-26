@@ -84,10 +84,12 @@ try:
 
     # ---------- 3) Liste sayfalama ve USDA besin kartı
     search(pg, "")
+    pg.evaluate("setFoodCat('g:et')"); pg.wait_for_timeout(80)   # v81: "Tümü" artık grup kutuları; sayfalama grup listesinde
     rows = pg.locator("#foodList [data-food]").count()
-    check(rows <= 61 and pg.locator("#foodMore").count() == 1, f"'Tümü' ilk {rows} sonucu gösteriyor, 'daha fazla' düğmesi var")
+    check(rows <= 61 and pg.locator("#foodMore").count() == 1, f"grup listesi ilk {rows} sonucu gösteriyor, 'daha fazla' düğmesi var")
     pg.click("#foodMore"); pg.wait_for_timeout(80)
     check(pg.locator("#foodList [data-food]").count() > rows, "'daha fazla' yeni sonuçlar getiriyor")
+    pg.evaluate("setFoodCat('all')"); pg.wait_for_timeout(80)
     search(pg, "elma kabuklu")
     apple = pg.evaluate("Object.keys(USDA_DB).find(id => USDA_DB[id].name === 'Elma (kabuklu), çiğ')")
     check(apple is not None, "USDA elma bulundu")

@@ -206,7 +206,7 @@ function saveRecipe() {
   closeModal("recipeModal");
   toast(editing ? t("{n} tarifi güncellendi", { n: name }) : t("{n} tarifi besin listene eklendi", { n: name }));
   renderAll();
-  if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") { foodUI.cat = "recipes"; renderFoods(); selectFood(id); }
+  if (!editing && state.activeTab === "nutrition" && state.nutriView === "foods") { foodUI.cat = "recipes"; foodUI.auto = false; renderFoods(); selectFood(id); }
 }
 
 // ---------------------------------------------------------------------------
