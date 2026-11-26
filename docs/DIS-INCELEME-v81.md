@@ -53,3 +53,4 @@ Durum: ✔ = doğrulandı (gerçek) · ~ = gerçek ama dar/kenar durum · ✗ = 
 - iCloud yedeğinde son sağlam kopyanın ezilmemesi: atomik yazma, önceki sürümü saklama (Codex).
 - iOS paketine foods.js, foods-en.js, vendor/, img/ alan `webDir` derleme adımı (Codex).
 - Info.plist / PrivacyInfo.xcprivacy şablonları (Gemini teklif etti).
+- Etiket fotoğrafından besin değeri okuma (OCR): iOS Vision (VNRecognizeTextRequest, internetsiz, ücretsiz); okunan 100 g / porsiyon değerleri etiket formuna dolar, kullanıcı kontrol edip kaydeder (otomatik kayıt yok). Kullanıcı onayı: 26 Kasım 2026 (v83 konuşması). Önce Türkçe tablolarda doğruluk denemesi.

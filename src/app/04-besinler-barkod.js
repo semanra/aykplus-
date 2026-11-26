@@ -581,7 +581,8 @@ async function onBarcode(raw) {
              ? `<div id="bcWarn" class="rounded-2xl p-3 text-[13px] leading-snug" style="background: var(--n-over-soft); color: var(--n-text)"><strong style="color: var(--n-over)">${t("⚠ Etiketle karşılaştır.")}</strong> ${esc(issues.join(" "))} ${t("Bu veriler gönüllülerce girilir; hata olabilir.")}</div>
                 <button onclick="barcodeFixFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Etikete bakıp düzelt")}</button>
                 <button onclick="addBarcodeFood()" class="n-btn-outline w-full h-12 rounded-full text-[15px]">${t("Yine de ekle")}</button>`
-             : `<button onclick="addBarcodeFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Listeme ekle ve seç")}</button>`}`
+             : `<button onclick="addBarcodeFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Listeme ekle ve seç")}</button>`}
+           <button data-bc-wrong onclick="barcodeWrongProduct()" class="w-full min-h-[44px] rounded-full text-[14px] font-semibold n-muted underline underline-offset-4">${t("Bu ürün değil, elle gir")}</button>`
         : `<p class="text-[13px] n-muted">${t("Paketin üzerindeki 100 {u} değerleriyle elle ekleyebilirsin.", { u: unit })}</p>
            <button onclick="barcodeManualFood()" class="n-btn w-full h-12 rounded-full text-[15px]">${t("Elle ekle")}</button>`}
     </div>`;
@@ -643,6 +644,14 @@ function barcodeFixFood() {
   $("cfHint").textContent = t("Barkod {code}. Bulunan değerler tutarsızdı; paketin besin tablosuyla karşılaştırıp düzelt (100 g değerleri).", { code: b.code });
   if (b.kcal != null) $("cfK").value = fmtNum(b.kcal);
   $("cfP").value = fmtNum(b.p); $("cfC").value = fmtNum(b.c); $("cfF").value = fmtNum(b.f);
+}
+// v83: barkod yanlış ürünü getirdi → boş etiket formu (ad ve değerler kullanıcıdan); ürün bu barkodla kaydedilir
+function barcodeWrongProduct() {
+  const b = bc.found || {};
+  if (!b.code) return;
+  closeBarcode();
+  openLabelForm(b.code, "");
+  $("cfHint").textContent = t("Barkod {code}. Bulunan ürün yanlıştı; paketteki ürün adını ve besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.", { code: b.code });
 }
 function barcodeManualFood() {
   const b = bc.found || {};

@@ -273,6 +273,8 @@ Object.assign(EN, {
   "Etikete bakıp düzelt": "Edit from label",
   "Yine de ekle": "Add anyway",
   "Listeme ekle ve seç": "Add to my foods and select",
+  "Bu ürün değil, elle gir": "Wrong product, enter manually",
+  "Barkod {code}. Bulunan ürün yanlıştı; paketteki ürün adını ve besin tablosundaki değerleri yaz (100 g ya da 1 porsiyon). Ürün bu barkodla kaydedilir; sonraki taramada internetsiz tanırım.": "Barcode {code}. The product found was wrong; enter the product name and the values from the nutrition table on the pack (per 100 g or per serving). It's saved with this barcode, so next time it's recognised offline.",
   "Paketin üzerindeki 100 {u} değerleriyle elle ekleyebilirsin.": "You can add it manually using the per-100 {u} values on the pack.",
   "Elle ekle": "Add manually",
   "Etiketteki değerleri gir": "Enter label values",
