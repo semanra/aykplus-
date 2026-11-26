@@ -1783,7 +1783,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v83</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v84</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -3270,6 +3270,9 @@ function normalizeStateInner(raw) {
   // v65: favori besinler (kimlik listesi; tekrarsız, en fazla 300; bulunamayan kimlik silinmez, listede gösterilmez)
   if (!Array.isArray(s.favFoods)) s.favFoods = [];
   s.favFoods = [...new Set(s.favFoods.filter(x => typeof x === "string" && x))].slice(0, 300);
+  // v84: besin başına en son seçilen miktar (Besinler kartı bir dahakine bununla açılır); en fazla 200 besin, en yenisi sonda
+  { const fa = {}; if (isObj(s.foodAmts)) Object.keys(s.foodAmts).forEach(k => { const v = num(s.foodAmts[k], NaN); if (k && k !== "__proto__" && isFinite(v) && v > 0 && v <= 5000) fa[k] = round1(v); });
+    const ks = Object.keys(fa); ks.slice(0, Math.max(0, ks.length - 200)).forEach(k => delete fa[k]); s.foodAmts = fa; }
   // v78: hareket notları { exKey: metin } (boş atılır, en fazla EX_NOTE_MAX karakter)
   if (!isObj(s.exNotes)) s.exNotes = {};
   Object.keys(s.exNotes).forEach(k => {
@@ -5256,7 +5259,8 @@ function selectFood(id) {
   if (!f) return;
   if (!String(id).startsWith("combo:") && !foodKindOk(id, f)) { foodUI.kind = isDrinkFood(id, f) ? "drink" : "food"; foodUI.cat = "all"; foodUI.auto = false; renderFoods(); }   // v66
   foodUI.sel = id;
-  foodUI.amt = round1(num(f.def, 1));
+  const last = state.foodAmts && Object.prototype.hasOwnProperty.call(state.foodAmts, id) ? num(state.foodAmts[id], 0) : 0;   // v84: en son seçilen miktar
+  foodUI.amt = last > 0 ? round1(last) : round1(num(f.def, 1));
   renderFoodHead();
   renderFoodList();
   const el = $("foodSelCard");
@@ -5334,6 +5338,7 @@ function addSelectedFood() {
   const tIdx = foodTargetIdx();
   if (!s || tIdx < 0 || !(s.a > 0)) return;
   const fid = foodUI.sel, amt = s.a;
+  if (!s.combo && fid) { const fa = state.foodAmts || (state.foodAmts = {}); delete fa[fid]; fa[fid] = round1(amt); const ks = Object.keys(fa); if (ks.length > 200) delete fa[ks[0]]; }   // v84
   if (foodUI.dest === "menu") {
     const mealTitle = curMeals()[tIdx].title;
     quickAdd(tIdx, fid, amt, curMeals());

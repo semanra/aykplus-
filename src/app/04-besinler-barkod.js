@@ -293,7 +293,8 @@ function selectFood(id) {
   if (!f) return;
   if (!String(id).startsWith("combo:") && !foodKindOk(id, f)) { foodUI.kind = isDrinkFood(id, f) ? "drink" : "food"; foodUI.cat = "all"; foodUI.auto = false; renderFoods(); }   // v66
   foodUI.sel = id;
-  foodUI.amt = round1(num(f.def, 1));
+  const last = state.foodAmts && Object.prototype.hasOwnProperty.call(state.foodAmts, id) ? num(state.foodAmts[id], 0) : 0;   // v84: en son seçilen miktar
+  foodUI.amt = last > 0 ? round1(last) : round1(num(f.def, 1));
   renderFoodHead();
   renderFoodList();
   const el = $("foodSelCard");
@@ -371,6 +372,7 @@ function addSelectedFood() {
   const tIdx = foodTargetIdx();
   if (!s || tIdx < 0 || !(s.a > 0)) return;
   const fid = foodUI.sel, amt = s.a;
+  if (!s.combo && fid) { const fa = state.foodAmts || (state.foodAmts = {}); delete fa[fid]; fa[fid] = round1(amt); const ks = Object.keys(fa); if (ks.length > 200) delete fa[ks[0]]; }   // v84
   if (foodUI.dest === "menu") {
     const mealTitle = curMeals()[tIdx].title;
     quickAdd(tIdx, fid, amt, curMeals());

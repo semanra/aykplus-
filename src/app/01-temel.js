@@ -372,6 +372,9 @@ function normalizeStateInner(raw) {
   // v65: favori besinler (kimlik listesi; tekrarsız, en fazla 300; bulunamayan kimlik silinmez, listede gösterilmez)
   if (!Array.isArray(s.favFoods)) s.favFoods = [];
   s.favFoods = [...new Set(s.favFoods.filter(x => typeof x === "string" && x))].slice(0, 300);
+  // v84: besin başına en son seçilen miktar (Besinler kartı bir dahakine bununla açılır); en fazla 200 besin, en yenisi sonda
+  { const fa = {}; if (isObj(s.foodAmts)) Object.keys(s.foodAmts).forEach(k => { const v = num(s.foodAmts[k], NaN); if (k && k !== "__proto__" && isFinite(v) && v > 0 && v <= 5000) fa[k] = round1(v); });
+    const ks = Object.keys(fa); ks.slice(0, Math.max(0, ks.length - 200)).forEach(k => delete fa[k]); s.foodAmts = fa; }
   // v78: hareket notları { exKey: metin } (boş atılır, en fazla EX_NOTE_MAX karakter)
   if (!isObj(s.exNotes)) s.exNotes = {};
   Object.keys(s.exNotes).forEach(k => {
