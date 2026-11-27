@@ -119,6 +119,7 @@ function openRecipeModal(editId) {
   $("rcTitle").textContent = isRec ? t("Tarifi düzenle") : t("Yeni tarif");
   $("rcName").value = isRec ? stripEmoji(f.name) : "";
   $("rcCooked").value = isRec ? fmtNum(f.recipe.cooked) : "";
+  $("rcEat").value = "";
   closeModal("pickerModal");
   renderRecipe();
   openModal("recipeModal");
@@ -168,6 +169,13 @@ function updateRecipeSummary() {
       ? `<div class="flex items-baseline justify-between gap-2 mt-1"><span class="n-muted">${t("Pişmiş 100 g")}</span><strong class="tabular-nums n-accent">${fmtInt(rt.cal * per)} kcal</strong></div>
          <div class="text-right text-[12px] font-semibold tabular-nums">${macroLine(rt.p * per, rt.c * per, rt.f * per, true)}</div>`
       : `<div class="text-[12px] n-dim mt-1">${t("100 g değerlerini hesaplamam için pişmiş toplam ağırlığı yaz.")}</div>`);
+  // v85: "tamamı 640 g, ben 180 g yedim" — yenen miktarın değerleri (kayda yazılmaz; besin olarak eklerken aynı gram yazılır)
+  $("rcEatBox").classList.toggle("hidden", !(cooked > 0 && rt.cal > 0));
+  const eat = num($("rcEat").value, 0);
+  $("rcEatOut").innerHTML = cooked > 0 && eat > 0
+    ? `<div class="flex items-baseline justify-between gap-2"><span class="n-muted">${esc(t("{e} g / {c} g (%{pct})", { e: fmtNum(eat), c: fmtNum(cooked), pct: String(Math.round(eat / cooked * 100)) }))}</span><strong class="n-accent">${fmtInt(rt.cal * eat / cooked)} kcal</strong></div>
+       <div class="text-right text-[12px] font-semibold">${macroLine(rt.p * eat / cooked, rt.c * eat / cooked, rt.f * eat / cooked, true)}</div>`
+    : `<span class="n-dim text-[12px]">${t("Tencereden aldığın tabağı tart; değerleri burada görürsün. Tarifi kaydettikten sonra Besinler'de aynı gramı yazarak eklersin.")}</span>`;
 }
 function rcAddIngredient() {
   const db = getFoodDB();

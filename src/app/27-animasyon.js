@@ -309,7 +309,7 @@ function animSheetIn(overlay) {
     animPlay(box, [{ opacity: 0, transform: "translateY(8px) scale(.95)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "cubic-bezier(.34, 1.3, .64, 1)" });
   }
 }
-const SHEET_NOSWIPE = new Set(["recipeModal", "freeMealModal"]);   // dışına dokununca da kapanmayan, kaydedilmemiş giriş tutan pencereler
+const SHEET_NOSWIPE = new Set(["recipeModal", "freeMealModal", "editLogModal", "pastFoodModal"]);   // v85: düzelt / geçmiş güne ekle   // dışına dokununca da kapanmayan, kaydedilmemiş giriş tutan pencereler
 const SHEET_CLOSE_RX = /^\s*close(Modal\('\w+'\)|Barcode\(\))\s*;?\s*$/;
 function sheetCloseVia(overlay) {
   if (overlay.id === "uiDialog") { if (uiDlg && uiDlg.dismissable) uiDialogDone(false); return; }

@@ -477,6 +477,21 @@ async function addWorkoutDay() {
   state.activeWorkoutDayIdx = state.workoutDays.length - 1;
   renderAll();
 }
+// v85: günü kopyala — hareketler ve set hedefleri aynı, işaretler (done/rekor/zorluk) temiz; süperset grupları yeni kimlikle
+async function copyWorkoutDay() {
+  const d = activeDay();
+  const name = await uiAsk({ title: t("Günü kopyala"), message: t("Kopyanın adını yaz."), input: { value: t("{name} (kopya)", { name: d.name }) }, ok: t("Kopyala") });
+  if (!name || !name.trim()) return;
+  const exs = clone(d.exercises), ssMap = {};
+  exs.forEach(ex => {
+    (ex.sets || []).forEach(s => { s.done = false; s.pr = false; delete s.e; });
+    if (typeof ex.ss === "string" && ex.ss) ex.ss = ssMap[ex.ss] || (ssMap[ex.ss] = ssNewId());
+  });
+  state.workoutDays.push({ id: "day_" + Date.now(), name: name.trim().slice(0, 60), exercises: exs });
+  state.activeWorkoutDayIdx = state.workoutDays.length - 1;
+  renderAll();
+  toast(t("\"{name}\" oluşturuldu", { name: name.trim().slice(0, 60) }));
+}
 async function renameWorkoutDay() {
   const d = activeDay();
   const n = await uiAsk({ title: t("Günü adlandır"), message: t("Günün yeni adını yaz."), input: { value: d.name }, ok: t("Kaydet") });

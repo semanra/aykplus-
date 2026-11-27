@@ -1315,6 +1315,8 @@
       </div>
       <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
         <p class="text-[13px] n-muted" data-t="Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.">Tahmini değerleri gir. Bu giriş yalnızca bugünü etkiler; menün değişmez.</p>
+        <div><label for="fmMealSel" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Hangi öğün?">Hangi öğün?</label>
+          <select id="fmMealSel" onchange="fmPickMeal(this.value)" class="n-in w-full font-semibold"></select></div>
         <div><label for="fmName" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Ne yedin? (isteğe bağlı)">Ne yedin? (isteğe bağlı)</label>
           <input id="fmName" type="text" autocomplete="off" placeholder="örn: Döner dürüm + ayran" data-t-ph="örn: Döner dürüm + ayran" class="n-in w-full" /></div>
         <div class="grid grid-cols-2 gap-2">
@@ -1345,6 +1347,38 @@
     </div>
   </div>
 
+  <!-- v85: GEÇMİŞ GÜNE YEDİĞİNİ EKLE (beslenme temasında; besin seçici bunun üstünde açılır → z-[45]) -->
+  <div id="pastFoodModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-[45]">
+    <div role="dialog" aria-labelledby="pdTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
+      <div class="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
+        <div class="min-w-0"><h3 id="pdTitle" class="text-[20px] font-extrabold" data-t="Yediğini ekle">Yediğini ekle</h3><div id="pdDay" class="text-[13px] n-muted truncate"></div></div>
+        <button onclick="closeModal('pastFoodModal')" aria-label="Kapat" data-t-aria="Kapat" class="w-11 h-11 shrink-0 rounded-full n-elev n-muted flex items-center justify-center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="flex-1 overflow-y-auto px-5 pb-3 space-y-3">
+        <p class="text-[13px] n-muted" data-t="O gün yediğin ama girmeyi unuttuğun yemeği ekle. Günün özeti, haftalık ortalama ve kalori koçu buna göre güncellenir.">O gün yediğin ama girmeyi unuttuğun yemeği ekle. Günün özeti, haftalık ortalama ve kalori koçu buna göre güncellenir.</p>
+        <div id="pdList"></div>
+        <div id="pdSel"></div>
+        <div class="n-label pt-1" data-t="YA DA TAHMİNİ GİR">YA DA TAHMİNİ GİR</div>
+        <div><label for="pdName" class="block text-[13px] font-semibold n-muted mb-1.5" data-t="Ne yedin? (isteğe bağlı)">Ne yedin? (isteğe bağlı)</label>
+          <input id="pdName" type="text" autocomplete="off" placeholder="örn: Döner dürüm + ayran" data-t-ph="örn: Döner dürüm + ayran" class="n-in w-full" /></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label for="pdKcal" class="block text-[13px] font-semibold mb-1.5" data-t="Kalori (kcal)">Kalori (kcal)</label>
+            <input id="pdKcal" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 850" data-t-ph="örn: 850" class="n-in w-full" /></div>
+          <div><label for="pdP" class="block text-[13px] font-semibold n-p mb-1.5" data-t="Protein (g)">Protein (g)</label>
+            <input id="pdP" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 40" data-t-ph="örn: 40" class="n-in w-full" /></div>
+          <div><label for="pdC" class="block text-[13px] font-semibold n-k mb-1.5" data-t="Karb (g) · isteğe bağlı">Karb (g) · isteğe bağlı</label>
+            <input id="pdC" type="text" inputmode="decimal" autocomplete="off" placeholder="—" class="n-in w-full" /></div>
+          <div><label for="pdF" class="block text-[13px] font-semibold n-y mb-1.5" data-t="Yağ (g) · isteğe bağlı">Yağ (g) · isteğe bağlı</label>
+            <input id="pdF" type="text" inputmode="decimal" autocomplete="off" placeholder="—" class="n-in w-full" /></div>
+        </div>
+        <button onclick="pdAddEst()" class="n-btn-outline w-full h-12 rounded-full text-[14px]" data-t="Tahmini ekle">Tahmini ekle</button>
+      </div>
+      <div class="px-5 pt-3 pb-5 n-bt">
+        <button onclick="closeModal('pastFoodModal')" class="n-btn-ghost w-full h-[52px] rounded-full text-[15px]" data-t="Bitti">Bitti</button>
+      </div>
+    </div>
+  </div>
+
   <!-- v15: TARİF (beslenme temasında; malzeme seçici bunun üstünde açılır → z-[45]) -->
   <div id="recipeModal" class="fixed inset-0 bg-black/80 hidden items-end md:items-center justify-center z-[45]">
     <div role="dialog" aria-labelledby="rcTitle" class="sheet n-sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] flex flex-col" style="max-height: 94vh;">
@@ -1364,6 +1398,11 @@
           <input id="rcCooked" type="text" inputmode="decimal" autocomplete="off" oninput="updateRecipeSummary()" class="n-in w-full" />
           <p class="text-[12px] n-dim mt-1.5" data-t="Pişince tencereyi tart, boş tencerenin ağırlığını düş. Sonra yediğin miktarı gram olarak girersin.">Pişince tencereyi tart, boş tencerenin ağırlığını düş. Sonra yediğin miktarı gram olarak girersin.</p></div>
         <div id="rcSum" class="n-elev rounded-2xl px-3.5 py-3 text-[13px]"></div>
+        <div id="rcEatBox" class="hidden n-elev rounded-2xl px-3.5 py-3 space-y-2">
+          <label for="rcEat" class="block text-[13px] font-semibold" data-t="Ben ne kadar yedim? (g)">Ben ne kadar yedim? (g)</label>
+          <input id="rcEat" type="text" inputmode="decimal" autocomplete="off" placeholder="örn: 180" data-t-ph="örn: 180" oninput="updateRecipeSummary()" class="n-in w-full" />
+          <div id="rcEatOut" class="text-[13px] tabular-nums" role="status" aria-live="polite"></div>
+        </div>
       </div>
       <div class="grid grid-cols-2 gap-2 px-5 pt-3 pb-5 n-bt">
         <button onclick="closeModal('recipeModal')" class="n-btn-ghost h-[52px] rounded-full text-[15px]" data-t="Vazgeç">Vazgeç</button>
@@ -1418,6 +1457,13 @@
   <div id="finishModal" class="fixed inset-0 bg-black/70 hidden items-end md:items-center justify-center z-50">
     <div role="dialog" aria-modal="true" aria-labelledby="finTitle" class="sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] px-5 pt-2.5 pb-6 overflow-y-auto" style="max-height: 90vh;">
       <div id="finBody"></div>
+    </div>
+  </div>
+
+  <!-- v85: BİTMİŞ ANTRENMANI DÜZELT (içerik renderEditLog ile çizilir) -->
+  <div id="editLogModal" class="fixed inset-0 bg-black/70 hidden items-end md:items-center justify-center z-50">
+    <div role="dialog" aria-modal="true" aria-labelledby="elTitle" class="sheet w-full md:max-w-md rounded-t-[28px] md:rounded-[28px] px-5 pt-2.5 pb-6 overflow-y-auto" style="max-height: 90vh;">
+      <div id="elBody"></div>
     </div>
   </div>
 
@@ -1599,6 +1645,25 @@
             </label>
             <div id="setBfHint" class="hidden bg-[var(--t-well)] border border-[var(--t-line)] rounded-2xl px-3.5 py-3 text-[13px] text-[var(--t-muted)]"></div>
             <div id="pfTargetsBox"></div>
+          </div>
+        </section>
+        <!-- v85: KENDİ HEDEFİM (diyetisyen/koç verdiyse elle) -->
+        <section class="space-y-2.5" aria-labelledby="pfHMan">
+          <div id="pfHMan" class="t-label" data-t="KENDİ HEDEFİM">KENDİ HEDEFİM</div>
+          <div class="t-card rounded-[22px] p-4 space-y-3">
+            <label class="flex items-center justify-between gap-3 min-h-[52px]" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Hedefimi elle gireceğim">Hedefimi elle gireceğim</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Diyetisyenin ya da koçun verdiyse. Hesaplanan hedefin ve koç önerisi yerine geçer.">Diyetisyenin ya da koçun verdiyse. Hesaplanan hedefin ve koç önerisi yerine geçer.</span></span>
+              <input id="manOn" type="checkbox" role="switch" class="t-sw" onchange="manualTargetChanged()" />
+            </label>
+            <div id="manBox" class="hidden space-y-2.5">
+              <div class="grid grid-cols-2 gap-2.5">
+                <div><label for="manKcal" class="t-field" data-t="Kalori (kcal)">Kalori (kcal)</label><input id="manKcal" type="text" inputmode="decimal" placeholder="örn: 2200" data-t-ph="örn: 2200" onchange="manualTargetChanged()" class="t-in text-center font-bold" /></div>
+                <div><label for="manP" class="t-field" data-t="Protein (g)">Protein (g)</label><input id="manP" type="text" inputmode="decimal" placeholder="örn: 160" data-t-ph="örn: 160" onchange="manualTargetChanged()" class="t-in text-center font-bold" /></div>
+                <div><label for="manC" class="t-field" data-t="Karb (g) · isteğe bağlı">Karb (g) · isteğe bağlı</label><input id="manC" type="text" inputmode="decimal" placeholder="otomatik" data-t-ph="otomatik" onchange="manualTargetChanged()" class="t-in text-center font-bold" /></div>
+                <div><label for="manF" class="t-field" data-t="Yağ (g) · isteğe bağlı">Yağ (g) · isteğe bağlı</label><input id="manF" type="text" inputmode="decimal" placeholder="otomatik" data-t-ph="otomatik" onchange="manualTargetChanged()" class="t-in text-center font-bold" /></div>
+              </div>
+              <p id="manNote" class="text-[13px] text-[var(--t-muted)]" role="status" aria-live="polite"></p>
+            </div>
           </div>
         </section>
         <section class="space-y-2.5" aria-labelledby="pfH4">
@@ -1783,7 +1848,7 @@
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v84</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v85</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

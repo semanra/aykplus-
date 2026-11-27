@@ -268,6 +268,9 @@ function progCoachHtml() {
     + (a.notGaining ? `<p class="p-warn">${pI("warn", 16, 2)}${t("Kalori fazlası verdiğin hâlde kilo almıyorsun. Porsiyonları tartarak girmeyi ve öğün tiklerini kontrol etmeyi öneririm.")}</p>` : "")
     + (a.keepDrift ? `<p class="p-warn">${pI("warn", 16, 2)}${t("Kilon korunmuyor: haftada %{p} değişiyor.", { p: fmtNum(Math.abs(a.pctPerWeek)) })}</p>` : "")
     + (a.gaining ? `<p class="p-warn">${pI("warn", 16, 2)}${t("Açık verdiğin hâlde kilo alıyorsun. Porsiyonları tartarak girmeyi ve öğün tiklerini kontrol etmeyi öneririm.")}</p>` : "");
+  if (a.manual) {   // v85: kendi hedefin varken öneri yok; gerçek harcama yine gösterilir
+    return `<div class="p-card" id="pCoach" data-coach-manual>${head(t("Kalori koçu"), t("Kendi hedefini kullanıyorsun"))}<p class="p-fine">${t("Profil'de elle girdiğin hedef geçerli; koç hedefini değiştirmez. Tahmini gerçek harcaman: {v} kcal.", { v: String(a.tdeeEst) })}</p>${warns}${details}</div>`;
+  }
   if (Math.abs(a.delta) < 100) {
     return `<div class="p-card" id="pCoach">${head(t("Kalori koçu"), t("Doğru yoldasın; kalorinde değişiklik gerekmiyor."))}${warns}${details}${adjLine}</div>`;
   }

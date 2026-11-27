@@ -120,6 +120,13 @@ function foodSelMacros() {
 // Hazır porsiyonlar: [{ v: miktar, label }]. USDA besinlerinde USDA porsiyonları (gram karşılığıyla) gösterilir.
 function foodPresets(f) {
   const def = num(f.def, 1);
+  // v85: tarif — "tencerenin tamamı 640 g, ben 180 g yedim": Tamamı / Yarısı / Çeyreği + porsiyon + 100 g
+  const ck = f.recipe && f.unit === "g" ? Math.round(num(f.recipe.cooked, 0)) : 0;
+  if (ck > 0) {
+    const list = [{ v: round1(ck), label: t("Tamamı · {n} g", { n: fmtNum(ck) }) }, { v: round1(ck / 2), label: t("Yarısı · {n} g", { n: fmtNum(round1(ck / 2)) }) }, { v: round1(ck / 4), label: t("Çeyreği · {n} g", { n: fmtNum(round1(ck / 4)) }) }];
+    [def, 100].forEach(v => { v = round1(v); if (v > 0 && !list.some(x => x.v === v)) list.push({ v, label: `${fmtNum(v)} g${v === round1(def) ? t(" · porsiyon") : ""}` }); });
+    return { list, plus: 50 };
+  }
   if (Array.isArray(f.portions) && f.portions.length) {
     const list = f.portions.map(([n, g], i) => ({ v: round1(g), label: `${portionL(f, i, n)} · ${fmtNum(g)} g` }));
     if (!list.some(x => x.v === 100)) list.push({ v: 100, label: "100 g" });
@@ -228,6 +235,7 @@ function foodRowHtml(id, f, tIdx) {   // v65: renderFoodList'ten ayrıldı (grup
             <div class="text-[12px] n-muted mt-0.5">${esc(t(stripEmoji(f.cat || "")))}${f.barcode ? esc(t(" · barkod {b}", { b: f.barcode })) : ""}</div>
             ${foodSourceText(f) ? `<div class="text-[12px] n-dim mt-0.5" data-src>${esc(foodSourceText(f))}</div>` : ""}
             ${f.note ? `<div class="text-[12px] n-dim mt-0.5">${esc(foodNoteL(f))}</div>` : ""}
+            ${f.recipe && num(f.recipe.cooked, 0) > 0 ? `<div class="text-[12px] n-accent mt-0.5" data-recipe-hint>${esc(t("Tencerenin tamamı {n} g. Tabağını tartıp yediğin gramı yaz ya da aşağıdan seç.", { n: fmtNum(Math.round(num(f.recipe.cooked))) }))}</div>` : ""}
             ${f.kx ? `<div class="text-[12px] n-dim mt-0.5">${esc(t("Kalori USDA ölçümüdür ({x} nedeniyle makrolardan hesaplanandan farklı).", { x: kxL(f.kx) }))}</div>` : ""}</div>
           <div class="flex items-start gap-1 shrink-0">
             <div class="text-right whitespace-nowrap pt-2"><span id="foodSelKcal" class="t-display text-[28px] leading-none tabular-nums"></span><span class="text-[12px] n-muted ml-1">kcal</span></div>
@@ -435,11 +443,13 @@ function renderNutriHistory() {
           <span class="text-[13px] n-muted">${tg ? "/ " + fmtInt(tg) + " " : ""}kcal ${hasEaten ? t("yenen") : t("planlanan")}</span></div>
         ${tg ? `<div class="h-1.5 rounded-full n-bar-bg overflow-hidden"><div class="h-full rounded-full" style="width:${pct}%;background:${over ? "var(--n-over)" : "var(--n-accent)"}"></div></div>` : ""}
         ${bits.length ? `<div class="text-[12px] n-muted flex flex-wrap gap-x-3 gap-y-1">${bits.map(b => `<span>${b}</span>`).join("")}</div>` : ""}
+        ${typeof pdCardHtml === "function" ? pdCardHtml(r) : ""}
       </div>`;
   };
   $("nutriHistory").innerHTML = weekCardHtml() + rows.map(card).join("")
     + (rows.length === 1 ? `<p class="text-[13px] n-muted text-center py-2">${t("Her gün gece yarısı (ya da \"Yeni gün\" ile) günün özeti buraya eklenir.")}</p>` : "")
     + `<button onclick="switchTab('progress')" class="n-btn-outline w-full h-12 rounded-full text-[14px]">${t("Grafikler için İlerleme sekmesine git")}</button>`;
+  if (pdUI.key && !$("pastFoodModal").classList.contains("hidden")) renderPastDay();   // v85: Geri al sonrası pencere güncel kalsın
 }
 
 // ---------------------------------------------------------------------------

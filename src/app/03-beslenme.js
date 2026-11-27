@@ -15,6 +15,17 @@ function getTargets() {
   const goal = ["lose", "keep", "gain"].includes(st.goal) ? st.goal : "lose";
   const goalDelta = goal === "lose" ? -state.deficit : goal === "gain" ? Math.round(tdee * (GAIN_PACE[st.gainPace] || GAIN_PACE.mid)) : 0;
   const floor = female ? 1400 : 1750, adj = Math.round(num(st.calAdjust, 0));
+  // v85: kendi makro hedefim — formül ve koç düzeltmesi yerine kullanıcının yazdığı değerler (iki gün tipinde aynı).
+  // Karb/yağ boşsa: yağ kalorinin %25'i, karb kalan (en az 0). Alt sınır uygulanmaz (diyetisyen kararı), uyarı gösterilir.
+  const mt = st.manualTarget;
+  if (mt && mt.on && mt.kcal > 0 && mt.p > 0) {
+    const calTarget = mt.kcal, proTarget = mt.p;
+    const fatTarget = mt.f > 0 ? mt.f : Math.round(calTarget * 0.25 / 9);
+    const carbTarget = mt.c > 0 ? mt.c : Math.max(0, Math.round((calTarget - proTarget * 4 - fatTarget * 9) / 4));
+    const macroOver = Math.max(0, proTarget * 4 + carbTarget * 4 + fatTarget * 9 - calTarget);
+    const goalDelta = calTarget - tdee;
+    return { calTarget, proTarget, carbTarget, fatTarget, tdee, goal, goalDelta, floor, floored: false, effDelta: goalDelta, macroOver, manual: true, belowFloor: calTarget < floor };
+  }
   const calTarget = Math.max(floor, tdee + adj + goalDelta);
   // v82: güvenli alt sınır hedefi yukarı çektiyse gerçekte uygulanan fark (ekrandaki açık / hafta hesabı bununla)
   const floored = tdee + adj + goalDelta < floor;
@@ -335,7 +346,8 @@ function renderWeightBlock(st) {
     : t("Kalori açığı yok: kilo koruma modu");
   // v82: güvenli alt sınır notu ve makro aşımı notu
   if (tg.floored && goal !== "keep") info = t("Güvenli alt sınır ({n} kcal) nedeniyle hedefin bundan aşağı inmiyor.", { n: fmtInt(tg.floor) }) + " " + info;
-  if (tg.macroOver >= 20) info += " " + t("Protein hedefin yüksek olduğu için makroların toplamı kalori hedefini ~{n} kcal aşıyor.", { n: fmtInt(tg.macroOver) });
+  if (tg.manual) info = t("Kendi hedefin geçerli: {k} kcal (Profil → Kendi hedefim). Hesaplanan harcaman ~{d} kcal.", { k: fmtInt(tg.calTarget), d: fmtInt(tg.tdee) });   // v85
+  if (tg.macroOver >= 20 && !tg.manual) info += " " + t("Protein hedefin yüksek olduğu için makroların toplamı kalori hedefini ~{n} kcal aşıyor.", { n: fmtInt(tg.macroOver) });
   $("timelineInfo").textContent = wTxt(info);
   const hint = coachHintText();
   $("coachHint").classList.toggle("hidden", !hint);
@@ -456,7 +468,9 @@ function renderTodayMeals() {
         </div>
       </div>`;
   }
-  $("todayMeals").innerHTML = banner + meals.map((meal, mIdx) => {
+  // v85: "Dışarıda yedim" tek dokunuşla (eskiden yalnız öğün düzenleme panelinde)
+  const quickFree = `<button onclick="openFreeMealQuick()" data-quick-free class="n-btn-ghost w-full h-11 rounded-full text-[13px] mb-3 flex items-center justify-center gap-1.5">${svgI("plus", 16, 2.4)}${t("Dışarıda yedim · tahmini ekle")}</button>`;
+  $("todayMeals").innerHTML = banner + quickFree + meals.map((meal, mIdx) => {
     const mt = mealTotals(meal);
     const isNext = mIdx === nextIdx;
     const last = mIdx === meals.length - 1;
@@ -691,11 +705,27 @@ function openFreeMeal(mIdx) {
   if (!m) return;
   fmIdx = mIdx;
   $("fmMeal").textContent = m.title;
+  // v85: öğün seçici (Bugün ekranındaki tek dokunuşluk düğmeden açılınca sıradaki öğün seçili gelir)
+  $("fmMealSel").innerHTML = dayMeals().map((x, i) => `<option value="${i}"${i === mIdx ? " selected" : ""}>${esc((x.time ? x.time + " · " : "") + x.title)}${x.done ? " ✓" : ""}</option>`).join("");
   ["fmName", "fmKcal", "fmP", "fmC", "fmF"].forEach(id => { $(id).value = ""; });
   $("fmReplace").checked = true;
   $("fmBalance").checked = false;
   updateFreeMealHint();
   openModal("freeMealModal");
+}
+// v85: Bugün → "Dışarıda yedim" tek dokunuş: sıradaki yenmemiş öğün (hepsi yendiyse sonuncusu)
+function openFreeMealQuick() {
+  const meals = dayMeals();
+  if (!meals.length) return;
+  const n = meals.findIndex(m => !m.done);
+  openFreeMeal(n >= 0 ? n : meals.length - 1);
+}
+function fmPickMeal(v) {
+  const i = parseInt(v, 10), m = dayMeals()[i];
+  if (!m) return;
+  fmIdx = i;
+  $("fmMeal").textContent = m.title;
+  updateFreeMealHint();
 }
 function freeMealPreview() {
   const meals = dayMeals();

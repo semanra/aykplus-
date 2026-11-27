@@ -260,4 +260,21 @@ Object.assign(EN, {
   "Notu düzenle": "Edit note", "Not ekle": "Add note", "Koltuk ayarı, tutuş, kademe…": "Seat setting, grip, stack level…",
   // v82
   "Plaka hesabı en fazla {n} kg için yapılır.": "Plates are calculated up to {n} kg.",
+  // v85
+  "{n}. seti sil": "Delete set {n}",
+  "Kilo (kg)": "Weight (kg)",
+  "tekrar": "reps",
+  "Bu eski kayıtta set ayrıntısı yok; düzeltilecek bir şey bulunamadı.": "This older entry has no set details, so there is nothing to fix.",
+  "Antrenmanı düzelt": "Fix workout",
+  "Yanlış girdiğin kilo ya da tekrarı düzelt. Rekorlar ve grafikler yeniden hesaplanır.": "Fix a weight or rep count you entered wrong. Records and charts are recalculated.",
+  "Lütfen kilo ve tekrarı sayı olarak yaz.": "Please enter weight and reps as numbers.",
+  "Hiç set kalmadı": "No sets left",
+  "Bütün kaydı silmek istiyorsan Geçmiş'teki çöp kutusunu kullan.": "To delete the whole entry, use the trash button in History.",
+  "Antrenman düzeltildi": "Workout fixed",
+  "Düzelt": "Fix",
+  "Günü kopyala": "Duplicate day",
+  "Kopyanın adını yaz.": "Name the copy.",
+  "{name} (kopya)": "{name} (copy)",
+  "\"{name}\" oluşturuldu": "\"{name}\" created",
+  "Daha fazla göster ({n} kayıt daha)": { one: "Show more ({n} more entry)", other: "Show more ({n} more entries)" },
 });

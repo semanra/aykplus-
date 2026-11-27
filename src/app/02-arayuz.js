@@ -265,6 +265,7 @@ function nutritionTotals(meals) {
 
 function archiveDay(dateKey) {
   if (!dateKey) return;
+  markPartDirty("dailyLogs");   // v85: hızlı kayıt — eski günlerin öğün içerikleri de silinir
   // v27: o gün yapılan mobilite hareketleri sessizce saklanır (boş gün yazılmaz, kayıt silinmez)
   const mobDone = [...new Set(mobAllItems().filter(i => i.done).map(i => i.name))];
   const prevMob = Array.isArray(state.mobilityLog[dateKey]) ? state.mobilityLog[dateKey] : [];
@@ -289,9 +290,15 @@ function archiveDay(dateKey) {
   // tutulur (çift sayım yok, kayıp yok). Eskiden gün içinde düğmeye basınca gece yarısı günün özeti sıfırlarla eziliyordu.
   const old = state.dailyLogs[dateKey], cur = state.dailyLogs[dateKey] = log;
   if (old && old.manual) {
-    ["eatenKcal", "eatenP", "water", "mealsDone", "supps"].forEach(k => { cur[k] = Math.max(num(old[k], 0), num(cur[k], 0)); });
+    const oa = Array.isArray(old.added) ? pdSum(old.added) : { k: 0, p: 0 };   // v85: sonradan eklenenler aşağıda yeniden eklenir
+    ["eatenKcal", "eatenP", "water", "mealsDone", "supps"].forEach(k => { cur[k] = Math.max(num(old[k], 0) - (k === "eatenKcal" ? oa.k : k === "eatenP" ? oa.p : 0), num(cur[k], 0)); });
     if (num(old.mealsDone, 0) > dm.filter(m => m.done).length && Array.isArray(old.meals)) cur.meals = old.meals;
     cur.manual = true;
+  }
+  // v85: bu güne Geçmiş'ten sonradan eklenenler korunur (eski özetteki değerleri zaten içeriyordu; yeni özete yeniden eklenir)
+  if (old && Array.isArray(old.added) && old.added.length) {
+    cur.added = old.added;
+    cur.added.forEach(e => pdApply(cur, e, 1));
   }
   const keys = Object.keys(state.dailyLogs).sort();
   // v25: günlük özetler hiç silinmez (eskiden 180 günden eskiler siliniyordu)
@@ -317,7 +324,7 @@ function checkNewDay() {
   // ileri alınınca mantıksal gün bir gün geri gider) — o durumda dokunulmaz, yoksa dünün arşivi bugünün verisiyle ezilirdi.
   if (state.today > td && (Date.parse(state.today) - Date.parse(td)) / DAY_MS >= 2) {
     state.today = td;
-    if (state.dailyLogs[td]) state.dailyLogs[td].manual = true;   // v36: saat ileriyken bugün zaten arşivlendiyse o özet ezilmesin
+    if (state.dailyLogs[td]) { state.dailyLogs[td].manual = true; markPartDirty("dailyLogs"); }   // v36: saat ileriyken bugün zaten arşivlendiyse o özet ezilmesin
     return true;   // v36: çağıran yeniden çizip kaydetsin (eskiden düzeltme bir sonraki dokunuşa kadar kaydedilmiyordu)
   }
   if (td > state.today) {   // yalnızca ileri gidince (gün geçişi saati ileri alınınca aynı gün tekrar arşivlenmez)
@@ -334,7 +341,7 @@ async function manualNewDay() {
   if (!(await askConfirm(t("Yeni güne geçilsin mi?"), t("Su, takviye, öğün ve mobilite tikleri sıfırlanır. Bugünün özeti Beslenme → Geçmiş'e kaydedilir."), t("Yeni güne geç")))) return;
   const key = state.today || logicalToday();
   archiveDay(key);
-  if (state.dailyLogs[key]) state.dailyLogs[key].manual = true;   // v36: gece yarısı bu özet ezilmesin (archiveDay)
+  if (state.dailyLogs[key]) { state.dailyLogs[key].manual = true; markPartDirty("dailyLogs"); }   // v36: gece yarısı bu özet ezilmesin (archiveDay)
   resetDaily();
   state.today = logicalToday();
   renderAll();

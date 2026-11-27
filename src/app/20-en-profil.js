@@ -207,4 +207,18 @@ Object.assign(EN, {
   "Yine de geri yükle": "Restore anyway",
   "Şu anki verilerin iç yedeğe kaydedilemedi. Sıfırlarsan önceki hâle dönemezsin. Önce Yedekle ile dosya alman önerilir. Yine de devam edilsin mi?": "Your current data couldn't be saved to the internal backup. If you reset, you won't be able to go back. It's best to save a backup file first. Continue anyway?",
   "Yine de sıfırla": "Reset anyway",
+  // v85
+  "KENDİ HEDEFİM": "MY OWN TARGET",
+  "Hedefimi elle gireceğim": "I'll enter my target myself",
+  "Diyetisyenin ya da koçun verdiyse. Hesaplanan hedefin ve koç önerisi yerine geçer.": "If your dietitian or coach gave you one. It replaces the calculated target and coach suggestions.",
+  "örn: 2200": "e.g. 2200",
+  "örn: 160": "e.g. 160",
+  "otomatik": "automatic",
+  "Değer aralık dışında: kalori 800–6000, protein 1–500 g, karb 1–1000 g, yağ 1–400 g.": "Value out of range: calories 800–6000, protein 1–500 g, carbs 1–1000 g, fat 1–400 g.",
+  "Kalori ve proteini yazınca hedefin bu değerlere geçer.": "Once you enter calories and protein, your target switches to these values.",
+  "Geçerli hedef: {k} kcal · protein {p} g · karb {c} g · yağ {f} g": "Current target: {k} kcal · protein {p} g · carbs {c} g · fat {f} g",
+  "Makroların toplamı {n} kcal ediyor; kalori hedefinle uyuşmuyor.": "Your macros add up to {n} kcal, which doesn't match your calorie target.",
+  "Protein ve yağ kalorinin tamamını dolduruyor; karbonhidrata yer kalmadı.": "Protein and fat fill all your calories; there's no room left for carbs.",
+  "Bu kalori önerilen alt sınırın ({n} kcal) altında; bir uzmanın verdiği hedef değilse dikkat et.": "This is below the recommended minimum ({n} kcal); be careful unless a professional gave you this target.",
+  "Bugünün hedefleri: aşağıda elle girdiğin değerler.": "Today's targets: the values you entered below.",
 });

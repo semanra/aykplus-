@@ -24,6 +24,7 @@ function fillProfileFields(skipId) {
   $("setSex").value = st.sex;
   profileUnitUI();
   $("setActivity").value = ["low", "mid", "high"].includes(st.activity) ? st.activity : "mid";
+  if (typeof fillManualFields === "function") fillManualFields();   // v85
   $("setProtein").value = st.proteinHigh === true ? "high" : "std";
   $("setWaterAuto").checked = st.waterAuto !== false;
   updateWaterAutoHint();
@@ -264,11 +265,11 @@ function renderProfile() {
     wh = `<p class="text-[13px] t-dim">${t("Henüz tartı kaydın yok. Kilonu yazıp \"Tartıyı kaydet\"e dokun; ilerlemen İlerleme sekmesinde grafiğe dönüşür.")}</p>`;
   }
   $("pfWeightBox").innerHTML = wh;
-  // Günlük hedefler (hesaplanan)
+  // Günlük hedefler (hesaplanan; v85: elle hedef açıksa onu gösterir)
   const tg = getTargets();
   $("pfTargetsBox").innerHTML = `<div class="grid grid-cols-4 gap-1.5 text-center">
     ${[["Kalori", Math.round(tg.calTarget), "kcal", true], ["Protein", Math.round(tg.proTarget), "g"], ["Karb", Math.round(tg.carbTarget), "g"], ["Yağ", Math.round(tg.fatTarget), "g"]].map(([l, v, u, loc]) => `<div class="bg-[var(--t-elev)] rounded-2xl px-1 py-2.5"><div class="text-[12px] t-muted">${t(l)}</div><div class="t-display text-[19px] leading-tight">${isFinite(v) ? (loc ? v.toLocaleString(locale()) : v) : "—"}</div><div class="text-[11px] t-dim">${u}</div></div>`).join("")}
-  </div><p class="text-[12px] t-dim mt-2">${t("Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.")}</p>`;
+  </div><p class="text-[12px] t-dim mt-2">${tg.manual ? t("Bugünün hedefleri: aşağıda elle girdiğin değerler.") : t("Bugünün hedefleri: bu bilgilerden, gün tipinden (antrenman/dinlenme), hedefinden (Ver/Koru/Al), hareketlilik ve protein seçiminden hesaplanır.")}</p>`;
   // Vücut ölçüleri
   const ms = state.measurements;
   const lastOf = k => { for (let i = ms.length - 1; i >= 0; i--) if (ms[i][k] != null) return ms[i]; return null; };

@@ -46,7 +46,7 @@ try:
       pg.evaluate("switchTab('nutrition'); setNutriView('today')"); pg.wait_for_timeout(150)
       check(pg.evaluate(FITS_JS, "#nutriNav") is True, tag + "Beslenme alt sekmeleri yana kaymadan sığıyor (Geçmiş kesilmiyor)")
       check(not pg.evaluate(SMALL_JS, "#nutriNav button"), tag + "Beslenme alt sekmeleri ≥ 44 px")
-      yedim = pg.locator("#todayMeals button", has_text="Yedim").first
+      yedim = pg.locator("#todayMeals button:not([data-quick-free])", has_text="Yedim").first
       check(yedim.evaluate("e => getComputedStyle(e).backgroundColor") == "rgb(21, 128, 61)", tag + "Yedim düğmesi #15803D (beyaz yazı 5,0:1)")
       check(ov(pg), tag + "Beslenme yatay taşma yok")
       if W == 390:

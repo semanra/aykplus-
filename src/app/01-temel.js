@@ -21,6 +21,13 @@ const DEFAULT_SETTINGS = {
   textSize: "system",   // v61: system | normal | large | xlarge (28-yazi-boyutu.js)
   theme: "system"   // v31: system | dark | light (nutriLight eski alan, artık kullanılmıyor ama silinmez)
 };
+// v85: kendi makro hedefim (diyetisyen/koç verdiyse). Karb/yağ 0 = otomatik. Aralık dışı değer 0 (= girilmemiş).
+function normManualTarget(m) {
+  const o = isObj(m) ? m : {};
+  const rng = (v, lo, hi) => { const n = Math.round(num(v, 0)); return n >= lo && n <= hi ? n : 0; };
+  const r = { on: o.on === true, kcal: rng(o.kcal, 800, 6000), p: rng(o.p, 1, 500), c: rng(o.c, 1, 1000), f: rng(o.f, 1, 400) };
+  return r;   // getTargets yalnız on + kalori + protein varken kullanır
+}
 const DEFAULT_SUPPS = [];   // v44: genel varsayılan — takviye listesi boş
 // v24: hazır takviyeler (Düzenle'de tek dokunuşla eklenir; listede adı m'ye uyan takviye varsa gösterilmez)
 const SUPP_PRESETS = [
@@ -366,6 +373,14 @@ function normalizeStateInner(raw) {
     const d = s.dailyLogs[k];
     if (!isObj(d)) { delete s.dailyLogs[k]; return; }
     if (d.meals != null) { if (Array.isArray(d.meals)) d.meals = normMealList(d.meals); else delete d.meals; }
+    if (d.added != null) {   // v85: geçmiş güne sonradan eklenenler (bozuk girdi atılır, değer uydurulmaz)
+      const a = Array.isArray(d.added) ? d.added.filter(isObj).map(e => {
+        const o = { n: String(e.n == null ? "" : e.n).slice(0, 80), k: Math.max(0, num(e.k, 0)), p: Math.max(0, num(e.p, 0)), c: Math.max(0, num(e.c, 0)), f: Math.max(0, num(e.f, 0)) };
+        if (typeof e.id === "string" && e.id) { o.id = e.id; o.a = Math.max(0, num(e.a, 0)); }
+        return o;
+      }) : [];
+      if (a.length) d.added = a; else delete d.added;
+    }
   });
   if (!Array.isArray(s.recentFoods)) s.recentFoods = [];
   s.recentFoods = s.recentFoods.filter(x => typeof x === "string" && x);   // v35
@@ -473,6 +488,7 @@ function normalizeStateInner(raw) {
   if (s.settings.lang !== "tr" && s.settings.lang !== "en") s.settings.lang = "tr";   // v46
   if (s.settings.units !== "metric" && s.settings.units !== "imperial") s.settings.units = "metric";   // v53
   s.settings.proteinHigh = s.settings.proteinHigh === true;
+  s.settings.manualTarget = normManualTarget(s.settings.manualTarget);   // v85: kendi makro hedefim
   s.settings.mobVoice = s.settings.mobVoice === true;   // v40: sesli yönlendirme isteğe bağlı (varsayılan kapalı)
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
   s.settings.mobSuggest = s.settings.mobSuggest !== false;   // v71: kaslara göre esneme önerisi (varsayılan açık)

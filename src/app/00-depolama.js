@@ -266,20 +266,53 @@ function storageSaveFailed(e) {
     idbOpen().then(db => { aykDB = db; if (storeMode === "idb") flushSave(); }, () => {});
   }
 }
-function flushSave() {
+// v85: HIZLI KAYIT. Büyük geçmiş parçaları (5 yıllık veride ~1,5 MB) her dokunuşta metne çevrilmez: parça aynı nesneyse,
+// "değişti" işareti yoksa (markPartDirty) ve ucuz imzası (adet + en son kayıtlar) aynıysa o dokunuşta atlanır.
+// Güvenlik ağı: bir parça atlandıysa 2 sn sonra TAM karşılaştırma (flushSave(true)); arka plana geçerken / sayfa
+// kapanırken writeMirror de önce tam karşılaştırma yapar. İmzanın göremediği değişiklik (eski bir kaydın içi) en geç
+// 2 sn içinde ya da uygulamadan çıkarken yazılır. Bağlantı yenilenince (storeLast = {}) hiçbir parça atlanmaz.
+const FAST_PARTS = ["exerciseHistory", "dailyLogs", "workoutLogs"];
+var storeRef = {}, storeSig = {}, partDirty = new Set(), verifyTimer = 0;
+function markPartDirty(k) { partDirty.add(k); }
+function partSig(k, v) {
+  if (!v || typeof v !== "object") return String(v);
+  if (Array.isArray(v)) return v.length + "|" + JSON.stringify(v.slice(-3));
+  const keys = Object.keys(v);
+  if (k === "exerciseHistory") return keys.length + "|" + keys.map(x => { const a = v[x]; return x + ":" + (Array.isArray(a) ? a.length + ":" + JSON.stringify(a[a.length - 1]) : typeof a); }).join("|");
+  return keys.length + "|" + keys.slice(-3).map(x => x + ":" + JSON.stringify(v[x])).join("|");
+}
+function scheduleVerify() {
+  if (verifyTimer) return;
+  verifyTimer = setTimeout(() => { verifyTimer = 0; flushSave(true); }, MIRROR_DELAY_MS);
+}
+function flushSave(full) {
   saveQueued = false;
   if (storeMode !== "idb" || !storeReady || storeReadOnly) return;
-  const parts = stateParts(state), puts = [];
+  if (full === true && verifyTimer) { clearTimeout(verifyTimer); verifyTimer = 0; }
+  const parts = {}, puts = [], core = { ...state };
+  let skipped = 0;
+  STORE_PARTS.forEach(k => {
+    delete core[k];
+    const v = state[k] === undefined ? null : state[k];
+    const fast = FAST_PARTS.includes(k);
+    if (fast && full !== true && storeLast[k] != null && storeRef[k] === v && !partDirty.has(k) && storeSig[k] === partSig(k, v)) { skipped++; return; }
+    parts[k] = JSON.stringify(v);
+    storeRef[k] = v;
+    if (fast) storeSig[k] = partSig(k, v);
+  });
+  parts.core = JSON.stringify(core);
+  partDirty.clear();
+  if (skipped) scheduleVerify();
   Object.keys(parts).forEach(k => { if (parts[k] !== storeLast[k]) puts.push(["parts", k, parts[k]]); });
   if (!puts.length) return;
-  const full = puts.length === Object.keys(parts).length;
+  const full2 = !skipped && puts.length === STORE_PARTS.length + 1;
   storeGen++;
   puts.forEach(([, k, v]) => { storeLast[k] = v; });   // gönderildiği anda (sıradaki yazma bununla karşılaştırır)
   puts.push(["meta", "main", { ...storeMeta, gen: storeGen }]);
   mirrorDirty = true;
   if (!aykDB) { storageSaveFailed(new Error("bağlantı yok")); return; }
   try {
-    idbWrite(puts).then(() => { if (full) idbBroken = false; saveFailNotified = false; }, storageSaveFailed);
+    idbWrite(puts).then(() => { if (full2) idbBroken = false; saveFailNotified = false; }, storageSaveFailed);
   } catch (e) { storageSaveFailed(e); }
   scheduleMirror();
 }
@@ -291,7 +324,7 @@ function scheduleMirror() {
 function writeMirror(force) {
   clearTimeout(mirrorTimer); mirrorTimer = 0;
   if (storeMode !== "idb" || !storeReady || storeReadOnly) return;
-  if (saveQueued) flushSave();
+  if (saveQueued || verifyTimer) flushSave(true);   // v85: atlanmış parça varsa önce tam karşılaştırma
   const cur = lsGet(STORAGE_KEY);
   if (cur != null && strSig(cur) !== lastWrittenSig) return;   // başkası yazdı: ezme
   if (cur == null && lastWrittenSig) return;                    // biz yazdıktan sonra silindi: yeniden oluşturma

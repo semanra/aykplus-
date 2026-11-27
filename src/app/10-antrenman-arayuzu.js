@@ -425,8 +425,9 @@ function gymProgramHtml() {
   }).join("");
   return `
     <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">${chips}</div>
-    <div class="grid grid-cols-3 gap-2">
+    <div class="grid grid-cols-2 gap-2">
       <button onclick="addWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]">${t("+ Yeni gün")}</button>
+      <button onclick="copyWorkoutDay()" data-copy-day class="t-btn-ghost h-11 rounded-xl text-[13px]">${t("Günü kopyala")}</button>
       <button onclick="renameWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]">${t("Adlandır")}</button>
       <button onclick="deleteWorkoutDay()" class="t-btn-ghost h-11 rounded-xl text-[13px]" style="color:var(--t-danger-text)">${t("Günü sil")}</button>
     </div>
@@ -579,10 +580,12 @@ function gymLibraryHtml() {
     <div id="libBrowse" class="space-y-2.5">${libBrowseHtml()}</div>`;
 }
 
+let gymHistLimit = 30;   // v85: geçmiş listesi sayfalı (kaydedilmez)
+function gymHistMore() { gymHistLimit += 30; renderAll(); }
 function gymHistoryHtml() {
   const ws = weekStart();
   const weekLogs = state.workoutLogs.filter(l => l.ts && l.ts >= ws);
-  const logs = state.workoutLogs.map((l, i) => ({ l, i })).reverse().slice(0, 30);
+  const logs = state.workoutLogs.map((l, i) => ({ l, i })).reverse().slice(0, gymHistLimit);   // v85: "Daha fazla göster" ile +30
   const rows = logs.map(({ l, i }) => `
     <div class="t-card-flat rounded-2xl pl-3.5 pr-1.5 py-2.5 flex items-center gap-2">
       <div class="flex-1 min-w-0">
@@ -590,6 +593,7 @@ function gymHistoryHtml() {
         <div class="text-[15px] font-semibold truncate">${esc(l.dayName)}</div>
         <div class="text-xs t-muted mt-0.5">${tn(num(l.sets), "{n} set")} · ${isImperial() ? Math.round(wRaw(num(l.volume))).toLocaleString(locale()) : num(l.volume).toLocaleString(locale())} ${wUnit()}${num(l.durationMin) ? " · " + fmtMinutes(num(l.durationMin)) : ""}${num(l.cardioMin) ? " · " + t("{n} dk kardiyo", { n: num(l.cardioMin) }) : ""}${num(l.prs) ? ` · <span class="text-[var(--t-warn-mid)]">${tn(num(l.prs), "{n} rekor")}</span>` : ""}</div>
       </div>
+      <button onclick="openEditLog(${i})" data-edit-log aria-label="${t("Düzelt")}" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("edit", 19)}</button>
       <button onclick="openShareCard(${i})" aria-label="${t("Paylaş")}" class="w-11 h-11 rounded-xl flex items-center justify-center t-muted">${svgI("share", 20)}</button>
       <button onclick="deleteWorkoutLog(${i})" aria-label="${t("Kaydı sil")}" class="w-11 h-11 rounded-xl flex items-center justify-center t-dim">${svgI("trash", 19)}</button>
     </div>`).join("");
@@ -600,7 +604,7 @@ function gymHistoryHtml() {
       <div class="t-card-flat rounded-2xl px-3.5 py-3"><div class="text-xs t-muted">${t("Toplam")}</div><div class="t-display text-[26px]">${state.workoutLogs.length}<span class="t-dim text-lg"> ${tn(state.workoutLogs.length, "antr.")}</span></div></div>
     </div>
     <button onclick="openWorkoutCalendar()" data-open-cal class="t-btn-ghost w-full h-11 rounded-xl text-sm flex items-center justify-center gap-2">${svgI("cal", 18)}${t("Takvim")}</button>
-    <div id="workoutHistoryList" class="space-y-2">${rows || `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">${t("Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.")}</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">${t("Bugünün antrenmanına git")}</button></div>`}</div>
+    <div id="workoutHistoryList" class="space-y-2">${rows ? rows + (state.workoutLogs.length > gymHistLimit ? `<button onclick="gymHistMore()" data-hist-more class="t-btn-ghost w-full h-11 rounded-xl text-sm">${tn(state.workoutLogs.length - gymHistLimit, "Daha fazla göster ({n} kayıt daha)")}</button>` : "") : `<div class="t-card-flat rounded-2xl p-6 text-center space-y-3"><p class="text-sm t-muted">${t("Henüz kaydedilmiş antrenman yok. Antrenmanı bitirip kaydettiğinde burada listelenir.")}</p><button onclick="setGymView('today')" class="t-btn h-12 px-5 rounded-2xl text-[15px]">${t("Bugünün antrenmanına git")}</button></div>`}</div>
     <button onclick="switchTab('progress')" class="t-btn-ghost w-full min-h-11 px-4 py-2 rounded-xl text-sm">${t("Grafikler ve rekorlar: İlerleme sekmesi")}</button>`;
 }
 

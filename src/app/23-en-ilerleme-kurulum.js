@@ -216,4 +216,7 @@ Object.assign(EN, {
   "{n} gün esneme / mobilite": { one: "{n} day of stretching / mobility", other: "{n} days of stretching / mobility" },
   "Ortalama {k} kcal · {p} g protein": "Average {k} kcal · {p} g protein",
   "Kayıtlı {d} günün {h} gününde kalori hedefine (±%5), {pr} gününde protein hedefine ulaştın.": "On {h} of {d} logged days you hit your calorie target (±5%), and your protein target on {pr}.",
+  // v85
+  "Kendi hedefini kullanıyorsun": "You're using your own target",
+  "Profil'de elle girdiğin hedef geçerli; koç hedefini değiştirmez. Tahmini gerçek harcaman: {v} kcal.": "The target you entered in Profile applies; the coach won't change it. Your estimated real expenditure: {v} kcal.",
 });

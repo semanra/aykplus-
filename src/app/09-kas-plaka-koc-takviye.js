@@ -524,6 +524,7 @@ function coachAnalysis() {
   // (az yiyen kişinin ölçülen harcaması düşük çıkar; çözüm hedefi tutturmak, uyarı ayrıca gösterilir)
   if (goal === "gain" && weekly < 0.05 && fullDelta < 0) fullDelta = 0;
   if (goal === "lose" && weekly >= 0 && fullDelta > 0) fullDelta = 0;
+  if (targets.manual) fullDelta = 0;   // v85: kendi hedefin varken koç hedefi değiştirmez (yalnız gözlem)
   let delta = Math.max(-COACH_MAX_STEP, Math.min(COACH_MAX_STEP, fullDelta));
   const adj = targets.calTarget - (targets.tdee + targets.goalDelta);   // v82: alt sınırda birikmiş düzeltme değil, uygulanan fark
   if (adj + delta > 1000) delta = 1000 - adj;
@@ -535,6 +536,7 @@ function coachAnalysis() {
     ready: true, goal, n: pts.length, spanDays: res.spanDays, weekly, expectedWeekly, pctPerWeek,
     avgIntake: Math.round(avgIntake), intakeDays: intakes.length, intakeAssumed,
     tdeeEst, tdeeFormula: targets.tdee, desired, delta, fullDelta, newTarget: targets.calTarget + delta, calTarget: targets.calTarget,
+    manual: !!targets.manual,
     tooFast: goal === "lose" && pctPerWeek < -1.0, gaining: goal === "lose" && weekly > 0.1 && state.deficit > 0,
     gainTooFast: goal === "gain" && pctPerWeek > 0.5, notGaining: goal === "gain" && weekly < 0.05,
     keepDrift: goal === "keep" && Math.abs(pctPerWeek) > 0.25
@@ -544,7 +546,7 @@ function coachAnalysis() {
 
 function applyCoach() {
   const a = coachAnalysis();
-  if (!a.ready || a.delta === 0) return;
+  if (!a.ready || a.delta === 0 || a.manual) return;
   // v82: düzeltme doğrudan yeni hedefe göre yazılır (alt sınırdayken birikmiş düzeltme yüzünden hedef değişmeyebiliyordu)
   const tg = getTargets();
   state.settings.calAdjust = Math.max(-1000, Math.min(1000, Math.round(a.newTarget - (tg.tdee + tg.goalDelta))));

@@ -87,7 +87,7 @@ try:
     exp = pg.evaluate("(() => { const db = getFoodDB(); return (kcalPerUnit(db.pirinc) * 200 + kcalPerUnit(db.zeytinyagi) * 20) / 600 * 100; })()")
     check(pg.evaluate(f"fmtInt({exp})") in pg.inner_text("#rcSum") and "Pişmiş 100 g" in pg.inner_text("#rcSum"), f"100 g kalorisi doğru hesaplandı (~{round(exp)} kcal)")
     pg.screenshot(path=SHOTS + "/v15_recipe.png")
-    pg.click("#recipeModal >> text=Kaydet"); pg.wait_for_timeout(150)
+    pg.click("#recipeModal button >> text=Kaydet"); pg.wait_for_timeout(150)
     cf = st(pg)["customFoods"]
     rid = [k for k in cf if k.startswith("custom_recipe_")]
     check(len(rid) == 1, "tarif besin olarak kaydedildi")
@@ -98,7 +98,7 @@ try:
     # Tarifi düzenle → pişmiş ağırlık değişince değerler güncellenir
     pg.evaluate(f"editCustomFood('{rid}')"); pg.wait_for_timeout(80)
     check(pg.input_value("#rcName") == "Mercimek Çorbası" and pg.input_value("#rcCooked") == "600" and pg.locator("#rcItems [data-rc-item]").count() == 2, "düzenle: tarif penceresi değerlerle açıldı")
-    pg.fill("#rcCooked", "800"); pg.click("#recipeModal >> text=Kaydet"); pg.wait_for_timeout(100)
+    pg.fill("#rcCooked", "800"); pg.click("#recipeModal button >> text=Kaydet"); pg.wait_for_timeout(100)
     check(abs(st(pg)["customFoods"][rid]["kcal"] * 800 - exp * 6) < 0.5, "pişmiş ağırlık değişince 100 g değeri güncellendi")
     # Tarifi menüye ekle (alışveriş listesi testi için)
     pg.evaluate(f"quickAdd(3, '{rid}', 200, curMeals())"); pg.wait_for_timeout(50)

@@ -126,6 +126,9 @@ SCREENS = [
   ("paylas-harita", "closeProfile(); switchTab('gym'); window.scrollTo(0, 0); void openShareCard(state.workoutLogs.length - 1); return new Promise(r => { const w = () => document.querySelector('#shareTrack [data-share-tpl] img[src]') ? setTimeout(r, 350) : setTimeout(w, 50); w(); })"),
   ("paylas-foto", "setShareTpl('photo', true); return new Promise(r => { const w = () => document.querySelector('#shareTrack [data-share-tpl] img[src]') ? setTimeout(r, 350) : setTimeout(w, 50); w(); })"),
   ("paylas-liste", "setShareTpl('list', true); return new Promise(r => { const w = () => document.querySelector('#shareTrack [data-share-tpl] img[src]') ? setTimeout(r, 350) : setTimeout(w, 50); w(); })"),
+  # v85: bitmiş antrenmanı düzelt, geçmiş güne yediğini ekle, kendi hedefim (paylaşım penceresi kapanır)
+  ("g-duzelt", "closeShare && closeShare(); closeModal('shareModal'); switchTab('gym'); setGymView('history'); openEditLog(state.workoutLogs.length - 1)"),
+  ("n-gecmis-ekle", "closeModal('editLogModal'); switchTab('nutrition'); setNutriView('history'); openPastDay(Object.keys(state.dailyLogs).sort().reverse()[0])"),
 ]
 # v59: gerçek Profil düzeni ekranları yalnız görünür alan çekilir (sabit katman; arkadaki sayfa tam sayfa çekimine karışır)
 PF_VIEW_ONLY = ("paylas-", "en-paylas-", "en-u-paylas", "profil-ana", "profil-ara", "profil-kisisel", "profil-hedef", "profil-gorunum", "profil-antrenman", "profil-beslenme", "profil-veri", "profil-hakkinda2", "en-pf-")
