@@ -95,11 +95,12 @@ function bootApp() {
   window.addEventListener("pagehide", () => writeMirror());
   if (state.settings.onboarded === false) openOnboarding();   // v44: yeni kurulum → ilk açılış kurulumu
   loadFoodsEn();   // v51: İngilizceyse besin adları dosyası (Türkçede istek yok)
+  window.aykBootMs = performance.now();   // v86: Tanılama'da açılış süresi (B12)
   window.aykBooted = true;
 }
 storageInit().then(bootApp, e => { console.error(e); storageUseLegacy(); bootApp(); });
 
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* yoksay */ }
-if ("serviceWorker" in navigator) {
+if ("serviceWorker" in navigator && !isNative()) {   // v86: iPhone uygulamasında dosyalar zaten içeride
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 }

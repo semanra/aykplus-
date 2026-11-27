@@ -597,6 +597,12 @@ async function shareGo() {
   finally { ctxRef.busy = false; }
 }
 async function shareFileOut(file) {
+  if (isNative()) {   // v86: uygulamada paylaş menüsü ("Görseli Kaydet", Instagram…)
+    let r = "failed";
+    try { r = await nativeShareFile(file.name || shareFileName(), await blobToBase64(file), { base64: true, title: t("AYK+ Antrenman") }); } catch (e) { diagLog("kart", e); }
+    if (r === "failed") toast(t("Paylaşılamadı. Görsele basılı tutup kaydedebilirsin."), "error");
+    return;
+  }
   if (navigator.canShare && file instanceof File && navigator.canShare({ files: [file] })) {
     try { await navigator.share({ files: [file], title: t("AYK+ Antrenman") }); return; }
     catch (e) {

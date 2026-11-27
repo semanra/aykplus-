@@ -221,4 +221,14 @@ Object.assign(EN, {
   "Protein ve yağ kalorinin tamamını dolduruyor; karbonhidrata yer kalmadı.": "Protein and fat fill all your calories; there's no room left for carbs.",
   "Bu kalori önerilen alt sınırın ({n} kcal) altında; bir uzmanın verdiği hedef değilse dikkat et.": "This is below the recommended minimum ({n} kcal); be careful unless a professional gave you this target.",
   "Bugünün hedefleri: aşağıda elle girdiğin değerler.": "Today's targets: the values you entered below.",
+  // v86
+  "Parmakla yakınlaştırma": "Pinch to zoom",
+  "Ekranı iki parmakla büyütebilirsin. Çift dokunuş yakınlaştırmaz.": "Zoom the screen with two fingers. Double-tap doesn't zoom.",
+  "Tanılama bilgisi": "Diagnostics",
+  "Son {n} hata kaydı var.": { one: "There is {n} error record.", other: "There are {n} error records." },
+  "Hata kaydı yok.": "No error records.",
+  "Kopyalayıp sorunu anlatırken gönderebilirsin. Kişisel verin içinde yok.": "Copy it and send it along when you report a problem. It contains no personal data.",
+  "Kopyala|metin": "Copy",
+  "Kopyalandı": "Copied",
+  "Kopyalanamadı": "Couldn't copy",
 });

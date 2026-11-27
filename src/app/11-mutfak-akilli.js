@@ -355,6 +355,7 @@ async function copyShopList() {
   toast(ok ? t("Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin.") : t("Kopyalanamadı; Paylaş düğmesini dene."), ok ? "ok" : "error");
 }
 async function shareShopList() {
+  if (isNative()) { if (await nativeShareText(t("Alışveriş listesi"), shopText()) === "failed") copyShopList(); return; }   // v86
   try { await navigator.share({ title: t("Alışveriş listesi"), text: shopText() }); }
   catch (e) { if (e && e.name !== "AbortError") copyShopList(); }
 }

@@ -493,6 +493,7 @@ function normalizeStateInner(raw) {
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
   s.settings.mobSuggest = s.settings.mobSuggest !== false;   // v71: kaslara göre esneme önerisi (varsayılan açık)
   s.settings.anim = s.settings.anim !== false;   // v55: uygulama içi animasyonlar (varsayılan açık)
+  s.settings.zoom = s.settings.zoom === true;   // v86: parmakla yakınlaştırma (varsayılan kapalı)
   if (!["system", "normal", "large", "xlarge"].includes(s.settings.textSize)) s.settings.textSize = "system";   // v61
   {   // v67: paylaşım seçimleri (fotoğraf şablonu ve fotoğraf asla kaydedilmez)
     const sh = isObj(s.settings.share) ? s.settings.share : {}, ss = isObj(sh.stats) ? sh.stats : {};

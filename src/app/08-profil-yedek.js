@@ -2,7 +2,7 @@
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobSuggest", "setMobVoice", "setSplash", "setAnim", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobSuggest", "setMobVoice", "setSplash", "setAnim", "setZoom", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 // v58: yazı kutularının kayıttan gösterilen değerleri (fillProfileFields ve yazarken kayıt denetimi ortak kullanır)
 function pfTextVals() {
@@ -35,6 +35,7 @@ function fillProfileFields(skipId) {
   $("setMobVoice").checked = st.mobVoice === true;
   $("setSplash").checked = st.splash !== false;
   $("setAnim").checked = st.anim !== false;   // v55
+  $("setZoom").checked = !!st.zoom;   // v86
   $("setDayStart").value = String(dayStartHour());
   updateBfHint();
 }
@@ -61,8 +62,8 @@ function renderAbout() {
   const li = x => "<li>" + esc(t(x)) + "</li>";
   $("pfAboutHealth").textContent = t(HEALTH_NOTE);
   $("pfAboutPrivacy").textContent = t(PRIVACY_NOTE);
-  $("pfPrivacyLink").setAttribute("href", en ? "privacy.html#en" : "privacy.html");   // v61: gizlilik / destek sayfaları (depoda, GitHub Pages)
-  $("pfSupportLink").setAttribute("href", en ? "support.html#en" : "support.html");
+  $("pfPrivacyLink").setAttribute("href", appPageUrl(en ? "privacy.html#en" : "privacy.html"));   // v61: gizlilik / destek sayfaları (depoda, GitHub Pages); v86: uygulamada web adresi (Safari)
+  $("pfSupportLink").setAttribute("href", appPageUrl(en ? "support.html#en" : "support.html"));
   $("pfMethodBody").innerHTML = [
     "<p><b>" + t("Günlük harcama.") + "</b> " + t("Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.") + "</p>",
     "<p><b>" + t("Hareketlilik çarpanları") + "</b> " + t("(antrenman günü · dinlenme günü): az hareketli {l0} · {l1}, orta {m0} · {m1}, çok hareketli {h0} · {h1}.", {
@@ -408,6 +409,7 @@ function applyProfileFields(changedId, opts = {}) {
   st.mobVoice = $("setMobVoice").checked;
   st.splash = $("setSplash").checked;
   st.anim = $("setAnim").checked;   // v55
+  st.zoom = $("setZoom").checked;   // v86: parmakla yakınlaştırma
   st.dayStartHour = Math.max(0, Math.min(5, parseInt($("setDayStart").value, 10) || 0));
   if (w) state.weight = w;
   if (live && changedId) {   // kutuda yazılan, kayda girecek değerle aynı değilse (kırpma / yuvarlama) şimdilik kaydetme
@@ -449,6 +451,7 @@ function markBackup() { state.lastBackupAt = Date.now(); state.backupSnoozeUntil
 
 // v35: metni dosya olarak paylaş (iPhone: Dosyalar'a Kaydet) veya indir — yedek ve kurtarma kopyası ortak
 async function saveTextFile(text, name, title, type = "application/json") {   // v61: CSV için tür
+  if (isNative()) return nativeShareFile(name, text, { title });   // v86: uygulamada paylaş menüsü (indirme çalışmaz)
   let file = null;
   try { file = new File([text], name, { type }); } catch (e) { file = null; }
   if (file && navigator.canShare && navigator.canShare({ files: [file] })) {

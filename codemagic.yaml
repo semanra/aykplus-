@@ -1,0 +1,42 @@
+# AYK+ — iPhone uygulamasını bulutta derleyip TestFlight'a gönderir (Aşama B, v86).
+# Mac gerekmez: Codemagic'in macOS makinesi derler. Derleme ELLE başlatılır (ücretsiz dakikalar boşa gitmesin).
+# Gizli bilgiler (App Store Connect API anahtarı) DEPODA DEĞİL, Codemagic → Team integrations → Developer Portal'da durur;
+# aşağıdaki "AYK ASC" o kaydın adıdır.
+# Web dosyaları derlenmez: depodaki, testlerden geçmiş index.html aynen kullanılır (scripts/native.mjs → www/).
+workflows:
+  ios-testflight:
+    name: AYK+ iOS → TestFlight
+    max_build_duration: 40
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: AYK ASC
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.aykplus.app
+      vars:
+        XCODE_PROJECT: ios/App/App.xcodeproj
+        XCODE_SCHEME: App
+      node: 22
+      xcode: latest
+    scripts:
+      - name: Paketler
+        script: npm ci
+      - name: Web dosyaları → www/
+        script: node scripts/native.mjs
+      - name: iOS projesine kopyala
+        script: npx cap sync ios
+      - name: İmza profilleri
+        script: xcode-project use-profiles
+      - name: Derleme numarası
+        script: |
+          sed -i '' "s/CURRENT_PROJECT_VERSION = [0-9]*;/CURRENT_PROJECT_VERSION = $BUILD_NUMBER;/g" ios/App/App.xcodeproj/project.pbxproj
+          grep -m1 "CURRENT_PROJECT_VERSION" ios/App/App.xcodeproj/project.pbxproj
+      - name: Derle (.ipa)
+        script: xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration

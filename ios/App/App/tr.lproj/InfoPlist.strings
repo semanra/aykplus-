@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Kamera, besin barkodlarını ve besin değeri etiketlerini okumak için kullanılır. Fotoğraflar kaydedilmez, gönderilmez.";
+"NSPhotoLibraryAddUsageDescription" = "Antrenman paylaşım kartlarını fotoğraflarına kaydetmek için kullanılır.";
+"NSPhotoLibraryUsageDescription" = "Profil fotoğrafı veya antrenman paylaşım kartı için fotoğraf seçmeye kullanılır. Fotoğraflar telefonunda kalır.";

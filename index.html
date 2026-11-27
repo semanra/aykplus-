@@ -1717,6 +1717,10 @@
               <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Açılış animasyonu">Açılış animasyonu</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Uygulama açılırken logo kısa bir geçişle görünür.">Uygulama açılırken logo kısa bir geçişle görünür.</span></span>
               <input id="setSplash" type="checkbox" role="switch" class="t-sw" />
             </label>
+            <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Parmakla yakınlaştırma">Parmakla yakınlaştırma</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Ekranı iki parmakla büyütebilirsin. Çift dokunuş yakınlaştırmaz.">Ekranı iki parmakla büyütebilirsin. Çift dokunuş yakınlaştırmaz.</span></span>
+              <input id="setZoom" type="checkbox" role="switch" class="t-sw" />
+            </label>
           </div>
         </section>
         </div>
@@ -1843,12 +1847,13 @@
               <summary class="min-h-[48px] flex items-center cursor-pointer text-[14px] font-semibold text-[var(--t-text)]" data-t="Lisanslar">Lisanslar</summary>
               <ul id="pfLicList" class="text-[12.5px] leading-snug text-[var(--t-muted)] space-y-1.5 pb-3 list-disc pl-4"></ul>
             </details>
+            <button type="button" id="pfDiagBtn" onclick="openDiag()" data-pf-row class="w-full min-h-[48px] bg-[var(--t-elev)] rounded-2xl px-3.5 text-left text-[14px] font-semibold text-[var(--t-text)]" data-t="Tanılama bilgisi">Tanılama bilgisi</button>
           </div>
         </section>
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v85</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v86</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>
@@ -3489,6 +3494,7 @@ function normalizeStateInner(raw) {
   s.settings.warmupCard = s.settings.warmupCard !== false;   // v40: antrenmanda ısınma kartı (gizlenebilir)
   s.settings.mobSuggest = s.settings.mobSuggest !== false;   // v71: kaslara göre esneme önerisi (varsayılan açık)
   s.settings.anim = s.settings.anim !== false;   // v55: uygulama içi animasyonlar (varsayılan açık)
+  s.settings.zoom = s.settings.zoom === true;   // v86: parmakla yakınlaştırma (varsayılan kapalı)
   if (!["system", "normal", "large", "xlarge"].includes(s.settings.textSize)) s.settings.textSize = "system";   // v61
   {   // v67: paylaşım seçimleri (fotoğraf şablonu ve fotoğraf asla kaydedilmez)
     const sh = isObj(s.settings.share) ? s.settings.share : {}, ss = isObj(sh.stats) ? sh.stats : {};
@@ -4266,6 +4272,8 @@ function applyTheme() {
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) { const bg = getComputedStyle(document.body).backgroundColor; if (bg && meta.getAttribute("content") !== bg) meta.setAttribute("content", bg); }
   try { if (localStorage.getItem("ayk_theme") !== state.settings.theme) localStorage.setItem("ayk_theme", state.settings.theme); } catch (e) {}
+  if (typeof applyZoom === "function") applyZoom();   // v86
+  if (typeof nativeStatusBar === "function") nativeStatusBar(light);   // v86: uygulamada durum çubuğu yazı rengi
 }
 function setTheme(mode) { state.settings.theme = ["system", "dark", "light"].includes(mode) ? mode : "system"; renderAll(); }
 function toggleTheme() {
@@ -7952,7 +7960,7 @@ function renderProgress() {
 // AYARLAR
 // ---------------------------------------------------------------------------
 // Profil sayfası (eski Ayarlar penceresinin yerini aldı). Alan kimlikleri (setAge, setBf, ...) aynı kaldı.
-const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobSuggest", "setMobVoice", "setSplash", "setAnim", "setDayStart"];
+const PF_FIELDS = ["setSex", "setAge", "setHeight", "setHeightFt", "setHeightIn", "pfWeight", "setTarget", "setActivity", "setProtein", "setWater", "setWaterAuto", "setBf", "setTargetBf", "setRest", "setSound", "setAwake", "setWarmup", "setMobSuggest", "setMobVoice", "setSplash", "setAnim", "setZoom", "setDayStart"];
 function profileIsOpen() { const el = $("profilePage"); return !!el && !el.classList.contains("hidden"); }
 // v58: yazı kutularının kayıttan gösterilen değerleri (fillProfileFields ve yazarken kayıt denetimi ortak kullanır)
 function pfTextVals() {
@@ -7985,6 +7993,7 @@ function fillProfileFields(skipId) {
   $("setMobVoice").checked = st.mobVoice === true;
   $("setSplash").checked = st.splash !== false;
   $("setAnim").checked = st.anim !== false;   // v55
+  $("setZoom").checked = !!st.zoom;   // v86
   $("setDayStart").value = String(dayStartHour());
   updateBfHint();
 }
@@ -8011,8 +8020,8 @@ function renderAbout() {
   const li = x => "<li>" + esc(t(x)) + "</li>";
   $("pfAboutHealth").textContent = t(HEALTH_NOTE);
   $("pfAboutPrivacy").textContent = t(PRIVACY_NOTE);
-  $("pfPrivacyLink").setAttribute("href", en ? "privacy.html#en" : "privacy.html");   // v61: gizlilik / destek sayfaları (depoda, GitHub Pages)
-  $("pfSupportLink").setAttribute("href", en ? "support.html#en" : "support.html");
+  $("pfPrivacyLink").setAttribute("href", appPageUrl(en ? "privacy.html#en" : "privacy.html"));   // v61: gizlilik / destek sayfaları (depoda, GitHub Pages); v86: uygulamada web adresi (Safari)
+  $("pfSupportLink").setAttribute("href", appPageUrl(en ? "support.html#en" : "support.html"));
   $("pfMethodBody").innerHTML = [
     "<p><b>" + t("Günlük harcama.") + "</b> " + t("Dinlenirken harcadığın enerji Mifflin-St Jeor denklemiyle bulunur. Yağ oranını girdiysen bunun yerine yağsız kütleye dayalı Katch-McArdle denklemi kullanılır. Sonra hareketlilik çarpanıyla çarpılır.") + "</p>",
     "<p><b>" + t("Hareketlilik çarpanları") + "</b> " + t("(antrenman günü · dinlenme günü): az hareketli {l0} · {l1}, orta {m0} · {m1}, çok hareketli {h0} · {h1}.", {
@@ -8358,6 +8367,7 @@ function applyProfileFields(changedId, opts = {}) {
   st.mobVoice = $("setMobVoice").checked;
   st.splash = $("setSplash").checked;
   st.anim = $("setAnim").checked;   // v55
+  st.zoom = $("setZoom").checked;   // v86: parmakla yakınlaştırma
   st.dayStartHour = Math.max(0, Math.min(5, parseInt($("setDayStart").value, 10) || 0));
   if (w) state.weight = w;
   if (live && changedId) {   // kutuda yazılan, kayda girecek değerle aynı değilse (kırpma / yuvarlama) şimdilik kaydetme
@@ -8399,6 +8409,7 @@ function markBackup() { state.lastBackupAt = Date.now(); state.backupSnoozeUntil
 
 // v35: metni dosya olarak paylaş (iPhone: Dosyalar'a Kaydet) veya indir — yedek ve kurtarma kopyası ortak
 async function saveTextFile(text, name, title, type = "application/json") {   // v61: CSV için tür
+  if (isNative()) return nativeShareFile(name, text, { title });   // v86: uygulamada paylaş menüsü (indirme çalışmaz)
   let file = null;
   try { file = new File([text], name, { type }); } catch (e) { file = null; }
   if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -10846,6 +10857,7 @@ async function copyShopList() {
   toast(ok ? t("Liste kopyalandı. Notlar'ı açıp yapıştırabilirsin.") : t("Kopyalanamadı; Paylaş düğmesini dene."), ok ? "ok" : "error");
 }
 async function shareShopList() {
+  if (isNative()) { if (await nativeShareText(t("Alışveriş listesi"), shopText()) === "failed") copyShopList(); return; }   // v86
   try { await navigator.share({ title: t("Alışveriş listesi"), text: shopText() }); }
   catch (e) { if (e && e.name !== "AbortError") copyShopList(); }
 }
@@ -11425,12 +11437,13 @@ function bootApp() {
   window.addEventListener("pagehide", () => writeMirror());
   if (state.settings.onboarded === false) openOnboarding();   // v44: yeni kurulum → ilk açılış kurulumu
   loadFoodsEn();   // v51: İngilizceyse besin adları dosyası (Türkçede istek yok)
+  window.aykBootMs = performance.now();   // v86: Tanılama'da açılış süresi (B12)
   window.aykBooted = true;
 }
 storageInit().then(bootApp, e => { console.error(e); storageUseLegacy(); bootApp(); });
 
 try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* yoksay */ }
-if ("serviceWorker" in navigator) {
+if ("serviceWorker" in navigator && !isNative()) {   // v86: iPhone uygulamasında dosyalar zaten içeride
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 }
 // ===========================================================================
@@ -12699,6 +12712,16 @@ Object.assign(EN, {
   "Protein ve yağ kalorinin tamamını dolduruyor; karbonhidrata yer kalmadı.": "Protein and fat fill all your calories; there's no room left for carbs.",
   "Bu kalori önerilen alt sınırın ({n} kcal) altında; bir uzmanın verdiği hedef değilse dikkat et.": "This is below the recommended minimum ({n} kcal); be careful unless a professional gave you this target.",
   "Bugünün hedefleri: aşağıda elle girdiğin değerler.": "Today's targets: the values you entered below.",
+  // v86
+  "Parmakla yakınlaştırma": "Pinch to zoom",
+  "Ekranı iki parmakla büyütebilirsin. Çift dokunuş yakınlaştırmaz.": "Zoom the screen with two fingers. Double-tap doesn't zoom.",
+  "Tanılama bilgisi": "Diagnostics",
+  "Son {n} hata kaydı var.": { one: "There is {n} error record.", other: "There are {n} error records." },
+  "Hata kaydı yok.": "No error records.",
+  "Kopyalayıp sorunu anlatırken gönderebilirsin. Kişisel verin içinde yok.": "Copy it and send it along when you report a problem. It contains no personal data.",
+  "Kopyala|metin": "Copy",
+  "Kopyalandı": "Copied",
+  "Kopyalanamadı": "Couldn't copy",
 });
 // v48: İngilizce sözlük, Antrenman (terimler ve kayıtlı değerlerin görünen adları). Anahtar = Türkçe metin.
 // Terimler docs/i18n-terimler.md bölüm 5–6'ya uyar. Kayıtta Türkçe kalanlar docs/i18n-kayitli-metinler.md'ye göre (kas adı, targetInfo).
@@ -16760,6 +16783,12 @@ async function shareGo() {
   finally { ctxRef.busy = false; }
 }
 async function shareFileOut(file) {
+  if (isNative()) {   // v86: uygulamada paylaş menüsü ("Görseli Kaydet", Instagram…)
+    let r = "failed";
+    try { r = await nativeShareFile(file.name || shareFileName(), await blobToBase64(file), { base64: true, title: t("AYK+ Antrenman") }); } catch (e) { diagLog("kart", e); }
+    if (r === "failed") toast(t("Paylaşılamadı. Görsele basılı tutup kaydedebilirsin."), "error");
+    return;
+  }
   if (navigator.canShare && file instanceof File && navigator.canShare({ files: [file] })) {
     try { await navigator.share({ files: [file], title: t("AYK+ Antrenman") }); return; }
     catch (e) {
@@ -18184,6 +18213,140 @@ function pdCardHtml(r) {
   const s = pdSum(list);
   return `${list.length ? `<div class="text-[12px] n-muted" data-pd-note>${esc(tn(list.length, "Sonradan eklenen {n} kayıt · {k} kcal", { k: fmtInt(s.k) }))}</div>` : ""}
     <button onclick='openPastDay(${esc(JSON.stringify(r.key))})' data-pd-open="${esc(r.key)}" class="n-btn-ghost w-full h-11 rounded-full text-[13px] flex items-center justify-center gap-1.5">${svgI("plus", 16, 2.4)}${t("Yediğini ekle")}</button>`;
+}
+// ============================================================================
+// v86 (Aşama B) — iPhone uygulaması (Capacitor) yardımcıları.
+// Web uygulamasında (GitHub Pages / ana ekran) isNative() false; buradaki her şey etkisiz kalır.
+// Eklentilere npm/bundler olmadan erişilir: uygulamada window.Capacitor yerel köprü tarafından sayfaya eklenir.
+// Testler window.Capacitor taklidiyle dener (tests/test_v86_uygulama.py).
+// ============================================================================
+function isNative() {
+  try { return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); }
+  catch (e) { return false; }
+}
+function capPlugin(name) {
+  const C = window.Capacitor;
+  if (!C) return null;
+  if (C.Plugins && C.Plugins[name]) return C.Plugins[name];
+  try { return C.registerPlugin ? C.registerPlugin(name) : null; } catch (e) { return null; }
+}
+// Uygulamanın içinden açılan sayfalar (gizlilik, destek) web adresinden Safari'de açılır; yerel dosyaya gidilirse geri dönüş yok
+const WEB_BASE = "https://semanra.github.io/aykplus-/";
+function appPageUrl(page) { return isNative() ? WEB_BASE + page : page; }
+
+// ---------------------------------------------------------------------------
+// Dosya paylaşma (yedek, CSV, paylaşım kartı): WKWebView'da <a download> çalışmaz →
+// dosya önbellek klasörüne yazılır, iPhone'un paylaş menüsü açılır ("Dosyalar'a Kaydet", AirDrop…).
+// Dönüş: "shared" | "aborted" | "failed" (saveTextFile ile aynı sözleşme)
+// ---------------------------------------------------------------------------
+function nativeSafeName(name) { return String(name || "AYK").replace(/[\/\\:*?"<>|]/g, "-").slice(0, 120); }
+async function nativeShareFile(name, data, { base64 = false, title = "" } = {}) {
+  const FS = capPlugin("Filesystem"), SH = capPlugin("Share");
+  if (!FS || !SH) return "failed";
+  let uri;
+  try {
+    const opts = { path: nativeSafeName(name), data, directory: "CACHE" };
+    if (!base64) opts.encoding = "utf8";
+    uri = (await FS.writeFile(opts)).uri;
+  } catch (e) { diagLog("dosya-yaz", e); return "failed"; }
+  try { await SH.share({ title, files: [uri] }); return "shared"; }
+  catch (e) {
+    if (/cancel/i.test(String((e && e.message) || e))) return "aborted";
+    diagLog("paylas", e); return "failed";
+  }
+}
+async function nativeShareText(title, text) {
+  const SH = capPlugin("Share");
+  if (!SH) return "failed";
+  try { await SH.share({ title, text }); return "shared"; }
+  catch (e) { return /cancel/i.test(String((e && e.message) || e)) ? "aborted" : "failed"; }
+}
+function blobToBase64(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => { const s = String(r.result || ""); res(s.slice(s.indexOf(",") + 1)); };
+    r.onerror = () => rej(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Durum çubuğu: aydınlık temada koyu yazı, koyu temada açık yazı (web'de theme-color meta'sı yapıyor)
+// ---------------------------------------------------------------------------
+let nativeSbLight = null;
+function nativeStatusBar(light) {
+  if (!isNative() || nativeSbLight === light) return;
+  const SB = capPlugin("StatusBar");
+  if (!SB) return;
+  nativeSbLight = light;
+  try { Promise.resolve(SB.setStyle({ style: light ? "LIGHT" : "DARK" })).catch(() => {}); } catch (e) { /* yoksay */ }
+}
+
+// ---------------------------------------------------------------------------
+// Parmakla yakınlaştırma (Profil → Ayarlar, settings.zoom; varsayılan kapalı).
+// Çift dokunuş yakınlaştırması her durumda kapalı (body { touch-action: manipulation }).
+// ---------------------------------------------------------------------------
+function zoomViewport(on) {
+  return "width=device-width, initial-scale=1.0, " + (on ? "maximum-scale=5.0" : "maximum-scale=1.0, user-scalable=no") + ", viewport-fit=cover";
+}
+function applyZoom() {
+  const m = document.querySelector('meta[name="viewport"]');
+  if (!m) return;
+  const c = zoomViewport(!!(state && state.settings && state.settings.zoom));
+  if (m.getAttribute("content") !== c) m.setAttribute("content", c);
+}
+
+// ---------------------------------------------------------------------------
+// Tanılama günlüğü: Mac olmadan uygulamanın içini izleyemediğimiz için son hatalar telefonda tutulur
+// (ayrı anahtar, en fazla 30 satır; kullanıcı verisine dokunmaz). Profil → Hakkında → "Tanılama bilgisi".
+// ---------------------------------------------------------------------------
+const DIAG_KEY = "ayk_tani";
+const DIAG_MAX = 30;
+function diagRead() {
+  try { const a = JSON.parse(localStorage.getItem(DIAG_KEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+}
+function diagLog(where, err) {
+  try {
+    const a = diagRead();
+    // Safari'de err.stack mesajı içermez → mesaj + yığın birlikte (Chromium'da yığın mesajla başlar, tekrar yazılmaz)
+    let m = String(err);
+    if (err && typeof err === "object" && (err.message || err.stack)) {
+      const msg = String(err.message || ""), st = String(err.stack || "");
+      m = st.includes(msg) ? st : msg + (st ? " | " + st : "");
+    }
+    a.push({ t: Date.now(), w: String(where).slice(0, 40), m: String(m).slice(0, 400) });
+    while (a.length > DIAG_MAX) a.shift();
+    localStorage.setItem(DIAG_KEY, JSON.stringify(a));
+  } catch (e) { /* yoksay */ }
+}
+window.addEventListener("error", e => diagLog("hata", (e && e.error) || (e && (e.message + " @" + (e.filename || "") + ":" + (e.lineno || 0)))));
+window.addEventListener("unhandledrejection", e => diagLog("promise", e && e.reason));
+function diagText() {
+  const v = (document.querySelector("#pfFoot span") || {}).textContent || "";
+  let head = [v, isNative() ? "app" : "web", "store:" + (typeof storeMode !== "undefined" ? storeMode : "?"), navigator.userAgent].join(" | ");
+  head += "\n" + diagPerf();
+  const lines = diagRead().map(x => new Date(x.t).toISOString().slice(0, 19) + " " + x.w + ": " + x.m.replace(/\s+/g, " "));
+  return head + "\n" + (lines.length ? lines.join("\n") : "-");
+}
+// B12: besin listesinin (foods.js, ~1 MB) yüklenme süresi ve açılış süresi; iPhone'da ölçmek için
+function diagPerf() {
+  try {
+    const f = performance.getEntriesByType("resource").find(e => /foods\.js/.test(e.name));
+    const nav = performance.getEntriesByType("navigation")[0];
+    const ms = x => (x > 0 ? Math.round(x) + " ms" : "?");
+    return "foods.js: " + ms(f ? f.responseEnd - f.startTime : 0) + " | DOM: " + ms(nav ? nav.domContentLoadedEventEnd : 0) + " | boot: " + ms(window.aykBootMs || 0);
+  } catch (e) { return "perf: ?"; }
+}
+async function openDiag() {
+  const n = diagRead().length;
+  const ok = await uiAsk({
+    title: t("Tanılama bilgisi"),
+    message: (n ? tn(n, "Son {n} hata kaydı var.") : t("Hata kaydı yok.")) + " " + t("Kopyalayıp sorunu anlatırken gönderebilirsin. Kişisel verin içinde yok."),
+    ok: t("Kopyala|metin"), cancel: t("Kapat")
+  });
+  if (!ok) return;
+  const done = await copyText(diagText());
+  toast(done ? t("Kopyalandı") : t("Kopyalanamadı"), done ? "ok" : "error");
 }
 
 </script>

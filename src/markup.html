@@ -1717,6 +1717,10 @@
               <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Açılış animasyonu">Açılış animasyonu</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Uygulama açılırken logo kısa bir geçişle görünür.">Uygulama açılırken logo kısa bir geçişle görünür.</span></span>
               <input id="setSplash" type="checkbox" role="switch" class="t-sw" />
             </label>
+            <label class="flex items-center justify-between gap-3 min-h-[60px] px-4 py-2.5 border-t border-[var(--t-line)] first:border-t-0" data-pf-row>
+              <span class="min-w-0"><span class="block text-[15px] font-semibold text-[var(--t-text)]" data-t="Parmakla yakınlaştırma">Parmakla yakınlaştırma</span><span class="block text-[13px] text-[var(--t-dim)]" data-t="Ekranı iki parmakla büyütebilirsin. Çift dokunuş yakınlaştırmaz.">Ekranı iki parmakla büyütebilirsin. Çift dokunuş yakınlaştırmaz.</span></span>
+              <input id="setZoom" type="checkbox" role="switch" class="t-sw" />
+            </label>
           </div>
         </section>
         </div>
@@ -1843,12 +1847,13 @@
               <summary class="min-h-[48px] flex items-center cursor-pointer text-[14px] font-semibold text-[var(--t-text)]" data-t="Lisanslar">Lisanslar</summary>
               <ul id="pfLicList" class="text-[12.5px] leading-snug text-[var(--t-muted)] space-y-1.5 pb-3 list-disc pl-4"></ul>
             </details>
+            <button type="button" id="pfDiagBtn" onclick="openDiag()" data-pf-row class="w-full min-h-[48px] bg-[var(--t-elev)] rounded-2xl px-3.5 text-left text-[14px] font-semibold text-[var(--t-text)]" data-t="Tanılama bilgisi">Tanılama bilgisi</button>
           </div>
         </section>
         </div>
 
         <div id="pfFoot" class="flex items-center justify-between gap-2 pt-1">
-          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v85</span>
+          <span class="text-[12px] text-[var(--t-dim)]">AYK+ v86</span>
           <button onclick="resetToDefaults()" class="h-11 px-4 rounded-xl text-[13px] font-semibold bg-[var(--t-danger-bg)] text-[var(--t-danger-text)]" data-t="Fabrika ayarlarına sıfırla">Fabrika ayarlarına sıfırla</button>
         </div>
       </div>

@@ -117,6 +117,8 @@ function applyTheme() {
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) { const bg = getComputedStyle(document.body).backgroundColor; if (bg && meta.getAttribute("content") !== bg) meta.setAttribute("content", bg); }
   try { if (localStorage.getItem("ayk_theme") !== state.settings.theme) localStorage.setItem("ayk_theme", state.settings.theme); } catch (e) {}
+  if (typeof applyZoom === "function") applyZoom();   // v86
+  if (typeof nativeStatusBar === "function") nativeStatusBar(light);   // v86: uygulamada durum çubuğu yazı rengi
 }
 function setTheme(mode) { state.settings.theme = ["system", "dark", "light"].includes(mode) ? mode : "system"; renderAll(); }
 function toggleTheme() {

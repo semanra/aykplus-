@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "The camera is used to scan food barcodes and nutrition labels. Photos are not saved or sent.";
+"NSPhotoLibraryAddUsageDescription" = "Used to save your workout share cards to your photo library.";
+"NSPhotoLibraryUsageDescription" = "Used to pick a photo for your profile or a workout share card. Photos stay on your device.";
